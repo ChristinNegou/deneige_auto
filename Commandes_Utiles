@@ -16,3 +16,6 @@ flutter run
 
 ### Arrêter tous les services :
 .\stop-all.ps1
+
+### Supprimer tous les conteneurs :
+.\remove-all.ps1
