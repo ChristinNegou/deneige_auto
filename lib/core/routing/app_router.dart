@@ -1,3 +1,4 @@
+import 'package:deneige_auto/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../constants/app_routes.dart';
@@ -53,6 +54,13 @@ class AppRouter {
           ),
           settings: settings,
         );
+
+      case AppRoutes.forgotPassword:
+        return MaterialPageRoute(
+            builder: (_) => const ForgotPasswordScreen(),
+            settings: settings,
+        );
+
 
     // Routes principales
       case AppRoutes.home:

@@ -162,7 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
                                   onPressed: () {
-                                    // TODO: Implémenter mot de passe oublié
+                                    Navigator.of(context).pushNamed(
+                                      AppRoutes.forgotPassword,
+                                    );
                                   },
                                   child: const Text('Mot de passe oublié ?'),
                                 ),

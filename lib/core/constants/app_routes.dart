@@ -8,7 +8,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String onboarding = '/onboarding';
-
+  static const String forgotPassword = '/forgot-password';
   // Routes principales
   static const String home = '/home';
   static const String dashboard = '/dashboard';

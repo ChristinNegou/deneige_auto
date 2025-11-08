@@ -93,6 +93,8 @@ const server = app.listen(PORT, () => {
     console.log(`   GET  /health        - État du serveur`);
     console.log(`   POST /api/auth/register`);
     console.log(`   POST /api/auth/login`);
+    console.log(`   POST /api/auth/forgot-password`);
+    console.log(`   PUT  /api/auth/reset-password/:token`);
     console.log(`   GET  /api/auth/me`);
     console.log(`   POST /api/auth/logout`);
     console.log(`   PUT  /api/auth/update-profile`);

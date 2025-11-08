@@ -9,16 +9,21 @@
     "dev:verbose": "nodemon server.js --watch . --ext js,json --verbose",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["api", "deneigement", "backend"],
+  "keywords": [
+    "api",
+    "deneigement",
+    "backend"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2",
-    "mongoose": "^8.9.3",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "cors": "^2.8.5"
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.3",
+    "nodemailer": "^7.0.10"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

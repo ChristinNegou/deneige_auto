@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../domain/entities/user.dart';
 
@@ -92,7 +91,10 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                       style: TextStyle(color: Colors.white70),
                     ),
                     TextButton(
-                      onPressed: () => context.push('/login'),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(AppRoutes.login);
+                      },
+
                       child: const Text(
                         'Se connecter',
                         style: TextStyle(

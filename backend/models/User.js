@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -14,7 +15,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Le mot de passe est requis'],
         minlength: [6, 'Le mot de passe doit contenir au moins 6 caractères'],
-        select: false, // Ne pas retourner le mot de passe par défaut
+        select: false,
     },
     firstName: {
         type: String,
@@ -42,6 +43,8 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
     createdAt: {
         type: Date,
         default: Date.now,
@@ -54,7 +57,6 @@ const userSchema = new mongoose.Schema({
 
 // Hash le mot de passe avant de sauvegarder
 userSchema.pre('save', async function (next) {
-    // Seulement hasher si le mot de passe a été modifié
     if (!this.isModified('password')) {
         return next();
     }
@@ -73,10 +75,29 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
+// Générer et hasher le token de réinitialisation de mot de passe
+userSchema.methods.getResetPasswordToken = function () {
+    // Générer un token aléatoire
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    // Hasher le token et le stocker dans la base de données
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    // Définir l'expiration du token (10 minutes)
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+    return resetToken;
+};
+
 // Méthode pour obtenir l'objet utilisateur sans le mot de passe
 userSchema.methods.toJSON = function () {
     const user = this.toObject();
     delete user.password;
+    delete user.resetPasswordToken;
+    delete user.resetPasswordExpire;
     delete user.__v;
     return user;
 };
