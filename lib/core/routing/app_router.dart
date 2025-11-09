@@ -1,6 +1,7 @@
 import 'package:deneige_auto/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../constants/app_routes.dart';
 import '../di/injection_container.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
@@ -61,6 +62,15 @@ class AppRouter {
             settings: settings,
         );
 
+      case AppRoutes.resetPassword:
+        final token = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => sl<AuthBloc>(),
+            child: ResetPasswordScreen(token: token),
+          ),
+          settings: settings,
+        );
 
     // Routes principales
       case AppRoutes.home:

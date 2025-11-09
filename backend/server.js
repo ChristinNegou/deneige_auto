@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/database');
+const path = require('path');
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -20,6 +21,10 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//  Servir les fichiers statiques
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 // Logging middleware amélioré
 app.use((req, res, next) => {
     const timestamp = new Date().toISOString();
@@ -33,8 +38,14 @@ app.use((req, res, next) => {
     next();
 });
 
-// Routes
+// Routes API
 app.use('/api/auth', require('./routes/auth'));
+
+// ✅ Route pour la page de réinitialisation
+app.get('/reset-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
+});
+
 
 // Route de test
 app.get('/', (req, res) => {

@@ -1,10 +1,11 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/forgot_password.dart';
+import '../../domain/usecases/forgot_password_usecase.dart';
 import '../../domain/usecases/get_current_user_usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
+import '../../domain/usecases/reset_password_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -13,20 +14,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase register;
   final LogoutUseCase logout;
   final GetCurrentUserUseCase getCurrentUser;
-  final ForgotPasswordUseCase forgotPassword; // ✅ Ajouté
+  final ForgotPasswordUseCase forgotPassword;
+  final ResetPasswordUseCase resetPassword;
 
   AuthBloc({
     required this.login,
     required this.register,
     required this.logout,
     required this.getCurrentUser,
-    required this.forgotPassword, // ✅ Ajouté
+    required this.forgotPassword,
+    required this.resetPassword,
+
   }) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
     on<RegisterRequested>(_onRegisterRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<ForgotPasswordEvent>(_onForgotPassword);
+    on<ResetPasswordEvent>(_onResetPassword);
+
   }
 
   Future<void> _onLoginRequested(
@@ -106,4 +112,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (user) => emit(AuthAuthenticated(user: user)),
     );
   }
+
+  Future<void> _onResetPassword(
+      ResetPasswordEvent event,
+      Emitter<AuthState> emit,
+      ) async {
+    emit(AuthLoading());
+
+    final result = await resetPassword(
+      token: event.token,
+      newPassword: event.newPassword,
+    );
+
+    result.fold(
+          (failure) => emit(AuthError(message: failure.message)),
+          (_) => emit(const ResetPasswordSuccess()),
+    );
+  }
+
 }

@@ -18,7 +18,9 @@ abstract class AuthRemoteDataSource {
       });
   Future<UserModel> getCurrentUser();
   Future<void> logout();
-  Future<void> forgotPassword(String email); // ✅ Ajoutée
+  Future<void> forgotPassword(String email);
+  Future<void> resetPassword(String token, String newPassword);
+
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -183,4 +185,30 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }
+
+  @override
+  Future<void> resetPassword(String token, String newPassword) async {
+    try {
+      final response = await dio.put(
+        '/auth/reset-password/$token',
+        data: {'password': newPassword},
+      );
+
+      if (response.statusCode != 200) {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de la réinitialisation',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) {
+        throw ServerException(
+          message: e.response?.data['message'] ?? 'le lien de récupération est expiré',
+          statusCode: 400,
+        );
+      }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
 }

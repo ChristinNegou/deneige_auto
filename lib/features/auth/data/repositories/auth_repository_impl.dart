@@ -115,4 +115,19 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Right(false);
     }
   }
+
+  @override
+  Future<Either<Failure, void>> resetPassword(String token, String newPassword) async {
+    try {
+      await remoteDataSource.resetPassword(token, newPassword);
+      return const Right(null);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
 }

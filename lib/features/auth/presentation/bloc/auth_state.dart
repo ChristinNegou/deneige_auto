@@ -56,3 +56,11 @@ class ForgotPasswordSuccess extends AuthState {
   @override
   List<Object> get props => [];
 }
+
+//  état pour le succès de la réinitialisation
+class ResetPasswordSuccess extends AuthState {
+  const ResetPasswordSuccess();
+
+  @override
+  List<Object> get props => [];
+}
