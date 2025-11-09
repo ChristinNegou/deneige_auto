@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import '../../../../core/errors/exceptions.dart';
-import '../../../../core/storage/secure_storage.dart';
 import '../../../../service/secure_storage_service.dart';
 import '../../domain/entities/user.dart';
 import '../models/user_model.dart';

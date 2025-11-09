@@ -2,8 +2,6 @@
 import 'package:deneige_auto/features/reservation/data/models/vehicule_model.dart';
 
 import '../../domain/entities/reservation.dart';
-import '../../domain/entities/vehicle.dart';
-import '../../domain/entities/parking_spot.dart';
 import '../../../../core/config/app_config.dart';
 
 import 'parking_spot_model.dart';

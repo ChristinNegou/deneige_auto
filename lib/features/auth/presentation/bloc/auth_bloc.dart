@@ -1,4 +1,3 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/forgot_password_usecase.dart';
 import '../../domain/usecases/get_current_user_usecase.dart';
@@ -24,7 +23,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.getCurrentUser,
     required this.forgotPassword,
     required this.resetPassword,
-
   }) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
     on<RegisterRequested>(_onRegisterRequested);
@@ -32,20 +30,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<ForgotPasswordEvent>(_onForgotPassword);
     on<ResetPasswordEvent>(_onResetPassword);
-
   }
 
   Future<void> _onLoginRequested(
       LoginRequested event,
       Emitter<AuthState> emit,
       ) async {
+    print('[DEBUG] AuthBloc - Login demandé pour: ${event.email}');
     emit(AuthLoading());
 
     final result = await login(event.email, event.password);
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (user) => emit(AuthAuthenticated(user: user)),
+          (failure) {
+        print('[DEBUG] AuthBloc - Échec de la connexion: ${failure.message}');
+        emit(AuthError(message: failure.message));
+      },
+          (user) {
+        print('[DEBUG] AuthBloc - Connexion réussie');
+        print('[DEBUG] AuthBloc - User ID: ${user.id}');
+        print('[DEBUG] AuthBloc - User Email: ${user.email}');
+        print('[DEBUG] AuthBloc - User Role: ${user.role}');
+        print('[DEBUG] AuthBloc - User Role toString: ${user.role.toString()}');
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
@@ -53,6 +61,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       RegisterRequested event,
       Emitter<AuthState> emit,
       ) async {
+    print('[DEBUG] AuthBloc - Inscription demandée pour: ${event.email}');
+    print('[DEBUG] AuthBloc - Rôle demandé: ${event.role}');
     emit(AuthLoading());
 
     final result = await register(
@@ -65,8 +75,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (user) => emit(AuthAuthenticated(user: user)),
+          (failure) {
+        print('[DEBUG] AuthBloc - Échec de l\'inscription: ${failure.message}');
+        emit(AuthError(message: failure.message));
+      },
+          (user) {
+        print('[DEBUG] AuthBloc - Inscription réussie');
+        print('[DEBUG] AuthBloc - User ID: ${user.id}');
+        print('[DEBUG] AuthBloc - User Email: ${user.email}');
+        print('[DEBUG] AuthBloc - User Role: ${user.role}');
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
@@ -84,7 +103,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  // ✅ Méthode corrigée
   Future<void> _onForgotPassword(
       ForgotPasswordEvent event,
       Emitter<AuthState> emit,
@@ -103,13 +121,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       CheckAuthStatus event,
       Emitter<AuthState> emit,
       ) async {
+    print('[DEBUG] AuthBloc - Vérification du statut d\'authentification');
     emit(AuthLoading());
 
     final result = await getCurrentUser();
 
     result.fold(
-          (failure) => emit(AuthUnauthenticated()),
-          (user) => emit(AuthAuthenticated(user: user)),
+          (failure) {
+        print('[DEBUG] AuthBloc - Utilisateur non authentifié');
+        emit(AuthUnauthenticated());
+      },
+          (user) {
+        print('[DEBUG] AuthBloc - Utilisateur déjà authentifié');
+        print('[DEBUG] AuthBloc - User Role: ${user.role}');
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
@@ -129,5 +155,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (_) => emit(const ResetPasswordSuccess()),
     );
   }
-
 }

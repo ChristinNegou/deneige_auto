@@ -8,10 +8,10 @@ class UpcomingReservationsList extends StatelessWidget {
   final Function(Reservation) onReservationTap;
 
   const UpcomingReservationsList({
-    Key? key,
+    super.key,
     required this.reservations,
     required this.onReservationTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

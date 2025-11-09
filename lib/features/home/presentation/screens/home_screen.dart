@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../reservation/domain/entities/weather.dart';
-import '../../domain/entities/weather.dart';
 import '../../../../core/utils/time_utils.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
@@ -15,9 +14,9 @@ class WeatherCard extends StatelessWidget {
   final Weather weather;
 
   const WeatherCard({
-    Key? key,
+    super.key,
     required this.weather,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +151,7 @@ class WeatherCard extends StatelessWidget {
 
 /// Écran principal de l'application affichant un résumé des informations importantes
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();

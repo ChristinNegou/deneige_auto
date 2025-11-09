@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_routes.dart';
 import '../../../../core/routing/app_router.dart';
 //import '../../core/routing/app_router.dart';
 
 class MainNavigationPage extends StatefulWidget {
-  const MainNavigationPage({Key? key}) : super(key: key);
+  const MainNavigationPage({super.key});
 
   @override
   State<MainNavigationPage> createState() => _MainNavigationPageState();

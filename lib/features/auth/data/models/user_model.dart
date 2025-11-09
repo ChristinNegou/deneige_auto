@@ -13,6 +13,8 @@ class UserModel extends User {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    print('[DEBUG] UserModel.fromJson - role reçu: ${json['role']}'); // Debug
+
     return UserModel(
       id: json['id'] as String,
       email: json['email'] as String,
@@ -39,15 +41,25 @@ class UserModel extends User {
   }
 
   static UserRole _parseRole(String? role) {
-    switch (role?.toLowerCase()) {
+    if (role == null) {
+      print('[DEBUG] _parseRole - role est null, retour client');
+      return UserRole.client;
+    }
+
+    final roleStr = role.toLowerCase().replaceAll('_', '');
+    print('[DEBUG] _parseRole - role normalisé: $roleStr');
+
+    switch (roleStr) {
       case 'snowworker':
-      case 'snow_worker':
       case 'deneigeur':
+        print('[DEBUG] _parseRole - détecté comme snowWorker');
         return UserRole.snowWorker;
       case 'admin':
+        print('[DEBUG] _parseRole - détecté comme admin');
         return UserRole.admin;
       case 'client':
       default:
+        print('[DEBUG] _parseRole - détecté comme client');
         return UserRole.client;
     }
   }

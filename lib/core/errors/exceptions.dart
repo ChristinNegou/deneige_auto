@@ -16,32 +16,32 @@ abstract class AppException implements Exception {
 /// Exception levée lorsqu'une erreur serveur se produit
 class ServerException extends AppException {
   const ServerException({
-    required String message,
-    int? statusCode,
-  }) : super(message: message, statusCode: statusCode);
+    required super.message,
+    super.statusCode,
+  });
 }
 
 /// Exception levée lorsqu'une erreur réseau se produit
 class NetworkException extends AppException {
   const NetworkException({
-    required String message,
-    int? statusCode,
-  }) : super(message: message, statusCode: statusCode);
+    required super.message,
+    super.statusCode,
+  });
 }
 
 /// Exception levée lorsque les données du cache sont invalides
 class CacheException extends AppException {
   const CacheException({
-    required String message,
-  }) : super(message: message);
+    required super.message,
+  });
 }
 
 /// Exception levée lors d'erreurs d'authentification
 class AuthException extends AppException {
   const AuthException({
-    required String message,
-    int? statusCode,
-  }) : super(message: message, statusCode: statusCode);
+    required super.message,
+    super.statusCode,
+  });
 }
 
 /// Exception levée lors d'erreurs de validation
@@ -49,7 +49,7 @@ class ValidationException extends AppException {
   final Map<String, String>? errors;
 
   const ValidationException({
-    required String message,
+    required super.message,
     this.errors,
-  }) : super(message: message);
+  });
 }

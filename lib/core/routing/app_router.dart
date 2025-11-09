@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../constants/app_routes.dart';
 import '../di/injection_container.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/auth/presentation/screens/account_type_selection_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -12,6 +11,7 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/domain/entities/user.dart';
+import 'role_based_home_wrapper.dart';
 
 /// Classe qui gère la génération et la navigation des routes
 class AppRouter {
@@ -77,7 +77,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (context) => sl<HomeBloc>(),
-            child: const HomeScreen(),
+            child: const RoleBasedHomeWrapper(),
           ),
           settings: settings,
         );
@@ -251,86 +251,86 @@ class AppRouter {
 // Pages placeholder - Remplacez-les par vos vraies pages au fur et à mesure
 
 class DashboardPage extends StatelessWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+  const DashboardPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Dashboard')));
 }
 
 class ReservationsPage extends StatelessWidget {
-  const ReservationsPage({Key? key}) : super(key: key);
+  const ReservationsPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Réservations')));
 }
 
 class NewReservationPage extends StatelessWidget {
-  const NewReservationPage({Key? key}) : super(key: key);
+  const NewReservationPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Nouvelle réservation')));
 }
 
 class ReservationDetailsPage extends StatelessWidget {
   final String reservationId;
-  const ReservationDetailsPage({Key? key, required this.reservationId}) : super(key: key);
+  const ReservationDetailsPage({super.key, required this.reservationId});
   @override
   Widget build(BuildContext context) => Scaffold(body: Center(child: Text('Détails: $reservationId')));
 }
 
 class WeatherPage extends StatelessWidget {
-  const WeatherPage({Key? key}) : super(key: key);
+  const WeatherPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Météo')));
 }
 
 class VehiclesPage extends StatelessWidget {
-  const VehiclesPage({Key? key}) : super(key: key);
+  const VehiclesPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Véhicules')));
 }
 
 class AddVehiclePage extends StatelessWidget {
-  const AddVehiclePage({Key? key}) : super(key: key);
+  const AddVehiclePage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Ajouter véhicule')));
 }
 
 class SubscriptionPage extends StatelessWidget {
-  const SubscriptionPage({Key? key}) : super(key: key);
+  const SubscriptionPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Abonnement')));
 }
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Profil')));
 }
 
 class EditProfilePage extends StatelessWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+  const EditProfilePage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Éditer profil')));
 }
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Paramètres')));
 }
 
 class NotificationsPage extends StatelessWidget {
-  const NotificationsPage({Key? key}) : super(key: key);
+  const NotificationsPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Notifications')));
 }
 
 class SnowWorkerDashboardPage extends StatelessWidget {
-  const SnowWorkerDashboardPage({Key? key}) : super(key: key);
+  const SnowWorkerDashboardPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Dashboard Déneigeur')));
 }
 
 class JobsListPage extends StatelessWidget {
-  const JobsListPage({Key? key}) : super(key: key);
+  const JobsListPage({super.key});
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Liste des jobs')));
 }

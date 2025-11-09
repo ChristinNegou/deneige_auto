@@ -9,10 +9,10 @@ class ReservationCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const ReservationCard({
-    Key? key,
+    super.key,
     required this.reservation,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

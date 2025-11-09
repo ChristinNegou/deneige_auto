@@ -5,21 +5,21 @@ abstract class Failure {
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure({String message = 'Erreur serveur'}) : super(message: message);
+  const ServerFailure({super.message = 'Erreur serveur'});
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure({String message = 'Erreur de connexion'}) : super(message: message);
+  const NetworkFailure({super.message = 'Erreur de connexion'});
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure({String message = 'Erreur de cache'}) : super(message: message);
+  const CacheFailure({super.message = 'Erreur de cache'});
 }
 
 class AuthFailure extends Failure {
-  const AuthFailure({String message = 'Erreur d\'authentification'}) : super(message: message);
+  const AuthFailure({super.message = 'Erreur d\'authentification'});
 }
 
 class ValidationFailure extends Failure {
-  const ValidationFailure({String message = 'Erreur de validation'}) : super(message: message);
+  const ValidationFailure({super.message = 'Erreur de validation'});
 }

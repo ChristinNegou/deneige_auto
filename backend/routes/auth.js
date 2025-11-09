@@ -97,6 +97,15 @@ router.post('/login', async (req, res) => {
 
         const token = generateToken(user._id, user.role);
 
+        // ✅ LOG DE DEBUG
+        console.log('========================================');
+        console.log('[DEBUG BACKEND] Connexion réussie');
+        console.log('[DEBUG BACKEND] - Email:', user.email);
+        console.log('[DEBUG BACKEND] - Rôle dans la BDD:', user.role);
+        console.log('[DEBUG BACKEND] - Type du rôle:', typeof user.role);
+        console.log('========================================');
+
+
         res.status(200).json({
             success: true,
             user: {

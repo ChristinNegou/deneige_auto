@@ -8,9 +8,6 @@ import 'app.dart';
 
 // Import de l'injection de dépendances
 import 'core/di/injection_container.dart';
-import 'features/auth/domain/usecases/get_current_user_usecase.dart';
-import 'features/home/domain/usecases/get_weather_usecase.dart';
-import 'features/reservation/domain/usecases/get_reservations_usecase.dart';
 
 /// Point d'entrée principal de l'application Deneige Auto
 /// Cette fonction est appelée au démarrage de l'application

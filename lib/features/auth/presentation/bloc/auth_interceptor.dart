@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import '../../../../service/secure_storage_service.dart';
-import '../../../../core/storage/secure_storage.dart';
-import '../../../../core/errors/exceptions.dart';
 /// Intercepteur pour ajouter le token d'authentification aux requêtes
 class AuthInterceptor extends Interceptor {
   final SecureStorageService secureStorage;

@@ -46,4 +46,7 @@ class AppRoutes {
   static const String jobsList = '/snow-worker/jobs';
   static const String jobDetails = '/snow-worker/jobs/details';
 
+  //Routes pour le dashboard client
+  static const String clientHome = '/client-home';
+
 }

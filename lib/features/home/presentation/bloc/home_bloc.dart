@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/errors/failures.dart';
 import '../../../auth/domain/usecases/get_current_user_usecase.dart';
 import '../../../reservation/domain/entities/reservation.dart';
 import '../../../reservation/domain/usecases/get_reservations_usecase.dart';

@@ -7,12 +7,12 @@ class QuickActionsPanel extends StatelessWidget {
   final VoidCallback onViewSubscription;
 
   const QuickActionsPanel({
-    Key? key,
+    super.key,
     required this.onNewReservation,
     required this.onViewReservations,
     required this.onViewVehicles,
     required this.onViewSubscription,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import '../../../../core/errors/exceptions.dart';
-import '../../domain/entities/reservation.dart';
 import '../models/reservation_model.dart';
 
 abstract class ReservationRemoteDataSource {

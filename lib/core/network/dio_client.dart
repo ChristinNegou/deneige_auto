@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../features/auth/presentation/bloc/auth_interceptor.dart';
 import '../../service/secure_storage_service.dart';
-import 'api_interceptor.dart';
 
 /// Client Dio configuré pour l'application
 class DioClient {

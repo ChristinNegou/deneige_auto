@@ -10,7 +10,7 @@ import 'features/auth/domain/entities/user.dart';
 import 'features/home/presentation/bloc/home_bloc.dart';
 
 class DeneigeAutoApp extends StatelessWidget {
-  const DeneigeAutoApp({Key? key}) : super(key: key);
+  const DeneigeAutoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class DeneigeAutoApp extends StatelessWidget {
 
 /// Widget qui gère la navigation initiale selon l'état d'authentification
 class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({Key? key}) : super(key: key);
+  const AuthWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {

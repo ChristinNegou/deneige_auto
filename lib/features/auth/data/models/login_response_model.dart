@@ -1,4 +1,3 @@
-import '../../domain/entities/user.dart';
 import 'user_model.dart';
 
 class LoginResponseModel {
