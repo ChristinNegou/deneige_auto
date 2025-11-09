@@ -47,3 +47,12 @@ class AuthSuccess extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+//  État de Succès du mot de passe oublié
+
+class ForgotPasswordSuccess extends AuthState {
+  const ForgotPasswordSuccess();
+
+  @override
+  List<Object> get props => [];
+}

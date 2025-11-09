@@ -125,19 +125,27 @@ router.post('/login', async (req, res) => {
 // @desc    Envoyer un email de réinitialisation de mot de passe
 // @access  Public
 router.post('/forgot-password', async (req, res) => {
+    console.log('\n========================================');
+    console.log('[DEBUG] Route /forgot-password appelée');
+    console.log('[DEBUG] Body reçu:', req.body);
+    console.log('========================================\n');
+
     try {
         const { email } = req.body;
 
         if (!email) {
+            console.log('[!] Email manquant dans la requête');
+
             return res.status(400).json({
                 success: false,
                 message: 'Veuillez fournir un email',
             });
         }
-
+        console.log('[*] Recherche de l\'utilisateur avec email:', email);
         const user = await User.findOne({ email });
 
         if (!user) {
+            console.log('[!] Utilisateur non trouvé pour email:', email);
             // Pour des raisons de sécurité, ne pas révéler si l'email existe ou non
             return res.status(200).json({
                 success: true,
@@ -145,15 +153,23 @@ router.post('/forgot-password', async (req, res) => {
             });
         }
 
+        console.log('[OK] Utilisateur trouvé:', user.firstName, user.lastName);
+
         // Générer le token de réinitialisation
         const resetToken = user.getResetPasswordToken();
+        console.log('[OK] Token généré:', resetToken.substring(0, 10) + '...');
 
         // Sauvegarder le token dans la base de données
         await user.save({ validateBeforeSave: false });
+        console.log('[OK] Token sauvegardé dans la base de données');
 
         try {
+            console.log('[*] Tentative d\'envoi de l\'email...');
+
+
             // Envoyer l'email
             await sendPasswordResetEmail(user, resetToken);
+            console.log('[OK] Email envoyé avec succès !');
 
             res.status(200).json({
                 success: true,
@@ -161,6 +177,7 @@ router.post('/forgot-password', async (req, res) => {
             });
         } catch (error) {
             console.error('Erreur lors de l\'envoi de l\'email:', error);
+            console.error('[X] Détails de l\'erreur:', error.message);
 
             // Supprimer le token si l'envoi échoue
             user.resetPasswordToken = undefined;

@@ -18,6 +18,7 @@ abstract class AuthRemoteDataSource {
       });
   Future<UserModel> getCurrentUser();
   Future<void> logout();
+  Future<void> forgotPassword(String email); // ✅ Ajoutée
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -153,6 +154,32 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on DioException catch (e) {
       // Même en cas d'erreur, supprimer les tokens locaux
       await secureStorage.deleteAll();
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  // ✅ Méthode forgotPassword ajoutée
+  @override
+  Future<void> forgotPassword(String email) async {
+    try {
+      final response = await dio.post(
+        '/auth/forgot-password',
+        data: {'email': email},
+      );
+
+      if (response.statusCode != 200) {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de l\'envoi de l\'email',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) {
+        throw ServerException(
+          message: e.response?.data['message'] ?? 'Email invalide',
+          statusCode: 400,
+        );
+      }
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }

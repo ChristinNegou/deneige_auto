@@ -1,4 +1,6 @@
+
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/user.dart';
@@ -38,11 +40,11 @@ class AuthRepositoryImpl implements AuthRepository {
       final nameParts = name.split(' ');
       final firstName = nameParts.first;
       final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
-      
+
       final user = await remoteDataSource.register(
-        email, 
-        password, 
-        firstName, 
+        email,
+        password,
+        firstName,
         lastName,
         phone: phone,
         role: role,
@@ -59,8 +61,20 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // ... existing code ...
-  
+  @override
+  Future<Either<Failure, void>> forgotPassword(String email) async {
+    try {
+      // ✅ Utiliser remoteDataSource au lieu de _dioClient
+      await remoteDataSource.forgotPassword(email);
+      return const Right(null);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
 
   @override
   Future<Either<Failure, User>> getCurrentUser() async {
