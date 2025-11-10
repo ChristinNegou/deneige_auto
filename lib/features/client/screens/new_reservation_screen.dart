@@ -16,7 +16,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
   // Clé API Google Places - À remplacer par votre clé
   static const String kGoogleApiKey = 'AIzaSyC4JjnG-g798JbVyR_wPOS-ORvjHntzfps';
 
-  int _currentStep = 0;
+  int _currentStep = 00;
   String _selectedServiceType = 'standard';
   String _selectedAddress = '';
   DateTime? _selectedDate;
