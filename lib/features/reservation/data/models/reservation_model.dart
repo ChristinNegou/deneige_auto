@@ -35,11 +35,23 @@ class ReservationModel extends Reservation {
 
   factory ReservationModel.fromJson(Map<String, dynamic> json) {
     return ReservationModel(
-      id: json['id'] as String,
+      id: json['id'] as String? ?? json['_id'] as String,
       userId: json['userId'] as String,
       workerId: json['workerId'] as String?,
-      parkingSpot: ParkingSpotModel.fromJson(json['parkingSpot'] as Map<String, dynamic>),
-      vehicle: VehicleModel.fromJson(json['vehicle'] as Map<String, dynamic>),
+      parkingSpot: json['parkingSpot'] != null
+          ? ParkingSpotModel.fromJson(json['parkingSpot'] as Map<String, dynamic>)
+          : ParkingSpotModel.fromJson({
+        'id': 'manual',
+        'spotNumber': json['parkingSpotNumber'] ?? json['customLocation'] ?? 'N/A',
+        'level': 'outdoor',
+        'isAssigned': false,
+        'isActive': true,
+        'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      }),
+      vehicle: json['vehicle'] != null
+          ? VehicleModel.fromJson(json['vehicle'] as Map<String, dynamic>)
+          : throw Exception('Vehicle data is required but was null'),
       departureTime: DateTime.parse(json['departureTime'] as String),
       deadlineTime: json['deadlineTime'] != null
           ? DateTime.parse(json['deadlineTime'] as String)
@@ -52,7 +64,9 @@ class ReservationModel extends Reservation {
       totalPrice: (json['totalPrice'] as num).toDouble(),
       beforePhotoUrl: json['beforePhotoUrl'] as String?,
       afterPhotoUrl: json['afterPhotoUrl'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
       assignedAt: json['assignedAt'] != null
           ? DateTime.parse(json['assignedAt'] as String)
           : null,
@@ -70,6 +84,7 @@ class ReservationModel extends Reservation {
       snowDepthCm: json['snowDepthCm'] as int?,
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {

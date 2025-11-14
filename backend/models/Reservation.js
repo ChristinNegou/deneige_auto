@@ -48,7 +48,7 @@ const reservationSchema = new mongoose.Schema({
     },
     serviceOptions: [{
         type: String,
-        enum: ['brushSnow', 'scrapeIce', 'defrostWindows', 'clearRoof'],
+        enum: ['windowScraping', 'doorDeicing', 'wheelClearance'],
     }],
     snowDepthCm: {
         type: Number,

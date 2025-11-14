@@ -244,9 +244,28 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
+      // ✅ Déterminer le parkingSpotId
+      String parkingSpotId;
+      if (state.selectedParkingSpot != null) {
+        // Cas 1: Place complète sélectionnée
+        parkingSpotId = state.selectedParkingSpot!.id;
+      } else if (state.parkingSpotNumber != null && state.parkingSpotNumber!.trim().isNotEmpty) {
+        // Cas 2: Numéro manuel → utiliser le numéro comme ID temporaire
+        parkingSpotId = 'manual-${state.parkingSpotNumber!.trim()}';
+      } else if (state.customLocation != null && state.customLocation!.trim().isNotEmpty) {
+        // Cas 3: Emplacement personnalisé
+        parkingSpotId = 'custom-${state.customLocation!.trim()}';
+      } else {
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: 'Aucune place de parking sélectionnée',
+        ));
+        return;
+      }
+
       final result = await createReservation(CreateReservationParams(
         vehicleId: state.selectedVehicle!.id,
-        parkingSpotId: state.selectedParkingSpot!.id,
+        parkingSpotId: parkingSpotId,
         departureTime: state.departureDateTime!,
         deadlineTime: state.deadlineTime!,
         serviceOptions: state.selectedOptions,

@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
 const Reservation = require('../models/Reservation');
+const ParkingSpot = require('../models/ParkingSpot');
 
 // @route   GET /api/reservations
 // @desc    Obtenir toutes les réservations de l'utilisateur
@@ -83,7 +84,7 @@ router.post('/', protect, async (req, res) => {
         const {
             vehicleId,
             parkingSpotId,
-            parkingSpotNumber,
+            parkingSpotNumber, // ✅ Ajouté ici
             customLocation,
             departureTime,
             deadlineTime,
@@ -93,20 +94,49 @@ router.post('/', protect, async (req, res) => {
             paymentMethod,
         } = req.body;
 
-        //  Validation: au moins un emplacement fourni
-        if (!parkingSpotId && !parkingSpotNumber && !customLocation) {
-            return res.status(400).json({
-                success: false,
-                message: 'Un emplacement doit être fourni (place de parking, numéro ou description)',
-            });
-        }
-
-        const reservation = await Reservation.create({
+        console.log('📝 Nouvelle réservation:', {
             userId: req.user.id,
             vehicleId,
             parkingSpotId,
             parkingSpotNumber,
             customLocation,
+            departureTime,
+            totalPrice,
+        });
+
+        // ✅ Gérer les différents cas de place de parking
+        let finalParkingSpotId = null;
+        let finalParkingSpotNumber = null;
+        let finalCustomLocation = null;
+
+        if (parkingSpotId && parkingSpotId.startsWith('manual-')) {
+            // Place manuelle avec numéro
+            finalParkingSpotNumber = parkingSpotId.replace('manual-', '');
+            console.log('✅ Place manuelle:', finalParkingSpotNumber);
+        } else if (parkingSpotId && parkingSpotId.startsWith('custom-')) {
+            // Emplacement personnalisé
+            finalCustomLocation = parkingSpotId.replace('custom-', '');
+            console.log('✅ Emplacement personnalisé:', finalCustomLocation);
+        } else if (parkingSpotId) {
+            // ID de place valide
+            finalParkingSpotId = parkingSpotId;
+            console.log('✅ Place de parking ID:', finalParkingSpotId);
+        } else if (parkingSpotNumber) {
+            // Numéro fourni directement
+            finalParkingSpotNumber = parkingSpotNumber;
+            console.log('✅ Numéro de place fourni:', parkingSpotNumber);
+        } else if (customLocation) {
+            // Emplacement fourni directement
+            finalCustomLocation = customLocation;
+            console.log('✅ Emplacement fourni:', customLocation);
+        }
+
+        const reservation = await Reservation.create({
+            userId: req.user.id,
+            vehicleId,
+            parkingSpotId: finalParkingSpotId,
+            parkingSpotNumber: finalParkingSpotNumber,
+            customLocation: finalCustomLocation,
             departureTime: new Date(departureTime),
             deadlineTime: new Date(deadlineTime),
             serviceOptions: serviceOptions || [],
@@ -116,18 +146,49 @@ router.post('/', protect, async (req, res) => {
             paymentMethod,
         });
 
+        // ✅ IMPORTANT: Populer les relations avant de renvoyer
         await reservation.populate('vehicleId');
-        if (parkingSpotId) {
+        if (finalParkingSpotId) {
             await reservation.populate('parkingSpotId');
         }
 
+        console.log('✅ Réservation créée avec succès:', reservation._id);
+
         res.status(201).json({
             success: true,
-            reservation,
+            reservation: {
+                id: reservation._id.toString(),
+                userId: reservation.userId.toString(),
+                workerId: reservation.workerId?.toString(),
+                vehicle: reservation.vehicleId, // ✅ Déjà populé
+                parkingSpot: reservation.parkingSpotId || {
+                    // ✅ Créer un objet factice si place manuelle
+                    id: 'manual',
+                    spotNumber: finalParkingSpotNumber || finalCustomLocation || 'N/A',
+                    level: 'outdoor',
+                    displayName: finalParkingSpotNumber || finalCustomLocation || 'N/A',
+                    fullDisplayName: finalParkingSpotNumber || finalCustomLocation || 'N/A',
+                    isAssigned: false,
+                    isActive: true,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                },
+                departureTime: reservation.departureTime.toISOString(),
+                deadlineTime: reservation.deadlineTime?.toISOString(),
+                status: reservation.status,
+                serviceOptions: reservation.serviceOptions,
+                basePrice: reservation.basePrice,
+                totalPrice: reservation.totalPrice,
+                isPriority: reservation.isPriority,
+                snowDepthCm: reservation.snowDepthCm,
+                paymentMethod: reservation.paymentMethod,
+                paymentStatus: reservation.paymentStatus,
+                createdAt: reservation.createdAt.toISOString(),
+            },
             message: 'Réservation créée avec succès',
         });
     } catch (error) {
-        console.error('Erreur lors de la création de la réservation:', error);
+        console.error('❌ Erreur lors de la création de la réservation:', error);
         res.status(500).json({
             success: false,
             message: error.message || 'Erreur lors de la création de la réservation',
