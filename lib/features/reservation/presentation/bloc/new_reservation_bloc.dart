@@ -156,26 +156,45 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       CalculatePrice event,
       Emitter<NewReservationState> emit,
       ) {
-    if (state.selectedVehicle == null || state.selectedParkingSpot == null) {
+    // ✅ Vérifier qu'il y a un véhicule
+    if (state.selectedVehicle == null) {
+      return;
+    }
+
+    // ✅ Vérifier qu'il y a UNE place (spot complet OU numéro manuel OU emplacement perso)
+    final hasParkingInfo = state.selectedParkingSpot != null ||
+        (state.parkingSpotNumber != null && state.parkingSpotNumber!.trim().isNotEmpty) ||
+        (state.customLocation != null && state.customLocation!.trim().isNotEmpty);
+
+    if (!hasParkingInfo) {
       return;
     }
 
     double basePrice = AppConfig.basePrice;
 
+    // ✅ Calcul du facteur véhicule
     final vehicleFactor = state.selectedVehicle!.type.priceFactor;
     final vehicleAdjustment = basePrice * (vehicleFactor - 1.0);
     double price = basePrice * vehicleFactor;
 
-    final parkingFactor = state.selectedParkingSpot!.level.priceFactor;
-    final parkingAdjustment = price * (parkingFactor - 1.0);
-    price *= parkingFactor;
+    // ✅ Calcul du facteur parking (si place complète sélectionnée, sinon facteur neutre)
+    double parkingFactor = 1.0;
+    double parkingAdjustment = 0;
 
+    if (state.selectedParkingSpot != null) {
+      parkingFactor = state.selectedParkingSpot!.level.priceFactor;
+      parkingAdjustment = price * (parkingFactor - 1.0);
+      price *= parkingFactor;
+    }
+
+    // ✅ Calcul du supplément neige
     double snowSurcharge = 0;
     if (state.snowDepthCm != null && state.snowDepthCm! > 10) {
       snowSurcharge = (state.snowDepthCm! - 10) * AppConfig.pricePerCm;
       price += snowSurcharge;
     }
 
+    // ✅ Calcul du coût des options
     double optionsCost = 0;
     for (final option in state.selectedOptions) {
       switch (option) {
@@ -192,6 +211,7 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
     }
     price += optionsCost;
 
+    // ✅ Calcul des frais d'urgence
     double urgencyFee = 0;
     if (state.isUrgent) {
       urgencyFee = price * AppConfig.urgencyFeePercentage;
@@ -213,6 +233,7 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       priceBreakdown: breakdown,
     ));
   }
+
 
   Future<void> _onSubmitReservation(
       SubmitReservation event,

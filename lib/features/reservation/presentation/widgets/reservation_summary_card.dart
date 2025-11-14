@@ -4,6 +4,7 @@ import '../../../../core/config/app_config.dart';
 import '../bloc/new_reservation_bloc.dart';
 import '../bloc/new_reservation_state.dart';
 import 'package:intl/intl.dart';
+
 // Widget pour le résumé final (Step 4)
 class ReservationSummaryCard extends StatelessWidget {
   const ReservationSummaryCard({Key? key}) : super(key: key);
@@ -61,15 +62,16 @@ class ReservationSummaryCard extends StatelessWidget {
                     _SummaryRow(
                       icon: Icons.directions_car,
                       label: 'Véhicule',
-                      value: state.selectedVehicle?.displayWithColor ?? '-',
+                      value: state.selectedVehicle?.displayName ?? '-',
                     ),
 
                     const Divider(height: 24),
 
+                    // ✅ Logique corrigée pour afficher la place de parking
                     _SummaryRow(
                       icon: Icons.local_parking,
                       label: 'Place',
-                      value: state.selectedParkingSpot?.fullDisplayName ?? '-',
+                      value: _getParkingSpotDisplay(state),
                     ),
 
                     const Divider(height: 24),
@@ -114,14 +116,35 @@ class ReservationSummaryCard extends StatelessWidget {
     );
   }
 
+  // ✅ Nouvelle méthode pour déterminer l'affichage de la place
+  String _getParkingSpotDisplay(NewReservationState state) {
+    // 1. Si une place de parking complète est sélectionnée
+    if (state.selectedParkingSpot != null) {
+      return state.selectedParkingSpot!.fullDisplayName;
+    }
+
+    // 2. Si un numéro de place manuel est entré
+    if (state.parkingSpotNumber != null && state.parkingSpotNumber!.isNotEmpty) {
+      return 'Place ${state.parkingSpotNumber}';
+    }
+
+    // 3. Si un emplacement personnalisé est entré
+    if (state.customLocation != null && state.customLocation!.isNotEmpty) {
+      return state.customLocation!;
+    }
+
+    // 4. Sinon, afficher un tiret
+    return '-';
+  }
+
   String _getOptionShortName(ServiceOption option) {
     switch (option) {
       case ServiceOption.windowScraping:
         return 'Vitres';
       case ServiceOption.doorDeicing:
-        return 'Portes';
-      case ServiceOption.wheelClearance:
         return 'Roues';
+      case ServiceOption.wheelClearance:
+        return 'Portes';
     }
   }
 }
@@ -163,6 +186,8 @@ class _SummaryRow extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.right,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
