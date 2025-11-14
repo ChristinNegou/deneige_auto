@@ -21,9 +21,7 @@ class DashboardPage extends StatelessWidget {
           )..add(const LoadReservations(upcomingOnly: true)),
         ),
         BlocProvider(
-          create: (context) => VehicleBloc(
-            getVehicles: sl(),
-          )..add(LoadVehicles()),
+          create: (context) => sl<VehicleBloc>()..add(LoadVehicles()),
         ),
       ],
       child: const DashboardView(),

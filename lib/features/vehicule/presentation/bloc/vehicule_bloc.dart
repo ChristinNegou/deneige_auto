@@ -1,4 +1,5 @@
 
+import 'package:deneige_auto/features/reservation/domain/usecases/add_vehicle_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../reservation/domain/entities/vehicle.dart';
@@ -15,12 +16,12 @@ abstract class VehicleEvent extends Equatable {
 class LoadVehicles extends VehicleEvent {}
 
 class AddVehicle extends VehicleEvent {
-  final Vehicle vehicle;
+  final AddVehicleParams params;
 
-  const AddVehicle(this.vehicle);
+  const AddVehicle(this.params);
 
   @override
-  List<Object?> get props => [vehicle];
+  List<Object?> get props => [params];
 }
 
 class DeleteVehicle extends VehicleEvent {
@@ -36,37 +37,55 @@ class DeleteVehicle extends VehicleEvent {
 class VehicleState extends Equatable {
   final List<Vehicle> vehicles;
   final bool isLoading;
+  final bool isSubmitting;
   final String? errorMessage;
+  final String? successMessage;
 
   const VehicleState({
     this.vehicles = const [],
     this.isLoading = false,
+    this.isSubmitting = false,
     this.errorMessage,
+    this.successMessage,
   });
 
   VehicleState copyWith({
     List<Vehicle>? vehicles,
     bool? isLoading,
+    bool? isSubmitting,
     String? errorMessage,
+    String? successMessage,
     bool clearError = false,
+    bool clearSuccess = false,
   }) {
     return VehicleState(
       vehicles: vehicles ?? this.vehicles,
       isLoading: isLoading ?? this.isLoading,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      successMessage: clearSuccess ? null : (successMessage ?? this.successMessage),
     );
   }
 
   @override
-  List<Object?> get props => [vehicles, isLoading, errorMessage];
+  List<Object?> get props => [
+    vehicles,
+    isLoading,
+    isSubmitting,
+    errorMessage,
+    successMessage,
+  ];
 }
+
 
 // ==================== BLOC ====================
 class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
   final GetVehiclesUseCase getVehicles;
+  final AddVehicleUseCase addVehicle;
 
   VehicleBloc({
     required this.getVehicles,
+    required this.addVehicle,
   }) : super(const VehicleState()) {
     on<LoadVehicles>(_onLoadVehicles);
     on<AddVehicle>(_onAddVehicle);
@@ -98,14 +117,32 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
       AddVehicle event,
       Emitter<VehicleState> emit,
       ) async {
-    final updatedVehicles = List<Vehicle>.from(state.vehicles)..add(event.vehicle);
-    emit(state.copyWith(vehicles: updatedVehicles));
+    emit(state.copyWith(isSubmitting: true, clearError: true));
+
+    final result = await addVehicle(event.params);
+
+    result.fold(
+          (failure) => emit(state.copyWith(
+        isSubmitting: false,
+        errorMessage: failure.message,
+      )),
+          (vehicle) {
+        final updatedVehicles = List<Vehicle>.from(state.vehicles)..add(vehicle);
+        emit(state.copyWith(
+          isSubmitting: false,
+          vehicles: updatedVehicles,
+          successMessage: 'Véhicule ajouté avec succès',
+          clearError: true,
+        ));
+      },
+    );
   }
 
   Future<void> _onDeleteVehicle(
       DeleteVehicle event,
       Emitter<VehicleState> emit,
       ) async {
+    // TODO: Implémenter la suppression via API
     final updatedVehicles = state.vehicles
         .where((v) => v.id != event.vehicleId)
         .toList();

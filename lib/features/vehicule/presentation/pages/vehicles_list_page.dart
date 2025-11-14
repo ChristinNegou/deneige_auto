@@ -11,9 +11,7 @@ class VehiclesListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => VehicleBloc(
-        getVehicles: sl(),
-      )..add(LoadVehicles()),
+      create: (context) => sl<VehicleBloc>()..add(LoadVehicles()),
       child: const VehiclesListView(),
     );
   }
@@ -28,11 +26,19 @@ class VehiclesListView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mes véhicules'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
-          ),
-        ],
+      IconButton(
+      icon: const Icon(Icons.add),
+        onPressed: () async {
+          final result = await Navigator.pushNamed(
+            context,
+            AppRoutes.addVehicle,
+          );
+          if (result == true && context.mounted) {
+            context.read<VehicleBloc>().add(LoadVehicles());
+          }
+        },
+    ),
+   ],
       ),
       body: BlocConsumer<VehicleBloc, VehicleState>(
         listener: (context, state) {

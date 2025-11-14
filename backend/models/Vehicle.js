@@ -35,7 +35,7 @@ const vehicleSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['sedan', 'suv', 'truck', 'van', 'coupe', 'hatchback'],
+        enum: ['sedan', 'suv', 'truck', 'van', 'coupe', 'hatchback', 'car'],
         required: [true, 'Le type de véhicule est requis'],
         default: 'sedan',
     },
@@ -73,6 +73,8 @@ vehicleSchema.virtual('icon').get(function() {
         van: '🚐',
         coupe: '🏎️',
         hatchback: '🚗',
+        car: '🚗',
+
     };
     return icons[this.type] || '🚗';
 });

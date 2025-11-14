@@ -1,6 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/reservation.dart';
 import '../../domain/entities/vehicle.dart';
 import '../../domain/entities/parking_spot.dart';
 import '../../../../core/config/app_config.dart';
@@ -31,6 +29,25 @@ class SelectParkingSpot extends NewReservationEvent {
   @override
   List<Object?> get props => [parkingSpot];
 }
+
+class UpdateParkingSpotNumber extends NewReservationEvent {
+  final String spotNumber;
+
+  const UpdateParkingSpotNumber(this.spotNumber);
+
+  @override
+  List<Object?> get props => [spotNumber];
+}
+
+class UpdateCustomLocation extends NewReservationEvent {
+  final String location;
+
+  const UpdateCustomLocation(this.location);
+
+  @override
+  List<Object?> get props => [location];
+}
+
 
 // Step 2 Events
 class SelectDateTime extends NewReservationEvent {

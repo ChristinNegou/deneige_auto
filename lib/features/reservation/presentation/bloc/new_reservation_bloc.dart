@@ -29,6 +29,10 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
     on<GoToNextStep>(_onGoToNextStep);
     on<GoToPreviousStep>(_onGoToPreviousStep);
     on<ResetReservation>(_onResetReservation);
+    on<UpdateParkingSpotNumber>(_onUpdateParkingSpotNumber);
+    on<UpdateCustomLocation>(_onUpdateCustomLocation);
+
+
   }
 
   Future<void> _onLoadInitialData(
@@ -78,6 +82,26 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
     if (state.currentStep >= 2) {
       add(CalculatePrice());
     }
+  }
+
+  void _onUpdateParkingSpotNumber(
+      UpdateParkingSpotNumber event,
+      Emitter<NewReservationState> emit,
+      ) {
+    emit(state.copyWith(
+      parkingSpotNumber: event.spotNumber,
+      customLocation: null,
+    ));
+  }
+
+  void _onUpdateCustomLocation(
+      UpdateCustomLocation event,
+      Emitter<NewReservationState> emit,
+      ) {
+    emit(state.copyWith(
+      customLocation: event.location,
+      parkingSpotNumber: null, // ✅ Réinitialiser l'autre option
+    ));
   }
 
   void _onSelectDateTime(

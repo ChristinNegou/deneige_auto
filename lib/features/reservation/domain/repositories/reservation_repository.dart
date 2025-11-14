@@ -22,6 +22,19 @@ abstract class ReservationRepository {
     required String paymentMethod,
   });
 
+  Future<Either<Failure, Vehicle>> addVehicle({
+    required String make,
+    required String model,
+    required int year,
+    required String color,
+    required String licensePlate,
+    required VehicleType type,
+    String? photoUrl,
+    bool isDefault = false,
+  });
+
+
+
   Future<Either<Failure, List<Reservation>>> getReservations({
     bool upcoming,
     String? userId,

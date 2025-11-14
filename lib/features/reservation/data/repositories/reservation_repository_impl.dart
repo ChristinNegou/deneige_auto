@@ -74,6 +74,8 @@ class ReservationRepositoryImpl implements ReservationRepository {
   Future<Either<Failure, Reservation>> createReservation({
     required String vehicleId,
     required String parkingSpotId,
+    String? parkingSpotNumber,
+    String? customLocation,
     required DateTime departureTime,
     required DateTime deadlineTime,
     required List<String> serviceOptions,
@@ -84,17 +86,54 @@ class ReservationRepositoryImpl implements ReservationRepository {
     try {
       final data = {
         'vehicleId': vehicleId,
-        'parkingSpotId': parkingSpotId,
+        if (parkingSpotId != null) 'parkingSpotId': parkingSpotId,
+        if (parkingSpotNumber != null) 'parkingSpotNumber': parkingSpotNumber,
+        if (customLocation != null) 'customLocation': customLocation,
         'departureTime': departureTime.toIso8601String(),
         'deadlineTime': deadlineTime.toIso8601String(),
         'serviceOptions': serviceOptions,
         'snowDepthCm': snowDepthCm,
         'totalPrice': totalPrice,
         'paymentMethod': paymentMethod,
+
       };
 
       final createdReservation = await remoteDataSource.createReservation(data);
       return Right(createdReservation);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Vehicle>> addVehicle({
+    required String make,
+    required String model,
+    required int year,
+    required String color,
+    required String licensePlate,
+    required VehicleType type,
+    String? photoUrl,
+    bool isDefault = false,
+  }) async {
+    try {
+      final data = {
+        'make': make,
+        'model': model,
+        'year': year,
+        'color': color,
+        'licensePlate': licensePlate,
+        'type': type.name,
+        'photoUrl': photoUrl,
+        'isDefault': isDefault,
+      };
+
+      final response = await remoteDataSource.addVehicle(data);
+      return Right(response);
     } on NetworkException catch (e) {
       return Left(NetworkFailure(message: e.message));
     } on ServerException catch (e) {

@@ -1,7 +1,6 @@
 
 import 'package:dio/dio.dart';
 import '../../../../core/errors/exceptions.dart';
-import '../../domain/entities/parking_spot.dart';
 import '../../domain/entities/vehicle.dart';
 import '../models/parking_spot_model.dart';
 import '../models/reservation_model.dart';
@@ -13,6 +12,9 @@ abstract class ReservationRemoteDataSource {
   Future<List<ReservationModel>> getReservations({bool? upcoming});
   Future<ReservationModel> createReservation(Map<String, dynamic> data);
   Future<void> cancelReservation(String reservationId);
+  Future<Vehicle> addVehicle(Map<String, dynamic> data);
+
+
 }
 
 class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
@@ -104,6 +106,30 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }
+
+  @override
+  Future<Vehicle> addVehicle(Map<String, dynamic> data) async {
+    try {
+      final response = await dio.post(
+        '/vehicles',
+        data: data,
+      );
+
+      if (response.statusCode == 201) {
+        // Convertir la réponse en VehicleModel
+        return VehicleModel.fromJson(response.data['vehicle']);
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de l\'ajout du véhicule',
+          statusCode: response.statusCode ?? 500,
+        );
+      }
+    } on DioException catch (e) {
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+
 
   @override
   Future<void> cancelReservation(String reservationId) async {

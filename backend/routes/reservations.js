@@ -83,6 +83,8 @@ router.post('/', protect, async (req, res) => {
         const {
             vehicleId,
             parkingSpotId,
+            parkingSpotNumber,
+            customLocation,
             departureTime,
             deadlineTime,
             serviceOptions,
@@ -91,10 +93,20 @@ router.post('/', protect, async (req, res) => {
             paymentMethod,
         } = req.body;
 
+        //  Validation: au moins un emplacement fourni
+        if (!parkingSpotId && !parkingSpotNumber && !customLocation) {
+            return res.status(400).json({
+                success: false,
+                message: 'Un emplacement doit être fourni (place de parking, numéro ou description)',
+            });
+        }
+
         const reservation = await Reservation.create({
             userId: req.user.id,
             vehicleId,
             parkingSpotId,
+            parkingSpotNumber,
+            customLocation,
             departureTime: new Date(departureTime),
             deadlineTime: new Date(deadlineTime),
             serviceOptions: serviceOptions || [],
@@ -105,7 +117,9 @@ router.post('/', protect, async (req, res) => {
         });
 
         await reservation.populate('vehicleId');
-        await reservation.populate('parkingSpotId');
+        if (parkingSpotId) {
+            await reservation.populate('parkingSpotId');
+        }
 
         res.status(201).json({
             success: true,

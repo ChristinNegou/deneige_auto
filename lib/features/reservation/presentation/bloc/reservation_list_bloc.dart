@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../../../core/errors/failures.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/usecases/get_reservations_usecase.dart';
 import '../../domain/usecases/cancel_reservation_usecase.dart';

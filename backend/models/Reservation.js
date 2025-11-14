@@ -14,8 +14,20 @@ const reservationSchema = new mongoose.Schema({
     parkingSpotId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ParkingSpot',
-        required: [true, 'La place de parking est requise'],
+        default: null,
     },
+    parkingSpotNumber: {
+        type: String,
+        trim: true,
+        uppercase: true,
+        default: null,
+    },
+    customLocation: {
+        type: String,
+        trim: true,
+        default: null,
+    },
+
     workerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -121,6 +133,9 @@ const reservationSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+
+
+
 // Index pour recherche rapide
 reservationSchema.index({ userId: 1, status: 1, departureTime: -1 });
 reservationSchema.index({ workerId: 1, status: 1 });
@@ -180,6 +195,14 @@ reservationSchema.statics.getUpcoming = function(userId) {
         .populate('workerId', 'firstName lastName phoneNumber')
         .sort({ departureTime: 1 });
 };
+
+// Validation: au moins un emplacement doit être défini
+reservationSchema.pre('save', function(next) {
+    if (!this.parkingSpotId && !this.parkingSpotNumber && !this.customLocation) {
+        return next(new Error('Un emplacement doit être fourni (place de parking, numéro ou description)'));
+    }
+    next();
+});
 
 // Options pour inclure les virtuals dans JSON
 reservationSchema.set('toJSON', { virtuals: true });

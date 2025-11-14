@@ -21,6 +21,10 @@ class NewReservationState extends Equatable {
   final String? errorMessage;
   final bool isSubmitted;
   final String? reservationId;
+  final String? parkingSpotNumber;
+  final String? customLocation;
+
+
 
   const NewReservationState({
     this.currentStep = 0,
@@ -40,10 +44,24 @@ class NewReservationState extends Equatable {
     this.errorMessage,
     this.isSubmitted = false,
     this.reservationId,
+    this.parkingSpotNumber,
+    this.customLocation,
+
   });
 
   bool get canProceedStep1 {
-    return selectedVehicle != null && selectedParkingSpot != null;
+    // Un véhicule doit être sélectionné
+    if (selectedVehicle == null) return false;
+
+    // SOIT une place de parking est sélectionnée
+    if (selectedParkingSpot != null) return true;
+
+    // SOIT un numéro/emplacement manuel est renseigné
+    final hasManualLocation = (parkingSpotNumber != null && parkingSpotNumber!.trim().isNotEmpty) ||
+        (customLocation != null && customLocation!.trim().isNotEmpty);
+
+    return hasManualLocation;
+
   }
 
   bool get canProceedStep2 {
@@ -98,6 +116,8 @@ class NewReservationState extends Equatable {
     String? errorMessage,
     bool? isSubmitted,
     String? reservationId,
+    String? parkingSpotNumber,
+    String? customLocation,
   }) {
     return NewReservationState(
       currentStep: currentStep ?? this.currentStep,
@@ -117,6 +137,8 @@ class NewReservationState extends Equatable {
       errorMessage: errorMessage,
       isSubmitted: isSubmitted ?? this.isSubmitted,
       reservationId: reservationId ?? this.reservationId,
+      parkingSpotNumber: parkingSpotNumber ?? this.parkingSpotNumber,
+      customLocation: customLocation ?? this.customLocation,
     );
   }
 
@@ -139,6 +161,9 @@ class NewReservationState extends Equatable {
     errorMessage,
     isSubmitted,
     reservationId,
+    parkingSpotNumber,
+    customLocation,
+
   ];
 }
 

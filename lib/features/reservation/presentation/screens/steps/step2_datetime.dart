@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -17,14 +18,20 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
   TimeOfDay? selectedTime;
 
   @override
+  void initState() {
+    super.initState();
+    // ✅ Initialiser depuis le state BLoC si disponible
+    final state = context.read<NewReservationBloc>().state;
+    if (state.departureDateTime != null) {
+      selectedDate = state.departureDateTime;
+      selectedTime = TimeOfDay.fromDateTime(state.departureDateTime!);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<NewReservationBloc, NewReservationState>(
       builder: (context, state) {
-        selectedDate = state.departureDateTime;
-        selectedTime = state.departureDateTime != null
-            ? TimeOfDay.fromDateTime(state.departureDateTime!)
-            : null;
-
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -56,6 +63,52 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
               _buildTimePicker(context, state),
 
               const SizedBox(height: 32),
+
+              // ✅ Message de validation si les deux sont sélectionnés
+              if (selectedDate != null && selectedTime != null && state.departureDateTime != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green[200]!),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green[700],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Date et heure validées',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.green[900],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              DateFormat('EEEE d MMMM yyyy à HH:mm', 'fr_CA')
+                                  .format(state.departureDateTime!),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.green[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
 
               // Deadline info
               if (state.deadlineTime != null) ...[
@@ -99,11 +152,11 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 16),
               ],
 
               // Urgent warning
               if (state.isUrgent) ...[
-                const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -140,6 +193,40 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              // ✅ Message informatif si une seule est sélectionnée
+              if ((selectedDate != null && selectedTime == null) ||
+                  (selectedDate == null && selectedTime != null)) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.amber[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.amber[200]!),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.amber[700],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          selectedDate == null
+                              ? 'Veuillez sélectionner une date'
+                              : 'Veuillez sélectionner une heure',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.amber[900],
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
@@ -266,7 +353,7 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
                   const SizedBox(height: 4),
                   Text(
                     selectedTime != null
-                        ? selectedTime!.format(context)
+                        ? '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}'
                         : 'Sélectionner une heure',
                     style: TextStyle(
                       fontSize: 16,
@@ -298,12 +385,23 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
       firstDate: now,
       lastDate: now.add(const Duration(days: 30)),
       locale: const Locale('fr', 'CA'),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Theme.of(context).primaryColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() {
         selectedDate = picked;
       });
+      // ✅ Mettre à jour immédiatement après sélection
       _updateDateTime(context);
     }
   }
@@ -312,17 +410,32 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
     final picked = await showTimePicker(
       context: context,
       initialTime: selectedTime ?? const TimeOfDay(hour: 7, minute: 0),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                primary: Theme.of(context).primaryColor,
+              ),
+            ),
+            child: child!,
+          ),
+        );
+      },
     );
 
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() {
         selectedTime = picked;
       });
+      // ✅ Mettre à jour immédiatement après sélection
       _updateDateTime(context);
     }
   }
 
   void _updateDateTime(BuildContext context) {
+    // ✅ Ne mettre à jour que si les DEUX sont sélectionnés
     if (selectedDate != null && selectedTime != null) {
       final dateTime = DateTime(
         selectedDate!.year,
@@ -332,7 +445,20 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
         selectedTime!.minute,
       );
 
+      // ✅ Notifier le BLoC
       context.read<NewReservationBloc>().add(SelectDateTime(dateTime));
+
+      // ✅ Debug print pour vérifier
+      print('✅ DateTime mis à jour: $dateTime');
+
+      // Message de confirmation
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Date et heure enregistrées ✓'),
+          duration: Duration(seconds: 1),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 }

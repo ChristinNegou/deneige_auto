@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // Config
 import '../../features/auth/domain/usecases/reset_password_usecase.dart';
 import '../../features/auth/domain/usecases/update_profile_usecase.dart';
+import '../../features/reservation/domain/usecases/add_vehicle_usecase.dart';
 import '../../features/reservation/domain/usecases/get_parking_spots_usecase.dart';
 import '../../features/reservation/domain/usecases/get_vehicules_usecase.dart';
 import '../../features/reservation/presentation/bloc/reservation_list_bloc.dart';
@@ -93,6 +94,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => GetParkingSpotsUseCase(sl()));
   sl.registerLazySingleton(() => CreateReservationUseCase(sl()));
   sl.registerLazySingleton(() => GetReservationsUseCase(sl()));
+  sl.registerLazySingleton(() => AddVehicleUseCase(sl()));
   sl.registerLazySingleton(() => CancelReservationUseCase(sl()));
   sl.registerLazySingleton(() => GetWeatherUseCase(
     repository: sl(),
@@ -116,9 +118,13 @@ Future<void> initializeDependencies() async {
     createReservation: sl(),
   ));
 
-  sl.registerFactory(() => VehicleBloc(
-    getVehicles: sl(),
-  ));
+  sl.registerFactory(
+        () => VehicleBloc(
+      getVehicles: sl(),
+      addVehicle: sl(),
+    ),
+  );
+
 
   sl.registerFactory(() => ReservationListBloc(
     getReservations: sl(),
