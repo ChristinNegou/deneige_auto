@@ -11,6 +11,7 @@ import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/reservation/presentation/bloc/new_reservation_bloc.dart';
 import '../../features/reservation/presentation/pages/reservation_details_page.dart';
 import '../../features/reservation/presentation/pages/reservations_page.dart';
+import '../../features/reservation/presentation/screens/reservation_success_screen.dart';
 import '../../features/settings/page/settings_page.dart';
 import '../../features/snow_worker/presentation/pages/snowworker_dashboard_page.dart';
 import '../../features/subscription/presentation/page/subscription_page.dart';
@@ -126,6 +127,15 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => ReservationDetailsPage(
             reservationId: reservationId ?? '',
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.reservationSuccess:
+        final reservationId = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => ReservationSuccessScreen(
+            reservationId: reservationId,
           ),
           settings: settings,
         );

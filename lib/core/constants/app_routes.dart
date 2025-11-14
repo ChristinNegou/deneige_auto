@@ -19,6 +19,7 @@ class AppRoutes {
   static const String reservations = '/reservations';
   static const String newReservation = '/reservations/new';
   static const String reservationDetails = '/reservations/details';
+  static const String reservationSuccess = '/reservation/success';
 
   // Routes de météo
   static const String weather = '/weather';
