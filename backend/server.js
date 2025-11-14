@@ -40,6 +40,9 @@ app.use((req, res, next) => {
 
 // Routes API
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/reservations', require('./routes/reservations'));
+app.use('/api/vehicles', require('./routes/vehicles'));
+app.use('/api/parking-spots', require('./routes/parking-spots'));
 
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
@@ -109,6 +112,14 @@ const server = app.listen(PORT, () => {
     console.log(`   GET  /api/auth/me`);
     console.log(`   POST /api/auth/logout`);
     console.log(`   PUT  /api/auth/update-profile`);
+    console.log(`   GET  /api/reservations`);
+    console.log(`   POST /api/reservations`);
+    console.log(`   GET  /api/reservations/:id`);
+    console.log(`   DELETE /api/reservations/:id`);
+    console.log(`   GET  /api/vehicles`);
+    console.log(`   POST /api/vehicles`);
+    console.log(`   GET  /api/parking-spots`);
+
     console.log('\n' + '='.repeat(50) + '\n');
 });
 

@@ -15,6 +15,13 @@ abstract class AuthRemoteDataSource {
         String? phone,
         UserRole role,
       });
+  Future<UserModel> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? photoUrl,
+  });
+
   Future<UserModel> getCurrentUser();
   Future<void> logout();
   Future<void> forgotPassword(String email);
@@ -51,7 +58,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           await secureStorage.saveRefreshToken(loginResponse.refreshToken!);
         }
         await secureStorage.saveUserId(loginResponse.user.id);
-        await secureStorage.saveUserRole(loginResponse.user.role.toString().split('.').last);
+        await secureStorage.saveUserRole(loginResponse.user.role
+            .toString()
+            .split('.')
+            .last);
 
         return loginResponse.user;
       } else {
@@ -72,8 +82,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> register(
-      String email,
+  Future<UserModel> register(String email,
       String password,
       String firstName,
       String lastName, {
@@ -89,7 +98,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'firstName': firstName,
           'lastName': lastName,
           'phoneNumber': phone,
-          'role': role.toString().split('.').last,
+          'role': role
+              .toString()
+              .split('.')
+              .last,
         },
       );
 
@@ -102,7 +114,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           await secureStorage.saveRefreshToken(loginResponse.refreshToken!);
         }
         await secureStorage.saveUserId(loginResponse.user.id);
-        await secureStorage.saveUserRole(loginResponse.user.role.toString().split('.').last);
+        await secureStorage.saveUserRole(loginResponse.user.role
+            .toString()
+            .split('.')
+            .last);
 
         return loginResponse.user;
       } else {
@@ -159,7 +174,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  // ✅ Méthode forgotPassword ajoutée
+  //  Méthode forgotPassword ajoutée
   @override
   Future<void> forgotPassword(String email) async {
     try {
@@ -170,7 +185,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (response.statusCode != 200) {
         throw ServerException(
-          message: response.data['message'] ?? 'Erreur lors de l\'envoi de l\'email',
+          message: response.data['message'] ??
+              'Erreur lors de l\'envoi de l\'email',
           statusCode: response.statusCode,
         );
       }
@@ -195,14 +211,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (response.statusCode != 200) {
         throw ServerException(
-          message: response.data['message'] ?? 'Erreur lors de la réinitialisation',
+          message: response.data['message'] ??
+              'Erreur lors de la réinitialisation',
           statusCode: response.statusCode,
         );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 400) {
         throw ServerException(
-          message: e.response?.data['message'] ?? 'le lien de récupération est expiré',
+          message: e.response?.data['message'] ??
+              'le lien de récupération est expiré',
           statusCode: 400,
         );
       }
@@ -210,4 +228,39 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  // méthode mise à jour du profil
+  @override
+  Future<UserModel> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? photoUrl,
+  }) async {
+    try {
+      final Map<String, dynamic> data = {};
+      if (firstName != null) data['firstName'] = firstName;
+      if (lastName != null) data['lastName'] = lastName;
+      if (phoneNumber != null) data['phoneNumber'] = phoneNumber;
+      if (photoUrl != null) data['photoUrl'] = photoUrl;
+
+      final response = await dio.put(
+        '/auth/update-profile',
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(response.data['user']);
+      } else {
+        throw ServerException(
+          message: response.data['message'] ??
+              'Erreur lors de la mise à jour du profil',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw NetworkException(
+        message: e.response?.data['message'] ?? 'Erreur réseau',
+      );
+    }
+  }
 }

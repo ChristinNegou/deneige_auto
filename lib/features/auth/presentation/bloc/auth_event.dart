@@ -65,5 +65,23 @@ class ResetPasswordEvent extends AuthEvent {
   });
 
   @override
-  List<Object> get props => [token, newPassword];
+  List<Object?> get props => [token, newPassword];
+
+}
+
+  class UpdateProfile extends AuthEvent {
+  final String? firstName;
+  final String? lastName;
+  final String? phoneNumber;
+  final String? photoUrl;
+
+  const UpdateProfile({
+  this.firstName,
+  this.lastName,
+  this.phoneNumber,
+  this.photoUrl,
+  });
+
+  @override
+  List<Object?> get props => [firstName, lastName, phoneNumber, photoUrl];
 }

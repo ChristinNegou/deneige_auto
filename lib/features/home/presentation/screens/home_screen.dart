@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_routes.dart';
-import '../../../reservation/domain/entities/weather.dart';
 import '../../../../core/utils/time_utils.dart';
+import '../../domain/entities/weather.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
@@ -86,7 +86,7 @@ class WeatherCard extends StatelessWidget {
                 ],
               ),
               Text(
-                weather.icon,
+                weather.iconUrl,
                 style: const TextStyle(fontSize: 64),
               ),
             ],
@@ -109,7 +109,7 @@ class WeatherCard extends StatelessWidget {
               ),
               _buildWeatherInfo(
                 Icons.ac_unit,
-                '${weather.snowDepthCm} cm',
+                '${weather.snowDepth} cm',
                 'Neige',
               ),
             ],

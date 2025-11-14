@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
+import 'package:deneige_auto/features/home/domain/entities/weather.dart';
 
 import '../../../../core/errors/failures.dart';
-import '../../../reservation/domain/entities/weather.dart';
 import '../repositories/weather_repository.dart';
 
 /// Use case pour récupérer les prévisions météo

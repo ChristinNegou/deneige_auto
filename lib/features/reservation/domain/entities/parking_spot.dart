@@ -1,20 +1,18 @@
-import 'dart:math';
-
 import 'package:equatable/equatable.dart';
+import 'dart:math' show asin, cos, sqrt;
 
-/// Entity représentant une place de stationnement
 class ParkingSpot extends Equatable {
   final String id;
-  final String spotNumber;      // Ex: "B-12"
-  final String? buildingCode;   // Code de l'immeuble (pour multi-immeubles V2)
-  final ParkingLevel level;     // Niveau de stationnement
-  final String? section;        // Section (A, B, C, etc.)
-  final double? latitude;       // Coordonnées GPS (optionnel)
+  final String spotNumber;
+  final String? buildingCode;
+  final ParkingLevel level;
+  final String? section;
+  final double? latitude;
   final double? longitude;
-  final bool isAssigned;        // Assignée à un résident
-  final String? assignedUserId; // ID du résident assigné
-  final bool isActive;          // Place active (non bloquée)
-  final String? notes;          // Notes spéciales (ex: "près de l'ascenseur")
+  final bool isAssigned;
+  final String? assignedUserId;
+  final bool isActive;
+  final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -34,7 +32,6 @@ class ParkingSpot extends Equatable {
     required this.updatedAt,
   });
 
-  /// Affichage formaté de la place
   String get displayName {
     if (section != null) {
       return '$section-$spotNumber';
@@ -42,7 +39,6 @@ class ParkingSpot extends Equatable {
     return spotNumber;
   }
 
-  /// Affichage complet avec niveau
   String get fullDisplayName {
     String name = displayName;
     if (level != ParkingLevel.outdoor) {
@@ -51,31 +47,22 @@ class ParkingSpot extends Equatable {
     return name;
   }
 
-  /// Vérifie si la place est disponible
   bool get isAvailable => isActive && !isAssigned;
 
-  /// Distance approximative depuis un point (si GPS disponible)
   double? distanceFrom(double lat, double lng) {
     if (latitude == null || longitude == null) return null;
 
-    // Formule haversine pour calculer la distance entre deux points GPS
-    const double earthRadius = 6371000; // mètres
-    
-    double lat1Rad = _toRadians(latitude!);
-    double lat2Rad = _toRadians(lat);
+    const double earthRadius = 6371000;
     double dLat = _toRadians(lat - latitude!);
     double dLng = _toRadians(lng - longitude!);
 
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(lat1Rad) * cos(lat2Rad) *
-        sin(dLng / 2) * sin(dLng / 2);
-    
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    double a = 0.5 - 0.5 * cos(2 * dLat) +
+        cos(_toRadians(latitude!)) * cos(_toRadians(lat)) * (1 - cos(2 * dLng)) / 2;
 
-    return earthRadius * c;
+    return earthRadius * 2 * asin(sqrt(a));
   }
 
-  double _toRadians(double degrees) => degrees * pi / 180.0;
+  double _toRadians(double degrees) => degrees * 3.14159265359 / 180.0;
 
   ParkingSpot copyWith({
     String? id,
@@ -127,13 +114,12 @@ class ParkingSpot extends Equatable {
   ];
 }
 
-/// Niveaux de stationnement
 enum ParkingLevel {
-  outdoor,      // Extérieur
-  underground1, // Sous-sol 1
-  underground2, // Sous-sol 2
-  underground3, // Sous-sol 3
-  covered,      // Couvert (mais pas souterrain)
+  outdoor,
+  underground1,
+  underground2,
+  underground3,
+  covered,
 }
 
 extension ParkingLevelExtension on ParkingLevel {
@@ -180,13 +166,12 @@ extension ParkingLevelExtension on ParkingLevel {
     }
   }
 
-  /// Multiplicateur de prix (souterrain = moins cher car moins exposé)
   double get priceFactor {
     switch (this) {
       case ParkingLevel.outdoor:
         return 1.0;
       case ParkingLevel.underground1:
-        return 0.8; // -20% car moins de neige
+        return 0.8;
       case ParkingLevel.underground2:
         return 0.7;
       case ParkingLevel.underground3:

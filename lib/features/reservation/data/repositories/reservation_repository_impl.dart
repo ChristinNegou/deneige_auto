@@ -2,7 +2,9 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
+import '../../domain/entities/parking_spot.dart';
 import '../../domain/entities/reservation.dart';
+import '../../domain/entities/vehicle.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../datasources/reservation_remote_datasource.dart';
 import '../models/reservation_model.dart';
@@ -11,6 +13,38 @@ class ReservationRepositoryImpl implements ReservationRepository {
   final ReservationRemoteDataSource remoteDataSource;
 
   ReservationRepositoryImpl({required this.remoteDataSource});
+
+  @override
+  Future<Either<Failure, List<Vehicle>>> getVehicles() async {
+    try {
+      final vehicles = await remoteDataSource.getVehicles();
+      return Right(vehicles);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ParkingSpot>>> getParkingSpots({
+    bool availableOnly = false,
+  }) async {
+    try {
+      final parkingSpots = await remoteDataSource.getParkingSpots(
+        availableOnly: availableOnly,
+      );
+      return Right(parkingSpots);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
 
   @override
   Future<Either<Failure, List<Reservation>>> getReservations({
@@ -37,12 +71,28 @@ class ReservationRepositoryImpl implements ReservationRepository {
   }
 
   @override
-  Future<Either<Failure, Reservation>> createReservation(
-    Reservation reservation,
-  ) async {
+  Future<Either<Failure, Reservation>> createReservation({
+    required String vehicleId,
+    required String parkingSpotId,
+    required DateTime departureTime,
+    required DateTime deadlineTime,
+    required List<String> serviceOptions,
+    int? snowDepthCm,
+    required double totalPrice,
+    required String paymentMethod,
+  }) async {
     try {
-      // Convertir l'entité Reservation en Map pour l'API
-      final data = _reservationToMap(reservation);
+      final data = {
+        'vehicleId': vehicleId,
+        'parkingSpotId': parkingSpotId,
+        'departureTime': departureTime.toIso8601String(),
+        'deadlineTime': deadlineTime.toIso8601String(),
+        'serviceOptions': serviceOptions,
+        'snowDepthCm': snowDepthCm,
+        'totalPrice': totalPrice,
+        'paymentMethod': paymentMethod,
+      };
+
       final createdReservation = await remoteDataSource.createReservation(data);
       return Right(createdReservation);
     } on NetworkException catch (e) {
@@ -53,6 +103,7 @@ class ReservationRepositoryImpl implements ReservationRepository {
       return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
     }
   }
+
 
   @override
   Future<Either<Failure, void>> cancelReservation(String reservationId) async {
@@ -114,7 +165,7 @@ class ReservationRepositoryImpl implements ReservationRepository {
     if (reservation is ReservationModel) {
       return reservation.toJson();
     }
-    
+
     // Sinon, créer manuellement le Map
     return {
       'userId': reservation.userId,

@@ -1,3 +1,5 @@
+// lib/features/reservation/domain/usecases/get_reservations_usecase.dart
+
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/reservation.dart';
@@ -8,13 +10,11 @@ class GetReservationsUseCase {
 
   GetReservationsUseCase(this.repository);
 
+  /// Récupère les réservations de l'utilisateur connecté
+  /// [upcoming] : si true, récupère seulement les réservations à venir
   Future<Either<Failure, List<Reservation>>> call({
-    bool? upcoming,
-    String? userId,
+    bool upcoming = false,
   }) async {
-    return await repository.getReservations(
-      upcoming: upcoming,
-      userId: userId,
-    );
+    return await repository.getReservations(upcoming: upcoming);
   }
 }

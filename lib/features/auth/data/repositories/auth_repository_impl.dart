@@ -28,8 +28,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, User>> register(
-      String email,
+  Future<Either<Failure, User>> register(String email,
       String password,
       String name, {
         String? phone,
@@ -38,7 +37,9 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final nameParts = name.split(' ');
       final firstName = nameParts.first;
-      final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      final lastName = nameParts.length > 1
+          ? nameParts.sublist(1).join(' ')
+          : '';
 
       final user = await remoteDataSource.register(
         email,
@@ -116,7 +117,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> resetPassword(String token, String newPassword) async {
+  Future<Either<Failure, void>> resetPassword(String token,
+      String newPassword) async {
     try {
       await remoteDataSource.resetPassword(token, newPassword);
       return const Right(null);
@@ -129,4 +131,28 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, User>> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? photoUrl,
+  }) async {
+    try {
+      final user = await remoteDataSource.updateProfile(
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+        photoUrl: photoUrl,
+      );
+      return Right(user);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(
+          message: 'Erreur inattendue lors de la mise à jour du profil'));
+    }
+  }
 }

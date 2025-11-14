@@ -27,7 +27,7 @@ class AppConfig {
   // OpenWeatherMap API
   static String get openWeatherMapApiKey {
     if (isProduction) {
-      return 'YOUR_PRODUCTION_OPENWEATHERMAP_API_KEY';
+      return 'ab72e143d388c56b44d4571dd67697ba';
     }
     return 'ab72e143d388c56b44d4571dd67697ba'; // TODO: Remplacer par votre clé API
   }
@@ -42,9 +42,23 @@ class AppConfig {
   static const String buildNumber = '1';
 
   // Location
-  static const String targetAddress = '3750 boulevard Jean-XXIII, Trois-Rivières (QC)';
+  static const String defaultCity = 'Trois-Rivières';
+  static const String defaultCountryCode = 'CA';
   static const double targetLatitude = 46.3432;
   static const double targetLongitude = -72.5476;
+
+  /// Clé API OpenWeatherMap (GRATUIT - 1000 appels/jour)
+  /// Obtenez votre clé sur: https://openweathermap.org/api
+  static const String openWeatherApiKey = 'ab72e143d388c56b44d4571dd67697ba'; // ← METTEZ VOTRE CLÉ ICI
+
+  /// URL de base pour l'API OpenWeatherMap
+  static const String openWeatherBaseUrl = 'https://api.openweathermap.org/data/2.5';
+
+  /// Coordonnées par défaut (Trois-Rivières, QC)
+  static const double defaultLatitude = 46.3432;
+  static const double defaultLongitude = -72.5476;
+
+
 
   // Business Rules
   static const int minReservationTimeMinutes = 60; // 60 min avant l'heure de sortie
@@ -77,9 +91,9 @@ class AppConfig {
   // Stripe
   static String get stripePublishableKey {
     if (isProduction) {
-      return 'pk_live_YOUR_LIVE_KEY';
+      return 'sk_test_51SPfZVKE0PkCEiT4YUctyxg2KKkLpcDBjAcsnHpl58H2tk0hji5xTsJU5kzqctl5MfCD7dDSPLN14Nvn8JXhs5wH00vVV8ajVM';
     }
-    return 'pk_test_YOUR_TEST_KEY';
+    return 'pk_test_51SPfZVKE0PkCEiT4bfjgqbPnGY5yVhTyFvEj8vjV9FTeWerXmi4cyt2ARCu1yV2e2AxTYwUzCugCO0V6NNKGqIM300zV3czGnr';
   }
 
   // Google Maps
@@ -156,4 +170,6 @@ class AppStrings {
   static const String networkError = 'Erreur de connexion';
   static const String unknownError = 'Une erreur est survenue';
   static const String validationError = 'Veuillez vérifier vos informations';
+  static const String weatherLoadError = 'Impossible de charger la météo';
+  static const String weatherUnavailable = 'Météo indisponible';
 }

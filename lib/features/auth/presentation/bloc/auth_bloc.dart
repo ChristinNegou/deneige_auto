@@ -6,6 +6,7 @@ import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
+import '../../domain/usecases/update_profile_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -16,6 +17,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GetCurrentUserUseCase getCurrentUser;
   final ForgotPasswordUseCase forgotPassword;
   final ResetPasswordUseCase resetPassword;
+  final UpdateProfileUseCase updateProfile;
+
 
   AuthBloc({
     required this.login,
@@ -24,6 +27,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.getCurrentUser,
     required this.forgotPassword,
     required this.resetPassword,
+    required this.updateProfile,
   }) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
     on<RegisterRequested>(_onRegisterRequested);
@@ -31,7 +35,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<ForgotPasswordEvent>(_onForgotPassword);
     on<ResetPasswordEvent>(_onResetPassword);
+    on<UpdateProfile>(_onUpdateProfile);
+
   }
+
+  Future<void> _onUpdateProfile(
+      UpdateProfile event,
+      Emitter<AuthState> emit,
+      ) async {
+    emit(AuthLoading());
+
+    final result = await updateProfile(
+      UpdateProfileParams(
+        firstName: event.firstName,
+        lastName: event.lastName,
+        phoneNumber: event.phoneNumber,
+        photoUrl: event.photoUrl,
+      ),
+    );
+
+    result.fold(
+          (failure) => emit(AuthError(message: failure.message)),
+          (user) => emit(AuthAuthenticated(user: user)),
+    );
+  }
+
 
   Future<void> _onLoginRequested(
       LoginRequested event,

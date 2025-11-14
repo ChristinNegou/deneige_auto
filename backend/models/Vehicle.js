@@ -1,0 +1,95 @@
+const mongoose = require('mongoose');
+
+const vehicleSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'L\'utilisateur est requis'],
+    },
+    make: {
+        type: String,
+        required: [true, 'La marque est requise'],
+        trim: true,
+    },
+    model: {
+        type: String,
+        required: [true, 'Le modèle est requis'],
+        trim: true,
+    },
+    year: {
+        type: Number,
+        required: [true, 'L\'année est requise'],
+        min: [1900, 'Année invalide'],
+        max: [new Date().getFullYear() + 1, 'Année invalide'],
+    },
+    color: {
+        type: String,
+        required: [true, 'La couleur est requise'],
+        trim: true,
+    },
+    licensePlate: {
+        type: String,
+        required: [true, 'La plaque d\'immatriculation est requise'],
+        trim: true,
+        uppercase: true,
+    },
+    type: {
+        type: String,
+        enum: ['sedan', 'suv', 'truck', 'van', 'coupe', 'hatchback'],
+        required: [true, 'Le type de véhicule est requis'],
+        default: 'sedan',
+    },
+    photoUrl: {
+        type: String,
+        default: null,
+    },
+    isDefault: {
+        type: Boolean,
+        default: false,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+}, {
+    timestamps: true,
+});
+
+// Index pour recherche rapide
+vehicleSchema.index({ userId: 1, isActive: 1 });
+vehicleSchema.index({ licensePlate: 1 });
+
+// Méthode virtuelle pour le nom complet
+vehicleSchema.virtual('displayName').get(function() {
+    return `${this.make} ${this.model} (${this.year})`;
+});
+
+// Méthode pour obtenir l'émoji selon le type
+vehicleSchema.virtual('icon').get(function() {
+    const icons = {
+        sedan: '🚗',
+        suv: '🚙',
+        truck: '🛻',
+        van: '🚐',
+        coupe: '🏎️',
+        hatchback: '🚗',
+    };
+    return icons[this.type] || '🚗';
+});
+
+// S'assurer qu'un seul véhicule par défaut par utilisateur
+vehicleSchema.pre('save', async function(next) {
+    if (this.isDefault && this.isModified('isDefault')) {
+        await this.constructor.updateMany(
+            { userId: this.userId, _id: { $ne: this._id } },
+            { isDefault: false }
+        );
+    }
+    next();
+});
+
+// Options pour inclure les virtuals dans JSON
+vehicleSchema.set('toJSON', { virtuals: true });
+vehicleSchema.set('toObject', { virtuals: true });
+
+module.exports = mongoose.model('Vehicle', vehicleSchema);

@@ -151,3 +151,4 @@ extension VehicleTypeExtension on VehicleType {
     }
   }
 }
+

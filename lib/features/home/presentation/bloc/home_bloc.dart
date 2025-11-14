@@ -7,6 +7,7 @@ import '../../domain/usecases/get_weather_usecase.dart';
 import 'home_event.dart';
 import 'home_state.dart';
 
+
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetCurrentUserUseCase getCurrentUser;
   final GetWeatherUseCase getWeather;

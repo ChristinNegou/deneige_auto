@@ -1,7 +1,21 @@
 import 'package:deneige_auto/features/auth/presentation/screens/forgot_password_screen.dart';
+import 'package:deneige_auto/features/vehicule/presentation/pages/vehicles_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
+import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/jobslist/jobslist_page.dart';
+import '../../features/notifications/pages/notifications_page.dart';
+import '../../features/profile/presentation/pages/edit_profile_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/reservation/presentation/bloc/new_reservation_bloc.dart';
+import '../../features/reservation/presentation/pages/reservation_details_page.dart';
+import '../../features/reservation/presentation/pages/reservations_page.dart';
+import '../../features/settings/page/settings_page.dart';
+import '../../features/snow_worker/presentation/pages/snowworker_dashboard_page.dart';
+import '../../features/subscription/presentation/page/subscription_page.dart';
+import '../../features/vehicule/presentation/pages/add_vehicle_page.dart';
+import '../../features/weather/presentation/pages/weather_page.dart';
 import '../constants/app_routes.dart';
 import '../di/injection_container.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
@@ -12,7 +26,8 @@ import '../../features/auth/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/domain/entities/user.dart';
 import 'role_based_home_wrapper.dart';
-import '../../features/client/screens/new_reservation_screen.dart';
+import '../../features/reservation/presentation/screens/new_reservation_screen.dart';
+import '../../features/vehicule/presentation/bloc/vehicule_bloc.dart';
 
 
 /// Classe qui gère la génération et la navigation des routes
@@ -96,11 +111,16 @@ class AppRouter {
           settings: settings,
         );
 
+
       case AppRoutes.newReservation:
         return MaterialPageRoute(
-          builder: (_) => const NewReservationScreen(),
+          builder: (_) => BlocProvider(
+            create: (context) => sl<NewReservationBloc>(),
+            child: const NewReservationScreen(),
+          ),
           settings: settings,
         );
+
 
       case AppRoutes.reservationDetails:
         final reservationId = settings.arguments as String?;
@@ -119,7 +139,7 @@ class AppRouter {
 
       case AppRoutes.vehicles:
         return MaterialPageRoute(
-          builder: (_) => const VehiclesPage(),
+          builder: (_) => const VehiclesListPage(),
           settings: settings,
         );
 
@@ -250,84 +270,8 @@ class AppRouter {
   }
 }
 
-// Pages placeholder - Remplacez-les par vos vraies pages au fur et à mesure
-
-class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Dashboard')));
-}
-
-class ReservationsPage extends StatelessWidget {
-  const ReservationsPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Réservations')));
-}
+// ======================= PAGE PLACEHOLDER ===================
 
 
-class ReservationDetailsPage extends StatelessWidget {
-  final String reservationId;
-  const ReservationDetailsPage({super.key, required this.reservationId});
-  @override
-  Widget build(BuildContext context) => Scaffold(body: Center(child: Text('Détails: $reservationId')));
-}
 
-class WeatherPage extends StatelessWidget {
-  const WeatherPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Météo')));
-}
 
-class VehiclesPage extends StatelessWidget {
-  const VehiclesPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Véhicules')));
-}
-
-class AddVehiclePage extends StatelessWidget {
-  const AddVehiclePage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Ajouter véhicule')));
-}
-
-class SubscriptionPage extends StatelessWidget {
-  const SubscriptionPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Abonnement')));
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Profil')));
-}
-
-class EditProfilePage extends StatelessWidget {
-  const EditProfilePage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Éditer profil')));
-}
-
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Paramètres')));
-}
-
-class NotificationsPage extends StatelessWidget {
-  const NotificationsPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Notifications')));
-}
-
-class SnowWorkerDashboardPage extends StatelessWidget {
-  const SnowWorkerDashboardPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Dashboard Déneigeur')));
-}
-
-class JobsListPage extends StatelessWidget {
-  const JobsListPage({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Liste des jobs')));
-}

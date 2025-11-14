@@ -5,15 +5,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // Config
 import '../../features/auth/domain/usecases/reset_password_usecase.dart';
+import '../../features/auth/domain/usecases/update_profile_usecase.dart';
+import '../../features/reservation/domain/usecases/get_parking_spots_usecase.dart';
+import '../../features/reservation/domain/usecases/get_vehicules_usecase.dart';
+import '../../features/reservation/presentation/bloc/reservation_list_bloc.dart';
+import '../../features/vehicule/presentation/bloc/vehicule_bloc.dart';
 import '../../service/secure_storage_service.dart';
-import '../config/app_config.dart';
 import '../network/dio_client.dart';
+import '../services/location_service.dart';
+
 
 // Auth
 import '../../features/auth/data/datasources/auth_remote_datasource.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/domain/usecases/forgot_password_usecase.dart'; // ✅ Ajouté
+import '../../features/auth/domain/usecases/forgot_password_usecase.dart';
 import '../../features/auth/domain/usecases/get_current_user_usecase.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
@@ -36,54 +42,64 @@ import '../../features/reservation/domain/usecases/get_reservations_usecase.dart
 // BLoCs
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
-import '../../features/reservation/presentation/bloc/reservation_bloc.dart';
+import '../../features/reservation/presentation/bloc/new_reservation_bloc.dart';
+
+
 
 final sl = GetIt.instance; // sl = Service Locator
 
 /// Initialise toutes les dépendances de l'application
 Future<void> initializeDependencies() async {
   //! Core
-
-  // Secure Storage
-  sl.registerLazySingleton<SecureStorageService>(
-        () => SecureStorageService(),
-  );
-
-  // Dio Client
-  sl.registerLazySingleton<DioClient>(
-        () => DioClient(secureStorage: sl()),
-  );
-
-  // Dio pour les appels HTTP
+  sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
+  sl.registerLazySingleton<LocationService>(() => LocationService());
+  sl.registerLazySingleton<DioClient>(() => DioClient(secureStorage: sl()));
   sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);
 
-  // SharedPreferences pour le stockage local
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
-  //! Auth Feature
-  // Data sources
+  //! Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-        () => AuthRemoteDataSourceImpl(
-      dio: sl(),
-      secureStorage: sl(),
-    ),
+        () => AuthRemoteDataSourceImpl(dio: sl(), secureStorage: sl()),
+  );
+  sl.registerLazySingleton<ReservationRemoteDataSource>(
+        () => ReservationRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<WeatherRemoteDatasource>(
+        () => WeatherRemoteDatasourceImpl(dio: sl()),
   );
 
-  // Repositories
+  //! Repositories
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<ReservationRepository>(
+        () => ReservationRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<WeatherRepository>(
+        () => WeatherRepositoryImpl(remoteDatasource: sl()),
+  );
 
-  // Use cases
+  //! Use cases
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => RegisterUseCase(sl()));
   sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
+  sl.registerLazySingleton(() => GetVehiclesUseCase(sl()));
+  sl.registerLazySingleton(() => GetParkingSpotsUseCase(sl()));
+  sl.registerLazySingleton(() => CreateReservationUseCase(sl()));
+  sl.registerLazySingleton(() => GetReservationsUseCase(sl()));
+  sl.registerLazySingleton(() => CancelReservationUseCase(sl()));
+  sl.registerLazySingleton(() => GetWeatherUseCase(
+    repository: sl(),
+    locationService: sl(),
+  ));
 
-  // BLoC
+  //! BLoCs
   sl.registerFactory(() => AuthBloc(
     login: sl(),
     register: sl(),
@@ -91,49 +107,24 @@ Future<void> initializeDependencies() async {
     getCurrentUser: sl(),
     forgotPassword: sl(),
     resetPassword: sl(),
+    updateProfile: sl(),
   ));
 
-  //! Home/Weather Feature
-  // Data sources
-  sl.registerLazySingleton<WeatherRemoteDataSource>(
-        () => WeatherRemoteDataSourceImpl(
-      dio: sl(),
-      apiKey: AppConfig.openWeatherMapApiKey,
-    ),
-  );
-
-  // Repositories
-  sl.registerLazySingleton<WeatherRepository>(
-        () => WeatherRepositoryImpl(remoteDataSource: sl()),
-  );
-
-  // Use cases
-  sl.registerLazySingleton(() => GetWeatherUseCase(sl()));
-
-  //! Reservation Feature
-  // Data sources
-  sl.registerLazySingleton<ReservationRemoteDataSource>(
-        () => ReservationRemoteDataSourceImpl(dio: sl()),
-  );
-
-  // Repositories
-  sl.registerLazySingleton<ReservationRepository>(
-        () => ReservationRepositoryImpl(remoteDataSource: sl()),
-  );
-
-  // Use cases
-  sl.registerLazySingleton(() => GetReservationsUseCase(sl()));
-  sl.registerLazySingleton(() => CreateReservationUseCase(sl()));
-  sl.registerLazySingleton(() => CancelReservationUseCase(sl()));
-
-  // BLoC
-  sl.registerFactory(() => ReservationBloc(
-    getReservations: sl(),
+  sl.registerFactory(() => NewReservationBloc(
+    getVehicles: sl(),
+    getParkingSpots: sl(),
     createReservation: sl(),
+  ));
+
+  sl.registerFactory(() => VehicleBloc(
+    getVehicles: sl(),
+  ));
+
+  sl.registerFactory(() => ReservationListBloc(
+    getReservations: sl(),
     cancelReservation: sl(),
   ));
 
-  //! Home BLoC (nécessite plusieurs use cases)
   sl.registerFactory(() => HomeBloc(
     getCurrentUser: sl(),
     getWeather: sl(),

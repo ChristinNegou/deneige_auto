@@ -23,3 +23,8 @@ class AuthFailure extends Failure {
 class ValidationFailure extends Failure {
   const ValidationFailure({super.message = 'Erreur de validation'});
 }
+
+class UnauthorizedFailure extends Failure {
+  const UnauthorizedFailure({super.message = 'Non autorisé'});
+}
+

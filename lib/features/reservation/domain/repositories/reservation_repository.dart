@@ -1,35 +1,36 @@
-
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/reservation.dart';
+import '../entities/vehicle.dart';
+import '../entities/parking_spot.dart';
 
-/// Interface du repository pour la gestion des réservations
-/// Suit le principe de Clean Architecture - Domain Layer
 abstract class ReservationRepository {
-  /// Récupère la liste des réservations
-  ///
-  /// [upcoming] - Si true, récupère uniquement les réservations à venir
-  /// [userId] - ID de l'utilisateur pour filtrer ses réservations
-  ///
-  /// Retourne Either<Failure, List<Reservation>>
-  Future<Either<Failure, List<Reservation>>> getReservations({
-    bool? upcoming,
-    String? userId,
+  Future<Either<Failure, List<Vehicle>>> getVehicles();
+
+  Future<Either<Failure, List<ParkingSpot>>> getParkingSpots({
+    bool availableOnly = false,
   });
 
-  /// Crée une nouvelle réservation
-  Future<Either<Failure, Reservation>> createReservation(
-      Reservation reservation,
-      );
+  Future<Either<Failure, Reservation>> createReservation({
+    required String vehicleId,
+    required String parkingSpotId,
+    required DateTime departureTime,
+    required DateTime deadlineTime,
+    required List<String> serviceOptions,
+    int? snowDepthCm,
+    required double totalPrice,
+    required String paymentMethod,
+  });
 
-  /// Annule une réservation existante
-  Future<Either<Failure, void>> cancelReservation(String reservationId);
+  Future<Either<Failure, List<Reservation>>> getReservations({
+    bool upcoming,
+    String? userId,
 
-  /// Récupère une réservation par son ID
+  });
+
   Future<Either<Failure, Reservation>> getReservationById(String id);
 
-  /// Met à jour une réservation
-  Future<Either<Failure, Reservation>> updateReservation(
-      Reservation reservation,
-      );
+  Future<Either<Failure, void>> cancelReservation(String id);
+  Future<Either<Failure, Reservation>> updateReservation(Reservation reservation);
+
 }

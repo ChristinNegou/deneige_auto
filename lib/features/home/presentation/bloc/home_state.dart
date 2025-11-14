@@ -1,8 +1,8 @@
 // ============= home_state.dart =============
 import 'package:equatable/equatable.dart';
 import '../../../auth/domain/entities/user.dart' as auth_entities;
-import '../../../reservation/domain/entities/weather.dart';
 import '../../../reservation/domain/entities/reservation.dart';
+import '../../domain/entities/weather.dart';
 
 class HomeState extends Equatable {
   final bool isLoading;

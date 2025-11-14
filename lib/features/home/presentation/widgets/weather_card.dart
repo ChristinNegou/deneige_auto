@@ -1,34 +1,15 @@
+// lib/features/home/presentation/widgets/weather_card.dart
 
 import 'package:flutter/material.dart';
-
-/// Modèle simple pour Weather (à créer dans lib/features/home/domain/entities/weather.dart si absent)
-class Weather {
-  final double temperature;
-  final String condition;
-  final int humidity;
-  final double windSpeed;
-  final int snowDepthCm;
-  final String icon;
-  final bool hasSnowAlert;
-
-  const Weather({
-    required this.temperature,
-    required this.condition,
-    required this.humidity,
-    required this.windSpeed,
-    this.snowDepthCm = 0,
-    this.icon = '☁️',
-    this.hasSnowAlert = false,
-  });
-}
+import '../../domain/entities/weather.dart';
 
 class WeatherCard extends StatelessWidget {
   final Weather weather;
 
   const WeatherCard({
-    super.key,
+    Key? key,
     required this.weather,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,18 +17,15 @@ class WeatherCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
+          colors: _getGradientColors(weather.conditionCode),
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.blue[400]!,
-            Colors.blue[700]!,
-          ],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -55,6 +33,7 @@ class WeatherCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -62,82 +41,188 @@ class WeatherCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Météo actuelle',
+                    'Météo',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${weather.temperature.round()}°',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: Text(
-                          weather.condition,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    weather.location,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
               Text(
-                weather.icon,
-                style: const TextStyle(fontSize: 64),
+                weather.emoji,
+                style: const TextStyle(fontSize: 40),
               ),
             ],
           ),
+
           const SizedBox(height: 16),
-          Divider(color: Colors.white.withOpacity(0.3)),
-          const SizedBox(height: 16),
+
+          // Température principale
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildWeatherInfo(
-                Icons.opacity,
-                '${weather.humidity}%',
-                'Humidité',
+              Text(
+                '${weather.temperature.round()}°',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 56,
+                  fontWeight: FontWeight.bold,
+                  height: 1,
+                ),
               ),
-              _buildWeatherInfo(
-                Icons.air,
-                '${weather.windSpeed.round()} km/h',
-                'Vent',
-              ),
-              _buildWeatherInfo(
-                Icons.ac_unit,
-                '${weather.snowDepthCm} cm',
-                'Neige',
+              const SizedBox(width: 12),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      weather.condition,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    if (weather.snowDepth != null)
+                      Text(
+                        '❄️ ${weather.snowDepth} cm au sol',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),
+
+          const SizedBox(height: 16),
+
+          // Infos supplémentaires
+          Row(
+            children: [
+              Expanded(
+                child: _WeatherInfo(
+                  icon: Icons.water_drop,
+                  label: 'Humidité',
+                  value: '${weather.humidity}%',
+                ),
+              ),
+              Expanded(
+                child: _WeatherInfo(
+                  icon: Icons.air,
+                  label: 'Vent',
+                  value: '${weather.windSpeed.round()} km/h',
+                ),
+              ),
+            ],
+          ),
+
+          // Alerte neige
+          if (weather.hasSnowAlert) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Colors.orange.shade300,
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      weather.alertDescription ?? 'Alerte neige',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildWeatherInfo(IconData icon, String value, String label) {
+  List<Color> _getGradientColors(String conditionCode) {
+    switch (conditionCode.toLowerCase()) {
+      case 'sunny':
+      case 'clear':
+        return [Colors.orange.shade400, Colors.orange.shade600];
+      case 'cloudy':
+      case 'overcast':
+        return [Colors.grey.shade600, Colors.grey.shade800];
+      case 'rain':
+        return [Colors.blue.shade600, Colors.blue.shade800];
+      case 'snow':
+      case 'snowy':
+        return [Colors.blue.shade300, Colors.blue.shade500];
+      case 'fog':
+        return [Colors.blueGrey.shade400, Colors.blueGrey.shade600];
+      default:
+        return [Colors.blue.shade400, Colors.blue.shade600];
+    }
+  }
+}
+
+class _WeatherInfo extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _WeatherInfo({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          color: Colors.white,
-          size: 24,
+        Row(
+          children: [
+            Icon(
+              icon,
+              color: Colors.white70,
+              size: 16,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 4),
         Text(
@@ -145,14 +230,7 @@ class WeatherCard extends StatelessWidget {
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
-            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],
