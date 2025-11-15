@@ -3,7 +3,8 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
 const Reservation = require('../models/Reservation');
-const ParkingSpot = require('../models/ParkingSpot');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 
 // @route   GET /api/reservations
 // @desc    Obtenir toutes les réservations de l'utilisateur
@@ -269,6 +270,35 @@ router.delete('/:id', protect, async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de l\'annulation de la réservation',
+        });
+    }
+});
+
+// @route   POST /api/payments/create-intent
+// @desc    Créer un Payment Intent Stripe
+// @access  Private
+router.post('/create-intent', protect, async (req, res) => {
+    try {
+        const { amount } = req.body; // Montant en dollars
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: Math.round(amount * 100), // Stripe utilise les cents
+            currency: 'cad',
+            metadata: {
+                userId: req.user.id,
+            },
+        });
+
+        res.status(200).json({
+            success: true,
+            clientSecret: paymentIntent.client_secret,
+            paymentIntentId: paymentIntent.id,
+        });
+    } catch (error) {
+        console.error('Erreur Stripe:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
         });
     }
 });

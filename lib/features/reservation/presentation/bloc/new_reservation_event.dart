@@ -80,10 +80,13 @@ class CalculatePrice extends NewReservationEvent {}
 
 class SubmitReservation extends NewReservationEvent {
   final String paymentMethod;
-  const SubmitReservation(this.paymentMethod);
+  final String? paymentIntentId;
+
+  const SubmitReservation(this.paymentMethod, {this.paymentIntentId});
 
   @override
-  List<Object?> get props => [paymentMethod];
+  List<Object?> get props => [paymentMethod, paymentIntentId];
+
 }
 
 // Navigation Events

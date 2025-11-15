@@ -19,7 +19,8 @@ class AppConfig {
       case 'staging':
         return 'https://staging-api.deneige-auto.com/v1';
       default:
-        return 'http://localhost:3000/v1';
+        // Pour téléphone physique, utilisez l'adresse IP locale du PC
+        return 'http://192.168.40.228:3000/v1';
     }
   }
 

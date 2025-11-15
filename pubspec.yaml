@@ -16,7 +16,7 @@ dependencies:
   dartz: ^0.10.1
 
   google_places_flutter: ^2.0.9
-  http: ^1.1.0
+  http: ^1.6.0
 
 
   flutter_secure_storage: ^9.0.0
@@ -60,9 +60,9 @@ dependencies:
   # Dates & Time
   intl: ^0.20.0
 
-  # Push Notifications
-  firebase_core: ^4.2.1
-  firebase_messaging: ^16.0.4
+  # Push Notifications (temporairement désactivé - Firebase non configuré)
+  # firebase_core: ^4.2.1
+  # firebase_messaging: ^16.0.4
   flutter_local_notifications: ^19.5.0
 
   # Payments

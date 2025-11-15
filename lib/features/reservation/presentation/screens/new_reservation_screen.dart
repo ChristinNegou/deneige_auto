@@ -2,6 +2,7 @@ import 'package:deneige_auto/features/reservation/presentation/screens/steps/ste
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../payment/presentation/screens/payment_screen.dart';
 import '../bloc/new_reservation_bloc.dart';
 import '../bloc/new_reservation_event.dart';
 import '../bloc/new_reservation_state.dart';
@@ -349,8 +350,11 @@ class NewReservationView extends StatelessWidget {
     );
   }
 
+  // Modifier la méthode _showPaymentDialog
+
   void _showPaymentDialog(BuildContext context) {
     final bloc = context.read<NewReservationBloc>();
+    final state = bloc.state;
 
     showModalBottomSheet(
       context: context,
@@ -386,9 +390,28 @@ class NewReservationView extends StatelessWidget {
               icon: Icons.credit_card,
               title: 'Carte de crédit',
               subtitle: 'Visa, Mastercard, Amex',
-              onTap: () {
+              onTap: () async {
                 Navigator.of(sheetContext).pop();
-                bloc.add(const SubmitReservation('card'));
+
+                // ✅ Ouvrir la page de paiement
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PaymentScreen(
+                      amount: state.calculatedPrice ?? 0,
+                      reservationId: null, // Sera mis à jour après création
+                    ),
+                  ),
+                );
+
+                // ✅ Si le paiement réussit
+                if (result != null && result['success'] == true) {
+                  print('✅ Paiement validé, soumission de la réservation...');
+                  bloc.add(SubmitReservation(
+                    'card',
+                    paymentIntentId: result['paymentIntentId'],
+                  ));
+                }
               },
             ),
             const SizedBox(height: 24),

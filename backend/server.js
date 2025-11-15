@@ -43,7 +43,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/vehicles', require('./routes/vehicles'));
 app.use('/api/parking-spots', require('./routes/parking-spots'));
-
+app.use('/api/payments', require('./routes/payments'));
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
