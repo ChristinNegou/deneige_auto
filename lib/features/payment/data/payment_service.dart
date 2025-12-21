@@ -34,12 +34,12 @@ class PaymentService {
     }
   }
 
-  /// Confirmer le paiement
+  /// Confirmer le paiement avec Payment Sheet (nouvelle carte)
   Future<bool> confirmPayment({
     required String clientSecret,
   }) async {
     try {
-      // Confirmer le paiement avec Stripe
+      // Confirmer le paiement avec Stripe Payment Sheet
       await Stripe.instance.presentPaymentSheet();
       return true;
     } on StripeException catch (e) {
@@ -48,6 +48,31 @@ class PaymentService {
     } catch (e) {
       print('Erreur: $e');
       return false;
+    }
+  }
+
+  /// Confirmer le paiement avec une carte sauvegardée
+  Future<bool> confirmPaymentWithSavedCard({
+    required String clientSecret,
+    required String paymentMethodId,
+  }) async {
+    try {
+      // Confirm payment intent with saved payment method
+      await Stripe.instance.confirmPayment(
+        paymentIntentClientSecret: clientSecret,
+        data: PaymentMethodParams.cardFromMethodId(
+          paymentMethodData: PaymentMethodDataCardFromMethod(
+            paymentMethodId: paymentMethodId,
+          ),
+        ),
+      );
+      return true;
+    } on StripeException catch (e) {
+      print('Erreur Stripe: ${e.error.message}');
+      throw Exception(e.error.message ?? 'Erreur de paiement');
+    } catch (e) {
+      print('Erreur: $e');
+      throw Exception('Erreur de paiement: $e');
     }
   }
 

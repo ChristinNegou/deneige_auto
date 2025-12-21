@@ -92,7 +92,8 @@ app.use((err, req, res, next) => {
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => {
+const HOST = '0.0.0.0'; // Écouter sur toutes les interfaces réseau
+const server = app.listen(PORT, HOST, () => {
     console.log('\n' + '='.repeat(50));
     console.log('🚀 SERVEUR DÉMARRÉ AVEC SUCCÈS');
     console.log('='.repeat(50));

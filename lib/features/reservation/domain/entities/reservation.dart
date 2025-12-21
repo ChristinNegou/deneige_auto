@@ -69,6 +69,10 @@ class Reservation extends Equatable {
         status == ReservationStatus.assigned;
   }
 
+  bool get canBeEdited {
+    return status == ReservationStatus.pending;
+  }
+
   bool get canBeRated {
     return status == ReservationStatus.completed && rating == null;
   }

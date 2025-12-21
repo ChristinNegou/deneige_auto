@@ -19,6 +19,7 @@ class AppRoutes {
   static const String reservations = '/reservations';
   static const String newReservation = '/reservations/new';
   static const String reservationDetails = '/reservations/details';
+  static const String editReservation = '/reservations/edit';
   static const String reservationSuccess = '/reservation/success';
 
   // Routes de météo
@@ -35,6 +36,10 @@ class AppRoutes {
   // Routes de profil
   static const String profile = '/profile';
   static const String editProfile = '/profile/edit';
+
+  // Routes de paiements
+  static const String payments = '/payments';
+  static const String addPaymentMethod = '/payments/add-method';
 
   // Routes de paramètres
   static const String settings = '/settings';

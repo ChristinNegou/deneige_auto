@@ -12,6 +12,7 @@ abstract class ReservationRemoteDataSource {
   Future<List<ReservationModel>> getReservations({bool? upcoming});
   Future<ReservationModel> createReservation(Map<String, dynamic> data);
   Future<void> cancelReservation(String reservationId);
+  Future<ReservationModel> updateReservation(String reservationId, Map<String, dynamic> data);
   Future<Vehicle> addVehicle(Map<String, dynamic> data);
 
 
@@ -139,6 +140,24 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw ServerException(
           message: 'Erreur d\'annulation de réservation',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<ReservationModel> updateReservation(String reservationId, Map<String, dynamic> data) async {
+    try {
+      final response = await dio.put('/reservations/$reservationId', data: data);
+
+      if (response.statusCode == 200) {
+        return ReservationModel.fromJson(response.data['reservation'] ?? response.data);
+      } else {
+        throw ServerException(
+          message: 'Erreur de mise à jour de réservation',
           statusCode: response.statusCode,
         );
       }

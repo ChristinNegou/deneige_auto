@@ -1,21 +1,66 @@
-### Démarrer l'environnement de développement :
-# Terminal 1 - Backend
-cd backend
-npm run dev
+ Voici les commandes pour lancer chaque composant manuellement:
 
-# Terminal 2 - Flutter
-flutter run
+  📱 Frontend (Application Flutter)
 
-### Ou utilisez le script automatique :
-.\start-dev.ps1
+  # Lister les émulateurs disponibles
+  flutter emulators
 
-### Hot Reload Flutter (pendant que l'app tourne) :
-- **`r`** - Recharger rapidement (hot reload)
-- **`R`** - Redémarrer complètement (hot restart)
-- **`q`** - Quitter l'application
+  # Lancer un émulateur spécifique
+  flutter emulators --launch Pixel_7a
+  ou
+   flutter run -d SM (mon telephone samsung physique)
 
-### Arrêter tous les services :
-.\stop-all.ps1
+  # Ou démarrer l'application (Flutter détectera automatiquement l'émulateur)
+  flutter run
 
-### Supprimer tous les conteneurs :
-.\remove-all.ps1
+  # Ou spécifier un appareil précis
+  flutter run -d emulator-5556
+
+  🖥️ Backend (Node.js/Express)
+
+  # Se déplacer dans le dossier backend
+  cd backend
+
+  # Lancer en mode développement (avec auto-reload)
+  npm run dev
+
+  # Ou lancer en mode production
+  npm start
+
+  🗄️ MongoDB
+
+  Option 1: Via le service Windows (nécessite droits admin)
+  # Démarrer le service
+  net start MongoDB
+
+  # Arrêter le service
+  net stop MongoDB
+
+  Option 2: Manuellement (sans droits admin)
+  # Créer le dossier de données si nécessaire
+  mkdir -p C:/data/db
+
+  # Lancer MongoDB
+  mongod --dbpath C:/data/db --bind_ip 127.0.0.1
+
+  Option 3: Avec chemin personnalisé
+  # Utiliser un autre dossier pour les données
+  mongod --dbpath "C:\chemin\vers\data\db" --bind_ip 127.0.0.1
+
+  🚀 Tout lancer en même temps
+
+  Dans des terminaux séparés:
+  # Terminal 1 - MongoDB
+  mongod --dbpath C:/data/db --bind_ip 127.0.0.1
+
+  # Terminal 2 - Backend
+  cd backend && npm run dev
+
+  # Terminal 3 - Flutter
+  flutter run
+
+  🛑 Arrêter les services
+
+  - MongoDB: Ctrl+C dans le terminal ou net stop MongoDB
+  - Backend: Ctrl+C dans le terminal
+  - Flutter: Tapez q dans le terminal Flutter ou Ctrl+C

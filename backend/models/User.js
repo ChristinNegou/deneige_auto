@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
         enum: ['client', 'snowWorker', 'admin'],
         default: 'client',
     },
+    stripeCustomerId: {
+        type: String,
+        default: null,
+    },
     photoUrl: {
         type: String,
     },

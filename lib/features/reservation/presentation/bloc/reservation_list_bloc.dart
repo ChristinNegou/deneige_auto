@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../../core/config/app_config.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/usecases/get_reservations_usecase.dart';
 import '../../domain/usecases/cancel_reservation_usecase.dart';
@@ -93,11 +94,20 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
         isLoading: false,
         errorMessage: failure.message,
       )),
-          (reservations) => emit(state.copyWith(
-        isLoading: false,
-        reservations: reservations,
-        clearError: true,
-      )),
+          (reservations) {
+        // Filtrer pour afficher uniquement les réservations actives
+        final activeReservations = reservations.where((r) =>
+          r.status == ReservationStatus.pending ||
+          r.status == ReservationStatus.assigned ||
+          r.status == ReservationStatus.inProgress
+        ).toList();
+
+        emit(state.copyWith(
+          isLoading: false,
+          reservations: activeReservations,
+          clearError: true,
+        ));
+      },
     );
   }
 
@@ -109,10 +119,19 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
 
     result.fold(
           (failure) => emit(state.copyWith(errorMessage: failure.message)),
-          (reservations) => emit(state.copyWith(
-        reservations: reservations,
-        clearError: true,
-      )),
+          (reservations) {
+        // Filtrer pour afficher uniquement les réservations actives
+        final activeReservations = reservations.where((r) =>
+          r.status == ReservationStatus.pending ||
+          r.status == ReservationStatus.assigned ||
+          r.status == ReservationStatus.inProgress
+        ).toList();
+
+        emit(state.copyWith(
+          reservations: activeReservations,
+          clearError: true,
+        ));
+      },
     );
   }
 

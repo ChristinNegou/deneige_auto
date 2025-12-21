@@ -182,13 +182,29 @@ class ReservationRepositoryImpl implements ReservationRepository {
   }
 
   @override
-  Future<Either<Failure, Reservation>> updateReservation(
-    Reservation reservation,
-  ) async {
+  Future<Either<Failure, Reservation>> updateReservation({
+    required String reservationId,
+    required String vehicleId,
+    required String parkingSpotId,
+    required DateTime departureTime,
+    required DateTime deadlineTime,
+    required List<String> serviceOptions,
+    int? snowDepthCm,
+    required double totalPrice,
+  }) async {
     try {
-      // TODO: Implémenter l'appel API pour mettre à jour une réservation
-      // Pour l'instant, on retourne une erreur
-      return Left(ServerFailure(message: 'Mise à jour non implémentée'));
+      final data = {
+        'vehicleId': vehicleId,
+        'parkingSpotId': parkingSpotId,
+        'departureTime': departureTime.toIso8601String(),
+        'deadlineTime': deadlineTime.toIso8601String(),
+        'serviceOptions': serviceOptions,
+        'snowDepthCm': snowDepthCm,
+        'totalPrice': totalPrice,
+      };
+
+      final updatedReservation = await remoteDataSource.updateReservation(reservationId, data);
+      return Right(updatedReservation);
     } on NetworkException catch (e) {
       return Left(NetworkFailure(message: e.message));
     } on ServerException catch (e) {

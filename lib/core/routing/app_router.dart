@@ -3,15 +3,19 @@ import 'package:deneige_auto/features/vehicule/presentation/pages/vehicles_list_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
-import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/jobslist/jobslist_page.dart';
 import '../../features/notifications/pages/notifications_page.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/payment/presentation/screens/payments_list_screen.dart';
+import '../../features/payment/presentation/screens/add_payment_method_screen.dart';
+import '../../features/payment/presentation/bloc/payment_methods_bloc.dart';
 import '../../features/reservation/presentation/bloc/new_reservation_bloc.dart';
 import '../../features/reservation/presentation/pages/reservation_details_page.dart';
+import '../../features/reservation/presentation/pages/edit_reservation_page.dart';
 import '../../features/reservation/presentation/pages/reservations_page.dart';
 import '../../features/reservation/presentation/screens/reservation_success_screen.dart';
+import '../../features/reservation/domain/entities/reservation.dart';
 import '../../features/settings/page/settings_page.dart';
 import '../../features/snow_worker/presentation/pages/snowworker_dashboard_page.dart';
 import '../../features/subscription/presentation/page/subscription_page.dart';
@@ -99,11 +103,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case AppRoutes.dashboard:
-        return MaterialPageRoute(
-          builder: (_) => const DashboardPage(),
-          settings: settings,
-        );
 
       case AppRoutes.reservations:
         return MaterialPageRoute(
@@ -127,6 +126,15 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => ReservationDetailsPage(
             reservationId: reservationId ?? '',
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.editReservation:
+        final reservation = settings.arguments as Reservation;
+        return MaterialPageRoute(
+          builder: (_) => EditReservationPage(
+            reservation: reservation,
           ),
           settings: settings,
         );
@@ -173,6 +181,21 @@ class AppRouter {
       case AppRoutes.editProfile:
         return MaterialPageRoute(
           builder: (_) => const EditProfilePage(),
+          settings: settings,
+        );
+
+      case AppRoutes.payments:
+        return MaterialPageRoute(
+          builder: (_) => const PaymentsListScreen(),
+          settings: settings,
+        );
+
+      case AppRoutes.addPaymentMethod:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => sl<PaymentMethodsBloc>(),
+            child: const AddPaymentMethodScreen(),
+          ),
           settings: settings,
         );
 

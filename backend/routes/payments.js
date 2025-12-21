@@ -2,6 +2,14 @@ const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { protect } = require('../middleware/auth');
+const {
+  getPaymentMethods,
+  savePaymentMethod,
+  deletePaymentMethod,
+  setDefaultPaymentMethod,
+  createRefund,
+  getRefundStatus,
+} = require('../controllers/paymentController');
 
 // @route   POST /api/payments/create-intent
 // @desc    Créer un Payment Intent Stripe
@@ -9,6 +17,7 @@ const { protect } = require('../middleware/auth');
 router.post('/create-intent', protect, async (req, res) => {
     try {
         const { amount, reservationId } = req.body;
+        const User = require('../models/User');
 
         console.log('💳 Création Payment Intent:', {
             amount,
@@ -16,8 +25,11 @@ router.post('/create-intent', protect, async (req, res) => {
             userId: req.user.id,
         });
 
+        // Récupérer l'utilisateur pour obtenir son stripeCustomerId
+        const user = await User.findById(req.user.id);
+
         // Créer le Payment Intent
-        const paymentIntent = await stripe.paymentIntents.create({
+        const paymentIntentParams = {
             amount: Math.round(amount * 100), // Stripe utilise les cents
             currency: 'cad',
             automatic_payment_methods: {
@@ -28,7 +40,15 @@ router.post('/create-intent', protect, async (req, res) => {
                 reservationId: reservationId || 'temp',
                 userEmail: req.user.email,
             },
-        });
+        };
+
+        // Si l'utilisateur a un Stripe Customer ID, l'inclure
+        if (user.stripeCustomerId) {
+            paymentIntentParams.customer = user.stripeCustomerId;
+            console.log('✅ Customer ID ajouté:', user.stripeCustomerId);
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams);
 
         console.log('✅ Payment Intent créé:', paymentIntent.id);
 
@@ -88,5 +108,37 @@ router.post('/confirm', protect, async (req, res) => {
         });
     }
 });
+
+// Payment Methods Management Routes
+// @route   GET /api/payments/payment-methods
+// @desc    Récupérer les méthodes de paiement du client
+// @access  Private
+router.get('/payment-methods', protect, getPaymentMethods);
+
+// @route   POST /api/payments/payment-methods
+// @desc    Ajouter une nouvelle méthode de paiement
+// @access  Private
+router.post('/payment-methods', protect, savePaymentMethod);
+
+// @route   DELETE /api/payments/payment-methods/:id
+// @desc    Supprimer une méthode de paiement
+// @access  Private
+router.delete('/payment-methods/:id', protect, deletePaymentMethod);
+
+// @route   PATCH /api/payments/payment-methods/:id/default
+// @desc    Définir une méthode de paiement par défaut
+// @access  Private
+router.patch('/payment-methods/:id/default', protect, setDefaultPaymentMethod);
+
+// Refund Routes
+// @route   POST /api/payments/refunds
+// @desc    Créer un remboursement
+// @access  Private
+router.post('/refunds', protect, createRefund);
+
+// @route   GET /api/payments/refunds/:id
+// @desc    Récupérer le statut d'un remboursement
+// @access  Private
+router.get('/refunds/:id', protect, getRefundStatus);
 
 module.exports = router;
