@@ -25,8 +25,8 @@ router.get('/', protect, async (req, res) => {
         }
 
         const reservations = await Reservation.find(query)
-            .populate('vehicleId')
-            .populate('parkingSpotId')
+            .populate('vehicle')
+            .populate('parkingSpot')
             .populate('workerId', 'firstName lastName phoneNumber')
             .sort({ departureTime: -1 });
 
@@ -53,8 +53,8 @@ router.get('/:id', protect, async (req, res) => {
             _id: req.params.id,
             userId: req.user.id,
         })
-            .populate('vehicleId')
-            .populate('parkingSpotId')
+            .populate('vehicle')
+            .populate('parkingSpot')
             .populate('workerId', 'firstName lastName phoneNumber');
 
         if (!reservation) {
@@ -134,8 +134,8 @@ router.post('/', protect, async (req, res) => {
 
         const reservation = await Reservation.create({
             userId: req.user.id,
-            vehicleId,
-            parkingSpotId: finalParkingSpotId,
+            vehicle: vehicleId,
+            parkingSpot: finalParkingSpotId,
             parkingSpotNumber: finalParkingSpotNumber,
             customLocation: finalCustomLocation,
             departureTime: new Date(departureTime),
@@ -148,9 +148,9 @@ router.post('/', protect, async (req, res) => {
         });
 
         // ✅ IMPORTANT: Populer les relations avant de renvoyer
-        await reservation.populate('vehicleId');
+        await reservation.populate('vehicle');
         if (finalParkingSpotId) {
-            await reservation.populate('parkingSpotId');
+            await reservation.populate('parkingSpot');
         }
 
         console.log('✅ Réservation créée avec succès:', reservation._id);
@@ -161,8 +161,8 @@ router.post('/', protect, async (req, res) => {
                 id: reservation._id.toString(),
                 userId: reservation.userId.toString(),
                 workerId: reservation.workerId?.toString(),
-                vehicle: reservation.vehicleId, // ✅ Déjà populé
-                parkingSpot: reservation.parkingSpotId || {
+                vehicle: reservation.vehicle, // ✅ Déjà populé
+                parkingSpot: reservation.parkingSpot || {
                     // ✅ Créer un objet factice si place manuelle
                     id: 'manual',
                     spotNumber: finalParkingSpotNumber || finalCustomLocation || 'N/A',
@@ -202,13 +202,24 @@ router.post('/', protect, async (req, res) => {
 // @access  Private
 router.put('/:id', protect, async (req, res) => {
     try {
+        // Mapper les champs du frontend vers le schéma backend
+        const updateData = { ...req.body };
+        if (updateData.vehicleId) {
+            updateData.vehicle = updateData.vehicleId;
+            delete updateData.vehicleId;
+        }
+        if (updateData.parkingSpotId) {
+            updateData.parkingSpot = updateData.parkingSpotId;
+            delete updateData.parkingSpotId;
+        }
+
         const reservation = await Reservation.findOneAndUpdate(
             { _id: req.params.id, userId: req.user.id },
-            req.body,
+            updateData,
             { new: true, runValidators: true }
         )
-            .populate('vehicleId')
-            .populate('parkingSpotId')
+            .populate('vehicle')
+            .populate('parkingSpot')
             .populate('workerId');
 
         if (!reservation) {

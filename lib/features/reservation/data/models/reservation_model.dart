@@ -38,20 +38,8 @@ class ReservationModel extends Reservation {
       id: json['id'] as String? ?? json['_id'] as String,
       userId: json['userId'] as String,
       workerId: json['workerId'] as String?,
-      parkingSpot: json['parkingSpot'] != null
-          ? ParkingSpotModel.fromJson(json['parkingSpot'] as Map<String, dynamic>)
-          : ParkingSpotModel.fromJson({
-        'id': 'manual',
-        'spotNumber': json['parkingSpotNumber'] ?? json['customLocation'] ?? 'N/A',
-        'level': 'outdoor',
-        'isAssigned': false,
-        'isActive': true,
-        'createdAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
-      }),
-      vehicle: json['vehicle'] != null
-          ? VehicleModel.fromJson(json['vehicle'] as Map<String, dynamic>)
-          : throw Exception('Vehicle data is required but was null'),
+      parkingSpot: _parseParkingSpot(json),
+      vehicle: _parseVehicle(json),
       departureTime: DateTime.parse(json['departureTime'] as String),
       deadlineTime: json['deadlineTime'] != null
           ? DateTime.parse(json['deadlineTime'] as String)
@@ -176,5 +164,86 @@ class ReservationModel extends Reservation {
       case ServiceOption.wheelClearance:
         return 'wheelClearance';
     }
+  }
+
+  static VehicleModel _parseVehicle(Map<String, dynamic> json) {
+    // Cas 1: L'objet véhicule complet est fourni dans 'vehicle'
+    if (json['vehicle'] != null && json['vehicle'] is Map) {
+      return VehicleModel.fromJson(json['vehicle'] as Map<String, dynamic>);
+    }
+
+    // Cas 2: L'objet véhicule complet est fourni dans 'vehicleId' (incohérence backend)
+    if (json['vehicleId'] != null && json['vehicleId'] is Map) {
+      return VehicleModel.fromJson(json['vehicleId'] as Map<String, dynamic>);
+    }
+
+    // Cas 3: Seulement l'ID du véhicule est fourni (String)
+    if (json['vehicleId'] != null && json['vehicleId'] is String) {
+      return VehicleModel.fromJson({
+        'id': json['vehicleId'],
+        'userId': json['userId'] ?? 'unknown',
+        'make': 'Chargement...',
+        'model': '',
+        'year': 2020,
+        'color': 'Inconnu',
+        'licensePlate': 'N/A',
+        'type': 'compact',
+        'isActive': true,
+        'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+    }
+
+    // Cas 4: Aucune donnée de véhicule - erreur
+    throw Exception('Vehicle data is required but was null (neither vehicle nor vehicleId found)');
+  }
+
+  static ParkingSpotModel _parseParkingSpot(Map<String, dynamic> json) {
+    // Cas 1: L'objet parkingSpot complet est fourni dans 'parkingSpot'
+    if (json['parkingSpot'] != null && json['parkingSpot'] is Map) {
+      return ParkingSpotModel.fromJson(json['parkingSpot'] as Map<String, dynamic>);
+    }
+
+    // Cas 2: L'objet parkingSpot complet est fourni dans 'parkingSpotId' (incohérence backend)
+    if (json['parkingSpotId'] != null && json['parkingSpotId'] is Map) {
+      return ParkingSpotModel.fromJson(json['parkingSpotId'] as Map<String, dynamic>);
+    }
+
+    // Cas 3: Seulement l'ID de la place est fourni (String)
+    if (json['parkingSpotId'] != null && json['parkingSpotId'] is String) {
+      return ParkingSpotModel.fromJson({
+        'id': json['parkingSpotId'],
+        'spotNumber': json['parkingSpotNumber'] ?? 'N/A',
+        'level': 'outdoor',
+        'isAssigned': false,
+        'isActive': true,
+        'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+    }
+
+    // Cas 3: Données manuelles (customLocation)
+    if (json['customLocation'] != null || json['parkingSpotNumber'] != null) {
+      return ParkingSpotModel.fromJson({
+        'id': 'manual',
+        'spotNumber': json['parkingSpotNumber'] ?? json['customLocation'] ?? 'N/A',
+        'level': 'outdoor',
+        'isAssigned': false,
+        'isActive': true,
+        'createdAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
+    }
+
+    // Cas 4: Aucune donnée - créer une place par défaut
+    return ParkingSpotModel.fromJson({
+      'id': 'default',
+      'spotNumber': 'N/A',
+      'level': 'outdoor',
+      'isAssigned': false,
+      'isActive': true,
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    });
   }
 }

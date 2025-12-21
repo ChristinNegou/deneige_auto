@@ -144,6 +144,7 @@ class ReservationSuccessScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
+
                   child: const Text('Accueil'),
                 ),
               ),

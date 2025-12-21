@@ -6,12 +6,12 @@ const reservationSchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'L\'utilisateur est requis'],
     },
-    vehicleId: {
+    vehicle: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Vehicle',
         required: [true, 'Le véhicule est requis'],
     },
-    parkingSpotId: {
+    parkingSpot: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ParkingSpot',
         default: null,

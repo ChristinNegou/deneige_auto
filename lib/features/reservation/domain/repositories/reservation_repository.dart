@@ -44,6 +44,16 @@ abstract class ReservationRepository {
   Future<Either<Failure, Reservation>> getReservationById(String id);
 
   Future<Either<Failure, void>> cancelReservation(String id);
-  Future<Either<Failure, Reservation>> updateReservation(Reservation reservation);
+
+  Future<Either<Failure, Reservation>> updateReservation({
+    required String reservationId,
+    required String vehicleId,
+    required String parkingSpotId,
+    required DateTime departureTime,
+    required DateTime deadlineTime,
+    required List<String> serviceOptions,
+    int? snowDepthCm,
+    required double totalPrice,
+  });
 
 }

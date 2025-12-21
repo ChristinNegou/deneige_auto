@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(flutter analyze:*)"
+      "Bash(flutter analyze:*)",
+      "Bash(dir /s /b \"C:\\\\Deneige-auto\\\\lib\\\\features\")",
+      "Bash(dir /s /b \"C:\\\\Deneige-auto\\\\backend\")",
+      "Bash(npm run dev:*)",
+      "Bash(flutter devices:*)",
+      "Bash(dir /s /b \"C:\\\\Deneige-auto\\\\lib\\\\features\\\\reservation\\\\data\\\\*.dart\")",
+      "Bash(dir /s /b \"C:\\\\Deneige-auto\\\\lib\\\\features\\\\reservation\\\\presentation\\\\screens\\\\steps\")",
+      "Bash(findstr:*)",
+      "Bash(ipconfig:*)"
     ],
     "deny": [],
     "ask": []

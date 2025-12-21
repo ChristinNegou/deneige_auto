@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../dashboard/presentation/pages/dashboard_page.dart';
+
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../../../reservation/presentation/pages/reservations_page.dart';
 import '../../../weather/presentation/pages/weather_page.dart';
@@ -17,7 +17,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   // Liste des pages pour chaque onglet
   final List<Widget> _pages = const [
-    DashboardPage(),
+
     ReservationsPage(),
     WeatherPage(),
     ProfilePage(),
