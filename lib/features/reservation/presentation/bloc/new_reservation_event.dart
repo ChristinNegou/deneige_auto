@@ -93,3 +93,16 @@ class SubmitReservation extends NewReservationEvent {
 class GoToNextStep extends NewReservationEvent {}
 class GoToPreviousStep extends NewReservationEvent {}
 class ResetReservation extends NewReservationEvent {}
+
+// Location Events
+class GetCurrentLocation extends NewReservationEvent {}
+
+class SetLocationFromAddress extends NewReservationEvent {
+  final String address;
+  const SetLocationFromAddress(this.address);
+
+  @override
+  List<Object?> get props => [address];
+}
+
+class ClearLocationError extends NewReservationEvent {}

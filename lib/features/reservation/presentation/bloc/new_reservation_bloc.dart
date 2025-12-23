@@ -1,6 +1,8 @@
 import 'package:deneige_auto/features/reservation/domain/entities/parking_spot.dart';
 import 'package:deneige_auto/features/reservation/domain/entities/vehicle.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../../core/config/app_config.dart';
 import '../../domain/usecases/create_reservation_usecase.dart';
 import '../../domain/usecases/get_parking_spots_usecase.dart';
@@ -31,8 +33,151 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
     on<ResetReservation>(_onResetReservation);
     on<UpdateParkingSpotNumber>(_onUpdateParkingSpotNumber);
     on<UpdateCustomLocation>(_onUpdateCustomLocation);
+    on<GetCurrentLocation>(_onGetCurrentLocation);
+    on<SetLocationFromAddress>(_onSetLocationFromAddress);
+    on<ClearLocationError>(_onClearLocationError);
+  }
 
+  Future<void> _onGetCurrentLocation(
+    GetCurrentLocation event,
+    Emitter<NewReservationState> emit,
+  ) async {
+    emit(state.copyWith(
+      isGettingLocation: true,
+      locationError: null,
+      needsManualAddress: false,
+    ));
 
+    try {
+      // Vérifier les permissions
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          emit(state.copyWith(
+            isGettingLocation: false,
+            needsManualAddress: true,
+            locationError: 'Permission de localisation refusée. Veuillez entrer votre adresse.',
+          ));
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        emit(state.copyWith(
+          isGettingLocation: false,
+          needsManualAddress: true,
+          locationError: 'Permission refusée définitivement. Veuillez entrer votre adresse.',
+        ));
+        return;
+      }
+
+      // Obtenir la position
+      var position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+
+      // DEBUG: Détecter si on est sur l'émulateur (coordonnées de Mountain View, California)
+      // et utiliser Trois-Rivières à la place
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+
+      final isEmulatorLocation = (position.latitude - 37.4219983).abs() < 0.01 &&
+          (position.longitude - (-122.084)).abs() < 0.01;
+
+      if (isEmulatorLocation) {
+        // Utiliser les coordonnées de Trois-Rivières pour les tests
+        latitude = 46.3432;
+        longitude = -72.5476;
+      }
+
+      // Reverse geocoding pour obtenir l'adresse
+      String? address;
+      try {
+        final placemarks = await placemarkFromCoordinates(
+          latitude,
+          longitude,
+        );
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          address = '${p.street ?? ''}, ${p.locality ?? ''}, ${p.country ?? ''}'.trim();
+          if (address.startsWith(',')) address = address.substring(1).trim();
+        }
+      } catch (_) {
+        // Ignorer les erreurs de reverse geocoding
+        if (isEmulatorLocation) {
+          address = 'Trois-Rivières, QC, Canada';
+        }
+      }
+
+      emit(state.copyWith(
+        isGettingLocation: false,
+        locationLatitude: latitude,
+        locationLongitude: longitude,
+        locationAddress: address ?? state.customLocation ?? state.parkingSpotNumber,
+        needsManualAddress: false,
+        locationError: null,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isGettingLocation: false,
+        needsManualAddress: true,
+        locationError: 'Impossible d\'obtenir votre position. Veuillez entrer votre adresse.',
+      ));
+    }
+  }
+
+  Future<void> _onSetLocationFromAddress(
+    SetLocationFromAddress event,
+    Emitter<NewReservationState> emit,
+  ) async {
+    if (event.address.trim().isEmpty) {
+      emit(state.copyWith(locationError: 'Veuillez entrer une adresse valide'));
+      return;
+    }
+
+    emit(state.copyWith(
+      isGettingLocation: true,
+      locationError: null,
+    ));
+
+    try {
+      // Geocoding: convertir l'adresse en coordonnées
+      final locations = await locationFromAddress(event.address);
+
+      if (locations.isEmpty) {
+        emit(state.copyWith(
+          isGettingLocation: false,
+          locationError: 'Adresse non trouvée. Veuillez réessayer avec une adresse plus précise.',
+        ));
+        return;
+      }
+
+      final location = locations.first;
+      emit(state.copyWith(
+        isGettingLocation: false,
+        locationLatitude: location.latitude,
+        locationLongitude: location.longitude,
+        locationAddress: event.address,
+        needsManualAddress: false,
+        locationError: null,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        isGettingLocation: false,
+        locationError: 'Erreur lors de la recherche de l\'adresse. Veuillez réessayer.',
+      ));
+    }
+  }
+
+  void _onClearLocationError(
+    ClearLocationError event,
+    Emitter<NewReservationState> emit,
+  ) {
+    emit(state.copyWith(locationError: null));
   }
 
   Future<void> _onLoadInitialData(
@@ -241,6 +386,15 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       ) async {
     if (!state.canSubmit) return;
 
+    // Vérifier que la localisation est disponible
+    if (!state.hasValidLocation) {
+      emit(state.copyWith(
+        errorMessage: 'La localisation est requise. Veuillez activer le GPS ou entrer une adresse.',
+        needsManualAddress: true,
+      ));
+      return;
+    }
+
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
@@ -263,6 +417,7 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
         return;
       }
 
+      // Utiliser la localisation stockée dans le state
       final result = await createReservation(CreateReservationParams(
         vehicleId: state.selectedVehicle!.id,
         parkingSpotId: parkingSpotId,
@@ -272,6 +427,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
         snowDepthCm: state.snowDepthCm,
         totalPrice: state.calculatedPrice!,
         paymentMethod: event.paymentMethod,
+        latitude: state.locationLatitude,
+        longitude: state.locationLongitude,
+        address: state.locationAddress ?? state.customLocation ?? state.parkingSpotNumber,
       ));
 
       result.fold(
@@ -301,11 +459,13 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       GoToNextStep event,
       Emitter<NewReservationState> emit,
       ) {
-    if (state.currentStep < 3) {
+    // 5 steps: 0=Vehicle/Parking, 1=Location, 2=DateTime, 3=Options, 4=Summary
+    if (state.currentStep < 4) {
       final nextStep = state.currentStep + 1;
       emit(state.copyWith(currentStep: nextStep));
 
-      if (nextStep == 2) {
+      // Calculer le prix quand on arrive au step 3 (options)
+      if (nextStep == 3) {
         add(CalculatePrice());
       }
     }

@@ -26,6 +26,9 @@ class CreateReservationUseCase {
       snowDepthCm: params.snowDepthCm,
       totalPrice: params.totalPrice,
       paymentMethod: params.paymentMethod,
+      latitude: params.latitude,
+      longitude: params.longitude,
+      address: params.address,
     );
   }
 
@@ -54,6 +57,10 @@ class CreateReservationParams {
   final int? snowDepthCm;
   final double totalPrice;
   final String paymentMethod;
+  // Localisation GPS pour le système déneigeur
+  final double? latitude;
+  final double? longitude;
+  final String? address;
 
   CreateReservationParams({
     required this.vehicleId,
@@ -64,5 +71,8 @@ class CreateReservationParams {
     this.snowDepthCm,
     required this.totalPrice,
     required this.paymentMethod,
+    this.latitude,
+    this.longitude,
+    this.address,
   });
 }

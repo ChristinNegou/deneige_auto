@@ -47,6 +47,88 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+
+    // Worker-specific profile (only used when role === 'snowWorker')
+    workerProfile: {
+        isAvailable: {
+            type: Boolean,
+            default: false,
+        },
+        currentLocation: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point',
+            },
+            coordinates: {
+                type: [Number], // [longitude, latitude]
+                default: [0, 0],
+            },
+        },
+        preferredZones: [{
+            name: {
+                type: String,
+                required: true,
+            },
+            centerLat: {
+                type: Number,
+                required: true,
+            },
+            centerLng: {
+                type: Number,
+                required: true,
+            },
+            radiusKm: {
+                type: Number,
+                default: 5,
+            },
+        }],
+        maxActiveJobs: {
+            type: Number,
+            default: 3,
+        },
+        vehicleType: {
+            type: String,
+            enum: ['car', 'truck', 'atv', 'other'],
+            default: 'car',
+        },
+        equipmentList: [{
+            type: String,
+        }],
+
+        // Worker statistics
+        totalJobsCompleted: {
+            type: Number,
+            default: 0,
+        },
+        totalEarnings: {
+            type: Number,
+            default: 0,
+        },
+        totalTipsReceived: {
+            type: Number,
+            default: 0,
+        },
+        averageRating: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 5,
+        },
+        totalRatingsCount: {
+            type: Number,
+            default: 0,
+        },
+
+        // Payout information
+        stripeConnectId: {
+            type: String,
+        },
+        bankAccountLast4: {
+            type: String,
+        },
+    },
+
     resetPasswordToken: String,
     resetPasswordExpire: Date,
     createdAt: {
@@ -58,6 +140,9 @@ const userSchema = new mongoose.Schema({
         default: Date.now,
     },
 });
+
+// Geospatial index for worker location queries
+userSchema.index({ 'workerProfile.currentLocation': '2dsphere' });
 
 // Hash le mot de passe avant de sauvegarder
 userSchema.pre('save', async function (next) {

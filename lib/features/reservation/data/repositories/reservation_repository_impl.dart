@@ -82,6 +82,10 @@ class ReservationRepositoryImpl implements ReservationRepository {
     int? snowDepthCm,
     required double totalPrice,
     required String paymentMethod,
+    // Localisation GPS pour le système déneigeur
+    double? latitude,
+    double? longitude,
+    String? address,
   }) async {
     try {
       final data = {
@@ -95,7 +99,10 @@ class ReservationRepositoryImpl implements ReservationRepository {
         'snowDepthCm': snowDepthCm,
         'totalPrice': totalPrice,
         'paymentMethod': paymentMethod,
-
+        // Ajouter les coordonnées GPS si disponibles
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
+        if (address != null) 'address': address,
       };
 
       final createdReservation = await remoteDataSource.createReservation(data);
@@ -191,6 +198,9 @@ class ReservationRepositoryImpl implements ReservationRepository {
     required List<String> serviceOptions,
     int? snowDepthCm,
     required double totalPrice,
+    double? latitude,
+    double? longitude,
+    String? address,
   }) async {
     try {
       final data = {
@@ -201,6 +211,9 @@ class ReservationRepositoryImpl implements ReservationRepository {
         'serviceOptions': serviceOptions,
         'snowDepthCm': snowDepthCm,
         'totalPrice': totalPrice,
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
+        if (address != null) 'address': address,
       };
 
       final updatedReservation = await remoteDataSource.updateReservation(reservationId, data);

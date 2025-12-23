@@ -9,7 +9,13 @@
       "Bash(dir /s /b \"C:\\\\Deneige-auto\\\\lib\\\\features\\\\reservation\\\\data\\\\*.dart\")",
       "Bash(dir /s /b \"C:\\\\Deneige-auto\\\\lib\\\\features\\\\reservation\\\\presentation\\\\screens\\\\steps\")",
       "Bash(findstr:*)",
-      "Bash(ipconfig:*)"
+      "Bash(ipconfig:*)",
+      "Bash(curl:*)",
+      "Bash(cat:*)",
+      "Bash(node -e:*)",
+      "Bash(flutter run:*)",
+      "Bash(node:*)",
+      "Bash(flutter pub get:*)"
     ],
     "deny": [],
     "ask": []

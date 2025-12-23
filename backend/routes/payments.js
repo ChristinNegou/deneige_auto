@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { protect } = require('../middleware/auth');
+const Notification = require('../models/Notification');
+const Reservation = require('../models/Reservation');
 const {
   getPaymentMethods,
   savePaymentMethod,
@@ -83,17 +85,36 @@ router.post('/confirm', protect, async (req, res) => {
 
         if (paymentIntent.status === 'succeeded') {
             // Mettre à jour la réservation
-            const Reservation = require('../models/Reservation');
-            await Reservation.findByIdAndUpdate(reservationId, {
-                paymentStatus: 'paid',
-                paymentIntentId: paymentIntentId,
-            });
+            const reservation = await Reservation.findByIdAndUpdate(
+                reservationId,
+                {
+                    paymentStatus: 'paid',
+                    paymentIntentId: paymentIntentId,
+                },
+                { new: true }
+            );
+
+            // Envoyer notification de paiement réussi
+            if (reservation) {
+                await Notification.notifyPaymentSuccess(reservation);
+            }
 
             res.status(200).json({
                 success: true,
                 message: 'Paiement confirmé',
             });
         } else {
+            // Paiement échoué - envoyer notification
+            if (reservationId) {
+                const reservation = await Reservation.findById(reservationId);
+                if (reservation) {
+                    await Notification.notifyPaymentFailed(
+                        reservation,
+                        paymentIntent.last_payment_error?.message || 'Paiement refusé'
+                    );
+                }
+            }
+
             res.status(400).json({
                 success: false,
                 message: 'Le paiement n\'a pas réussi',

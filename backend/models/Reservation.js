@@ -43,7 +43,7 @@ const reservationSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'assigned', 'inProgress', 'completed', 'cancelled'],
+        enum: ['pending', 'assigned', 'enRoute', 'inProgress', 'completed', 'cancelled'],
         default: 'pending',
     },
     serviceOptions: [{
@@ -129,6 +129,73 @@ const reservationSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
+
+    // Tip from client to worker
+    tip: {
+        amount: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        paidAt: {
+            type: Date,
+            default: null,
+        },
+        paymentIntentId: {
+            type: String,
+            default: null,
+        },
+    },
+
+    // Geolocation for proximity-based job discovery
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point',
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: [0, 0],
+        },
+        address: {
+            type: String,
+            trim: true,
+        },
+    },
+
+    // Worker tracking timestamps
+    assignedAt: {
+        type: Date,
+        default: null,
+    },
+    workerEnRouteAt: {
+        type: Date,
+        default: null,
+    },
+    workerArrivedAt: {
+        type: Date,
+        default: null,
+    },
+    startedAt: {
+        type: Date,
+        default: null,
+    },
+    estimatedArrivalTime: {
+        type: Date,
+        default: null,
+    },
+
+    // Worker's last known location during job
+    workerLocation: {
+        type: {
+            type: String,
+            enum: ['Point'],
+        },
+        coordinates: {
+            type: [Number],
+        },
+    },
 }, {
     timestamps: true,
 });
@@ -140,6 +207,9 @@ const reservationSchema = new mongoose.Schema({
 reservationSchema.index({ userId: 1, status: 1, departureTime: -1 });
 reservationSchema.index({ workerId: 1, status: 1 });
 reservationSchema.index({ departureTime: 1, status: 1 });
+
+// Geospatial index for location-based job discovery
+reservationSchema.index({ 'location': '2dsphere' });
 
 // Méthode virtuelle pour savoir si c'est urgent
 reservationSchema.virtual('isUrgent').get(function() {
@@ -153,6 +223,7 @@ reservationSchema.virtual('statusIcon').get(function() {
     const icons = {
         pending: '⏳',
         assigned: '👷',
+        enRoute: '🚗',
         inProgress: '🚧',
         completed: '✅',
         cancelled: '❌',
@@ -165,6 +236,7 @@ reservationSchema.virtual('statusDisplayName').get(function() {
     const names = {
         pending: 'En attente',
         assigned: 'Assignée',
+        enRoute: 'En route',
         inProgress: 'En cours',
         completed: 'Terminée',
         cancelled: 'Annulée',
@@ -198,7 +270,7 @@ reservationSchema.statics.getUpcoming = function(userId) {
 
 // Validation: au moins un emplacement doit être défini
 reservationSchema.pre('save', function(next) {
-    if (!this.parkingSpotId && !this.parkingSpotNumber && !this.customLocation) {
+    if (!this.parkingSpot && !this.parkingSpotNumber && !this.customLocation) {
         return next(new Error('Un emplacement doit être fourni (place de parking, numéro ou description)'));
     }
     next();

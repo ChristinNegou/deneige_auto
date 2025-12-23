@@ -1,4 +1,3 @@
-import 'package:deneige_auto/features/reservation/presentation/screens/steps/step1_vehicule_parking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
@@ -6,9 +5,11 @@ import '../../../payment/presentation/screens/payment_screen.dart';
 import '../bloc/new_reservation_bloc.dart';
 import '../bloc/new_reservation_event.dart';
 import '../bloc/new_reservation_state.dart';
-import 'steps/step2_datetime.dart';
-import 'steps/step3_options.dart';
-import 'steps/step4_summary.dart';
+import 'steps/step1_vehicule_parking.dart';
+import 'steps/step2_location.dart';
+import 'steps/step3_datetime.dart';
+import 'steps/step4_options.dart';
+import 'steps/step5_summary.dart';
 
 class NewReservationScreen extends StatelessWidget {
   const NewReservationScreen({Key? key}) : super(key: key);
@@ -98,9 +99,9 @@ class NewReservationView extends StatelessWidget {
 
   Widget _buildStepper(BuildContext context, NewReservationState state) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       child: Row(
-        children: List.generate(4, (index) {
+        children: List.generate(5, (index) {
           return Expanded(
             child: _buildStepIndicator(
               context: context,
@@ -124,10 +125,11 @@ class NewReservationView extends StatelessWidget {
     final isActive = index == currentStep;
 
     final stepIcons = [
-      Icons.directions_car,
-      Icons.access_time,
-      Icons.tune,
-      Icons.receipt_long,
+      Icons.directions_car,  // Step 1: Véhicule/Parking
+      Icons.location_on,     // Step 2: Localisation
+      Icons.access_time,     // Step 3: Date/Heure
+      Icons.tune,            // Step 4: Options
+      Icons.receipt_long,    // Step 5: Résumé
     ];
 
     Color getColor() {
@@ -139,8 +141,8 @@ class NewReservationView extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 40,
-          height: 40,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: isActive ? theme.primaryColor : Colors.transparent,
@@ -151,19 +153,19 @@ class NewReservationView extends StatelessWidget {
           ),
           child: Center(
             child: isCompleted
-                ? Icon(Icons.check, size: 20, color: theme.primaryColor)
+                ? Icon(Icons.check, size: 18, color: theme.primaryColor)
                 : Icon(
               stepIcons[index],
-              size: 20,
+              size: 18,
               color: isActive ? Colors.white : Colors.grey[400],
             ),
           ),
         ),
-        if (index < 3)
+        if (index < 4)
           Expanded(
             child: Container(
               height: 2,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
+              margin: const EdgeInsets.symmetric(horizontal: 2),
               color: isCompleted ? theme.primaryColor : Colors.grey[300],
             ),
           ),
@@ -189,11 +191,13 @@ class NewReservationView extends StatelessWidget {
       case 0:
         return const Step1VehicleParkingScreen();
       case 1:
-        return const Step2DateTimeScreen();
+        return const Step2LocationScreen();
       case 2:
-        return const Step3OptionsScreen();
+        return const Step3DateTimeScreen();
       case 3:
-        return const Step4SummaryScreen();
+        return const Step4OptionsScreen();
+      case 4:
+        return const Step5SummaryScreen();
       default:
         return const SizedBox.shrink();
     }
@@ -264,7 +268,7 @@ class NewReservationView extends StatelessWidget {
                     Text(_getNextButtonText(state)),
                     const SizedBox(width: 8),
                     Icon(
-                      state.currentStep == 3
+                      state.currentStep == 4
                           ? Icons.check
                           : Icons.arrow_forward,
                       size: 20,
@@ -286,8 +290,10 @@ class NewReservationView extends StatelessWidget {
       case 1:
         return 'Continuer';
       case 2:
-        return 'Voir le résumé';
+        return 'Continuer';
       case 3:
+        return 'Voir le résumé';
+      case 4:
         return 'Confirmer et payer';
       default:
         return 'Continuer';
@@ -308,11 +314,13 @@ class NewReservationView extends StatelessWidget {
       case 1:
         return state.canProceedStep2 ? () => bloc.add(GoToNextStep()) : null;
       case 2:
+        return state.canProceedStep3 ? () => bloc.add(GoToNextStep()) : null;
+      case 3:
         return () {
           bloc.add(CalculatePrice());
           bloc.add(GoToNextStep());
         };
-      case 3:
+      case 4:
         return state.canSubmit ? () => _showPaymentDialog(context) : null;
       default:
         return null;

@@ -1,0 +1,81 @@
+import 'dart:io';
+
+import 'package:dartz/dartz.dart';
+
+import '../../../../core/errors/failures.dart';
+import '../entities/worker_job.dart';
+import '../repositories/worker_repository.dart';
+
+class AcceptJobUseCase {
+  final WorkerRepository repository;
+
+  AcceptJobUseCase(this.repository);
+
+  Future<Either<Failure, WorkerJob>> call(String jobId) {
+    return repository.acceptJob(jobId);
+  }
+}
+
+class MarkEnRouteUseCase {
+  final WorkerRepository repository;
+
+  MarkEnRouteUseCase(this.repository);
+
+  Future<Either<Failure, WorkerJob>> call({
+    required String jobId,
+    double? latitude,
+    double? longitude,
+    int? estimatedMinutes,
+  }) {
+    return repository.markEnRoute(
+      jobId: jobId,
+      latitude: latitude,
+      longitude: longitude,
+      estimatedMinutes: estimatedMinutes,
+    );
+  }
+}
+
+class StartJobUseCase {
+  final WorkerRepository repository;
+
+  StartJobUseCase(this.repository);
+
+  Future<Either<Failure, WorkerJob>> call(String jobId) {
+    return repository.startJob(jobId);
+  }
+}
+
+class CompleteJobUseCase {
+  final WorkerRepository repository;
+
+  CompleteJobUseCase(this.repository);
+
+  Future<Either<Failure, WorkerJob>> call({
+    required String jobId,
+    String? workerNotes,
+  }) {
+    return repository.completeJob(
+      jobId: jobId,
+      workerNotes: workerNotes,
+    );
+  }
+}
+
+class UploadJobPhotoUseCase {
+  final WorkerRepository repository;
+
+  UploadJobPhotoUseCase(this.repository);
+
+  Future<Either<Failure, String>> call({
+    required String jobId,
+    required String type,
+    required File photo,
+  }) {
+    return repository.uploadPhoto(
+      jobId: jobId,
+      type: type,
+      photo: photo,
+    );
+  }
+}
