@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/jobslist/jobslist_page.dart';
-import '../../features/notifications/pages/notifications_page.dart';
+import '../../features/notifications/presentation/bloc/notification_bloc.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/payment/presentation/screens/payments_list_screen.dart';
@@ -18,6 +19,13 @@ import '../../features/reservation/presentation/screens/reservation_success_scre
 import '../../features/reservation/domain/entities/reservation.dart';
 import '../../features/settings/page/settings_page.dart';
 import '../../features/snow_worker/presentation/pages/snowworker_dashboard_page.dart';
+import '../../features/snow_worker/presentation/pages/worker_job_details_page.dart';
+import '../../features/snow_worker/presentation/pages/active_job_page.dart';
+import '../../features/snow_worker/presentation/pages/worker_history_page.dart';
+import '../../features/snow_worker/presentation/pages/worker_earnings_page.dart';
+import '../../features/snow_worker/presentation/pages/worker_settings_page.dart';
+import '../../features/snow_worker/domain/entities/worker_job.dart';
+import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../../features/subscription/presentation/page/subscription_page.dart';
 import '../../features/vehicule/presentation/pages/add_vehicle_page.dart';
 import '../../features/weather/presentation/pages/weather_page.dart';
@@ -207,7 +215,10 @@ class AppRouter {
 
       case AppRoutes.notifications:
         return MaterialPageRoute(
-          builder: (_) => const NotificationsPage(),
+          builder: (_) => BlocProvider(
+            create: (_) => sl<NotificationBloc>()..add(LoadNotifications()),
+            child: const NotificationsPage(),
+          ),
           settings: settings,
         );
 
@@ -221,6 +232,44 @@ class AppRouter {
       case AppRoutes.jobsList:
         return MaterialPageRoute(
           builder: (_) => const JobsListPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.workerJobDetails:
+        final job = settings.arguments as WorkerJob;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => sl<WorkerJobsBloc>(),
+            child: WorkerJobDetailsPage(job: job),
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.workerActiveJob:
+        final job = settings.arguments as WorkerJob;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => sl<WorkerJobsBloc>(),
+            child: ActiveJobPage(job: job),
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.workerHistory:
+        return MaterialPageRoute(
+          builder: (_) => const WorkerHistoryPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.workerEarnings:
+        return MaterialPageRoute(
+          builder: (_) => const WorkerEarningsPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.workerSettings:
+        return MaterialPageRoute(
+          builder: (_) => const WorkerSettingsPage(),
           settings: settings,
         );
 

@@ -1,13 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_state.dart';
 import '../../home/presentation/bloc/home_bloc.dart';
 import '../../home/presentation/bloc/home_event.dart';
+import '../../notifications/presentation/bloc/notification_bloc.dart';
+import '../../reservation/domain/entities/reservation.dart';
+import '../../../core/config/app_config.dart';
+import '../../reservation/presentation/bloc/reservation_list_bloc.dart' as reservation_bloc;
 import '../../widgets/upcoming_reservations_card.dart';
 import '../../widgets/weather_card.dart';
 import '../../widgets/quick_action_card.dart';
+import '../../widgets/live_tracking_card.dart';
+import '../../widgets/service_completed_dialog.dart';
 
 
 class ClientHomeScreen extends StatefulWidget {
@@ -17,16 +26,101 @@ class ClientHomeScreen extends StatefulWidget {
   State<ClientHomeScreen> createState() => _ClientHomeScreenState();
 }
 
-class _ClientHomeScreenState extends State<ClientHomeScreen> {
+class _ClientHomeScreenState extends State<ClientHomeScreen>
+    with TickerProviderStateMixin {
+  Timer? _refreshTimer;
+  Set<String> _ratedReservations = {};
+  late AnimationController _fabController;
+
+  // Auto-refresh interval (10 seconds for better responsiveness)
+  static const Duration _refreshInterval = Duration(seconds: 10);
+
   @override
   void initState() {
     super.initState();
-    // Charger les données météo au démarrage
+    _fabController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    // Charger les données au démarrage
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<HomeBloc>().add(LoadHomeData());
+        // Charger les réservations
+        context.read<reservation_bloc.ReservationListBloc>().add(const reservation_bloc.LoadReservations());
+        // Charger les notifications
+        context.read<NotificationBloc>().add(LoadNotifications());
       }
     });
+    // Démarrer l'auto-refresh
+    _startAutoRefresh();
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    _fabController.dispose();
+    super.dispose();
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer = Timer.periodic(_refreshInterval, (_) {
+      if (mounted) {
+        // Rafraîchir les réservations et notifications silencieusement
+        context.read<reservation_bloc.ReservationListBloc>().add(reservation_bloc.RefreshReservations());
+        context.read<NotificationBloc>().add(RefreshNotifications());
+      }
+    });
+  }
+
+  void _checkForCompletedReservations(List<Reservation> reservations) {
+    for (final reservation in reservations) {
+      if (reservation.status == ReservationStatus.completed &&
+          !_ratedReservations.contains(reservation.id) &&
+          reservation.rating == null) {
+        // Show service completed dialog with photo for recently completed reservation
+        _ratedReservations.add(reservation.id);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            HapticFeedback.heavyImpact();
+            ServiceCompletedDialog.show(
+              context,
+              reservation: reservation,
+              onSubmitRating: (rating, tip, comment) {
+                // TODO: Send rating to backend
+                debugPrint('Rating: $rating, Tip: $tip, Comment: $comment');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.check_circle, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Text(tip != null && tip > 0
+                            ? 'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé'
+                            : 'Merci pour votre évaluation!'),
+                      ],
+                    ),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+              },
+              onViewDetails: () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.reservationDetails,
+                  arguments: reservation.id,
+                );
+              },
+            );
+          }
+        });
+        break; // Only show one dialog at a time
+      }
+    }
   }
 
   @override
@@ -135,33 +229,49 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                         ),
                       ),
                       actions: [
-                        Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          child: Stack(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.notifications_outlined, size: 28),
-                                onPressed: () {
-                                  // TODO: Ouvrir les notifications
-                                },
-                              ),
-                              Positioned(
-                                right: 8,
-                                top: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
+                        BlocBuilder<NotificationBloc, NotificationState>(
+                          builder: (context, notifState) {
+                            final unreadCount = notifState.unreadCount;
+
+                            return Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              child: Stack(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.notifications_outlined, size: 28),
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, AppRoutes.notifications);
+                                    },
                                   ),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 8,
-                                    minHeight: 8,
-                                  ),
-                                ),
+                                  if (unreadCount > 0)
+                                    Positioned(
+                                      right: 6,
+                                      top: 6,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        constraints: const BoxConstraints(
+                                          minWidth: 18,
+                                          minHeight: 18,
+                                        ),
+                                        child: Text(
+                                          unreadCount > 9 ? '9+' : '$unreadCount',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                         IconButton(
                           icon: const Icon(Icons.settings_outlined, size: 26),
@@ -175,15 +285,23 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
                     // Contenu
                     SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Carte météo
-                            const WeatherCard(),
+                      child: BlocListener<reservation_bloc.ReservationListBloc,
+                          reservation_bloc.ReservationListState>(
+                        listener: (context, state) {
+                          _checkForCompletedReservations(state.reservations);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Live tracking card (si déneigeur en route ou en cours)
+                              const LiveTrackingCard(),
 
-                            const SizedBox(height: 24),
+                              // Carte météo
+                              const WeatherCard(),
+
+                              const SizedBox(height: 24),
 
                             // Actions rapides - Header amélioré
                             Row(
@@ -382,8 +500,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                             // Bannière d'information
                             _buildInfoBanner(context),
 
-                            const SizedBox(height: 80), // Espace pour la bottom nav
-                          ],
+                              const SizedBox(height: 80), // Espace pour la bottom nav
+                            ],
+                          ),
                         ),
                       ),
                     ),

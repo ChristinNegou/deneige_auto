@@ -20,6 +20,10 @@ abstract class ReservationRepository {
     int? snowDepthCm,
     required double totalPrice,
     required String paymentMethod,
+    // Localisation GPS pour le système déneigeur
+    double? latitude,
+    double? longitude,
+    String? address,
   });
 
   Future<Either<Failure, Vehicle>> addVehicle({
@@ -54,6 +58,9 @@ abstract class ReservationRepository {
     required List<String> serviceOptions,
     int? snowDepthCm,
     required double totalPrice,
+    double? latitude,
+    double? longitude,
+    String? address,
   });
 
 }

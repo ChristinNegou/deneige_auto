@@ -11,6 +11,8 @@ class ReservationModel extends Reservation {
     required super.id,
     required super.userId,
     super.workerId,
+    super.workerName,
+    super.workerPhone,
     required super.parkingSpot,
     required super.vehicle,
     required super.departureTime,
@@ -31,13 +33,19 @@ class ReservationModel extends Reservation {
     super.tip,
     super.isPriority,
     super.snowDepthCm,
+    super.estimatedArrivalMinutes,
+    super.locationLatitude,
+    super.locationLongitude,
+    super.locationAddress,
   });
 
   factory ReservationModel.fromJson(Map<String, dynamic> json) {
     return ReservationModel(
       id: json['id'] as String? ?? json['_id'] as String,
-      userId: json['userId'] as String,
-      workerId: json['workerId'] as String?,
+      userId: _parseUserId(json['userId']),
+      workerId: _parseWorkerId(json['workerId']),
+      workerName: _parseWorkerName(json['workerId']),
+      workerPhone: _parseWorkerPhone(json['workerId']),
       parkingSpot: _parseParkingSpot(json),
       vehicle: _parseVehicle(json),
       departureTime: DateTime.parse(json['departureTime'] as String),
@@ -67,10 +75,49 @@ class ReservationModel extends Reservation {
       workerNotes: json['workerNotes'] as String?,
       rating: json['rating'] != null ? (json['rating'] as num).toDouble() : null,
       review: json['review'] as String?,
-      tip: json['tip'] != null ? (json['tip'] as num).toDouble() : null,
+      tip: _parseTip(json['tip']),
       isPriority: json['isPriority'] as bool? ?? false,
       snowDepthCm: json['snowDepthCm'] as int?,
+      estimatedArrivalMinutes: json['estimatedArrivalMinutes'] as int?,
+      locationLatitude: _parseLocationLatitude(json['location']),
+      locationLongitude: _parseLocationLongitude(json['location']),
+      locationAddress: _parseLocationAddress(json['location']),
     );
+  }
+
+  /// Parse location latitude from GeoJSON format
+  static double? _parseLocationLatitude(dynamic location) {
+    if (location == null) return null;
+    if (location is Map<String, dynamic>) {
+      final coordinates = location['coordinates'];
+      if (coordinates is List && coordinates.length >= 2) {
+        // GeoJSON format: [longitude, latitude]
+        return (coordinates[1] as num?)?.toDouble();
+      }
+    }
+    return null;
+  }
+
+  /// Parse location longitude from GeoJSON format
+  static double? _parseLocationLongitude(dynamic location) {
+    if (location == null) return null;
+    if (location is Map<String, dynamic>) {
+      final coordinates = location['coordinates'];
+      if (coordinates is List && coordinates.length >= 2) {
+        // GeoJSON format: [longitude, latitude]
+        return (coordinates[0] as num?)?.toDouble();
+      }
+    }
+    return null;
+  }
+
+  /// Parse location address
+  static String? _parseLocationAddress(dynamic location) {
+    if (location == null) return null;
+    if (location is Map<String, dynamic>) {
+      return location['address'] as String?;
+    }
+    return null;
   }
 
 
@@ -99,6 +146,13 @@ class ReservationModel extends Reservation {
       'tip': tip,
       'isPriority': isPriority,
       'snowDepthCm': snowDepthCm,
+      'estimatedArrivalMinutes': estimatedArrivalMinutes,
+      if (locationLatitude != null && locationLongitude != null)
+        'location': {
+          'type': 'Point',
+          'coordinates': [locationLongitude, locationLatitude],
+          'address': locationAddress,
+        },
     };
   }
 
@@ -108,6 +162,9 @@ class ReservationModel extends Reservation {
         return ReservationStatus.pending;
       case 'assigned':
         return ReservationStatus.assigned;
+      case 'enroute':
+      case 'en_route':
+        return ReservationStatus.enRoute;
       case 'inprogress':
       case 'in_progress':
         return ReservationStatus.inProgress;
@@ -128,6 +185,8 @@ class ReservationModel extends Reservation {
         return 'pending';
       case ReservationStatus.assigned:
         return 'assigned';
+      case ReservationStatus.enRoute:
+        return 'enRoute';
       case ReservationStatus.inProgress:
         return 'inProgress';
       case ReservationStatus.completed:
@@ -164,6 +223,84 @@ class ReservationModel extends Reservation {
       case ServiceOption.wheelClearance:
         return 'wheelClearance';
     }
+  }
+
+  /// Parse userId qui peut être une String (ID) ou un objet (populated)
+  static String _parseUserId(dynamic userId) {
+    if (userId == null) {
+      return 'unknown';
+    }
+    if (userId is String) {
+      return userId;
+    }
+    if (userId is Map<String, dynamic>) {
+      return userId['_id'] as String? ?? userId['id'] as String? ?? 'unknown';
+    }
+    return userId.toString();
+  }
+
+  /// Parse workerId qui peut être null, une String (ID) ou un objet (populated)
+  static String? _parseWorkerId(dynamic workerId) {
+    if (workerId == null) {
+      return null;
+    }
+    if (workerId is String) {
+      return workerId;
+    }
+    if (workerId is Map<String, dynamic>) {
+      return workerId['_id'] as String? ?? workerId['id'] as String?;
+    }
+    return workerId.toString();
+  }
+
+  /// Parse workerName depuis l'objet worker (populated)
+  static String? _parseWorkerName(dynamic workerId) {
+    if (workerId == null) {
+      return null;
+    }
+    if (workerId is Map<String, dynamic>) {
+      final firstName = workerId['firstName'] as String?;
+      final lastName = workerId['lastName'] as String?;
+      if (firstName != null || lastName != null) {
+        return '${firstName ?? ''} ${lastName ?? ''}'.trim();
+      }
+    }
+    return null;
+  }
+
+  /// Parse workerPhone depuis l'objet worker (populated)
+  static String? _parseWorkerPhone(dynamic workerId) {
+    if (workerId == null) {
+      return null;
+    }
+    if (workerId is Map<String, dynamic>) {
+      return workerId['phoneNumber'] as String?;
+    }
+    return null;
+  }
+
+  /// Parse le champ tip qui peut être:
+  /// - null
+  /// - un num (ancien format)
+  /// - un objet {amount, paidAt, paymentIntentId} (nouveau format)
+  static double? _parseTip(dynamic tip) {
+    if (tip == null) return null;
+
+    // Ancien format: tip est directement un nombre
+    if (tip is num) {
+      return tip.toDouble();
+    }
+
+    // Nouveau format: tip est un objet avec amount
+    if (tip is Map<String, dynamic>) {
+      final amount = tip['amount'];
+      if (amount != null && amount is num && amount > 0) {
+        return amount.toDouble();
+      }
+      return null;
+    }
+
+    return null;
   }
 
   static VehicleModel _parseVehicle(Map<String, dynamic> json) {
@@ -222,11 +359,16 @@ class ReservationModel extends Reservation {
       });
     }
 
-    // Cas 3: Données manuelles (customLocation)
+    // Cas 3: Données manuelles (parkingSpotNumber ou customLocation)
     if (json['customLocation'] != null || json['parkingSpotNumber'] != null) {
+      final spotNumber = json['parkingSpotNumber'] ?? json['customLocation'] ?? 'N/A';
+      // ✅ Inclure le numéro dans l'ID pour préserver l'information lors de l'édition
+      final spotId = json['customLocation'] != null
+          ? 'custom-$spotNumber'
+          : 'manual-$spotNumber';
       return ParkingSpotModel.fromJson({
-        'id': 'manual',
-        'spotNumber': json['parkingSpotNumber'] ?? json['customLocation'] ?? 'N/A',
+        'id': spotId,
+        'spotNumber': spotNumber,
         'level': 'outdoor',
         'isAssigned': false,
         'isActive': true,

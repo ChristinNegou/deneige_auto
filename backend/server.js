@@ -23,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //  Servir les fichiers statiques
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // Logging middleware amélioré
@@ -44,6 +45,8 @@ app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/vehicles', require('./routes/vehicles'));
 app.use('/api/parking-spots', require('./routes/parking-spots'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/workers', require('./routes/workers'));
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));

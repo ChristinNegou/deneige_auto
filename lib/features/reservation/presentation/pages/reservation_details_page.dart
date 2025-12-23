@@ -1,11 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../domain/entities/reservation.dart';
 import '../bloc/reservation_list_bloc.dart';
+import '../../../widgets/rating_tip_dialog.dart';
 
 
 class ReservationDetailsPage extends StatelessWidget {
@@ -22,16 +28,53 @@ class ReservationDetailsPage extends StatelessWidget {
   }
 }
 
-class ReservationDetailsView extends StatelessWidget {
+class ReservationDetailsView extends StatefulWidget {
   final String reservationId;
 
   const ReservationDetailsView({super.key, required this.reservationId});
 
   @override
+  State<ReservationDetailsView> createState() => _ReservationDetailsViewState();
+}
+
+class _ReservationDetailsViewState extends State<ReservationDetailsView>
+    with TickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    // Auto-refresh every 5 seconds for active reservations
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (mounted) {
+        context.read<ReservationListBloc>().add(RefreshReservations());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<ReservationListBloc, ReservationListState>(
       builder: (context, state) {
-        if (state.isLoading) {
+        if (state.isLoading && state.reservations.isEmpty) {
           return Scaffold(
             appBar: AppBar(title: const Text('Détails de la réservation')),
             body: const Center(child: CircularProgressIndicator()),
@@ -49,26 +92,161 @@ class ReservationDetailsView extends StatelessWidget {
           );
         }
 
+        final isActive = reservation.status == ReservationStatus.enRoute ||
+            reservation.status == ReservationStatus.inProgress;
+
         return Scaffold(
-          appBar: AppBar(title: const Text('Détails de la réservation')),
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              _buildStatusCard(context, reservation),
-              const SizedBox(height: 16),
-              _buildDetailsCard(context, reservation),
-              const SizedBox(height: 16),
-              _buildServiceOptionsCard(context, reservation),
-              const SizedBox(height: 16),
-              _buildPriceCard(context, reservation),
-              const SizedBox(height: 24),
-              if (reservation.canBeEdited)
-                _buildEditButton(context, reservation),
-              if (reservation.canBeEdited && reservation.canBeCancelled)
-                const SizedBox(height: 12),
-              if (reservation.canBeCancelled)
-                _buildCancelButton(context, reservation),
-            ],
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  _getStatusColor(reservation.status),
+                  _getStatusColor(reservation.status).withOpacity(0.7),
+                  Colors.grey[100]!,
+                ],
+                stops: const [0.0, 0.15, 0.3],
+              ),
+            ),
+            child: SafeArea(
+              child: CustomScrollView(
+                slivers: [
+                  // App Bar
+                  SliverAppBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    floating: true,
+                    leading: IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.arrow_back, color: Colors.white),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    actions: [
+                      if (isActive)
+                        Container(
+                          margin: const EdgeInsets.only(right: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              ScaleTransition(
+                                scale: _pulseAnimation,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'EN DIRECT',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+
+                  // Content
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        // Status Header
+                        _buildStatusHeader(context, reservation),
+
+                        // Main Content
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(32),
+                              topRight: Radius.circular(32),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Timeline
+                                _buildTimeline(context, reservation),
+                                const SizedBox(height: 24),
+
+                                // Worker Card (if assigned)
+                                if (reservation.workerId != null)
+                                  _buildWorkerCard(context, reservation),
+
+                                const SizedBox(height: 20),
+
+                                // Quick Actions (if active)
+                                if (isActive) ...[
+                                  _buildQuickActions(context, reservation),
+                                  const SizedBox(height: 20),
+                                ],
+
+                                // Details Card
+                                _buildDetailsCard(context, reservation),
+                                const SizedBox(height: 16),
+
+                                // Service Options Card
+                                _buildServiceOptionsCard(context, reservation),
+                                const SizedBox(height: 16),
+
+                                // Photos Card (if available)
+                                if (reservation.afterPhotoUrl != null ||
+                                    reservation.beforePhotoUrl != null) ...[
+                                  _buildPhotosCard(context, reservation),
+                                  const SizedBox(height: 16),
+                                ],
+
+                                // Price Card
+                                _buildPriceCard(context, reservation),
+                                const SizedBox(height: 24),
+
+                                // Rating section (if completed and not rated)
+                                if (reservation.status == ReservationStatus.completed)
+                                  _buildRatingSection(context, reservation),
+
+                                // Action Buttons
+                                if (reservation.canBeEdited)
+                                  _buildEditButton(context, reservation),
+                                if (reservation.canBeEdited && reservation.canBeCancelled)
+                                  const SizedBox(height: 12),
+                                if (reservation.canBeCancelled)
+                                  _buildCancelButton(context, reservation),
+
+                                const SizedBox(height: 40),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -77,57 +255,386 @@ class ReservationDetailsView extends StatelessWidget {
 
   Reservation? _findReservation(List<Reservation> reservations) {
     try {
-      return reservations.firstWhere((r) => r.id == reservationId);
+      return reservations.firstWhere((r) => r.id == widget.reservationId);
     } catch (e) {
       return null;
     }
   }
 
-  Widget _buildStatusCard(BuildContext context, Reservation reservation) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: _getStatusColor(reservation.status).withOpacity(0.2),
-                shape: BoxShape.circle,
+  Widget _buildStatusHeader(BuildContext context, Reservation reservation) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+      child: Column(
+        children: [
+          // Status Icon with animation
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                reservation.status.icon,
+                style: const TextStyle(fontSize: 40),
               ),
-              child: Center(
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            reservation.status.displayName,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _getStatusDescription(reservation),
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white.withOpacity(0.9),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getStatusDescription(Reservation reservation) {
+    switch (reservation.status) {
+      case ReservationStatus.pending:
+        return 'En attente d\'un déneigeur disponible';
+      case ReservationStatus.assigned:
+        return 'Un déneigeur a été assigné à votre demande';
+      case ReservationStatus.enRoute:
+        return '${reservation.workerName ?? "Le déneigeur"} est en route vers vous';
+      case ReservationStatus.inProgress:
+        return 'Votre véhicule est en cours de déneigement';
+      case ReservationStatus.completed:
+        return 'Service terminé avec succès';
+      case ReservationStatus.cancelled:
+        return 'Cette réservation a été annulée';
+      case ReservationStatus.late:
+        return 'Le service est en retard';
+    }
+  }
+
+  Widget _buildTimeline(BuildContext context, Reservation reservation) {
+    final statuses = [
+      ReservationStatus.pending,
+      ReservationStatus.assigned,
+      ReservationStatus.enRoute,
+      ReservationStatus.inProgress,
+      ReservationStatus.completed,
+    ];
+
+    final currentIndex = statuses.indexOf(reservation.status);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.timeline, color: Color(0xFF3B82F6)),
+              SizedBox(width: 8),
+              Text(
+                'Progression',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: List.generate(statuses.length * 2 - 1, (index) {
+              if (index.isOdd) {
+                // Connector line
+                final stepIndex = index ~/ 2;
+                final isCompleted = stepIndex < currentIndex;
+                return Expanded(
+                  child: Container(
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: isCompleted
+                          ? const Color(0xFF10B981)
+                          : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                );
+              } else {
+                // Step circle
+                final stepIndex = index ~/ 2;
+                final status = statuses[stepIndex];
+                final isCompleted = stepIndex < currentIndex;
+                final isCurrent = stepIndex == currentIndex;
+
+                return Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isCompleted
+                        ? const Color(0xFF10B981)
+                        : isCurrent
+                            ? _getStatusColor(status)
+                            : Colors.grey[200],
+                    shape: BoxShape.circle,
+                    border: isCurrent
+                        ? Border.all(
+                            color: _getStatusColor(status).withOpacity(0.3),
+                            width: 4,
+                          )
+                        : null,
+                  ),
+                  child: Center(
+                    child: isCompleted
+                        ? const Icon(Icons.check, color: Colors.white, size: 20)
+                        : Text(
+                            status.icon,
+                            style: TextStyle(
+                              fontSize: isCurrent ? 18 : 14,
+                            ),
+                          ),
+                  ),
+                );
+              }
+            }),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: statuses.map((status) {
+              final isCurrent = status == reservation.status;
+              return SizedBox(
+                width: 50,
                 child: Text(
-                  reservation.status.icon,
-                  style: const TextStyle(fontSize: 24),
+                  _getShortStatusName(status),
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                    color: isCurrent ? _getStatusColor(status) : Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getShortStatusName(ReservationStatus status) {
+    switch (status) {
+      case ReservationStatus.pending:
+        return 'Attente';
+      case ReservationStatus.assigned:
+        return 'Assigné';
+      case ReservationStatus.enRoute:
+        return 'En route';
+      case ReservationStatus.inProgress:
+        return 'En cours';
+      case ReservationStatus.completed:
+        return 'Terminé';
+      case ReservationStatus.cancelled:
+        return 'Annulé';
+      case ReservationStatus.late:
+        return 'En retard';
+    }
+  }
+
+  Widget _buildWorkerCard(BuildContext context, Reservation reservation) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF3B82F6).withOpacity(0.1),
+            const Color(0xFF8B5CF6).withOpacity(0.1),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFF3B82F6).withOpacity(0.2),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFF3B82F6),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF3B82F6).withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                reservation.workerName?.isNotEmpty == true
+                    ? reservation.workerName![0].toUpperCase()
+                    : '?',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Statut',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Votre déneigeur',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
                   ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  reservation.workerName ?? 'Déneigeur assigné',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (reservation.rating != null) ...[
                   const SizedBox(height: 4),
-                  Text(
-                    reservation.status.displayName,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: _getStatusColor(reservation.status),
-                    ),
+                  Row(
+                    children: [
+                      ...List.generate(5, (index) {
+                        return Icon(
+                          index < (reservation.rating ?? 0).round()
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: Colors.amber,
+                          size: 16,
+                        );
+                      }),
+                    ],
                   ),
                 ],
+              ],
+            ),
+          ),
+          if (reservation.workerPhone != null) ...[
+            IconButton(
+              onPressed: () => _callWorker(reservation),
+              icon: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.phone, color: Colors.white, size: 20),
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context, Reservation reservation) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildQuickActionButton(
+            icon: Icons.phone,
+            label: 'Appeler',
+            color: const Color(0xFF10B981),
+            onTap: () => _callWorker(reservation),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildQuickActionButton(
+            icon: Icons.message,
+            label: 'Message',
+            color: const Color(0xFF3B82F6),
+            onTap: () => _messageWorker(reservation),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildQuickActionButton(
+            icon: Icons.map,
+            label: 'Carte',
+            color: const Color(0xFF8B5CF6),
+            onTap: () => _openMap(reservation),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: color,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            children: [
+              Icon(icon, color: Colors.white, size: 24),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -136,175 +643,713 @@ class ReservationDetailsView extends StatelessWidget {
   Widget _buildDetailsCard(BuildContext context, Reservation reservation) {
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Détails',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const Divider(height: 24),
-            _buildDetailRow(
-              Icons.directions_car,
-              'Véhicule',
-              '${reservation.vehicle.displayName} (${reservation.vehicle.color})',
-            ),
-            const SizedBox(height: 16),
-            _buildDetailRow(
-              Icons.local_parking,
-              'Place de parking',
-              reservation.parkingSpot.displayName,
-            ),
-            const SizedBox(height: 16),
-            _buildDetailRow(
-              Icons.access_time,
-              'Heure de départ',
-              dateFormat.format(reservation.departureTime),
-            ),
-            if (reservation.deadlineTime != null) ...[
-              const SizedBox(height: 16),
-              _buildDetailRow(
-                Icons.alarm,
-                'Deadline',
-                dateFormat.format(reservation.deadlineTime!),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.info_outline, color: Color(0xFF3B82F6)),
+              SizedBox(width: 8),
+              Text(
+                'Informations',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
+          ),
+          const Divider(height: 24),
+          _buildDetailRow(
+            Icons.directions_car,
+            'Véhicule',
+            '${reservation.vehicle.displayName}',
+            subtitle: reservation.vehicle.color,
+          ),
+          const SizedBox(height: 16),
+          _buildDetailRow(
+            Icons.local_parking,
+            'Emplacement',
+            reservation.parkingSpot.displayName,
+          ),
+          if (reservation.locationAddress != null) ...[
             const SizedBox(height: 16),
             _buildDetailRow(
-              Icons.calendar_today,
-              'Créée le',
-              dateFormat.format(reservation.createdAt),
+              Icons.location_on,
+              'Adresse',
+              reservation.locationAddress!,
             ),
           ],
-        ),
+          const SizedBox(height: 16),
+          _buildDetailRow(
+            Icons.schedule,
+            'Heure de départ souhaitée',
+            dateFormat.format(reservation.departureTime),
+          ),
+          if (reservation.assignedAt != null) ...[
+            const SizedBox(height: 16),
+            _buildDetailRow(
+              Icons.person_add,
+              'Assignée le',
+              dateFormat.format(reservation.assignedAt!),
+            ),
+          ],
+          if (reservation.startedAt != null) ...[
+            const SizedBox(height: 16),
+            _buildDetailRow(
+              Icons.play_arrow,
+              'Commencée le',
+              dateFormat.format(reservation.startedAt!),
+            ),
+          ],
+          if (reservation.completedAt != null) ...[
+            const SizedBox(height: 16),
+            _buildDetailRow(
+              Icons.check_circle,
+              'Terminée le',
+              dateFormat.format(reservation.completedAt!),
+            ),
+          ],
+        ],
       ),
     );
   }
 
   Widget _buildServiceOptionsCard(BuildContext context, Reservation reservation) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Options de service',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const Divider(height: 24),
-            if (reservation.serviceOptions.isEmpty)
-              const Text('Aucune option supplémentaire')
-            else
-              ...reservation.serviceOptions.map((option) {
-                String optionText;
-                switch (option) {
-                  case ServiceOption.windowScraping:
-                    optionText = 'Grattage des vitres (+5\$)';
-                    break;
-                  case ServiceOption.doorDeicing:
-                    optionText = 'Déglaçage des portes (+3\$)';
-                    break;
-                  case ServiceOption.wheelClearance:
-                    optionText = 'Dégagement des roues (+4\$)';
-                    break;
-                }
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.green, size: 20),
-                      const SizedBox(width: 8),
-                      Text(optionText),
-                    ],
-                  ),
-                );
-              }).toList(),
-            if (reservation.snowDepthCm != null) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.ac_unit, color: Colors.blue, size: 20),
-                  const SizedBox(width: 8),
-                  Text('Profondeur de neige: ${reservation.snowDepthCm} cm'),
-                ],
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.ac_unit, color: Color(0xFF3B82F6)),
+              SizedBox(width: 8),
+              Text(
+                'Services demandés',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
+          ),
+          const Divider(height: 24),
+          // Base service
+          _buildServiceItem(
+            icon: Icons.cleaning_services,
+            label: 'Déneigement de base',
+            price: reservation.basePrice,
+            isIncluded: true,
+          ),
+          if (reservation.serviceOptions.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            ...reservation.serviceOptions.map((option) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildServiceItem(
+                  icon: _getOptionIcon(option),
+                  label: _getOptionLabel(option),
+                  price: _getOptionPrice(option),
+                  isIncluded: true,
+                ),
+              );
+            }),
           ],
+          if (reservation.snowDepthCm != null) ...[
+            const Divider(height: 24),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.height, color: Colors.blue[600], size: 20),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Profondeur de neige: ${reservation.snowDepthCm} cm',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceItem({
+    required IconData icon,
+    required String label,
+    required double price,
+    required bool isIncluded,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isIncluded ? Colors.green[50] : Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: isIncluded ? Colors.green[600] : Colors.grey,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 14),
+          ),
+        ),
+        Text(
+          '${price.toStringAsFixed(2)} \$',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[700],
+          ),
+        ),
+      ],
+    );
+  }
+
+  IconData _getOptionIcon(ServiceOption option) {
+    switch (option) {
+      case ServiceOption.windowScraping:
+        return Icons.window;
+      case ServiceOption.doorDeicing:
+        return Icons.door_front_door;
+      case ServiceOption.wheelClearance:
+        return Icons.trip_origin;
+    }
+  }
+
+  String _getOptionLabel(ServiceOption option) {
+    switch (option) {
+      case ServiceOption.windowScraping:
+        return 'Grattage des vitres';
+      case ServiceOption.doorDeicing:
+        return 'Déglaçage des portes';
+      case ServiceOption.wheelClearance:
+        return 'Dégagement des roues';
+    }
+  }
+
+  double _getOptionPrice(ServiceOption option) {
+    switch (option) {
+      case ServiceOption.windowScraping:
+        return 5.0;
+      case ServiceOption.doorDeicing:
+        return 3.0;
+      case ServiceOption.wheelClearance:
+        return 4.0;
+    }
+  }
+
+  Widget _buildPhotosCard(BuildContext context, Reservation reservation) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.photo_camera, color: Colors.green[600], size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Photos du service',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 24),
+
+          // After Photo (primary - result)
+          if (reservation.afterPhotoUrl != null) ...[
+            const Text(
+              'Résultat final',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF10B981),
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => _showPhotoFullscreen(
+                context,
+                reservation.afterPhotoUrl!,
+                'Résultat final',
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 200,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: reservation.afterPhotoUrl!,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error, color: Colors.grey[400], size: 40),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Photo non disponible',
+                          style: TextStyle(color: Colors.grey[500]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.touch_app, size: 14, color: Colors.grey[500]),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Appuyez pour agrandir',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // Before Photo (if exists)
+          if (reservation.beforePhotoUrl != null) ...[
+            if (reservation.afterPhotoUrl != null) const SizedBox(height: 20),
+            const Text(
+              'Avant le service',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF6B7280),
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => _showPhotoFullscreen(
+                context,
+                reservation.beforePhotoUrl!,
+                'Avant le service',
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 150,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: CachedNetworkImage(
+                    imageUrl: reservation.beforePhotoUrl!,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error, color: Colors.grey[400], size: 32),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Photo non disponible',
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showPhotoFullscreen(BuildContext context, String imageUrl, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: Text(
+              title,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.error,
+                  color: Colors.white,
+                  size: 48,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildPriceCard(BuildContext context, Reservation reservation) {
-    return Card(
-      color: Colors.blue.shade50,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Prix total',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF3B82F6),
+            const Color(0xFF1E3A8A),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF3B82F6).withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Prix total',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white.withOpacity(0.8),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${reservation.totalPrice.toStringAsFixed(2)} \$',
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+              ),
+              const SizedBox(height: 4),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${reservation.totalPrice.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 6, left: 4),
+                    child: Text(
+                      '\$',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (reservation.tip != null && reservation.tip! > 0) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.favorite, color: Colors.amber, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        '+${reservation.tip!.toStringAsFixed(2)}\$ pourboire',
+                        style: const TextStyle(
+                          color: Colors.amber,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
+            ],
+          ),
+          if (reservation.isPriority)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.bolt, color: Colors.white, size: 18),
+                  SizedBox(width: 6),
+                  Text(
+                    'URGENT',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            if (reservation.isPriority)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade100,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.priority_high, color: Colors.orange, size: 16),
-                    SizedBox(width: 4),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRatingSection(BuildContext context, Reservation reservation) {
+    if (reservation.rating != null) {
+      // Already rated - show the rating
+      return Container(
+        margin: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.green[50],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.green[200]!),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green[100],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.star, color: Colors.green[700], size: 28),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Votre évaluation',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: List.generate(5, (index) {
+                      return Icon(
+                        index < reservation.rating!.round()
+                            ? Icons.star
+                            : Icons.star_border,
+                        color: Colors.amber,
+                        size: 24,
+                      );
+                    }),
+                  ),
+                  if (reservation.review != null && reservation.review!.isNotEmpty) ...[
+                    const SizedBox(height: 8),
                     Text(
-                      'Urgent',
+                      '"${reservation.review}"',
                       style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[700],
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                   ],
-                ),
+                ],
               ),
+            ),
           ],
+        ),
+      );
+    }
+
+    // Not rated yet - show button to rate
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Material(
+        color: Colors.amber,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: () {
+            HapticFeedback.mediumImpact();
+            RatingTipDialog.show(
+              context,
+              workerName: reservation.workerName ?? 'Déneigeur',
+              servicePrice: reservation.totalPrice,
+              onSubmit: (rating, tip, comment) {
+                // TODO: Send rating to backend
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.check_circle, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Text(tip != null && tip > 0
+                            ? 'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé'
+                            : 'Merci pour votre évaluation!'),
+                      ],
+                    ),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.star, color: Colors.white, size: 28),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Évaluer le service',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Partagez votre expérience et ajoutez un pourboire',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value) {
+  Widget _buildDetailRow(
+    IconData icon,
+    String label,
+    String value, {
+    String? subtitle,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 20, color: Colors.grey[600]),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -321,10 +1366,20 @@ class ReservationDetailsView extends StatelessWidget {
               Text(
                 value,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
               ),
+              if (subtitle != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -337,6 +1392,7 @@ class ReservationDetailsView extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: () {
+          HapticFeedback.lightImpact();
           Navigator.pushNamed(
             context,
             AppRoutes.editReservation,
@@ -346,7 +1402,12 @@ class ReservationDetailsView extends StatelessWidget {
         icon: const Icon(Icons.edit),
         label: const Text('Modifier la réservation'),
         style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF3B82F6),
+          foregroundColor: Colors.white,
           padding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
@@ -355,48 +1416,114 @@ class ReservationDetailsView extends StatelessWidget {
   Widget _buildCancelButton(BuildContext context, Reservation reservation) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton.icon(
+      child: OutlinedButton.icon(
         onPressed: () => _showCancelDialog(context, reservation),
         icon: const Icon(Icons.cancel),
         label: const Text('Annuler la réservation'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.white,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.red,
+          side: const BorderSide(color: Colors.red),
           padding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
   }
 
   void _showCancelDialog(BuildContext context, Reservation reservation) {
+    HapticFeedback.mediumImpact();
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Annuler la réservation'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.warning, color: Colors.red),
+            ),
+            const SizedBox(width: 12),
+            const Text('Annuler?'),
+          ],
+        ),
         content: const Text(
           'Êtes-vous sûr de vouloir annuler cette réservation? Cette action est irréversible.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Non'),
+            child: const Text('Non, garder'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<ReservationListBloc>().add(
                     CancelReservationEvent(reservation.id),
                   );
-              Navigator.pop(context); // Retour à la liste
+              Navigator.pop(context);
             },
-            child: const Text(
-              'Oui, annuler',
-              style: TextStyle(color: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
             ),
+            child: const Text('Oui, annuler'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _callWorker(Reservation reservation) async {
+    if (reservation.workerPhone != null) {
+      final uri = Uri.parse('tel:${reservation.workerPhone}');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Numéro de téléphone non disponible'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _messageWorker(Reservation reservation) async {
+    if (reservation.workerPhone != null) {
+      final uri = Uri.parse('sms:${reservation.workerPhone}');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Numéro de téléphone non disponible'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _openMap(Reservation reservation) async {
+    if (reservation.locationLatitude != null && reservation.locationLongitude != null) {
+      final uri = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=${reservation.locationLatitude},${reservation.locationLongitude}',
+      );
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    }
   }
 
   Color _getStatusColor(ReservationStatus status) {
@@ -404,11 +1531,13 @@ class ReservationDetailsView extends StatelessWidget {
       case ReservationStatus.pending:
         return Colors.orange;
       case ReservationStatus.assigned:
-        return Colors.blue;
+        return const Color(0xFF3B82F6);
+      case ReservationStatus.enRoute:
+        return const Color(0xFF6366F1);
       case ReservationStatus.inProgress:
-        return Colors.purple;
+        return const Color(0xFF8B5CF6);
       case ReservationStatus.completed:
-        return Colors.green;
+        return const Color(0xFF10B981);
       case ReservationStatus.cancelled:
         return Colors.grey;
       case ReservationStatus.late:

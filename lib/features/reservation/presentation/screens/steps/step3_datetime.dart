@@ -6,14 +6,14 @@ import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
 
-class Step2DateTimeScreen extends StatefulWidget {
-  const Step2DateTimeScreen({Key? key}) : super(key: key);
+class Step3DateTimeScreen extends StatefulWidget {
+  const Step3DateTimeScreen({Key? key}) : super(key: key);
 
   @override
-  State<Step2DateTimeScreen> createState() => _Step2DateTimeScreenState();
+  State<Step3DateTimeScreen> createState() => _Step3DateTimeScreenState();
 }
 
-class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
+class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
 
@@ -276,7 +276,7 @@ class _Step2DateTimeScreenState extends State<Step2DateTimeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Étape 2 sur 4',
+                  'Étape 3 sur 5',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

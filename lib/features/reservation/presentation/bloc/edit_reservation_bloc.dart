@@ -66,6 +66,21 @@ class RecalculatePrice extends EditReservationEvent {}
 
 class SubmitReservationUpdate extends EditReservationEvent {}
 
+class UpdateLocationAddress extends EditReservationEvent {
+  final String address;
+  final double? latitude;
+  final double? longitude;
+
+  const UpdateLocationAddress({
+    required this.address,
+    this.latitude,
+    this.longitude,
+  });
+
+  @override
+  List<Object?> get props => [address, latitude, longitude];
+}
+
 // ==================== STATE ====================
 
 class EditReservationState extends Equatable {
@@ -83,6 +98,11 @@ class EditReservationState extends Equatable {
   final String? errorMessage;
   final bool isUpdateSuccessful;
 
+  // Location fields
+  final double? locationLatitude;
+  final double? locationLongitude;
+  final String? locationAddress;
+
   const EditReservationState({
     this.originalReservation,
     this.availableVehicles = const [],
@@ -97,6 +117,9 @@ class EditReservationState extends Equatable {
     this.isLoadingData = false,
     this.errorMessage,
     this.isUpdateSuccessful = false,
+    this.locationLatitude,
+    this.locationLongitude,
+    this.locationAddress,
   });
 
   bool get canSubmit =>
@@ -112,7 +135,8 @@ class EditReservationState extends Equatable {
     return selectedVehicle?.id != originalReservation!.vehicle.id ||
         selectedParkingSpot?.id != originalReservation!.parkingSpot.id ||
         departureTime != originalReservation!.departureTime ||
-        !_serviceOptionsEqual(selectedOptions, originalReservation!.serviceOptions);
+        !_serviceOptionsEqual(selectedOptions, originalReservation!.serviceOptions) ||
+        locationAddress != originalReservation!.locationAddress;
   }
 
   bool _serviceOptionsEqual(List<ServiceOption> a, List<ServiceOption> b) {
@@ -135,6 +159,9 @@ class EditReservationState extends Equatable {
     String? errorMessage,
     bool? isUpdateSuccessful,
     bool clearError = false,
+    double? locationLatitude,
+    double? locationLongitude,
+    String? locationAddress,
   }) {
     return EditReservationState(
       originalReservation: originalReservation ?? this.originalReservation,
@@ -150,6 +177,9 @@ class EditReservationState extends Equatable {
       isLoadingData: isLoadingData ?? this.isLoadingData,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       isUpdateSuccessful: isUpdateSuccessful ?? this.isUpdateSuccessful,
+      locationLatitude: locationLatitude ?? this.locationLatitude,
+      locationLongitude: locationLongitude ?? this.locationLongitude,
+      locationAddress: locationAddress ?? this.locationAddress,
     );
   }
 
@@ -168,6 +198,9 @@ class EditReservationState extends Equatable {
         isLoadingData,
         errorMessage,
         isUpdateSuccessful,
+        locationLatitude,
+        locationLongitude,
+        locationAddress,
       ];
 }
 
@@ -190,6 +223,7 @@ class EditReservationBloc extends Bloc<EditReservationEvent, EditReservationStat
     on<ToggleServiceOptionEdit>(_onToggleServiceOption);
     on<RecalculatePrice>(_onRecalculatePrice);
     on<SubmitReservationUpdate>(_onSubmitUpdate);
+    on<UpdateLocationAddress>(_onUpdateLocationAddress);
   }
 
   Future<void> _onLoadEditReservationData(
@@ -226,6 +260,20 @@ class EditReservationBloc extends Bloc<EditReservationEvent, EditReservationStat
       deadlineTime: event.reservation.deadlineTime,
       selectedOptions: event.reservation.serviceOptions,
       calculatedPrice: event.reservation.totalPrice,
+      locationLatitude: event.reservation.locationLatitude,
+      locationLongitude: event.reservation.locationLongitude,
+      locationAddress: event.reservation.locationAddress,
+    ));
+  }
+
+  void _onUpdateLocationAddress(
+    UpdateLocationAddress event,
+    Emitter<EditReservationState> emit,
+  ) {
+    emit(state.copyWith(
+      locationAddress: event.address,
+      locationLatitude: event.latitude,
+      locationLongitude: event.longitude,
     ));
   }
 
@@ -362,6 +410,9 @@ class EditReservationBloc extends Bloc<EditReservationEvent, EditReservationStat
       serviceOptions: state.selectedOptions,
       snowDepthCm: state.originalReservation!.snowDepthCm,
       totalPrice: state.calculatedPrice!,
+      latitude: state.locationLatitude,
+      longitude: state.locationLongitude,
+      address: state.locationAddress,
     );
 
     final result = await updateReservation(params);

@@ -125,6 +125,7 @@ enum UserRole {
 enum ReservationStatus {
   pending,      // En attente d'assignation
   assigned,     // Assignée à un déneigeur
+  enRoute,      // Déneigeur en route
   inProgress,   // En cours
   completed,    // Terminée
   cancelled,    // Annulée

@@ -8,8 +8,8 @@ import '../../widgets/service_option_tile.dart';
 import '../../widgets/snow_depth_input.dart';
 import '../../widgets/price_summary_card.dart';
 
-class Step3OptionsScreen extends StatelessWidget {
-  const Step3OptionsScreen({Key? key}) : super(key: key);
+class Step4OptionsScreen extends StatelessWidget {
+  const Step4OptionsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +146,7 @@ class Step3OptionsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Étape 3 sur 4',
+                  'Étape 4 sur 5',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

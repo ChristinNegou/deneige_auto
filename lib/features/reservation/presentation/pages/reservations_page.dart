@@ -191,6 +191,8 @@ class ReservationsView extends StatelessWidget {
         return Colors.orange;
       case ReservationStatus.assigned:
         return Colors.blue;
+      case ReservationStatus.enRoute:
+        return Colors.indigo;
       case ReservationStatus.inProgress:
         return Colors.purple;
       case ReservationStatus.completed:

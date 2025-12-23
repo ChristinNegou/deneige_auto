@@ -547,7 +547,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Étape 1 sur 4',
+                  'Étape 1 sur 5',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

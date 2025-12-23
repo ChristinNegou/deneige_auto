@@ -56,6 +56,30 @@ import '../../features/payment/presentation/bloc/payment_history_bloc.dart';
 import '../../features/payment/presentation/bloc/payment_methods_bloc.dart';
 import '../../features/payment/presentation/bloc/refund_bloc.dart';
 
+// Notifications
+import '../../features/notifications/data/datasources/notification_remote_datasource.dart';
+import '../../features/notifications/data/repositories/notification_repository_impl.dart';
+import '../../features/notifications/domain/repositories/notification_repository.dart';
+import '../../features/notifications/domain/usecases/get_notifications_usecase.dart';
+import '../../features/notifications/domain/usecases/get_unread_count_usecase.dart';
+import '../../features/notifications/domain/usecases/mark_as_read_usecase.dart';
+import '../../features/notifications/domain/usecases/mark_all_as_read_usecase.dart';
+import '../../features/notifications/presentation/bloc/notification_bloc.dart';
+
+// Snow Worker
+import '../../features/snow_worker/data/datasources/worker_remote_datasource.dart';
+import '../../features/snow_worker/data/repositories/worker_repository_impl.dart';
+import '../../features/snow_worker/domain/repositories/worker_repository.dart';
+import '../../features/snow_worker/domain/usecases/get_available_jobs_usecase.dart';
+import '../../features/snow_worker/domain/usecases/get_my_jobs_usecase.dart';
+import '../../features/snow_worker/domain/usecases/get_job_history_usecase.dart';
+import '../../features/snow_worker/domain/usecases/get_worker_stats_usecase.dart';
+import '../../features/snow_worker/domain/usecases/toggle_availability_usecase.dart';
+import '../../features/snow_worker/domain/usecases/job_actions_usecase.dart';
+import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
+import '../../features/snow_worker/presentation/bloc/worker_stats_bloc.dart';
+import '../../features/snow_worker/presentation/bloc/worker_availability_bloc.dart';
+
 // BLoCs
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
@@ -89,6 +113,12 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<PaymentRemoteDataSource>(
         () => PaymentRemoteDataSourceImpl(dio: sl()),
   );
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+        () => NotificationRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<WorkerRemoteDataSource>(
+        () => WorkerRemoteDataSourceImpl(dio: sl()),
+  );
 
   //! Repositories
   sl.registerLazySingleton<AuthRepository>(
@@ -102,6 +132,12 @@ Future<void> initializeDependencies() async {
   );
   sl.registerLazySingleton<PaymentRepository>(
         () => PaymentRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<NotificationRepository>(
+        () => NotificationRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<WorkerRepository>(
+        () => WorkerRepositoryImpl(remoteDataSource: sl()),
   );
 
   //! Use cases
@@ -129,6 +165,23 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => DeletePaymentMethodUseCase(sl()));
   sl.registerLazySingleton(() => SetDefaultPaymentMethodUseCase(sl()));
   sl.registerLazySingleton(() => ProcessRefundUseCase(sl()));
+  sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
+  sl.registerLazySingleton(() => GetUnreadCountUseCase(sl()));
+  sl.registerLazySingleton(() => MarkAsReadUseCase(sl()));
+  sl.registerLazySingleton(() => MarkAllAsReadUseCase(sl()));
+
+  // Worker use cases
+  sl.registerLazySingleton(() => GetAvailableJobsUseCase(sl()));
+  sl.registerLazySingleton(() => GetMyJobsUseCase(sl()));
+  sl.registerLazySingleton(() => GetJobHistoryUseCase(sl()));
+  sl.registerLazySingleton(() => GetWorkerStatsUseCase(sl()));
+  sl.registerLazySingleton(() => GetEarningsUseCase(sl()));
+  sl.registerLazySingleton(() => ToggleAvailabilityUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateLocationUseCase(sl()));
+  sl.registerLazySingleton(() => AcceptJobUseCase(sl()));
+  sl.registerLazySingleton(() => MarkEnRouteUseCase(sl()));
+  sl.registerLazySingleton(() => StartJobUseCase(sl()));
+  sl.registerLazySingleton(() => CompleteJobUseCase(sl()));
 
   //! BLoCs
   sl.registerFactory(() => AuthBloc(
@@ -185,5 +238,34 @@ Future<void> initializeDependencies() async {
 
   sl.registerFactory(() => RefundBloc(
     processRefund: sl(),
+  ));
+
+  sl.registerFactory(() => NotificationBloc(
+    getNotifications: sl(),
+    getUnreadCount: sl(),
+    markAsRead: sl(),
+    markAllAsRead: sl(),
+  ));
+
+  // Worker BLoCs
+  sl.registerFactory(() => WorkerJobsBloc(
+    getAvailableJobsUseCase: sl(),
+    getMyJobsUseCase: sl(),
+    getJobHistoryUseCase: sl(),
+    acceptJobUseCase: sl(),
+    markEnRouteUseCase: sl(),
+    startJobUseCase: sl(),
+    completeJobUseCase: sl(),
+  ));
+
+  sl.registerFactory(() => WorkerStatsBloc(
+    getWorkerStatsUseCase: sl(),
+    getEarningsUseCase: sl(),
+  ));
+
+  sl.registerFactory(() => WorkerAvailabilityBloc(
+    toggleAvailabilityUseCase: sl(),
+    updateLocationUseCase: sl(),
+    repository: sl(),
   ));
 }

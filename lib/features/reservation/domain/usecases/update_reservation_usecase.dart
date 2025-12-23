@@ -26,6 +26,9 @@ class UpdateReservationUseCase {
       serviceOptions: params.serviceOptions.map((e) => e.name).toList(),
       snowDepthCm: params.snowDepthCm,
       totalPrice: params.totalPrice,
+      latitude: params.latitude,
+      longitude: params.longitude,
+      address: params.address,
     );
   }
 
@@ -54,6 +57,9 @@ class UpdateReservationParams {
   final List<ServiceOption> serviceOptions;
   final int? snowDepthCm;
   final double totalPrice;
+  final double? latitude;
+  final double? longitude;
+  final String? address;
 
   UpdateReservationParams({
     required this.reservationId,
@@ -64,5 +70,8 @@ class UpdateReservationParams {
     required this.serviceOptions,
     this.snowDepthCm,
     required this.totalPrice,
+    this.latitude,
+    this.longitude,
+    this.address,
   });
 }

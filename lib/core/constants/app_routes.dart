@@ -51,6 +51,11 @@ class AppRoutes {
   static const String snowWorkerDashboard = '/snow-worker/dashboard';
   static const String jobsList = '/snow-worker/jobs';
   static const String jobDetails = '/snow-worker/jobs/details';
+  static const String workerJobDetails = '/snow-worker/jobs/details';
+  static const String workerActiveJob = '/snow-worker/active-job';
+  static const String workerHistory = '/snow-worker/history';
+  static const String workerEarnings = '/snow-worker/earnings';
+  static const String workerSettings = '/snow-worker/settings';
 
   //Routes pour le dashboard client
   static const String clientHome = '/client-home';

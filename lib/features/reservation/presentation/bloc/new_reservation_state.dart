@@ -24,7 +24,13 @@ class NewReservationState extends Equatable {
   final String? parkingSpotNumber;
   final String? customLocation;
 
-
+  // Location fields
+  final double? locationLatitude;
+  final double? locationLongitude;
+  final String? locationAddress;
+  final bool isGettingLocation;
+  final bool needsManualAddress;
+  final String? locationError;
 
   const NewReservationState({
     this.currentStep = 0,
@@ -46,8 +52,15 @@ class NewReservationState extends Equatable {
     this.reservationId,
     this.parkingSpotNumber,
     this.customLocation,
-
+    this.locationLatitude,
+    this.locationLongitude,
+    this.locationAddress,
+    this.isGettingLocation = false,
+    this.needsManualAddress = false,
+    this.locationError,
   });
+
+  bool get hasValidLocation => locationLatitude != null && locationLongitude != null;
 
   bool get canProceedStep1 {
     // Un véhicule doit être sélectionné
@@ -61,19 +74,25 @@ class NewReservationState extends Equatable {
         (customLocation != null && customLocation!.trim().isNotEmpty);
 
     return hasManualLocation;
-
   }
 
+  // Step 2: Localisation (NOUVEAU)
   bool get canProceedStep2 {
+    return hasValidLocation;
+  }
+
+  // Step 3: Date/Heure (anciennement step2)
+  bool get canProceedStep3 {
     return departureDateTime != null && _validateDateTime(departureDateTime) == null;
   }
 
-  bool get canProceedStep3 {
+  // Step 4: Options (anciennement step3)
+  bool get canProceedStep4 {
     return true;
   }
 
   bool get canSubmit {
-    return canProceedStep1 && canProceedStep2 && calculatedPrice != null;
+    return canProceedStep1 && canProceedStep2 && canProceedStep3 && calculatedPrice != null;
   }
 
   String? _validateDateTime(DateTime? dateTime) {
@@ -118,6 +137,12 @@ class NewReservationState extends Equatable {
     String? reservationId,
     String? parkingSpotNumber,
     String? customLocation,
+    double? locationLatitude,
+    double? locationLongitude,
+    String? locationAddress,
+    bool? isGettingLocation,
+    bool? needsManualAddress,
+    String? locationError,
   }) {
     return NewReservationState(
       currentStep: currentStep ?? this.currentStep,
@@ -139,6 +164,12 @@ class NewReservationState extends Equatable {
       reservationId: reservationId ?? this.reservationId,
       parkingSpotNumber: parkingSpotNumber ?? this.parkingSpotNumber,
       customLocation: customLocation ?? this.customLocation,
+      locationLatitude: locationLatitude ?? this.locationLatitude,
+      locationLongitude: locationLongitude ?? this.locationLongitude,
+      locationAddress: locationAddress ?? this.locationAddress,
+      isGettingLocation: isGettingLocation ?? this.isGettingLocation,
+      needsManualAddress: needsManualAddress ?? this.needsManualAddress,
+      locationError: locationError,
     );
   }
 
@@ -163,7 +194,12 @@ class NewReservationState extends Equatable {
     reservationId,
     parkingSpotNumber,
     customLocation,
-
+    locationLatitude,
+    locationLongitude,
+    locationAddress,
+    isGettingLocation,
+    needsManualAddress,
+    locationError,
   ];
 }
 

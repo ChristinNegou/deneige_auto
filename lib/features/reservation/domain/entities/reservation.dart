@@ -7,6 +7,8 @@ class Reservation extends Equatable {
   final String id;
   final String userId;
   final String? workerId;
+  final String? workerName;
+  final String? workerPhone;
   final ParkingSpot parkingSpot;
   final Vehicle vehicle;
   final DateTime departureTime;
@@ -27,11 +29,19 @@ class Reservation extends Equatable {
   final double? tip;
   final bool isPriority;
   final int? snowDepthCm;
+  final int? estimatedArrivalMinutes;
+
+  // Location fields
+  final double? locationLatitude;
+  final double? locationLongitude;
+  final String? locationAddress;
 
   const Reservation({
     required this.id,
     required this.userId,
     this.workerId,
+    this.workerName,
+    this.workerPhone,
     required this.parkingSpot,
     required this.vehicle,
     required this.departureTime,
@@ -52,6 +62,10 @@ class Reservation extends Equatable {
     this.tip,
     this.isPriority = false,
     this.snowDepthCm,
+    this.estimatedArrivalMinutes,
+    this.locationLatitude,
+    this.locationLongitude,
+    this.locationAddress,
   });
 
   bool get isLate {
@@ -97,6 +111,8 @@ class Reservation extends Equatable {
     String? id,
     String? userId,
     String? workerId,
+    String? workerName,
+    String? workerPhone,
     ParkingSpot? parkingSpot,
     Vehicle? vehicle,
     DateTime? departureTime,
@@ -117,11 +133,17 @@ class Reservation extends Equatable {
     double? tip,
     bool? isPriority,
     int? snowDepthCm,
+    int? estimatedArrivalMinutes,
+    double? locationLatitude,
+    double? locationLongitude,
+    String? locationAddress,
   }) {
     return Reservation(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       workerId: workerId ?? this.workerId,
+      workerName: workerName ?? this.workerName,
+      workerPhone: workerPhone ?? this.workerPhone,
       parkingSpot: parkingSpot ?? this.parkingSpot,
       vehicle: vehicle ?? this.vehicle,
       departureTime: departureTime ?? this.departureTime,
@@ -142,6 +164,10 @@ class Reservation extends Equatable {
       tip: tip ?? this.tip,
       isPriority: isPriority ?? this.isPriority,
       snowDepthCm: snowDepthCm ?? this.snowDepthCm,
+      estimatedArrivalMinutes: estimatedArrivalMinutes ?? this.estimatedArrivalMinutes,
+      locationLatitude: locationLatitude ?? this.locationLatitude,
+      locationLongitude: locationLongitude ?? this.locationLongitude,
+      locationAddress: locationAddress ?? this.locationAddress,
     );
   }
 
@@ -150,6 +176,8 @@ class Reservation extends Equatable {
     id,
     userId,
     workerId,
+    workerName,
+    workerPhone,
     parkingSpot,
     vehicle,
     departureTime,
@@ -170,6 +198,10 @@ class Reservation extends Equatable {
     tip,
     isPriority,
     snowDepthCm,
+    estimatedArrivalMinutes,
+    locationLatitude,
+    locationLongitude,
+    locationAddress,
   ];
 }
 
@@ -180,6 +212,8 @@ extension ReservationStatusExtension on ReservationStatus {
         return 'En attente';
       case ReservationStatus.assigned:
         return 'Assignée';
+      case ReservationStatus.enRoute:
+        return 'En route';
       case ReservationStatus.inProgress:
         return 'En cours';
       case ReservationStatus.completed:
@@ -197,6 +231,8 @@ extension ReservationStatusExtension on ReservationStatus {
         return '⏳';
       case ReservationStatus.assigned:
         return '👤';
+      case ReservationStatus.enRoute:
+        return '🚗';
       case ReservationStatus.inProgress:
         return '🚀';
       case ReservationStatus.completed:

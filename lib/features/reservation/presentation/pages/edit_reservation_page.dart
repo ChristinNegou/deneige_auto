@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection_container.dart';
@@ -31,6 +32,15 @@ class EditReservationView extends StatefulWidget {
 }
 
 class _EditReservationViewState extends State<EditReservationView> {
+  final TextEditingController _addressController = TextEditingController();
+  bool _isSearchingAddress = false;
+
+  @override
+  void dispose() {
+    _addressController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<EditReservationBloc, EditReservationState>(
@@ -52,6 +62,11 @@ class _EditReservationViewState extends State<EditReservationView> {
               backgroundColor: Colors.red,
             ),
           );
+        }
+
+        // Initialize address controller when data is loaded
+        if (!state.isLoadingData && state.locationAddress != null && _addressController.text.isEmpty) {
+          _addressController.text = state.locationAddress!;
         }
       },
       builder: (context, state) {
@@ -140,6 +155,9 @@ class _EditReservationViewState extends State<EditReservationView> {
               const SizedBox(height: 16),
 
               _buildParkingSpotSection(context, state),
+              const SizedBox(height: 16),
+
+              _buildLocationSection(context, state),
               const SizedBox(height: 16),
 
               _buildDepartureTimeSection(context, state),
@@ -241,6 +259,134 @@ class _EditReservationViewState extends State<EditReservationView> {
         ),
       ),
     );
+  }
+
+  Widget _buildLocationSection(BuildContext context, EditReservationState state) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.location_on),
+                const SizedBox(width: 8),
+                Text(
+                  'Adresse du véhicule',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _addressController,
+              decoration: InputDecoration(
+                labelText: 'Adresse',
+                hintText: 'Ex: 123 Rue Principale, Montréal, QC',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.home),
+                suffixIcon: _isSearchingAddress
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () => _searchAddress(context),
+                      ),
+              ),
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _searchAddress(context),
+            ),
+            if (state.locationAddress != null && state.locationLatitude != null) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green.shade700, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Position GPS enregistrée',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.green.shade900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _searchAddress(BuildContext context) async {
+    final address = _addressController.text.trim();
+    if (address.isEmpty) return;
+
+    setState(() => _isSearchingAddress = true);
+
+    try {
+      final locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        final location = locations.first;
+        if (context.mounted) {
+          context.read<EditReservationBloc>().add(
+                UpdateLocationAddress(
+                  address: address,
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                ),
+              );
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Adresse validée avec succès'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Adresse non trouvée. Veuillez réessayer.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erreur lors de la recherche de l\'adresse'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSearchingAddress = false);
+      }
+    }
   }
 
   Widget _buildDepartureTimeSection(BuildContext context, EditReservationState state) {

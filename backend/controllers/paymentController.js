@@ -1,6 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
+const Notification = require('../models/Notification');
 
 // Get payment methods from Stripe Customer
 exports.getPaymentMethods = async (req, res) => {
@@ -160,6 +161,20 @@ exports.createRefund = async (req, res) => {
       }
 
       await reservation.save();
+
+      // Créer notification de remboursement
+      await Notification.createNotification({
+        userId: reservation.userId,
+        type: 'refundProcessed',
+        title: 'Remboursement effectué',
+        message: `Votre remboursement de ${refundedAmount.toFixed(2)} $ a été traité avec succès`,
+        priority: 'normal',
+        reservationId: reservation._id,
+        metadata: {
+          amount: refundedAmount,
+          refundId: refund.id,
+        },
+      });
     }
 
     res.json({ success: true, refund });

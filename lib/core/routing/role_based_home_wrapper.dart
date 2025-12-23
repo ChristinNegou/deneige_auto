@@ -5,8 +5,13 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/client/screens/client_home_screen.dart';
 import '../../features/snow_worker/screens/snow_worker_homescreen.dart';
+import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
+import '../../features/snow_worker/presentation/bloc/worker_stats_bloc.dart';
+import '../../features/snow_worker/presentation/bloc/worker_availability_bloc.dart';
 import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
+import '../../features/notifications/presentation/bloc/notification_bloc.dart';
+import '../../features/reservation/presentation/bloc/reservation_list_bloc.dart';
 import '../di/injection_container.dart';
 
 
@@ -24,14 +29,22 @@ class RoleBasedHomeWrapper extends StatelessWidget {
           // Rediriger vers le bon dashboard selon le rôle
           switch (user.role) {
             case UserRole.client:
-              return BlocProvider(
-                create: (context) => sl<HomeBloc>(),
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (context) => sl<HomeBloc>()),
+                  BlocProvider(create: (context) => sl<ReservationListBloc>()),
+                  BlocProvider(create: (context) => sl<NotificationBloc>()),
+                ],
                 child: const ClientHomeScreen(),
               );
 
             case UserRole.snowWorker:
-              return BlocProvider(
-                create: (context) => sl<HomeBloc>(),
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (context) => sl<WorkerJobsBloc>()),
+                  BlocProvider(create: (context) => sl<WorkerStatsBloc>()),
+                  BlocProvider(create: (context) => sl<WorkerAvailabilityBloc>()),
+                ],
                 child: const SnowWorkerHomeScreen(),
               );
 
@@ -42,8 +55,12 @@ class RoleBasedHomeWrapper extends StatelessWidget {
               );
 
             default:
-              return BlocProvider(
-                create: (context) => sl<HomeBloc>(),
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (context) => sl<HomeBloc>()),
+                  BlocProvider(create: (context) => sl<ReservationListBloc>()),
+                  BlocProvider(create: (context) => sl<NotificationBloc>()),
+                ],
                 child: const ClientHomeScreen(),
               );
           }
