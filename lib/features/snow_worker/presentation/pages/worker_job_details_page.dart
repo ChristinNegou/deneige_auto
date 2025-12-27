@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_jobs_bloc.dart';
 
@@ -13,204 +14,41 @@ class WorkerJobDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Détails du job'),
-        backgroundColor: Colors.orange[600],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Client Info Card
-            _buildCard(
-              title: 'Client',
-              icon: Icons.person,
-              children: [
-                _buildInfoRow('Nom', job.client.fullName),
-                if (job.client.phoneNumber != null) ...[
-                  _buildInfoRow('Téléphone', job.client.phoneNumber!),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _callClient(),
-                          icon: const Icon(Icons.phone, size: 18),
-                          label: const Text('Appeler'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF10B981),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => _messageClient(),
-                          icon: const Icon(Icons.message, size: 18),
-                          label: const Text('SMS'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3B82F6),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Location Card
-            _buildCard(
-              title: 'Adresse',
-              icon: Icons.location_on,
-              children: [
-                Text(
-                  job.displayAddress,
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                Row(
+            _buildHeader(context),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppTheme.paddingLG),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.directions, color: Colors.grey[600], size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      job.distanceKm != null ? '${job.distanceKm!.toStringAsFixed(1)} km' : 'N/A',
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
+                    _buildClientCard(),
+                    const SizedBox(height: 16),
+                    _buildLocationCard(),
+                    const SizedBox(height: 16),
+                    _buildVehicleCard(),
+                    const SizedBox(height: 16),
+                    _buildServiceCard(),
+                    const SizedBox(height: 16),
+                    _buildPricingCard(),
+                    if (job.clientNotes != null && job.clientNotes!.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      _buildNotesCard(),
+                    ],
+                    const SizedBox(height: 100),
                   ],
                 ),
-                if (job.location != null) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _openMaps(job.location!.latitude, job.location!.longitude),
-                          icon: const Icon(Icons.map),
-                          label: const Text('Google Maps'),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => _openWaze(job.location!.latitude, job.location!.longitude),
-                          icon: const Icon(Icons.navigation),
-                          label: const Text('Waze'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Vehicle Card
-            _buildCard(
-              title: 'Véhicule',
-              icon: Icons.directions_car,
-              children: [
-                _buildInfoRow('Véhicule', job.vehicle.displayName),
-                if (job.vehicle.color != null)
-                  _buildInfoRow('Couleur', job.vehicle.color!),
-                if (job.vehicle.licensePlate != null)
-                  _buildInfoRow('Plaque', job.vehicle.licensePlate!),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Service Card
-            _buildCard(
-              title: 'Service demandé',
-              icon: Icons.ac_unit,
-              children: [
-                _buildInfoRow('Type', 'Déneigement'),
-                if (job.serviceOptions.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Options:',
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 4),
-                  ...job.serviceOptions.map((option) => Padding(
-                    padding: const EdgeInsets.only(left: 8, top: 4),
-                    child: Row(
-                      children: [
-                        Icon(Icons.check, color: Colors.green[600], size: 16),
-                        const SizedBox(width: 8),
-                        Text(_getOptionLabel(option)),
-                      ],
-                    ),
-                  )),
-                ],
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Pricing Card
-            _buildCard(
-              title: 'Tarification',
-              icon: Icons.attach_money,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Prix total'),
-                    Text(
-                      '${job.totalPrice.toStringAsFixed(2)} \$',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-                if (job.tipAmount != null && job.tipAmount! > 0) ...[
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Pourboire'),
-                      Text(
-                        '+ ${job.tipAmount!.toStringAsFixed(2)} \$',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.orange[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Notes
-            if (job.clientNotes != null && job.clientNotes!.isNotEmpty)
-              _buildCard(
-                title: 'Notes du client',
-                icon: Icons.note,
-                children: [
-                  Text(job.clientNotes!),
-                ],
               ),
-
-            const SizedBox(height: 100),
+            ),
           ],
         ),
       ),
@@ -220,43 +58,391 @@ class WorkerJobDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: AppTheme.shadowSM,
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppTheme.textPrimary,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'Détails du job',
+            style: AppTheme.headlineMedium,
+          ),
+          const Spacer(),
+          StatusBadge(
+            label: _getStatusLabel(job.status),
+            color: _getStatusColor(job.status),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildClientCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: Colors.orange[600], size: 20),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
+                child: const Icon(Icons.person_rounded, color: AppTheme.primary, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Text('Client', style: AppTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildInfoRow('Nom', job.client.fullName),
+          if (job.client.phoneNumber != null) ...[
+            _buildInfoRow('Téléphone', job.client.phoneNumber!),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildContactButton(
+                    icon: Icons.phone_rounded,
+                    label: 'Appeler',
+                    color: AppTheme.success,
+                    onTap: _callClient,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildContactButton(
+                    icon: Icons.message_rounded,
+                    label: 'SMS',
+                    color: AppTheme.primary,
+                    onTap: _messageClient,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContactButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLocationCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: const Icon(Icons.location_on_rounded, color: AppTheme.error, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Text('Adresse', style: AppTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(job.displayAddress, style: AppTheme.bodyMedium),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.directions_rounded, size: 16, color: AppTheme.textTertiary),
+              const SizedBox(width: 4),
+              Text(
+                job.distanceKm != null ? '${job.distanceKm!.toStringAsFixed(1)} km' : 'N/A',
+                style: AppTheme.bodySmall,
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          ...children,
+          if (job.location != null) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _openMaps(job.location!.latitude, job.location!.longitude),
+                    icon: const Icon(Icons.map_rounded, size: 18),
+                    label: const Text('Google Maps'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.primary,
+                      side: const BorderSide(color: AppTheme.primary),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _openWaze(job.location!.latitude, job.location!.longitude),
+                    icon: const Icon(Icons.navigation_rounded, size: 18),
+                    label: const Text('Waze'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.info,
+                      side: const BorderSide(color: AppTheme.info),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVehicleCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.secondary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: const Icon(Icons.directions_car_rounded, color: AppTheme.secondary, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Text('Véhicule', style: AppTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildInfoRow('Véhicule', job.vehicle.displayName),
+          if (job.vehicle.color != null)
+            _buildInfoRow('Couleur', job.vehicle.color!),
+          if (job.vehicle.licensePlate != null)
+            _buildInfoRow('Plaque', job.vehicle.licensePlate!),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: const Icon(Icons.ac_unit_rounded, color: AppTheme.info, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Text('Service', style: AppTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildInfoRow('Type', 'Déneigement'),
+          if (job.serviceOptions.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text('Options:', style: AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            ...job.serviceOptions.map((option) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  Icon(Icons.check_circle_rounded, color: AppTheme.success, size: 16),
+                  const SizedBox(width: 8),
+                  Text(_getOptionLabel(option), style: AppTheme.bodyMedium),
+                ],
+              ),
+            )),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPricingCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.success.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: const Icon(Icons.attach_money_rounded, color: AppTheme.success, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Text('Tarification', style: AppTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Prix total', style: AppTheme.bodyMedium),
+              Text(
+                '${job.totalPrice.toStringAsFixed(2)} \$',
+                style: AppTheme.headlineMedium.copyWith(color: AppTheme.success),
+              ),
+            ],
+          ),
+          if (job.tipAmount != null && job.tipAmount! > 0) ...[
+            const Divider(height: 24, color: AppTheme.divider),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Pourboire', style: AppTheme.bodyMedium),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.warning.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                  ),
+                  child: Text(
+                    '+ ${job.tipAmount!.toStringAsFixed(2)} \$',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.warning,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotesCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.warning.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: const Icon(Icons.note_rounded, color: AppTheme.warning, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Text('Notes du client', style: AppTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(job.clientNotes!, style: AppTheme.bodyMedium),
         ],
       ),
     );
@@ -268,14 +454,8 @@ class WorkerJobDetailsPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(color: Colors.grey[600]),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
+          Text(label, style: AppTheme.bodySmall),
+          Text(value, style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -284,24 +464,23 @@ class WorkerJobDetailsPage extends StatelessWidget {
   Widget _buildAcceptButton(BuildContext context) {
     return BlocConsumer<WorkerJobsBloc, WorkerJobsState>(
       listener: (context, state) {
-        debugPrint('🔔 WorkerJobDetailsPage state: $state');
         if (state is JobActionSuccess && state.action == 'accept') {
           HapticFeedback.heavyImpact();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.white),
-                  const SizedBox(width: 12),
-                  const Text('Job accepté avec succès!'),
+                children: const [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Job accepté avec succès!'),
                 ],
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: AppTheme.success,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
             ),
           );
-          Navigator.pop(context, true); // Return true to indicate job was accepted
+          Navigator.pop(context, true);
         } else if (state is WorkerJobsError) {
           HapticFeedback.vibrate();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -313,9 +492,9 @@ class WorkerJobDetailsPage extends StatelessWidget {
                   Expanded(child: Text(state.message)),
                 ],
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: AppTheme.error,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
             ),
           );
         }
@@ -326,77 +505,106 @@ class WorkerJobDetailsPage extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -4),
               ),
             ],
           ),
           child: SafeArea(
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        HapticFeedback.mediumImpact();
-                        debugPrint('🔔 Accepting job: ${job.id}');
-                        context.read<WorkerJobsBloc>().add(AcceptJob(job.id));
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange[600],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            child: GestureDetector(
+              onTap: isLoading
+                  ? null
+                  : () {
+                      HapticFeedback.mediumImpact();
+                      context.read<WorkerJobsBloc>().add(AcceptJob(job.id));
+                    },
+              child: Container(
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppTheme.success, Color(0xFF059669)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
                   ),
-                  elevation: isLoading ? 0 : 4,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.success.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: isLoading
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
+                child: Center(
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
                           ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            'Acceptation en cours...',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.check_circle_rounded, color: Colors.white, size: 24),
+                            SizedBox(width: 8),
+                            Text(
+                              'Accepter ce job',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
-                      )
-                    : const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle, size: 24),
-                          SizedBox(width: 8),
-                          Text(
-                            'Accepter ce job',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                ),
               ),
             ),
           ),
         );
       },
     );
+  }
+
+  String _getStatusLabel(JobStatus status) {
+    switch (status) {
+      case JobStatus.pending:
+        return 'En attente';
+      case JobStatus.assigned:
+        return 'Assigné';
+      case JobStatus.enRoute:
+        return 'En route';
+      case JobStatus.inProgress:
+        return 'En cours';
+      case JobStatus.completed:
+        return 'Terminé';
+      case JobStatus.cancelled:
+        return 'Annulé';
+    }
+  }
+
+  Color _getStatusColor(JobStatus status) {
+    switch (status) {
+      case JobStatus.pending:
+        return AppTheme.warning;
+      case JobStatus.assigned:
+        return AppTheme.primary;
+      case JobStatus.enRoute:
+        return AppTheme.secondary;
+      case JobStatus.inProgress:
+        return AppTheme.success;
+      case JobStatus.completed:
+        return const Color(0xFF059669);
+      case JobStatus.cancelled:
+        return AppTheme.textTertiary;
+    }
   }
 
   String _getOptionLabel(ServiceOption option) {
@@ -429,7 +637,6 @@ class WorkerJobDetailsPage extends StatelessWidget {
   }
 
   Future<void> _openMaps(double lat, double lng) async {
-    // DEBUG: Détecter les coordonnées de l'émulateur (Mountain View) et utiliser Trois-Rivières
     double finalLat = lat;
     double finalLng = lng;
 
@@ -448,7 +655,6 @@ class WorkerJobDetailsPage extends StatelessWidget {
   }
 
   Future<void> _openWaze(double lat, double lng) async {
-    // DEBUG: Détecter les coordonnées de l'émulateur (Mountain View) et utiliser Trois-Rivières
     double finalLat = lat;
     double finalLng = lng;
 

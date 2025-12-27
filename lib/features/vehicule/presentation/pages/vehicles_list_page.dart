@@ -1,8 +1,10 @@
 import 'package:deneige_auto/features/reservation/domain/entities/vehicle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../bloc/vehicule_bloc.dart';
 
 class VehiclesListPage extends StatelessWidget {
@@ -22,173 +24,348 @@ class VehiclesListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mes véhicules'),
-        actions: [
-      IconButton(
-      icon: const Icon(Icons.add),
-        onPressed: () async {
-          final result = await Navigator.pushNamed(
-            context,
-            AppRoutes.addVehicle,
-          );
-          if (result == true && context.mounted) {
-            context.read<VehicleBloc>().add(LoadVehicles());
-          }
-        },
-    ),
-   ],
-      ),
-      body: BlocConsumer<VehicleBloc, VehicleState>(
-        listener: (context, state) {
-          if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state.isLoading && state.vehicles.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: BlocConsumer<VehicleBloc, VehicleState>(
+                listener: (context, state) {
+                  if (state.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.errorMessage!),
+                        backgroundColor: AppTheme.error,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state.isLoading && state.vehicles.isEmpty) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: AppTheme.primary),
+                    );
+                  }
 
-          if (state.vehicles.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.directions_car_outlined,
-                      size: 80,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Aucun véhicule enregistré',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Ajoutez votre premier véhicule pour\ncommencer à utiliser le service',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => Navigator.pushNamed(
-                        context,
-                        AppRoutes.addVehicle,
-                      ),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Ajouter un véhicule'),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
+                  if (state.vehicles.isEmpty) {
+                    return _buildEmptyState(context);
+                  }
 
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<VehicleBloc>().add(LoadVehicles());
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: state.vehicles.length,
-              itemBuilder: (context, index) {
-                final vehicle = state.vehicles[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                      child: Text(
-                        vehicle.type.icon,
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                    ),
-                    title: Text(
-                      vehicle.displayName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: _getVehicleColor(vehicle.color),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey[400]!),
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(vehicle.color),
-                          ],
-                        ),
-                        if (vehicle.licensePlate != null) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            vehicle.licensePlate!,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    trailing: vehicle.isDefault
-                        ? Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'Par défaut',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
-                      ),
-                    )
-                        : IconButton(
-                      icon: const Icon(Icons.delete_outline),
-                      color: Colors.red,
-                      onPressed: () {
-                        _showDeleteConfirmation(context, vehicle.id);
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<VehicleBloc>().add(LoadVehicles());
+                    },
+                    color: AppTheme.primary,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(AppTheme.paddingLG),
+                      itemCount: state.vehicles.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == state.vehicles.length) {
+                          return _buildAddButton(context);
+                        }
+                        final vehicle = state.vehicles[index];
+                        return _buildVehicleCard(context, vehicle);
                       },
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: AppTheme.shadowSM,
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppTheme.textPrimary,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'Mes véhicules',
+            style: AppTheme.headlineMedium,
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () async {
+              final result = await Navigator.pushNamed(context, AppRoutes.addVehicle);
+              if (result == true && context.mounted) {
+                context.read<VehicleBloc>().add(LoadVehicles());
+              }
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.primary,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+              ),
+              child: const Icon(
+                Icons.directions_car_outlined,
+                size: 50,
+                color: AppTheme.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Aucun véhicule enregistré',
+              style: AppTheme.headlineSmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Ajoutez votre premier véhicule pour\ncommencer à utiliser le service',
+              style: AppTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                ),
+                icon: const Icon(Icons.add_rounded),
+                label: const Text(
+                  'Ajouter un véhicule',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVehicleCard(BuildContext context, Vehicle vehicle) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        border: vehicle.isDefault
+            ? Border.all(color: AppTheme.success.withValues(alpha: 0.5), width: 1.5)
+            : null,
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Row(
+        children: [
+          // Vehicle icon
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
+            child: Center(
+              child: Text(
+                vehicle.type.icon,
+                style: const TextStyle(fontSize: 28),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        vehicle.displayName,
+                        style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    if (vehicle.isDefault)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.success.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                        ),
+                        child: Text(
+                          'Par défaut',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.success,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: _getVehicleColor(vehicle.color),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppTheme.border),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      vehicle.color,
+                      style: AppTheme.bodySmall,
+                    ),
+                    if (vehicle.licensePlate != null) ...[
+                      const SizedBox(width: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.background,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          vehicle.licensePlate!,
+                          style: AppTheme.labelSmall.copyWith(
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Delete button
+          if (!vehicle.isDefault)
+            GestureDetector(
+              onTap: () => _showDeleteConfirmation(context, vehicle.id),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppTheme.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+                child: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: AppTheme.error,
+                  size: 18,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          border: Border.all(
+            color: AppTheme.primary.withValues(alpha: 0.3),
+            style: BorderStyle.solid,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                color: AppTheme.primary,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Ajouter un véhicule',
+              style: AppTheme.labelLarge.copyWith(
+                color: AppTheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -197,25 +374,28 @@ class VehiclesListView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Supprimer le véhicule'),
-        content: const Text(
-          'Êtes-vous sûr de vouloir supprimer ce véhicule ?',
-        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         ),
+        title: const Text('Supprimer le véhicule'),
+        content: const Text('Êtes-vous sûr de vouloir supprimer ce véhicule ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text(
+              'Annuler',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           TextButton(
             onPressed: () {
               context.read<VehicleBloc>().add(DeleteVehicle(vehicleId));
               Navigator.pop(dialogContext);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Supprimer'),
+            child: const Text(
+              'Supprimer',
+              style: TextStyle(color: AppTheme.error),
+            ),
           ),
         ],
       ),

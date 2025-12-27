@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../bloc/payment_methods_bloc.dart';
 
 class AddPaymentMethodScreen extends StatefulWidget {
@@ -18,246 +20,347 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ajouter une carte'),
-        backgroundColor: const Color(0xFF8B5CF6),
-        foregroundColor: Colors.white,
-        elevation: 0,
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: BlocListener<PaymentMethodsBloc, PaymentMethodsState>(
+          listener: (context, state) {
+            if (state.isLoading) {
+              setState(() => _isLoading = true);
+            } else {
+              setState(() => _isLoading = false);
+            }
+
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: AppTheme.error,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                  ),
+                ),
+              );
+            }
+
+            if (state.successMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.successMessage!),
+                  backgroundColor: AppTheme.success,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                  ),
+                ),
+              );
+              Navigator.pop(context, true);
+            }
+          },
+          child: Column(
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppTheme.paddingXL),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildInfoCard(),
+                        const SizedBox(height: 24),
+                        _buildCardSection(),
+                        const SizedBox(height: 20),
+                        _buildDefaultOption(),
+                        const SizedBox(height: 24),
+                        _buildSecurityInfo(),
+                        const SizedBox(height: 32),
+                        _buildSubmitButton(),
+                        const SizedBox(height: 12),
+                        _buildCancelButton(),
+                        const SizedBox(height: 24),
+                        _buildAcceptedCards(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      body: BlocListener<PaymentMethodsBloc, PaymentMethodsState>(
-        listener: (context, state) {
-          if (state.isLoading) {
-            setState(() => _isLoading = true);
-          } else {
-            setState(() => _isLoading = false);
-          }
+    );
+  }
 
-          if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: AppTheme.shadowSM,
               ),
-            );
-          }
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppTheme.textPrimary,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'Ajouter une carte',
+            style: AppTheme.headlineMedium,
+          ),
+        ],
+      ),
+    );
+  }
 
-          if (state.successMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.successMessage!),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.pop(context, true);
-          }
-        },
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
+  Widget _buildInfoCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.info.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        border: Border.all(color: AppTheme.info.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppTheme.info.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+            ),
+            child: const Icon(
+              Icons.lock_rounded,
+              color: AppTheme.info,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Info Card
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.blue[200]!),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Colors.blue[700]),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Vos informations de paiement sont sécurisées par Stripe',
-                          style: TextStyle(
-                            color: Colors.blue[700],
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Card Input Label
                 Text(
-                  'Informations de la carte',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-                const SizedBox(height: 12),
-
-                // Stripe Card Field
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[300]!),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: CardField(
-                    onCardChanged: (card) {
-                      setState(() {
-                        _cardComplete = card?.complete ?? false;
-                      });
-                    },
-                    style: const TextStyle(fontSize: 16),
-                    enablePostalCode: true,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Numéro de carte',
-                    ),
+                  'Paiement sécurisé',
+                  style: AppTheme.labelLarge.copyWith(
+                    color: AppTheme.info,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 24),
-
-                // Set as default checkbox
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[200]!),
-                  ),
-                  child: CheckboxListTile(
-                    value: _setAsDefault,
-                    onChanged: (value) {
-                      setState(() {
-                        _setAsDefault = value ?? false;
-                      });
-                    },
-                    activeColor: const Color(0xFF8B5CF6),
-                    title: const Text('Définir comme méthode par défaut'),
-                    subtitle: const Text(
-                      'Cette carte sera utilisée pour vos futurs paiements',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    controlAffinity: ListTileControlAffinity.leading,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Security Info
-                Row(
-                  children: [
-                    Icon(Icons.lock_outline, size: 20, color: Colors.grey[600]),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Vos données sont cryptées et sécurisées. Nous ne stockons jamais votre numéro de carte complet.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-
-                // Submit Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: (_cardComplete && !_isLoading)
-                        ? _handleAddCard
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B5CF6),
-                      disabledBackgroundColor: Colors.grey[300],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : const Text(
-                            'Ajouter la carte',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Cancel Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: OutlinedButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF8B5CF6)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Annuler',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF8B5CF6),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Accepted Cards
-                Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        'Cartes acceptées',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildCardBrand(Icons.credit_card, 'Visa'),
-                          const SizedBox(width: 12),
-                          _buildCardBrand(Icons.credit_card, 'Mastercard'),
-                          const SizedBox(width: 12),
-                          _buildCardBrand(Icons.credit_card, 'Amex'),
-                        ],
-                      ),
-                    ],
+                const SizedBox(height: 2),
+                Text(
+                  'Vos informations sont protégées par Stripe',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppTheme.info.withValues(alpha: 0.8),
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        boxShadow: AppTheme.shadowMD,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: const Icon(
+                  Icons.credit_card_rounded,
+                  color: AppTheme.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Informations de la carte',
+                style: AppTheme.headlineSmall,
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              color: AppTheme.background,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              border: Border.all(color: AppTheme.border),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: CardField(
+              onCardChanged: (card) {
+                setState(() {
+                  _cardComplete = card?.complete ?? false;
+                });
+              },
+              style: AppTheme.bodyMedium,
+              enablePostalCode: true,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Numéro de carte',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDefaultOption() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: CheckboxListTile(
+        value: _setAsDefault,
+        onChanged: (value) {
+          setState(() {
+            _setAsDefault = value ?? false;
+          });
+        },
+        activeColor: AppTheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        ),
+        title: Text(
+          'Définir comme méthode par défaut',
+          style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w500),
+        ),
+        subtitle: Text(
+          'Cette carte sera utilisée pour vos futurs paiements',
+          style: AppTheme.labelSmall,
+        ),
+        controlAffinity: ListTileControlAffinity.leading,
+      ),
+    );
+  }
+
+  Widget _buildSecurityInfo() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.verified_user_rounded,
+          size: 18,
+          color: AppTheme.success,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            'Vos données sont cryptées et sécurisées. Nous ne stockons jamais votre numéro de carte complet.',
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return GestureDetector(
+      onTap: (_cardComplete && !_isLoading) ? _handleAddCard : null,
+      child: Container(
+        height: 52,
+        decoration: BoxDecoration(
+          gradient: (_cardComplete && !_isLoading)
+              ? const LinearGradient(
+                  colors: [AppTheme.primary, AppTheme.secondary],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                )
+              : null,
+          color: (_cardComplete && !_isLoading) ? null : AppTheme.border,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          boxShadow: (_cardComplete && !_isLoading)
+              ? [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Center(
+          child: _isLoading
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.5,
+                  ),
+                )
+              : Text(
+                  'Ajouter la carte',
+                  style: TextStyle(
+                    color: (_cardComplete && !_isLoading)
+                        ? Colors.white
+                        : AppTheme.textTertiary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCancelButton() {
+    return GestureDetector(
+      onTap: _isLoading ? null : () => Navigator.pop(context),
+      child: Container(
+        height: 52,
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          border: Border.all(color: AppTheme.border),
+        ),
+        child: const Center(
+          child: Text(
+            'Annuler',
+            style: TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -265,25 +368,49 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     );
   }
 
-  Widget _buildCardBrand(IconData icon, String label) {
+  Widget _buildAcceptedCards() {
+    return Center(
+      child: Column(
+        children: [
+          Text(
+            'Cartes acceptées',
+            style: AppTheme.labelSmall,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildCardBrand('Visa'),
+              const SizedBox(width: 10),
+              _buildCardBrand('Mastercard'),
+              const SizedBox(width: 10),
+              _buildCardBrand('Amex'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardBrand(String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.grey[700]),
-          const SizedBox(width: 4),
+          const Icon(
+            Icons.credit_card_rounded,
+            size: 14,
+            color: AppTheme.textSecondary,
+          ),
+          const SizedBox(width: 6),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
-            ),
+            style: AppTheme.labelSmall.copyWith(fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -297,21 +424,19 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Create payment method with Stripe
       final paymentMethod = await Stripe.instance.createPaymentMethod(
         params: const PaymentMethodParams.card(
           paymentMethodData: PaymentMethodData(),
         ),
       );
 
-      // Save payment method via BLoC
       if (mounted) {
         context.read<PaymentMethodsBloc>().add(
-              SavePaymentMethod(
-                paymentMethod.id,
-                setAsDefault: _setAsDefault,
-              ),
-            );
+          SavePaymentMethod(
+            paymentMethod.id,
+            setAsDefault: _setAsDefault,
+          ),
+        );
       }
     } catch (e) {
       setState(() => _isLoading = false);
@@ -319,7 +444,11 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+            ),
           ),
         );
       }
