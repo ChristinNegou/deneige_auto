@@ -1,10 +1,12 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:confetti/confetti.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../bloc/worker_stats_bloc.dart';
 import '../../domain/entities/worker_stats.dart';
 import '../../../../core/di/injection_container.dart';
@@ -65,7 +67,6 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
   }
 
   void _checkMilestone(double todayEarnings) {
-    // Show confetti for milestone earnings (every $50)
     if (!_hasShownConfetti && todayEarnings >= 50 && todayEarnings % 50 < 10) {
       _confettiController.play();
       HapticFeedback.heavyImpact();
@@ -75,102 +76,178 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mes revenus'),
-        backgroundColor: Colors.green[600],
-        elevation: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          tabs: const [
-            Tab(text: 'Jour'),
-            Tab(text: 'Semaine'),
-            Tab(text: 'Mois'),
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                _buildHeader(),
+                _buildTabBar(),
+                Expanded(
+                  child: BlocBuilder<WorkerStatsBloc, WorkerStatsState>(
+                    builder: (context, state) {
+                      if (state is WorkerStatsLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: AppTheme.primary),
+                        );
+                      }
+
+                      if (state is WorkerStatsError) {
+                        return _buildErrorState(state.message);
+                      }
+
+                      if (state is WorkerStatsLoaded) {
+                        _checkMilestone(state.stats.today.earnings);
+                        return TabBarView(
+                          controller: _tabController,
+                          children: [
+                            _buildDayTab(state.stats, state.earnings),
+                            _buildWeekTab(state.stats, state.earnings),
+                            _buildMonthTab(state.stats, state.earnings),
+                          ],
+                        );
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ),
+              ],
+            ),
+            // Confetti overlay
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirection: math.pi / 2,
+                maxBlastForce: 5,
+                minBlastForce: 2,
+                emissionFrequency: 0.05,
+                numberOfParticles: 20,
+                gravity: 0.2,
+                colors: const [
+                  AppTheme.success,
+                  AppTheme.primary,
+                  AppTheme.warning,
+                  AppTheme.secondary,
+                ],
+              ),
+            ),
           ],
         ),
       ),
-      body: Stack(
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      child: Row(
         children: [
-          BlocBuilder<WorkerStatsBloc, WorkerStatsState>(
-            builder: (context, state) {
-              if (state is WorkerStatsLoading) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircularProgressIndicator(color: Colors.green),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Chargement des statistiques...',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              if (state is WorkerStatsError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                      const SizedBox(height: 16),
-                      Text(state.message),
-                      const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          context.read<WorkerStatsBloc>().add(const LoadStats());
-                          context.read<WorkerStatsBloc>().add(const LoadEarnings());
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Réessayer'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[600],
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              if (state is WorkerStatsLoaded) {
-                _checkMilestone(state.stats.today.earnings);
-                return TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildDayTab(state.stats, state.earnings),
-                    _buildWeekTab(state.stats, state.earnings),
-                    _buildMonthTab(state.stats, state.earnings),
-                  ],
-                );
-              }
-
-              return const SizedBox.shrink();
-            },
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: AppTheme.shadowSM,
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppTheme.textPrimary,
+                size: 20,
+              ),
+            ),
           ),
-          // Confetti overlay
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirection: math.pi / 2,
-              maxBlastForce: 5,
-              minBlastForce: 2,
-              emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              gravity: 0.2,
-              colors: const [
-                Colors.green,
-                Colors.greenAccent,
-                Colors.lightGreen,
-                Colors.yellow,
-                Colors.amber,
-              ],
+          const SizedBox(width: 16),
+          Text(
+            'Mes revenus',
+            style: AppTheme.headlineMedium,
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () {
+              context.read<WorkerStatsBloc>().add(const LoadStats());
+              context.read<WorkerStatsBloc>().add(const LoadEarnings());
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.success.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+              child: const Icon(
+                Icons.refresh_rounded,
+                color: AppTheme.success,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: TabBar(
+        controller: _tabController,
+        indicator: BoxDecoration(
+          color: AppTheme.success,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        ),
+        labelColor: Colors.white,
+        unselectedLabelColor: AppTheme.textSecondary,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        tabs: const [
+          Tab(text: 'Jour'),
+          Tab(text: 'Semaine'),
+          Tab(text: 'Mois'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline_rounded, size: 48, color: AppTheme.error),
+          const SizedBox(height: 12),
+          Text(message, style: AppTheme.bodySmall),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () {
+              context.read<WorkerStatsBloc>().add(const LoadStats());
+              context.read<WorkerStatsBloc>().add(const LoadEarnings());
+            },
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Réessayer'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.success,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
             ),
           ),
         ],
@@ -180,7 +257,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
 
   Widget _buildDayTab(WorkerStats stats, EarningsBreakdown? earnings) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.paddingLG),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -190,9 +267,8 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
             jobsCount: stats.today.completed,
             tips: stats.today.tips,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           _buildTodayStatsGrid(stats.today),
-          const SizedBox(height: 24),
         ],
       ),
     );
@@ -200,7 +276,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
 
   Widget _buildWeekTab(WorkerStats stats, EarningsBreakdown? earnings) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.paddingLG),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -210,9 +286,9 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
             jobsCount: stats.week.completed,
             tips: stats.week.tips,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           _buildPeriodStatsRow(stats.week),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           if (earnings != null) _buildWeeklyChart(earnings),
         ],
       ),
@@ -221,7 +297,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
 
   Widget _buildMonthTab(WorkerStats stats, EarningsBreakdown? earnings) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.paddingLG),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -231,9 +307,9 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
             jobsCount: stats.month.completed,
             tips: stats.month.tips,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           _buildPeriodStatsRow(stats.month),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           _buildAllTimeStats(stats.allTime),
         ],
       ),
@@ -257,15 +333,15 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green[700]!, Colors.green[500]!],
+            gradient: const LinearGradient(
+              colors: [AppTheme.success, Color(0xFF059669)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
             boxShadow: [
               BoxShadow(
-                color: Colors.green.withOpacity(0.4),
+                color: AppTheme.success.withValues(alpha: 0.3),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -273,7 +349,6 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           ),
           child: Column(
             children: [
-              // Daily goal progress indicator
               if (title == "Aujourd'hui") ...[
                 _buildDailyGoalProgress(animatedAmount),
                 const SizedBox(height: 16),
@@ -281,8 +356,8 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
-                  fontSize: 16,
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: 14,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -295,7 +370,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                     animatedAmount.toStringAsFixed(2),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 48,
+                      fontSize: 44,
                       fontWeight: FontWeight.bold,
                       fontFeatures: [FontFeature.tabularFigures()],
                     ),
@@ -306,7 +381,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                       ' \$',
                       style: TextStyle(
                         color: Colors.white70,
-                        fontSize: 24,
+                        fontSize: 22,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -317,34 +392,34 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildSummaryItem(
-                      icon: Icons.check_circle_outline,
+                      icon: Icons.check_circle_outline_rounded,
                       label: 'Jobs',
                       value: animatedJobs.toString(),
                     ),
                     Container(
-                      height: 40,
+                      height: 36,
                       width: 1,
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
                     _buildSummaryItem(
-                      icon: Icons.favorite_outline,
+                      icon: Icons.volunteer_activism_rounded,
                       label: 'Pourboires',
                       value: '${animatedTips.toStringAsFixed(0)} \$',
                     ),
                     Container(
-                      height: 40,
+                      height: 36,
                       width: 1,
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
                     _buildSummaryItem(
-                      icon: Icons.trending_up,
+                      icon: Icons.trending_up_rounded,
                       label: 'Moyenne',
                       value: jobsCount > 0
                           ? '${(amount / jobsCount).toStringAsFixed(0)} \$'
@@ -361,7 +436,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
   }
 
   Widget _buildDailyGoalProgress(double currentAmount) {
-    const double dailyGoal = 100.0; // Objectif journalier par défaut
+    const double dailyGoal = 100.0;
     final progress = (currentAmount / dailyGoal).clamp(0.0, 1.0);
 
     return Column(
@@ -372,7 +447,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
             Text(
               'Objectif: ${dailyGoal.toInt()}\$',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 12,
               ),
             ),
@@ -391,9 +466,9 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: Colors.white.withOpacity(0.2),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(
-              progress >= 1.0 ? Colors.amber : Colors.white,
+              progress >= 1.0 ? AppTheme.warning : Colors.white,
             ),
             minHeight: 6,
           ),
@@ -404,12 +479,12 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.emoji_events, color: Colors.amber[300], size: 16),
+                Icon(Icons.emoji_events_rounded, color: AppTheme.warning, size: 16),
                 const SizedBox(width: 4),
                 Text(
                   'Objectif atteint!',
                   style: TextStyle(
-                    color: Colors.amber[300],
+                    color: AppTheme.warning,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -428,13 +503,13 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
   }) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 20),
+        Icon(icon, color: Colors.white, size: 18),
         const SizedBox(height: 4),
         Text(
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -442,7 +517,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           label,
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.8),
-            fontSize: 12,
+            fontSize: 11,
           ),
         ),
       ],
@@ -456,8 +531,8 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           child: _buildStatCard(
             title: 'Terminés',
             value: stats.completed.toString(),
-            icon: Icons.check_circle,
-            color: Colors.green,
+            icon: Icons.check_circle_rounded,
+            color: AppTheme.success,
           ),
         ),
         const SizedBox(width: 12),
@@ -465,8 +540,8 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           child: _buildStatCard(
             title: 'En cours',
             value: stats.inProgress.toString(),
-            icon: Icons.engineering,
-            color: Colors.orange,
+            icon: Icons.engineering_rounded,
+            color: AppTheme.warning,
           ),
         ),
         const SizedBox(width: 12),
@@ -474,8 +549,8 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           child: _buildStatCard(
             title: 'Assignés',
             value: stats.assigned.toString(),
-            icon: Icons.assignment,
-            color: Colors.blue,
+            icon: Icons.assignment_rounded,
+            color: AppTheme.primary,
           ),
         ),
       ],
@@ -487,10 +562,10 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
       children: [
         Expanded(
           child: _buildStatCard(
-            title: 'Jobs terminés',
+            title: 'Jobs',
             value: stats.completed.toString(),
-            icon: Icons.check_circle,
-            color: Colors.green,
+            icon: Icons.check_circle_rounded,
+            color: AppTheme.success,
           ),
         ),
         const SizedBox(width: 12),
@@ -498,17 +573,17 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           child: _buildStatCard(
             title: 'Revenus',
             value: '${stats.earnings.toStringAsFixed(0)}\$',
-            icon: Icons.attach_money,
-            color: Colors.blue,
+            icon: Icons.attach_money_rounded,
+            color: AppTheme.primary,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            title: 'Pourboires',
+            title: 'Tips',
             value: '${stats.tips.toStringAsFixed(0)}\$',
-            icon: Icons.volunteer_activism,
-            color: Colors.amber,
+            icon: Icons.volunteer_activism_rounded,
+            color: AppTheme.warning,
           ),
         ),
       ],
@@ -524,31 +599,30 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(height: 10),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
-            ),
+            style: AppTheme.headlineSmall,
           ),
+          const SizedBox(height: 2),
           Text(
             title,
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: AppTheme.labelSmall,
             textAlign: TextAlign.center,
           ),
         ],
@@ -564,29 +638,16 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
     final maxHeight = maxEarning > 0 ? maxEarning : 100.0;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Revenus par jour',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
-            ),
-          ),
+          Text('Revenus par jour', style: AppTheme.headlineSmall),
           const SizedBox(height: 24),
           SizedBox(
             height: 150,
@@ -605,22 +666,19 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                     if (earning > 0)
                       Text(
                         '${earning.toInt()}\$',
-                        style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                        style: AppTheme.labelSmall.copyWith(fontSize: 10),
                       ),
                     const SizedBox(height: 4),
                     Container(
                       width: 32,
                       height: height.clamp(4.0, 120.0),
                       decoration: BoxDecoration(
-                        color: Colors.green[400],
+                        color: AppTheme.success,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      days[index],
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
+                    Text(days[index], style: AppTheme.labelSmall),
                   ],
                 );
               }),
@@ -633,30 +691,31 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
 
   Widget _buildAllTimeStats(AllTimeStats allTime) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Statistiques globales',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
-            ),
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+                child: const Icon(Icons.analytics_rounded, color: AppTheme.primary, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Text('Statistiques globales', style: AppTheme.headlineSmall),
+            ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildAllTimeRow('Total jobs', allTime.completed.toString()),
           _buildAllTimeRow('Revenus totaux', '${allTime.earnings.toStringAsFixed(2)} \$'),
           _buildAllTimeRow('Pourboires totaux', '${allTime.tips.toStringAsFixed(2)} \$'),
@@ -673,15 +732,12 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
 
   Widget _buildAllTimeRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[600])),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
+          Text(label, style: AppTheme.bodySmall),
+          Text(value, style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600)),
         ],
       ),
     );

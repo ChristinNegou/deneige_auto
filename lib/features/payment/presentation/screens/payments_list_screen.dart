@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/payment.dart';
 import '../../domain/entities/payment_method.dart';
 import '../bloc/payment_history_bloc.dart';
@@ -52,62 +54,82 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: CustomScrollView(
-        slivers: [
-          // App Bar with Balance Card
-          SliverAppBar(
-            expandedHeight: 200,
-            floating: false,
-            pinned: true,
-            backgroundColor: const Color(0xFF8B5CF6),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF8B5CF6),
-                      Color(0xFF7C3AED),
-                      Color(0xFF6D28D9),
-                    ],
-                  ),
-                ),
-                child: _buildBalanceCard(),
-              ),
-            ),
-          ),
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
 
-          // Tab Bar
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _SliverAppBarDelegate(
-              TabBar(
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(),
+            _buildBalanceCard(),
+            const SizedBox(height: 16),
+            _buildTabBar(),
+            const SizedBox(height: 8),
+            Expanded(
+              child: TabBarView(
                 controller: _tabController,
-                labelColor: const Color(0xFF8B5CF6),
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: const Color(0xFF8B5CF6),
-                indicatorWeight: 3,
-                tabs: const [
-                  Tab(text: 'Historique'),
-                  Tab(text: 'Méthodes'),
-                  Tab(text: 'Statistiques'),
+                children: [
+                  _buildHistoryTab(),
+                  _buildMethodsTab(),
+                  _buildStatsTab(),
                 ],
               ),
             ),
-          ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          // Tab Content
-          SliverFillRemaining(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildHistoryTab(),
-                _buildMethodsTab(),
-                _buildStatsTab(),
-              ],
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: AppTheme.shadowSM,
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppTheme.textPrimary,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'Paiements',
+            style: AppTheme.headlineMedium,
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () {
+              context.read<PaymentHistoryBloc>().add(RefreshPaymentHistory());
+              context.read<PaymentMethodsBloc>().add(LoadPaymentMethods());
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+              child: const Icon(
+                Icons.refresh_rounded,
+                color: AppTheme.primary,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -118,33 +140,86 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   Widget _buildBalanceCard() {
     return BlocBuilder<PaymentHistoryBloc, PaymentHistoryState>(
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppTheme.primary, AppTheme.secondary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primary.withValues(alpha: 0.3),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Solde total',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${state.totalSpent.toStringAsFixed(2)} \$',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
               Row(
                 children: [
-                  _buildStatItem('Transactions', state.transactionCount.toString()),
-                  const SizedBox(width: 24),
-                  _buildStatItem('Moyenne', '${state.averagePerTransaction.toStringAsFixed(2)} \$'),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_wallet_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Total dépensé',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        '${state.totalSpent.toStringAsFixed(2)} \$',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildMiniStat(
+                      Icons.receipt_long_rounded,
+                      state.transactionCount.toString(),
+                      'Transactions',
+                    ),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 40,
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
+                  Expanded(
+                    child: _buildMiniStat(
+                      Icons.trending_up_rounded,
+                      '${state.averagePerTransaction.toStringAsFixed(0)} \$',
+                      'Moyenne',
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -154,27 +229,61 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildMiniStat(IconData icon, String value, String label) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white70, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 4),
         Text(
-          value,
+          label,
           style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            color: Colors.white60,
+            fontSize: 11,
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: TabBar(
+        controller: _tabController,
+        indicator: BoxDecoration(
+          color: AppTheme.primary,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        ),
+        labelColor: Colors.white,
+        unselectedLabelColor: AppTheme.textSecondary,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        tabs: const [
+          Tab(text: 'Historique'),
+          Tab(text: 'Méthodes'),
+          Tab(text: 'Stats'),
+        ],
+      ),
     );
   }
 
@@ -182,40 +291,23 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     return BlocBuilder<PaymentHistoryBloc, PaymentHistoryState>(
       builder: (context, state) {
         if (state.isLoading && state.payments.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: AppTheme.primary),
+          );
         }
 
         if (state.errorMessage != null && state.payments.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                Text(state.errorMessage!),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => context.read<PaymentHistoryBloc>().add(RefreshPaymentHistory()),
-                  child: const Text('Réessayer'),
-                ),
-              ],
-            ),
+          return _buildErrorState(
+            state.errorMessage!,
+            () => context.read<PaymentHistoryBloc>().add(RefreshPaymentHistory()),
           );
         }
 
         if (state.filteredPayments.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.receipt_long, size: 64, color: Colors.grey[400]),
-                const SizedBox(height: 16),
-                Text(
-                  'Aucun paiement',
-                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                ),
-              ],
-            ),
+          return _buildEmptyState(
+            Icons.receipt_long_rounded,
+            'Aucun paiement',
+            'Vos transactions apparaîtront ici',
           );
         }
 
@@ -223,8 +315,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
           onRefresh: () async {
             context.read<PaymentHistoryBloc>().add(RefreshPaymentHistory());
           },
+          color: AppTheme.primary,
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppTheme.paddingLG),
             itemCount: state.filteredPayments.length,
             itemBuilder: (context, index) {
               return _buildPaymentCard(state.filteredPayments[index]);
@@ -236,102 +329,84 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildPaymentCard(Payment payment) {
-    return Card(
+    final statusColor = _getStatusColor(payment.status);
+
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(payment.status).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    _getStatusIcon(payment.status),
-                    color: _getStatusColor(payment.status),
-                    size: 24,
-                  ),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        payment.displayDescription,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        DateFormat('dd MMM yyyy à HH:mm').format(payment.createdAt),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
+                child: Icon(
+                  _getStatusIcon(payment.status),
+                  color: statusColor,
+                  size: 22,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${payment.amount.toStringAsFixed(2)} \$',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      payment.displayDescription,
+                      style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(payment.status).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        payment.status.displayName,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: _getStatusColor(payment.status),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                    Text(
+                      DateFormat('dd MMM yyyy à HH:mm').format(payment.createdAt),
+                      style: AppTheme.labelSmall,
                     ),
                   ],
                 ),
-              ],
-            ),
-            if (payment.methodType == PaymentMethodType.card && payment.last4 != null) ...[
-              const SizedBox(height: 12),
-              const Divider(),
-              const SizedBox(height: 8),
-              Row(
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Icon(Icons.credit_card, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 8),
                   Text(
-                    '•••• ${payment.last4}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                    '${payment.amount.toStringAsFixed(2)} \$',
+                    style: AppTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 4),
+                  StatusBadge(
+                    label: payment.status.displayName,
+                    color: statusColor,
+                    small: true,
                   ),
                 ],
               ),
             ],
+          ),
+          if (payment.methodType == PaymentMethodType.card && payment.last4 != null) ...[
+            const SizedBox(height: 12),
+            const Divider(height: 1, color: AppTheme.divider),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.credit_card_rounded, size: 14, color: AppTheme.textTertiary),
+                const SizedBox(width: 6),
+                Text(
+                  '•••• ${payment.last4}',
+                  style: AppTheme.labelSmall,
+                ),
+              ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -339,34 +414,34 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   Color _getStatusColor(PaymentStatus status) {
     switch (status) {
       case PaymentStatus.succeeded:
-        return Colors.green;
+        return AppTheme.success;
       case PaymentStatus.pending:
       case PaymentStatus.processing:
-        return Colors.orange;
+        return AppTheme.warning;
       case PaymentStatus.failed:
-        return Colors.red;
+        return AppTheme.error;
       case PaymentStatus.refunded:
       case PaymentStatus.partiallyRefunded:
-        return Colors.blue;
+        return AppTheme.info;
       case PaymentStatus.canceled:
-        return Colors.grey;
+        return AppTheme.textTertiary;
     }
   }
 
   IconData _getStatusIcon(PaymentStatus status) {
     switch (status) {
       case PaymentStatus.succeeded:
-        return Icons.check_circle;
+        return Icons.check_circle_rounded;
       case PaymentStatus.pending:
       case PaymentStatus.processing:
-        return Icons.schedule;
+        return Icons.schedule_rounded;
       case PaymentStatus.failed:
-        return Icons.error;
+        return Icons.error_rounded;
       case PaymentStatus.refunded:
       case PaymentStatus.partiallyRefunded:
-        return Icons.refresh;
+        return Icons.refresh_rounded;
       case PaymentStatus.canceled:
-        return Icons.cancel;
+        return Icons.cancel_rounded;
     }
   }
 
@@ -374,32 +449,23 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     return BlocBuilder<PaymentMethodsBloc, PaymentMethodsState>(
       builder: (context, state) {
         if (state.isLoading && state.methods.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: AppTheme.primary),
+          );
         }
 
         if (state.errorMessage != null && state.methods.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                Text(state.errorMessage!),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => context.read<PaymentMethodsBloc>().add(LoadPaymentMethods()),
-                  child: const Text('Réessayer'),
-                ),
-              ],
-            ),
+          return _buildErrorState(
+            state.errorMessage!,
+            () => context.read<PaymentMethodsBloc>().add(LoadPaymentMethods()),
           );
         }
 
         return ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppTheme.paddingLG),
           children: [
             ...state.methods.map((method) => _buildPaymentMethodCard(method)),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             _buildAddPaymentMethodButton(),
           ],
         );
@@ -408,114 +474,117 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildPaymentMethodCard(PaymentMethod method) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF8B5CF6).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.credit_card,
-                color: Color(0xFF8B5CF6),
-                size: 32,
-              ),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        border: method.isDefault
+            ? Border.all(color: AppTheme.success.withValues(alpha: 0.5), width: 1.5)
+            : null,
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        method.brand.displayName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+            child: const Icon(
+              Icons.credit_card_rounded,
+              color: AppTheme.primary,
+              size: 26,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      method.brand.displayName,
+                      style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    if (method.isDefault) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppTheme.success.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                        ),
+                        child: Text(
+                          'Par défaut',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.success,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      if (method.isDefault)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Text(
-                            'Par défaut',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.green,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
                     ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    method.displayNumber,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Expire ${method.expiryDisplay}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: method.isExpired ? Colors.red : Colors.grey[500],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'default') {
-                  context.read<PaymentMethodsBloc>().add(
-                    SetDefaultPaymentMethod(method.stripePaymentMethodId!),
-                  );
-                } else if (value == 'delete') {
-                  _showDeleteConfirmation(context, method);
-                }
-              },
-              itemBuilder: (context) => [
-                if (!method.isDefault)
-                  const PopupMenuItem(
-                    value: 'default',
-                    child: Row(
-                      children: [
-                        Icon(Icons.star, size: 20),
-                        SizedBox(width: 8),
-                        Text('Définir par défaut'),
-                      ],
-                    ),
-                  ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, size: 20, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Supprimer', style: TextStyle(color: Colors.red)),
-                    ],
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  method.displayNumber,
+                  style: AppTheme.bodySmall,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Expire ${method.expiryDisplay}',
+                  style: AppTheme.labelSmall.copyWith(
+                    color: method.isExpired ? AppTheme.error : AppTheme.textTertiary,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded, color: AppTheme.textSecondary),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
+            onSelected: (value) {
+              if (value == 'default') {
+                context.read<PaymentMethodsBloc>().add(
+                  SetDefaultPaymentMethod(method.stripePaymentMethodId!),
+                );
+              } else if (value == 'delete') {
+                _showDeleteConfirmation(context, method);
+              }
+            },
+            itemBuilder: (context) => [
+              if (!method.isDefault)
+                const PopupMenuItem(
+                  value: 'default',
+                  child: Row(
+                    children: [
+                      Icon(Icons.star_rounded, size: 20, color: AppTheme.warning),
+                      SizedBox(width: 8),
+                      Text('Définir par défaut'),
+                    ],
+                  ),
+                ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.error),
+                    SizedBox(width: 8),
+                    Text('Supprimer', style: TextStyle(color: AppTheme.error)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -524,12 +593,18 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        ),
         title: const Text('Supprimer la carte'),
         content: Text('Voulez-vous vraiment supprimer la carte ${method.displayNumber} ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text(
+              'Annuler',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -538,8 +613,10 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                 DeletePaymentMethod(method.stripePaymentMethodId!),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Supprimer'),
+            child: const Text(
+              'Supprimer',
+              style: TextStyle(color: AppTheme.error),
+            ),
           ),
         ],
       ),
@@ -547,24 +624,51 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildAddPaymentMethodButton() {
-    return OutlinedButton.icon(
-      onPressed: () async {
+    return GestureDetector(
+      onTap: () async {
         final result = await Navigator.pushNamed(
           context,
           AppRoutes.addPaymentMethod,
         );
-
-        // Reload payment methods if card was added
         if (result == true && mounted) {
           context.read<PaymentMethodsBloc>().add(LoadPaymentMethods());
         }
       },
-      icon: const Icon(Icons.add),
-      label: const Text('Ajouter une carte'),
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        side: const BorderSide(color: Color(0xFF8B5CF6)),
-        foregroundColor: const Color(0xFF8B5CF6),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          border: Border.all(
+            color: AppTheme.primary.withValues(alpha: 0.3),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                color: AppTheme.primary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Ajouter une carte',
+              style: AppTheme.labelLarge.copyWith(
+                color: AppTheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -573,34 +677,34 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     return BlocBuilder<PaymentHistoryBloc, PaymentHistoryState>(
       builder: (context, state) {
         return ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppTheme.paddingLG),
           children: [
             _buildStatCard(
               'Total dépensé',
               '${state.totalSpent.toStringAsFixed(2)} \$',
-              Icons.monetization_on,
-              Colors.green,
+              Icons.monetization_on_rounded,
+              AppTheme.success,
             ),
             const SizedBox(height: 12),
             _buildStatCard(
               'Nombre de transactions',
               state.transactionCount.toString(),
-              Icons.receipt_long,
-              Colors.blue,
+              Icons.receipt_long_rounded,
+              AppTheme.primary,
             ),
             const SizedBox(height: 12),
             _buildStatCard(
               'Montant moyen',
               '${state.averagePerTransaction.toStringAsFixed(2)} \$',
-              Icons.analytics,
-              Colors.orange,
+              Icons.analytics_rounded,
+              AppTheme.warning,
             ),
             const SizedBox(height: 12),
             _buildStatCard(
               'Total remboursé',
               '${state.totalRefunded.toStringAsFixed(2)} \$',
-              Icons.refresh,
-              Colors.purple,
+              Icons.refresh_rounded,
+              AppTheme.secondary,
             ),
           ],
         );
@@ -609,72 +713,91 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 32),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTheme.bodySmall,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: AppTheme.headlineMedium,
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-}
 
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar _tabBar;
-
-  _SliverAppBarDelegate(this._tabBar);
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Colors.white,
-      child: _tabBar,
+  Widget _buildEmptyState(IconData icon, String title, String subtitle) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+            ),
+            child: Icon(icon, size: 40, color: AppTheme.primary),
+          ),
+          const SizedBox(height: 20),
+          Text(title, style: AppTheme.headlineSmall),
+          const SizedBox(height: 8),
+          Text(subtitle, style: AppTheme.bodySmall),
+        ],
+      ),
     );
   }
 
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
+  Widget _buildErrorState(String message, VoidCallback onRetry) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline_rounded, size: 48, color: AppTheme.error),
+          const SizedBox(height: 12),
+          Text(message, style: AppTheme.bodySmall),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: onRetry,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+            ),
+            child: const Text('Réessayer'),
+          ),
+        ],
+      ),
+    );
   }
 }

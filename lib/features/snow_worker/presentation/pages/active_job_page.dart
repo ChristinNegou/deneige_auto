@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/worker_job.dart';
 import '../../domain/repositories/worker_repository.dart';
 import '../bloc/worker_jobs_bloc.dart';
@@ -62,13 +64,28 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+
     return BlocListener<WorkerJobsBloc, WorkerJobsState>(
       listener: (context, state) {
         if (state is JobActionSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_getSuccessMessage(state.action)),
-              backgroundColor: Colors.green,
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Text(_getSuccessMessage(state.action)),
+                ],
+              ),
+              backgroundColor: AppTheme.success,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
             ),
           );
           if (state.action == 'complete') {
@@ -84,35 +101,52 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         } else if (state is WorkerJobsError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(state.message)),
+                ],
+              ),
+              backgroundColor: AppTheme.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
             ),
           );
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Job actif'),
-          backgroundColor: _getStatusColor(_currentJob.status),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+        backgroundColor: AppTheme.background,
+        body: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStatusBanner(),
-              const SizedBox(height: 16),
-              if (_currentJob.status == JobStatus.inProgress)
-                _buildTimerCard(),
-              const SizedBox(height: 16),
-              _buildClientCard(),
-              const SizedBox(height: 16),
-              _buildVehicleCard(),
-              const SizedBox(height: 16),
-              if (_currentJob.location != null) _buildNavigationButtons(),
-              const SizedBox(height: 16),
-              _buildActionSection(),
-              const SizedBox(height: 100),
+              _buildHeader(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppTheme.paddingLG),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStatusBanner(),
+                      const SizedBox(height: 16),
+                      if (_currentJob.status == JobStatus.inProgress)
+                        _buildTimerCard(),
+                      if (_currentJob.status == JobStatus.inProgress)
+                        const SizedBox(height: 16),
+                      _buildClientCard(),
+                      const SizedBox(height: 12),
+                      _buildVehicleCard(),
+                      const SizedBox(height: 16),
+                      if (_currentJob.location != null) _buildNavigationButtons(),
+                      if (_currentJob.location != null) const SizedBox(height: 16),
+                      _buildActionSection(),
+                      const SizedBox(height: 100),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -120,42 +154,93 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     );
   }
 
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: AppTheme.shadowSM,
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppTheme.textPrimary,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'Job actif',
+            style: AppTheme.headlineMedium,
+          ),
+          const Spacer(),
+          StatusBadge(
+            label: _getStatusLabel(_currentJob.status),
+            color: _getStatusColor(_currentJob.status),
+            icon: _getStatusIcon(_currentJob.status),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStatusBanner() {
+    final color = _getStatusColor(_currentJob.status);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _getStatusColor(_currentJob.status).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _getStatusColor(_currentJob.status),
-          width: 2,
+        gradient: LinearGradient(
+          colors: [
+            color.withValues(alpha: 0.15),
+            color.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
       ),
       child: Row(
         children: [
-          Icon(
-            _getStatusIcon(_currentJob.status),
-            color: _getStatusColor(_currentJob.status),
-            size: 32,
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
+            child: Icon(
+              _getStatusIcon(_currentJob.status),
+              color: color,
+              size: 28,
+            ),
           ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _getStatusLabel(_currentJob.status),
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: _getStatusColor(_currentJob.status),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _getStatusLabel(_currentJob.status),
+                  style: AppTheme.headlineSmall.copyWith(color: color),
                 ),
-              ),
-              Text(
-                _getStatusSubtitle(_currentJob.status),
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  _getStatusSubtitle(_currentJob.status),
+                  style: AppTheme.bodySmall,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -171,27 +256,96 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          const Text(
-            'Temps écoulé',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-            style: TextStyle(
-              fontSize: 48,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue[700],
-              fontFamily: 'monospace',
-            ),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primary, AppTheme.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.timer_outlined, color: Colors.white70, size: 18),
+              const SizedBox(width: 8),
+              const Text(
+                'Temps écoulé',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildTimeBlock(hours.toString().padLeft(2, '0'), 'h'),
+              const Text(
+                ' : ',
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              _buildTimeBlock(minutes.toString().padLeft(2, '0'), 'm'),
+              const Text(
+                ' : ',
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              _buildTimeBlock(seconds.toString().padLeft(2, '0'), 's'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeBlock(String value, String unit) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+          ),
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          unit,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.white70,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 
@@ -200,57 +354,125 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        boxShadow: AppTheme.shadowSM,
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            backgroundColor: Colors.orange[100],
-            child: Text(
-              _currentJob.client.firstName[0].toUpperCase(),
-              style: TextStyle(
-                color: Colors.orange[700],
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _currentJob.client.fullName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppTheme.warning, Color(0xFFFF9500)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: Center(
+                  child: Text(
+                    _currentJob.client.firstName[0].toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                Text(
-                  _currentJob.displayAddress,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _currentJob.client.fullName,
+                      style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on_outlined, size: 14, color: AppTheme.textTertiary),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            _currentJob.displayAddress,
+                            style: AppTheme.bodySmall,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           if (_currentJob.client.phoneNumber != null) ...[
-            IconButton(
-              onPressed: () => _messageClient(_currentJob.client.phoneNumber!),
-              icon: Icon(Icons.message, color: Colors.blue[600]),
-              tooltip: 'Envoyer un SMS',
-            ),
-            IconButton(
-              onPressed: () => _callClient(_currentJob.client.phoneNumber!),
-              icon: Icon(Icons.phone, color: Colors.green[600]),
-              tooltip: 'Appeler',
+            const SizedBox(height: 14),
+            const Divider(height: 1, color: AppTheme.divider),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _callClient(_currentJob.client.phoneNumber!),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.success.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.phone_rounded, size: 20, color: AppTheme.success),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Appeler',
+                            style: TextStyle(
+                              color: AppTheme.success,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _messageClient(_currentJob.client.phoneNumber!),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.message_rounded, size: 20, color: AppTheme.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            'SMS',
+                            style: TextStyle(
+                              color: AppTheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ],
@@ -263,42 +485,47 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
+              color: AppTheme.secondary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
             ),
-            child: Icon(Icons.directions_car, color: Colors.grey[700]),
+            child: const Center(
+              child: Text('🚗', style: TextStyle(fontSize: 26)),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   _currentJob.vehicle.displayName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
                 ),
                 if (_currentJob.vehicle.licensePlate != null)
-                  Text(
-                    _currentJob.vehicle.licensePlate!,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  Container(
+                    margin: const EdgeInsets.only(top: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.background,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      _currentJob.vehicle.licensePlate!,
+                      style: AppTheme.labelSmall.copyWith(
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -307,14 +534,15 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(20),
+                color: AppTheme.infoLight,
+                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
               ),
               child: Text(
                 _currentJob.vehicle.color!,
                 style: TextStyle(
-                  color: Colors.blue[700],
-                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.info,
                 ),
               ),
             ),
@@ -327,33 +555,65 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     return Row(
       children: [
         Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () => _openMaps(
+          child: GestureDetector(
+            onTap: () => _openMaps(
               _currentJob.location!.latitude,
               _currentJob.location!.longitude,
             ),
-            icon: const Icon(Icons.map),
-            label: const Text('Google Maps'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+                boxShadow: AppTheme.shadowSM,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.map_rounded, size: 20, color: AppTheme.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Google Maps',
+                    style: TextStyle(
+                      color: AppTheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () => _openWaze(
+          child: GestureDetector(
+            onTap: () => _openWaze(
               _currentJob.location!.latitude,
               _currentJob.location!.longitude,
             ),
-            icon: const Icon(Icons.navigation),
-            label: const Text('Waze'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.cyan,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                border: Border.all(color: AppTheme.info.withValues(alpha: 0.3)),
+                boxShadow: AppTheme.shadowSM,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.navigation_rounded, size: 20, color: AppTheme.info),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Waze',
+                    style: TextStyle(
+                      color: AppTheme.info,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -366,108 +626,216 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       builder: (context, state) {
         final isLoading = state is JobActionLoading && state.jobId == _currentJob.id;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Divider(height: 32),
-            Text(
-              'Actions',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (_currentJob.status == JobStatus.assigned)
-              _buildActionButton(
-                label: 'En route',
-                icon: Icons.directions_car,
-                color: Colors.blue,
-                isLoading: isLoading,
-                onPressed: () async {
-                  // Marquer en route
-                  context.read<WorkerJobsBloc>().add(MarkEnRoute(_currentJob.id));
-
-                  // Ouvrir la navigation GPS
-                  if (_currentJob.location != null) {
-                    await _openMaps(
-                      _currentJob.location!.latitude,
-                      _currentJob.location!.longitude,
-                    );
-                  } else {
-                    // Afficher un message si pas de coordonnées
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Coordonnées GPS non disponibles. Utilisez l\'adresse affichée.'),
-                          backgroundColor: Colors.orange,
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-            if (_currentJob.status == JobStatus.enRoute) ...[
-              // Bouton "Je suis arrivé" - vérifie la position GPS
-              _buildActionButton(
-                label: 'Je suis arrivé',
-                icon: Icons.location_on,
-                color: Colors.purple,
-                isLoading: isLoading,
-                onPressed: () => _verifyArrivalAndStart(context),
-              ),
-              const SizedBox(height: 12),
-              // Boutons de navigation (au cas où l'utilisateur a fermé l'app GPS)
-              if (_currentJob.location != null)
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _openMaps(
-                          _currentJob.location!.latitude,
-                          _currentJob.location!.longitude,
-                        ),
-                        icon: const Icon(Icons.map, size: 18),
-                        label: const Text('Maps'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.blue,
-                        ),
-                      ),
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            boxShadow: AppTheme.shadowSM,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _openWaze(
-                          _currentJob.location!.latitude,
-                          _currentJob.location!.longitude,
-                        ),
-                        icon: const Icon(Icons.navigation, size: 18),
-                        label: const Text('Waze'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.cyan,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-            ],
-            if (_currentJob.status == JobStatus.inProgress) ...[
-              // Section photo obligatoire
-              _buildPhotoSection(),
+                    child: const Icon(Icons.flash_on_rounded, color: AppTheme.primary, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Text('Actions', style: AppTheme.headlineSmall),
+                ],
+              ),
               const SizedBox(height: 16),
-              // Bouton terminer - uniquement si photo uploadée
-              _buildActionButton(
-                label: _photoUploaded ? 'Terminer le job' : 'Photo requise',
-                icon: _photoUploaded ? Icons.check_circle : Icons.camera_alt,
-                color: _photoUploaded ? Colors.green : Colors.grey,
-                isLoading: isLoading,
-                onPressed: _photoUploaded ? () => _showCompleteDialog(context) : null,
-              ),
+              if (_currentJob.status == JobStatus.assigned)
+                _buildGradientActionButton(
+                  label: 'En route',
+                  icon: Icons.directions_car_rounded,
+                  gradientColors: [AppTheme.primary, AppTheme.secondary],
+                  isLoading: isLoading,
+                  onPressed: () async {
+                    context.read<WorkerJobsBloc>().add(MarkEnRoute(_currentJob.id));
+                    if (_currentJob.location != null) {
+                      await _openMaps(
+                        _currentJob.location!.latitude,
+                        _currentJob.location!.longitude,
+                      );
+                    } else {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(Icons.warning, color: Colors.white, size: 20),
+                                const SizedBox(width: 12),
+                                const Expanded(child: Text('Coordonnées GPS non disponibles')),
+                              ],
+                            ),
+                            backgroundColor: AppTheme.warning,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+              if (_currentJob.status == JobStatus.enRoute) ...[
+                _buildGradientActionButton(
+                  label: 'Je suis arrivé',
+                  icon: Icons.location_on_rounded,
+                  gradientColors: [AppTheme.secondary, const Color(0xFF7C3AED)],
+                  isLoading: isLoading,
+                  onPressed: () => _verifyArrivalAndStart(context),
+                ),
+                const SizedBox(height: 12),
+                if (_currentJob.location != null)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildOutlinedButton(
+                          icon: Icons.map_rounded,
+                          label: 'Maps',
+                          color: AppTheme.primary,
+                          onPressed: () => _openMaps(
+                            _currentJob.location!.latitude,
+                            _currentJob.location!.longitude,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildOutlinedButton(
+                          icon: Icons.navigation_rounded,
+                          label: 'Waze',
+                          color: AppTheme.info,
+                          onPressed: () => _openWaze(
+                            _currentJob.location!.latitude,
+                            _currentJob.location!.longitude,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+              if (_currentJob.status == JobStatus.inProgress) ...[
+                _buildPhotoSection(),
+                const SizedBox(height: 16),
+                _buildGradientActionButton(
+                  label: _photoUploaded ? 'Terminer le job' : 'Photo requise',
+                  icon: _photoUploaded ? Icons.check_circle_rounded : Icons.camera_alt_rounded,
+                  gradientColors: _photoUploaded
+                      ? [AppTheme.success, const Color(0xFF059669)]
+                      : [AppTheme.textTertiary, AppTheme.textSecondary],
+                  isLoading: isLoading,
+                  onPressed: _photoUploaded ? () => _showCompleteDialog(context) : null,
+                ),
+              ],
             ],
-          ],
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildGradientActionButton({
+    required String label,
+    required IconData icon,
+    required List<Color> gradientColors,
+    required bool isLoading,
+    VoidCallback? onPressed,
+  }) {
+    final isDisabled = onPressed == null;
+    return GestureDetector(
+      onTap: isLoading || isDisabled ? null : onPressed,
+      child: Container(
+        width: double.infinity,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDisabled
+                ? [AppTheme.textTertiary.withValues(alpha: 0.5), AppTheme.textSecondary.withValues(alpha: 0.5)]
+                : gradientColors,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          boxShadow: isDisabled
+              ? null
+              : [
+                  BoxShadow(
+                    color: gradientColors.first.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isLoading)
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            else
+              Icon(icon, color: Colors.white, size: 22),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOutlinedButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -476,11 +844,15 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _photoUploaded ? Colors.green[50] : Colors.orange[50],
-        borderRadius: BorderRadius.circular(12),
+        color: _photoUploaded
+            ? AppTheme.successLight
+            : AppTheme.warningLight,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         border: Border.all(
-          color: _photoUploaded ? Colors.green : Colors.orange,
-          width: 2,
+          color: _photoUploaded
+              ? AppTheme.success.withValues(alpha: 0.4)
+              : AppTheme.warning.withValues(alpha: 0.4),
+          width: 1.5,
         ),
       ),
       child: Column(
@@ -488,10 +860,20 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         children: [
           Row(
             children: [
-              Icon(
-                _photoUploaded ? Icons.check_circle : Icons.camera_alt,
-                color: _photoUploaded ? Colors.green : Colors.orange,
-                size: 28,
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: _photoUploaded
+                      ? AppTheme.success.withValues(alpha: 0.2)
+                      : AppTheme.warning.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+                child: Icon(
+                  _photoUploaded ? Icons.check_circle_rounded : Icons.camera_alt_rounded,
+                  color: _photoUploaded ? AppTheme.success : AppTheme.warning,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -499,23 +881,18 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _photoUploaded
-                          ? 'Photo envoyée!'
-                          : 'Photo du travail terminé',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: _photoUploaded ? Colors.green[700] : Colors.orange[700],
+                      _photoUploaded ? 'Photo envoyée!' : 'Photo du travail terminé',
+                      style: AppTheme.labelLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: _photoUploaded ? AppTheme.success : AppTheme.warning,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       _photoUploaded
-                          ? 'Vous pouvez maintenant terminer le job'
+                          ? 'Vous pouvez maintenant terminer'
                           : 'Prenez une photo avant de terminer',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                      ),
+                      style: AppTheme.bodySmall,
                     ),
                   ],
                 ),
@@ -524,9 +901,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           ),
           const SizedBox(height: 16),
           if (_afterPhoto != null && !_photoUploaded) ...[
-            // Afficher la preview de la photo
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               child: Image.file(
                 _afterPhoto!,
                 height: 200,
@@ -538,58 +914,113 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _isUploadingPhoto ? null : _takePhoto,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Reprendre'),
+                  child: _buildOutlinedButton(
+                    icon: Icons.refresh_rounded,
+                    label: 'Reprendre',
+                    color: AppTheme.textSecondary,
+                    onPressed: _isUploadingPhoto ? () {} : _takePhoto,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _isUploadingPhoto ? null : _uploadPhoto,
-                    icon: _isUploadingPhoto
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                  child: GestureDetector(
+                    onTap: _isUploadingPhoto ? null : _uploadPhoto,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.warning,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (_isUploadingPhoto)
+                            const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          else
+                            const Icon(Icons.cloud_upload_rounded, color: Colors.white, size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            _isUploadingPhoto ? 'Envoi...' : 'Envoyer',
+                            style: const TextStyle(
                               color: Colors.white,
+                              fontWeight: FontWeight.w600,
                             ),
-                          )
-                        : const Icon(Icons.cloud_upload),
-                    label: Text(_isUploadingPhoto ? 'Envoi...' : 'Envoyer'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
           ] else if (_photoUploaded) ...[
-            // Photo uploadée avec succès
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.file(
-                _afterPhoto!,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              child: Stack(
+                children: [
+                  Image.file(
+                    _afterPhoto!,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.success,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ] else ...[
-            // Pas encore de photo
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _takePhoto,
-                icon: const Icon(Icons.camera_alt),
-                label: const Text('Prendre une photo'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+            GestureDetector(
+              onTap: _takePhoto,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppTheme.warning,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.warning.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 22),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Prendre une photo',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -621,7 +1052,11 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur lors de la prise de photo: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
           ),
         );
       }
@@ -649,7 +1084,11 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Erreur: ${failure.message}'),
-                backgroundColor: Colors.red,
+                backgroundColor: AppTheme.error,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
               ),
             );
           }
@@ -661,9 +1100,19 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           });
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Photo envoyée avec succès!'),
-                backgroundColor: Colors.green,
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
+                    const Text('Photo envoyée avec succès!'),
+                  ],
+                ),
+                backgroundColor: AppTheme.success,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
               ),
             );
           }
@@ -674,7 +1123,11 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur lors de l\'envoi: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
           ),
         );
       }
@@ -688,29 +1141,34 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   }
 
   Future<void> _verifyArrivalAndStart(BuildContext context) async {
-    // Afficher un indicateur de chargement
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Vérification de votre position...'),
-              ],
-            ),
+      builder: (_) => Center(
+        child: Container(
+          margin: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            boxShadow: AppTheme.shadowLG,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(color: AppTheme.primary),
+              const SizedBox(height: 20),
+              Text(
+                'Vérification de votre position...',
+                style: AppTheme.bodyMedium,
+              ),
+            ],
           ),
         ),
       ),
     );
 
     try {
-      // Vérifier les permissions
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -732,7 +1190,6 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         return;
       }
 
-      // Obtenir la position actuelle
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -741,27 +1198,21 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       );
 
       if (!context.mounted) return;
-      Navigator.pop(context); // Fermer le loading
+      Navigator.pop(context);
 
-      // Vérifier si le job a une localisation
       if (_currentJob.location == null) {
-        // Pas de coordonnées GPS pour le job, permettre de commencer avec confirmation
         _showArrivedDialogNoGps(context);
         return;
       }
 
-      // DEBUG: Détecter si on est sur l'émulateur (coordonnées de Mountain View)
       final isEmulatorPosition = (position.latitude - 37.4219983).abs() < 0.5 &&
           (position.longitude - (-122.084)).abs() < 0.5;
 
-      // Si on est sur l'émulateur, on bypass la vérification de distance
       if (isEmulatorPosition) {
-        debugPrint('🔧 DEBUG: Position émulateur détectée - Bypass de la vérification GPS');
         _showArrivedDialogConfirmed(context, 0);
         return;
       }
 
-      // Calculer la distance
       final distance = Geolocator.distanceBetween(
         position.latitude,
         position.longitude,
@@ -770,10 +1221,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       );
 
       if (distance <= _arrivalRadiusMeters) {
-        // Worker est dans le rayon autorisé
         _showArrivedDialogConfirmed(context, distance.round());
       } else {
-        // Worker est trop loin
         _showTooFarDialog(context, distance.round());
       }
     } catch (e) {
@@ -787,25 +1236,40 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        ),
+        icon: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: AppTheme.successLight,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(Icons.check_circle_rounded, color: AppTheme.success, size: 40),
+        ),
         title: const Text('Position confirmée!'),
         content: Text(
-          'Vous êtes à ${distanceMeters}m du véhicule.\n\n'
-          'Vous pouvez maintenant commencer le travail.',
+          'Vous êtes à ${distanceMeters}m du véhicule.\n\nVous pouvez maintenant commencer le travail.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text('Annuler', style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton.icon(
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<WorkerJobsBloc>().add(StartJob(_currentJob.id));
             },
-            icon: const Icon(Icons.play_arrow),
+            icon: const Icon(Icons.play_arrow_rounded),
             label: const Text('Commencer'),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.success,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+            ),
           ),
         ],
       ),
@@ -816,25 +1280,40 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: const Icon(Icons.warning, color: Colors.orange, size: 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        ),
+        icon: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: AppTheme.warningLight,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(Icons.warning_rounded, color: AppTheme.warning, size: 40),
+        ),
         title: const Text('Coordonnées non disponibles'),
         content: const Text(
-          'Ce job n\'a pas de coordonnées GPS enregistrées.\n\n'
-          'Confirmez-vous être arrivé à l\'emplacement indiqué?',
+          'Ce job n\'a pas de coordonnées GPS enregistrées.\n\nConfirmez-vous être arrivé à l\'emplacement indiqué?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Non'),
+            child: Text('Non', style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton.icon(
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<WorkerJobsBloc>().add(StartJob(_currentJob.id));
             },
-            icon: const Icon(Icons.play_arrow),
+            icon: const Icon(Icons.play_arrow_rounded),
             label: const Text('Oui, commencer'),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.warning,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+            ),
           ),
         ],
       ),
@@ -845,17 +1324,26 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: const Icon(Icons.location_off, color: Colors.red, size: 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        ),
+        icon: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: AppTheme.errorLight,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(Icons.location_off_rounded, color: AppTheme.error, size: 40),
+        ),
         title: const Text('Trop loin'),
         content: Text(
-          'Vous êtes à ${distanceMeters}m du véhicule.\n\n'
-          'Vous devez être à moins de ${_arrivalRadiusMeters.round()}m pour confirmer votre arrivée.\n\n'
-          'Continuez à vous rapprocher.',
+          'Vous êtes à ${distanceMeters}m du véhicule.\n\nVous devez être à moins de ${_arrivalRadiusMeters.round()}m pour confirmer votre arrivée.\n\nContinuez à vous rapprocher.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('OK'),
+            child: Text('OK', style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -867,9 +1355,14 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 );
               }
             },
-            icon: const Icon(Icons.navigation),
+            icon: const Icon(Icons.navigation_rounded),
             label: const Text('Ouvrir GPS'),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+            ),
           ),
         ],
       ),
@@ -880,7 +1373,18 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: const Icon(Icons.error, color: Colors.red, size: 48),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        ),
+        icon: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: AppTheme.errorLight,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(Icons.error_rounded, color: AppTheme.error, size: 40),
+        ),
         title: const Text('Erreur de localisation'),
         content: Text(message),
         actions: [
@@ -893,57 +1397,40 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     );
   }
 
-  Widget _buildActionButton({
-    required String label,
-    required IconData icon,
-    required Color color,
-    required bool isLoading,
-    VoidCallback? onPressed,
-  }) {
-    final isDisabled = onPressed == null;
-    return SizedBox(
-      height: 56,
-      child: ElevatedButton.icon(
-        onPressed: isLoading || isDisabled ? null : onPressed,
-        icon: isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : Icon(icon),
-        label: Text(label, style: const TextStyle(fontSize: 18)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-    );
-  }
-
   void _showCompleteDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        ),
+        icon: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: AppTheme.successLight,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(Icons.task_alt_rounded, color: AppTheme.success, size: 40),
+        ),
         title: const Text('Terminer le job'),
         content: const Text('Êtes-vous sûr de vouloir marquer ce job comme terminé?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text('Annuler', style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<WorkerJobsBloc>().add(CompleteJob(_currentJob.id));
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.success,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+            ),
             child: const Text('Confirmer'),
           ),
         ],
@@ -954,37 +1441,37 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   Color _getStatusColor(JobStatus status) {
     switch (status) {
       case JobStatus.assigned:
-        return Colors.blue;
+        return AppTheme.primary;
       case JobStatus.enRoute:
-        return Colors.purple;
+        return AppTheme.secondary;
       case JobStatus.inProgress:
-        return Colors.orange;
+        return AppTheme.warning;
       case JobStatus.completed:
-        return Colors.green;
+        return AppTheme.success;
       default:
-        return Colors.grey;
+        return AppTheme.textTertiary;
     }
   }
 
   IconData _getStatusIcon(JobStatus status) {
     switch (status) {
       case JobStatus.assigned:
-        return Icons.assignment;
+        return Icons.assignment_rounded;
       case JobStatus.enRoute:
-        return Icons.directions_car;
+        return Icons.directions_car_rounded;
       case JobStatus.inProgress:
-        return Icons.engineering;
+        return Icons.engineering_rounded;
       case JobStatus.completed:
-        return Icons.check_circle;
+        return Icons.check_circle_rounded;
       default:
-        return Icons.help;
+        return Icons.help_rounded;
     }
   }
 
   String _getStatusLabel(JobStatus status) {
     switch (status) {
       case JobStatus.assigned:
-        return 'Job assigné';
+        return 'Assigné';
       case JobStatus.enRoute:
         return 'En route';
       case JobStatus.inProgress:
@@ -1039,7 +1526,6 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   }
 
   Future<void> _openMaps(double lat, double lng) async {
-    // DEBUG: Détecter les coordonnées de l'émulateur (Mountain View) et utiliser Trois-Rivières
     double finalLat = lat;
     double finalLng = lng;
 
@@ -1058,7 +1544,6 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   }
 
   Future<void> _openWaze(double lat, double lng) async {
-    // DEBUG: Détecter les coordonnées de l'émulateur (Mountain View) et utiliser Trois-Rivières
     double finalLat = lat;
     double finalLng = lng;
 

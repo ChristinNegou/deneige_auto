@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/routing/app_router.dart';
 import 'core/constants/app_routes.dart';
 import 'core/di/injection_container.dart';
+import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/auth/presentation/bloc/auth_state.dart';
@@ -36,14 +37,7 @@ class DeneigeAutoApp extends StatelessWidget {
           useMaterial3: true,
         ),*/
 
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          fontFamily: 'Roboto',
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF3B82F6),
-          ),
-        ),
+        theme: AppTheme.lightTheme,
 
         initialRoute: AppRoutes.onboarding,
 
