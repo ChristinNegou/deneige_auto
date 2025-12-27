@@ -152,3 +152,201 @@ exports.clearAllNotifications = async (req, res) => {
         });
     }
 };
+
+// @desc    Send notification to client (for workers)
+// @route   POST /api/notifications/send-to-client
+// @access  Private (Workers only)
+exports.sendNotificationToClient = async (req, res) => {
+    try {
+        const { reservationId, type, title, message, metadata } = req.body;
+
+        // Vérifier que l'utilisateur est un worker
+        if (req.user.role !== 'worker' && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Seuls les déneigeurs peuvent envoyer des notifications aux clients',
+            });
+        }
+
+        // Récupérer la réservation pour obtenir le client
+        const Reservation = require('../models/Reservation');
+        const reservation = await Reservation.findById(reservationId);
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Réservation non trouvée',
+            });
+        }
+
+        // Vérifier que le worker est assigné à cette réservation
+        if (reservation.assignedWorker?.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Vous n\'êtes pas assigné à cette réservation',
+            });
+        }
+
+        // Déterminer la priorité selon le type
+        let priority = 'normal';
+        if (['workerEnRoute', 'workStarted', 'workCompleted'].includes(type)) {
+            priority = 'high';
+        }
+
+        // Créer la notification pour le client
+        const notification = await Notification.createNotification({
+            userId: reservation.userId,
+            type: type,
+            title: title,
+            message: message,
+            priority: priority,
+            reservationId: reservationId,
+            workerId: req.user.id,
+            metadata: {
+                ...metadata,
+                workerName: `${req.user.firstName} ${req.user.lastName}`,
+                sentAt: new Date(),
+            },
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Notification envoyée au client',
+            notification: notification,
+        });
+    } catch (error) {
+        console.error('Error sending notification to client:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+// @desc    Get notifications for worker (job-related)
+// @route   GET /api/notifications/worker
+// @access  Private (Workers only)
+exports.getWorkerNotifications = async (req, res) => {
+    try {
+        if (req.user.role !== 'worker' && req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Accès réservé aux déneigeurs',
+            });
+        }
+
+        const notifications = await Notification.find({
+            userId: req.user.id,
+            type: {
+                $in: [
+                    'urgentRequest',
+                    'reservationAssigned',
+                    'reservationCancelled',
+                    'paymentSuccess',
+                    'weatherAlert',
+                    'systemNotification',
+                ]
+            }
+        })
+            .sort({ createdAt: -1 })
+            .limit(50);
+
+        res.json({
+            success: true,
+            notifications,
+        });
+    } catch (error) {
+        console.error('Error fetching worker notifications:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+// @desc    Create worker-specific notification (admin/system)
+// @route   POST /api/notifications/worker/:workerId
+// @access  Private (Admin only)
+exports.createWorkerNotification = async (req, res) => {
+    try {
+        const { workerId } = req.params;
+        const { type, title, message, priority, metadata } = req.body;
+
+        // Vérifier que c'est un admin ou le système
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Accès réservé aux administrateurs',
+            });
+        }
+
+        const notification = await Notification.createNotification({
+            userId: workerId,
+            type: type || 'systemNotification',
+            title: title,
+            message: message,
+            priority: priority || 'normal',
+            metadata: metadata,
+        });
+
+        res.status(201).json({
+            success: true,
+            notification,
+        });
+    } catch (error) {
+        console.error('Error creating worker notification:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+// @desc    Notify all workers in a zone about high demand
+// @route   POST /api/notifications/broadcast-zone
+// @access  Private (Admin only)
+exports.broadcastZoneNotification = async (req, res) => {
+    try {
+        const { zone, title, message, priority } = req.body;
+
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Accès réservé aux administrateurs',
+            });
+        }
+
+        // Trouver tous les workers actifs dans la zone
+        const User = require('../models/User');
+        const workers = await User.find({
+            role: 'worker',
+            isActive: true,
+            // Optionnel: filtrer par zone géographique
+        });
+
+        const notifications = [];
+        for (const worker of workers) {
+            const notification = await Notification.createNotification({
+                userId: worker._id,
+                type: 'weatherAlert',
+                title: title,
+                message: message,
+                priority: priority || 'high',
+                metadata: { zone, broadcastType: 'zone' },
+            });
+            notifications.push(notification);
+        }
+
+        res.status(201).json({
+            success: true,
+            message: `${notifications.length} notifications envoyées`,
+            count: notifications.length,
+        });
+    } catch (error) {
+        console.error('Error broadcasting zone notification:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};

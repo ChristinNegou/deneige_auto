@@ -5,7 +5,6 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../domain/entities/user.dart';
 import '../bloc/auth_bloc.dart';
-import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -42,19 +41,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  String _formatPhoneNumber(String phone) {
+    // Nettoyer le numéro (garder uniquement les chiffres)
+    String cleaned = phone.replaceAll(RegExp(r'[^\d]'), '');
+
+    // Si le numéro commence par 1, l'ajouter au format international
+    if (cleaned.length == 10) {
+      cleaned = '1$cleaned';
+    }
+
+    // Retourner au format E.164
+    return '+$cleaned';
+  }
+
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Le numéro de téléphone est obligatoire';
+    }
+
+    // Nettoyer le numéro
+    String cleaned = value.replaceAll(RegExp(r'[^\d]'), '');
+
+    // Vérifier que c'est un numéro canadien valide (10 ou 11 chiffres)
+    if (cleaned.length < 10 || cleaned.length > 11) {
+      return 'Numéro de téléphone invalide';
+    }
+
+    // Si 11 chiffres, doit commencer par 1
+    if (cleaned.length == 11 && !cleaned.startsWith('1')) {
+      return 'Numéro de téléphone invalide';
+    }
+
+    return null;
+  }
+
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
-      context.read<AuthBloc>().add(
-        RegisterRequested(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-          firstName: _firstNameController.text.trim(),
-          lastName: _lastNameController.text.trim(),
-          phone: _phoneController.text.trim().isEmpty
-              ? null
-              : _phoneController.text.trim(),
-          role: widget.role,
-        ),
+      // Formater le numéro de téléphone
+      final formattedPhone = _formatPhoneNumber(_phoneController.text.trim());
+
+      // Naviguer vers l'écran de vérification téléphonique
+      Navigator.of(context).pushNamed(
+        AppRoutes.phoneVerification,
+        arguments: {
+          'phoneNumber': formattedPhone,
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text,
+          'firstName': _firstNameController.text.trim(),
+          'lastName': _lastNameController.text.trim(),
+          'role': widget.role.toString().split('.').last,
+        },
       );
     }
   }
@@ -204,10 +240,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     const SizedBox(height: 16),
                                     AppTextField(
                                       controller: _phoneController,
-                                      label: 'Téléphone (optionnel)',
+                                      label: 'Téléphone',
                                       hint: '+1 (514) 123-4567',
                                       prefixIcon: Icons.phone,
                                       keyboardType: TextInputType.phone,
+                                      validator: _validatePhoneNumber,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Un code de vérification sera envoyé à ce numéro',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                        fontStyle: FontStyle.italic,
+                                      ),
                                     ),
                                     const SizedBox(height: 16),
                                     AppTextField(

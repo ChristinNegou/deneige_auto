@@ -41,6 +41,7 @@ import '../../features/reservation/domain/repositories/reservation_repository.da
 import '../../features/reservation/domain/usecases/cancel_reservation_usecase.dart';
 import '../../features/reservation/domain/usecases/create_reservation_usecase.dart';
 import '../../features/reservation/domain/usecases/get_reservations_usecase.dart';
+import '../../features/reservation/domain/usecases/get_reservation_by_id_usecase.dart';
 
 // Payment
 import '../../features/payment/data/datasources/payment_remote_datasource.dart';
@@ -64,6 +65,8 @@ import '../../features/notifications/domain/usecases/get_notifications_usecase.d
 import '../../features/notifications/domain/usecases/get_unread_count_usecase.dart';
 import '../../features/notifications/domain/usecases/mark_as_read_usecase.dart';
 import '../../features/notifications/domain/usecases/mark_all_as_read_usecase.dart';
+import '../../features/notifications/domain/usecases/delete_notification_usecase.dart';
+import '../../features/notifications/domain/usecases/clear_all_notifications_usecase.dart';
 import '../../features/notifications/presentation/bloc/notification_bloc.dart';
 
 // Snow Worker
@@ -152,6 +155,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => GetParkingSpotsUseCase(sl()));
   sl.registerLazySingleton(() => CreateReservationUseCase(sl()));
   sl.registerLazySingleton(() => GetReservationsUseCase(sl()));
+  sl.registerLazySingleton(() => GetReservationByIdUseCase(sl()));
   sl.registerLazySingleton(() => AddVehicleUseCase(sl()));
   sl.registerLazySingleton(() => CancelReservationUseCase(sl()));
   sl.registerLazySingleton(() => UpdateReservationUseCase(sl()));
@@ -169,6 +173,8 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => GetUnreadCountUseCase(sl()));
   sl.registerLazySingleton(() => MarkAsReadUseCase(sl()));
   sl.registerLazySingleton(() => MarkAllAsReadUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteNotificationUseCase(sl()));
+  sl.registerLazySingleton(() => ClearAllNotificationsUseCase(sl()));
 
   // Worker use cases
   sl.registerLazySingleton(() => GetAvailableJobsUseCase(sl()));
@@ -192,6 +198,7 @@ Future<void> initializeDependencies() async {
     forgotPassword: sl(),
     resetPassword: sl(),
     updateProfile: sl(),
+    authRepository: sl(),
   ));
 
   sl.registerFactory(() => NewReservationBloc(
@@ -210,6 +217,7 @@ Future<void> initializeDependencies() async {
 
   sl.registerFactory(() => ReservationListBloc(
     getReservations: sl(),
+    getReservationById: sl(),
     cancelReservation: sl(),
   ));
 
@@ -245,6 +253,8 @@ Future<void> initializeDependencies() async {
     getUnreadCount: sl(),
     markAsRead: sl(),
     markAllAsRead: sl(),
+    deleteNotification: sl(),
+    clearAllNotifications: sl(),
   ));
 
   // Worker BLoCs

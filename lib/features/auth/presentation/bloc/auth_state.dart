@@ -64,3 +64,37 @@ class ResetPasswordSuccess extends AuthState {
   @override
   List<Object> get props => [];
 }
+
+/// Code de vérification envoyé avec succès
+class PhoneCodeSent extends AuthState {
+  final String phoneNumber;
+  final String? devCode; // Code en mode développement pour les tests
+
+  const PhoneCodeSent({
+    required this.phoneNumber,
+    this.devCode,
+  });
+
+  @override
+  List<Object?> get props => [phoneNumber, devCode];
+}
+
+/// Vérification du téléphone réussie, compte créé
+class PhoneVerificationSuccess extends AuthState {
+  final User user;
+
+  const PhoneVerificationSuccess({required this.user});
+
+  @override
+  List<Object?> get props => [user];
+}
+
+/// Code renvoyé avec succès
+class PhoneCodeResent extends AuthState {
+  final String? devCode;
+
+  const PhoneCodeResent({this.devCode});
+
+  @override
+  List<Object?> get props => [devCode];
+}

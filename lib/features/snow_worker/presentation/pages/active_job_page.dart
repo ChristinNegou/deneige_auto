@@ -241,11 +241,18 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               ],
             ),
           ),
-          if (_currentJob.client.phoneNumber != null)
+          if (_currentJob.client.phoneNumber != null) ...[
+            IconButton(
+              onPressed: () => _messageClient(_currentJob.client.phoneNumber!),
+              icon: Icon(Icons.message, color: Colors.blue[600]),
+              tooltip: 'Envoyer un SMS',
+            ),
             IconButton(
               onPressed: () => _callClient(_currentJob.client.phoneNumber!),
               icon: Icon(Icons.phone, color: Colors.green[600]),
+              tooltip: 'Appeler',
             ),
+          ],
         ],
       ),
     );
@@ -1019,6 +1026,13 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
 
   Future<void> _callClient(String phone) async {
     final uri = Uri.parse('tel:$phone');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _messageClient(String phone) async {
+    final uri = Uri.parse('sms:$phone');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }

@@ -155,4 +155,74 @@ class AuthRepositoryImpl implements AuthRepository {
           message: 'Erreur inattendue lors de la mise à jour du profil'));
     }
   }
+
+  // ============ PHONE VERIFICATION ============
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> sendPhoneVerificationCode({
+    required String phoneNumber,
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    required String role,
+  }) async {
+    try {
+      final result = await remoteDataSource.sendPhoneVerificationCode(
+        phoneNumber: phoneNumber,
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        role: role,
+      );
+      return Right(result);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> verifyPhoneCode({
+    required String phoneNumber,
+    required String code,
+  }) async {
+    try {
+      final user = await remoteDataSource.verifyPhoneCode(
+        phoneNumber: phoneNumber,
+        code: code,
+      );
+      return Right(user);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> resendPhoneVerificationCode(
+      String phoneNumber) async {
+    try {
+      final result =
+          await remoteDataSource.resendPhoneVerificationCode(phoneNumber);
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
 }

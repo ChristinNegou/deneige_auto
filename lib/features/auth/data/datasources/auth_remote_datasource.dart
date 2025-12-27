@@ -27,6 +27,20 @@ abstract class AuthRemoteDataSource {
   Future<void> forgotPassword(String email);
   Future<void> resetPassword(String token, String newPassword);
 
+  // Phone verification methods
+  Future<Map<String, dynamic>> sendPhoneVerificationCode({
+    required String phoneNumber,
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    required String role,
+  });
+  Future<UserModel> verifyPhoneCode({
+    required String phoneNumber,
+    required String code,
+  });
+  Future<Map<String, dynamic>> resendPhoneVerificationCode(String phoneNumber);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -261,6 +275,147 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw NetworkException(
         message: e.response?.data['message'] ?? 'Erreur réseau',
       );
+    }
+  }
+
+  // ============ PHONE VERIFICATION METHODS ============
+
+  @override
+  Future<Map<String, dynamic>> sendPhoneVerificationCode({
+    required String phoneNumber,
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    required String role,
+  }) async {
+    try {
+      final response = await dio.post(
+        '/phone/send-code',
+        data: {
+          'phoneNumber': phoneNumber,
+          'email': email,
+          'password': password,
+          'firstName': firstName,
+          'lastName': lastName,
+          'role': role,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'phoneNumber': response.data['phoneNumber'],
+          'devCode': response.data['devCode'],
+          'simulated': response.data['simulated'] ?? false,
+        };
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de l\'envoi du code',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        throw AuthException(
+          message: e.response?.data['message'] ?? 'Ce numéro ou email est déjà utilisé',
+          statusCode: 409,
+        );
+      }
+      if (e.response?.statusCode == 429) {
+        throw ServerException(
+          message: e.response?.data['message'] ?? 'Veuillez patienter avant de renvoyer',
+          statusCode: 429,
+        );
+      }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<UserModel> verifyPhoneCode({
+    required String phoneNumber,
+    required String code,
+  }) async {
+    try {
+      final response = await dio.post(
+        '/phone/verify-code',
+        data: {
+          'phoneNumber': phoneNumber,
+          'code': code,
+        },
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        // Compte créé avec succès
+        if (response.data['accountCreated'] == true) {
+          final token = response.data['token'] as String;
+          final userData = response.data['user'] as Map<String, dynamic>;
+
+          // Sauvegarder le token et les infos utilisateur
+          await secureStorage.saveToken(token);
+          await secureStorage.saveUserId(userData['id'] as String);
+          await secureStorage.saveUserRole(userData['role'] as String);
+
+          return UserModel.fromJson(userData);
+        } else {
+          // Juste une vérification sans création de compte
+          throw ServerException(
+            message: 'Vérification réussie mais aucun compte créé',
+            statusCode: response.statusCode,
+          );
+        }
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de la vérification',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) {
+        throw AuthException(
+          message: e.response?.data['message'] ?? 'Code invalide',
+          statusCode: 400,
+        );
+      }
+      if (e.response?.statusCode == 409) {
+        throw AuthException(
+          message: e.response?.data['message'] ?? 'Cet email est déjà utilisé',
+          statusCode: 409,
+        );
+      }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> resendPhoneVerificationCode(String phoneNumber) async {
+    try {
+      final response = await dio.post(
+        '/phone/resend-code',
+        data: {'phoneNumber': phoneNumber},
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'devCode': response.data['devCode'],
+          'simulated': response.data['simulated'] ?? false,
+        };
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors du renvoi',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 429) {
+        throw ServerException(
+          message: e.response?.data['message'] ?? 'Veuillez patienter avant de renvoyer',
+          statusCode: 429,
+        );
+      }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }
 }

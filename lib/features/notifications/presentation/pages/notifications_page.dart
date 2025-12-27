@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/notification.dart';
+import '../../services/notification_navigation_service.dart';
 import '../bloc/notification_bloc.dart';
 
 class NotificationsPage extends StatelessWidget {
@@ -11,6 +12,8 @@ class NotificationsPage extends StatelessWidget {
     return const NotificationsPageContent();
   }
 }
+
+final _navigationService = NotificationNavigationService();
 
 class NotificationsPageContent extends StatelessWidget {
   const NotificationsPageContent({super.key});
@@ -192,9 +195,14 @@ class NotificationsPageContent extends StatelessWidget {
   }
 
   Widget _buildNotificationCard(BuildContext context, AppNotification notification) {
+    final action = _navigationService.getActionForNotification(notification);
+
     return Dismissible(
       key: Key(notification.id),
       direction: DismissDirection.endToStart,
+      onDismissed: (_) {
+        context.read<NotificationBloc>().add(DeleteNotification(notification.id));
+      },
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
@@ -212,7 +220,8 @@ class NotificationsPageContent extends StatelessWidget {
                   MarkNotificationAsRead(notification.id),
                 );
           }
-          // TODO: Navigate to relevant screen based on notification type
+          // Navigation deep-link vers l'écran approprié
+          _navigationService.handleNotificationTap(context, notification);
         },
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -235,70 +244,173 @@ class NotificationsPageContent extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icon
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: _getNotificationColor(notification.type).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    _getNotificationIcon(notification.type),
-                    color: _getNotificationColor(notification.type),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              notification.title,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.bold,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Icon avec indicateur de priorité
+                    Stack(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: _getNotificationColor(notification.type).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            _getNotificationIcon(notification.type),
+                            color: _getNotificationColor(notification.type),
+                            size: 24,
+                          ),
+                        ),
+                        if (notification.isUrgent)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
                               ),
                             ),
                           ),
-                          if (!notification.isRead)
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF8B5CF6),
-                                shape: BoxShape.circle,
+                      ],
+                    ),
+                    const SizedBox(width: 12),
+
+                    // Content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  notification.title,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.bold,
+                                  ),
+                                ),
                               ),
+                              if (!notification.isRead)
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF8B5CF6),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            notification.message,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 12,
+                                color: Colors.grey[500],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                notification.timeAgo,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                              if (notification.priority == NotificationPriority.high ||
+                                  notification.priority == NotificationPriority.urgent) ...[
+                                const SizedBox(width: 12),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: notification.isUrgent
+                                        ? Colors.red.withValues(alpha: 0.1)
+                                        : Colors.orange.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    notification.isUrgent ? 'Urgent' : 'Important',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: notification.isUrgent ? Colors.red : Colors.orange,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notification.message,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        notification.timeAgo,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+
+                    // Chevron pour indiquer l'action
+                    Icon(
+                      Icons.chevron_right,
+                      color: Colors.grey[400],
+                    ),
+                  ],
                 ),
+
+                // Bouton d'action (CTA) - Style apps modernes
+                if (action != null && !notification.isRead) ...[
+                  const SizedBox(height: 12),
+                  const Divider(height: 1),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        context.read<NotificationBloc>().add(
+                              MarkNotificationAsRead(notification.id),
+                            );
+                        _navigationService.handleNotificationTap(context, notification);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: action.isUrgent
+                            ? Colors.red
+                            : (action.isHighlighted
+                                ? const Color(0xFF8B5CF6)
+                                : Colors.grey[700]),
+                        side: BorderSide(
+                          color: action.isUrgent
+                              ? Colors.red
+                              : (action.isHighlighted
+                                  ? const Color(0xFF8B5CF6)
+                                  : Colors.grey[300]!),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: Icon(action.icon, size: 18),
+                      label: Text(
+                        action.label,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

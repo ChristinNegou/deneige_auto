@@ -29,8 +29,45 @@ class WorkerJobDetailsPage extends StatelessWidget {
               icon: Icons.person,
               children: [
                 _buildInfoRow('Nom', job.client.fullName),
-                if (job.client.phoneNumber != null)
+                if (job.client.phoneNumber != null) ...[
                   _buildInfoRow('Téléphone', job.client.phoneNumber!),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _callClient(),
+                          icon: const Icon(Icons.phone, size: 18),
+                          label: const Text('Appeler'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _messageClient(),
+                          icon: const Icon(Icons.message, size: 18),
+                          label: const Text('SMS'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF3B82F6),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: 16),
@@ -370,6 +407,24 @@ class WorkerJobDetailsPage extends StatelessWidget {
         return 'Déglaçage portes';
       case ServiceOption.wheelClearance:
         return 'Dégagement roues';
+    }
+  }
+
+  Future<void> _callClient() async {
+    if (job.client.phoneNumber != null) {
+      final uri = Uri.parse('tel:${job.client.phoneNumber}');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    }
+  }
+
+  Future<void> _messageClient() async {
+    if (job.client.phoneNumber != null) {
+      final uri = Uri.parse('sms:${job.client.phoneNumber}');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
     }
   }
 

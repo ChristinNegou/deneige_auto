@@ -15,10 +15,7 @@ class ReservationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ReservationListBloc(
-        getReservations: sl(),
-        cancelReservation: sl(),
-      )..add(const LoadReservations()),
+      create: (context) => sl<ReservationListBloc>()..add(const LoadReservations()),
       child: const ReservationsView(),
     );
   }

@@ -22,7 +22,23 @@ abstract class AuthRepository {
     String? lastName,
     String? phoneNumber,
     String? photoUrl,
-
   });
 
+  // Phone verification methods
+  Future<Either<Failure, Map<String, dynamic>>> sendPhoneVerificationCode({
+    required String phoneNumber,
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    required String role,
+  });
+
+  Future<Either<Failure, User>> verifyPhoneCode({
+    required String phoneNumber,
+    required String code,
+  });
+
+  Future<Either<Failure, Map<String, dynamic>>> resendPhoneVerificationCode(
+      String phoneNumber);
 }

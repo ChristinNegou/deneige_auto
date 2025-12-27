@@ -168,16 +168,7 @@ class ReservationRepositoryImpl implements ReservationRepository {
   @override
   Future<Either<Failure, Reservation>> getReservationById(String id) async {
     try {
-      // TODO: Implémenter l'appel API pour récupérer une réservation par ID
-      // Pour l'instant, on récupère toutes les réservations et on filtre
-      final reservations = await remoteDataSource.getReservations();
-      final reservation = reservations.firstWhere(
-        (r) => r.id == id,
-        orElse: () => throw ServerException(
-          message: 'Réservation non trouvée',
-          statusCode: 404,
-        ),
-      );
+      final reservation = await remoteDataSource.getReservationById(id);
       return Right(reservation);
     } on NetworkException catch (e) {
       return Left(NetworkFailure(message: e.message));
