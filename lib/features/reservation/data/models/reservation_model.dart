@@ -58,8 +58,8 @@ class ReservationModel extends Reservation {
           .toList() ?? [],
       basePrice: (json['basePrice'] as num).toDouble(),
       totalPrice: (json['totalPrice'] as num).toDouble(),
-      beforePhotoUrl: json['beforePhotoUrl'] as String?,
-      afterPhotoUrl: json['afterPhotoUrl'] as String?,
+      beforePhotoUrl: _parsePhotoUrl(json['photos'], 'before') ?? json['beforePhotoUrl'] as String?,
+      afterPhotoUrl: _parsePhotoUrl(json['photos'], 'after') ?? json['afterPhotoUrl'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
@@ -83,6 +83,43 @@ class ReservationModel extends Reservation {
       locationLongitude: _parseLocationLongitude(json['location']),
       locationAddress: _parseLocationAddress(json['location']),
     );
+  }
+
+  /// Parse photo URL from photos array
+  /// Returns the most recent photo of the specified type with full URL
+  static String? _parsePhotoUrl(dynamic photos, String type) {
+    if (photos == null || photos is! List || photos.isEmpty) {
+      return null;
+    }
+
+    // Filter photos by type and get the most recent one
+    final matchingPhotos = photos
+        .where((p) => p is Map<String, dynamic> && p['type'] == type)
+        .toList();
+
+    if (matchingPhotos.isEmpty) {
+      return null;
+    }
+
+    // Sort by uploadedAt descending to get the most recent
+    matchingPhotos.sort((a, b) {
+      final aDate = a['uploadedAt'] as String?;
+      final bDate = b['uploadedAt'] as String?;
+      if (aDate == null && bDate == null) return 0;
+      if (aDate == null) return 1;
+      if (bDate == null) return -1;
+      return bDate.compareTo(aDate);
+    });
+
+    final photoUrl = matchingPhotos.first['url'] as String?;
+    if (photoUrl == null) return null;
+
+    // If URL is relative, prepend the server base URL
+    if (photoUrl.startsWith('/')) {
+      return '${AppConfig.apiBaseUrl}$photoUrl';
+    }
+
+    return photoUrl;
   }
 
   /// Parse location latitude from GeoJSON format

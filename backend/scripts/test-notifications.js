@@ -12,11 +12,24 @@ const Notification = require('../models/Notification');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/deneige-auto';
 
-async function createTestNotifications(userId) {
+async function createTestNotifications(userId, reservationId = null) {
     try {
         // Connexion à MongoDB
         await mongoose.connect(MONGODB_URI);
         console.log('✅ Connecté à MongoDB');
+
+        // Si pas de reservationId fourni, essayer d'en trouver une existante
+        let testReservationId = reservationId;
+        if (!testReservationId) {
+            const Reservation = require('../models/Reservation');
+            const existingReservation = await Reservation.findOne({ userId }).sort({ createdAt: -1 });
+            if (existingReservation) {
+                testReservationId = existingReservation._id.toString();
+                console.log(`📋 Utilisation de la réservation existante: ${testReservationId}`);
+            } else {
+                console.log('⚠️ Aucune réservation trouvée - les notifications liées aux réservations n\'auront pas de reservationId');
+            }
+        }
 
         // Créer plusieurs notifications de test
         const notifications = [
@@ -26,6 +39,7 @@ async function createTestNotifications(userId) {
                 title: 'Déneigeur assigné',
                 message: 'Jean Tremblay a accepté votre demande de déneigement',
                 priority: 'high',
+                reservationId: testReservationId,
             },
             {
                 userId,
@@ -33,6 +47,7 @@ async function createTestNotifications(userId) {
                 title: 'Déneigeur en route',
                 message: 'Jean est en route vers votre véhicule',
                 priority: 'high',
+                reservationId: testReservationId,
             },
             {
                 userId,
@@ -40,6 +55,7 @@ async function createTestNotifications(userId) {
                 title: 'Déneigement commencé',
                 message: 'Jean a commencé le déneigement de votre véhicule',
                 priority: 'normal',
+                reservationId: testReservationId,
             },
             {
                 userId,
@@ -47,6 +63,7 @@ async function createTestNotifications(userId) {
                 title: 'Déneigement terminé',
                 message: 'Jean a terminé le déneigement. Votre véhicule est prêt!',
                 priority: 'high',
+                reservationId: testReservationId,
             },
             {
                 userId,
@@ -54,6 +71,7 @@ async function createTestNotifications(userId) {
                 title: 'Paiement réussi',
                 message: 'Votre paiement de 25.50 $ a été effectué avec succès',
                 priority: 'normal',
+                reservationId: testReservationId,
             },
             {
                 userId,
@@ -61,6 +79,7 @@ async function createTestNotifications(userId) {
                 title: 'Alerte météo',
                 message: '15 cm de neige prévus demain. Planifiez votre déneigement!',
                 priority: 'high',
+                // Pas de reservationId pour les alertes météo
             },
             {
                 userId,
@@ -68,6 +87,7 @@ async function createTestNotifications(userId) {
                 title: 'Bienvenue!',
                 message: 'Merci d\'utiliser Déneige Auto. Votre première réservation est offerte à -20%!',
                 priority: 'normal',
+                // Pas de reservationId pour les notifications système
             },
         ];
 

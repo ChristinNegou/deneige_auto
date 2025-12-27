@@ -47,6 +47,7 @@ app.use('/api/parking-spots', require('./routes/parking-spots'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/workers', require('./routes/workers'));
+app.use('/api/phone', require('./routes/phoneVerification'));
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
@@ -116,6 +117,9 @@ const server = app.listen(PORT, HOST, () => {
     console.log(`   GET  /api/auth/me`);
     console.log(`   POST /api/auth/logout`);
     console.log(`   PUT  /api/auth/update-profile`);
+    console.log(`   POST /api/phone/send-code`);
+    console.log(`   POST /api/phone/verify-code`);
+    console.log(`   POST /api/phone/resend-code`);
     console.log(`   GET  /api/reservations`);
     console.log(`   POST /api/reservations`);
     console.log(`   GET  /api/reservations/:id`);

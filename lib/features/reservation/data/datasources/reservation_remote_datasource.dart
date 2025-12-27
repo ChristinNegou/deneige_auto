@@ -10,12 +10,11 @@ abstract class ReservationRemoteDataSource {
   Future<List<VehicleModel>> getVehicles();
   Future<List<ParkingSpotModel>> getParkingSpots({bool availableOnly});
   Future<List<ReservationModel>> getReservations({bool? upcoming});
+  Future<ReservationModel> getReservationById(String reservationId);
   Future<ReservationModel> createReservation(Map<String, dynamic> data);
   Future<void> cancelReservation(String reservationId);
   Future<ReservationModel> updateReservation(String reservationId, Map<String, dynamic> data);
   Future<Vehicle> addVehicle(Map<String, dynamic> data);
-
-
 }
 
 class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
@@ -86,6 +85,31 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
         );
       }
     } on DioException catch (e) {
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<ReservationModel> getReservationById(String reservationId) async {
+    try {
+      final response = await dio.get('/reservations/$reservationId');
+
+      if (response.statusCode == 200) {
+        final data = response.data['reservation'] ?? response.data;
+        return ReservationModel.fromJson(data);
+      } else {
+        throw ServerException(
+          message: 'Réservation non trouvée',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw ServerException(
+          message: 'Réservation non trouvée',
+          statusCode: 404,
+        );
+      }
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }

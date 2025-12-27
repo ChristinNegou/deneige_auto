@@ -29,7 +29,13 @@ const userSchema = new mongoose.Schema({
     },
     phoneNumber: {
         type: String,
+        required: [true, 'Le numéro de téléphone est requis'],
         trim: true,
+        index: true,
+    },
+    phoneVerified: {
+        type: Boolean,
+        default: false,
     },
     role: {
         type: String,

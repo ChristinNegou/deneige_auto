@@ -69,19 +69,65 @@ class ResetPasswordEvent extends AuthEvent {
 
 }
 
-  class UpdateProfile extends AuthEvent {
+class UpdateProfile extends AuthEvent {
   final String? firstName;
   final String? lastName;
   final String? phoneNumber;
   final String? photoUrl;
 
   const UpdateProfile({
-  this.firstName,
-  this.lastName,
-  this.phoneNumber,
-  this.photoUrl,
+    this.firstName,
+    this.lastName,
+    this.phoneNumber,
+    this.photoUrl,
   });
 
   @override
   List<Object?> get props => [firstName, lastName, phoneNumber, photoUrl];
+}
+
+/// Envoie un code de vérification SMS au numéro de téléphone
+class SendPhoneVerificationCode extends AuthEvent {
+  final String phoneNumber;
+  final String email;
+  final String password;
+  final String firstName;
+  final String lastName;
+  final String role;
+
+  const SendPhoneVerificationCode({
+    required this.phoneNumber,
+    required this.email,
+    required this.password,
+    required this.firstName,
+    required this.lastName,
+    required this.role,
+  });
+
+  @override
+  List<Object?> get props => [phoneNumber, email, password, firstName, lastName, role];
+}
+
+/// Vérifie le code SMS entré par l'utilisateur
+class VerifyPhoneCode extends AuthEvent {
+  final String phoneNumber;
+  final String code;
+
+  const VerifyPhoneCode({
+    required this.phoneNumber,
+    required this.code,
+  });
+
+  @override
+  List<Object?> get props => [phoneNumber, code];
+}
+
+/// Renvoie un nouveau code de vérification
+class ResendPhoneVerificationCode extends AuthEvent {
+  final String phoneNumber;
+
+  const ResendPhoneVerificationCode({required this.phoneNumber});
+
+  @override
+  List<Object?> get props => [phoneNumber];
 }

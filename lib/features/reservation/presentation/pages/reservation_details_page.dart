@@ -22,7 +22,7 @@ class ReservationDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<ReservationListBloc>()..add(const LoadReservations()),
+      create: (context) => sl<ReservationListBloc>()..add(LoadReservationById(reservationId)),
       child: ReservationDetailsView(reservationId: reservationId),
     );
   }
@@ -55,12 +55,24 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    // Auto-refresh every 5 seconds for active reservations
-    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+    // Auto-refresh every 15 seconds for active reservations
+    _refreshTimer = Timer.periodic(const Duration(seconds: 15), (_) {
       if (mounted) {
-        context.read<ReservationListBloc>().add(RefreshReservations());
+        final state = context.read<ReservationListBloc>().state;
+        final reservation = state.selectedReservation;
+        // Ne rafraîchir que si la réservation est active
+        if (reservation != null && _isActiveReservation(reservation.status)) {
+          context.read<ReservationListBloc>().add(LoadReservationById(widget.reservationId));
+        }
       }
     });
+  }
+
+  bool _isActiveReservation(ReservationStatus status) {
+    return status == ReservationStatus.pending ||
+           status == ReservationStatus.assigned ||
+           status == ReservationStatus.enRoute ||
+           status == ReservationStatus.inProgress;
   }
 
   @override
@@ -74,20 +86,62 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   Widget build(BuildContext context) {
     return BlocBuilder<ReservationListBloc, ReservationListState>(
       builder: (context, state) {
-        if (state.isLoading && state.reservations.isEmpty) {
+        final reservation = state.selectedReservation;
+
+        // Afficher le chargement uniquement lors du premier chargement
+        // (quand on n'a pas encore de réservation)
+        if (state.isLoading && reservation == null) {
           return Scaffold(
             appBar: AppBar(title: const Text('Détails de la réservation')),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
 
-        final reservation = _findReservation(state.reservations);
-
+        // Réservation introuvable après chargement
         if (reservation == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Détails de la réservation')),
-            body: const Center(
-              child: Text('Réservation introuvable'),
+            appBar: AppBar(
+              title: const Text('Détails de la réservation'),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Réservation introuvable',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Cette réservation n\'existe plus ou a été supprimée',
+                    style: TextStyle(color: Colors.grey[600]),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<ReservationListBloc>().add(LoadReservationById(widget.reservationId));
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Actualiser'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3B82F6),
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Retour'),
+                  ),
+                ],
+              ),
             ),
           );
         }
@@ -251,14 +305,6 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         );
       },
     );
-  }
-
-  Reservation? _findReservation(List<Reservation> reservations) {
-    try {
-      return reservations.firstWhere((r) => r.id == widget.reservationId);
-    } catch (e) {
-      return null;
-    }
   }
 
   Widget _buildStatusHeader(BuildContext context, Reservation reservation) {

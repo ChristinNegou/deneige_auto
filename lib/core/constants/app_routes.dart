@@ -7,6 +7,7 @@ class AppRoutes {
   static const String accountType = '/account-type';
   static const String login = '/login';
   static const String register = '/register';
+  static const String phoneVerification = '/phone-verification';
   static const String onboarding = '/onboarding';
   static const String forgotPassword = '/forgot-password';
   static const String resetPassword = '/reset-password';

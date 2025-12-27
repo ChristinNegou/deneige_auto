@@ -35,6 +35,7 @@ import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/auth/presentation/screens/account_type_selection_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/auth/presentation/screens/phone_verification_screen.dart';
 import '../../features/auth/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/domain/entities/user.dart';
@@ -81,6 +82,23 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (context) => sl<AuthBloc>(),
             child: RegisterScreen(role: role),
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.phoneVerification:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => sl<AuthBloc>(),
+            child: PhoneVerificationScreen(
+              phoneNumber: args['phoneNumber'] as String,
+              email: args['email'] as String,
+              password: args['password'] as String,
+              firstName: args['firstName'] as String,
+              lastName: args['lastName'] as String,
+              role: args['role'] as String,
+            ),
           ),
           settings: settings,
         );
@@ -274,7 +292,24 @@ class AppRouter {
         );
 
       default:
-      // Route non trouvée
+        // Fallback pour les anciennes routes de réservation
+        if (settings.name != null && settings.name!.contains('reservation')) {
+          // Rediriger vers la page des détails de réservation si on a un ID
+          final reservationId = settings.arguments as String?;
+          if (reservationId != null && reservationId.isNotEmpty) {
+            return MaterialPageRoute(
+              builder: (_) => ReservationDetailsPage(reservationId: reservationId),
+              settings: settings,
+            );
+          }
+          // Sinon, rediriger vers la liste des réservations
+          return MaterialPageRoute(
+            builder: (_) => const ReservationsPage(),
+            settings: settings,
+          );
+        }
+
+        // Route non trouvée
         return MaterialPageRoute(
           builder: (context) => Scaffold(
             appBar: AppBar(
