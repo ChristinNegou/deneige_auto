@@ -2,6 +2,10 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
 const Notification = require('../models/Notification');
+const Transaction = require('../models/Transaction');
+
+// Configuration
+const PLATFORM_FEE_PERCENT = 0.25; // 25%
 
 // Get payment methods from Stripe Customer
 exports.getPaymentMethods = async (req, res) => {
@@ -191,6 +195,260 @@ exports.getRefundStatus = async (req, res) => {
     res.json({ success: true, refund });
   } catch (error) {
     console.error('Error fetching refund:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ============================================
+// PAYOUT FUNCTIONS (Versement aux déneigeurs)
+// ============================================
+
+/**
+ * Créer un transfert manuel vers un déneigeur
+ * Utilisé quand le paiement a été fait avant l'assignation du déneigeur
+ */
+exports.createWorkerPayout = async (req, res) => {
+  try {
+    const { reservationId } = req.body;
+
+    const reservation = await Reservation.findById(reservationId)
+      .populate('workerId')
+      .populate('userId');
+
+    if (!reservation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Réservation non trouvée',
+      });
+    }
+
+    // Vérifier que le paiement a été effectué
+    if (reservation.paymentStatus !== 'paid') {
+      return res.status(400).json({
+        success: false,
+        message: 'Le paiement n\'a pas encore été effectué',
+      });
+    }
+
+    // Vérifier qu'un déneigeur est assigné
+    if (!reservation.workerId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Aucun déneigeur assigné à cette réservation',
+      });
+    }
+
+    // Vérifier que le payout n'a pas déjà été fait
+    if (reservation.payout?.status === 'paid') {
+      return res.status(400).json({
+        success: false,
+        message: 'Le versement a déjà été effectué',
+      });
+    }
+
+    // Récupérer le déneigeur avec son compte Connect
+    const worker = await User.findById(reservation.workerId);
+    const workerConnectId = worker?.workerProfile?.stripeConnectId;
+
+    if (!workerConnectId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Le déneigeur n\'a pas configuré son compte de paiement',
+      });
+    }
+
+    // Calculer les montants
+    const grossAmount = reservation.totalPrice;
+    const platformFee = grossAmount * PLATFORM_FEE_PERCENT;
+    const stripeFee = (grossAmount * 0.029) + 0.30;
+    const workerAmount = grossAmount - platformFee;
+
+    // Créer le transfert vers le compte Connect du déneigeur
+    const transfer = await stripe.transfers.create({
+      amount: Math.round(workerAmount * 100), // En cents
+      currency: 'cad',
+      destination: workerConnectId,
+      description: `Versement pour réservation #${reservation._id}`,
+      metadata: {
+        reservationId: reservation._id.toString(),
+        workerId: worker._id.toString(),
+        clientId: reservation.userId.toString(),
+      },
+    });
+
+    // Mettre à jour la réservation
+    reservation.payout = {
+      status: 'paid',
+      workerAmount: workerAmount,
+      platformFee: platformFee,
+      stripeFee: stripeFee,
+      stripeTransferId: transfer.id,
+      paidAt: new Date(),
+    };
+    await reservation.save();
+
+    // Créer la transaction
+    await Transaction.create({
+      type: 'payout',
+      status: 'succeeded',
+      amount: workerAmount,
+      reservationId: reservation._id,
+      toUserId: worker._id,
+      stripeTransferId: transfer.id,
+      breakdown: {
+        grossAmount,
+        stripeFee,
+        platformFee,
+        workerAmount,
+      },
+      description: `Versement manuel pour réservation #${reservation._id}`,
+      processedAt: new Date(),
+    });
+
+    // Mettre à jour les stats du déneigeur
+    await User.findByIdAndUpdate(worker._id, {
+      $inc: {
+        'workerProfile.totalEarnings': workerAmount,
+      },
+    });
+
+    console.log('✅ Transfert créé:', transfer.id);
+
+    res.json({
+      success: true,
+      message: 'Versement effectué avec succès',
+      payout: {
+        transferId: transfer.id,
+        workerAmount: workerAmount,
+        platformFee: platformFee,
+      },
+    });
+  } catch (error) {
+    console.error('Error creating worker payout:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * Obtenir les réservations en attente de paiement pour un déneigeur
+ */
+exports.getPendingPayouts = async (req, res) => {
+  try {
+    const reservations = await Reservation.find({
+      workerId: req.user.id,
+      paymentStatus: 'paid',
+      status: 'completed',
+      'payout.status': { $ne: 'paid' },
+    })
+      .populate('userId', 'firstName lastName')
+      .populate('vehicle')
+      .sort({ completedAt: -1 });
+
+    const pendingPayouts = reservations.map(r => ({
+      reservationId: r._id,
+      client: `${r.userId.firstName} ${r.userId.lastName}`,
+      totalPrice: r.totalPrice,
+      expectedAmount: r.totalPrice * (1 - PLATFORM_FEE_PERCENT),
+      completedAt: r.completedAt,
+      status: r.payout?.status || 'pending',
+    }));
+
+    res.json({
+      success: true,
+      pendingPayouts,
+      count: pendingPayouts.length,
+    });
+  } catch (error) {
+    console.error('Error fetching pending payouts:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * Obtenir l'historique des paiements reçus par un déneigeur
+ */
+exports.getWorkerPayoutHistory = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({
+      toUserId: req.user.id,
+      type: { $in: ['payout', 'tip'] },
+      status: 'succeeded',
+    })
+      .populate('reservationId', 'departureTime')
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    const history = transactions.map(t => ({
+      id: t._id,
+      type: t.type,
+      amount: t.amount,
+      date: t.createdAt,
+      reservationId: t.reservationId?._id,
+      reservationDate: t.reservationId?.departureTime,
+      breakdown: t.breakdown,
+    }));
+
+    // Calculer le total
+    const totalEarnings = transactions.reduce((sum, t) => sum + t.amount, 0);
+
+    res.json({
+      success: true,
+      history,
+      totalEarnings,
+      count: history.length,
+    });
+  } catch (error) {
+    console.error('Error fetching payout history:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * Obtenir le résumé des gains d'un déneigeur
+ */
+exports.getWorkerEarningsSummary = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    const summary = await Transaction.getWorkerEarningsSummary(
+      req.user.id,
+      start,
+      end
+    );
+
+    // Récupérer aussi le solde Stripe si disponible
+    const user = await User.findById(req.user.id);
+    let stripeBalance = null;
+
+    if (user.workerProfile?.stripeConnectId) {
+      try {
+        const balance = await stripe.balance.retrieve({
+          stripeAccount: user.workerProfile.stripeConnectId,
+        });
+
+        stripeBalance = {
+          available: balance.available.reduce((acc, b) =>
+            b.currency === 'cad' ? acc + (b.amount / 100) : acc, 0),
+          pending: balance.pending.reduce((acc, b) =>
+            b.currency === 'cad' ? acc + (b.amount / 100) : acc, 0),
+        };
+      } catch (e) {
+        console.log('Note: Impossible de récupérer le solde Stripe');
+      }
+    }
+
+    res.json({
+      success: true,
+      summary: {
+        ...summary,
+        stripeBalance,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching earnings summary:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

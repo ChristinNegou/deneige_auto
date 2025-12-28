@@ -4,6 +4,8 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { protect } = require('../middleware/auth');
 const Notification = require('../models/Notification');
 const Reservation = require('../models/Reservation');
+const User = require('../models/User');
+const Transaction = require('../models/Transaction');
 const {
   getPaymentMethods,
   savePaymentMethod,
@@ -11,15 +13,21 @@ const {
   setDefaultPaymentMethod,
   createRefund,
   getRefundStatus,
+  createWorkerPayout,
+  getPendingPayouts,
+  getWorkerPayoutHistory,
+  getWorkerEarningsSummary,
 } = require('../controllers/paymentController');
 
+// Configuration commission plateforme
+const PLATFORM_FEE_PERCENT = 0.25; // 25%
+
 // @route   POST /api/payments/create-intent
-// @desc    Créer un Payment Intent Stripe
+// @desc    Créer un Payment Intent Stripe avec transfert automatique au déneigeur
 // @access  Private
 router.post('/create-intent', protect, async (req, res) => {
     try {
         const { amount, reservationId } = req.body;
-        const User = require('../models/User');
 
         console.log('💳 Création Payment Intent:', {
             amount,
@@ -27,12 +35,30 @@ router.post('/create-intent', protect, async (req, res) => {
             userId: req.user.id,
         });
 
-        // Récupérer l'utilisateur pour obtenir son stripeCustomerId
+        // Récupérer l'utilisateur client
         const user = await User.findById(req.user.id);
 
-        // Créer le Payment Intent
+        // Récupérer la réservation et le déneigeur assigné
+        let reservation = null;
+        let worker = null;
+        let workerConnectId = null;
+
+        if (reservationId && reservationId !== 'temp') {
+            reservation = await Reservation.findById(reservationId).populate('workerId');
+            if (reservation?.workerId) {
+                worker = await User.findById(reservation.workerId);
+                workerConnectId = worker?.workerProfile?.stripeConnectId;
+            }
+        }
+
+        // Calculer les montants
+        const amountInCents = Math.round(amount * 100);
+        const platformFeeInCents = Math.round(amountInCents * PLATFORM_FEE_PERCENT);
+        const workerAmountInCents = amountInCents - platformFeeInCents;
+
+        // Paramètres du Payment Intent
         const paymentIntentParams = {
-            amount: Math.round(amount * 100), // Stripe utilise les cents
+            amount: amountInCents,
             currency: 'cad',
             automatic_payment_methods: {
                 enabled: true,
@@ -41,6 +67,8 @@ router.post('/create-intent', protect, async (req, res) => {
                 userId: req.user.id.toString(),
                 reservationId: reservationId || 'temp',
                 userEmail: req.user.email,
+                platformFee: platformFeeInCents,
+                workerAmount: workerAmountInCents,
             },
         };
 
@@ -48,6 +76,22 @@ router.post('/create-intent', protect, async (req, res) => {
         if (user.stripeCustomerId) {
             paymentIntentParams.customer = user.stripeCustomerId;
             console.log('✅ Customer ID ajouté:', user.stripeCustomerId);
+        }
+
+        // Si un déneigeur avec compte Connect est assigné, configurer le transfert
+        if (workerConnectId) {
+            paymentIntentParams.transfer_data = {
+                destination: workerConnectId,
+                amount: workerAmountInCents, // Le déneigeur reçoit 75%
+            };
+            paymentIntentParams.metadata.workerId = worker._id.toString();
+            paymentIntentParams.metadata.workerConnectId = workerConnectId;
+
+            console.log('✅ Transfert configuré:', {
+                destination: workerConnectId,
+                workerAmount: workerAmountInCents / 100,
+                platformFee: platformFeeInCents / 100,
+            });
         }
 
         const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams);
@@ -58,6 +102,12 @@ router.post('/create-intent', protect, async (req, res) => {
             success: true,
             clientSecret: paymentIntent.client_secret,
             paymentIntentId: paymentIntent.id,
+            breakdown: {
+                total: amount,
+                platformFee: platformFeeInCents / 100,
+                workerAmount: workerAmountInCents / 100,
+                hasWorkerTransfer: !!workerConnectId,
+            },
         });
     } catch (error) {
         console.error('❌ Erreur Stripe:', error);
@@ -69,7 +119,7 @@ router.post('/create-intent', protect, async (req, res) => {
 });
 
 // @route   POST /api/payments/confirm
-// @desc    Confirmer un paiement et mettre à jour la réservation
+// @desc    Confirmer un paiement et mettre à jour la réservation + payout
 // @access  Private
 router.post('/confirm', protect, async (req, res) => {
     try {
@@ -84,24 +134,99 @@ router.post('/confirm', protect, async (req, res) => {
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
         if (paymentIntent.status === 'succeeded') {
-            // Mettre à jour la réservation
+            // Extraire les métadonnées
+            const metadata = paymentIntent.metadata;
+            const platformFee = parseInt(metadata.platformFee || 0) / 100;
+            const workerAmount = parseInt(metadata.workerAmount || 0) / 100;
+            const workerId = metadata.workerId;
+            const grossAmount = paymentIntent.amount / 100;
+
+            // Estimer les frais Stripe (~2.9% + 0.30$)
+            const stripeFee = (grossAmount * 0.029) + 0.30;
+
+            // Mettre à jour la réservation avec les infos de payout
+            const updateData = {
+                paymentStatus: 'paid',
+                paymentIntentId: paymentIntentId,
+            };
+
+            // Si un déneigeur est assigné, mettre à jour les infos de payout
+            if (workerId) {
+                updateData['payout.status'] = paymentIntent.transfer_data ? 'paid' : 'pending';
+                updateData['payout.workerAmount'] = workerAmount;
+                updateData['payout.platformFee'] = platformFee;
+                updateData['payout.stripeFee'] = stripeFee;
+                updateData['payout.paidAt'] = paymentIntent.transfer_data ? new Date() : null;
+
+                // Récupérer l'ID du transfert si disponible
+                if (paymentIntent.transfer_data) {
+                    try {
+                        const transfers = await stripe.transfers.list({
+                            transfer_group: paymentIntent.transfer_group,
+                            limit: 1,
+                        });
+                        if (transfers.data.length > 0) {
+                            updateData['payout.stripeTransferId'] = transfers.data[0].id;
+                        }
+                    } catch (e) {
+                        console.log('Note: Impossible de récupérer l\'ID du transfert');
+                    }
+                }
+            }
+
             const reservation = await Reservation.findByIdAndUpdate(
                 reservationId,
-                {
-                    paymentStatus: 'paid',
-                    paymentIntentId: paymentIntentId,
-                },
+                updateData,
                 { new: true }
             );
 
-            // Envoyer notification de paiement réussi
+            // Créer les transactions dans notre système
             if (reservation) {
+                try {
+                    await Transaction.createPaymentTransaction({
+                        reservationId: reservation._id,
+                        clientId: reservation.userId,
+                        workerId: workerId || null,
+                        grossAmount: grossAmount,
+                        stripeFee: stripeFee,
+                        platformFeePercent: PLATFORM_FEE_PERCENT,
+                        stripePaymentIntentId: paymentIntentId,
+                        stripeTransferId: updateData['payout.stripeTransferId'] || null,
+                    });
+                    console.log('✅ Transactions enregistrées');
+                } catch (txError) {
+                    console.error('⚠️ Erreur enregistrement transactions:', txError);
+                    // Ne pas échouer le paiement pour ça
+                }
+
+                // Mettre à jour les stats du déneigeur si applicable
+                if (workerId) {
+                    try {
+                        await User.findByIdAndUpdate(workerId, {
+                            $inc: {
+                                'workerProfile.totalEarnings': workerAmount,
+                                'workerProfile.totalJobsCompleted': 1,
+                            },
+                        });
+                        console.log('✅ Stats déneigeur mises à jour');
+                    } catch (statsError) {
+                        console.error('⚠️ Erreur mise à jour stats:', statsError);
+                    }
+                }
+
+                // Envoyer notification de paiement réussi
                 await Notification.notifyPaymentSuccess(reservation);
             }
 
             res.status(200).json({
                 success: true,
                 message: 'Paiement confirmé',
+                breakdown: {
+                    total: grossAmount,
+                    platformFee: platformFee,
+                    workerAmount: workerAmount,
+                    stripeFee: stripeFee,
+                },
             });
         } else {
             // Paiement échoué - envoyer notification
@@ -161,5 +286,29 @@ router.post('/refunds', protect, createRefund);
 // @desc    Récupérer le statut d'un remboursement
 // @access  Private
 router.get('/refunds/:id', protect, getRefundStatus);
+
+// ============================================
+// Payout Routes (Versements aux déneigeurs)
+// ============================================
+
+// @route   POST /api/payments/payouts
+// @desc    Créer un versement manuel au déneigeur
+// @access  Private (Admin)
+router.post('/payouts', protect, createWorkerPayout);
+
+// @route   GET /api/payments/payouts/pending
+// @desc    Récupérer les versements en attente (pour un déneigeur)
+// @access  Private (snowWorker)
+router.get('/payouts/pending', protect, getPendingPayouts);
+
+// @route   GET /api/payments/payouts/history
+// @desc    Récupérer l'historique des versements reçus
+// @access  Private (snowWorker)
+router.get('/payouts/history', protect, getWorkerPayoutHistory);
+
+// @route   GET /api/payments/payouts/summary
+// @desc    Récupérer le résumé des gains
+// @access  Private (snowWorker)
+router.get('/payouts/summary', protect, getWorkerEarningsSummary);
 
 module.exports = router;

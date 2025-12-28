@@ -48,6 +48,7 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/workers', require('./routes/workers'));
 app.use('/api/phone', require('./routes/phoneVerification'));
+app.use('/api/stripe-connect', require('./routes/stripeConnect'));
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));

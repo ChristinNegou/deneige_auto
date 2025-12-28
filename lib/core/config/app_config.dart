@@ -75,6 +75,15 @@ class AppConfig {
   static const double doorDeicingSurcharge = 3.0;
   static const double wheelClearanceSurcharge = 4.0;
 
+  // Taxes (Québec)
+  static const double tpsRate = 0.05;      // TPS - Taxe fédérale (5%)
+  static const double tvqRate = 0.09975;   // TVQ - Taxe provinciale Québec (9.975%)
+
+  // Frais supplémentaires
+  static const double serviceFee = 1.50;           // Frais de service fixe
+  static const double processingFeeRate = 0.029;   // Frais de traitement (2.9%)
+  static const double insuranceFee = 0.75;         // Frais d'assurance
+
   // Subscriptions
   static const double weeklySubscriptionPrice = 39.0;
   static const double monthlySubscriptionPrice = 129.0;

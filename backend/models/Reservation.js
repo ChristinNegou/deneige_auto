@@ -147,6 +147,39 @@ const reservationSchema = new mongoose.Schema({
         },
     },
 
+    // Payout information (versement au déneigeur)
+    payout: {
+        status: {
+            type: String,
+            enum: ['pending', 'processing', 'paid', 'failed'],
+            default: 'pending',
+        },
+        workerAmount: {
+            type: Number,
+            default: 0,
+        },
+        platformFee: {
+            type: Number,
+            default: 0,
+        },
+        stripeFee: {
+            type: Number,
+            default: 0,
+        },
+        stripeTransferId: {
+            type: String,
+            default: null,
+        },
+        paidAt: {
+            type: Date,
+            default: null,
+        },
+        errorMessage: {
+            type: String,
+            default: null,
+        },
+    },
+
     // Geolocation for proximity-based job discovery
     location: {
         type: {

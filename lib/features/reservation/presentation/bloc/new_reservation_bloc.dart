@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/services/tax_service.dart';
 import '../../domain/usecases/create_reservation_usecase.dart';
 import '../../domain/usecases/get_parking_spots_usecase.dart';
 import '../../domain/usecases/get_vehicules_usecase.dart';
@@ -363,6 +364,21 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       price += urgencyFee;
     }
 
+    // ✅ Sous-total avant taxes et frais
+    final subtotal = price;
+
+    // ✅ Frais de service et assurance
+    const serviceFee = AppConfig.serviceFee;
+    const insuranceFee = AppConfig.insuranceFee;
+    price += serviceFee + insuranceFee;
+
+    // ✅ Détecter la province à partir de l'adresse
+    final taxService = TaxService();
+    final provinceCode = taxService.detectProvinceFromAddress(state.locationAddress);
+
+    // ✅ Calcul des taxes selon la province
+    final taxCalc = taxService.calculateTaxes(price, provinceCode);
+
     final breakdown = PriceBreakdown(
       basePrice: basePrice,
       vehicleAdjustment: vehicleAdjustment,
@@ -370,11 +386,23 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       snowSurcharge: snowSurcharge,
       optionsCost: optionsCost,
       urgencyFee: urgencyFee,
-      totalPrice: price,
+      subtotal: subtotal,
+      serviceFee: serviceFee,
+      insuranceFee: insuranceFee,
+      federalTax: taxCalc.federalTax,
+      federalTaxRate: taxCalc.federalTaxRate,
+      federalTaxName: taxCalc.federalTaxName,
+      provincialTax: taxCalc.provincialTax,
+      provincialTaxRate: taxCalc.provincialTaxRate,
+      provincialTaxName: taxCalc.provincialTaxName,
+      provinceCode: taxCalc.provinceCode,
+      provinceName: taxCalc.provinceName,
+      isHST: taxCalc.isHST,
+      totalPrice: taxCalc.total,
     );
 
     emit(state.copyWith(
-      calculatedPrice: price,
+      calculatedPrice: taxCalc.total,
       priceBreakdown: breakdown,
     ));
   }

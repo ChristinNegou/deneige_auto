@@ -91,6 +91,19 @@ class Reservation extends Equatable {
     return status == ReservationStatus.completed && rating == null;
   }
 
+  /// Vérifie si la réservation est passée (departureTime déjà écoulé)
+  /// Utilisé pour filtrer les réservations dans la section "Prochaines réservations"
+  bool get isPast {
+    return departureTime.isBefore(DateTime.now());
+  }
+
+  /// Vérifie si la réservation est à venir et active (non passée et statut pending/assigned)
+  bool get isUpcoming {
+    return !isPast &&
+           (status == ReservationStatus.pending ||
+            status == ReservationStatus.assigned);
+  }
+
   int get estimatedDurationMinutes {
     int base = 15;
     if (serviceOptions.contains(ServiceOption.windowScraping)) base += 5;

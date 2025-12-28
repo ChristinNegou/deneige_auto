@@ -42,6 +42,10 @@ class AppRoutes {
   static const String payments = '/payments';
   static const String addPaymentMethod = '/payments/add-method';
 
+  // Routes d'activités
+  static const String activities = '/activities';
+  static const String activityDetails = '/activities/details';
+
   // Routes de paramètres
   static const String settings = '/settings';
 
@@ -57,6 +61,7 @@ class AppRoutes {
   static const String workerHistory = '/snow-worker/history';
   static const String workerEarnings = '/snow-worker/earnings';
   static const String workerSettings = '/snow-worker/settings';
+  static const String workerPaymentSetup = '/snow-worker/payment-setup';
 
   //Routes pour le dashboard client
   static const String clientHome = '/client-home';

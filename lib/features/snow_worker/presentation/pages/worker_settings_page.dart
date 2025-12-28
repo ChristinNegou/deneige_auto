@@ -6,6 +6,7 @@ import '../bloc/worker_availability_bloc.dart';
 import '../../domain/entities/worker_profile.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/constants/app_routes.dart';
 
 class WorkerSettingsPage extends StatelessWidget {
   const WorkerSettingsPage({super.key});
@@ -115,6 +116,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          _buildPaymentSection(context),
+                          const SizedBox(height: 16),
                           _buildEquipmentSection(),
                           const SizedBox(height: 16),
                           _buildVehicleSection(),
@@ -191,6 +194,76 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentSection(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.workerPaymentSetup),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.green[600]!, Colors.green[400]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.green.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.account_balance_wallet,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Mes paiements',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Configurer mon compte bancaire',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: Colors.white,
+              size: 24,
+            ),
+          ],
+        ),
       ),
     );
   }

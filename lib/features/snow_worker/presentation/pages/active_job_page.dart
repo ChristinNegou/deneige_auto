@@ -36,7 +36,6 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   File? _afterPhoto;
   bool _isUploadingPhoto = false;
   bool _photoUploaded = false;
-  String? _uploadedPhotoUrl;
 
   @override
   void initState() {
@@ -1044,7 +1043,6 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         setState(() {
           _afterPhoto = File(photo.path);
           _photoUploaded = false;
-          _uploadedPhotoUrl = null;
         });
       }
     } catch (e) {
@@ -1093,9 +1091,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             );
           }
         },
-        (photoUrl) {
+        (_) {
           setState(() {
-            _uploadedPhotoUrl = photoUrl;
             _photoUploaded = true;
           });
           if (mounted) {

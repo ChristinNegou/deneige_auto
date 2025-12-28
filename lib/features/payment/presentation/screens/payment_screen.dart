@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/payment_method.dart';
 import '../bloc/payment_methods_bloc.dart';
 import '../../data/payment_service.dart';
@@ -37,10 +38,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return BlocProvider(
       create: (_) => sl<PaymentMethodsBloc>()..add(LoadPaymentMethods()),
       child: Scaffold(
+        backgroundColor: AppTheme.background,
         appBar: AppBar(
           title: const Text('Paiement'),
-          backgroundColor: const Color(0xFF8B5CF6),
-          foregroundColor: Colors.white,
+          backgroundColor: AppTheme.surface,
+          elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => Navigator.pop(context, false),
@@ -48,7 +50,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
         body: BlocConsumer<PaymentMethodsBloc, PaymentMethodsState>(
           listener: (context, state) {
-            // Auto-select default payment method when loaded
             if (state.methods.isNotEmpty && _selectedPaymentMethod == null && !_useNewCard) {
               setState(() {
                 _selectedPaymentMethod = state.defaultMethod ?? state.methods.first;
@@ -61,45 +62,37 @@ class _PaymentScreenState extends State<PaymentScreen> {
             }
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Montant à payer
+                  // Montant
                   _buildAmountCard(),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
 
-                  // Payment Method Selection
-                  Text(
-                    'Méthode de paiement',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 16),
+                  // Méthodes de paiement
+                  _buildSectionTitle('Méthode de paiement'),
+                  const SizedBox(height: 12),
 
-                  // Saved payment methods
                   if (state.methods.isNotEmpty) ...[
                     ...state.methods.map((method) => _buildPaymentMethodTile(method)),
-                    const SizedBox(height: 12),
                   ],
 
-                  // New card option
                   _buildNewCardTile(),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
 
-                  // Security Info
+                  // Info sécurité
                   _buildSecurityInfo(),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
 
-                  // Payment Button
+                  // Bouton payer
                   _buildPaymentButton(),
 
                   const SizedBox(height: 16),
 
-                  // Card Logos
+                  // Logos
                   _buildCardLogos(),
                 ],
               ),
@@ -110,54 +103,57 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: AppTheme.textPrimary,
+      ),
+    );
+  }
+
   Widget _buildAmountCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF8B5CF6),
-            Color(0xFF7C3AED),
-            Color(0xFF6D28D9),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
-          const Text(
-            'Montant total',
+          Text(
+            'Montant à payer',
             style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontSize: 13,
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            '${widget.amount.toStringAsFixed(2)} \$',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -1,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'CAD',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                widget.amount.toStringAsFixed(2),
+                style: const TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Text(
+                '\$ CAD',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white70,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -165,83 +161,104 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildPaymentMethodTile(PaymentMethod method) {
-    final isSelected = !_useNewCard && _selectedPaymentMethod?.stripePaymentMethodId == method.stripePaymentMethodId;
+    final isSelected = !_useNewCard &&
+        _selectedPaymentMethod?.stripePaymentMethodId == method.stripePaymentMethodId;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isSelected ? const Color(0xFF8B5CF6) : Colors.grey[300]!,
-          width: isSelected ? 2 : 1,
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _useNewCard = false;
+          _selectedPaymentMethod = method;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? AppTheme.primary : Colors.grey[200]!,
+            width: isSelected ? 1.5 : 1,
+          ),
         ),
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
-      child: RadioListTile<String>(
-        value: method.stripePaymentMethodId ?? '',
-        groupValue: _useNewCard ? '' : (_selectedPaymentMethod?.stripePaymentMethodId ?? ''),
-        onChanged: (value) {
-          setState(() {
-            _useNewCard = false;
-            _selectedPaymentMethod = method;
-          });
-        },
-        activeColor: const Color(0xFF8B5CF6),
-        title: Row(
+        child: Row(
           children: [
-            Icon(
-              Icons.credit_card,
-              color: isSelected ? const Color(0xFF8B5CF6) : Colors.grey[600],
+            // Radio
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected ? AppTheme.primary : Colors.transparent,
+                border: Border.all(
+                  color: isSelected ? AppTheme.primary : Colors.grey[300]!,
+                  width: 1.5,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, size: 12, color: Colors.white)
+                  : null,
             ),
             const SizedBox(width: 12),
+
+            // Icône carte
+            Container(
+              width: 40,
+              height: 28,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Center(
+                child: Icon(Icons.credit_card, size: 18, color: Colors.grey[600]),
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // Infos
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    method.displayNumber,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? const Color(0xFF8B5CF6) : Colors.black87,
-                    ),
-                  ),
-                  if (method.isDefault)
-                    Container(
-                      margin: const EdgeInsets.only(top: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'Par défaut',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Color(0xFF8B5CF6),
+                  Row(
+                    children: [
+                      Text(
+                        method.displayNumber,
+                        style: const TextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
+                      if (method.isDefault) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'Par défaut',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Expire ${method.expMonth.toString().padLeft(2, '0')}/${method.expYear}',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  ),
                 ],
               ),
             ),
           ],
-        ),
-        subtitle: Text(
-          'Expire ${method.expMonth.toString().padLeft(2, '0')}/${method.expYear}',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
         ),
       ),
     );
@@ -250,46 +267,61 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Widget _buildNewCardTile() {
     final isSelected = _useNewCard;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isSelected ? const Color(0xFF8B5CF6) : Colors.grey[300]!,
-          width: isSelected ? 2 : 1,
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _useNewCard = true;
+          _selectedPaymentMethod = null;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? AppTheme.primary : Colors.grey[200]!,
+            width: isSelected ? 1.5 : 1,
+          ),
         ),
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
-      child: RadioListTile<bool>(
-        value: true,
-        groupValue: _useNewCard,
-        onChanged: (value) {
-          setState(() {
-            _useNewCard = true;
-            _selectedPaymentMethod = null;
-          });
-        },
-        activeColor: const Color(0xFF8B5CF6),
-        title: Row(
+        child: Row(
           children: [
-            Icon(
-              Icons.add_card,
-              color: isSelected ? const Color(0xFF8B5CF6) : Colors.grey[600],
+            // Radio
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected ? AppTheme.primary : Colors.transparent,
+                border: Border.all(
+                  color: isSelected ? AppTheme.primary : Colors.grey[300]!,
+                  width: 1.5,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, size: 12, color: Colors.white)
+                  : null,
             ),
             const SizedBox(width: 12),
-            Text(
+
+            // Icône
+            Container(
+              width: 40,
+              height: 28,
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Icon(Icons.add, size: 18, color: AppTheme.primary),
+            ),
+            const SizedBox(width: 12),
+
+            // Texte
+            const Text(
               'Utiliser une nouvelle carte',
               style: TextStyle(
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? const Color(0xFF8B5CF6) : Colors.black87,
               ),
             ),
           ],
@@ -300,46 +332,37 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Widget _buildSecurityInfo() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue[200]!),
+        color: Colors.blue.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(Icons.shield_outlined, color: Colors.blue[700], size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Paiement sécurisé',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue[900],
+          Icon(Icons.lock_outline, size: 20, color: Colors.blue[700]),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Paiement sécurisé',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blue[900],
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  'SSL 256-bit · PCI DSS · Propulsé par Stripe',
+                  style: TextStyle(fontSize: 11, color: Colors.blue[700]),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          _buildInfoRow('✓ Cryptage SSL 256-bit'),
-          _buildInfoRow('✓ Conforme PCI DSS'),
-          _buildInfoRow('✓ Propulsé par Stripe'),
         ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 13,
-          color: Colors.blue[900],
-        ),
       ),
     );
   }
@@ -349,33 +372,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     return SizedBox(
       width: double.infinity,
-      height: 56,
       child: ElevatedButton(
         onPressed: canPay ? _handlePayment : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF8B5CF6),
+          backgroundColor: AppTheme.primary,
+          foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey[300],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 0,
         ),
         child: _isLoading
             ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               )
             : Text(
                 'Payer ${widget.amount.toStringAsFixed(2)} \$',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
       ),
     );
@@ -386,9 +401,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildCardLogo('Visa'),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         _buildCardLogo('Mastercard'),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         _buildCardLogo('Amex'),
       ],
     );
@@ -396,21 +411,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Widget _buildCardLogo(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(4),
       ),
-      child: Row(
-        children: [
-          const Icon(Icons.credit_card, size: 14, color: Colors.black54),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-          ),
-        ],
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[600]),
       ),
     );
   }
@@ -419,30 +427,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() => _isLoading = true);
 
     try {
-      print('🔄 Début du processus de paiement...');
-
-      // 1. Create Payment Intent
       final paymentData = await _paymentService.createPaymentIntent(
         amount: widget.amount,
         reservationId: widget.reservationId,
       );
 
-      print('✅ Payment Intent créé: ${paymentData['paymentIntentId']}');
-
       bool success = false;
 
       if (_useNewCard) {
-        // Use new card - show Stripe Payment Sheet
         await _paymentService.initPaymentSheet(
           clientSecret: paymentData['clientSecret'],
           merchantDisplayName: 'Déneige Auto',
         );
-
         success = await _paymentService.confirmPayment(
           clientSecret: paymentData['clientSecret'],
         );
       } else if (_selectedPaymentMethod != null) {
-        // Use saved card - confirm with payment method ID
         success = await _paymentService.confirmPaymentWithSavedCard(
           clientSecret: paymentData['clientSecret'],
           paymentMethodId: _selectedPaymentMethod!.stripePaymentMethodId!,
@@ -450,15 +450,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       }
 
       if (success && mounted) {
-        print('✅ Paiement réussi !');
-
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Paiement réussi !'),
-            backgroundColor: Colors.green,
-          ),
+          const SnackBar(content: Text('Paiement réussi !'), backgroundColor: Colors.green),
         );
-
         Navigator.of(context).pop({
           'success': true,
           'paymentIntentId': paymentData['paymentIntentId'],
@@ -467,23 +461,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
         _showError('Paiement annulé');
       }
     } catch (e) {
-      print('❌ Erreur de paiement: $e');
-      if (mounted) {
-        _showError('Erreur: ${e.toString()}');
-      }
+      if (mounted) _showError('Erreur: ${e.toString()}');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 }

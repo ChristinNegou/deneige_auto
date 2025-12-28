@@ -28,14 +28,37 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        const user = await User.create({
+        // Preparer les donnees utilisateur
+        const userData = {
             email,
             password,
             firstName,
             lastName,
             phoneNumber,
             role: role || 'client',
-        });
+        };
+
+        // Initialiser workerProfile pour les deneigeurs
+        if (role === 'snowWorker') {
+            userData.workerProfile = {
+                isAvailable: false,
+                currentLocation: {
+                    type: 'Point',
+                    coordinates: [0, 0],
+                },
+                preferredZones: [],
+                maxActiveJobs: 3,
+                vehicleType: 'car',
+                equipmentList: [],
+                totalJobsCompleted: 0,
+                totalEarnings: 0,
+                totalTipsReceived: 0,
+                averageRating: 0,
+                totalRatingsCount: 0,
+            };
+        }
+
+        const user = await User.create(userData);
 
         const token = generateToken(user._id, user.role);
 

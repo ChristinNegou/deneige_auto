@@ -2,6 +2,7 @@ import 'package:deneige_auto/features/auth/presentation/screens/forgot_password_
 import 'package:deneige_auto/features/vehicule/presentation/pages/vehicles_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/activities/presentation/screens/activities_screen.dart';
 import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/jobslist/jobslist_page.dart';
 import '../../features/notifications/presentation/bloc/notification_bloc.dart';
@@ -24,6 +25,7 @@ import '../../features/snow_worker/presentation/pages/active_job_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_history_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_earnings_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_settings_page.dart';
+import '../../features/snow_worker/presentation/pages/worker_payment_setup_page.dart';
 import '../../features/snow_worker/domain/entities/worker_job.dart';
 import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../../features/subscription/presentation/page/subscription_page.dart';
@@ -240,6 +242,22 @@ class AppRouter {
           settings: settings,
         );
 
+    // Routes d'activités
+      case AppRoutes.activities:
+        return MaterialPageRoute(
+          builder: (_) => const ActivitiesScreen(),
+          settings: settings,
+        );
+
+      case AppRoutes.activityDetails:
+        final reservationId = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => ReservationDetailsPage(
+            reservationId: reservationId ?? '',
+          ),
+          settings: settings,
+        );
+
     // Routes déneigeur
       case AppRoutes.snowWorkerDashboard:
         return MaterialPageRoute(
@@ -288,6 +306,12 @@ class AppRouter {
       case AppRoutes.workerSettings:
         return MaterialPageRoute(
           builder: (_) => const WorkerSettingsPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.workerPaymentSetup:
+        return MaterialPageRoute(
+          builder: (_) => const WorkerPaymentSetupPage(),
           settings: settings,
         );
 

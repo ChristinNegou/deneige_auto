@@ -43,6 +43,12 @@ class LoadReservationById extends ReservationListEvent {
   List<Object?> get props => [reservationId];
 }
 
+/// Événement pour charger toutes les réservations (incluant terminées)
+/// Utilisé pour la page "Activités"
+class LoadAllReservations extends ReservationListEvent {
+  const LoadAllReservations();
+}
+
 // States
 class ReservationListState extends Equatable {
   final List<Reservation> reservations;
@@ -97,6 +103,7 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
     on<RefreshReservations>(_onRefreshReservations);
     on<CancelReservationEvent>(_onCancelReservation);
     on<LoadReservationById>(_onLoadReservationById);
+    on<LoadAllReservations>(_onLoadAllReservations);
   }
 
   Future<void> _onLoadReservations(
@@ -113,12 +120,13 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
         errorMessage: failure.message,
       )),
           (reservations) {
-        // Filtrer pour afficher uniquement les réservations actives
+        // Filtrer pour afficher uniquement les réservations actives et non passées
         final activeReservations = reservations.where((r) =>
-          r.status == ReservationStatus.pending ||
-          r.status == ReservationStatus.assigned ||
-          r.status == ReservationStatus.enRoute ||
-          r.status == ReservationStatus.inProgress
+          !r.isPast &&
+          (r.status == ReservationStatus.pending ||
+           r.status == ReservationStatus.assigned ||
+           r.status == ReservationStatus.enRoute ||
+           r.status == ReservationStatus.inProgress)
         ).toList();
 
         emit(state.copyWith(
@@ -139,12 +147,13 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
     result.fold(
           (failure) => emit(state.copyWith(errorMessage: failure.message)),
           (reservations) {
-        // Filtrer pour afficher uniquement les réservations actives
+        // Filtrer pour afficher uniquement les réservations actives et non passées
         final activeReservations = reservations.where((r) =>
-          r.status == ReservationStatus.pending ||
-          r.status == ReservationStatus.assigned ||
-          r.status == ReservationStatus.enRoute ||
-          r.status == ReservationStatus.inProgress
+          !r.isPast &&
+          (r.status == ReservationStatus.pending ||
+           r.status == ReservationStatus.assigned ||
+           r.status == ReservationStatus.enRoute ||
+           r.status == ReservationStatus.inProgress)
         ).toList();
 
         emit(state.copyWith(
@@ -205,6 +214,44 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
         emit(state.copyWith(
           isLoading: false,
           selectedReservation: reservation,
+          clearError: true,
+        ));
+      },
+    );
+  }
+
+  /// Charge toutes les réservations (incluant en cours et terminées)
+  /// pour la page "Activités"
+  Future<void> _onLoadAllReservations(
+      LoadAllReservations event,
+      Emitter<ReservationListState> emit,
+      ) async {
+    emit(state.copyWith(isLoading: true, clearError: true));
+
+    final result = await getReservations(upcoming: false);
+
+    result.fold(
+          (failure) => emit(state.copyWith(
+        isLoading: false,
+        errorMessage: failure.message,
+      )),
+          (reservations) {
+        // Filtrer pour afficher les réservations en cours et terminées
+        // Exclure: pending (en attente), cancelled (annulées)
+        final activityReservations = reservations.where((r) =>
+          r.status == ReservationStatus.assigned ||
+          r.status == ReservationStatus.enRoute ||
+          r.status == ReservationStatus.inProgress ||
+          r.status == ReservationStatus.completed
+        ).toList();
+
+        // Trier par date (les plus récentes en premier)
+        activityReservations.sort((a, b) =>
+          b.departureTime.compareTo(a.departureTime));
+
+        emit(state.copyWith(
+          isLoading: false,
+          reservations: activityReservations,
           clearError: true,
         ));
       },

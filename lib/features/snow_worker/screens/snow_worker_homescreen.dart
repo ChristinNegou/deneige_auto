@@ -6,15 +6,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../../core/constants/app_routes.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_state.dart';
 import '../domain/entities/worker_job.dart';
 import '../presentation/bloc/worker_availability_bloc.dart';
 import '../presentation/bloc/worker_jobs_bloc.dart';
 import '../presentation/bloc/worker_stats_bloc.dart';
-import '../presentation/widgets/availability_toggle.dart';
 import '../presentation/widgets/swipeable_job_card.dart';
-import '../presentation/widgets/stats_card.dart';
+import '../presentation/widgets/shimmer_loading.dart';
 import '../services/worker_notification_service.dart';
 
 class SnowWorkerHomeScreen extends StatefulWidget {
@@ -69,48 +69,61 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
       final newJobs = currentJobs.where((j) => newJobIds.contains(j.id)).toList();
       final hasUrgent = newJobs.any((j) => j.isPriority);
 
-      // Vibration + notification
-      if (newJobs.length == 1) {
-        _notificationService.notifyNewJob(newJobs.first);
-      } else {
-        _notificationService.notifyMultipleNewJobs(newJobs.length, hasUrgent: hasUrgent);
-      }
-
-      // Haptic feedback
+      _notificationService.notifyNewJob(newJobs.first);
       HapticFeedback.heavyImpact();
 
-      // Show in-app snackbar
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(
-                  hasUrgent ? Icons.bolt : Icons.work,
-                  color: Colors.white,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    hasUrgent ? Icons.bolt : Icons.work_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    newJobs.length == 1
-                        ? 'Nouveau job: ${newJobs.first.displayAddress}'
-                        : '${newJobs.length} nouveaux jobs disponibles!',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        newJobs.length == 1 ? 'Nouveau job!' : '${newJobs.length} nouveaux jobs!',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      if (newJobs.length == 1)
+                        Text(
+                          newJobs.first.displayAddress,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white.withValues(alpha: 0.9),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
                   ),
                 ),
               ],
             ),
-            backgroundColor: hasUrgent ? Colors.orange[700] : Colors.green[700],
+            backgroundColor: hasUrgent ? AppTheme.warning : AppTheme.success,
             duration: const Duration(seconds: 4),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            action: SnackBarAction(
-              label: 'VOIR',
-              textColor: Colors.white,
-              onPressed: () {
-                // Scroll to jobs section
-              },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
             ),
+            margin: const EdgeInsets.all(16),
           ),
         );
       }
@@ -153,13 +166,10 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // DEBUG: Détecter si on est sur l'émulateur (coordonnées de Mountain View)
-      // et utiliser Trois-Rivières à la place
       final isEmulatorLocation = (position.latitude - 37.4219983).abs() < 0.01 &&
           (position.longitude - (-122.084)).abs() < 0.01;
 
       if (isEmulatorLocation) {
-        debugPrint('🔧 Emulator detected, using Trois-Rivières coordinates');
         _loadDataWithDefaultLocation();
         return;
       }
@@ -168,11 +178,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
         _currentPosition = position;
       });
 
-      // Load data with position
       _loadData();
     } catch (e) {
-      debugPrint('Error getting location: $e');
-      // Load with default position (Trois-Rivières)
       _loadDataWithDefaultLocation();
     }
   }
@@ -189,7 +196,6 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   void _loadDataWithDefaultLocation() {
-    // Default: Trois-Rivières
     context.read<WorkerJobsBloc>().add(const LoadAvailableJobs(
           latitude: 46.3432,
           longitude: -72.5476,
@@ -199,7 +205,6 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Future<void> _onRefresh() async {
-    // Utiliser la position actuelle ou les coordonnées par défaut (Trois-Rivières)
     final lat = _currentPosition?.latitude ?? 46.3432;
     final lng = _currentPosition?.longitude ?? -72.5476;
 
@@ -212,137 +217,75 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, authState) {
             if (authState is! AuthAuthenticated) {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(color: AppTheme.primary),
               );
             }
 
             final user = authState.user;
 
             return RefreshIndicator(
-              onRefresh: _onRefresh,
+              onRefresh: () async {
+                HapticFeedback.mediumImpact();
+                await _onRefresh();
+              },
+              color: AppTheme.primary,
+              backgroundColor: AppTheme.surface,
+              strokeWidth: 2.5,
               child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
                 slivers: [
-                  // App Bar
-                  SliverAppBar(
-                    expandedHeight: 100,
-                    floating: false,
-                    pinned: true,
-                    backgroundColor: Colors.orange[600],
-                    elevation: 0,
-                    flexibleSpace: FlexibleSpaceBar(
-                      title: Text(
-                        'Bonjour, ${user.name.split(' ').first}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.history),
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.workerHistory);
-                        },
-                        tooltip: 'Historique',
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.account_circle),
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.profile);
-                        },
-                        tooltip: 'Profil',
-                      ),
-                    ],
+                  // Header
+                  SliverToBoxAdapter(
+                    child: _buildHeader(user.name),
                   ),
 
                   // Content
-                  SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 16),
-
+                  SliverPadding(
+                    padding: const EdgeInsets.all(AppTheme.paddingLG),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
                         // Availability Toggle
-                        BlocBuilder<WorkerAvailabilityBloc,
-                            WorkerAvailabilityState>(
-                          builder: (context, state) {
-                            bool isAvailable = false;
-                            bool isLoading = false;
-
-                            if (state is WorkerAvailabilityLoaded) {
-                              isAvailable = state.isAvailable;
-                              isLoading = state.isUpdating;
-                            } else if (state is WorkerAvailabilityLoading) {
-                              isLoading = true;
-                            }
-
-                            return AvailabilityToggle(
-                              isAvailable: isAvailable,
-                              isLoading: isLoading,
-                              onToggle: () {
-                                context
-                                    .read<WorkerAvailabilityBloc>()
-                                    .add(const ToggleAvailability());
-                              },
-                            );
-                          },
+                        FadeSlideTransition(
+                          index: 0,
+                          child: _buildAvailabilityCard(),
                         ),
-
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
 
                         // Stats Section
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            "Aujourd'hui",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[800],
-                            ),
-                          ),
+                        FadeSlideTransition(
+                          index: 1,
+                          child: _buildStatsSection(),
                         ),
-                        const SizedBox(height: 12),
-
-                        BlocBuilder<WorkerStatsBloc, WorkerStatsState>(
-                          builder: (context, state) {
-                            if (state is WorkerStatsLoaded) {
-                              return StatsRow(
-                                completed: state.stats.today.completed,
-                                inProgress: state.stats.today.inProgress,
-                                earnings: state.stats.today.earnings,
-                                rating: state.stats.allTime.averageRating,
-                              );
-                            }
-                            return const StatsRow(
-                              completed: 0,
-                              inProgress: 0,
-                              earnings: 0,
-                              rating: 0,
-                            );
-                          },
-                        ),
-
                         const SizedBox(height: 24),
 
                         // My Active Jobs
-                        _buildMyJobsSection(),
+                        FadeSlideTransition(
+                          index: 2,
+                          child: _buildMyJobsSection(),
+                        ),
 
-                        const SizedBox(height: 24),
-
-                        // Available Jobs Section
-                        _buildAvailableJobsSection(),
+                        // Available Jobs
+                        FadeSlideTransition(
+                          index: 3,
+                          child: _buildAvailableJobsSection(),
+                        ),
 
                         const SizedBox(height: 100),
-                      ],
+                      ]),
                     ),
                   ),
                 ],
@@ -351,15 +294,445 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.pushNamed(context, AppRoutes.workerEarnings);
-        },
-        backgroundColor: Colors.green[600],
-        icon: const Icon(Icons.attach_money),
-        label: const Text('Mes revenus'),
-      ),
+      floatingActionButton: _buildFloatingButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  Widget _buildHeader(String userName) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+      child: Row(
+        children: [
+          // Avatar
+          Hero(
+            tag: 'worker_avatar',
+            child: Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppTheme.secondary, AppTheme.primary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.local_shipping_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Bonjour, ${userName.split(' ').first}',
+                  style: AppTheme.headlineSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
+                  builder: (context, state) {
+                    bool isAvailable = false;
+                    if (state is WorkerAvailabilityLoaded) {
+                      isAvailable = state.isAvailable;
+                    }
+                    return Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: isAvailable ? AppTheme.success : AppTheme.textTertiary,
+                            shape: BoxShape.circle,
+                            boxShadow: isAvailable
+                                ? [
+                                    BoxShadow(
+                                      color: AppTheme.success.withValues(alpha: 0.4),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isAvailable ? 'Disponible' : 'Hors ligne',
+                          style: AppTheme.bodySmall.copyWith(
+                            color: AppTheme.textTertiary,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          _buildHeaderButton(
+            icon: Icons.history_rounded,
+            onTap: () => Navigator.pushNamed(context, AppRoutes.workerHistory),
+          ),
+          const SizedBox(width: 10),
+          _buildHeaderButton(
+            icon: Icons.settings_rounded,
+            onTap: () => Navigator.pushNamed(context, AppRoutes.workerSettings),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderButton({required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          boxShadow: AppTheme.shadowSM,
+        ),
+        child: Icon(
+          icon,
+          color: AppTheme.textSecondary,
+          size: 22,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAvailabilityCard() {
+    return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
+      builder: (context, state) {
+        bool isAvailable = false;
+        bool isLoading = false;
+
+        if (state is WorkerAvailabilityLoaded) {
+          isAvailable = state.isAvailable;
+          isLoading = state.isUpdating;
+        } else if (state is WorkerAvailabilityLoading) {
+          isLoading = true;
+        }
+
+        return GestureDetector(
+          onTap: isLoading
+              ? null
+              : () {
+                  HapticFeedback.mediumImpact();
+                  context.read<WorkerAvailabilityBloc>().add(const ToggleAvailability());
+                },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              gradient: isAvailable
+                  ? LinearGradient(
+                      colors: [
+                        AppTheme.success,
+                        AppTheme.success.withValues(alpha: 0.85),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null,
+              color: isAvailable ? null : AppTheme.surface,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+              boxShadow: [
+                BoxShadow(
+                  color: isAvailable
+                      ? AppTheme.success.withValues(alpha: 0.3)
+                      : Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: isAvailable
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : AppTheme.background,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                  child: isLoading
+                      ? const Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: AppTheme.primary,
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          isAvailable ? Icons.work_rounded : Icons.work_off_rounded,
+                          color: isAvailable ? Colors.white : AppTheme.textTertiary,
+                          size: 28,
+                        ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isAvailable ? 'Vous etes disponible' : 'Vous etes hors ligne',
+                        style: TextStyle(
+                          color: isAvailable ? Colors.white : AppTheme.textPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isAvailable
+                            ? 'Vous recevez les nouveaux jobs'
+                            : 'Activez pour recevoir des jobs',
+                        style: TextStyle(
+                          color: isAvailable
+                              ? Colors.white.withValues(alpha: 0.85)
+                              : AppTheme.textTertiary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: isAvailable
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : AppTheme.background,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                  ),
+                  child: Switch(
+                    value: isAvailable,
+                    onChanged: isLoading
+                        ? null
+                        : (_) {
+                            HapticFeedback.mediumImpact();
+                            context.read<WorkerAvailabilityBloc>().add(const ToggleAvailability());
+                          },
+                    activeColor: Colors.white,
+                    activeTrackColor: Colors.white.withValues(alpha: 0.3),
+                    inactiveThumbColor: AppTheme.textTertiary,
+                    inactiveTrackColor: AppTheme.border,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatsSection() {
+    return BlocBuilder<WorkerStatsBloc, WorkerStatsState>(
+      builder: (context, state) {
+        if (state is WorkerStatsLoading) {
+          return Row(
+            children: const [
+              Expanded(child: StatCardSkeleton()),
+              SizedBox(width: 12),
+              Expanded(child: StatCardSkeleton()),
+            ],
+          );
+        }
+
+        int completed = 0;
+        int inProgress = 0;
+        double earnings = 0;
+        double rating = 0;
+
+        if (state is WorkerStatsLoaded) {
+          completed = state.stats.today.completed;
+          inProgress = state.stats.today.inProgress;
+          earnings = state.stats.today.earnings;
+          rating = state.stats.allTime.averageRating;
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Aujourd'hui",
+                  style: AppTheme.headlineSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    Navigator.pushNamed(context, AppRoutes.workerEarnings);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.success.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Details',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.success,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 14,
+                          color: AppTheme.success,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.check_circle_rounded,
+                    iconColor: AppTheme.success,
+                    value: completed.toString(),
+                    label: 'Termines',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.pending_rounded,
+                    iconColor: AppTheme.warning,
+                    value: inProgress.toString(),
+                    label: 'En cours',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.attach_money_rounded,
+                    iconColor: AppTheme.primary,
+                    value: '${earnings.toStringAsFixed(0)}\$',
+                    label: 'Revenus',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.star_rounded,
+                    iconColor: const Color(0xFFFFB800),
+                    value: rating > 0 ? rating.toStringAsFixed(1) : '-',
+                    label: 'Note',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required Color iconColor,
+    required String value,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  iconColor.withValues(alpha: 0.15),
+                  iconColor.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+            ),
+            child: Icon(icon, color: iconColor, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: AppTheme.headlineSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: AppTheme.labelSmall.copyWith(
+                    color: AppTheme.textTertiary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -379,71 +752,74 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.purple[100],
-                          borderRadius: BorderRadius.circular(8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.secondary.withValues(alpha: 0.15),
+                            AppTheme.primary.withValues(alpha: 0.1),
+                          ],
                         ),
-                        child: Icon(
-                          Icons.work,
-                          color: Colors.purple[700],
-                          size: 20,
-                        ),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Mes jobs actifs',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
+                      child: const Icon(
+                        Icons.work_rounded,
+                        color: AppTheme.secondary,
+                        size: 20,
                       ),
-                    ],
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Mes jobs actifs',
+                      style: AppTheme.headlineSmall.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppTheme.secondary, AppTheme.primary],
+                    ),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.purple[50],
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      '${myJobs.length} actif${myJobs.length > 1 ? 's' : ''}',
-                      style: TextStyle(
-                        color: Colors.purple[700],
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
+                  child: Text(
+                    '${myJobs.length} actif${myJobs.length > 1 ? 's' : ''}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            ...myJobs.map((job) => SwipeableJobCard(
-                  job: job,
-                  showAcceptButton: false,
-                  enableSwipe: false,
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.workerActiveJob,
-                      arguments: job,
-                    );
-                  },
+            const SizedBox(height: 14),
+            ...myJobs.map((job) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: SwipeableJobCard(
+                    job: job,
+                    showAcceptButton: false,
+                    enableSwipe: false,
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.workerActiveJob,
+                        arguments: job,
+                      );
+                    },
+                  ),
                 )),
+            const SizedBox(height: 10),
           ],
         );
       },
@@ -463,50 +839,25 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
       },
       builder: (context, state) {
         if (state is WorkerJobsLoading) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Recherche de jobs...',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ],
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Jobs disponibles',
+                style: AppTheme.headlineSmall.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
+              const SizedBox(height: 14),
+              const JobCardSkeleton(),
+              const SizedBox(height: 12),
+              const JobCardSkeleton(),
+            ],
           );
         }
 
         if (state is WorkerJobsError) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                children: [
-                  Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
-                  const SizedBox(height: 16),
-                  Text(
-                    state.message,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: _loadDataWithDefaultLocation,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Réessayer'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange[600],
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+          return _buildErrorState(state.message);
         }
 
         List<WorkerJob> availableJobs = [];
@@ -519,7 +870,6 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
           loadingJobId = state.jobId;
         }
 
-        // Sort: urgent first, then by departure time
         availableJobs.sort((a, b) {
           if (a.isPriority && !b.isPriority) return -1;
           if (!a.isPriority && b.isPriority) return 1;
@@ -529,107 +879,113 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Jobs disponibles',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Jobs disponibles',
+                      style: AppTheme.headlineSmall.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
-                      if (availableJobs.any((j) => j.isPriority)) ...[
-                        const SizedBox(width: 8),
-                        AnimatedBuilder(
-                          animation: _pulseController,
-                          builder: (context, child) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(
-                                  0.7 + (_pulseController.value * 0.3),
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.bolt,
-                                    color: Colors.white,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${availableJobs.where((j) => j.isPriority).length} urgent',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                    ),
+                    if (availableJobs.any((j) => j.isPriority)) ...[
+                      const SizedBox(width: 10),
+                      AnimatedBuilder(
+                        animation: _pulseController,
+                        builder: (context, child) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppTheme.warning,
+                                  AppTheme.warning.withValues(
+                                    alpha: 0.7 + (_pulseController.value * 0.3),
                                   ),
                                 ],
                               ),
-                            );
-                          },
-                        ),
-                      ],
+                              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppTheme.warning.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.bolt,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${availableJobs.where((j) => j.isPriority).length} urgent',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ],
-                  ),
-                  if (availableJobs.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        '${availableJobs.length} job${availableJobs.length > 1 ? 's' : ''}',
-                        style: TextStyle(
-                          color: Colors.blue[700],
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
+                  ],
+                ),
+                if (availableJobs.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.info.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                    ),
+                    child: Text(
+                      '${availableJobs.length} job${availableJobs.length > 1 ? 's' : ''}',
+                      style: TextStyle(
+                        color: AppTheme.info,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
                       ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 14),
             if (availableJobs.isEmpty)
               _buildEmptyState()
             else
-              ...availableJobs.map((job) => SwipeableJobCard(
-                    job: job,
-                    showAcceptButton: true,
-                    enableSwipe: true,
-                    isLoading: loadingJobId == job.id,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.workerJobDetails,
-                        arguments: job,
-                      );
-                    },
-                    onAccept: () {
-                      context.read<WorkerJobsBloc>().add(AcceptJob(job.id));
-                    },
-                    onDecline: () {
-                      // Just dismiss for now, could add to "skipped" list
-                      HapticFeedback.lightImpact();
-                    },
+              ...availableJobs.map((job) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: SwipeableJobCard(
+                      job: job,
+                      showAcceptButton: true,
+                      enableSwipe: true,
+                      isLoading: loadingJobId == job.id,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.workerJobDetails,
+                          arguments: job,
+                        );
+                      },
+                      onAccept: () {
+                        context.read<WorkerJobsBloc>().add(AcceptJob(job.id));
+                      },
+                      onDecline: () {
+                        HapticFeedback.lightImpact();
+                      },
+                    ),
                   )),
           ],
         );
@@ -638,68 +994,206 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          children: [
-            // Animated waiting icon
-            TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
-              duration: const Duration(seconds: 2),
-              builder: (context, value, child) {
-                return Transform.rotate(
-                  angle: value * 0.1,
-                  child: Icon(
-                    Icons.hourglass_empty,
-                    size: 72,
-                    color: Colors.grey[400],
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        children: [
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(seconds: 2),
+            builder: (context, value, child) {
+              return Transform.rotate(
+                angle: value * 0.1,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.primary.withValues(alpha: 0.1),
+                        AppTheme.secondary.withValues(alpha: 0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
                   ),
-                );
-              },
-              onEnd: () {
-                if (mounted) setState(() {});
-              },
+                  child: const Icon(
+                    Icons.hourglass_empty_rounded,
+                    size: 40,
+                    color: AppTheme.primary,
+                  ),
+                ),
+              );
+            },
+            onEnd: () {
+              if (mounted) setState(() {});
+            },
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'En attente de jobs...',
+            style: AppTheme.headlineSmall.copyWith(
+              fontWeight: FontWeight.w700,
             ),
-            const SizedBox(height: 20),
-            Text(
-              'En attente de jobs...',
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Les nouveaux jobs apparaitront ici\nautomatiquement',
+            textAlign: TextAlign.center,
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textTertiary,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Les nouveaux jobs apparaîtront ici\nautomatiquement',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 14,
-              ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppTheme.info.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              border: Border.all(color: AppTheme.info.withValues(alpha: 0.2)),
             ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.refresh_rounded, color: AppTheme.info, size: 16),
+                const SizedBox(width: 8),
+                Text(
+                  'Actualisation auto. toutes les 15s',
+                  style: TextStyle(
+                    color: AppTheme.info,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.error.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: AppTheme.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+            ),
+            child: Icon(
+              Icons.error_outline_rounded,
+              size: 32,
+              color: AppTheme.error,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Oups!',
+            style: AppTheme.headlineSmall.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textTertiary,
+            ),
+          ),
+          const SizedBox(height: 20),
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              _loadDataWithDefaultLocation();
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blue[200]!),
+                gradient: const LinearGradient(
+                  colors: [AppTheme.primary, AppTheme.secondary],
+                ),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.refresh, color: Colors.blue[700], size: 18),
-                  const SizedBox(width: 8),
+                children: const [
+                  Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
+                  SizedBox(width: 8),
                   Text(
-                    'Actualisation auto. toutes les 15s',
+                    'Reessayer',
                     style: TextStyle(
-                      color: Colors.blue[700],
-                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatingButton() {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        Navigator.pushNamed(context, AppRoutes.workerEarnings);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppTheme.success,
+              AppTheme.success.withValues(alpha: 0.85),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.success.withValues(alpha: 0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 20),
+            SizedBox(width: 10),
+            Text(
+              'Mes revenus',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
               ),
             ),
           ],

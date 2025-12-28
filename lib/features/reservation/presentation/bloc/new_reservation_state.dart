@@ -210,6 +210,21 @@ class PriceBreakdown extends Equatable {
   final double snowSurcharge;
   final double optionsCost;
   final double urgencyFee;
+  final double subtotal;           // Sous-total avant taxes
+  final double serviceFee;         // Frais de service
+  final double insuranceFee;       // Frais d'assurance
+
+  // Taxes dynamiques selon la province
+  final double federalTax;         // TPS/GST/HST
+  final double federalTaxRate;
+  final String federalTaxName;     // "TPS", "GST", "HST"
+  final double provincialTax;      // TVQ/PST (0 si HST)
+  final double provincialTaxRate;
+  final String provincialTaxName;  // "TVQ", "PST", ""
+  final String provinceCode;       // "QC", "ON", etc.
+  final String provinceName;       // "Québec", "Ontario", etc.
+  final bool isHST;                // Si taxe harmonisée
+
   final double totalPrice;
 
   const PriceBreakdown({
@@ -219,8 +234,37 @@ class PriceBreakdown extends Equatable {
     required this.snowSurcharge,
     required this.optionsCost,
     required this.urgencyFee,
+    required this.subtotal,
+    required this.serviceFee,
+    required this.insuranceFee,
+    required this.federalTax,
+    required this.federalTaxRate,
+    required this.federalTaxName,
+    required this.provincialTax,
+    required this.provincialTaxRate,
+    required this.provincialTaxName,
+    required this.provinceCode,
+    required this.provinceName,
+    required this.isHST,
     required this.totalPrice,
   });
+
+  /// Libellé formaté pour la taxe fédérale
+  String get federalTaxLabel {
+    final rateStr = federalTaxRate == 0.13 || federalTaxRate == 0.15 || federalTaxRate == 0.05
+        ? (federalTaxRate * 100).toStringAsFixed(0)
+        : (federalTaxRate * 100).toStringAsFixed(2);
+    return '$federalTaxName ($rateStr%)';
+  }
+
+  /// Libellé formaté pour la taxe provinciale
+  String get provincialTaxLabel {
+    if (provincialTaxRate == 0 || isHST) return '';
+    final rateStr = provincialTaxRate == 0.09975
+        ? '9.975'
+        : (provincialTaxRate * 100).toStringAsFixed(0);
+    return '$provincialTaxName ($rateStr%)';
+  }
 
   @override
   List<Object?> get props => [
@@ -230,6 +274,18 @@ class PriceBreakdown extends Equatable {
     snowSurcharge,
     optionsCost,
     urgencyFee,
+    subtotal,
+    serviceFee,
+    insuranceFee,
+    federalTax,
+    federalTaxRate,
+    federalTaxName,
+    provincialTax,
+    provincialTaxRate,
+    provincialTaxName,
+    provinceCode,
+    provinceName,
+    isHST,
     totalPrice,
   ];
 }

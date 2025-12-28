@@ -553,9 +553,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             reservation_bloc.ReservationListState>(
           builder: (context, state) {
             final upcoming = state.reservations
-                .where((r) =>
-            r.status == ReservationStatus.pending ||
-                r.status == ReservationStatus.assigned)
+                .where((r) => r.isUpcoming)
                 .take(3)
                 .toList();
 
@@ -821,10 +819,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                 ),
               ),
               _buildNavItem(
-                Icons.credit_card_outlined,
-                'Paiements',
+                Icons.history_outlined,
+                'Activités',
                 false,
-                    () => Navigator.pushNamed(context, AppRoutes.payments),
+                    () => Navigator.pushNamed(context, AppRoutes.activities),
               ),
               _buildNavItem(
                 Icons.person_outline,
