@@ -16,6 +16,9 @@ import '../../features/vehicule/presentation/bloc/vehicule_bloc.dart';
 import '../../service/secure_storage_service.dart';
 import '../network/dio_client.dart';
 import '../services/location_service.dart';
+import '../services/push_notification_service.dart';
+import '../services/socket_service.dart';
+import '../services/analytics_service.dart';
 
 
 // Auth
@@ -99,6 +102,9 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<LocationService>(() => LocationService());
   sl.registerLazySingleton<DioClient>(() => DioClient(secureStorage: sl()));
   sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);
+  sl.registerLazySingleton<PushNotificationService>(() => PushNotificationService());
+  sl.registerLazySingleton<SocketService>(() => SocketService());
+  sl.registerLazySingleton<AnalyticsService>(() => AnalyticsService.instance);
 
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);

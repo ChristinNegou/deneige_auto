@@ -116,7 +116,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 decoration: BoxDecoration(
                   color: AppTheme.errorLight,
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  border: Border.all(color: AppTheme.error.withOpacity(0.3)),
+                  border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -932,7 +932,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               child: Container(
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppTheme.error.withOpacity(0.1),
+                  color: AppTheme.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   border: Border.all(color: AppTheme.error, width: 2),
                 ),
@@ -1046,7 +1046,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   decoration: BoxDecoration(
                     color: Colors.orange[50],
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                    border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: const [
@@ -1070,19 +1070,23 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                ...reasons.entries.map((entry) => RadioListTile<String>(
+                RadioGroup<String>(
+                  groupValue: selectedReasonCode,
+                  onChanged: (value) {
+                    setState(() => selectedReasonCode = value);
+                  },
+                  child: Column(
+                    children: reasons.entries.map((entry) => RadioListTile<String>(
                       title: Text(entry.value.label,
                           style: const TextStyle(fontSize: 14)),
                       subtitle: Text(entry.value.description,
                           style: const TextStyle(fontSize: 11)),
                       value: entry.key,
-                      groupValue: selectedReasonCode,
                       contentPadding: EdgeInsets.zero,
                       dense: true,
-                      onChanged: (value) {
-                        setState(() => selectedReasonCode = value);
-                      },
-                    )),
+                    )).toList(),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: descriptionController,

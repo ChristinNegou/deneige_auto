@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'api_keys.dart';
 
 class AppConfig {
   // Environment
@@ -25,12 +26,10 @@ class AppConfig {
   }
 
 
-  // OpenWeatherMap API
+  // OpenWeatherMap API - Use --dart-define=OPENWEATHER_API_KEY=xxx or api_keys.dart
   static String get openWeatherMapApiKey {
-    if (isProduction) {
-      return 'ab72e143d388c56b44d4571dd67697ba';
-    }
-    return 'ab72e143d388c56b44d4571dd67697ba'; // TODO: Remplacer par votre clé API
+    const envKey = String.fromEnvironment('OPENWEATHER_API_KEY', defaultValue: '');
+    return envKey.isNotEmpty ? envKey : ApiKeys.openWeatherMapApiKey;
   }
 
   // Debug
@@ -49,8 +48,8 @@ class AppConfig {
   static const double targetLongitude = -72.5476;
 
   /// Clé API OpenWeatherMap (GRATUIT - 1000 appels/jour)
-  /// Obtenez votre clé sur: https://openweathermap.org/api
-  static const String openWeatherApiKey = 'ab72e143d388c56b44d4571dd67697ba'; // ← METTEZ VOTRE CLÉ ICI
+  /// Configurez via: flutter run --dart-define=OPENWEATHER_API_KEY=votre_cle
+  static String get openWeatherApiKey => openWeatherMapApiKey;
 
   /// URL de base pour l'API OpenWeatherMap
   static const String openWeatherBaseUrl = 'https://api.openweathermap.org/data/2.5';
@@ -95,20 +94,27 @@ class AppConfig {
   static const int maxPhotoSizeMB = 5;
   static const int photosPerJob = 2; // avant/après
 
-  // Firebase
-  static const String firebaseApiKey = 'YOUR_FIREBASE_API_KEY';
-  static const String firebaseProjectId = 'deneige-auto';
+  // Firebase - Configurez via --dart-define
+  static String get firebaseApiKey {
+    return const String.fromEnvironment(
+      'FIREBASE_API_KEY',
+      defaultValue: '',
+    );
+  }
+  static const String firebaseProjectId = 'deneigeauto';
 
-  // Stripe
+  // Stripe - Configurez via --dart-define=STRIPE_PUBLISHABLE_KEY=xxx ou api_keys.dart
   static String get stripePublishableKey {
-    if (isProduction) {
-      return 'sk_test_51SPfZVKE0PkCEiT4YUctyxg2KKkLpcDBjAcsnHpl58H2tk0hji5xTsJU5kzqctl5MfCD7dDSPLN14Nvn8JXhs5wH00vVV8ajVM';
-    }
-    return 'pk_test_51SPfZVKE0PkCEiT4bfjgqbPnGY5yVhTyFvEj8vjV9FTeWerXmi4cyt2ARCu1yV2e2AxTYwUzCugCO0V6NNKGqIM300zV3czGnr';
+    const envKey = String.fromEnvironment('STRIPE_PUBLISHABLE_KEY', defaultValue: '');
+    if (envKey.isNotEmpty) return envKey;
+    return isProduction ? ApiKeys.stripePublishableKeyLive : ApiKeys.stripePublishableKeyTest;
   }
 
-  // Google Maps
-  static const String googleMapsApiKey = 'AIzaSyBYGaWXAeRC5ScUL8bM3emRobMMlVQ05VE';
+  // Google Maps - Configurez via --dart-define=GOOGLE_MAPS_API_KEY=xxx ou api_keys.dart
+  static String get googleMapsApiKey {
+    const envKey = String.fromEnvironment('GOOGLE_MAPS_API_KEY', defaultValue: '');
+    return envKey.isNotEmpty ? envKey : ApiKeys.googleMapsApiKey;
+  }
 
 
 

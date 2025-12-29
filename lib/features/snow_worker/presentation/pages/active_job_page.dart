@@ -138,7 +138,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 decoration: BoxDecoration(
                   color: AppTheme.errorLight,
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  border: Border.all(color: AppTheme.error.withOpacity(0.3)),
+                  border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { sendPushNotification } = require('../services/firebaseService');
 
 const notificationSchema = new mongoose.Schema({
     userId: {
@@ -74,7 +75,36 @@ notificationSchema.statics.createNotification = async function(data) {
     const notification = new this(data);
     await notification.save();
 
-    // TODO: Envoyer une push notification si l'utilisateur a activé les notifications
+    // Envoyer une push notification si l'utilisateur a un token FCM
+    try {
+        const User = mongoose.model('User');
+        const user = await User.findById(data.userId).select('fcmToken notificationSettings');
+
+        if (user && user.fcmToken && user.notificationSettings?.pushEnabled !== false) {
+            const pushData = {
+                notificationId: notification._id.toString(),
+                type: data.type,
+                ...(data.reservationId && { reservationId: data.reservationId.toString() }),
+                ...(data.workerId && { workerId: data.workerId.toString() }),
+            };
+
+            const result = await sendPushNotification(
+                user.fcmToken,
+                data.title,
+                data.message,
+                pushData
+            );
+
+            // Si le token est invalide, le supprimer
+            if (result && result.invalidToken) {
+                await User.findByIdAndUpdate(data.userId, { fcmToken: null });
+                console.log(`Removed invalid FCM token for user ${data.userId}`);
+            }
+        }
+    } catch (error) {
+        console.error('Error sending push notification:', error.message);
+        // Ne pas faire échouer la création de notification si la push échoue
+    }
 
     return notification;
 };

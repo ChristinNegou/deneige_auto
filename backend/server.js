@@ -1,8 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
 const connectDB = require('./config/database');
 const path = require('path');
+const { initializeFirebase } = require('./services/firebaseService');
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -10,8 +13,14 @@ dotenv.config();
 // Connecter à la base de données
 connectDB();
 
+// Initialiser Firebase pour les push notifications
+initializeFirebase();
+
 // Initialiser Express
 const app = express();
+
+// Créer le serveur HTTP pour Socket.IO
+const httpServer = http.createServer(app);
 
 // Middleware
 app.use(cors({
@@ -49,6 +58,7 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/workers', require('./routes/workers'));
 app.use('/api/phone', require('./routes/phoneVerification'));
 app.use('/api/stripe-connect', require('./routes/stripeConnect'));
+app.use('/api/admin', require('./routes/admin'));
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
@@ -95,10 +105,82 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Initialiser Socket.IO pour les mises à jour en temps réel
+const io = new Server(httpServer, {
+    cors: {
+        origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+        methods: ['GET', 'POST'],
+        credentials: true,
+    },
+});
+
+// Middleware d'authentification Socket.IO
+const jwt = require('jsonwebtoken');
+const User = require('./models/User');
+
+io.use(async (socket, next) => {
+    try {
+        const token = socket.handshake.auth.token;
+        if (!token) {
+            return next(new Error('Token manquant'));
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return next(new Error('Utilisateur non trouvé'));
+        }
+
+        socket.userId = user._id.toString();
+        socket.userRole = user.role;
+        next();
+    } catch (error) {
+        next(new Error('Authentification échouée'));
+    }
+});
+
+// Gestion des connexions Socket.IO
+io.on('connection', (socket) => {
+    console.log(`🔌 Socket connecté: ${socket.userId} (${socket.userRole})`);
+
+    // Rejoindre une room personnelle basée sur l'ID utilisateur
+    socket.join(`user:${socket.userId}`);
+
+    // Les workers rejoignent aussi une room workers pour les broadcasts
+    if (socket.userRole === 'snowWorker') {
+        socket.join('workers');
+    }
+
+    // Les admins rejoignent une room admins
+    if (socket.userRole === 'admin') {
+        socket.join('admins');
+    }
+
+    socket.on('disconnect', () => {
+        console.log(`🔌 Socket déconnecté: ${socket.userId}`);
+    });
+
+    // Événement pour mettre à jour la position du worker
+    socket.on('worker:updateLocation', async (data) => {
+        if (socket.userRole !== 'snowWorker') return;
+
+        try {
+            await User.findByIdAndUpdate(socket.userId, {
+                'workerProfile.currentLocation.coordinates': [data.longitude, data.latitude],
+            });
+        } catch (error) {
+            console.error('Erreur mise à jour position:', error);
+        }
+    });
+});
+
+// Exporter io pour l'utiliser dans d'autres modules
+app.set('io', io);
+
 // Démarrer le serveur
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0'; // Écouter sur toutes les interfaces réseau
-const server = app.listen(PORT, HOST, () => {
+const server = httpServer.listen(PORT, HOST, () => {
     console.log('\n' + '='.repeat(50));
     console.log('🚀 SERVEUR DÉMARRÉ AVEC SUCCÈS');
     console.log('='.repeat(50));

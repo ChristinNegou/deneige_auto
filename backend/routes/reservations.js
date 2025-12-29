@@ -493,37 +493,141 @@ router.patch('/:id/start', protect, async (req, res) => {
     }
 });
 
+// Configuration des commissions
+const PLATFORM_FEE_PERCENT = 0.25; // 25% pour la plateforme
+
 // @route   PATCH /api/reservations/:id/complete
-// @desc    Marquer le travail comme terminé
+// @desc    Marquer le travail comme terminé et payer le déneigeur
 // @access  Private (Worker)
 router.patch('/:id/complete', protect, async (req, res) => {
     try {
-        const reservation = await Reservation.findOneAndUpdate(
-            {
-                _id: req.params.id,
-                workerId: req.user.id,
-            },
-            {
-                status: 'completed',
-                completedAt: new Date(),
-            },
-            { new: true }
-        );
+        const reservation = await Reservation.findOne({
+            _id: req.params.id,
+            workerId: req.user.id,
+            status: 'inProgress',
+        });
 
         if (!reservation) {
             return res.status(404).json({
                 success: false,
-                message: 'Réservation non trouvée',
+                message: 'Réservation non trouvée ou pas en cours',
             });
         }
+
+        // Récupérer le worker pour son compte Stripe Connect
+        const worker = await User.findById(req.user.id);
+
+        // Calculer les montants
+        const totalAmount = reservation.totalPrice;
+        const tipAmount = reservation.tipAmount || 0;
+        const platformFee = totalAmount * PLATFORM_FEE_PERCENT;
+        const workerAmount = totalAmount - platformFee + tipAmount; // Worker reçoit 75% + pourboire
+
+        // Mettre à jour la réservation
+        reservation.status = 'completed';
+        reservation.completedAt = new Date();
+        reservation.payout = {
+            status: 'pending',
+            workerAmount: workerAmount,
+            platformFee: platformFee,
+            tipAmount: tipAmount,
+            processedAt: null,
+        };
+
+        // Transférer l'argent au déneigeur via Stripe Connect
+        let transferResult = null;
+        if (worker.workerProfile?.stripeConnectId && reservation.paymentStatus === 'paid') {
+            try {
+                const transfer = await stripe.transfers.create({
+                    amount: Math.round(workerAmount * 100), // En cents
+                    currency: 'cad',
+                    destination: worker.workerProfile.stripeConnectId,
+                    description: `Paiement job #${reservation._id}`,
+                    metadata: {
+                        reservationId: reservation._id.toString(),
+                        workerId: worker._id.toString(),
+                        originalAmount: totalAmount,
+                        platformFee: platformFee,
+                        tipAmount: tipAmount,
+                    },
+                });
+
+                reservation.payout.status = 'completed';
+                reservation.payout.stripeTransferId = transfer.id;
+                reservation.payout.processedAt = new Date();
+
+                transferResult = {
+                    success: true,
+                    transferId: transfer.id,
+                    amount: workerAmount,
+                };
+
+                console.log(`✅ Transfert Stripe créé: ${transfer.id} - ${workerAmount}$`);
+
+                // Mettre à jour les stats du worker
+                worker.workerProfile.totalJobsCompleted = (worker.workerProfile.totalJobsCompleted || 0) + 1;
+                worker.workerProfile.totalEarnings = (worker.workerProfile.totalEarnings || 0) + workerAmount;
+                worker.workerProfile.totalTipsReceived = (worker.workerProfile.totalTipsReceived || 0) + tipAmount;
+                await worker.save();
+
+            } catch (stripeError) {
+                console.error('❌ Erreur transfert Stripe:', stripeError.message);
+                reservation.payout.status = 'failed';
+                reservation.payout.error = stripeError.message;
+
+                transferResult = {
+                    success: false,
+                    error: stripeError.message,
+                };
+            }
+        } else if (!worker.workerProfile?.stripeConnectId) {
+            reservation.payout.status = 'pending_account';
+            reservation.payout.note = 'En attente de configuration du compte de paiement';
+
+            transferResult = {
+                success: false,
+                error: 'Compte Stripe Connect non configuré',
+                needsSetup: true,
+            };
+        } else {
+            reservation.payout.status = 'pending_payment';
+            reservation.payout.note = 'En attente du paiement client';
+        }
+
+        await reservation.save();
 
         // Envoyer notification au client
         await Notification.notifyWorkCompleted(reservation, req.user);
 
+        // Notifier le worker de son paiement
+        await Notification.create({
+            userId: worker._id,
+            type: 'paymentSuccess',
+            title: 'Paiement reçu',
+            message: transferResult?.success
+                ? `Vous avez reçu ${workerAmount.toFixed(2)}$ pour le job terminé${tipAmount > 0 ? ` (incluant ${tipAmount.toFixed(2)}$ de pourboire)` : ''}.`
+                : `Job terminé! ${!worker.workerProfile?.stripeConnectId ? 'Configurez votre compte de paiement pour recevoir vos gains.' : 'Paiement en attente.'}`,
+            priority: 'high',
+            reservationId: reservation._id,
+            metadata: {
+                workerAmount,
+                platformFee,
+                tipAmount,
+                transferStatus: reservation.payout.status,
+            },
+        });
+
         res.status(200).json({
             success: true,
             reservation,
-            message: 'Travail terminé',
+            message: 'Travail terminé avec succès',
+            payout: {
+                workerAmount,
+                platformFee,
+                tipAmount,
+                status: reservation.payout.status,
+                transfer: transferResult,
+            },
         });
     } catch (error) {
         console.error('Erreur:', error);

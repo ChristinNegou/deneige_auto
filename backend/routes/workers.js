@@ -719,7 +719,7 @@ router.post('/jobs/:id/accept', protect, authorize('snowWorker'), async (req, re
         await reservation.populate('vehicle', 'make model color licensePlate');
 
         // Send notification to client
-        await Notification.create({
+        await Notification.createNotification({
             userId: reservation.userId._id,
             type: 'reservationAssigned',
             title: 'Déneigeur assigné',
@@ -789,7 +789,7 @@ router.patch('/jobs/:id/en-route', protect, authorize('snowWorker'), async (req,
 
         // Send notification to client
         const worker = await User.findById(req.user.id);
-        await Notification.create({
+        await Notification.createNotification({
             userId: reservation.userId._id,
             type: 'workerEnRoute',
             title: 'Déneigeur en route',
@@ -847,7 +847,7 @@ router.patch('/jobs/:id/start', protect, authorize('snowWorker'), async (req, re
 
         // Send notification to client
         const worker = await User.findById(req.user.id);
-        await Notification.create({
+        await Notification.createNotification({
             userId: reservation.userId._id,
             type: 'workStarted',
             title: 'Déneigement en cours',
@@ -923,7 +923,7 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
 
         // Send notification to client
         const worker = await User.findById(req.user.id);
-        await Notification.create({
+        await Notification.createNotification({
             userId: reservation.userId._id,
             type: 'workCompleted',
             title: 'Déneigement terminé',
