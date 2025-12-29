@@ -12,7 +12,25 @@ const {
     getWorkerNotifications,
     createWorkerNotification,
     broadcastZoneNotification,
+    registerFcmToken,
+    unregisterFcmToken,
+    updateNotificationSettings,
 } = require('../controllers/notificationController');
+
+// @route   POST /api/notifications/register-token
+// @desc    Register FCM token for push notifications
+// @access  Private
+router.post('/register-token', protect, registerFcmToken);
+
+// @route   DELETE /api/notifications/unregister-token
+// @desc    Unregister FCM token (logout)
+// @access  Private
+router.delete('/unregister-token', protect, unregisterFcmToken);
+
+// @route   PATCH /api/notifications/settings
+// @desc    Update notification settings
+// @access  Private
+router.patch('/settings', protect, updateNotificationSettings);
 
 // @route   GET /api/notifications
 // @desc    Get all notifications for current user

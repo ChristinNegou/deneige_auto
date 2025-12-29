@@ -1,4 +1,93 @@
 const Notification = require('../models/Notification');
+const User = require('../models/User');
+
+// @desc    Register FCM token for push notifications
+// @route   POST /api/notifications/register-token
+// @access  Private
+exports.registerFcmToken = async (req, res) => {
+    try {
+        const { fcmToken } = req.body;
+
+        if (!fcmToken) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le token FCM est requis',
+            });
+        }
+
+        // Mettre à jour le token FCM de l'utilisateur
+        await User.findByIdAndUpdate(req.user.id, { fcmToken });
+
+        res.json({
+            success: true,
+            message: 'Token FCM enregistré avec succès',
+        });
+    } catch (error) {
+        console.error('Error registering FCM token:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+// @desc    Unregister FCM token (logout)
+// @route   DELETE /api/notifications/unregister-token
+// @access  Private
+exports.unregisterFcmToken = async (req, res) => {
+    try {
+        await User.findByIdAndUpdate(req.user.id, { fcmToken: null });
+
+        res.json({
+            success: true,
+            message: 'Token FCM supprimé avec succès',
+        });
+    } catch (error) {
+        console.error('Error unregistering FCM token:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+// @desc    Update notification settings
+// @route   PATCH /api/notifications/settings
+// @access  Private
+exports.updateNotificationSettings = async (req, res) => {
+    try {
+        const { pushEnabled, emailEnabled, smsEnabled } = req.body;
+
+        const updateData = {};
+        if (typeof pushEnabled === 'boolean') {
+            updateData['notificationSettings.pushEnabled'] = pushEnabled;
+        }
+        if (typeof emailEnabled === 'boolean') {
+            updateData['notificationSettings.emailEnabled'] = emailEnabled;
+        }
+        if (typeof smsEnabled === 'boolean') {
+            updateData['notificationSettings.smsEnabled'] = smsEnabled;
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            updateData,
+            { new: true }
+        ).select('notificationSettings');
+
+        res.json({
+            success: true,
+            message: 'Paramètres de notification mis à jour',
+            settings: user.notificationSettings,
+        });
+    } catch (error) {
+        console.error('Error updating notification settings:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
 
 // @desc    Get all notifications for current user
 // @route   GET /api/notifications

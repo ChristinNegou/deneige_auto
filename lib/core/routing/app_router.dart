@@ -43,6 +43,7 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/domain/entities/user.dart';
 import 'role_based_home_wrapper.dart';
 import '../../features/reservation/presentation/screens/new_reservation_screen.dart';
+import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 
 
 /// Classe qui gère la génération et la navigation des routes
@@ -312,6 +313,13 @@ class AppRouter {
       case AppRoutes.workerPaymentSetup:
         return MaterialPageRoute(
           builder: (_) => const WorkerPaymentSetupPage(),
+          settings: settings,
+        );
+
+      // Routes admin
+      case AppRoutes.adminDashboard:
+        return MaterialPageRoute(
+          builder: (_) => const AdminDashboardPage(),
           settings: settings,
         );
 

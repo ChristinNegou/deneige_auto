@@ -4,6 +4,7 @@ import 'core/routing/app_router.dart';
 import 'core/constants/app_routes.dart';
 import 'core/di/injection_container.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/analytics_service.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/auth/presentation/bloc/auth_state.dart';
@@ -43,6 +44,12 @@ class DeneigeAutoApp extends StatelessWidget {
 
 
         debugShowCheckedModeBanner: false,
+
+        // Analytics observer pour tracker les navigations automatiquement
+        navigatorObservers: [
+          AnalyticsService.instance.observer,
+        ],
+
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,

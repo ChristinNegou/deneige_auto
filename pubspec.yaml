@@ -32,6 +32,7 @@ dependencies:
   dio: ^5.3.3
   retrofit: ^4.0.3
   json_annotation: ^4.8.1
+  socket_io_client: ^3.0.2
 
   # Local Storage
   shared_preferences: ^2.2.2
@@ -60,9 +61,11 @@ dependencies:
   # Dates & Time
   intl: ^0.20.0
 
-  # Push Notifications (temporairement désactivé - Firebase non configuré)
-  # firebase_core: ^4.2.1
-  # firebase_messaging: ^16.0.4
+  # Firebase
+  firebase_core: ^3.8.1
+  firebase_messaging: ^15.1.6
+  firebase_crashlytics: ^4.2.1
+  firebase_analytics: ^11.4.1
   flutter_local_notifications: ^19.5.0
 
   # Payments

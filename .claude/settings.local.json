@@ -15,7 +15,8 @@
       "Bash(node -e:*)",
       "Bash(flutter run:*)",
       "Bash(node:*)",
-      "Bash(flutter pub get:*)"
+      "Bash(flutter pub get:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

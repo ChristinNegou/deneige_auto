@@ -66,4 +66,10 @@ class AppRoutes {
   //Routes pour le dashboard client
   static const String clientHome = '/client-home';
 
+  // Routes admin
+  static const String adminDashboard = '/admin/dashboard';
+  static const String adminUsers = '/admin/users';
+  static const String adminReservations = '/admin/reservations';
+  static const String adminWorkers = '/admin/workers';
+  static const String adminReports = '/admin/reports';
 }

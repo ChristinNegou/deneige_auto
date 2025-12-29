@@ -184,7 +184,7 @@ const reservationSchema = new mongoose.Schema({
     payout: {
         status: {
             type: String,
-            enum: ['pending', 'processing', 'paid', 'failed'],
+            enum: ['pending', 'pending_account', 'pending_payment', 'processing', 'completed', 'paid', 'failed'],
             default: 'pending',
         },
         workerAmount: {
@@ -192,6 +192,10 @@ const reservationSchema = new mongoose.Schema({
             default: 0,
         },
         platformFee: {
+            type: Number,
+            default: 0,
+        },
+        tipAmount: {
             type: Number,
             default: 0,
         },
@@ -203,14 +207,29 @@ const reservationSchema = new mongoose.Schema({
             type: String,
             default: null,
         },
+        processedAt: {
+            type: Date,
+            default: null,
+        },
         paidAt: {
             type: Date,
             default: null,
         },
-        errorMessage: {
+        note: {
             type: String,
             default: null,
         },
+        error: {
+            type: String,
+            default: null,
+        },
+    },
+
+    // Tip amount (pourboire - montant simple pour faciliter les calculs)
+    tipAmount: {
+        type: Number,
+        default: 0,
+        min: 0,
     },
 
     // Geolocation for proximity-based job discovery

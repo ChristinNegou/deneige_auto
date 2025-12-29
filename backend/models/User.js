@@ -53,6 +53,26 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    // Firebase Cloud Messaging token for push notifications
+    fcmToken: {
+        type: String,
+        default: null,
+    },
+    // Notification preferences
+    notificationSettings: {
+        pushEnabled: {
+            type: Boolean,
+            default: true,
+        },
+        emailEnabled: {
+            type: Boolean,
+            default: true,
+        },
+        smsEnabled: {
+            type: Boolean,
+            default: false,
+        },
+    },
 
     // Worker-specific profile (only used when role === 'snowWorker')
     workerProfile: {

@@ -1,4 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../../core/services/push_notification_service.dart';
+import '../../../../core/services/analytics_service.dart';
+import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/forgot_password_usecase.dart';
 import '../../domain/usecases/get_current_user_usecase.dart';
@@ -74,7 +79,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
           (failure) => emit(AuthError(message: failure.message)),
-          (user) => emit(AuthAuthenticated(user: user)),
+          (user) {
+            // Enregistrer le token FCM et configurer les notifications
+            _setupNotificationsForUser(user);
+            emit(AuthAuthenticated(user: user));
+          },
     );
   }
 
@@ -95,7 +104,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
           (failure) => emit(AuthError(message: failure.message)),
-          (user) => emit(AuthAuthenticated(user: user)),
+          (user) {
+            // Enregistrer le token FCM et configurer les notifications
+            _setupNotificationsForUser(user);
+            emit(AuthAuthenticated(user: user));
+          },
     );
   }
 
@@ -104,6 +117,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       Emitter<AuthState> emit,
       ) async {
     emit(AuthLoading());
+
+    // Désinscrire le token FCM et se désabonner des topics
+    await _cleanupNotifications();
 
     final result = await logout();
 
@@ -137,7 +153,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
           (failure) => emit(AuthUnauthenticated()),
-          (user) => emit(AuthAuthenticated(user: user)),
+          (user) {
+            // Configurer les notifications pour l'utilisateur déjà connecté
+            _setupNotificationsForUser(user);
+            emit(AuthAuthenticated(user: user));
+          },
     );
   }
 
@@ -215,5 +235,86 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (failure) => emit(AuthError(message: failure.message)),
           (data) => emit(PhoneCodeResent(devCode: data['devCode'])),
     );
+  }
+
+  // ============ NOTIFICATION HELPERS ============
+
+  /// Configure les notifications push pour l'utilisateur connecté
+  Future<void> _setupNotificationsForUser(User user) async {
+    try {
+      final pushService = sl<PushNotificationService>();
+
+      // Enregistrer le token FCM sur le serveur
+      await pushService.registerTokenOnServer();
+      debugPrint('FCM token registered for user ${user.id}');
+
+      // S'abonner aux topics selon le rôle
+      await _subscribeToTopicsForRole(user.role, pushService);
+
+      // Configurer Analytics avec l'utilisateur
+      final analytics = sl<AnalyticsService>();
+      await analytics.setUserId(user.id);
+      await analytics.setUserRole(user.role.name);
+      await analytics.logLogin();
+
+      debugPrint('Notifications configured for ${user.role.name}');
+    } catch (e) {
+      debugPrint('Error setting up notifications: $e');
+    }
+  }
+
+  /// S'abonne aux topics FCM selon le rôle de l'utilisateur
+  Future<void> _subscribeToTopicsForRole(UserRole role, PushNotificationService pushService) async {
+    // Topic général pour tous les utilisateurs
+    await pushService.subscribeToTopic('all_users');
+
+    switch (role) {
+      case UserRole.client:
+        await pushService.subscribeToTopic('clients');
+        // Se désabonner des topics des autres rôles
+        await pushService.unsubscribeFromTopic('workers');
+        await pushService.unsubscribeFromTopic('admins');
+        break;
+
+      case UserRole.snowWorker:
+        await pushService.subscribeToTopic('workers');
+        // Se désabonner des topics des autres rôles
+        await pushService.unsubscribeFromTopic('clients');
+        await pushService.unsubscribeFromTopic('admins');
+        break;
+
+      case UserRole.admin:
+        await pushService.subscribeToTopic('admins');
+        // Les admins peuvent aussi recevoir les notifs workers/clients
+        await pushService.subscribeToTopic('workers');
+        await pushService.subscribeToTopic('clients');
+        break;
+    }
+
+    debugPrint('Subscribed to topics for role: ${role.name}');
+  }
+
+  /// Nettoie les notifications lors de la déconnexion
+  Future<void> _cleanupNotifications() async {
+    try {
+      final pushService = sl<PushNotificationService>();
+
+      // Désinscrire le token du serveur
+      await pushService.unregisterTokenFromServer();
+
+      // Se désabonner de tous les topics
+      await pushService.unsubscribeFromTopic('all_users');
+      await pushService.unsubscribeFromTopic('clients');
+      await pushService.unsubscribeFromTopic('workers');
+      await pushService.unsubscribeFromTopic('admins');
+
+      // Logger la déconnexion
+      final analytics = sl<AnalyticsService>();
+      await analytics.logLogout();
+
+      debugPrint('Notifications cleaned up');
+    } catch (e) {
+      debugPrint('Error cleaning up notifications: $e');
+    }
   }
 }

@@ -8,7 +8,7 @@ import '../../features/snow_worker/screens/snow_worker_homescreen.dart';
 import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../../features/snow_worker/presentation/bloc/worker_stats_bloc.dart';
 import '../../features/snow_worker/presentation/bloc/worker_availability_bloc.dart';
-import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
+import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/notifications/presentation/bloc/notification_bloc.dart';
 import '../../features/reservation/presentation/bloc/reservation_list_bloc.dart';
@@ -51,7 +51,7 @@ class RoleBasedHomeWrapper extends StatelessWidget {
             case UserRole.admin:
               return BlocProvider(
                 create: (context) => sl<HomeBloc>(),
-                child: const AdminDashboardScreen(),
+                child: const AdminDashboardPage(),
               );
 
             default:
