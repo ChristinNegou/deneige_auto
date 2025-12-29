@@ -4,7 +4,6 @@
 
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const PhoneVerification = require('../models/PhoneVerification');
 const User = require('../models/User');
@@ -77,14 +76,12 @@ router.post('/send-code', async (req, res) => {
         const code = generateVerificationCode();
 
         // Préparer les données d'inscription en attente
+        // Note: Ne pas hasher le mot de passe ici, le hook pre('save') du modèle User le fera
         let pendingRegistration = null;
         if (email && password && firstName && lastName) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt);
-
             pendingRegistration = {
                 email: email.toLowerCase(),
-                password: hashedPassword,
+                password: password, // Mot de passe en clair, sera haché par User.create()
                 firstName,
                 lastName,
                 role: role || 'client'
