@@ -11,6 +11,15 @@ import '../../domain/repositories/worker_repository.dart';
 import '../datasources/worker_remote_datasource.dart';
 import '../models/worker_profile_model.dart';
 
+export '../datasources/worker_remote_datasource.dart'
+    show
+        WorkerCancellationResult,
+        WorkerCancellationConsequence,
+        WorkerCancellationStats,
+        WorkerCancellationReasons,
+        WorkerCancellationReason,
+        WorkerCancellationPolicyInfo;
+
 class WorkerRepositoryImpl implements WorkerRepository {
   final WorkerRemoteDataSource remoteDataSource;
 
@@ -266,6 +275,40 @@ class WorkerRepositoryImpl implements WorkerRepository {
         photoUrl: photoUrl,
       );
       return const Right(null);
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, WorkerCancellationResult>> cancelJob({
+    required String jobId,
+    required String reasonCode,
+    String? reason,
+    String? description,
+  }) async {
+    try {
+      final result = await remoteDataSource.cancelJob(
+        jobId: jobId,
+        reasonCode: reasonCode,
+        reason: reason,
+        description: description,
+      );
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, WorkerCancellationReasons>> getCancellationReasons() async {
+    try {
+      final reasons = await remoteDataSource.getCancellationReasons();
+      return Right(reasons);
     } on DioException catch (e) {
       return Left(_handleDioError(e));
     } catch (e) {

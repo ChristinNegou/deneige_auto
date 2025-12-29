@@ -79,8 +79,11 @@ class Reservation extends Equatable {
   }
 
   bool get canBeCancelled {
+    // Le client peut annuler à tout moment (avec frais selon le statut)
     return status == ReservationStatus.pending ||
-        status == ReservationStatus.assigned;
+        status == ReservationStatus.assigned ||
+        status == ReservationStatus.enRoute ||
+        status == ReservationStatus.inProgress;
   }
 
   bool get canBeEdited {

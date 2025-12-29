@@ -298,7 +298,7 @@ router.get('/my-jobs', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const reservations = await Reservation.find({
             workerId: req.user.id,
-            status: { $in: ['assigned', 'inProgress'] },
+            status: { $in: ['assigned', 'enRoute', 'inProgress'] },
         })
             .populate('userId', 'firstName lastName phoneNumber')
             .populate('vehicle', 'make model color licensePlate')

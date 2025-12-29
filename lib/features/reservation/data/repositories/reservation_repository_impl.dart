@@ -9,6 +9,9 @@ import '../../domain/repositories/reservation_repository.dart';
 import '../datasources/reservation_remote_datasource.dart';
 import '../models/reservation_model.dart';
 
+export '../datasources/reservation_remote_datasource.dart'
+    show CancellationResult, CancellationPolicy, CancellationPolicyItem;
+
 class ReservationRepositoryImpl implements ReservationRepository {
   final ReservationRemoteDataSource remoteDataSource;
 
@@ -152,10 +155,30 @@ class ReservationRepositoryImpl implements ReservationRepository {
 
 
   @override
-  Future<Either<Failure, void>> cancelReservation(String reservationId) async {
+  Future<Either<Failure, CancellationResult>> cancelReservation(
+    String reservationId, {
+    String? reason,
+  }) async {
     try {
-      await remoteDataSource.cancelReservation(reservationId);
-      return const Right(null);
+      final result = await remoteDataSource.cancelReservation(
+        reservationId,
+        reason: reason,
+      );
+      return Right(result);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CancellationPolicy>> getCancellationPolicy() async {
+    try {
+      final policy = await remoteDataSource.getCancellationPolicy();
+      return Right(policy);
     } on NetworkException catch (e) {
       return Left(NetworkFailure(message: e.message));
     } on ServerException catch (e) {

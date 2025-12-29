@@ -69,6 +69,169 @@ abstract class WorkerRemoteDataSource {
     required String type,
     required File photoFile,
   });
+
+  /// Annuler un job avec une raison valable
+  Future<WorkerCancellationResult> cancelJob({
+    required String jobId,
+    required String reasonCode,
+    String? reason,
+    String? description,
+  });
+
+  /// Obtenir les raisons valables d'annulation
+  Future<WorkerCancellationReasons> getCancellationReasons();
+}
+
+/// Résultat d'annulation pour le déneigeur
+class WorkerCancellationResult {
+  final bool success;
+  final String message;
+  final String jobId;
+  final WorkerCancellationConsequence? consequence;
+  final WorkerCancellationStats stats;
+
+  WorkerCancellationResult({
+    required this.success,
+    required this.message,
+    required this.jobId,
+    this.consequence,
+    required this.stats,
+  });
+
+  factory WorkerCancellationResult.fromJson(Map<String, dynamic> json) {
+    final reservation = json['reservation'] as Map<String, dynamic>? ?? {};
+    final consequenceData = json['consequence'] as Map<String, dynamic>?;
+    final statsData = json['stats'] as Map<String, dynamic>? ?? {};
+
+    return WorkerCancellationResult(
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String? ?? '',
+      jobId: reservation['id'] as String? ?? '',
+      consequence: consequenceData != null
+          ? WorkerCancellationConsequence.fromJson(consequenceData)
+          : null,
+      stats: WorkerCancellationStats.fromJson(statsData),
+    );
+  }
+}
+
+class WorkerCancellationConsequence {
+  final String type; // 'warning' ou 'suspension'
+  final String message;
+  final DateTime? suspendedUntil;
+  final int? warningCount;
+
+  WorkerCancellationConsequence({
+    required this.type,
+    required this.message,
+    this.suspendedUntil,
+    this.warningCount,
+  });
+
+  factory WorkerCancellationConsequence.fromJson(Map<String, dynamic> json) {
+    return WorkerCancellationConsequence(
+      type: json['type'] as String? ?? '',
+      message: json['message'] as String? ?? '',
+      suspendedUntil: json['suspendedUntil'] != null
+          ? DateTime.parse(json['suspendedUntil'] as String)
+          : null,
+      warningCount: json['warningCount'] as int?,
+    );
+  }
+}
+
+class WorkerCancellationStats {
+  final int totalCancellations;
+  final int warningCount;
+  final bool isSuspended;
+
+  WorkerCancellationStats({
+    required this.totalCancellations,
+    required this.warningCount,
+    required this.isSuspended,
+  });
+
+  factory WorkerCancellationStats.fromJson(Map<String, dynamic> json) {
+    return WorkerCancellationStats(
+      totalCancellations: json['totalCancellations'] as int? ?? 0,
+      warningCount: json['warningCount'] as int? ?? 0,
+      isSuspended: json['isSuspended'] as bool? ?? false,
+    );
+  }
+}
+
+/// Raisons valables d'annulation pour le déneigeur
+class WorkerCancellationReasons {
+  final Map<String, WorkerCancellationReason> reasons;
+  final WorkerCancellationPolicyInfo policy;
+
+  WorkerCancellationReasons({
+    required this.reasons,
+    required this.policy,
+  });
+
+  factory WorkerCancellationReasons.fromJson(Map<String, dynamic> json) {
+    final reasonsData = json['reasons'] as Map<String, dynamic>? ?? {};
+    final policyData = json['policy'] as Map<String, dynamic>? ?? {};
+
+    final reasons = <String, WorkerCancellationReason>{};
+    reasonsData.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        reasons[key] = WorkerCancellationReason.fromJson(value);
+      }
+    });
+
+    return WorkerCancellationReasons(
+      reasons: reasons,
+      policy: WorkerCancellationPolicyInfo.fromJson(policyData),
+    );
+  }
+}
+
+class WorkerCancellationReason {
+  final String code;
+  final String label;
+  final String description;
+  final bool requiresDescription;
+
+  WorkerCancellationReason({
+    required this.code,
+    required this.label,
+    required this.description,
+    this.requiresDescription = false,
+  });
+
+  factory WorkerCancellationReason.fromJson(Map<String, dynamic> json) {
+    return WorkerCancellationReason(
+      code: json['code'] as String? ?? '',
+      label: json['label'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      requiresDescription: json['requiresDescription'] as bool? ?? false,
+    );
+  }
+}
+
+class WorkerCancellationPolicyInfo {
+  final int warningThreshold;
+  final int suspensionThreshold;
+  final int suspensionDays;
+  final String note;
+
+  WorkerCancellationPolicyInfo({
+    required this.warningThreshold,
+    required this.suspensionThreshold,
+    required this.suspensionDays,
+    required this.note,
+  });
+
+  factory WorkerCancellationPolicyInfo.fromJson(Map<String, dynamic> json) {
+    return WorkerCancellationPolicyInfo(
+      warningThreshold: json['warningThreshold'] as int? ?? 2,
+      suspensionThreshold: json['suspensionThreshold'] as int? ?? 5,
+      suspensionDays: json['suspensionDays'] as int? ?? 7,
+      note: json['note'] as String? ?? '',
+    );
+  }
 }
 
 class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
@@ -302,5 +465,33 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     );
 
     return response.data['data']['url'] as String;
+  }
+
+  @override
+  Future<WorkerCancellationResult> cancelJob({
+    required String jobId,
+    required String reasonCode,
+    String? reason,
+    String? description,
+  }) async {
+    final response = await dio.patch(
+      '/reservations/$jobId/cancel-by-worker',
+      data: {
+        'reasonCode': reasonCode,
+        if (reason != null) 'reason': reason,
+        if (description != null) 'description': description,
+      },
+    );
+
+    return WorkerCancellationResult.fromJson(
+        response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<WorkerCancellationReasons> getCancellationReasons() async {
+    final response = await dio.get('/reservations/worker/cancellation-reasons');
+
+    return WorkerCancellationReasons.fromJson(
+        response.data as Map<String, dynamic>);
   }
 }

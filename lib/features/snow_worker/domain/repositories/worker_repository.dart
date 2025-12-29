@@ -6,6 +6,8 @@ import '../../../../core/errors/failures.dart';
 import '../entities/worker_job.dart';
 import '../entities/worker_profile.dart';
 import '../entities/worker_stats.dart';
+import '../../data/datasources/worker_remote_datasource.dart'
+    show WorkerCancellationResult, WorkerCancellationReasons;
 
 abstract class WorkerRepository {
   /// Get available jobs near worker's location
@@ -87,4 +89,15 @@ abstract class WorkerRepository {
     required String type,
     required String photoUrl,
   });
+
+  /// Cancel a job with a valid reason
+  Future<Either<Failure, WorkerCancellationResult>> cancelJob({
+    required String jobId,
+    required String reasonCode,
+    String? reason,
+    String? description,
+  });
+
+  /// Get valid cancellation reasons for workers
+  Future<Either<Failure, WorkerCancellationReasons>> getCancellationReasons();
 }

@@ -81,7 +81,7 @@ const reservationSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ['pending', 'paid', 'failed', 'refunded'],
+        enum: ['pending', 'paid', 'failed', 'refunded', 'partially_refunded'],
         default: 'pending',
     },
     paymentIntentId: {
@@ -98,6 +98,39 @@ const reservationSchema = new mongoose.Schema({
     },
     cancelReason: {
         type: String,
+        default: null,
+    },
+    cancelledBy: {
+        type: String,
+        enum: ['client', 'worker', 'system', null],
+        default: null,
+    },
+    // Frais d'annulation facturés au client
+    cancellationFee: {
+        amount: {
+            type: Number,
+            default: 0,
+        },
+        percentage: {
+            type: Number,
+            default: 0,
+        },
+        charged: {
+            type: Boolean,
+            default: false,
+        },
+        chargedAt: {
+            type: Date,
+            default: null,
+        },
+    },
+    // Montant remboursé au client
+    refundAmount: {
+        type: Number,
+        default: 0,
+    },
+    refundedAt: {
+        type: Date,
         default: null,
     },
     notes: {

@@ -6,6 +6,8 @@ import '../../domain/usecases/get_available_jobs_usecase.dart';
 import '../../domain/usecases/get_my_jobs_usecase.dart';
 import '../../domain/usecases/get_job_history_usecase.dart';
 import '../../domain/usecases/job_actions_usecase.dart';
+import '../../data/datasources/worker_remote_datasource.dart'
+    show WorkerCancellationResult, WorkerCancellationConsequence;
 
 // Events
 abstract class WorkerJobsEvent extends Equatable {
@@ -113,6 +115,23 @@ class LoadJobHistory extends WorkerJobsEvent {
 
 class LoadMoreHistory extends WorkerJobsEvent {
   const LoadMoreHistory();
+}
+
+class CancelJob extends WorkerJobsEvent {
+  final String jobId;
+  final String reasonCode;
+  final String? reason;
+  final String? description;
+
+  const CancelJob({
+    required this.jobId,
+    required this.reasonCode,
+    this.reason,
+    this.description,
+  });
+
+  @override
+  List<Object?> get props => [jobId, reasonCode, reason, description];
 }
 
 // States
@@ -235,6 +254,19 @@ class WorkerJobsError extends WorkerJobsState {
   List<Object?> get props => [message, previousState];
 }
 
+class JobCancellationSuccess extends WorkerJobsState {
+  final WorkerCancellationResult result;
+  final WorkerJobsLoaded? previousState;
+
+  const JobCancellationSuccess({
+    required this.result,
+    this.previousState,
+  });
+
+  @override
+  List<Object?> get props => [result, previousState];
+}
+
 // BLoC
 class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
   final GetAvailableJobsUseCase getAvailableJobsUseCase;
@@ -244,6 +276,7 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
   final MarkEnRouteUseCase markEnRouteUseCase;
   final StartJobUseCase startJobUseCase;
   final CompleteJobUseCase completeJobUseCase;
+  final CancelJobUseCase? cancelJobUseCase;
 
   double? _lastLatitude;
   double? _lastLongitude;
@@ -258,6 +291,7 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     required this.markEnRouteUseCase,
     required this.startJobUseCase,
     required this.completeJobUseCase,
+    this.cancelJobUseCase,
   }) : super(const WorkerJobsInitial()) {
     on<LoadAvailableJobs>(_onLoadAvailableJobs);
     on<LoadMyJobs>(_onLoadMyJobs);
@@ -269,6 +303,7 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     on<SelectActiveJob>(_onSelectActiveJob);
     on<LoadJobHistory>(_onLoadJobHistory);
     on<LoadMoreHistory>(_onLoadMoreHistory);
+    on<CancelJob>(_onCancelJob);
   }
 
   Future<void> _onLoadAvailableJobs(
@@ -633,6 +668,61 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
         currentPage: _historyPage,
         hasMore: newJobs.length >= _historyLimit,
       )),
+    );
+  }
+
+  Future<void> _onCancelJob(
+    CancelJob event,
+    Emitter<WorkerJobsState> emit,
+  ) async {
+    if (cancelJobUseCase == null) {
+      emit(const WorkerJobsError('Annulation non disponible'));
+      return;
+    }
+
+    final currentState = state;
+    final previousLoaded = currentState is WorkerJobsLoaded ? currentState : null;
+
+    emit(JobActionLoading(
+      jobId: event.jobId,
+      action: 'cancel',
+      previousState: previousLoaded ?? const WorkerJobsLoaded(availableJobs: [], myJobs: []),
+    ));
+
+    final result = await cancelJobUseCase!(
+      jobId: event.jobId,
+      reasonCode: event.reasonCode,
+      reason: event.reason,
+      description: event.description,
+    );
+
+    result.fold(
+      (failure) => emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
+      (cancellationResult) {
+        // Supprimer le job de la liste
+        WorkerJobsLoaded? updatedState;
+        if (previousLoaded != null) {
+          final updatedMyJobs = previousLoaded.myJobs
+              .where((j) => j.id != event.jobId)
+              .toList();
+          updatedState = previousLoaded.copyWith(
+            myJobs: updatedMyJobs,
+            activeJob: previousLoaded.activeJob?.id == event.jobId ? null : previousLoaded.activeJob,
+          );
+        }
+
+        emit(JobCancellationSuccess(
+          result: cancellationResult,
+          previousState: updatedState,
+        ));
+
+        // Retourner à l'état chargé après le succès
+        if (updatedState != null) {
+          emit(updatedState);
+        } else {
+          emit(const WorkerJobsLoaded(availableJobs: [], myJobs: []));
+        }
+      },
     );
   }
 }

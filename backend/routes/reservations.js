@@ -563,4 +563,484 @@ router.post('/create-intent', protect, async (req, res) => {
     }
 });
 
+// ============================================================================
+// LOGIQUE MÉTIER D'ANNULATION
+// ============================================================================
+
+// Constantes pour la politique d'annulation
+const CANCELLATION_POLICY = {
+    // Seuils d'avertissement pour les déneigeurs
+    WARNING_THRESHOLD: 2,        // Nombre d'annulations avant avertissement
+    SUSPENSION_THRESHOLD: 5,     // Nombre d'annulations avant suspension
+    SUSPENSION_DAYS: 7,          // Durée de suspension en jours
+
+    // Pénalités pour les clients
+    EN_ROUTE_FEE_PERCENT: 50,    // 50% si déneigeur en route
+    IN_PROGRESS_FEE_PERCENT: 100, // 100% si travail commencé
+};
+
+// Raisons valables d'annulation pour les déneigeurs
+const VALID_WORKER_CANCELLATION_REASONS = [
+    'vehicle_breakdown',      // Panne de véhicule
+    'medical_emergency',      // Urgence médicale
+    'severe_weather',         // Conditions météo dangereuses
+    'road_blocked',           // Route bloquée/inaccessible
+    'family_emergency',       // Urgence familiale
+    'equipment_failure',      // Équipement défaillant
+    'other',                  // Autre (nécessite description)
+];
+
+/**
+ * @route   PATCH /api/reservations/:id/cancel-by-worker
+ * @desc    Annulation par le déneigeur - avec suivi et conséquences
+ * @access  Private (Worker)
+ */
+router.patch('/:id/cancel-by-worker', protect, async (req, res) => {
+    try {
+        const { reason, reasonCode, description } = req.body;
+
+        // Vérifier que l'utilisateur est un déneigeur
+        if (req.user.role !== 'snowWorker') {
+            return res.status(403).json({
+                success: false,
+                message: 'Seuls les déneigeurs peuvent utiliser cette fonctionnalité',
+            });
+        }
+
+        // Vérifier si le déneigeur est suspendu
+        const worker = await User.findById(req.user.id);
+        if (worker.workerProfile?.isSuspended) {
+            const suspendedUntil = worker.workerProfile.suspendedUntil;
+            if (suspendedUntil && new Date() < suspendedUntil) {
+                return res.status(403).json({
+                    success: false,
+                    message: `Votre compte est suspendu jusqu'au ${suspendedUntil.toLocaleDateString('fr-CA')}`,
+                    suspendedUntil,
+                });
+            }
+            // Lever la suspension si elle est expirée
+            worker.workerProfile.isSuspended = false;
+            worker.workerProfile.suspendedUntil = null;
+            worker.workerProfile.suspensionReason = null;
+            await worker.save();
+        }
+
+        // Valider la raison
+        if (!reasonCode || !VALID_WORKER_CANCELLATION_REASONS.includes(reasonCode)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Une raison valable est requise pour annuler',
+                validReasons: VALID_WORKER_CANCELLATION_REASONS,
+            });
+        }
+
+        if (reasonCode === 'other' && (!description || description.length < 10)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Veuillez fournir une description détaillée (minimum 10 caractères)',
+            });
+        }
+
+        // Trouver la réservation assignée à ce déneigeur
+        const reservation = await Reservation.findOne({
+            _id: req.params.id,
+            workerId: req.user.id,
+            status: { $in: ['assigned', 'enRoute', 'inProgress'] },
+        });
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Réservation non trouvée ou vous n\'êtes pas assigné à cette tâche',
+            });
+        }
+
+        const fullReason = reasonCode === 'other'
+            ? `${reason || 'Autre raison'}: ${description}`
+            : reason || reasonCode;
+
+        // Mettre à jour la réservation
+        reservation.status = 'cancelled';
+        reservation.cancelledAt = new Date();
+        reservation.cancelledBy = 'worker';
+        reservation.cancelReason = fullReason;
+        reservation.workerId = null; // Libérer la réservation pour un autre déneigeur
+
+        // Réinitialiser pour permettre une nouvelle assignation
+        reservation.assignedAt = null;
+        reservation.workerEnRouteAt = null;
+        reservation.startedAt = null;
+
+        await reservation.save();
+
+        // Mettre à jour le profil du déneigeur
+        worker.workerProfile.totalCancellations = (worker.workerProfile.totalCancellations || 0) + 1;
+        worker.workerProfile.cancellationHistory = worker.workerProfile.cancellationHistory || [];
+        worker.workerProfile.cancellationHistory.push({
+            reservationId: reservation._id,
+            reason: fullReason,
+            cancelledAt: new Date(),
+        });
+
+        // Calculer les conséquences
+        let consequence = null;
+        const totalCancellations = worker.workerProfile.totalCancellations;
+
+        if (totalCancellations >= CANCELLATION_POLICY.SUSPENSION_THRESHOLD) {
+            // Suspension
+            const suspendedUntil = new Date();
+            suspendedUntil.setDate(suspendedUntil.getDate() + CANCELLATION_POLICY.SUSPENSION_DAYS);
+
+            worker.workerProfile.isSuspended = true;
+            worker.workerProfile.suspendedUntil = suspendedUntil;
+            worker.workerProfile.suspensionReason = `Trop d'annulations (${totalCancellations})`;
+            worker.workerProfile.warningCount = 0; // Reset après suspension
+
+            consequence = {
+                type: 'suspension',
+                message: `Votre compte a été suspendu pour ${CANCELLATION_POLICY.SUSPENSION_DAYS} jours en raison de trop d'annulations`,
+                suspendedUntil,
+            };
+        } else if (totalCancellations >= CANCELLATION_POLICY.WARNING_THRESHOLD) {
+            // Avertissement
+            worker.workerProfile.warningCount = (worker.workerProfile.warningCount || 0) + 1;
+
+            const remainingBeforeSuspension = CANCELLATION_POLICY.SUSPENSION_THRESHOLD - totalCancellations;
+            consequence = {
+                type: 'warning',
+                message: `Avertissement: Vous avez ${totalCancellations} annulations. Encore ${remainingBeforeSuspension} et votre compte sera suspendu.`,
+                warningCount: worker.workerProfile.warningCount,
+            };
+        }
+
+        await worker.save();
+
+        // Notifier le client
+        await Notification.notifyReservationCancelled(
+            reservation,
+            `Annulée par le déneigeur: ${fullReason}`
+        );
+
+        // Notifier le déneigeur de la conséquence
+        if (consequence) {
+            await Notification.create({
+                userId: worker._id,
+                type: consequence.type === 'suspension' ? 'systemNotification' : 'systemNotification',
+                title: consequence.type === 'suspension' ? '⚠️ Compte suspendu' : '⚠️ Avertissement',
+                message: consequence.message,
+                priority: 'high',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Réservation annulée. Vous ne serez pas payé pour cette tâche.',
+            reservation: {
+                id: reservation._id,
+                status: reservation.status,
+                cancelledAt: reservation.cancelledAt,
+                cancelReason: reservation.cancelReason,
+            },
+            consequence,
+            stats: {
+                totalCancellations: worker.workerProfile.totalCancellations,
+                warningCount: worker.workerProfile.warningCount,
+                isSuspended: worker.workerProfile.isSuspended,
+            },
+        });
+
+    } catch (error) {
+        console.error('Erreur lors de l\'annulation par le déneigeur:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'annulation',
+        });
+    }
+});
+
+/**
+ * @route   PATCH /api/reservations/:id/cancel-by-client
+ * @desc    Annulation par le client - avec pénalités selon le statut
+ * @access  Private (Client)
+ */
+router.patch('/:id/cancel-by-client', protect, async (req, res) => {
+    try {
+        const { reason } = req.body;
+
+        const reservation = await Reservation.findOne({
+            _id: req.params.id,
+            userId: req.user.id,
+            status: { $nin: ['completed', 'cancelled'] },
+        }).populate('workerId', 'firstName lastName');
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Réservation non trouvée ou déjà terminée/annulée',
+            });
+        }
+
+        const previousStatus = reservation.status;
+        let cancellationFeePercent = 0;
+        let cancellationFeeAmount = 0;
+        let refundAmount = 0;
+        let message = '';
+
+        // Calculer les frais selon le statut
+        switch (previousStatus) {
+            case 'pending':
+                // Pas encore assigné - remboursement complet
+                cancellationFeePercent = 0;
+                refundAmount = reservation.paymentStatus === 'paid' ? reservation.totalPrice : 0;
+                message = 'Réservation annulée. Remboursement complet.';
+                break;
+
+            case 'assigned':
+                // Assigné mais pas en route - remboursement complet
+                cancellationFeePercent = 0;
+                refundAmount = reservation.paymentStatus === 'paid' ? reservation.totalPrice : 0;
+                message = 'Réservation annulée. Remboursement complet.';
+                break;
+
+            case 'enRoute':
+                // Déneigeur en route - 50% de frais
+                cancellationFeePercent = CANCELLATION_POLICY.EN_ROUTE_FEE_PERCENT;
+                cancellationFeeAmount = reservation.totalPrice * (cancellationFeePercent / 100);
+                refundAmount = reservation.paymentStatus === 'paid'
+                    ? reservation.totalPrice - cancellationFeeAmount
+                    : 0;
+                message = `Réservation annulée. Le déneigeur était en route, vous êtes facturé ${cancellationFeePercent}% (${cancellationFeeAmount.toFixed(2)}$).`;
+                break;
+
+            case 'inProgress':
+                // Travail en cours - 100% facturé
+                cancellationFeePercent = CANCELLATION_POLICY.IN_PROGRESS_FEE_PERCENT;
+                cancellationFeeAmount = reservation.totalPrice;
+                refundAmount = 0;
+                message = `Réservation annulée. Le travail avait commencé, vous êtes facturé ${cancellationFeePercent}% (${cancellationFeeAmount.toFixed(2)}$).`;
+                break;
+
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: 'Cette réservation ne peut pas être annulée',
+                });
+        }
+
+        // Mettre à jour la réservation
+        reservation.status = 'cancelled';
+        reservation.cancelledAt = new Date();
+        reservation.cancelledBy = 'client';
+        reservation.cancelReason = reason || 'Annulée par le client';
+        reservation.cancellationFee = {
+            amount: cancellationFeeAmount,
+            percentage: cancellationFeePercent,
+            charged: cancellationFeeAmount > 0,
+            chargedAt: cancellationFeeAmount > 0 ? new Date() : null,
+        };
+        reservation.refundAmount = refundAmount;
+        reservation.refundedAt = refundAmount > 0 ? new Date() : null;
+
+        // Mettre à jour le statut de paiement
+        if (reservation.paymentStatus === 'paid') {
+            if (refundAmount === reservation.totalPrice) {
+                reservation.paymentStatus = 'refunded';
+            } else if (refundAmount > 0) {
+                reservation.paymentStatus = 'partially_refunded';
+            }
+            // Si refundAmount === 0, garder 'paid' car le client paie tout
+        }
+
+        await reservation.save();
+
+        // Traiter le remboursement via Stripe si applicable
+        let stripeRefund = null;
+        if (refundAmount > 0 && reservation.paymentIntentId) {
+            try {
+                stripeRefund = await stripe.refunds.create({
+                    payment_intent: reservation.paymentIntentId,
+                    amount: Math.round(refundAmount * 100), // En cents
+                    reason: 'requested_by_customer',
+                });
+                console.log('✅ Remboursement Stripe créé:', stripeRefund.id);
+            } catch (stripeError) {
+                console.error('❌ Erreur remboursement Stripe:', stripeError);
+                // Continuer même si le remboursement échoue (à traiter manuellement)
+            }
+        }
+
+        // Payer le déneigeur si des frais sont appliqués et qu'il était assigné
+        if (cancellationFeeAmount > 0 && reservation.workerId) {
+            const platformFee = cancellationFeeAmount * 0.25; // 25% plateforme
+            const workerAmount = cancellationFeeAmount * 0.75; // 75% déneigeur
+
+            reservation.payout = {
+                status: 'pending',
+                workerAmount,
+                platformFee,
+                stripeFee: 0,
+            };
+            await reservation.save();
+
+            // TODO: Transférer au déneigeur via Stripe Connect si configuré
+        }
+
+        // Notifier le déneigeur si assigné
+        if (reservation.workerId) {
+            await Notification.create({
+                userId: reservation.workerId._id || reservation.workerId,
+                type: 'reservationCancelled',
+                title: '❌ Réservation annulée par le client',
+                message: cancellationFeeAmount > 0
+                    ? `Le client a annulé. Vous recevrez ${(cancellationFeeAmount * 0.75).toFixed(2)}$ de compensation.`
+                    : 'Le client a annulé la réservation.',
+                priority: 'high',
+                metadata: {
+                    reservationId: reservation._id,
+                    cancellationFee: cancellationFeeAmount,
+                    workerCompensation: cancellationFeeAmount * 0.75,
+                },
+            });
+        }
+
+        // Notifier le client
+        await Notification.create({
+            userId: req.user.id,
+            type: 'reservationCancelled',
+            title: '✅ Réservation annulée',
+            message: message,
+            priority: 'medium',
+            metadata: {
+                reservationId: reservation._id,
+                cancellationFee: cancellationFeeAmount,
+                refundAmount,
+            },
+        });
+
+        res.status(200).json({
+            success: true,
+            message,
+            reservation: {
+                id: reservation._id,
+                status: reservation.status,
+                previousStatus,
+                cancelledAt: reservation.cancelledAt,
+                cancelReason: reservation.cancelReason,
+            },
+            billing: {
+                originalPrice: reservation.totalPrice,
+                cancellationFeePercent,
+                cancellationFeeAmount,
+                refundAmount,
+                finalCharge: cancellationFeeAmount,
+            },
+            stripeRefund: stripeRefund ? {
+                id: stripeRefund.id,
+                status: stripeRefund.status,
+            } : null,
+        });
+
+    } catch (error) {
+        console.error('Erreur lors de l\'annulation par le client:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'annulation',
+        });
+    }
+});
+
+/**
+ * @route   GET /api/reservations/worker/cancellation-reasons
+ * @desc    Obtenir la liste des raisons valables d'annulation pour les déneigeurs
+ * @access  Private (Worker)
+ */
+router.get('/worker/cancellation-reasons', protect, (req, res) => {
+    const reasons = {
+        vehicle_breakdown: {
+            code: 'vehicle_breakdown',
+            label: 'Panne de véhicule',
+            description: 'Mon véhicule est en panne ou a un problème mécanique',
+        },
+        medical_emergency: {
+            code: 'medical_emergency',
+            label: 'Urgence médicale',
+            description: 'J\'ai une urgence médicale personnelle',
+        },
+        severe_weather: {
+            code: 'severe_weather',
+            label: 'Conditions météo dangereuses',
+            description: 'Les conditions météo rendent le trajet dangereux',
+        },
+        road_blocked: {
+            code: 'road_blocked',
+            label: 'Route bloquée',
+            description: 'La route vers le client est bloquée ou inaccessible',
+        },
+        family_emergency: {
+            code: 'family_emergency',
+            label: 'Urgence familiale',
+            description: 'J\'ai une urgence familiale',
+        },
+        equipment_failure: {
+            code: 'equipment_failure',
+            label: 'Équipement défaillant',
+            description: 'Mon équipement de déneigement est défaillant',
+        },
+        other: {
+            code: 'other',
+            label: 'Autre raison',
+            description: 'Autre raison (nécessite une description)',
+            requiresDescription: true,
+        },
+    };
+
+    res.json({
+        success: true,
+        reasons,
+        policy: {
+            warningThreshold: CANCELLATION_POLICY.WARNING_THRESHOLD,
+            suspensionThreshold: CANCELLATION_POLICY.SUSPENSION_THRESHOLD,
+            suspensionDays: CANCELLATION_POLICY.SUSPENSION_DAYS,
+            note: 'Les annulations fréquentes peuvent entraîner des avertissements et une suspension temporaire.',
+        },
+    });
+});
+
+/**
+ * @route   GET /api/reservations/client/cancellation-policy
+ * @desc    Obtenir la politique d'annulation pour les clients
+ * @access  Private
+ */
+router.get('/client/cancellation-policy', protect, (req, res) => {
+    res.json({
+        success: true,
+        policy: {
+            pending: {
+                status: 'pending',
+                label: 'En attente',
+                feePercent: 0,
+                description: 'Remboursement complet - Aucun déneigeur assigné',
+            },
+            assigned: {
+                status: 'assigned',
+                label: 'Assignée',
+                feePercent: 0,
+                description: 'Remboursement complet - Déneigeur pas encore en route',
+            },
+            enRoute: {
+                status: 'enRoute',
+                label: 'En route',
+                feePercent: CANCELLATION_POLICY.EN_ROUTE_FEE_PERCENT,
+                description: `Frais de ${CANCELLATION_POLICY.EN_ROUTE_FEE_PERCENT}% - Le déneigeur est en route vers vous`,
+            },
+            inProgress: {
+                status: 'inProgress',
+                label: 'En cours',
+                feePercent: CANCELLATION_POLICY.IN_PROGRESS_FEE_PERCENT,
+                description: `Frais de ${CANCELLATION_POLICY.IN_PROGRESS_FEE_PERCENT}% - Le travail a déjà commencé`,
+            },
+        },
+    });
+});
+
 module.exports = router;

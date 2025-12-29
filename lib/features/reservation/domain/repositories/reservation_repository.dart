@@ -3,6 +3,8 @@ import '../../../../core/errors/failures.dart';
 import '../entities/reservation.dart';
 import '../entities/vehicle.dart';
 import '../entities/parking_spot.dart';
+import '../../data/datasources/reservation_remote_datasource.dart'
+    show CancellationResult, CancellationPolicy;
 
 abstract class ReservationRepository {
   Future<Either<Failure, List<Vehicle>>> getVehicles();
@@ -47,7 +49,12 @@ abstract class ReservationRepository {
 
   Future<Either<Failure, Reservation>> getReservationById(String id);
 
-  Future<Either<Failure, void>> cancelReservation(String id);
+  Future<Either<Failure, CancellationResult>> cancelReservation(
+    String id, {
+    String? reason,
+  });
+
+  Future<Either<Failure, CancellationPolicy>> getCancellationPolicy();
 
   Future<Either<Failure, Reservation>> updateReservation({
     required String reservationId,

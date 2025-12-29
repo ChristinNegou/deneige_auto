@@ -12,9 +12,92 @@ abstract class ReservationRemoteDataSource {
   Future<List<ReservationModel>> getReservations({bool? upcoming});
   Future<ReservationModel> getReservationById(String reservationId);
   Future<ReservationModel> createReservation(Map<String, dynamic> data);
-  Future<void> cancelReservation(String reservationId);
+  Future<CancellationResult> cancelReservation(String reservationId, {String? reason});
   Future<ReservationModel> updateReservation(String reservationId, Map<String, dynamic> data);
   Future<Vehicle> addVehicle(Map<String, dynamic> data);
+  Future<CancellationPolicy> getCancellationPolicy();
+}
+
+/// Résultat d'une annulation de réservation
+class CancellationResult {
+  final bool success;
+  final String message;
+  final String reservationId;
+  final String previousStatus;
+  final double originalPrice;
+  final double cancellationFeePercent;
+  final double cancellationFeeAmount;
+  final double refundAmount;
+
+  CancellationResult({
+    required this.success,
+    required this.message,
+    required this.reservationId,
+    required this.previousStatus,
+    required this.originalPrice,
+    required this.cancellationFeePercent,
+    required this.cancellationFeeAmount,
+    required this.refundAmount,
+  });
+
+  factory CancellationResult.fromJson(Map<String, dynamic> json) {
+    final billing = json['billing'] as Map<String, dynamic>? ?? {};
+    final reservation = json['reservation'] as Map<String, dynamic>? ?? {};
+
+    return CancellationResult(
+      success: json['success'] as bool? ?? false,
+      message: json['message'] as String? ?? '',
+      reservationId: reservation['id'] as String? ?? '',
+      previousStatus: reservation['previousStatus'] as String? ?? '',
+      originalPrice: (billing['originalPrice'] as num?)?.toDouble() ?? 0.0,
+      cancellationFeePercent: (billing['cancellationFeePercent'] as num?)?.toDouble() ?? 0.0,
+      cancellationFeeAmount: (billing['cancellationFeeAmount'] as num?)?.toDouble() ?? 0.0,
+      refundAmount: (billing['refundAmount'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+}
+
+/// Politique d'annulation
+class CancellationPolicy {
+  final Map<String, CancellationPolicyItem> policies;
+
+  CancellationPolicy({required this.policies});
+
+  factory CancellationPolicy.fromJson(Map<String, dynamic> json) {
+    final policyData = json['policy'] as Map<String, dynamic>? ?? {};
+    final policies = <String, CancellationPolicyItem>{};
+
+    policyData.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        policies[key] = CancellationPolicyItem.fromJson(value);
+      }
+    });
+
+    return CancellationPolicy(policies: policies);
+  }
+}
+
+class CancellationPolicyItem {
+  final String status;
+  final String label;
+  final int feePercent;
+  final String description;
+
+  CancellationPolicyItem({
+    required this.status,
+    required this.label,
+    required this.feePercent,
+    required this.description,
+  });
+
+  factory CancellationPolicyItem.fromJson(Map<String, dynamic> json) {
+    return CancellationPolicyItem(
+      status: json['status'] as String? ?? '',
+      label: json['label'] as String? ?? '',
+      feePercent: json['feePercent'] as int? ?? 0,
+      description: json['description'] as String? ?? '',
+    );
+  }
 }
 
 class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
@@ -157,13 +240,44 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
 
 
   @override
-  Future<void> cancelReservation(String reservationId) async {
+  Future<CancellationResult> cancelReservation(String reservationId, {String? reason}) async {
     try {
-      final response = await dio.delete('/reservations/$reservationId');
+      final response = await dio.patch(
+        '/reservations/$reservationId/cancel-by-client',
+        data: {
+          if (reason != null) 'reason': reason,
+        },
+      );
 
-      if (response.statusCode != 200 && response.statusCode != 204) {
+      if (response.statusCode == 200) {
+        return CancellationResult.fromJson(response.data as Map<String, dynamic>);
+      } else {
         throw ServerException(
-          message: 'Erreur d\'annulation de réservation',
+          message: response.data['message'] ?? 'Erreur d\'annulation de réservation',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw ServerException(
+          message: e.response?.data['message'] ?? 'Réservation non trouvée ou déjà annulée',
+          statusCode: 404,
+        );
+      }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<CancellationPolicy> getCancellationPolicy() async {
+    try {
+      final response = await dio.get('/reservations/client/cancellation-policy');
+
+      if (response.statusCode == 200) {
+        return CancellationPolicy.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw ServerException(
+          message: 'Erreur de récupération de la politique d\'annulation',
           statusCode: response.statusCode,
         );
       }

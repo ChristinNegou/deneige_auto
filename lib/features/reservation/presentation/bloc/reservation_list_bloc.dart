@@ -5,6 +5,8 @@ import '../../domain/entities/reservation.dart';
 import '../../domain/usecases/get_reservations_usecase.dart';
 import '../../domain/usecases/get_reservation_by_id_usecase.dart';
 import '../../domain/usecases/cancel_reservation_usecase.dart';
+import '../../data/datasources/reservation_remote_datasource.dart'
+    show CancellationResult;
 
 // Events
 abstract class ReservationListEvent extends Equatable {
@@ -27,11 +29,12 @@ class RefreshReservations extends ReservationListEvent {}
 
 class CancelReservationEvent extends ReservationListEvent {
   final String reservationId;
+  final String? reason;
 
-  const CancelReservationEvent(this.reservationId);
+  const CancelReservationEvent(this.reservationId, {this.reason});
 
   @override
-  List<Object?> get props => [reservationId];
+  List<Object?> get props => [reservationId, reason];
 }
 
 class LoadReservationById extends ReservationListEvent {
@@ -56,6 +59,7 @@ class ReservationListState extends Equatable {
   final bool isLoading;
   final String? errorMessage;
   final String? successMessage;
+  final CancellationResult? lastCancellationResult;
 
   const ReservationListState({
     this.reservations = const [],
@@ -63,6 +67,7 @@ class ReservationListState extends Equatable {
     this.isLoading = false,
     this.errorMessage,
     this.successMessage,
+    this.lastCancellationResult,
   });
 
   ReservationListState copyWith({
@@ -71,9 +76,11 @@ class ReservationListState extends Equatable {
     bool? isLoading,
     String? errorMessage,
     String? successMessage,
+    CancellationResult? lastCancellationResult,
     bool clearError = false,
     bool clearSuccess = false,
     bool clearSelectedReservation = false,
+    bool clearCancellationResult = false,
   }) {
     return ReservationListState(
       reservations: reservations ?? this.reservations,
@@ -81,11 +88,12 @@ class ReservationListState extends Equatable {
       isLoading: isLoading ?? this.isLoading,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       successMessage: clearSuccess ? null : (successMessage ?? this.successMessage),
+      lastCancellationResult: clearCancellationResult ? null : (lastCancellationResult ?? this.lastCancellationResult),
     );
   }
 
   @override
-  List<Object?> get props => [reservations, selectedReservation, isLoading, errorMessage, successMessage];
+  List<Object?> get props => [reservations, selectedReservation, isLoading, errorMessage, successMessage, lastCancellationResult];
 }
 
 // BLoC
@@ -168,25 +176,35 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
       CancelReservationEvent event,
       Emitter<ReservationListState> emit,
       ) async {
-    emit(state.copyWith(isLoading: true, clearError: true));
+    emit(state.copyWith(isLoading: true, clearError: true, clearCancellationResult: true));
 
-    final result = await cancelReservation(event.reservationId);
+    final result = await cancelReservation(event.reservationId, reason: event.reason);
 
     result.fold(
           (failure) => emit(state.copyWith(
         isLoading: false,
         errorMessage: failure.message,
       )),
-          (_) {
+          (cancellationResult) {
         // Supprimer la réservation de la liste
         final updatedReservations = state.reservations
             .where((r) => r.id != event.reservationId)
             .toList();
 
+        // Construire le message de succès avec les infos de facturation
+        String successMessage = cancellationResult.message;
+        if (cancellationResult.cancellationFeeAmount > 0) {
+          successMessage += '\nFrais: ${cancellationResult.cancellationFeeAmount.toStringAsFixed(2)}\$';
+        }
+        if (cancellationResult.refundAmount > 0) {
+          successMessage += '\nRemboursement: ${cancellationResult.refundAmount.toStringAsFixed(2)}\$';
+        }
+
         emit(state.copyWith(
           isLoading: false,
           reservations: updatedReservations,
-          successMessage: 'Réservation annulée avec succès',
+          successMessage: successMessage,
+          lastCancellationResult: cancellationResult,
           clearError: true,
         ));
       },

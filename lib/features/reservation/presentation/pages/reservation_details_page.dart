@@ -1480,6 +1480,35 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
 
   void _showCancelDialog(BuildContext context, Reservation reservation) {
     HapticFeedback.mediumImpact();
+
+    // Calculer les frais selon le statut
+    String feeMessage;
+    int feePercent;
+    Color feeColor;
+
+    switch (reservation.status) {
+      case ReservationStatus.pending:
+      case ReservationStatus.assigned:
+        feePercent = 0;
+        feeMessage = 'Remboursement complet - Aucun frais';
+        feeColor = Colors.green;
+        break;
+      case ReservationStatus.enRoute:
+        feePercent = 50;
+        feeMessage = 'Le déneigeur est en route.\nFrais d\'annulation: 50% (${(reservation.totalPrice * 0.5).toStringAsFixed(2)}\$)';
+        feeColor = Colors.orange;
+        break;
+      case ReservationStatus.inProgress:
+        feePercent = 100;
+        feeMessage = 'Le travail a commencé.\nAucun remboursement (100% facturé)';
+        feeColor = Colors.red;
+        break;
+      default:
+        feePercent = 0;
+        feeMessage = '';
+        feeColor = Colors.grey;
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1498,8 +1527,43 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             const Text('Annuler?'),
           ],
         ),
-        content: const Text(
-          'Êtes-vous sûr de vouloir annuler cette réservation? Cette action est irréversible.',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Êtes-vous sûr de vouloir annuler cette réservation?',
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: feeColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: feeColor.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    feePercent == 0 ? Icons.check_circle : Icons.info,
+                    color: feeColor,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      feeMessage,
+                      style: TextStyle(
+                        color: feeColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(

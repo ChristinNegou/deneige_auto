@@ -1,16 +1,177 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_jobs_bloc.dart';
+import '../../data/datasources/worker_remote_datasource.dart'
+    show WorkerCancellationReason;
 
-class WorkerJobDetailsPage extends StatelessWidget {
+class WorkerJobDetailsPage extends StatefulWidget {
   final WorkerJob job;
 
   const WorkerJobDetailsPage({super.key, required this.job});
+
+  @override
+  State<WorkerJobDetailsPage> createState() => _WorkerJobDetailsPageState();
+}
+
+class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
+  Timer? _statusCheckTimer;
+  bool _isJobCancelled = false;
+  late WorkerJob _currentJob;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentJob = widget.job;
+    // Démarrer la vérification périodique du statut si le job est actif
+    if (_currentJob.status == JobStatus.assigned ||
+        _currentJob.status == JobStatus.enRoute ||
+        _currentJob.status == JobStatus.inProgress) {
+      _startStatusCheck();
+    }
+  }
+
+  @override
+  void dispose() {
+    _statusCheckTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startStatusCheck() {
+    _statusCheckTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _checkJobStatus();
+    });
+  }
+
+  Future<void> _checkJobStatus() async {
+    if (_isJobCancelled || !mounted) return;
+
+    try {
+      final dio = sl<Dio>();
+      final response = await dio.get('/reservations/${_currentJob.id}');
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final data = response.data['data'];
+        final status = data['status'] as String?;
+
+        if (status == 'cancelled') {
+          _isJobCancelled = true;
+          _statusCheckTimer?.cancel();
+
+          final cancelReason = data['cancelReason'] as String? ?? 'Le client a annulé la réservation';
+          final cancelledBy = data['cancelledBy'] as String? ?? 'client';
+
+          _showJobCancelledDialog(cancelReason, cancelledBy);
+        }
+      }
+    } catch (e) {
+      debugPrint('Erreur vérification statut job: $e');
+    }
+  }
+
+  void _showJobCancelledDialog(String reason, String cancelledBy) {
+    HapticFeedback.heavyImpact();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+          ),
+          icon: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppTheme.errorLight,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.cancel_rounded,
+              color: AppTheme.error,
+              size: 48,
+            ),
+          ),
+          title: const Text(
+            'Job annulé',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.errorLight,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  border: Border.all(color: AppTheme.error.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: AppTheme.error),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        cancelledBy == 'client'
+                            ? 'Le client a annulé cette réservation.'
+                            : 'Cette réservation a été annulée.',
+                        style: const TextStyle(
+                          color: AppTheme.error,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Raison: $reason',
+                style: AppTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                ),
+                child: const Text(
+                  'Retour au tableau de bord',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  WorkerJob get job => _currentJob;
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +213,7 @@ class WorkerJobDetailsPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: job.status == JobStatus.pending
-          ? _buildAcceptButton(context)
-          : null,
+      bottomNavigationBar: _buildBottomButtons(context),
     );
   }
 
@@ -670,5 +829,307 @@ class WorkerJobDetailsPage extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  Widget? _buildBottomButtons(BuildContext context) {
+    // Bouton d'acceptation pour les jobs en attente
+    if (job.status == JobStatus.pending) {
+      return _buildAcceptButton(context);
+    }
+
+    // Bouton d'annulation pour les jobs assignés/en route/en cours
+    if (job.status == JobStatus.assigned ||
+        job.status == JobStatus.enRoute ||
+        job.status == JobStatus.inProgress) {
+      return _buildCancelButton(context);
+    }
+
+    return null;
+  }
+
+  Widget _buildCancelButton(BuildContext context) {
+    return BlocConsumer<WorkerJobsBloc, WorkerJobsState>(
+      listener: (context, state) {
+        if (state is JobCancellationSuccess) {
+          HapticFeedback.heavyImpact();
+
+          String message = state.result.message;
+          Color bgColor = Colors.orange;
+
+          // Afficher l'avertissement ou la suspension si applicable
+          if (state.result.consequence != null) {
+            if (state.result.consequence!.type == 'suspension') {
+              message = state.result.consequence!.message;
+              bgColor = AppTheme.error;
+            } else if (state.result.consequence!.type == 'warning') {
+              message = state.result.consequence!.message;
+              bgColor = Colors.orange;
+            }
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    state.result.consequence?.type == 'suspension'
+                        ? Icons.block
+                        : Icons.warning_amber_rounded,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(message)),
+                ],
+              ),
+              backgroundColor: bgColor,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 5),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
+            ),
+          );
+          Navigator.pop(context, true);
+        } else if (state is WorkerJobsError) {
+          HapticFeedback.vibrate();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(state.message)),
+                ],
+              ),
+              backgroundColor: AppTheme.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        final isLoading =
+            state is JobActionLoading && state.action == 'cancel';
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: GestureDetector(
+              onTap: isLoading
+                  ? null
+                  : () => _showCancelDialog(context),
+              child: Container(
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppTheme.error.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  border: Border.all(color: AppTheme.error, width: 2),
+                ),
+                child: Center(
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: AppTheme.error,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.cancel_rounded,
+                                color: AppTheme.error, size: 24),
+                            SizedBox(width: 8),
+                            Text(
+                              'Annuler ce job',
+                              style: TextStyle(
+                                color: AppTheme.error,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCancelDialog(BuildContext context) {
+    HapticFeedback.mediumImpact();
+
+    // Raisons valables d'annulation
+    final reasons = <String, WorkerCancellationReason>{
+      'vehicle_breakdown': WorkerCancellationReason(
+        code: 'vehicle_breakdown',
+        label: 'Panne de véhicule',
+        description: 'Mon véhicule est en panne ou a un problème mécanique',
+      ),
+      'medical_emergency': WorkerCancellationReason(
+        code: 'medical_emergency',
+        label: 'Urgence médicale',
+        description: 'J\'ai une urgence médicale personnelle',
+      ),
+      'severe_weather': WorkerCancellationReason(
+        code: 'severe_weather',
+        label: 'Conditions météo dangereuses',
+        description: 'Les conditions météo rendent le trajet dangereux',
+      ),
+      'road_blocked': WorkerCancellationReason(
+        code: 'road_blocked',
+        label: 'Route bloquée',
+        description: 'La route vers le client est bloquée ou inaccessible',
+      ),
+      'family_emergency': WorkerCancellationReason(
+        code: 'family_emergency',
+        label: 'Urgence familiale',
+        description: 'J\'ai une urgence familiale',
+      ),
+      'equipment_failure': WorkerCancellationReason(
+        code: 'equipment_failure',
+        label: 'Équipement défaillant',
+        description: 'Mon équipement de déneigement est défaillant',
+      ),
+    };
+
+    String? selectedReasonCode;
+    final descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.warning, color: Colors.red),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Annuler le job?',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.info, color: Colors.orange, size: 20),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Vous ne serez pas payé pour ce job.\nLes annulations fréquentes peuvent entraîner une suspension.',
+                          style: TextStyle(
+                            color: Colors.orange,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Raison de l\'annulation:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                ...reasons.entries.map((entry) => RadioListTile<String>(
+                      title: Text(entry.value.label,
+                          style: const TextStyle(fontSize: 14)),
+                      subtitle: Text(entry.value.description,
+                          style: const TextStyle(fontSize: 11)),
+                      value: entry.key,
+                      groupValue: selectedReasonCode,
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      onChanged: (value) {
+                        setState(() => selectedReasonCode = value);
+                      },
+                    )),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    hintText: 'Détails supplémentaires (optionnel)',
+                    hintStyle: const TextStyle(fontSize: 13),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.all(12),
+                  ),
+                  maxLines: 2,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Retour'),
+            ),
+            ElevatedButton(
+              onPressed: selectedReasonCode == null
+                  ? null
+                  : () {
+                      Navigator.pop(dialogContext);
+                      context.read<WorkerJobsBloc>().add(
+                            CancelJob(
+                              jobId: job.id,
+                              reasonCode: selectedReasonCode!,
+                              reason: reasons[selectedReasonCode]?.label,
+                              description: descriptionController.text.isNotEmpty
+                                  ? descriptionController.text
+                                  : null,
+                            ),
+                          );
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Confirmer l\'annulation'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

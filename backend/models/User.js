@@ -133,6 +133,42 @@ const userSchema = new mongoose.Schema({
         bankAccountLast4: {
             type: String,
         },
+
+        // Cancellation tracking (suivi des annulations)
+        totalCancellations: {
+            type: Number,
+            default: 0,
+        },
+        cancellationHistory: [{
+            reservationId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Reservation',
+            },
+            reason: {
+                type: String,
+                required: true,
+            },
+            cancelledAt: {
+                type: Date,
+                default: Date.now,
+            },
+        }],
+        warningCount: {
+            type: Number,
+            default: 0,
+        },
+        isSuspended: {
+            type: Boolean,
+            default: false,
+        },
+        suspendedUntil: {
+            type: Date,
+            default: null,
+        },
+        suspensionReason: {
+            type: String,
+            default: null,
+        },
     },
 
     resetPasswordToken: String,

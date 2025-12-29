@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,8 +29,10 @@ class ActiveJobPage extends StatefulWidget {
 
 class _ActiveJobPageState extends State<ActiveJobPage> {
   Timer? _timer;
+  Timer? _statusCheckTimer;
   Duration _elapsed = Duration.zero;
   late WorkerJob _currentJob;
+  bool _isJobCancelled = false;
 
   // Photo management
   final ImagePicker _imagePicker = ImagePicker();
@@ -45,12 +48,159 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       _elapsed = DateTime.now().difference(_currentJob.startedAt!);
       _startTimer();
     }
+    // Démarrer la vérification périodique du statut
+    _startStatusCheck();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _statusCheckTimer?.cancel();
     super.dispose();
+  }
+
+  /// Démarre la vérification périodique du statut du job (toutes les 10 secondes)
+  void _startStatusCheck() {
+    _statusCheckTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _checkJobStatus();
+    });
+  }
+
+  /// Vérifie le statut actuel du job auprès du serveur
+  Future<void> _checkJobStatus() async {
+    if (_isJobCancelled || !mounted) return;
+
+    try {
+      final dio = sl<Dio>();
+      final response = await dio.get('/reservations/${_currentJob.id}');
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final data = response.data['data'];
+        final status = data['status'] as String?;
+
+        if (status == 'cancelled') {
+          _isJobCancelled = true;
+          _timer?.cancel();
+          _statusCheckTimer?.cancel();
+
+          final cancelReason = data['cancelReason'] as String? ?? 'Le client a annulé la réservation';
+          final cancelledBy = data['cancelledBy'] as String? ?? 'client';
+
+          _showJobCancelledDialog(cancelReason, cancelledBy);
+        }
+      }
+    } catch (e) {
+      // Ignorer les erreurs de réseau silencieusement
+      debugPrint('Erreur vérification statut job: $e');
+    }
+  }
+
+  /// Affiche le dialogue d'annulation et redirige vers le dashboard
+  void _showJobCancelledDialog(String reason, String cancelledBy) {
+    HapticFeedback.heavyImpact();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+          ),
+          icon: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppTheme.errorLight,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.cancel_rounded,
+              color: AppTheme.error,
+              size: 48,
+            ),
+          ),
+          title: const Text(
+            'Job annulé',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.errorLight,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  border: Border.all(color: AppTheme.error.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: AppTheme.error),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        cancelledBy == 'client'
+                            ? 'Le client a annulé cette réservation.'
+                            : 'Cette réservation a été annulée.',
+                        style: const TextStyle(
+                          color: AppTheme.error,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Raison: $reason',
+                style: AppTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Vous ne serez pas facturé pour ce job.',
+                style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  // Retourner au dashboard
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                ),
+                child: const Text(
+                  'Retour au tableau de bord',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _startTimer() {
