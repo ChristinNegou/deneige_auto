@@ -140,22 +140,30 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     // Rejoindre le room de la conversation
     socketService.emit('chat:join', {'reservationId': reservationId});
 
-    // Écouter les nouveaux messages
+    // Écouter les nouveaux messages via le stream dédié
     _messageSubscription?.cancel();
-    _messageSubscription = socketService.on('message:new').listen((data) {
-      if (data is Map<String, dynamic>) {
-        final messageData = data['message'] as Map<String, dynamic>?;
-        if (messageData != null) {
+    _messageSubscription = socketService.chatMessages.listen((data) {
+      // Vérifier que le message est pour cette conversation
+      final msgReservationId = data['reservationId'] as String?;
+      final messageData = data['message'] as Map<String, dynamic>?;
+
+      // Le message peut venir du room reservation:${id} (sans reservationId)
+      // ou du room user:${userId} (avec reservationId)
+      if (messageData != null) {
+        // Vérifier si c'est pour cette conversation
+        final msgResId = messageData['reservationId'] as String?;
+        if (msgResId == reservationId || msgReservationId == reservationId || msgResId == null) {
           final message = ChatMessageModel.fromJson(messageData);
           add(MessageReceived(message));
         }
       }
     });
 
-    // Écouter l'indicateur de frappe
+    // Écouter l'indicateur de frappe via le stream dédié
     _typingSubscription?.cancel();
-    _typingSubscription = socketService.on('chat:typing').listen((data) {
-      if (data is Map<String, dynamic>) {
+    _typingSubscription = socketService.chatTyping.listen((data) {
+      final typingReservationId = data['reservationId'] as String?;
+      if (typingReservationId == reservationId) {
         final isTyping = data['isTyping'] as bool? ?? false;
         add(OtherUserTyping(isTyping));
       }

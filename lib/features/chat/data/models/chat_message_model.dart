@@ -19,6 +19,7 @@ class ChatMessageModel extends ChatMessage {
   });
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
+    // Gérer senderId qui peut être un objet ou un string
     final sender = json['senderId'];
     String senderId;
     String? senderName;
@@ -30,6 +31,15 @@ class ChatMessageModel extends ChatMessage {
       senderPhoto = sender['profilePhoto'] as String?;
     } else {
       senderId = sender as String? ?? '';
+    }
+
+    // Gérer reservationId qui peut être un objet ou un string
+    final reservationIdRaw = json['reservationId'];
+    String reservationId;
+    if (reservationIdRaw is Map<String, dynamic>) {
+      reservationId = reservationIdRaw['_id'] as String? ?? '';
+    } else {
+      reservationId = reservationIdRaw as String? ?? '';
     }
 
     MessageType messageType;
@@ -51,7 +61,7 @@ class ChatMessageModel extends ChatMessage {
 
     return ChatMessageModel(
       id: json['_id'] as String? ?? '',
-      reservationId: json['reservationId'] as String? ?? '',
+      reservationId: reservationId,
       senderId: senderId,
       senderRole: json['senderRole'] as String? ?? 'client',
       senderName: senderName,

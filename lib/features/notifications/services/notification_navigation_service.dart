@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_routes.dart';
+import '../../../core/di/injection_container.dart';
+import '../../auth/presentation/bloc/auth_bloc.dart';
+import '../../auth/presentation/bloc/auth_state.dart';
+import '../../chat/presentation/bloc/chat_bloc.dart';
+import '../../chat/presentation/pages/chat_screen.dart';
 import '../domain/entities/notification.dart';
 
 /// Service de navigation basé sur les notifications
@@ -16,6 +22,13 @@ class NotificationNavigationService {
     BuildContext context,
     AppNotification notification,
   ) async {
+    // Traitement spécial pour les notifications de chat
+    if (notification.type == NotificationType.newMessage ||
+        notification.type == NotificationType.workerMessage) {
+      _navigateToChat(context, notification);
+      return;
+    }
+
     final route = _getRouteForNotification(notification);
     final arguments = _getArgumentsForNotification(notification);
 
@@ -30,6 +43,48 @@ class NotificationNavigationService {
     }
 
     Navigator.of(context).pushNamed(route, arguments: arguments);
+  }
+
+  /// Navigation vers le chat pour les notifications de message
+  void _navigateToChat(BuildContext context, AppNotification notification) {
+    if (notification.reservationId == null || notification.reservationId!.isEmpty) {
+      // Fallback vers les réservations si pas de reservationId
+      Navigator.of(context).pushNamed(AppRoutes.reservations);
+      return;
+    }
+
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erreur: utilisateur non authentifié'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Extraire le nom de l'expéditeur depuis les metadata ou le message
+    String otherUserName = 'Utilisateur';
+    if (notification.metadata != null) {
+      otherUserName = notification.metadata!['senderName'] as String? ??
+                      notification.metadata!['workerName'] as String? ??
+                      'Utilisateur';
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => sl<ChatBloc>()..add(LoadMessages(notification.reservationId!)),
+          child: ChatScreen(
+            reservationId: notification.reservationId!,
+            otherUserName: otherUserName,
+            otherUserPhoto: null,
+            currentUserId: authState.user.id,
+          ),
+        ),
+      ),
+    );
   }
 
   /// Vérifie si une route nécessite un reservationId
@@ -67,11 +122,10 @@ class NotificationNavigationService {
       case NotificationType.urgentRequest:
         return AppRoutes.jobsList;
 
-      // Messages - vers les détails de la réservation
+      // Messages - géré directement par _navigateToChat
       case NotificationType.workerMessage:
-        return notification.reservationId != null
-            ? AppRoutes.reservationDetails
-            : AppRoutes.notifications;
+      case NotificationType.newMessage:
+        return null; // Navigation gérée par _navigateToChat
 
       // Système
       case NotificationType.systemNotification:
@@ -175,9 +229,18 @@ class NotificationNavigationService {
 
       case NotificationType.workerMessage:
         return NotificationAction(
-          label: 'Voir les détails',
-          icon: Icons.message,
-          route: AppRoutes.reservationDetails,
+          label: 'Ouvrir le chat',
+          icon: Icons.chat_bubble_rounded,
+          route: '', // Géré par _navigateToChat
+          isHighlighted: true,
+        );
+
+      case NotificationType.newMessage:
+        return NotificationAction(
+          label: 'Répondre',
+          icon: Icons.chat_bubble_rounded,
+          route: '', // Géré par _navigateToChat
+          isHighlighted: true,
         );
 
       case NotificationType.systemNotification:

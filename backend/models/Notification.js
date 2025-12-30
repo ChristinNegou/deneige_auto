@@ -23,6 +23,7 @@ const notificationSchema = new mongoose.Schema({
             'urgentRequest',
             'workerMessage',
             'systemNotification',
+            'newMessage',  // Pour les messages de chat
         ],
         required: [true, 'Le type est requis'],
     },

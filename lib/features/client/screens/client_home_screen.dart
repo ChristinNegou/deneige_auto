@@ -18,6 +18,8 @@ import '../../reservation/domain/entities/reservation.dart';
 import '../../reservation/domain/repositories/reservation_repository.dart';
 import '../../reservation/presentation/bloc/reservation_list_bloc.dart' as reservation_bloc;
 import '../../widgets/service_completed_dialog.dart';
+import '../../chat/presentation/bloc/chat_bloc.dart';
+import '../../chat/presentation/pages/chat_screen.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -525,6 +527,25 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     ],
                   ),
                 ),
+                // Bouton Chat si déneigeur assigné
+                if (reservation.workerId != null) ...[
+                  GestureDetector(
+                    onTap: () => _openChatFromCard(reservation),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.chat_bubble_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
                 // Flèche
                 Icon(
                   Icons.arrow_forward_ios,
@@ -954,6 +975,39 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Ouvre le chat avec le déneigeur depuis la carte de suivi
+  void _openChatFromCard(Reservation reservation) {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Erreur: utilisateur non authentifié'),
+          backgroundColor: AppTheme.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          ),
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => sl<ChatBloc>()..add(LoadMessages(reservation.id)),
+          child: ChatScreen(
+            reservationId: reservation.id,
+            otherUserName: reservation.workerName ?? 'Déneigeur',
+            otherUserPhoto: null,
+            currentUserId: authState.user.id,
+          ),
+        ),
       ),
     );
   }

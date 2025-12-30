@@ -134,6 +134,7 @@ router.post('/:reservationId', protect, async (req, res) => {
             metadata: {
                 messageId: message._id,
                 senderRole: isClient ? 'client' : 'worker',
+                senderName: senderName,
             },
         });
 

@@ -470,6 +470,8 @@ class NotificationsPageContent extends StatelessWidget {
         return Icons.priority_high_rounded;
       case NotificationType.workerMessage:
         return Icons.message_rounded;
+      case NotificationType.newMessage:
+        return Icons.chat_bubble_rounded;
       case NotificationType.systemNotification:
         return Icons.info_rounded;
     }
@@ -493,6 +495,7 @@ class NotificationsPageContent extends StatelessWidget {
       case NotificationType.weatherAlert:
         return AppTheme.info;
       case NotificationType.workerMessage:
+      case NotificationType.newMessage:
         return AppTheme.secondary;
       case NotificationType.systemNotification:
         return AppTheme.textSecondary;
