@@ -572,36 +572,45 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           // Boutons de contact
           Row(
             children: [
-              if (_currentJob.client.phoneNumber != null) ...[
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _callClient(_currentJob.client.phoneNumber!),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppTheme.success.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.phone_rounded, size: 20, color: AppTheme.success),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Appeler',
-                            style: TextStyle(
-                              color: AppTheme.success,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
+              // Bouton Appeler - toujours visible
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _handleCallClient(),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: _currentJob.client.phoneNumber != null
+                          ? AppTheme.success.withValues(alpha: 0.1)
+                          : AppTheme.textTertiary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.phone_rounded,
+                          size: 20,
+                          color: _currentJob.client.phoneNumber != null
+                              ? AppTheme.success
+                              : AppTheme.textTertiary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Appeler',
+                          style: TextStyle(
+                            color: _currentJob.client.phoneNumber != null
+                                ? AppTheme.success
+                                : AppTheme.textTertiary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-              ],
+              ),
+              const SizedBox(width: 8),
               // Bouton Chat in-app
               Expanded(
                 child: GestureDetector(
@@ -641,36 +650,45 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   ),
                 ),
               ),
-              if (_currentJob.client.phoneNumber != null) ...[
-                const SizedBox(width: 8),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _messageClient(_currentJob.client.phoneNumber!),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppTheme.info.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.sms_rounded, size: 20, color: AppTheme.info),
-                          const SizedBox(width: 6),
-                          Text(
-                            'SMS',
-                            style: TextStyle(
-                              color: AppTheme.info,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
+              const SizedBox(width: 8),
+              // Bouton SMS - toujours visible
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _handleMessageClient(),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: _currentJob.client.phoneNumber != null
+                          ? AppTheme.info.withValues(alpha: 0.1)
+                          : AppTheme.textTertiary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.sms_rounded,
+                          size: 20,
+                          color: _currentJob.client.phoneNumber != null
+                              ? AppTheme.info
+                              : AppTheme.textTertiary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'SMS',
+                          style: TextStyle(
+                            color: _currentJob.client.phoneNumber != null
+                                ? AppTheme.info
+                                : AppTheme.textTertiary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ],
           ),
         ],
@@ -1707,10 +1725,46 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     }
   }
 
+  /// Gère l'appel du client avec vérification du numéro
+  void _handleCallClient() {
+    if (_currentJob.client.phoneNumber != null && _currentJob.client.phoneNumber!.isNotEmpty) {
+      _callClient(_currentJob.client.phoneNumber!);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Numéro de téléphone non disponible'),
+          backgroundColor: AppTheme.warning,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          ),
+        ),
+      );
+    }
+  }
+
   Future<void> _callClient(String phone) async {
     final uri = Uri.parse('tel:$phone');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
+    }
+  }
+
+  /// Gère l'envoi de SMS au client avec vérification du numéro
+  void _handleMessageClient() {
+    if (_currentJob.client.phoneNumber != null && _currentJob.client.phoneNumber!.isNotEmpty) {
+      _messageClient(_currentJob.client.phoneNumber!);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Numéro de téléphone non disponible'),
+          backgroundColor: AppTheme.warning,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          ),
+        ),
+      );
     }
   }
 

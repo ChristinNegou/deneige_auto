@@ -341,7 +341,7 @@ router.get('/history', protect, authorize('snowWorker'), async (req, res) => {
         const total = await Reservation.countDocuments(query);
 
         const reservations = await Reservation.find(query)
-            .populate('userId', 'firstName lastName')
+            .populate('userId', 'firstName lastName phoneNumber')
             .populate('vehicle', 'make model color')
             .sort({ completedAt: -1 })
             .skip((page - 1) * limit)
