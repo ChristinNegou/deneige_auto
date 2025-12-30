@@ -4,10 +4,7 @@ import '../../features/auth/domain/entities/user.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/client/screens/client_home_screen.dart';
-import '../../features/snow_worker/screens/snow_worker_homescreen.dart';
-import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
-import '../../features/snow_worker/presentation/bloc/worker_stats_bloc.dart';
-import '../../features/snow_worker/presentation/bloc/worker_availability_bloc.dart';
+import '../../features/snow_worker/presentation/pages/worker_main_dashboard.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../../features/admin/presentation/bloc/admin_bloc.dart';
 import '../../features/admin/presentation/bloc/admin_event.dart';
@@ -46,15 +43,8 @@ class RoleBasedHomeWrapper extends StatelessWidget {
               );
 
             case UserRole.snowWorker:
-              return MultiBlocProvider(
-                key: uniqueKey,
-                providers: [
-                  BlocProvider(create: (context) => sl<WorkerJobsBloc>()),
-                  BlocProvider(create: (context) => sl<WorkerStatsBloc>()),
-                  BlocProvider(create: (context) => sl<WorkerAvailabilityBloc>()),
-                ],
-                child: const SnowWorkerHomeScreen(),
-              );
+              // WorkerMainDashboard gère ses propres BlocProviders
+              return WorkerMainDashboard(key: uniqueKey);
 
             case UserRole.admin:
               return BlocProvider(

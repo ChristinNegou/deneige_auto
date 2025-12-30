@@ -221,19 +221,23 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header with countdown, priority badge and price
+                    // Header with countdown, priority badge, status and price
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: Row(
                             children: [
-                              if (widget.job.isPriority) ...[
-                                _buildUrgentBadge(),
+                              if (widget.job.status != JobStatus.pending) ...[
+                                _buildStatusChip(widget.job.status),
                                 const SizedBox(width: 8),
-                              ],
-                              if (widget.job.status == JobStatus.pending)
+                              ] else ...[
+                                if (widget.job.isPriority) ...[
+                                  _buildUrgentBadge(),
+                                  const SizedBox(width: 8),
+                                ],
                                 _buildCountdownBadge(isUrgent),
+                              ],
                             ],
                           ),
                         ),
@@ -368,13 +372,6 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                 ),
               ),
 
-              // Status indicator for non-pending jobs
-              if (widget.job.status != JobStatus.pending)
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: _buildStatusChip(widget.job.status),
-                ),
             ],
           ),
         ),
