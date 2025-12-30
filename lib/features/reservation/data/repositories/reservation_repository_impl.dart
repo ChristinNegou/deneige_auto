@@ -241,6 +241,76 @@ class ReservationRepositoryImpl implements ReservationRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> rateReservation({
+    required String reservationId,
+    required int rating,
+    String? review,
+  }) async {
+    try {
+      final result = await remoteDataSource.rateReservation(
+        reservationId: reservationId,
+        rating: rating,
+        review: review,
+      );
+      return Right(result);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> getReservationRating(String reservationId) async {
+    try {
+      final result = await remoteDataSource.getReservationRating(reservationId);
+      return Right(result);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> addTip({
+    required String reservationId,
+    required double amount,
+  }) async {
+    try {
+      final result = await remoteDataSource.addTip(
+        reservationId: reservationId,
+        amount: amount,
+      );
+      return Right(result);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteVehicle(String vehicleId) async {
+    try {
+      await remoteDataSource.deleteVehicle(vehicleId);
+      return const Right(null);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
   /// Convertit une entité Reservation en Map pour l'API
   Map<String, dynamic> _reservationToMap(Reservation reservation) {
     // Si c'est déjà un ReservationModel, utiliser sa méthode toJson

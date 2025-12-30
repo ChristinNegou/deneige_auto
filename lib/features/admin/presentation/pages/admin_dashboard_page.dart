@@ -1,50 +1,16 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/di/injection_container.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/admin_stats.dart';
+import '../bloc/admin_bloc.dart';
+import '../bloc/admin_event.dart';
+import '../bloc/admin_state.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_event.dart';
 
-class AdminDashboardPage extends StatefulWidget {
+class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({super.key});
-
-  @override
-  State<AdminDashboardPage> createState() => _AdminDashboardPageState();
-}
-
-class _AdminDashboardPageState extends State<AdminDashboardPage> {
-  AdminStats? _stats;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStats();
-  }
-
-  Future<void> _loadStats() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final dio = sl<Dio>();
-      final response = await dio.get('/admin/dashboard');
-
-      if (response.data['success'] == true) {
-        setState(() {
-          _stats = AdminStats.fromJson(response.data['stats']);
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _error = 'Erreur de chargement: $e';
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,39 +20,116 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadStats,
+            onPressed: () => context.read<AdminBloc>().add(LoadDashboardStats()),
           ),
         ],
       ),
-      drawer: _buildDrawer(),
-      body: _buildBody(),
+      drawer: _buildDrawer(context),
+      body: BlocConsumer<AdminBloc, AdminState>(
+        listener: (context, state) {
+          if (state.successMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.successMessage!),
+                backgroundColor: Colors.green,
+              ),
+            );
+            context.read<AdminBloc>().add(ClearError());
+          }
+          if (state.errorMessage != null && state.actionStatus == AdminStatus.error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage!),
+                backgroundColor: Colors.red,
+              ),
+            );
+            context.read<AdminBloc>().add(ClearError());
+          }
+        },
+        builder: (context, state) {
+          if (state.statsStatus == AdminStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.statsStatus == AdminStatus.error) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+                  const SizedBox(height: 16),
+                  Text(state.errorMessage ?? 'Erreur de chargement'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.read<AdminBloc>().add(LoadDashboardStats()),
+                    child: const Text('Réessayer'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (state.stats == null) {
+            return const Center(child: Text('Aucune donnée'));
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<AdminBloc>().add(LoadDashboardStats());
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildQuickActions(context),
+                  const SizedBox(height: 24),
+                  _buildStatsGrid(context, state.stats!),
+                  const SizedBox(height: 24),
+                  _buildRevenueCard(state.stats!),
+                  const SizedBox(height: 24),
+                  _buildTopWorkersCard(context, state.stats!),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildDrawer() {
+  Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: AppTheme.primary,
+              gradient: LinearGradient(
+                colors: [AppTheme.primary, AppTheme.primary.withValues(alpha: 0.8)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.admin_panel_settings, size: 35, color: AppTheme.primary),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.admin_panel_settings, size: 35, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 const Text(
                   'Administration',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -100,51 +143,68 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               ],
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.dashboard),
-            title: const Text('Dashboard'),
-            selected: true,
+          _buildDrawerItem(
+            context,
+            icon: Icons.dashboard,
+            title: 'Dashboard',
+            isSelected: true,
             onTap: () => Navigator.pop(context),
           ),
-          ListTile(
-            leading: const Icon(Icons.people),
-            title: const Text('Utilisateurs'),
+          _buildDrawerItem(
+            context,
+            icon: Icons.people,
+            title: 'Utilisateurs',
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/admin/users');
+              Navigator.pushNamed(context, AppRoutes.adminUsers);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.calendar_today),
-            title: const Text('Réservations'),
+          _buildDrawerItem(
+            context,
+            icon: Icons.calendar_today,
+            title: 'Réservations',
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/admin/reservations');
+              Navigator.pushNamed(context, AppRoutes.adminReservations);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.ac_unit),
-            title: const Text('Déneigeurs'),
+          _buildDrawerItem(
+            context,
+            icon: Icons.ac_unit,
+            title: 'Déneigeurs',
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/admin/workers');
+              Navigator.pushNamed(context, AppRoutes.adminWorkers);
             },
           ),
           const Divider(),
-          ListTile(
-            leading: const Icon(Icons.notifications),
-            title: const Text('Envoyer notification'),
+          _buildDrawerItem(
+            context,
+            icon: Icons.notifications,
+            title: 'Envoyer notification',
             onTap: () {
               Navigator.pop(context);
-              _showBroadcastDialog();
+              _showBroadcastDialog(context);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.bar_chart),
-            title: const Text('Rapports'),
+          _buildDrawerItem(
+            context,
+            icon: Icons.bar_chart,
+            title: 'Rapports',
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/admin/reports');
+              Navigator.pushNamed(context, AppRoutes.adminReports);
+            },
+          ),
+          const Divider(),
+          _buildDrawerItem(
+            context,
+            icon: Icons.logout_rounded,
+            title: 'Déconnexion',
+            isLogout: true,
+            onTap: () {
+              Navigator.pop(context);
+              _showLogoutDialog(context);
             },
           ),
         ],
@@ -152,52 +212,129 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isSelected = false,
+    bool isLogout = false,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: isLogout ? Colors.red : (isSelected ? AppTheme.primary : null),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isLogout ? Colors.red : (isSelected ? AppTheme.primary : null),
+          fontWeight: isSelected ? FontWeight.bold : null,
+        ),
+      ),
+      selected: isSelected,
+      onTap: onTap,
+    );
+  }
 
-    if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-            const SizedBox(height: 16),
-            Text(_error!, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadStats,
-              child: const Text('Réessayer'),
+  Widget _buildQuickActions(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Actions rapides',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
-          ],
-        ),
-      );
-    }
-
-    if (_stats == null) {
-      return const Center(child: Text('Aucune donnée'));
-    }
-
-    return RefreshIndicator(
-      onRefresh: _loadStats,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildStatsGrid(),
-            const SizedBox(height: 24),
-            _buildRevenueCard(),
-            const SizedBox(height: 24),
-            _buildTopWorkersCard(),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildQuickActionButton(
+                context,
+                icon: Icons.person_add,
+                label: 'Utilisateurs',
+                color: Colors.teal,
+                onTap: () => Navigator.pushNamed(context, AppRoutes.adminUsers),
+              ),
+              _buildQuickActionButton(
+                context,
+                icon: Icons.event_note,
+                label: 'Réservations',
+                color: Colors.purple,
+                onTap: () => Navigator.pushNamed(context, AppRoutes.adminReservations),
+              ),
+              _buildQuickActionButton(
+                context,
+                icon: Icons.notifications_active,
+                label: 'Notifier',
+                color: Colors.orange,
+                onTap: () => _showBroadcastDialog(context),
+              ),
+              _buildQuickActionButton(
+                context,
+                icon: Icons.analytics,
+                label: 'Rapports',
+                color: Colors.indigo,
+                onTap: () => Navigator.pushNamed(context, AppRoutes.adminReports),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildStatsGrid() {
+  Widget _buildQuickActionButton(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 26),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsGrid(BuildContext context, AdminStats stats) {
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -207,95 +344,109 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       childAspectRatio: 1.5,
       children: [
         _buildStatCard(
+          context,
           'Utilisateurs',
-          _stats!.users.total.toString(),
+          stats.users.total.toString(),
           Icons.people,
           Colors.blue,
-          subtitle: '${_stats!.users.clients} clients, ${_stats!.users.workers} déneigeurs',
+          subtitle: '${stats.users.clients} clients, ${stats.users.workers} déneigeurs',
+          onTap: () => Navigator.pushNamed(context, AppRoutes.adminUsers),
         ),
         _buildStatCard(
+          context,
           'Réservations',
-          _stats!.reservations.total.toString(),
+          stats.reservations.total.toString(),
           Icons.calendar_today,
           Colors.purple,
-          subtitle: '${_stats!.reservations.today} aujourd\'hui',
+          subtitle: '${stats.reservations.today} aujourd\'hui',
+          onTap: () => Navigator.pushNamed(context, AppRoutes.adminReservations),
         ),
         _buildStatCard(
+          context,
           'En attente',
-          _stats!.reservations.pending.toString(),
+          stats.reservations.pending.toString(),
           Icons.pending_actions,
           Colors.orange,
           subtitle: 'À traiter',
+          onTap: () => Navigator.pushNamed(context, AppRoutes.adminReservations),
         ),
         _buildStatCard(
+          context,
           'Taux de complétion',
-          '${_stats!.reservations.completionRate}%',
+          '${stats.reservations.completionRate.toStringAsFixed(0)}%',
           Icons.check_circle,
           Colors.green,
-          subtitle: '${_stats!.reservations.completed} terminées',
+          subtitle: '${stats.reservations.completed} terminées',
+          onTap: () => Navigator.pushNamed(context, AppRoutes.adminReports),
         ),
       ],
     );
   }
 
   Widget _buildStatCard(
+    BuildContext context,
     String title,
     String value,
     IconData icon,
     Color color, {
     String? subtitle,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, color: color, size: 24),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              if (subtitle != null)
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(icon, color: color, size: 24),
                 Text(
-                  subtitle,
+                  value,
                   style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey.shade600,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: color,
                   ),
                 ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildRevenueCard() {
+  Widget _buildRevenueCard(AdminStats stats) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -327,16 +478,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildRevenueItem('Total', _stats!.revenue.total, true),
-              _buildRevenueItem('Ce mois', _stats!.revenue.thisMonth, false),
+              _buildRevenueItem('Total', stats.revenue.total, true),
+              _buildRevenueItem('Ce mois', stats.revenue.thisMonth, false),
             ],
           ),
           const Divider(color: Colors.white24, height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildRevenueItem('Commission plateforme', _stats!.revenue.platformFees, false),
-              _buildRevenueItem('Pourboires', _stats!.revenue.tips, false),
+              _buildRevenueItem('Commission plateforme', stats.revenue.platformFees, false),
+              _buildRevenueItem('Pourboires', stats.revenue.tips, false),
             ],
           ),
         ],
@@ -368,7 +519,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildTopWorkersCard() {
+  Widget _buildTopWorkersCard(BuildContext context, AdminStats stats) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -385,25 +536,37 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.star, color: Colors.amber),
-              SizedBox(width: 8),
-              Text(
-                'Top Déneigeurs',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+              const Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber),
+                  SizedBox(width: 8),
+                  Text(
+                    'Top Déneigeurs',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              TextButton(
+                onPressed: () => Navigator.pushNamed(context, AppRoutes.adminWorkers),
+                child: const Text('Voir tous'),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          if (_stats!.topWorkers.isEmpty)
-            const Text('Aucun déneigeur pour le moment')
+          if (stats.topWorkers.isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: Text('Aucun déneigeur pour le moment')),
+            )
           else
-            ...List.generate(_stats!.topWorkers.length, (index) {
-              final worker = _stats!.topWorkers[index];
+            ...List.generate(stats.topWorkers.length, (index) {
+              final worker = stats.topWorkers[index];
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
@@ -438,14 +601,22 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         ],
                       ),
                     ),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, size: 16, color: Colors.amber),
-                        Text(
-                          worker.rating.toStringAsFixed(1),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star, size: 16, color: Colors.amber),
+                          const SizedBox(width: 4),
+                          Text(
+                            worker.rating.toStringAsFixed(1),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -469,92 +640,155 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     }
   }
 
-  void _showBroadcastDialog() {
+  void _showBroadcastDialog(BuildContext context) {
     final titleController = TextEditingController();
     final messageController = TextEditingController();
     String? selectedRole;
+    final adminBloc = context.read<AdminBloc>();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Envoyer une notification'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setState) => AlertDialog(
+          title: const Row(
             children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Titre',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: messageController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Message',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: selectedRole,
-                decoration: const InputDecoration(
-                  labelText: 'Destinataires',
-                  border: OutlineInputBorder(),
-                ),
-                items: const [
-                  DropdownMenuItem(value: null, child: Text('Tous les utilisateurs')),
-                  DropdownMenuItem(value: 'client', child: Text('Clients uniquement')),
-                  DropdownMenuItem(value: 'snowWorker', child: Text('Déneigeurs uniquement')),
-                ],
-                onChanged: (value) => selectedRole = value,
-              ),
+              Icon(Icons.notifications_active, color: Colors.orange),
+              SizedBox(width: 12),
+              Text('Envoyer une notification'),
             ],
           ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    labelText: 'Titre',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.title),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: messageController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Message',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.message),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedRole,
+                  decoration: InputDecoration(
+                    labelText: 'Destinataires',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.people),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: null, child: Text('Tous les utilisateurs')),
+                    DropdownMenuItem(value: 'client', child: Text('Clients uniquement')),
+                    DropdownMenuItem(value: 'snowWorker', child: Text('Déneigeurs uniquement')),
+                  ],
+                  onChanged: (value) => setState(() => selectedRole = value),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Annuler'),
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.send),
+              label: const Text('Envoyer'),
+              onPressed: () {
+                if (titleController.text.isEmpty || messageController.text.isEmpty) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    const SnackBar(
+                      content: Text('Veuillez remplir tous les champs'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                adminBloc.add(BroadcastNotification(
+                      title: titleController.text,
+                      message: messageController.text,
+                      targetRole: selectedRole,
+                    ));
+                Navigator.pop(dialogContext);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
+            ),
+            const SizedBox(width: 12),
+            const Text('Déconnexion Admin'),
+          ],
+        ),
+        content: const Text(
+          'Voulez-vous vraiment vous déconnecter du panneau d\'administration ?',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'Annuler',
+              style: TextStyle(color: Colors.grey.shade600),
+            ),
           ),
           ElevatedButton(
-            onPressed: () async {
-              if (titleController.text.isEmpty || messageController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Veuillez remplir tous les champs')),
-                );
-                return;
-              }
-
-              try {
-                final dio = sl<Dio>();
-                await dio.post('/admin/notifications/broadcast', data: {
-                  'title': titleController.text,
-                  'message': messageController.text,
-                  if (selectedRole != null) 'targetRole': selectedRole,
-                });
-
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Notification envoyée avec succès'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
-                  );
-                }
-              }
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              // Déclencher la déconnexion via AuthBloc
+              context.read<AuthBloc>().add(LogoutRequested());
+              // Naviguer vers la page de sélection de compte
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.accountType,
+                (route) => false,
+              );
             },
-            child: const Text('Envoyer'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('Déconnexion'),
           ),
         ],
       ),

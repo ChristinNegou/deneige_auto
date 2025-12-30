@@ -364,34 +364,55 @@ class ProfilePage extends StatelessWidget {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         ),
-        title: const Text('Déconnexion'),
-        content: const Text('Voulez-vous vraiment vous déconnecter ?'),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+              ),
+              child: Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+            ),
+            const SizedBox(width: 12),
+            const Text('Déconnexion'),
+          ],
+        ),
+        content: const Text(
+          'Voulez-vous vraiment vous déconnecter de votre compte ?',
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'Annuler',
               style: TextStyle(color: AppTheme.textSecondary),
             ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
+              // Déclencher la déconnexion via AuthBloc
               context.read<AuthBloc>().add(LogoutRequested());
+              // Naviguer vers la page de sélection de compte
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                AppRoutes.login,
+                AppRoutes.accountType,
                 (route) => false,
               );
             },
-            child: const Text(
-              'Déconnexion',
-              style: TextStyle(color: AppTheme.error),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
             ),
+            child: const Text('Déconnexion'),
           ),
         ],
       ),

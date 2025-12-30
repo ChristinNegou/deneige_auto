@@ -91,6 +91,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           statusCode: 401,
         );
       }
+      // Vérifier si l'utilisateur est suspendu
+      if (e.response?.statusCode == 403 &&
+          e.response?.data['code'] == 'USER_SUSPENDED') {
+        throw SuspendedException.fromJson(e.response!.data);
+      }
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }

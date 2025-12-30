@@ -1147,4 +1147,388 @@ router.get('/client/cancellation-policy', protect, (req, res) => {
     });
 });
 
+// ============================================================================
+// RATING SYSTEM
+// ============================================================================
+
+/**
+ * @route   POST /api/reservations/:id/rate
+ * @desc    Noter un déneigeur après un job complété
+ * @access  Private (Client only)
+ */
+router.post('/:id/rate', protect, async (req, res) => {
+    try {
+        const { rating, review } = req.body;
+        const reservationId = req.params.id;
+
+        // Validation de la note
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).json({
+                success: false,
+                message: 'La note doit être entre 1 et 5 étoiles',
+            });
+        }
+
+        // Récupérer la réservation
+        const reservation = await Reservation.findById(reservationId);
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Réservation non trouvée',
+            });
+        }
+
+        // Vérifier que c'est bien le client de cette réservation
+        if (reservation.userId.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: 'Vous ne pouvez noter que vos propres réservations',
+            });
+        }
+
+        // Vérifier que le job est complété
+        if (reservation.status !== 'completed') {
+            return res.status(400).json({
+                success: false,
+                message: 'Vous ne pouvez noter qu\'un job complété',
+            });
+        }
+
+        // Vérifier qu'il n'y a pas déjà une note
+        if (reservation.rating) {
+            return res.status(400).json({
+                success: false,
+                message: 'Vous avez déjà noté ce job',
+            });
+        }
+
+        // Vérifier qu'il y a un déneigeur assigné
+        if (!reservation.workerId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucun déneigeur assigné à ce job',
+            });
+        }
+
+        // Sauvegarder la note sur la réservation
+        reservation.rating = rating;
+        if (review && review.trim()) {
+            reservation.review = review.trim();
+        }
+        reservation.ratedAt = new Date();
+        await reservation.save();
+
+        // Mettre à jour la moyenne du déneigeur
+        const worker = await User.findById(reservation.workerId);
+        if (worker && worker.workerProfile) {
+            const currentRatingsCount = worker.workerProfile.totalRatingsCount || 0;
+            const currentAverage = worker.workerProfile.averageRating || 0;
+
+            // Calculer la nouvelle moyenne
+            const newRatingsCount = currentRatingsCount + 1;
+            const newAverage = ((currentAverage * currentRatingsCount) + rating) / newRatingsCount;
+
+            worker.workerProfile.totalRatingsCount = newRatingsCount;
+            worker.workerProfile.averageRating = Math.round(newAverage * 10) / 10; // Arrondir à 1 décimale
+            await worker.save();
+
+            // Envoyer une notification au déneigeur
+            await Notification.create({
+                userId: worker._id,
+                type: 'rating',
+                title: 'Nouvelle évaluation',
+                message: `Vous avez reçu une note de ${rating}/5${review ? ' avec un commentaire' : ''}.`,
+                priority: 'normal',
+                data: {
+                    reservationId: reservation._id,
+                    rating,
+                    hasReview: !!review,
+                },
+            });
+
+            console.log(`⭐ Nouvelle note: ${rating}/5 pour ${worker.firstName} ${worker.lastName}. Moyenne: ${worker.workerProfile.averageRating}`);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Merci pour votre évaluation !',
+            rating: {
+                rating,
+                review: reservation.review,
+                ratedAt: reservation.ratedAt,
+            },
+            workerNewAverage: worker?.workerProfile?.averageRating,
+        });
+
+    } catch (error) {
+        console.error('Erreur lors de la notation:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'enregistrement de la note',
+        });
+    }
+});
+
+/**
+ * @route   GET /api/reservations/:id/rating
+ * @desc    Récupérer la note d'une réservation
+ * @access  Private
+ */
+router.get('/:id/rating', protect, async (req, res) => {
+    try {
+        const reservation = await Reservation.findById(req.params.id)
+            .select('rating review ratedAt workerId userId')
+            .populate('workerId', 'firstName lastName workerProfile.averageRating');
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Réservation non trouvée',
+            });
+        }
+
+        // Vérifier les permissions (client ou worker de cette réservation)
+        const isClient = reservation.userId.toString() === req.user.id;
+        const isWorker = reservation.workerId?._id.toString() === req.user.id;
+        const isAdmin = req.user.role === 'admin';
+
+        if (!isClient && !isWorker && !isAdmin) {
+            return res.status(403).json({
+                success: false,
+                message: 'Accès non autorisé',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            hasRating: !!reservation.rating,
+            rating: reservation.rating,
+            review: reservation.review,
+            ratedAt: reservation.ratedAt,
+            worker: reservation.workerId ? {
+                id: reservation.workerId._id,
+                name: `${reservation.workerId.firstName} ${reservation.workerId.lastName}`,
+                averageRating: reservation.workerId.workerProfile?.averageRating || 0,
+            } : null,
+        });
+
+    } catch (error) {
+        console.error('Erreur récupération note:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération de la note',
+        });
+    }
+});
+
+/**
+ * @route   GET /api/reservations/worker/:workerId/reviews
+ * @desc    Récupérer tous les avis d'un déneigeur
+ * @access  Public
+ */
+router.get('/worker/:workerId/reviews', async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const [reviews, total] = await Promise.all([
+            Reservation.find({
+                workerId: req.params.workerId,
+                rating: { $exists: true, $ne: null },
+            })
+                .select('rating review ratedAt userId')
+                .populate('userId', 'firstName lastName')
+                .sort({ ratedAt: -1 })
+                .skip(skip)
+                .limit(parseInt(limit)),
+            Reservation.countDocuments({
+                workerId: req.params.workerId,
+                rating: { $exists: true, $ne: null },
+            }),
+        ]);
+
+        // Récupérer les stats du worker
+        const worker = await User.findById(req.params.workerId)
+            .select('firstName lastName workerProfile.averageRating workerProfile.totalRatingsCount');
+
+        res.status(200).json({
+            success: true,
+            worker: worker ? {
+                id: worker._id,
+                name: `${worker.firstName} ${worker.lastName}`,
+                averageRating: worker.workerProfile?.averageRating || 0,
+                totalRatings: worker.workerProfile?.totalRatingsCount || 0,
+            } : null,
+            reviews: reviews.map(r => ({
+                rating: r.rating,
+                review: r.review,
+                ratedAt: r.ratedAt,
+                client: r.userId ? `${r.userId.firstName} ${r.userId.lastName?.charAt(0) || ''}.` : 'Client',
+            })),
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / parseInt(limit)),
+            },
+        });
+
+    } catch (error) {
+        console.error('Erreur récupération avis:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération des avis',
+        });
+    }
+});
+
+// @route   POST /api/reservations/:id/tip
+// @desc    Ajouter un pourboire à une réservation complétée
+// @access  Private (Client owner only)
+router.post('/:id/tip', protect, async (req, res) => {
+    try {
+        const { amount } = req.body;
+
+        // Validation du montant
+        if (!amount || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le montant du pourboire doit être supérieur à 0',
+            });
+        }
+
+        if (amount > 500) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le pourboire ne peut pas dépasser 500$',
+            });
+        }
+
+        const reservation = await Reservation.findById(req.params.id)
+            .populate('workerId', 'firstName lastName workerProfile');
+
+        if (!reservation) {
+            return res.status(404).json({
+                success: false,
+                message: 'Réservation non trouvée',
+            });
+        }
+
+        // Vérifier que c'est bien le client qui fait la demande
+        if (reservation.userId.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: 'Vous ne pouvez donner un pourboire que sur vos propres réservations',
+            });
+        }
+
+        // Vérifier que la réservation est complétée
+        if (reservation.status !== 'completed') {
+            return res.status(400).json({
+                success: false,
+                message: 'Vous ne pouvez donner un pourboire que sur une réservation complétée',
+            });
+        }
+
+        // Vérifier qu'un pourboire n'a pas déjà été donné
+        if (reservation.tipAmount > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Un pourboire a déjà été donné pour cette réservation',
+                existingTip: reservation.tipAmount,
+            });
+        }
+
+        const worker = reservation.workerId;
+        if (!worker) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucun déneigeur assigné à cette réservation',
+            });
+        }
+
+        // Mettre à jour le pourboire sur la réservation
+        reservation.tipAmount = amount;
+        reservation.payout.tipAmount = amount;
+
+        // Mettre à jour le montant du worker (le pourboire va à 100% au worker)
+        reservation.payout.workerAmount = (reservation.payout.workerAmount || 0) + amount;
+
+        let transferResult = null;
+
+        // Si le worker a un compte Stripe Connect, transférer le pourboire
+        if (worker.workerProfile?.stripeConnectId && reservation.paymentStatus === 'succeeded') {
+            try {
+                const transfer = await stripe.transfers.create({
+                    amount: Math.round(amount * 100), // En cents
+                    currency: 'cad',
+                    destination: worker.workerProfile.stripeConnectId,
+                    transfer_group: `reservation_${reservation._id}`,
+                    metadata: {
+                        reservationId: reservation._id.toString(),
+                        type: 'tip',
+                        clientId: req.user.id,
+                        workerId: worker._id.toString(),
+                    },
+                });
+
+                transferResult = {
+                    success: true,
+                    transferId: transfer.id,
+                    amount: amount,
+                };
+
+                console.log(`✅ Transfert pourboire Stripe créé: ${transfer.id} - ${amount}$`);
+
+            } catch (stripeError) {
+                console.error('❌ Erreur transfert pourboire Stripe:', stripeError.message);
+                transferResult = {
+                    success: false,
+                    error: stripeError.message,
+                };
+            }
+        }
+
+        // Mettre à jour les stats du worker
+        const workerDoc = await User.findById(worker._id);
+        if (workerDoc) {
+            workerDoc.workerProfile.totalTipsReceived = (workerDoc.workerProfile.totalTipsReceived || 0) + amount;
+            workerDoc.workerProfile.totalEarnings = (workerDoc.workerProfile.totalEarnings || 0) + amount;
+            await workerDoc.save();
+        }
+
+        await reservation.save();
+
+        // Notifier le worker du pourboire reçu
+        await Notification.create({
+            userId: worker._id,
+            type: 'tipReceived',
+            title: 'Pourboire reçu!',
+            message: `Vous avez reçu un pourboire de ${amount.toFixed(2)}$ de la part d'un client. Merci pour votre excellent travail!`,
+            priority: 'high',
+            reservationId: reservation._id,
+            metadata: {
+                tipAmount: amount,
+                transferStatus: transferResult?.success ? 'completed' : 'pending',
+            },
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Pourboire envoyé avec succès',
+            tipAmount: amount,
+            workerName: `${worker.firstName} ${worker.lastName}`,
+            transfer: transferResult,
+        });
+
+    } catch (error) {
+        console.error('Erreur ajout pourboire:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'envoi du pourboire',
+        });
+    }
+});
+
 module.exports = router;

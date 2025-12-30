@@ -98,3 +98,21 @@ class PhoneCodeResent extends AuthState {
   @override
   List<Object?> get props => [devCode];
 }
+
+/// État lorsqu'un utilisateur est suspendu (lors de la connexion ou en cours de session)
+class UserSuspended extends AuthState {
+  final String message;
+  final String? reason;
+  final DateTime? suspendedUntil;
+  final String? suspendedUntilDisplay;
+
+  const UserSuspended({
+    required this.message,
+    this.reason,
+    this.suspendedUntil,
+    this.suspendedUntilDisplay,
+  });
+
+  @override
+  List<Object?> get props => [message, reason, suspendedUntil, suspendedUntilDisplay];
+}

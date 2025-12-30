@@ -161,6 +161,11 @@ const reservationSchema = new mongoose.Schema({
     review: {
         type: String,
         trim: true,
+        maxlength: 500,
+    },
+    ratedAt: {
+        type: Date,
+        default: null,
     },
 
     // Tip from client to worker

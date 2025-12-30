@@ -7,6 +7,8 @@ import '../../domain/entities/worker_profile.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_event.dart' show LogoutRequested;
 
 class WorkerSettingsPage extends StatelessWidget {
   const WorkerSettingsPage({super.key});
@@ -129,6 +131,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                           _buildNotificationsSection(),
                           const SizedBox(height: 24),
                           _buildSaveButton(),
+                          const SizedBox(height: 24),
+                          _buildLogoutSection(),
                           const SizedBox(height: 32),
                         ],
                       ),
@@ -985,5 +989,122 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
         ),
       );
     }
+  }
+
+  Widget _buildLogoutSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        boxShadow: AppTheme.shadowSM,
+        border: Border.all(color: AppTheme.error.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppTheme.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+                child: const Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Text('Compte', style: AppTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: () => _showLogoutDialog(context),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.error.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Se déconnecter',
+                    style: AppTheme.labelLarge.copyWith(
+                      color: AppTheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+              ),
+              child: Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+            ),
+            const SizedBox(width: 12),
+            const Text('Déconnexion'),
+          ],
+        ),
+        content: const Text(
+          'Voulez-vous vraiment vous déconnecter de votre compte déneigeur ?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'Annuler',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              // Déclencher la déconnexion via AuthBloc
+              context.read<AuthBloc>().add(LogoutRequested());
+              // Naviguer vers la page de sélection de compte
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.accountType,
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+            ),
+            child: const Text('Déconnexion'),
+          ),
+        ],
+      ),
+    );
   }
 }

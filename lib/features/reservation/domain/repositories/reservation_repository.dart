@@ -70,4 +70,22 @@ abstract class ReservationRepository {
     String? address,
   });
 
+  /// Noter un déneigeur après un job complété
+  Future<Either<Failure, Map<String, dynamic>>> rateReservation({
+    required String reservationId,
+    required int rating,
+    String? review,
+  });
+
+  /// Récupérer la note d'une réservation
+  Future<Either<Failure, Map<String, dynamic>>> getReservationRating(String reservationId);
+
+  /// Ajouter un pourboire à une réservation complétée
+  Future<Either<Failure, Map<String, dynamic>>> addTip({
+    required String reservationId,
+    required double amount,
+  });
+
+  /// Supprimer un véhicule
+  Future<Either<Failure, void>> deleteVehicle(String vehicleId);
 }

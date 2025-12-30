@@ -1,5 +1,6 @@
 
 import 'package:deneige_auto/features/reservation/domain/usecases/add_vehicle_usecase.dart';
+import 'package:deneige_auto/features/reservation/domain/usecases/delete_vehicle_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../reservation/domain/entities/vehicle.dart';
@@ -82,10 +83,12 @@ class VehicleState extends Equatable {
 class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
   final GetVehiclesUseCase getVehicles;
   final AddVehicleUseCase addVehicle;
+  final DeleteVehicleUseCase deleteVehicle;
 
   VehicleBloc({
     required this.getVehicles,
     required this.addVehicle,
+    required this.deleteVehicle,
   }) : super(const VehicleState()) {
     on<LoadVehicles>(_onLoadVehicles);
     on<AddVehicle>(_onAddVehicle);
@@ -142,10 +145,26 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
       DeleteVehicle event,
       Emitter<VehicleState> emit,
       ) async {
-    // TODO: Implémenter la suppression via API
-    final updatedVehicles = state.vehicles
-        .where((v) => v.id != event.vehicleId)
-        .toList();
-    emit(state.copyWith(vehicles: updatedVehicles));
+    emit(state.copyWith(isSubmitting: true, clearError: true));
+
+    final result = await deleteVehicle(event.vehicleId);
+
+    result.fold(
+          (failure) => emit(state.copyWith(
+        isSubmitting: false,
+        errorMessage: failure.message,
+      )),
+          (_) {
+        final updatedVehicles = state.vehicles
+            .where((v) => v.id != event.vehicleId)
+            .toList();
+        emit(state.copyWith(
+          isSubmitting: false,
+          vehicles: updatedVehicles,
+          successMessage: 'Véhicule supprimé avec succès',
+          clearError: true,
+        ));
+      },
+    );
   }
 }

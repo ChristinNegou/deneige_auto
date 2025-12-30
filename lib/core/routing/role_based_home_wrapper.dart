@@ -9,6 +9,8 @@ import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../../features/snow_worker/presentation/bloc/worker_stats_bloc.dart';
 import '../../features/snow_worker/presentation/bloc/worker_availability_bloc.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
+import '../../features/admin/presentation/bloc/admin_bloc.dart';
+import '../../features/admin/presentation/bloc/admin_event.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/notifications/presentation/bloc/notification_bloc.dart';
 import '../../features/reservation/presentation/bloc/reservation_list_bloc.dart';
@@ -26,10 +28,15 @@ class RoleBasedHomeWrapper extends StatelessWidget {
         if (state is AuthAuthenticated) {
           final user = state.user;
 
+          // Utiliser une Key unique basée sur l'ID utilisateur et le rôle
+          // pour forcer une reconstruction complète lors du changement de compte
+          final uniqueKey = ValueKey('${user.id}_${user.role.name}');
+
           // Rediriger vers le bon dashboard selon le rôle
           switch (user.role) {
             case UserRole.client:
               return MultiBlocProvider(
+                key: uniqueKey,
                 providers: [
                   BlocProvider(create: (context) => sl<HomeBloc>()),
                   BlocProvider(create: (context) => sl<ReservationListBloc>()),
@@ -40,6 +47,7 @@ class RoleBasedHomeWrapper extends StatelessWidget {
 
             case UserRole.snowWorker:
               return MultiBlocProvider(
+                key: uniqueKey,
                 providers: [
                   BlocProvider(create: (context) => sl<WorkerJobsBloc>()),
                   BlocProvider(create: (context) => sl<WorkerStatsBloc>()),
@@ -50,12 +58,14 @@ class RoleBasedHomeWrapper extends StatelessWidget {
 
             case UserRole.admin:
               return BlocProvider(
-                create: (context) => sl<HomeBloc>(),
+                key: uniqueKey,
+                create: (context) => sl<AdminBloc>()..add(LoadDashboardStats()),
                 child: const AdminDashboardPage(),
               );
 
             default:
               return MultiBlocProvider(
+                key: uniqueKey,
                 providers: [
                   BlocProvider(create: (context) => sl<HomeBloc>()),
                   BlocProvider(create: (context) => sl<ReservationListBloc>()),

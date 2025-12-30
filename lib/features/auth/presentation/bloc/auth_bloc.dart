@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../../core/services/push_notification_service.dart';
 import '../../../../core/services/analytics_service.dart';
+import '../../../../core/services/socket_service.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/forgot_password_usecase.dart';
@@ -13,6 +16,7 @@ import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/update_profile_usecase.dart';
 import 'auth_event.dart';
+import 'auth_interceptor.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -24,6 +28,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ResetPasswordUseCase resetPassword;
   final UpdateProfileUseCase updateProfile;
   final AuthRepository authRepository;
+
+  StreamSubscription<Map<String, dynamic>>? _suspensionSubscription;
 
   AuthBloc({
     required this.login,
@@ -45,6 +51,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SendPhoneVerificationCode>(_onSendPhoneVerificationCode);
     on<VerifyPhoneCode>(_onVerifyPhoneCode);
     on<ResendPhoneVerificationCode>(_onResendPhoneVerificationCode);
+    on<ForcedLogout>(_onForcedLogout);
+
+    // Écouter les événements de suspension de l'intercepteur
+    _suspensionSubscription = AuthInterceptor.suspensionStream.listen((data) {
+      final details = data['suspensionDetails'] as Map<String, dynamic>?;
+      add(ForcedLogout(
+        reason: data['message'] ?? 'Votre compte est suspendu',
+        suspensionReason: details?['reason'],
+        suspendedUntil: details?['suspendedUntil'] != null
+            ? DateTime.tryParse(details!['suspendedUntil'].toString())
+            : null,
+        suspendedUntilDisplay: details?['suspendedUntilDisplay'],
+      ));
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _suspensionSubscription?.cancel();
+    return super.close();
   }
 
   Future<void> _onUpdateProfile(
@@ -78,13 +104,41 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await login(event.email, event.password);
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
+          (failure) {
+            // Vérifier si c'est une erreur de suspension
+            if (failure is SuspendedFailure) {
+              emit(UserSuspended(
+                message: failure.message,
+                reason: failure.reason,
+                suspendedUntil: failure.suspendedUntil,
+                suspendedUntilDisplay: failure.suspendedUntilDisplay,
+              ));
+            } else {
+              emit(AuthError(message: failure.message));
+            }
+          },
           (user) {
             // Enregistrer le token FCM et configurer les notifications
             _setupNotificationsForUser(user);
             emit(AuthAuthenticated(user: user));
           },
     );
+  }
+
+  Future<void> _onForcedLogout(
+      ForcedLogout event,
+      Emitter<AuthState> emit,
+      ) async {
+    // Nettoyer toutes les ressources avant la déconnexion forcée
+    await _cleanupAllResources();
+
+    // Émettre l'état UserSuspended pour afficher le dialog
+    emit(UserSuspended(
+      message: event.reason,
+      reason: event.suspensionReason,
+      suspendedUntil: event.suspendedUntil,
+      suspendedUntilDisplay: event.suspendedUntilDisplay,
+    ));
   }
 
   Future<void> _onRegisterRequested(
@@ -118,8 +172,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ) async {
     emit(AuthLoading());
 
-    // Désinscrire le token FCM et se désabonner des topics
-    await _cleanupNotifications();
+    // Nettoyer toutes les ressources avant la déconnexion
+    await _cleanupAllResources();
 
     final result = await logout();
 
@@ -294,6 +348,37 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     debugPrint('Subscribed to topics for role: ${role.name}');
   }
 
+  /// Nettoie toutes les ressources lors de la déconnexion
+  /// (notifications, socket, analytics)
+  Future<void> _cleanupAllResources() async {
+    try {
+      // 1. Déconnecter le socket en temps réel
+      await _disconnectSocket();
+
+      // 2. Nettoyer les notifications
+      await _cleanupNotifications();
+
+      // 3. Logger la déconnexion dans Analytics
+      final analytics = sl<AnalyticsService>();
+      await analytics.logLogout();
+
+      debugPrint('All resources cleaned up successfully');
+    } catch (e) {
+      debugPrint('Error cleaning up resources: $e');
+    }
+  }
+
+  /// Déconnecte le service Socket.IO
+  Future<void> _disconnectSocket() async {
+    try {
+      final socketService = SocketService();
+      await socketService.disconnect();
+      debugPrint('Socket disconnected');
+    } catch (e) {
+      debugPrint('Error disconnecting socket: $e');
+    }
+  }
+
   /// Nettoie les notifications lors de la déconnexion
   Future<void> _cleanupNotifications() async {
     try {
@@ -307,10 +392,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await pushService.unsubscribeFromTopic('clients');
       await pushService.unsubscribeFromTopic('workers');
       await pushService.unsubscribeFromTopic('admins');
-
-      // Logger la déconnexion
-      final analytics = sl<AnalyticsService>();
-      await analytics.logLogout();
 
       debugPrint('Notifications cleaned up');
     } catch (e) {

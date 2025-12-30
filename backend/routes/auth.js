@@ -118,6 +118,24 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        // Vérifier si l'utilisateur est suspendu
+        if (user.isSuspended) {
+            const suspendedUntilStr = user.suspendedUntil
+                ? user.suspendedUntil.toLocaleDateString('fr-CA')
+                : 'indéterminée';
+
+            return res.status(403).json({
+                success: false,
+                code: 'USER_SUSPENDED',
+                message: 'Votre compte est suspendu',
+                suspensionDetails: {
+                    reason: user.suspensionReason || 'Non spécifiée',
+                    suspendedUntil: user.suspendedUntil,
+                    suspendedUntilDisplay: suspendedUntilStr,
+                },
+            });
+        }
+
         const token = generateToken(user._id, user.role);
 
         res.status(200).json({

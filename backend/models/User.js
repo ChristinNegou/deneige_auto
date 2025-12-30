@@ -53,6 +53,19 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    // Suspension fields (for all user types)
+    isSuspended: {
+        type: Boolean,
+        default: false,
+    },
+    suspendedUntil: {
+        type: Date,
+        default: null,
+    },
+    suspensionReason: {
+        type: String,
+        default: null,
+    },
     // Firebase Cloud Messaging token for push notifications
     fcmToken: {
         type: String,
