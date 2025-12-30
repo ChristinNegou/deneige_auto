@@ -13,6 +13,8 @@ enum NotificationType {
   urgentRequest,           // Demande urgente
   workerMessage,           // Message du déneigeur
   newMessage,              // Nouveau message de chat
+  tipReceived,             // Pourboire reçu par le déneigeur
+  rating,                  // Évaluation reçue par le déneigeur
   systemNotification,      // Notification système
 }
 
@@ -158,6 +160,10 @@ extension NotificationTypeExtension on NotificationType {
         return 'message';
       case NotificationType.newMessage:
         return 'chat_bubble';
+      case NotificationType.tipReceived:
+        return 'attach_money';
+      case NotificationType.rating:
+        return 'star';
       case NotificationType.systemNotification:
         return 'info';
     }
@@ -189,6 +195,10 @@ extension NotificationTypeExtension on NotificationType {
         return 'Message';
       case NotificationType.newMessage:
         return 'Nouveau message';
+      case NotificationType.tipReceived:
+        return 'Pourboire reçu';
+      case NotificationType.rating:
+        return 'Évaluation';
       case NotificationType.systemNotification:
         return 'Système';
     }
