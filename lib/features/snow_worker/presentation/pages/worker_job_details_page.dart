@@ -8,6 +8,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../chat/presentation/bloc/chat_bloc.dart';
+import '../../../chat/presentation/pages/chat_screen.dart';
 import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_jobs_bloc.dart';
 import '../../data/datasources/worker_remote_datasource.dart'
@@ -282,11 +286,13 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           ),
           const SizedBox(height: 16),
           _buildInfoRow('Nom', job.client.fullName),
-          if (job.client.phoneNumber != null) ...[
+          if (job.client.phoneNumber != null)
             _buildInfoRow('Téléphone', job.client.phoneNumber!),
-            const SizedBox(height: 12),
-            Row(
-              children: [
+          const SizedBox(height: 12),
+          // Boutons de contact - Chat toujours disponible
+          Row(
+            children: [
+              if (job.client.phoneNumber != null) ...[
                 Expanded(
                   child: _buildContactButton(
                     icon: Icons.phone_rounded,
@@ -295,18 +301,25 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     onTap: _callClient,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
+              ],
+              // Bouton Chat avec gradient
+              Expanded(
+                child: _buildChatButton(),
+              ),
+              if (job.client.phoneNumber != null) ...[
+                const SizedBox(width: 8),
                 Expanded(
                   child: _buildContactButton(
-                    icon: Icons.message_rounded,
+                    icon: Icons.sms_rounded,
                     label: 'SMS',
-                    color: AppTheme.primary,
+                    color: AppTheme.info,
                     onTap: _messageClient,
                   ),
                 ),
               ],
-            ),
-          ],
+            ],
+          ),
         ],
       ),
     );
@@ -330,15 +343,87 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Text(
               label,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChatButton() {
+    return GestureDetector(
+      onTap: _openChat,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [AppTheme.primary, AppTheme.secondary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primary.withValues(alpha: 0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 18),
+            SizedBox(width: 6),
+            Text(
+              'Chat',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openChat() {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Erreur: utilisateur non authentifié'),
+          backgroundColor: AppTheme.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          ),
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => sl<ChatBloc>()..add(LoadMessages(_currentJob.id)),
+          child: ChatScreen(
+            reservationId: _currentJob.id,
+            otherUserName: _currentJob.client.fullName,
+            otherUserPhoto: null,
+            currentUserId: authState.user.id,
+          ),
         ),
       ),
     );

@@ -11,6 +11,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../chat/presentation/bloc/chat_bloc.dart';
+import '../../../chat/presentation/pages/chat_screen.dart';
 import '../../domain/entities/worker_job.dart';
 import '../../domain/repositories/worker_repository.dart';
 import '../bloc/worker_jobs_bloc.dart';
@@ -562,12 +566,13 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               ),
             ],
           ),
-          if (_currentJob.client.phoneNumber != null) ...[
-            const SizedBox(height: 14),
-            const Divider(height: 1, color: AppTheme.divider),
-            const SizedBox(height: 14),
-            Row(
-              children: [
+          const SizedBox(height: 14),
+          const Divider(height: 1, color: AppTheme.divider),
+          const SizedBox(height: 14),
+          // Boutons de contact
+          Row(
+            children: [
+              if (_currentJob.client.phoneNumber != null) ...[
                 Expanded(
                   child: GestureDetector(
                     onTap: () => _callClient(_currentJob.client.phoneNumber!),
@@ -581,12 +586,13 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.phone_rounded, size: 20, color: AppTheme.success),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6),
                           Text(
                             'Appeler',
                             style: TextStyle(
                               color: AppTheme.success,
                               fontWeight: FontWeight.w600,
+                              fontSize: 13,
                             ),
                           ),
                         ],
@@ -594,26 +600,69 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
+              ],
+              // Bouton Chat in-app
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _openChat(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppTheme.primary, AppTheme.secondary],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primary.withValues(alpha: 0.3),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.chat_bubble_rounded, size: 20, color: Colors.white),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'Chat',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (_currentJob.client.phoneNumber != null) ...[
+                const SizedBox(width: 8),
                 Expanded(
                   child: GestureDetector(
                     onTap: () => _messageClient(_currentJob.client.phoneNumber!),
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: AppTheme.primary.withValues(alpha: 0.1),
+                        color: AppTheme.info.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.message_rounded, size: 20, color: AppTheme.primary),
-                          const SizedBox(width: 8),
+                          Icon(Icons.sms_rounded, size: 20, color: AppTheme.info),
+                          const SizedBox(width: 6),
                           Text(
                             'SMS',
                             style: TextStyle(
-                              color: AppTheme.primary,
+                              color: AppTheme.info,
                               fontWeight: FontWeight.w600,
+                              fontSize: 13,
                             ),
                           ),
                         ],
@@ -622,8 +671,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   ),
                 ),
               ],
-            ),
-          ],
+            ],
+          ),
         ],
       ),
     );
@@ -1670,6 +1719,40 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
+  }
+
+  /// Ouvre l'écran de chat avec le client
+  void _openChat(BuildContext context) {
+    // Récupérer l'ID de l'utilisateur actuel depuis AuthBloc
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Erreur: utilisateur non authentifié'),
+          backgroundColor: AppTheme.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          ),
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => sl<ChatBloc>()..add(LoadMessages(_currentJob.id)),
+          child: ChatScreen(
+            reservationId: _currentJob.id,
+            otherUserName: _currentJob.client.fullName,
+            otherUserPhoto: null,
+            currentUserId: authState.user.id,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _openMaps(double lat, double lng) async {

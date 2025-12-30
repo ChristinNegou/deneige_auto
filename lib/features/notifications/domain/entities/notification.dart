@@ -12,6 +12,7 @@ enum NotificationType {
   weatherAlert,            // Alerte météo (neige prévue)
   urgentRequest,           // Demande urgente
   workerMessage,           // Message du déneigeur
+  newMessage,              // Nouveau message de chat
   systemNotification,      // Notification système
 }
 
@@ -155,6 +156,8 @@ extension NotificationTypeExtension on NotificationType {
         return 'priority_high';
       case NotificationType.workerMessage:
         return 'message';
+      case NotificationType.newMessage:
+        return 'chat_bubble';
       case NotificationType.systemNotification:
         return 'info';
     }
@@ -184,6 +187,8 @@ extension NotificationTypeExtension on NotificationType {
         return 'Urgent';
       case NotificationType.workerMessage:
         return 'Message';
+      case NotificationType.newMessage:
+        return 'Nouveau message';
       case NotificationType.systemNotification:
         return 'Système';
     }

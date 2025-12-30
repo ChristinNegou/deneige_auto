@@ -6,6 +6,7 @@ import '../../../../core/errors/failures.dart';
 import '../../../../core/services/push_notification_service.dart';
 import '../../../../core/services/analytics_service.dart';
 import '../../../../core/services/socket_service.dart';
+import '../../../../service/secure_storage_service.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/forgot_password_usecase.dart';
@@ -293,9 +294,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   // ============ NOTIFICATION HELPERS ============
 
-  /// Configure les notifications push pour l'utilisateur connecté
+  /// Configure les notifications push et le socket pour l'utilisateur connecté
   Future<void> _setupNotificationsForUser(User user) async {
     try {
+      // Connecter le socket pour les communications en temps réel
+      await _connectSocket();
+
       final pushService = sl<PushNotificationService>();
 
       // Enregistrer le token FCM sur le serveur
@@ -376,6 +380,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       debugPrint('Socket disconnected');
     } catch (e) {
       debugPrint('Error disconnecting socket: $e');
+    }
+  }
+
+  /// Connecte le service Socket.IO avec le token d'authentification
+  Future<void> _connectSocket() async {
+    try {
+      final secureStorage = sl<SecureStorageService>();
+      final token = await secureStorage.getToken();
+
+      if (token != null && token.isNotEmpty) {
+        final socketService = SocketService();
+        await socketService.connect(token);
+        debugPrint('Socket connected with auth token');
+      } else {
+        debugPrint('No auth token available for socket connection');
+      }
+    } catch (e) {
+      debugPrint('Error connecting socket: $e');
     }
   }
 

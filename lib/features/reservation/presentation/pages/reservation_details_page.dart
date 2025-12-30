@@ -9,9 +9,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/reservation.dart';
 import '../bloc/reservation_list_bloc.dart';
 import '../../../widgets/rating_tip_dialog.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../chat/presentation/bloc/chat_bloc.dart';
+import '../../../chat/presentation/pages/chat_screen.dart';
 
 
 class ReservationDetailsPage extends StatelessWidget {
@@ -599,13 +604,27 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               ],
             ),
           ),
+          // Bouton Chat
+          IconButton(
+            onPressed: () => _openChat(context, reservation),
+            icon: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 20),
+            ),
+          ),
           if (reservation.workerPhone != null) ...[
             IconButton(
               onPressed: () => _callWorker(reservation),
               icon: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF10B981),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.phone, color: Colors.white, size: 20),
@@ -628,16 +647,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             onTap: () => _callWorker(reservation),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
+        // Chat in-app avec gradient
         Expanded(
-          child: _buildQuickActionButton(
-            icon: Icons.message,
-            label: 'Message',
-            color: const Color(0xFF3B82F6),
-            onTap: () => _messageWorker(reservation),
-          ),
+          child: _buildChatButton(context, reservation),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         Expanded(
           child: _buildQuickActionButton(
             icon: Icons.map,
@@ -647,6 +662,106 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildChatButton(BuildContext context, Reservation reservation) {
+    return Material(
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          _openChat(context, reservation);
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF3B82F6).withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: const Column(
+              children: [
+                Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 24),
+                SizedBox(height: 6),
+                Text(
+                  'Chat',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openChat(BuildContext context, Reservation reservation) {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Erreur: utilisateur non authentifié'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Vérifier qu'un déneigeur est assigné
+    if (reservation.workerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.white),
+              SizedBox(width: 12),
+              Text('Aucun déneigeur assigné pour le moment'),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => sl<ChatBloc>()..add(LoadMessages(reservation.id)),
+          child: ChatScreen(
+            reservationId: reservation.id,
+            otherUserName: reservation.workerName ?? 'Déneigeur',
+            otherUserPhoto: null,
+            currentUserId: authState.user.id,
+          ),
+        ),
+      ),
     );
   }
 

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/chat_message.dart';
 import '../bloc/chat_bloc.dart';
@@ -93,17 +92,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<ChatBloc>()..add(LoadMessages(widget.reservationId)),
-      child: Scaffold(
-        backgroundColor: AppTheme.background,
-        appBar: _buildAppBar(),
-        body: Column(
-          children: [
-            Expanded(child: _buildMessageList()),
-            _buildInputArea(),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: _buildAppBar(),
+      body: Column(
+        children: [
+          Expanded(child: _buildMessageList()),
+          _buildInputArea(),
+        ],
       ),
     );
   }

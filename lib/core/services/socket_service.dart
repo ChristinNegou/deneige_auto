@@ -21,6 +21,10 @@ class SocketService {
   final _notificationController = StreamController<Map<String, dynamic>>.broadcast();
   final _connectionStatusController = StreamController<bool>.broadcast();
 
+  // Stream controllers pour le chat
+  final _chatMessageController = StreamController<Map<String, dynamic>>.broadcast();
+  final _chatTypingController = StreamController<Map<String, dynamic>>.broadcast();
+
   /// Stream pour les mises à jour de réservations
   Stream<Map<String, dynamic>> get reservationUpdates => _reservationUpdatesController.stream;
 
@@ -32,6 +36,12 @@ class SocketService {
 
   /// Stream pour le statut de connexion
   Stream<bool> get connectionStatus => _connectionStatusController.stream;
+
+  /// Stream pour les nouveaux messages du chat
+  Stream<Map<String, dynamic>> get chatMessages => _chatMessageController.stream;
+
+  /// Stream pour l'indicateur de frappe du chat
+  Stream<Map<String, dynamic>> get chatTyping => _chatTypingController.stream;
 
   /// Vérifier si connecté
   bool get isConnected => _socket?.connected ?? false;
@@ -161,6 +171,21 @@ class SocketService {
         ...Map<String, dynamic>.from(data),
       });
     });
+
+    // Événements de chat
+    _socket!.on('message:new', (data) {
+      debugPrint('New chat message received: $data');
+      if (data is Map) {
+        _chatMessageController.add(Map<String, dynamic>.from(data));
+      }
+    });
+
+    _socket!.on('chat:typing', (data) {
+      debugPrint('Chat typing: $data');
+      if (data is Map) {
+        _chatTypingController.add(Map<String, dynamic>.from(data));
+      }
+    });
   }
 
   /// Émettre la position du worker
@@ -203,6 +228,8 @@ class SocketService {
     _jobUpdatesController.close();
     _notificationController.close();
     _connectionStatusController.close();
+    _chatMessageController.close();
+    _chatTypingController.close();
   }
 
   /// Émettre un événement générique

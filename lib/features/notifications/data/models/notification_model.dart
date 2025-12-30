@@ -77,6 +77,8 @@ class NotificationModel extends AppNotification {
         return NotificationType.urgentRequest;
       case 'workerMessage':
         return NotificationType.workerMessage;
+      case 'newMessage':
+        return NotificationType.newMessage;
       case 'systemNotification':
         return NotificationType.systemNotification;
       default:
@@ -123,6 +125,8 @@ class NotificationModel extends AppNotification {
         return 'urgentRequest';
       case NotificationType.workerMessage:
         return 'workerMessage';
+      case NotificationType.newMessage:
+        return 'newMessage';
       case NotificationType.systemNotification:
         return 'systemNotification';
     }
