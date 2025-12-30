@@ -94,7 +94,7 @@ router.post('/:reservationId', protect, async (req, res) => {
         }
 
         // Vérifier que la réservation est dans un état permettant le chat
-        const allowedStatuses = ['pending', 'assigned', 'en-route', 'in-progress'];
+        const allowedStatuses = ['pending', 'assigned', 'enRoute', 'inProgress'];
         if (!allowedStatuses.includes(reservation.status)) {
             return res.status(400).json({
                 success: false,
