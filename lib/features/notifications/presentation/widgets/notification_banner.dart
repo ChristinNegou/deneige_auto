@@ -305,6 +305,12 @@ class _NotificationBannerState extends State<NotificationBanner>
         return Icons.priority_high;
       case NotificationType.workerMessage:
         return Icons.message;
+      case NotificationType.newMessage:
+        return Icons.chat_bubble;
+      case NotificationType.tipReceived:
+        return Icons.attach_money;
+      case NotificationType.rating:
+        return Icons.star;
       case NotificationType.systemNotification:
         return Icons.info;
     }
@@ -328,7 +334,12 @@ class _NotificationBannerState extends State<NotificationBanner>
       case NotificationType.weatherAlert:
         return Colors.lightBlue;
       case NotificationType.workerMessage:
+      case NotificationType.newMessage:
         return const Color(0xFF8B5CF6);
+      case NotificationType.tipReceived:
+        return Colors.green;
+      case NotificationType.rating:
+        return Colors.amber;
       case NotificationType.systemNotification:
         return Colors.grey;
     }

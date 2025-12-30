@@ -266,6 +266,12 @@ extension NotificationTypeInfo on NotificationType {
         return 'Demandes urgentes';
       case NotificationType.workerMessage:
         return 'Messages du déneigeur';
+      case NotificationType.newMessage:
+        return 'Nouveaux messages de chat';
+      case NotificationType.tipReceived:
+        return 'Pourboires reçus';
+      case NotificationType.rating:
+        return 'Évaluations reçues';
       case NotificationType.systemNotification:
         return 'Mises à jour système';
     }
