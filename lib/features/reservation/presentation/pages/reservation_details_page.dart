@@ -11,6 +11,7 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/reservation.dart';
+import '../../domain/repositories/reservation_repository.dart';
 import '../bloc/reservation_list_bloc.dart';
 import '../../../widgets/rating_tip_dialog.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -1425,25 +1426,107 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               context,
               workerName: reservation.workerName ?? 'Déneigeur',
               servicePrice: reservation.totalPrice,
-              onSubmit: (rating, tip, comment) {
-                // TODO: Send rating to backend
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        const Icon(Icons.check_circle, color: Colors.white),
-                        const SizedBox(width: 12),
-                        Text(tip != null && tip > 0
-                            ? 'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé'
-                            : 'Merci pour votre évaluation!'),
-                      ],
-                    ),
-                    backgroundColor: Colors.green,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+              onSubmit: (rating, tip, comment) async {
+                // Submit rating to backend
+                final repository = sl<ReservationRepository>();
+
+                // Send rating first
+                final ratingResult = await repository.rateReservation(
+                  reservationId: reservation.id,
+                  rating: rating,
+                  review: comment,
+                );
+
+                ratingResult.fold(
+                  (failure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.error, color: Colors.white),
+                            const SizedBox(width: 12),
+                            Text('Erreur: ${failure.message}'),
+                          ],
+                        ),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  },
+                  (success) async {
+                    // If tip is provided, send it
+                    if (tip != null && tip > 0) {
+                      final tipResult = await repository.addTip(
+                        reservationId: reservation.id,
+                        amount: tip,
+                      );
+
+                      tipResult.fold(
+                        (failure) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.warning, color: Colors.white),
+                                  const SizedBox(width: 12),
+                                  Text('Évaluation envoyée, mais erreur pourboire: ${failure.message}'),
+                                ],
+                              ),
+                              backgroundColor: Colors.orange,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          );
+                        },
+                        (tipSuccess) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.check_circle, color: Colors.white),
+                                  const SizedBox(width: 12),
+                                  Text('Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé'),
+                                ],
+                              ),
+                              backgroundColor: Colors.green,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Row(
+                            children: [
+                              Icon(Icons.check_circle, color: Colors.white),
+                              SizedBox(width: 12),
+                              Text('Merci pour votre évaluation!'),
+                            ],
+                          ),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+                    }
+
+                    // Retourner au dashboard après un court délai pour voir le message
+                    await Future.delayed(const Duration(milliseconds: 1500));
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
                 );
               },
             );
