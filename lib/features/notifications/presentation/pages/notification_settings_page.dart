@@ -644,6 +644,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         return Icons.priority_high;
       case NotificationType.workerMessage:
         return Icons.message;
+      case NotificationType.newMessage:
+        return Icons.chat_bubble;
+      case NotificationType.tipReceived:
+        return Icons.attach_money;
+      case NotificationType.rating:
+        return Icons.star;
       case NotificationType.systemNotification:
         return Icons.info;
     }
