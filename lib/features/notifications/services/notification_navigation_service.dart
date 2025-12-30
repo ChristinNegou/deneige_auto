@@ -127,6 +127,13 @@ class NotificationNavigationService {
       case NotificationType.newMessage:
         return null; // Navigation gérée par _navigateToChat
 
+      // Pourboire et évaluation - vers les détails de la réservation
+      case NotificationType.tipReceived:
+      case NotificationType.rating:
+        return notification.reservationId != null
+            ? AppRoutes.reservationDetails
+            : null;
+
       // Système
       case NotificationType.systemNotification:
         return null; // Reste sur la page actuelle
@@ -241,6 +248,21 @@ class NotificationNavigationService {
           icon: Icons.chat_bubble_rounded,
           route: '', // Géré par _navigateToChat
           isHighlighted: true,
+        );
+
+      case NotificationType.tipReceived:
+        return NotificationAction(
+          label: 'Voir les détails',
+          icon: Icons.attach_money_rounded,
+          route: AppRoutes.reservationDetails,
+          isHighlighted: true,
+        );
+
+      case NotificationType.rating:
+        return NotificationAction(
+          label: 'Voir l\'évaluation',
+          icon: Icons.star_rounded,
+          route: AppRoutes.reservationDetails,
         );
 
       case NotificationType.systemNotification:

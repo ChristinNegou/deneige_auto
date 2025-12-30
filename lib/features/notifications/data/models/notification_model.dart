@@ -79,6 +79,10 @@ class NotificationModel extends AppNotification {
         return NotificationType.workerMessage;
       case 'newMessage':
         return NotificationType.newMessage;
+      case 'tipReceived':
+        return NotificationType.tipReceived;
+      case 'rating':
+        return NotificationType.rating;
       case 'systemNotification':
         return NotificationType.systemNotification;
       default:
@@ -127,6 +131,10 @@ class NotificationModel extends AppNotification {
         return 'workerMessage';
       case NotificationType.newMessage:
         return 'newMessage';
+      case NotificationType.tipReceived:
+        return 'tipReceived';
+      case NotificationType.rating:
+        return 'rating';
       case NotificationType.systemNotification:
         return 'systemNotification';
     }

@@ -23,7 +23,9 @@ const notificationSchema = new mongoose.Schema({
             'urgentRequest',
             'workerMessage',
             'systemNotification',
-            'newMessage',  // Pour les messages de chat
+            'newMessage',      // Pour les messages de chat
+            'tipReceived',     // Pourboire reçu par le déneigeur
+            'rating',          // Évaluation reçue par le déneigeur
         ],
         required: [true, 'Le type est requis'],
     },

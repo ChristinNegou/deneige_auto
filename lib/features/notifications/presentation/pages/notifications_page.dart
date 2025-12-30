@@ -472,6 +472,10 @@ class NotificationsPageContent extends StatelessWidget {
         return Icons.message_rounded;
       case NotificationType.newMessage:
         return Icons.chat_bubble_rounded;
+      case NotificationType.tipReceived:
+        return Icons.attach_money_rounded;
+      case NotificationType.rating:
+        return Icons.star_rounded;
       case NotificationType.systemNotification:
         return Icons.info_rounded;
     }
@@ -482,6 +486,7 @@ class NotificationsPageContent extends StatelessWidget {
       case NotificationType.reservationAssigned:
       case NotificationType.workCompleted:
       case NotificationType.paymentSuccess:
+      case NotificationType.tipReceived:
         return AppTheme.success;
       case NotificationType.workerEnRoute:
       case NotificationType.workStarted:
@@ -497,6 +502,8 @@ class NotificationsPageContent extends StatelessWidget {
       case NotificationType.workerMessage:
       case NotificationType.newMessage:
         return AppTheme.secondary;
+      case NotificationType.rating:
+        return AppTheme.warning;
       case NotificationType.systemNotification:
         return AppTheme.textSecondary;
     }
