@@ -1229,9 +1229,17 @@ router.post('/:id/rate', protect, async (req, res) => {
             const newRatingsCount = currentRatingsCount + 1;
             const newAverage = ((currentAverage * currentRatingsCount) + rating) / newRatingsCount;
 
-            worker.workerProfile.totalRatingsCount = newRatingsCount;
-            worker.workerProfile.averageRating = Math.round(newAverage * 10) / 10; // Arrondir à 1 décimale
-            await worker.save();
+            // Utiliser findByIdAndUpdate pour éviter la validation complète du modèle
+            await User.findByIdAndUpdate(
+                reservation.workerId,
+                {
+                    $set: {
+                        'workerProfile.totalRatingsCount': newRatingsCount,
+                        'workerProfile.averageRating': Math.round(newAverage * 10) / 10,
+                    },
+                },
+                { runValidators: false }
+            );
 
             // Envoyer une notification au déneigeur
             await Notification.create({
@@ -1490,13 +1498,17 @@ router.post('/:id/tip', protect, async (req, res) => {
             }
         }
 
-        // Mettre à jour les stats du worker
-        const workerDoc = await User.findById(worker._id);
-        if (workerDoc) {
-            workerDoc.workerProfile.totalTipsReceived = (workerDoc.workerProfile.totalTipsReceived || 0) + amount;
-            workerDoc.workerProfile.totalEarnings = (workerDoc.workerProfile.totalEarnings || 0) + amount;
-            await workerDoc.save();
-        }
+        // Mettre à jour les stats du worker avec findByIdAndUpdate pour éviter la validation complète
+        await User.findByIdAndUpdate(
+            worker._id,
+            {
+                $inc: {
+                    'workerProfile.totalTipsReceived': amount,
+                    'workerProfile.totalEarnings': amount,
+                },
+            },
+            { runValidators: false }
+        );
 
         await reservation.save();
 
