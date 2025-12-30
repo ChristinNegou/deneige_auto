@@ -1466,7 +1466,7 @@ router.post('/:id/tip', protect, async (req, res) => {
         let transferResult = null;
 
         // Si le worker a un compte Stripe Connect, transférer le pourboire
-        if (worker.workerProfile?.stripeConnectId && reservation.paymentStatus === 'succeeded') {
+        if (worker.workerProfile?.stripeConnectId && reservation.paymentStatus === 'paid') {
             try {
                 const transfer = await stripe.transfers.create({
                     amount: Math.round(amount * 100), // En cents
