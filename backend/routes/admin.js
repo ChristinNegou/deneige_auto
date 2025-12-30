@@ -4,6 +4,7 @@ const { protect, authorize } = require('../middleware/auth');
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
 const Notification = require('../models/Notification');
+const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../services/databaseCleanupService');
 
 // Middleware pour vérifier le rôle admin
 const adminOnly = authorize('admin');
@@ -792,6 +793,77 @@ router.get('/reports/revenue', protect, adminOnly, async (req, res) => {
             message: error.message,
         });
     }
+});
+
+// ============================================================================
+// DATABASE MANAGEMENT
+// ============================================================================
+
+/**
+ * @route   GET /api/admin/database/stats
+ * @desc    Obtenir les statistiques de la base de données
+ * @access  Private (Admin)
+ */
+router.get('/database/stats', protect, adminOnly, async (req, res) => {
+    try {
+        const stats = await getDatabaseStats();
+
+        res.json({
+            success: true,
+            stats,
+            retentionConfig: RETENTION_CONFIG,
+        });
+    } catch (error) {
+        console.error('Erreur stats database:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+});
+
+/**
+ * @route   POST /api/admin/database/cleanup
+ * @desc    Lancer un nettoyage manuel de la base de données
+ * @access  Private (Admin)
+ */
+router.post('/database/cleanup', protect, adminOnly, async (req, res) => {
+    try {
+        console.log(`🧹 Nettoyage manuel lancé par admin: ${req.user.id}`);
+
+        const result = await runFullCleanup();
+
+        res.json({
+            success: result.success,
+            message: `Nettoyage terminé: ${result.totalDeleted} éléments supprimés, ${result.totalUpdated} mis à jour`,
+            result,
+        });
+    } catch (error) {
+        console.error('Erreur nettoyage database:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+});
+
+/**
+ * @route   GET /api/admin/database/retention-config
+ * @desc    Obtenir la configuration de rétention des données
+ * @access  Private (Admin)
+ */
+router.get('/database/retention-config', protect, adminOnly, async (req, res) => {
+    res.json({
+        success: true,
+        config: RETENTION_CONFIG,
+        description: {
+            readNotifications: `Notifications lues supprimées après ${RETENTION_CONFIG.readNotifications} jours`,
+            unreadNotifications: `Notifications non lues supprimées après ${RETENTION_CONFIG.unreadNotifications} jours`,
+            messagesAfterCompletion: `Messages supprimés ${RETENTION_CONFIG.messagesAfterCompletion} jours après fin de réservation`,
+            completedReservationData: `Photos des réservations terminées supprimées après ${RETENTION_CONFIG.completedReservationData} jours`,
+            cancelledReservationData: `Données des réservations annulées nettoyées après ${RETENTION_CONFIG.cancelledReservationData} jours`,
+        },
+    });
 });
 
 module.exports = router;

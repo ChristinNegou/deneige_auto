@@ -3,9 +3,11 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
+const cron = require('node-cron');
 const connectDB = require('./config/database');
 const path = require('path');
 const { initializeFirebase } = require('./services/firebaseService');
+const { runFullCleanup, getDatabaseStats } = require('./services/databaseCleanupService');
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -220,6 +222,25 @@ io.on('connection', (socket) => {
 
 // Exporter io pour l'utiliser dans d'autres modules
 app.set('io', io);
+
+// ============================================
+// TÂCHES CRON - Nettoyage automatique de la BD
+// ============================================
+
+// Nettoyage quotidien à 3h du matin
+cron.schedule('0 3 * * *', async () => {
+    console.log('\n⏰ Tâche cron: Nettoyage quotidien de la base de données');
+    try {
+        const result = await runFullCleanup();
+        console.log(`✅ Nettoyage terminé: ${result.totalDeleted} éléments supprimés`);
+    } catch (error) {
+        console.error('❌ Erreur lors du nettoyage cron:', error);
+    }
+}, {
+    timezone: 'America/Montreal'
+});
+
+console.log('📅 Tâche cron de nettoyage programmée (3h00 tous les jours)');
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3000;
