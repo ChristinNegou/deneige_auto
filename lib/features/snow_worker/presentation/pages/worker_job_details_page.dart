@@ -289,35 +289,37 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           if (job.client.phoneNumber != null)
             _buildInfoRow('Téléphone', job.client.phoneNumber!),
           const SizedBox(height: 12),
-          // Boutons de contact - Chat toujours disponible
+          // Boutons de contact - toujours visibles
           Row(
             children: [
-              if (job.client.phoneNumber != null) ...[
-                Expanded(
-                  child: _buildContactButton(
-                    icon: Icons.phone_rounded,
-                    label: 'Appeler',
-                    color: AppTheme.success,
-                    onTap: _callClient,
-                  ),
+              // Bouton Appeler
+              Expanded(
+                child: _buildContactButton(
+                  icon: Icons.phone_rounded,
+                  label: 'Appeler',
+                  color: job.client.phoneNumber != null
+                      ? AppTheme.success
+                      : AppTheme.textTertiary,
+                  onTap: _handleCallClient,
                 ),
-                const SizedBox(width: 8),
-              ],
+              ),
+              const SizedBox(width: 8),
               // Bouton Chat avec gradient
               Expanded(
                 child: _buildChatButton(),
               ),
-              if (job.client.phoneNumber != null) ...[
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildContactButton(
-                    icon: Icons.sms_rounded,
-                    label: 'SMS',
-                    color: AppTheme.info,
-                    onTap: _messageClient,
-                  ),
+              const SizedBox(width: 8),
+              // Bouton SMS
+              Expanded(
+                child: _buildContactButton(
+                  icon: Icons.sms_rounded,
+                  label: 'SMS',
+                  color: job.client.phoneNumber != null
+                      ? AppTheme.info
+                      : AppTheme.textTertiary,
+                  onTap: _handleMessageClient,
                 ),
-              ],
+              ),
             ],
           ),
         ],
@@ -859,6 +861,42 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         return 'Déglaçage portes';
       case ServiceOption.wheelClearance:
         return 'Dégagement roues';
+    }
+  }
+
+  /// Gère l'appel du client avec vérification du numéro
+  void _handleCallClient() {
+    if (job.client.phoneNumber != null && job.client.phoneNumber!.isNotEmpty) {
+      _callClient();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Numéro de téléphone non disponible'),
+          backgroundColor: AppTheme.warning,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          ),
+        ),
+      );
+    }
+  }
+
+  /// Gère l'envoi de SMS au client avec vérification du numéro
+  void _handleMessageClient() {
+    if (job.client.phoneNumber != null && job.client.phoneNumber!.isNotEmpty) {
+      _messageClient();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Numéro de téléphone non disponible'),
+          backgroundColor: AppTheme.warning,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          ),
+        ),
+      );
     }
   }
 
