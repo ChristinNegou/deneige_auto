@@ -204,4 +204,31 @@ class SocketService {
     _notificationController.close();
     _connectionStatusController.close();
   }
+
+  /// Émettre un événement générique
+  void emit(String event, Map<String, dynamic> data) {
+    if (!isConnected) {
+      debugPrint('Socket not connected, cannot emit: $event');
+      return;
+    }
+    _socket!.emit(event, data);
+  }
+
+  /// Écouter un événement générique et retourner un Stream
+  Stream<dynamic> on(String event) {
+    final controller = StreamController<dynamic>.broadcast();
+
+    if (_socket != null) {
+      _socket!.on(event, (data) {
+        controller.add(data);
+      });
+    }
+
+    return controller.stream;
+  }
+
+  /// Retirer l'écoute d'un événement
+  void off(String event) {
+    _socket?.off(event);
+  }
 }

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/constants/app_routes.dart';
+import '../../../core/di/injection_container.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_state.dart';
@@ -14,6 +15,7 @@ import '../../home/presentation/bloc/home_event.dart';
 import '../../home/presentation/bloc/home_state.dart';
 import '../../notifications/presentation/bloc/notification_bloc.dart';
 import '../../reservation/domain/entities/reservation.dart';
+import '../../reservation/domain/repositories/reservation_repository.dart';
 import '../../reservation/presentation/bloc/reservation_list_bloc.dart' as reservation_bloc;
 import '../../widgets/service_completed_dialog.dart';
 
@@ -72,16 +74,14 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             ServiceCompletedDialog.show(
               context,
               reservation: reservation,
-              onSubmitRating: (rating, tip, comment) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(tip != null && tip > 0
-                        ? 'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé'
-                        : 'Merci pour votre évaluation!'),
-                    backgroundColor: AppTheme.success,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+              onSubmitRating: (rating, tip, comment) async {
+                // Soumettre la note au backend
+                await _submitRating(reservation.id, rating, comment);
+
+                // Soumettre le pourboire si présent
+                if (tip != null && tip > 0) {
+                  await _submitTip(reservation.id, tip);
+                }
               },
               onViewDetails: () {
                 Navigator.pushNamed(
@@ -94,6 +94,101 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           }
         });
         break;
+      }
+    }
+  }
+
+  Future<void> _submitRating(String reservationId, int rating, String? comment) async {
+    try {
+      final repository = sl<ReservationRepository>();
+      final result = await repository.rateReservation(
+        reservationId: reservationId,
+        rating: rating,
+        review: comment,
+      );
+
+      result.fold(
+        (failure) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erreur: ${failure.message}'),
+                backgroundColor: AppTheme.error,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        },
+        (data) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(data['message'] ?? 'Merci pour votre évaluation!'),
+                backgroundColor: AppTheme.success,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+            // Rafraîchir les réservations
+            context.read<reservation_bloc.ReservationListBloc>().add(
+                reservation_bloc.RefreshReservations());
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de l\'envoi: $e'),
+            backgroundColor: AppTheme.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _submitTip(String reservationId, double amount) async {
+    try {
+      final repository = sl<ReservationRepository>();
+      final result = await repository.addTip(
+        reservationId: reservationId,
+        amount: amount,
+      );
+
+      result.fold(
+        (failure) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erreur pourboire: ${failure.message}'),
+                backgroundColor: AppTheme.error,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        },
+        (data) {
+          if (mounted) {
+            final workerName = data['workerName'] ?? 'le déneigeur';
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Pourboire de ${amount.toStringAsFixed(0)}\$ envoyé à $workerName'),
+                backgroundColor: AppTheme.success,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de l\'envoi du pourboire: $e'),
+            backgroundColor: AppTheme.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     }
   }

@@ -28,3 +28,15 @@ class UnauthorizedFailure extends Failure {
   const UnauthorizedFailure({super.message = 'Non autorisé'});
 }
 
+class SuspendedFailure extends Failure {
+  final String? reason;
+  final DateTime? suspendedUntil;
+  final String? suspendedUntilDisplay;
+
+  const SuspendedFailure({
+    super.message = 'Votre compte est suspendu',
+    this.reason,
+    this.suspendedUntil,
+    this.suspendedUntilDisplay,
+  });
+}

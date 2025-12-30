@@ -52,6 +52,9 @@ class AppRoutes {
   // Routes de notifications
   static const String notifications = '/notifications';
 
+  // Routes de chat
+  static const String chat = '/chat';
+
   // Routes déneigeur
   static const String snowWorkerDashboard = '/snow-worker/dashboard';
   static const String jobsList = '/snow-worker/jobs';

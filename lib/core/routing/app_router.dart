@@ -39,11 +39,16 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/phone_verification_screen.dart';
 import '../../features/auth/presentation/screens/onboarding_screen.dart';
-import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/domain/entities/user.dart';
 import 'role_based_home_wrapper.dart';
 import '../../features/reservation/presentation/screens/new_reservation_screen.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
+import '../../features/admin/presentation/pages/admin_users_page.dart';
+import '../../features/admin/presentation/pages/admin_reservations_page.dart';
+import '../../features/admin/presentation/pages/admin_workers_page.dart';
+import '../../features/admin/presentation/pages/admin_reports_page.dart';
+import '../../features/admin/presentation/bloc/admin_bloc.dart';
+import '../../features/admin/presentation/bloc/admin_event.dart';
 
 
 /// Classe qui gère la génération et la navigation des routes
@@ -55,12 +60,10 @@ class AppRouter {
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
     // Routes d'authentification
+      // Routes d'authentification - utilisent le AuthBloc singleton fourni au niveau app
       case AppRoutes.onboarding:
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => sl<AuthBloc>(),
-            child: const OnboardingScreen(),
-          ),
+          builder: (_) => const OnboardingScreen(),
           settings: settings,
         );
 
@@ -72,36 +75,27 @@ class AppRouter {
 
       case AppRoutes.login:
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => sl<AuthBloc>(),
-            child: const LoginScreen(),
-          ),
+          builder: (_) => const LoginScreen(),
           settings: settings,
         );
 
       case AppRoutes.register:
         final role = settings.arguments as UserRole? ?? UserRole.client;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => sl<AuthBloc>(),
-            child: RegisterScreen(role: role),
-          ),
+          builder: (_) => RegisterScreen(role: role),
           settings: settings,
         );
 
       case AppRoutes.phoneVerification:
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => sl<AuthBloc>(),
-            child: PhoneVerificationScreen(
-              phoneNumber: args['phoneNumber'] as String,
-              email: args['email'] as String,
-              password: args['password'] as String,
-              firstName: args['firstName'] as String,
-              lastName: args['lastName'] as String,
-              role: args['role'] as String,
-            ),
+          builder: (_) => PhoneVerificationScreen(
+            phoneNumber: args['phoneNumber'] as String,
+            email: args['email'] as String,
+            password: args['password'] as String,
+            firstName: args['firstName'] as String,
+            lastName: args['lastName'] as String,
+            role: args['role'] as String,
           ),
           settings: settings,
         );
@@ -115,10 +109,7 @@ class AppRouter {
       case AppRoutes.resetPassword:
         final token = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => sl<AuthBloc>(),
-            child: ResetPasswordScreen(token: token),
-          ),
+          builder: (_) => ResetPasswordScreen(token: token),
           settings: settings,
         );
 
@@ -319,7 +310,46 @@ class AppRouter {
       // Routes admin
       case AppRoutes.adminDashboard:
         return MaterialPageRoute(
-          builder: (_) => const AdminDashboardPage(),
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AdminBloc>()..add(LoadDashboardStats()),
+            child: const AdminDashboardPage(),
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.adminUsers:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AdminBloc>(),
+            child: const AdminUsersPage(),
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.adminReservations:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AdminBloc>(),
+            child: const AdminReservationsPage(),
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.adminWorkers:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AdminBloc>(),
+            child: const AdminWorkersPage(),
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.adminReports:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AdminBloc>(),
+            child: const AdminReportsPage(),
+          ),
           settings: settings,
         );
 

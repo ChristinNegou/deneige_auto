@@ -328,12 +328,19 @@ router.post('/users/:id/suspend', protect, adminOnly, async (req, res) => {
         const suspendedUntil = new Date();
         suspendedUntil.setDate(suspendedUntil.getDate() + parseInt(days));
 
-        if (user.role === 'snowWorker') {
+        // Set suspension at root level (for all users)
+        user.isSuspended = true;
+        user.suspendedUntil = suspendedUntil;
+        user.suspensionReason = reason || 'Suspendu par un administrateur';
+        user.isActive = false;
+
+        // Also set in workerProfile if snowWorker (for backwards compatibility)
+        if (user.role === 'snowWorker' && user.workerProfile) {
             user.workerProfile.isSuspended = true;
             user.workerProfile.suspendedUntil = suspendedUntil;
             user.workerProfile.suspensionReason = reason || 'Suspendu par un administrateur';
+            user.workerProfile.isAvailable = false; // Disable availability
         }
-        user.isActive = false;
         await user.save();
 
         // Notifier l'utilisateur
@@ -374,12 +381,18 @@ router.post('/users/:id/unsuspend', protect, adminOnly, async (req, res) => {
             });
         }
 
-        if (user.role === 'snowWorker') {
+        // Clear suspension at root level (for all users)
+        user.isSuspended = false;
+        user.suspendedUntil = null;
+        user.suspensionReason = null;
+        user.isActive = true;
+
+        // Also clear in workerProfile if snowWorker (for backwards compatibility)
+        if (user.role === 'snowWorker' && user.workerProfile) {
             user.workerProfile.isSuspended = false;
             user.workerProfile.suspendedUntil = null;
             user.workerProfile.suspensionReason = null;
         }
-        user.isActive = true;
         await user.save();
 
         // Notifier l'utilisateur

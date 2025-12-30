@@ -131,3 +131,21 @@ class ResendPhoneVerificationCode extends AuthEvent {
   @override
   List<Object?> get props => [phoneNumber];
 }
+
+/// Déconnexion forcée (ex: suspension détectée en cours de session)
+class ForcedLogout extends AuthEvent {
+  final String reason;
+  final String? suspensionReason;
+  final DateTime? suspendedUntil;
+  final String? suspendedUntilDisplay;
+
+  const ForcedLogout({
+    required this.reason,
+    this.suspensionReason,
+    this.suspendedUntil,
+    this.suspendedUntilDisplay,
+  });
+
+  @override
+  List<Object?> get props => [reason, suspensionReason, suspendedUntil, suspendedUntilDisplay];
+}

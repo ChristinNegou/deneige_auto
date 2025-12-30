@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../reservation/domain/entities/vehicle.dart';
-import '../../../reservation/domain/usecases/add_vehicle_usecase.dart';
+import '../../../reservation/domain/usecases/add_vehicle_usecase.dart' show AddVehicleParams;
 import '../bloc/vehicule_bloc.dart';
 
 class AddVehiclePage extends StatelessWidget {
@@ -13,10 +13,7 @@ class AddVehiclePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => VehicleBloc(
-        getVehicles: sl(),
-        addVehicle: sl(),
-      ),
+      create: (context) => sl<VehicleBloc>(),
       child: const AddVehicleView(),
     );
   }

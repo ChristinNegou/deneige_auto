@@ -16,6 +16,17 @@ abstract class ReservationRemoteDataSource {
   Future<ReservationModel> updateReservation(String reservationId, Map<String, dynamic> data);
   Future<Vehicle> addVehicle(Map<String, dynamic> data);
   Future<CancellationPolicy> getCancellationPolicy();
+  Future<Map<String, dynamic>> rateReservation({
+    required String reservationId,
+    required int rating,
+    String? review,
+  });
+  Future<Map<String, dynamic>> getReservationRating(String reservationId);
+  Future<Map<String, dynamic>> addTip({
+    required String reservationId,
+    required double amount,
+  });
+  Future<void> deleteVehicle(String vehicleId);
 }
 
 /// Résultat d'une annulation de réservation
@@ -300,6 +311,119 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
         );
       }
     } on DioException catch (e) {
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> rateReservation({
+    required String reservationId,
+    required int rating,
+    String? review,
+  }) async {
+    try {
+      final response = await dio.post(
+        '/reservations/$reservationId/rate',
+        data: {
+          'rating': rating,
+          if (review != null) 'review': review,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': response.data['success'] ?? true,
+          'message': response.data['message'] ?? 'Note enregistrée',
+          'rating': response.data['rating'],
+          'workerNewAverage': response.data['workerNewAverage'],
+        };
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de l\'enregistrement de la note',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
+      throw ServerException(message: message, statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getReservationRating(String reservationId) async {
+    try {
+      final response = await dio.get('/reservations/$reservationId/rating');
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'hasRating': response.data['hasRating'] ?? false,
+          'rating': response.data['rating'],
+          'review': response.data['review'],
+          'ratedAt': response.data['ratedAt'],
+          'worker': response.data['worker'],
+        };
+      } else {
+        throw ServerException(
+          message: 'Erreur lors de la récupération de la note',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> addTip({
+    required String reservationId,
+    required double amount,
+  }) async {
+    try {
+      final response = await dio.post(
+        '/reservations/$reservationId/tip',
+        data: {
+          'amount': amount,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': response.data['success'] ?? true,
+          'message': response.data['message'] ?? 'Pourboire envoyé',
+          'tipAmount': response.data['tipAmount'],
+          'workerName': response.data['workerName'],
+        };
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de l\'envoi du pourboire',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
+      throw ServerException(message: message, statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<void> deleteVehicle(String vehicleId) async {
+    try {
+      final response = await dio.delete('/vehicles/$vehicleId');
+
+      if (response.statusCode != 200) {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de la suppression du véhicule',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw ServerException(
+          message: 'Véhicule non trouvé',
+          statusCode: 404,
+        );
+      }
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }

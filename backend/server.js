@@ -59,6 +59,7 @@ app.use('/api/workers', require('./routes/workers'));
 app.use('/api/phone', require('./routes/phoneVerification'));
 app.use('/api/stripe-connect', require('./routes/stripeConnect'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/messages', require('./routes/messages'));
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
@@ -170,6 +171,49 @@ io.on('connection', (socket) => {
             });
         } catch (error) {
             console.error('Erreur mise à jour position:', error);
+        }
+    });
+
+    // Rejoindre une room de conversation pour une réservation
+    socket.on('chat:join', async (data) => {
+        const { reservationId } = data;
+        if (!reservationId) return;
+
+        try {
+            const Reservation = require('./models/Reservation');
+            const reservation = await Reservation.findById(reservationId);
+
+            if (!reservation) return;
+
+            const isClient = reservation.userId.toString() === socket.userId;
+            const isWorker = reservation.workerId?.toString() === socket.userId;
+
+            if (isClient || isWorker) {
+                socket.join(`reservation:${reservationId}`);
+                console.log(`💬 ${socket.userId} a rejoint le chat: reservation:${reservationId}`);
+            }
+        } catch (error) {
+            console.error('Erreur chat:join:', error);
+        }
+    });
+
+    // Quitter une room de conversation
+    socket.on('chat:leave', (data) => {
+        const { reservationId } = data;
+        if (reservationId) {
+            socket.leave(`reservation:${reservationId}`);
+            console.log(`💬 ${socket.userId} a quitté le chat: reservation:${reservationId}`);
+        }
+    });
+
+    // Indicateur de frappe
+    socket.on('chat:typing', (data) => {
+        const { reservationId, isTyping } = data;
+        if (reservationId) {
+            socket.to(`reservation:${reservationId}`).emit('chat:typing', {
+                userId: socket.userId,
+                isTyping,
+            });
         }
     });
 });

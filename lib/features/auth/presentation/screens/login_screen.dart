@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/suspension_dialog.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -53,6 +54,14 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.of(context).pushNamedAndRemoveUntil(
               AppRoutes.home,
               (route) => false,
+            );
+          } else if (state is UserSuspended) {
+            // Afficher le popup de suspension
+            SuspensionDialog.show(
+              context,
+              message: state.message,
+              reason: state.reason,
+              suspendedUntilDisplay: state.suspendedUntilDisplay,
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(

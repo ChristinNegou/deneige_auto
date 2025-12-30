@@ -53,3 +53,30 @@ class ValidationException extends AppException {
     this.errors,
   });
 }
+
+/// Exception levée lorsqu'un utilisateur est suspendu
+class SuspendedException extends AppException {
+  final String? reason;
+  final DateTime? suspendedUntil;
+  final String? suspendedUntilDisplay;
+
+  const SuspendedException({
+    required super.message,
+    this.reason,
+    this.suspendedUntil,
+    this.suspendedUntilDisplay,
+    super.statusCode = 403,
+  });
+
+  factory SuspendedException.fromJson(Map<String, dynamic> json) {
+    final details = json['suspensionDetails'] as Map<String, dynamic>?;
+    return SuspendedException(
+      message: json['message'] ?? 'Votre compte est suspendu',
+      reason: details?['reason'],
+      suspendedUntil: details?['suspendedUntil'] != null
+          ? DateTime.tryParse(details!['suspendedUntil'].toString())
+          : null,
+      suspendedUntilDisplay: details?['suspendedUntilDisplay'],
+    );
+  }
+}

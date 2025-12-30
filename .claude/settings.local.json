@@ -16,7 +16,9 @@
       "Bash(flutter run:*)",
       "Bash(node:*)",
       "Bash(flutter pub get:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(timeout:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

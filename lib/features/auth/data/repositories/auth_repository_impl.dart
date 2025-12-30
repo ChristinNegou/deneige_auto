@@ -16,6 +16,13 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final user = await remoteDataSource.login(email, password);
       return Right(user);
+    } on SuspendedException catch (e) {
+      return Left(SuspendedFailure(
+        message: e.message,
+        reason: e.reason,
+        suspendedUntil: e.suspendedUntil,
+        suspendedUntilDisplay: e.suspendedUntilDisplay,
+      ));
     } on AuthException catch (e) {
       return Left(AuthFailure(message: e.message));
     } on NetworkException catch (e) {

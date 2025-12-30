@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/auth/domain/usecases/reset_password_usecase.dart';
 import '../../features/auth/domain/usecases/update_profile_usecase.dart';
 import '../../features/reservation/domain/usecases/add_vehicle_usecase.dart';
+import '../../features/reservation/domain/usecases/delete_vehicle_usecase.dart';
 import '../../features/reservation/domain/usecases/get_parking_spots_usecase.dart';
 import '../../features/reservation/domain/usecases/get_vehicules_usecase.dart';
 import '../../features/reservation/domain/usecases/update_reservation_usecase.dart';
@@ -72,6 +73,12 @@ import '../../features/notifications/domain/usecases/delete_notification_usecase
 import '../../features/notifications/domain/usecases/clear_all_notifications_usecase.dart';
 import '../../features/notifications/presentation/bloc/notification_bloc.dart';
 
+// Chat
+import '../../features/chat/data/datasources/chat_remote_datasource.dart';
+import '../../features/chat/data/repositories/chat_repository_impl.dart';
+import '../../features/chat/domain/repositories/chat_repository.dart';
+import '../../features/chat/presentation/bloc/chat_bloc.dart';
+
 // Snow Worker
 import '../../features/snow_worker/data/datasources/worker_remote_datasource.dart';
 import '../../features/snow_worker/data/repositories/worker_repository_impl.dart';
@@ -85,6 +92,12 @@ import '../../features/snow_worker/domain/usecases/job_actions_usecase.dart';
 import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../../features/snow_worker/presentation/bloc/worker_stats_bloc.dart';
 import '../../features/snow_worker/presentation/bloc/worker_availability_bloc.dart';
+
+// Admin
+import '../../features/admin/data/datasources/admin_remote_datasource.dart';
+import '../../features/admin/data/repositories/admin_repository_impl.dart';
+import '../../features/admin/domain/repositories/admin_repository.dart';
+import '../../features/admin/presentation/bloc/admin_bloc.dart';
 
 // BLoCs
 import '../../features/home/presentation/bloc/home_bloc.dart';
@@ -128,6 +141,12 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<WorkerRemoteDataSource>(
         () => WorkerRemoteDataSourceImpl(dio: sl()),
   );
+  sl.registerLazySingleton<AdminRemoteDataSource>(
+        () => AdminRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<ChatRemoteDataSource>(
+        () => ChatRemoteDataSourceImpl(dio: sl()),
+  );
 
   //! Repositories
   sl.registerLazySingleton<AuthRepository>(
@@ -148,6 +167,12 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<WorkerRepository>(
         () => WorkerRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<AdminRepository>(
+        () => AdminRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<ChatRepository>(
+        () => ChatRepositoryImpl(remoteDataSource: sl()),
+  );
 
   //! Use cases
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
@@ -163,6 +188,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => GetReservationsUseCase(sl()));
   sl.registerLazySingleton(() => GetReservationByIdUseCase(sl()));
   sl.registerLazySingleton(() => AddVehicleUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteVehicleUseCase(sl()));
   sl.registerLazySingleton(() => CancelReservationUseCase(sl()));
   sl.registerLazySingleton(() => UpdateReservationUseCase(sl()));
   sl.registerLazySingleton(() => GetWeatherUseCase(
@@ -196,7 +222,9 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => CompleteJobUseCase(sl()));
 
   //! BLoCs
-  sl.registerFactory(() => AuthBloc(
+  // AuthBloc doit être un singleton pour maintenir l'état d'authentification
+  // cohérent dans toute l'application
+  sl.registerLazySingleton(() => AuthBloc(
     login: sl(),
     register: sl(),
     logout: sl(),
@@ -217,6 +245,7 @@ Future<void> initializeDependencies() async {
         () => VehicleBloc(
       getVehicles: sl(),
       addVehicle: sl(),
+      deleteVehicle: sl(),
     ),
   );
 
@@ -283,5 +312,15 @@ Future<void> initializeDependencies() async {
     toggleAvailabilityUseCase: sl(),
     updateLocationUseCase: sl(),
     repository: sl(),
+  ));
+
+  // Admin BLoC
+  sl.registerFactory(() => AdminBloc(
+    repository: sl(),
+  ));
+
+  sl.registerFactory(() => ChatBloc(
+    repository: sl(),
+    socketService: sl(),
   ));
 }
