@@ -42,8 +42,15 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
         List<dynamic> reservations;
 
         // Handle different response structures
-        if (data is Map<String, dynamic> && data['data'] != null) {
-          reservations = data['data'] as List;
+        if (data is Map<String, dynamic>) {
+          // L'API renvoie { success: true, reservations: [...] }
+          if (data['reservations'] != null) {
+            reservations = data['reservations'] as List;
+          } else if (data['data'] != null) {
+            reservations = data['data'] as List;
+          } else {
+            reservations = [];
+          }
         } else if (data is List) {
           reservations = data;
         } else {
