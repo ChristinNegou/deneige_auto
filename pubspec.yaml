@@ -92,6 +92,8 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.4
+  flutter_launcher_icons: ^0.14.3
 
   # Code Generation
   build_runner: ^2.4.6
@@ -116,5 +118,24 @@ flutter:
       fonts:
         - asset: assets/fonts/CustomIcons.ttf
 
+# Configuration du splash screen
+flutter_native_splash:
+  color: "#000000"
+  image: assets/images/logoApp.jpg
+  android_12:
+    color: "#000000"
+    image: assets/images/logoApp.jpg
+  ios: true
+  android: true
+  web: false
 
+# Configuration de l'icône de l'application
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logoApp.jpg"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/images/logoApp.jpg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
 
