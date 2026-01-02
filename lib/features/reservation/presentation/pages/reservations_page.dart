@@ -95,12 +95,7 @@ class ReservationsView extends StatelessWidget {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () => Navigator.pushNamed(context, AppRoutes.newReservation),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Nouvelle réservation'),
-                  ),
+
                 ],
               ),
             );
