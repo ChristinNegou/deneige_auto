@@ -30,7 +30,8 @@ void main() {
 
       // Assert
       expect(result, const Right(null));
-      verify(() => mockRepository.resetPassword(tToken, tNewPassword)).called(1);
+      verify(() => mockRepository.resetPassword(tToken, tNewPassword))
+          .called(1);
       verifyNoMoreInteractions(mockRepository);
     });
 

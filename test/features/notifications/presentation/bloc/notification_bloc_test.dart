@@ -54,7 +54,8 @@ void main() {
         },
         act: (bloc) => bloc.add(LoadNotifications()),
         expect: () => [
-          isA<NotificationState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<NotificationState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<NotificationState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.notifications.length, 'notifications.length', 5)
@@ -76,7 +77,8 @@ void main() {
         },
         act: (bloc) => bloc.add(LoadNotifications()),
         expect: () => [
-          isA<NotificationState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<NotificationState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<NotificationState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.errorMessage, 'errorMessage', isNotNull),
@@ -117,9 +119,11 @@ void main() {
         ),
         act: (bloc) => bloc.add(MarkNotificationAsRead('notif-1')),
         expect: () => [
-          isA<NotificationState>()
-              .having((s) => s.notifications.firstWhere((n) => n.id == 'notif-1').isRead,
-                      'notif-1 isRead', true),
+          isA<NotificationState>().having(
+              (s) =>
+                  s.notifications.firstWhere((n) => n.id == 'notif-1').isRead,
+              'notif-1 isRead',
+              true),
         ],
         verify: (_) {
           verify(() => mockMarkAsRead('notif-1')).called(1);
@@ -161,7 +165,8 @@ void main() {
         expect: () => [
           isA<NotificationState>()
               .having((s) => s.unreadCount, 'unreadCount', 0)
-              .having((s) => s.notifications.every((n) => n.isRead), 'all read', true)
+              .having((s) => s.notifications.every((n) => n.isRead), 'all read',
+                  true)
               .having((s) => s.successMessage, 'successMessage', isNotNull),
         ],
       );
@@ -181,9 +186,10 @@ void main() {
         ),
         act: (bloc) => bloc.add(DeleteNotification('notif-1')),
         expect: () => [
-          isA<NotificationState>()
-              .having((s) => s.notifications.any((n) => n.id == 'notif-1'),
-                      'notif-1 deleted', false),
+          isA<NotificationState>().having(
+              (s) => s.notifications.any((n) => n.id == 'notif-1'),
+              'notif-1 deleted',
+              false),
         ],
         verify: (_) {
           verify(() => mockDeleteNotification('notif-1')).called(1);
@@ -235,12 +241,15 @@ void main() {
       blocTest<NotificationBloc, NotificationState>(
         'enables auto delete setting',
         build: () => bloc,
-        act: (bloc) => bloc.add(UpdateAutoDeleteSetting(enabled: true, delaySeconds: 5)),
+        act: (bloc) =>
+            bloc.add(UpdateAutoDeleteSetting(enabled: true, delaySeconds: 5)),
         expect: () => [
           isA<NotificationState>()
               .having((s) => s.autoDeleteEnabled, 'autoDeleteEnabled', true)
-              .having((s) => s.autoDeleteDelaySeconds, 'autoDeleteDelaySeconds', 5)
-              .having((s) => s.successMessage, 'successMessage', contains('activée')),
+              .having(
+                  (s) => s.autoDeleteDelaySeconds, 'autoDeleteDelaySeconds', 5)
+              .having((s) => s.successMessage, 'successMessage',
+                  contains('activée')),
         ],
       );
 
@@ -252,7 +261,8 @@ void main() {
         expect: () => [
           isA<NotificationState>()
               .having((s) => s.autoDeleteEnabled, 'autoDeleteEnabled', false)
-              .having((s) => s.successMessage, 'successMessage', contains('désactivée')),
+              .having((s) => s.successMessage, 'successMessage',
+                  contains('désactivée')),
         ],
       );
     });

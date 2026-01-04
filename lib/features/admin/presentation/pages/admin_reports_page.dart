@@ -47,7 +47,8 @@ class _AdminReportsPageState extends State<AdminReportsPage>
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<AdminBloc>().add(LoadDashboardStats()),
+            onPressed: () =>
+                context.read<AdminBloc>().add(LoadDashboardStats()),
           ),
         ],
       ),
@@ -62,7 +63,8 @@ class _AdminReportsPageState extends State<AdminReportsPage>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+                  Icon(Icons.error_outline,
+                      size: 64, color: Colors.red.shade300),
                   const SizedBox(height: 16),
                   Text(state.errorMessage ?? 'Une erreur est survenue'),
                   const SizedBox(height: 16),
@@ -94,7 +96,8 @@ class _AdminReportsPageState extends State<AdminReportsPage>
   }
 
   Widget _buildRevenueTab(AdminStats stats) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
+    final currencyFormat =
+        NumberFormat.currency(symbol: '\$', decimalDigits: 2);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -989,7 +992,8 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.amber.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),

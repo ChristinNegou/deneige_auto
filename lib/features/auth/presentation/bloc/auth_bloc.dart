@@ -75,9 +75,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onUpdateProfile(
-      UpdateProfile event,
-      Emitter<AuthState> emit,
-      ) async {
+    UpdateProfile event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await updateProfile(
@@ -90,46 +90,45 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (user) => emit(AuthAuthenticated(user: user)),
+      (failure) => emit(AuthError(message: failure.message)),
+      (user) => emit(AuthAuthenticated(user: user)),
     );
   }
 
-
   Future<void> _onLoginRequested(
-      LoginRequested event,
-      Emitter<AuthState> emit,
-      ) async {
+    LoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await login(event.email, event.password);
 
     result.fold(
-          (failure) {
-            // Vérifier si c'est une erreur de suspension
-            if (failure is SuspendedFailure) {
-              emit(UserSuspended(
-                message: failure.message,
-                reason: failure.reason,
-                suspendedUntil: failure.suspendedUntil,
-                suspendedUntilDisplay: failure.suspendedUntilDisplay,
-              ));
-            } else {
-              emit(AuthError(message: failure.message));
-            }
-          },
-          (user) {
-            // Enregistrer le token FCM et configurer les notifications
-            _setupNotificationsForUser(user);
-            emit(AuthAuthenticated(user: user));
-          },
+      (failure) {
+        // Vérifier si c'est une erreur de suspension
+        if (failure is SuspendedFailure) {
+          emit(UserSuspended(
+            message: failure.message,
+            reason: failure.reason,
+            suspendedUntil: failure.suspendedUntil,
+            suspendedUntilDisplay: failure.suspendedUntilDisplay,
+          ));
+        } else {
+          emit(AuthError(message: failure.message));
+        }
+      },
+      (user) {
+        // Enregistrer le token FCM et configurer les notifications
+        _setupNotificationsForUser(user);
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
   Future<void> _onForcedLogout(
-      ForcedLogout event,
-      Emitter<AuthState> emit,
-      ) async {
+    ForcedLogout event,
+    Emitter<AuthState> emit,
+  ) async {
     // Nettoyer toutes les ressources avant la déconnexion forcée
     await _cleanupAllResources();
 
@@ -143,9 +142,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onRegisterRequested(
-      RegisterRequested event,
-      Emitter<AuthState> emit,
-      ) async {
+    RegisterRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await register(
@@ -158,19 +157,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (user) {
-            // Enregistrer le token FCM et configurer les notifications
-            _setupNotificationsForUser(user);
-            emit(AuthAuthenticated(user: user));
-          },
+      (failure) => emit(AuthError(message: failure.message)),
+      (user) {
+        // Enregistrer le token FCM et configurer les notifications
+        _setupNotificationsForUser(user);
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
   Future<void> _onLogoutRequested(
-      LogoutRequested event,
-      Emitter<AuthState> emit,
-      ) async {
+    LogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     // Nettoyer toutes les ressources avant la déconnexion
@@ -179,47 +178,47 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await logout();
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (_) => emit(AuthUnauthenticated()),
+      (failure) => emit(AuthError(message: failure.message)),
+      (_) => emit(AuthUnauthenticated()),
     );
   }
 
   Future<void> _onForgotPassword(
-      ForgotPasswordEvent event,
-      Emitter<AuthState> emit,
-      ) async {
+    ForgotPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await forgotPassword(event.email);
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (_) => emit(const ForgotPasswordSuccess()),
+      (failure) => emit(AuthError(message: failure.message)),
+      (_) => emit(const ForgotPasswordSuccess()),
     );
   }
 
   Future<void> _onCheckAuthStatus(
-      CheckAuthStatus event,
-      Emitter<AuthState> emit,
-      ) async {
+    CheckAuthStatus event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await getCurrentUser();
 
     result.fold(
-          (failure) => emit(AuthUnauthenticated()),
-          (user) {
-            // Configurer les notifications pour l'utilisateur déjà connecté
-            _setupNotificationsForUser(user);
-            emit(AuthAuthenticated(user: user));
-          },
+      (failure) => emit(AuthUnauthenticated()),
+      (user) {
+        // Configurer les notifications pour l'utilisateur déjà connecté
+        _setupNotificationsForUser(user);
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
   Future<void> _onResetPassword(
-      ResetPasswordEvent event,
-      Emitter<AuthState> emit,
-      ) async {
+    ResetPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await resetPassword(
@@ -228,17 +227,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (_) => emit(const ResetPasswordSuccess()),
+      (failure) => emit(AuthError(message: failure.message)),
+      (_) => emit(const ResetPasswordSuccess()),
     );
   }
 
   // ============ PHONE VERIFICATION HANDLERS ============
 
   Future<void> _onSendPhoneVerificationCode(
-      SendPhoneVerificationCode event,
-      Emitter<AuthState> emit,
-      ) async {
+    SendPhoneVerificationCode event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await authRepository.sendPhoneVerificationCode(
@@ -251,8 +250,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (data) => emit(PhoneCodeSent(
+      (failure) => emit(AuthError(message: failure.message)),
+      (data) => emit(PhoneCodeSent(
         phoneNumber: data['phoneNumber'] ?? event.phoneNumber,
         devCode: data['devCode'],
       )),
@@ -260,9 +259,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onVerifyPhoneCode(
-      VerifyPhoneCode event,
-      Emitter<AuthState> emit,
-      ) async {
+    VerifyPhoneCode event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await authRepository.verifyPhoneCode(
@@ -271,15 +270,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (user) => emit(PhoneVerificationSuccess(user: user)),
+      (failure) => emit(AuthError(message: failure.message)),
+      (user) => emit(PhoneVerificationSuccess(user: user)),
     );
   }
 
   Future<void> _onResendPhoneVerificationCode(
-      ResendPhoneVerificationCode event,
-      Emitter<AuthState> emit,
-      ) async {
+    ResendPhoneVerificationCode event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
 
     final result = await authRepository.resendPhoneVerificationCode(
@@ -287,8 +286,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-          (failure) => emit(AuthError(message: failure.message)),
-          (data) => emit(PhoneCodeResent(devCode: data['devCode'])),
+      (failure) => emit(AuthError(message: failure.message)),
+      (data) => emit(PhoneCodeResent(devCode: data['devCode'])),
     );
   }
 
@@ -322,7 +321,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   /// S'abonne aux topics FCM selon le rôle de l'utilisateur
-  Future<void> _subscribeToTopicsForRole(UserRole role, PushNotificationService pushService) async {
+  Future<void> _subscribeToTopicsForRole(
+      UserRole role, PushNotificationService pushService) async {
     // Topic général pour tous les utilisateurs
     await pushService.subscribeToTopic('all_users');
 

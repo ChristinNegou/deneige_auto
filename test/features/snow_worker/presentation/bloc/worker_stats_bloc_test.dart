@@ -43,8 +43,7 @@ void main() {
         act: (bloc) => bloc.add(const LoadStats()),
         expect: () => [
           isA<WorkerStatsLoading>(),
-          isA<WorkerStatsLoaded>()
-              .having((s) => s.stats, 'stats', tStats),
+          isA<WorkerStatsLoaded>().having((s) => s.stats, 'stats', tStats),
         ],
         verify: (_) {
           verify(() => mockGetWorkerStats()).called(1);
@@ -78,7 +77,8 @@ void main() {
         seed: () => WorkerStatsLoaded(stats: tStats),
         act: (bloc) => bloc.add(const RefreshStats()),
         expect: () => [
-          isA<WorkerStatsLoaded>().having((s) => s.isRefreshing, 'isRefreshing', true),
+          isA<WorkerStatsLoaded>()
+              .having((s) => s.isRefreshing, 'isRefreshing', true),
           isA<WorkerStatsLoaded>()
               .having((s) => s.isRefreshing, 'isRefreshing', false)
               .having((s) => s.stats, 'stats', tStats),
@@ -95,8 +95,10 @@ void main() {
         seed: () => WorkerStatsLoaded(stats: tStats),
         act: (bloc) => bloc.add(const RefreshStats()),
         expect: () => [
-          isA<WorkerStatsLoaded>().having((s) => s.isRefreshing, 'isRefreshing', true),
-          isA<WorkerStatsLoaded>().having((s) => s.isRefreshing, 'isRefreshing', false),
+          isA<WorkerStatsLoaded>()
+              .having((s) => s.isRefreshing, 'isRefreshing', true),
+          isA<WorkerStatsLoaded>()
+              .having((s) => s.isRefreshing, 'isRefreshing', false),
           isA<WorkerStatsError>(),
         ],
       );

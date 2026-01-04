@@ -307,8 +307,11 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                               Text(
                                 '${dateFormatter.format(widget.job.departureTime)} à ${timeFormatter.format(widget.job.departureTime)}',
                                 style: TextStyle(
-                                  color: isUrgent ? Colors.red : Colors.grey[600],
-                                  fontWeight: isUrgent ? FontWeight.bold : FontWeight.normal,
+                                  color:
+                                      isUrgent ? Colors.red : Colors.grey[600],
+                                  fontWeight: isUrgent
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                   fontSize: 13,
                                 ),
                               ),
@@ -371,7 +374,6 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                   ],
                 ),
               ),
-
             ],
           ),
         ),

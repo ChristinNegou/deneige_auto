@@ -20,7 +20,8 @@ class AdminDashboardPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<AdminBloc>().add(LoadDashboardStats()),
+            onPressed: () =>
+                context.read<AdminBloc>().add(LoadDashboardStats()),
           ),
         ],
       ),
@@ -36,7 +37,8 @@ class AdminDashboardPage extends StatelessWidget {
             );
             context.read<AdminBloc>().add(ClearError());
           }
-          if (state.errorMessage != null && state.actionStatus == AdminStatus.error) {
+          if (state.errorMessage != null &&
+              state.actionStatus == AdminStatus.error) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
@@ -56,12 +58,14 @@ class AdminDashboardPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+                  Icon(Icons.error_outline,
+                      size: 64, color: Colors.red.shade300),
                   const SizedBox(height: 16),
                   Text(state.errorMessage ?? 'Erreur de chargement'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<AdminBloc>().add(LoadDashboardStats()),
+                    onPressed: () =>
+                        context.read<AdminBloc>().add(LoadDashboardStats()),
                     child: const Text('Réessayer'),
                   ),
                 ],
@@ -107,7 +111,10 @@ class AdminDashboardPage extends StatelessWidget {
           DrawerHeader(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppTheme.primary, AppTheme.primary.withValues(alpha: 0.8)],
+                colors: [
+                  AppTheme.primary,
+                  AppTheme.primary.withValues(alpha: 0.8)
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -122,7 +129,8 @@ class AdminDashboardPage extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(Icons.admin_panel_settings, size: 35, color: Colors.white),
+                  child: const Icon(Icons.admin_panel_settings,
+                      size: 35, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 const Text(
@@ -277,7 +285,8 @@ class AdminDashboardPage extends StatelessWidget {
                 icon: Icons.event_note,
                 label: 'Réservations',
                 color: Colors.purple,
-                onTap: () => Navigator.pushNamed(context, AppRoutes.adminReservations),
+                onTap: () =>
+                    Navigator.pushNamed(context, AppRoutes.adminReservations),
               ),
               _buildQuickActionButton(
                 context,
@@ -291,7 +300,8 @@ class AdminDashboardPage extends StatelessWidget {
                 icon: Icons.analytics,
                 label: 'Rapports',
                 color: Colors.indigo,
-                onTap: () => Navigator.pushNamed(context, AppRoutes.adminReports),
+                onTap: () =>
+                    Navigator.pushNamed(context, AppRoutes.adminReports),
               ),
             ],
           ),
@@ -349,7 +359,8 @@ class AdminDashboardPage extends StatelessWidget {
           stats.users.total.toString(),
           Icons.people,
           Colors.blue,
-          subtitle: '${stats.users.clients} clients, ${stats.users.workers} déneigeurs',
+          subtitle:
+              '${stats.users.clients} clients, ${stats.users.workers} déneigeurs',
           onTap: () => Navigator.pushNamed(context, AppRoutes.adminUsers),
         ),
         _buildStatCard(
@@ -359,7 +370,8 @@ class AdminDashboardPage extends StatelessWidget {
           Icons.calendar_today,
           Colors.purple,
           subtitle: '${stats.reservations.today} aujourd\'hui',
-          onTap: () => Navigator.pushNamed(context, AppRoutes.adminReservations),
+          onTap: () =>
+              Navigator.pushNamed(context, AppRoutes.adminReservations),
         ),
         _buildStatCard(
           context,
@@ -368,7 +380,8 @@ class AdminDashboardPage extends StatelessWidget {
           Icons.pending_actions,
           Colors.orange,
           subtitle: 'À traiter',
-          onTap: () => Navigator.pushNamed(context, AppRoutes.adminReservations),
+          onTap: () =>
+              Navigator.pushNamed(context, AppRoutes.adminReservations),
         ),
         _buildStatCard(
           context,
@@ -486,7 +499,8 @@ class AdminDashboardPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildRevenueItem('Commission plateforme', stats.revenue.platformFees, false),
+              _buildRevenueItem(
+                  'Commission plateforme', stats.revenue.platformFees, false),
               _buildRevenueItem('Pourboires', stats.revenue.tips, false),
             ],
           ),
@@ -553,7 +567,8 @@ class AdminDashboardPage extends StatelessWidget {
                 ],
               ),
               TextButton(
-                onPressed: () => Navigator.pushNamed(context, AppRoutes.adminWorkers),
+                onPressed: () =>
+                    Navigator.pushNamed(context, AppRoutes.adminWorkers),
                 child: const Text('Voir tous'),
               ),
             ],
@@ -602,7 +617,8 @@ class AdminDashboardPage extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.amber.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
@@ -695,9 +711,13 @@ class AdminDashboardPage extends StatelessWidget {
                     prefixIcon: const Icon(Icons.people),
                   ),
                   items: const [
-                    DropdownMenuItem(value: null, child: Text('Tous les utilisateurs')),
-                    DropdownMenuItem(value: 'client', child: Text('Clients uniquement')),
-                    DropdownMenuItem(value: 'snowWorker', child: Text('Déneigeurs uniquement')),
+                    DropdownMenuItem(
+                        value: null, child: Text('Tous les utilisateurs')),
+                    DropdownMenuItem(
+                        value: 'client', child: Text('Clients uniquement')),
+                    DropdownMenuItem(
+                        value: 'snowWorker',
+                        child: Text('Déneigeurs uniquement')),
                   ],
                   onChanged: (value) => setState(() => selectedRole = value),
                 ),
@@ -713,7 +733,8 @@ class AdminDashboardPage extends StatelessWidget {
               icon: const Icon(Icons.send),
               label: const Text('Envoyer'),
               onPressed: () {
-                if (titleController.text.isEmpty || messageController.text.isEmpty) {
+                if (titleController.text.isEmpty ||
+                    messageController.text.isEmpty) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
                     const SnackBar(
                       content: Text('Veuillez remplir tous les champs'),
@@ -724,10 +745,10 @@ class AdminDashboardPage extends StatelessWidget {
                 }
 
                 adminBloc.add(BroadcastNotification(
-                      title: titleController.text,
-                      message: messageController.text,
-                      targetRole: selectedRole,
-                    ));
+                  title: titleController.text,
+                  message: messageController.text,
+                  targetRole: selectedRole,
+                ));
                 Navigator.pop(dialogContext);
               },
             ),
@@ -752,7 +773,8 @@ class AdminDashboardPage extends StatelessWidget {
                 color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
+              child:
+                  const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('Déconnexion Admin'),

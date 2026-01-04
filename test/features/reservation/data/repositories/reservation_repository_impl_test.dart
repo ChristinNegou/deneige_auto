@@ -104,7 +104,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.getReservations())
             .thenThrow(const ServerException(message: 'Server error'));
 
@@ -188,7 +189,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.getVehicles())
             .thenThrow(const ServerException(message: 'Server error'));
 

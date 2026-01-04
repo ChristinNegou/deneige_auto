@@ -305,7 +305,8 @@ class WorkerRepositoryImpl implements WorkerRepository {
   }
 
   @override
-  Future<Either<Failure, WorkerCancellationReasons>> getCancellationReasons() async {
+  Future<Either<Failure, WorkerCancellationReasons>>
+      getCancellationReasons() async {
     try {
       final reasons = await remoteDataSource.getCancellationReasons();
       return Right(reasons);
@@ -329,7 +330,8 @@ class WorkerRepositoryImpl implements WorkerRepository {
 
     if (e.response != null) {
       final statusCode = e.response?.statusCode;
-      final errorMessage = e.response?.data?['message'] as String? ?? 'Erreur serveur';
+      final errorMessage =
+          e.response?.data?['message'] as String? ?? 'Erreur serveur';
 
       if (statusCode == 401) {
         return UnauthorizedFailure(message: errorMessage);

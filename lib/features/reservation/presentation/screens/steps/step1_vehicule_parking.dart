@@ -10,12 +10,14 @@ class Step1VehicleParkingScreen extends StatefulWidget {
   const Step1VehicleParkingScreen({super.key});
 
   @override
-  State<Step1VehicleParkingScreen> createState() => _Step1VehicleParkingScreenState();
+  State<Step1VehicleParkingScreen> createState() =>
+      _Step1VehicleParkingScreenState();
 }
 
 class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
   final TextEditingController _parkingSpotController = TextEditingController();
-  final TextEditingController _customLocationController = TextEditingController();
+  final TextEditingController _customLocationController =
+      TextEditingController();
   int _selectedLocationOption = 0; // 0 = none, 1 = parking spot, 2 = custom
 
   @override
@@ -86,7 +88,9 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
             child: _VehicleCard(
               vehicle: vehicle,
               isSelected: isSelected,
-              onTap: () => context.read<NewReservationBloc>().add(SelectVehicle(vehicle)),
+              onTap: () => context
+                  .read<NewReservationBloc>()
+                  .add(SelectVehicle(vehicle)),
             ),
           );
         }),
@@ -132,14 +136,18 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
                     ),
                     textCapitalization: TextCapitalization.characters,
-                    style: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 1),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500, letterSpacing: 1),
                     onChanged: (value) {
                       if (value.trim().isNotEmpty) {
                         _customLocationController.clear();
-                        context.read<NewReservationBloc>().add(UpdateParkingSpotNumber(value.trim()));
+                        context
+                            .read<NewReservationBloc>()
+                            .add(UpdateParkingSpotNumber(value.trim()));
                       }
                     },
                   ),
@@ -173,13 +181,16 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
                         ),
                         maxLines: 2,
                         onChanged: (value) {
                           if (value.trim().isNotEmpty) {
                             _parkingSpotController.clear();
-                            context.read<NewReservationBloc>().add(UpdateCustomLocation(value.trim()));
+                            context
+                                .read<NewReservationBloc>()
+                                .add(UpdateCustomLocation(value.trim()));
                           }
                         },
                       ),
@@ -217,7 +228,9 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.05)
+              : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppTheme.primary : Colors.grey[200]!,
@@ -229,7 +242,9 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, size: 20, color: isSelected ? AppTheme.primary : Colors.grey[600]),
+                Icon(icon,
+                    size: 20,
+                    color: isSelected ? AppTheme.primary : Colors.grey[600]),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -240,7 +255,9 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isSelected ? AppTheme.primary : AppTheme.textPrimary,
+                          color: isSelected
+                              ? AppTheme.primary
+                              : AppTheme.textPrimary,
                         ),
                       ),
                       Text(
@@ -305,7 +322,8 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
       ),
       child: Column(
         children: [
-          Icon(Icons.directions_car_outlined, size: 48, color: Colors.grey[400]),
+          Icon(Icons.directions_car_outlined,
+              size: 48, color: Colors.grey[400]),
           const SizedBox(height: 12),
           const Text(
             'Aucun véhicule',
@@ -325,7 +343,8 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
           ),
         ],
@@ -361,7 +380,9 @@ class _VehicleCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.05)
+              : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppTheme.primary : Colors.grey[200]!,
@@ -412,7 +433,8 @@ class _VehicleCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: _getColor(vehicle.color),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey[300]!, width: 0.5),
+                          border:
+                              Border.all(color: Colors.grey[300]!, width: 0.5),
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -424,7 +446,8 @@ class _VehicleCard extends StatelessWidget {
                         Text(' · ', style: TextStyle(color: Colors.grey[400])),
                         Text(
                           vehicle.licensePlate!,
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[600]),
                         ),
                       ],
                     ],

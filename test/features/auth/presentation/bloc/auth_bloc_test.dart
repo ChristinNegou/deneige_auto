@@ -95,8 +95,8 @@ void main() {
         build: () {
           when(() => mockLogin(tEmail, tPassword))
               .thenAnswer((_) async => const Left(
-                AuthFailure(message: 'Email ou mot de passe incorrect'),
-              ));
+                    AuthFailure(message: 'Email ou mot de passe incorrect'),
+                  ));
           return bloc;
         },
         act: (bloc) => bloc.add(const LoginRequested(
@@ -118,10 +118,10 @@ void main() {
         build: () {
           when(() => mockLogin(tEmail, tPassword))
               .thenAnswer((_) async => Left(SuspendedFailure(
-                message: 'Compte suspendu',
-                reason: 'Violation des regles',
-                suspendedUntil: DateTime(2024, 2, 1),
-              )));
+                    message: 'Compte suspendu',
+                    reason: 'Violation des regles',
+                    suspendedUntil: DateTime(2024, 2, 1),
+                  )));
           return bloc;
         },
         act: (bloc) => bloc.add(const LoginRequested(
@@ -151,13 +151,13 @@ void main() {
         'emits [AuthLoading, AuthAuthenticated] when registration succeeds',
         build: () {
           when(() => mockRegister(
-            email: tEmail,
-            password: tPassword,
-            firstName: tFirstName,
-            lastName: tLastName,
-            phone: tPhone,
-            role: UserRole.client,
-          )).thenAnswer((_) async => Right(tUser));
+                email: tEmail,
+                password: tPassword,
+                firstName: tFirstName,
+                lastName: tLastName,
+                phone: tPhone,
+                role: UserRole.client,
+              )).thenAnswer((_) async => Right(tUser));
           return bloc;
         },
         act: (bloc) => bloc.add(const RegisterRequested(
@@ -178,15 +178,15 @@ void main() {
         'emits [AuthLoading, AuthError] when registration fails',
         build: () {
           when(() => mockRegister(
-            email: tEmail,
-            password: tPassword,
-            firstName: tFirstName,
-            lastName: tLastName,
-            phone: tPhone,
-            role: UserRole.client,
-          )).thenAnswer((_) async => const Left(
-            ValidationFailure(message: 'Email deja utilise'),
-          ));
+                email: tEmail,
+                password: tPassword,
+                firstName: tFirstName,
+                lastName: tLastName,
+                phone: tPhone,
+                role: UserRole.client,
+              )).thenAnswer((_) async => const Left(
+                ValidationFailure(message: 'Email deja utilise'),
+              ));
           return bloc;
         },
         act: (bloc) => bloc.add(const RegisterRequested(
@@ -244,8 +244,7 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthLoading, AuthUnauthenticated] when logout succeeds',
         build: () {
-          when(() => mockLogout())
-              .thenAnswer((_) async => const Right(null));
+          when(() => mockLogout()).thenAnswer((_) async => const Right(null));
           return bloc;
         },
         act: (bloc) => bloc.add(LogoutRequested()),
@@ -292,8 +291,8 @@ void main() {
         build: () {
           when(() => mockForgotPassword(tEmail))
               .thenAnswer((_) async => const Left(
-                ValidationFailure(message: 'Email non trouve'),
-              ));
+                    ValidationFailure(message: 'Email non trouve'),
+                  ));
           return bloc;
         },
         act: (bloc) => bloc.add(const ForgotPasswordEvent(tEmail)),
@@ -312,9 +311,9 @@ void main() {
         'emits [AuthLoading, ResetPasswordSuccess] when password is reset',
         build: () {
           when(() => mockResetPassword(
-            token: tToken,
-            newPassword: tNewPassword,
-          )).thenAnswer((_) async => const Right(null));
+                token: tToken,
+                newPassword: tNewPassword,
+              )).thenAnswer((_) async => const Right(null));
           return bloc;
         },
         act: (bloc) => bloc.add(const ResetPasswordEvent(
@@ -331,11 +330,11 @@ void main() {
         'emits [AuthLoading, AuthError] when token is invalid',
         build: () {
           when(() => mockResetPassword(
-            token: tToken,
-            newPassword: tNewPassword,
-          )).thenAnswer((_) async => const Left(
-            ValidationFailure(message: 'Token invalide'),
-          ));
+                token: tToken,
+                newPassword: tNewPassword,
+              )).thenAnswer((_) async => const Left(
+                ValidationFailure(message: 'Token invalide'),
+              ));
           return bloc;
         },
         act: (bloc) => bloc.add(const ResetPasswordEvent(
@@ -396,15 +395,17 @@ void main() {
           suspendedUntil: DateTime(2024, 3, 1),
         )),
         expect: () => [
-          isA<UserSuspended>().having(
-            (state) => state.message,
-            'message',
-            'Compte suspendu par admin',
-          ).having(
-            (state) => state.reason,
-            'reason',
-            'Comportement inapproprie',
-          ),
+          isA<UserSuspended>()
+              .having(
+                (state) => state.message,
+                'message',
+                'Compte suspendu par admin',
+              )
+              .having(
+                (state) => state.reason,
+                'reason',
+                'Comportement inapproprie',
+              ),
         ],
       );
     });

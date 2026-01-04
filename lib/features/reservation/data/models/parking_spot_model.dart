@@ -24,8 +24,12 @@ class ParkingSpotModel extends ParkingSpot {
       buildingCode: json['buildingCode'] as String?,
       level: _parseParkingLevel(json['level'] as String?),
       section: json['section'] as String?,
-      latitude: json['latitude'] != null ? (json['latitude'] as num).toDouble() : null,
-      longitude: json['longitude'] != null ? (json['longitude'] as num).toDouble() : null,
+      latitude: json['latitude'] != null
+          ? (json['latitude'] as num).toDouble()
+          : null,
+      longitude: json['longitude'] != null
+          ? (json['longitude'] as num).toDouble()
+          : null,
       isAssigned: json['isAssigned'] as bool? ?? false,
       assignedUserId: json['assignedUserId'] as String?,
       isActive: json['isActive'] as bool? ?? true,

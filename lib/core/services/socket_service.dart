@@ -16,29 +16,37 @@ class SocketService {
   bool _isConnecting = false;
 
   // Stream controllers pour les différents événements
-  final _reservationUpdatesController = StreamController<Map<String, dynamic>>.broadcast();
-  final _jobUpdatesController = StreamController<Map<String, dynamic>>.broadcast();
-  final _notificationController = StreamController<Map<String, dynamic>>.broadcast();
+  final _reservationUpdatesController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final _jobUpdatesController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final _notificationController =
+      StreamController<Map<String, dynamic>>.broadcast();
   final _connectionStatusController = StreamController<bool>.broadcast();
 
   // Stream controllers pour le chat
-  final _chatMessageController = StreamController<Map<String, dynamic>>.broadcast();
-  final _chatTypingController = StreamController<Map<String, dynamic>>.broadcast();
+  final _chatMessageController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final _chatTypingController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
   /// Stream pour les mises à jour de réservations
-  Stream<Map<String, dynamic>> get reservationUpdates => _reservationUpdatesController.stream;
+  Stream<Map<String, dynamic>> get reservationUpdates =>
+      _reservationUpdatesController.stream;
 
   /// Stream pour les mises à jour de jobs (pour workers)
   Stream<Map<String, dynamic>> get jobUpdates => _jobUpdatesController.stream;
 
   /// Stream pour les notifications en temps réel
-  Stream<Map<String, dynamic>> get notifications => _notificationController.stream;
+  Stream<Map<String, dynamic>> get notifications =>
+      _notificationController.stream;
 
   /// Stream pour le statut de connexion
   Stream<bool> get connectionStatus => _connectionStatusController.stream;
 
   /// Stream pour les nouveaux messages du chat
-  Stream<Map<String, dynamic>> get chatMessages => _chatMessageController.stream;
+  Stream<Map<String, dynamic>> get chatMessages =>
+      _chatMessageController.stream;
 
   /// Stream pour l'indicateur de frappe du chat
   Stream<Map<String, dynamic>> get chatTyping => _chatTypingController.stream;

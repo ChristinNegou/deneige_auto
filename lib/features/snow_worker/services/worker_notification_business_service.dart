@@ -7,26 +7,26 @@ import 'worker_notification_service.dart';
 /// Types de notifications spécifiques aux snowworkers
 enum WorkerNotificationType {
   // Jobs
-  newJobAvailable,           // Nouveau job disponible
-  jobAssigned,               // Job assigné au worker
-  jobCancelled,              // Job annulé par le client
-  jobModified,               // Job modifié par le client
+  newJobAvailable, // Nouveau job disponible
+  jobAssigned, // Job assigné au worker
+  jobCancelled, // Job annulé par le client
+  jobModified, // Job modifié par le client
 
   // Revenus
-  paymentReceived,           // Paiement reçu
-  bonusEarned,               // Bonus gagné
-  weeklyPayoutReady,         // Paiement hebdomadaire prêt
+  paymentReceived, // Paiement reçu
+  bonusEarned, // Bonus gagné
+  weeklyPayoutReady, // Paiement hebdomadaire prêt
 
   // Performance
-  ratingReceived,            // Nouvelle évaluation reçue
-  performanceAlert,          // Alerte de performance (taux annulation élevé)
-  milestoneReached,          // Jalon atteint (100 jobs, etc.)
+  ratingReceived, // Nouvelle évaluation reçue
+  performanceAlert, // Alerte de performance (taux annulation élevé)
+  milestoneReached, // Jalon atteint (100 jobs, etc.)
 
   // Système
-  documentExpiring,          // Document expirant bientôt
-  accountUpdate,             // Mise à jour du compte
-  zoneHighDemand,            // Zone à forte demande
-  weatherOpportunity,        // Opportunité météo (tempête prévue)
+  documentExpiring, // Document expirant bientôt
+  accountUpdate, // Mise à jour du compte
+  zoneHighDemand, // Zone à forte demande
+  weatherOpportunity, // Opportunité météo (tempête prévue)
 }
 
 /// Service de logique métier pour les notifications des snowworkers
@@ -36,7 +36,8 @@ class WorkerNotificationBusinessService {
   factory WorkerNotificationBusinessService() => _instance;
   WorkerNotificationBusinessService._internal();
 
-  final WorkerNotificationService _localNotificationService = WorkerNotificationService();
+  final WorkerNotificationService _localNotificationService =
+      WorkerNotificationService();
   Dio? _dio;
 
   // Stream pour les notifications en temps réel
@@ -93,8 +94,9 @@ class WorkerNotificationBusinessService {
 
     _emitEvent(
       WorkerNotificationType.newJobAvailable,
-      title: '${ newJobs.length} nouveaux jobs',
-      message: hasUrgent ? 'Dont des jobs urgents!' : 'Disponibles près de vous',
+      title: '${newJobs.length} nouveaux jobs',
+      message:
+          hasUrgent ? 'Dont des jobs urgents!' : 'Disponibles près de vous',
       data: {'count': newJobs.length, 'hasUrgent': hasUrgent},
     );
   }
@@ -115,7 +117,8 @@ class WorkerNotificationBusinessService {
   Future<void> notifyJobCancelled(WorkerJob job, String? reason) async {
     await _showLocalNotification(
       title: 'Job annulé',
-      body: 'Le job à ${job.displayAddress} a été annulé${reason != null ? ': $reason' : ''}',
+      body:
+          'Le job à ${job.displayAddress} a été annulé${reason != null ? ': $reason' : ''}',
       isUrgent: false,
     );
 
@@ -146,7 +149,8 @@ class WorkerNotificationBusinessService {
   // ===== Notifications de Revenus =====
 
   /// Notifie d'un paiement reçu
-  Future<void> notifyPaymentReceived(double amount, String jobDescription) async {
+  Future<void> notifyPaymentReceived(
+      double amount, String jobDescription) async {
     await _localNotificationService.notifyJobCompleted(amount);
 
     _emitEvent(

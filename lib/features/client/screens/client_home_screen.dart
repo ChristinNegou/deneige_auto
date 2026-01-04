@@ -16,7 +16,8 @@ import '../../home/presentation/bloc/home_state.dart';
 import '../../notifications/presentation/bloc/notification_bloc.dart';
 import '../../reservation/domain/entities/reservation.dart';
 import '../../reservation/domain/repositories/reservation_repository.dart';
-import '../../reservation/presentation/bloc/reservation_list_bloc.dart' as reservation_bloc;
+import '../../reservation/presentation/bloc/reservation_list_bloc.dart'
+    as reservation_bloc;
 import '../../widgets/service_completed_dialog.dart';
 import '../../chat/presentation/bloc/chat_bloc.dart';
 import '../../chat/presentation/pages/chat_screen.dart';
@@ -40,8 +41,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<HomeBloc>().add(LoadHomeData());
-        context.read<reservation_bloc.ReservationListBloc>().add(
-            const reservation_bloc.LoadReservations());
+        context
+            .read<reservation_bloc.ReservationListBloc>()
+            .add(const reservation_bloc.LoadReservations());
         context.read<NotificationBloc>().add(LoadNotifications());
       }
     });
@@ -57,8 +59,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   void _startAutoRefresh() {
     _refreshTimer = Timer.periodic(_refreshInterval, (_) {
       if (mounted) {
-        context.read<reservation_bloc.ReservationListBloc>().add(
-            reservation_bloc.RefreshReservations());
+        context
+            .read<reservation_bloc.ReservationListBloc>()
+            .add(reservation_bloc.RefreshReservations());
         context.read<NotificationBloc>().add(RefreshNotifications());
       }
     });
@@ -100,7 +103,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     }
   }
 
-  Future<void> _submitRating(String reservationId, int rating, String? comment) async {
+  Future<void> _submitRating(
+      String reservationId, int rating, String? comment) async {
     try {
       final repository = sl<ReservationRepository>();
       final result = await repository.rateReservation(
@@ -125,14 +129,16 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(data['message'] ?? 'Merci pour votre évaluation!'),
+                content:
+                    Text(data['message'] ?? 'Merci pour votre évaluation!'),
                 backgroundColor: AppTheme.success,
                 behavior: SnackBarBehavior.floating,
               ),
             );
             // Rafraîchir les réservations
-            context.read<reservation_bloc.ReservationListBloc>().add(
-                reservation_bloc.RefreshReservations());
+            context
+                .read<reservation_bloc.ReservationListBloc>()
+                .add(reservation_bloc.RefreshReservations());
           }
         },
       );
@@ -174,7 +180,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             final workerName = data['workerName'] ?? 'le déneigeur';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Pourboire de ${amount.toStringAsFixed(0)}\$ envoyé à $workerName'),
+                content: Text(
+                    'Pourboire de ${amount.toStringAsFixed(0)}\$ envoyé à $workerName'),
                 backgroundColor: AppTheme.success,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -355,7 +362,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       return Icons.water_drop;
     } else if (lower.contains('cloud') || lower.contains('nuag')) {
       return Icons.cloud;
-    } else if (lower.contains('sun') || lower.contains('clear') ||
+    } else if (lower.contains('sun') ||
+        lower.contains('clear') ||
         lower.contains('soleil')) {
       return Icons.wb_sunny;
     }
@@ -408,10 +416,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     return BlocBuilder<reservation_bloc.ReservationListBloc,
         reservation_bloc.ReservationListState>(
       builder: (context, state) {
-        final activeReservation = state.reservations.where((r) =>
-        r.status == ReservationStatus.enRoute ||
-            r.status == ReservationStatus.inProgress ||
-            r.status == ReservationStatus.assigned).firstOrNull;
+        final activeReservation = state.reservations
+            .where((r) =>
+                r.status == ReservationStatus.enRoute ||
+                r.status == ReservationStatus.inProgress ||
+                r.status == ReservationStatus.assigned)
+            .firstOrNull;
 
         if (activeReservation == null) return const SizedBox.shrink();
 
@@ -462,12 +472,11 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () =>
-              Navigator.pushNamed(
-                context,
-                AppRoutes.reservationDetails,
-                arguments: reservation.id,
-              ),
+          onTap: () => Navigator.pushNamed(
+            context,
+            AppRoutes.reservationDetails,
+            arguments: reservation.id,
+          ),
           borderRadius: BorderRadius.circular(AppTheme.radiusLG),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -668,19 +677,15 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         BlocBuilder<reservation_bloc.ReservationListBloc,
             reservation_bloc.ReservationListState>(
           builder: (context, state) {
-            final upcoming = state.reservations
-                .where((r) => r.isUpcoming)
-                .take(3)
-                .toList();
+            final upcoming =
+                state.reservations.where((r) => r.isUpcoming).take(3).toList();
 
             if (upcoming.isEmpty) {
               return _buildEmptyState();
             }
 
             return Column(
-              children: upcoming
-                  .map((r) => _buildReservationCard(r))
-                  .toList(),
+              children: upcoming.map((r) => _buildReservationCard(r)).toList(),
             );
           },
         ),
@@ -746,12 +751,11 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () =>
-              Navigator.pushNamed(
-                context,
-                AppRoutes.reservationDetails,
-                arguments: reservation.id,
-              ),
+          onTap: () => Navigator.pushNamed(
+            context,
+            AppRoutes.reservationDetails,
+            arguments: reservation.id,
+          ),
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
           child: Padding(
             padding: const EdgeInsets.all(14),
@@ -839,15 +843,24 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
   String _formatMonth(DateTime date) {
     const months = [
-      'JAN', 'FÉV', 'MAR', 'AVR', 'MAI', 'JUN',
-      'JUL', 'AOÛ', 'SEP', 'OCT', 'NOV', 'DÉC'
+      'JAN',
+      'FÉV',
+      'MAR',
+      'AVR',
+      'MAI',
+      'JUN',
+      'JUL',
+      'AOÛ',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DÉC'
     ];
     return months[date.month - 1];
   }
 
   String _formatTime(DateTime date) {
-    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString()
-        .padLeft(2, '0')}';
+    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   String _getStatusLabel(ReservationStatus status) {
@@ -911,7 +924,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                 Icons.calendar_month_outlined,
                 'Agenda',
                 false,
-                    () => Navigator.pushNamed(context, AppRoutes.reservations),
+                () => Navigator.pushNamed(context, AppRoutes.reservations),
               ),
               // Bouton central
               GestureDetector(
@@ -938,13 +951,13 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                 Icons.history_outlined,
                 'Activités',
                 false,
-                    () => Navigator.pushNamed(context, AppRoutes.activities),
+                () => Navigator.pushNamed(context, AppRoutes.activities),
               ),
               _buildNavItem(
                 Icons.person_outline,
                 'Profil',
                 false,
-                    () => Navigator.pushNamed(context, AppRoutes.profile),
+                () => Navigator.pushNamed(context, AppRoutes.profile),
               ),
             ],
           ),
@@ -953,8 +966,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, bool isActive,
-      VoidCallback onTap) {
+  Widget _buildNavItem(
+      IconData icon, String label, bool isActive, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Column(

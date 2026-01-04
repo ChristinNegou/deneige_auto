@@ -25,10 +25,10 @@ void main() {
     test('should return list of available jobs when successful', () async {
       // Arrange
       when(() => mockRepository.getAvailableJobs(
-        latitude: tLatitude,
-        longitude: tLongitude,
-        radiusKm: tRadiusKm,
-      )).thenAnswer((_) async => Right(tJobs));
+            latitude: tLatitude,
+            longitude: tLongitude,
+            radiusKm: tRadiusKm,
+          )).thenAnswer((_) async => Right(tJobs));
 
       // Act
       final result = await usecase(
@@ -40,19 +40,19 @@ void main() {
       // Assert
       expect(result, Right(tJobs));
       verify(() => mockRepository.getAvailableJobs(
-        latitude: tLatitude,
-        longitude: tLongitude,
-        radiusKm: tRadiusKm,
-      )).called(1);
+            latitude: tLatitude,
+            longitude: tLongitude,
+            radiusKm: tRadiusKm,
+          )).called(1);
     });
 
     test('should return empty list when no available jobs', () async {
       // Arrange
       when(() => mockRepository.getAvailableJobs(
-        latitude: any(named: 'latitude'),
-        longitude: any(named: 'longitude'),
-        radiusKm: any(named: 'radiusKm'),
-      )).thenAnswer((_) async => const Right([]));
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+            radiusKm: any(named: 'radiusKm'),
+          )).thenAnswer((_) async => const Right([]));
 
       // Act
       final result = await usecase(
@@ -71,10 +71,10 @@ void main() {
     test('should use default radius when not specified', () async {
       // Arrange
       when(() => mockRepository.getAvailableJobs(
-        latitude: tLatitude,
-        longitude: tLongitude,
-        radiusKm: 10,
-      )).thenAnswer((_) async => Right(tJobs));
+            latitude: tLatitude,
+            longitude: tLongitude,
+            radiusKm: 10,
+          )).thenAnswer((_) async => Right(tJobs));
 
       // Act
       final result = await usecase(
@@ -89,10 +89,10 @@ void main() {
     test('should return ServerFailure on server error', () async {
       // Arrange
       when(() => mockRepository.getAvailableJobs(
-        latitude: any(named: 'latitude'),
-        longitude: any(named: 'longitude'),
-        radiusKm: any(named: 'radiusKm'),
-      )).thenAnswer((_) async => const Left(serverFailure));
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+            radiusKm: any(named: 'radiusKm'),
+          )).thenAnswer((_) async => const Left(serverFailure));
 
       // Act
       final result = await usecase(
@@ -107,10 +107,10 @@ void main() {
     test('should return NetworkFailure on connection error', () async {
       // Arrange
       when(() => mockRepository.getAvailableJobs(
-        latitude: any(named: 'latitude'),
-        longitude: any(named: 'longitude'),
-        radiusKm: any(named: 'radiusKm'),
-      )).thenAnswer((_) async => const Left(networkFailure));
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+            radiusKm: any(named: 'radiusKm'),
+          )).thenAnswer((_) async => const Left(networkFailure));
 
       // Act
       final result = await usecase(

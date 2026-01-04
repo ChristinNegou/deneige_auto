@@ -117,7 +117,8 @@ class SyncQueue {
   }
 
   /// Cree et ajoute une nouvelle operation
-  Future<void> addOperation(SyncOperationType type, Map<String, dynamic> data) async {
+  Future<void> addOperation(
+      SyncOperationType type, Map<String, dynamic> data) async {
     final item = SyncQueueItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       type: type,

@@ -8,13 +8,13 @@ import '../models/login_response_model.dart';
 abstract class AuthRemoteDataSource {
   Future<UserModel> login(String email, String password);
   Future<UserModel> register(
-      String email,
-      String password,
-      String firstName,
-      String lastName, {
-        String? phone,
-        UserRole role,
-      });
+    String email,
+    String password,
+    String firstName,
+    String lastName, {
+    String? phone,
+    UserRole role,
+  });
   Future<UserModel> updateProfile({
     String? firstName,
     String? lastName,
@@ -72,10 +72,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           await secureStorage.saveRefreshToken(loginResponse.refreshToken!);
         }
         await secureStorage.saveUserId(loginResponse.user.id);
-        await secureStorage.saveUserRole(loginResponse.user.role
-            .toString()
-            .split('.')
-            .last);
+        await secureStorage
+            .saveUserRole(loginResponse.user.role.toString().split('.').last);
 
         return loginResponse.user;
       } else {
@@ -101,13 +99,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> register(String email,
-      String password,
-      String firstName,
-      String lastName, {
-        String? phone,
-        UserRole role = UserRole.client,
-      }) async {
+  Future<UserModel> register(
+    String email,
+    String password,
+    String firstName,
+    String lastName, {
+    String? phone,
+    UserRole role = UserRole.client,
+  }) async {
     try {
       final response = await dio.post(
         '/auth/register',
@@ -117,10 +116,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'firstName': firstName,
           'lastName': lastName,
           'phoneNumber': phone,
-          'role': role
-              .toString()
-              .split('.')
-              .last,
+          'role': role.toString().split('.').last,
         },
       );
 
@@ -133,10 +129,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           await secureStorage.saveRefreshToken(loginResponse.refreshToken!);
         }
         await secureStorage.saveUserId(loginResponse.user.id);
-        await secureStorage.saveUserRole(loginResponse.user.role
-            .toString()
-            .split('.')
-            .last);
+        await secureStorage
+            .saveUserRole(loginResponse.user.role.toString().split('.').last);
 
         return loginResponse.user;
       } else {
@@ -204,8 +198,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (response.statusCode != 200) {
         throw ServerException(
-          message: response.data['message'] ??
-              'Erreur lors de l\'envoi de l\'email',
+          message:
+              response.data['message'] ?? 'Erreur lors de l\'envoi de l\'email',
           statusCode: response.statusCode,
         );
       }
@@ -230,8 +224,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (response.statusCode != 200) {
         throw ServerException(
-          message: response.data['message'] ??
-              'Erreur lors de la réinitialisation',
+          message:
+              response.data['message'] ?? 'Erreur lors de la réinitialisation',
           statusCode: response.statusCode,
         );
       }
@@ -316,20 +310,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         };
       } else {
         throw ServerException(
-          message: response.data['message'] ?? 'Erreur lors de l\'envoi du code',
+          message:
+              response.data['message'] ?? 'Erreur lors de l\'envoi du code',
           statusCode: response.statusCode,
         );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 409) {
         throw AuthException(
-          message: e.response?.data['message'] ?? 'Ce numéro ou email est déjà utilisé',
+          message: e.response?.data['message'] ??
+              'Ce numéro ou email est déjà utilisé',
           statusCode: 409,
         );
       }
       if (e.response?.statusCode == 429) {
         throw ServerException(
-          message: e.response?.data['message'] ?? 'Veuillez patienter avant de renvoyer',
+          message: e.response?.data['message'] ??
+              'Veuillez patienter avant de renvoyer',
           statusCode: 429,
         );
       }
@@ -394,7 +391,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> resendPhoneVerificationCode(String phoneNumber) async {
+  Future<Map<String, dynamic>> resendPhoneVerificationCode(
+      String phoneNumber) async {
     try {
       final response = await dio.post(
         '/phone/resend-code',
@@ -416,7 +414,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on DioException catch (e) {
       if (e.response?.statusCode == 429) {
         throw ServerException(
-          message: e.response?.data['message'] ?? 'Veuillez patienter avant de renvoyer',
+          message: e.response?.data['message'] ??
+              'Veuillez patienter avant de renvoyer',
           statusCode: 429,
         );
       }

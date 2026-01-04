@@ -1,11 +1,6 @@
-
 import 'package:equatable/equatable.dart';
 
-enum UserRole {
-  client,
-  snowWorker,
-  admin
-}
+enum UserRole { client, snowWorker, admin }
 
 class User extends Equatable {
   final String id;
@@ -27,7 +22,8 @@ class User extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, email, name, phoneNumber, photoUrl, createdAt, role];
+  List<Object?> get props =>
+      [id, email, name, phoneNumber, photoUrl, createdAt, role];
 
   String? get firstName {
     final parts = name.split(' ');

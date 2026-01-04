@@ -4,14 +4,14 @@ import 'package:equatable/equatable.dart';
 class Vehicle extends Equatable {
   final String id;
   final String userId;
-  final String make;        // Marque (ex: Honda)
-  final String model;       // Modèle (ex: Civic)
-  final int? year;          // Année
-  final String color;       // Couleur
+  final String make; // Marque (ex: Honda)
+  final String model; // Modèle (ex: Civic)
+  final int? year; // Année
+  final String color; // Couleur
   final String? licensePlate;
-  final String? photoUrl;   // Photo du véhicule
+  final String? photoUrl; // Photo du véhicule
   final VehicleType type;
-  final bool isDefault;     // Véhicule par défaut de l'utilisateur
+  final bool isDefault; // Véhicule par défaut de l'utilisateur
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -80,27 +80,27 @@ class Vehicle extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    userId,
-    make,
-    model,
-    year,
-    color,
-    licensePlate,
-    photoUrl,
-    type,
-    isDefault,
-    createdAt,
-    updatedAt,
-  ];
+        id,
+        userId,
+        make,
+        model,
+        year,
+        color,
+        licensePlate,
+        photoUrl,
+        type,
+        isDefault,
+        createdAt,
+        updatedAt,
+      ];
 }
 
 /// Types de véhicules
 enum VehicleType {
-  car,        // Voiture
-  suv,        // VUS
-  truck,      // Camion
-  van,        // Fourgonnette
+  car, // Voiture
+  suv, // VUS
+  truck, // Camion
+  van, // Fourgonnette
   motorcycle, // Moto (été)
 }
 
@@ -151,4 +151,3 @@ extension VehicleTypeExtension on VehicleType {
     }
   }
 }
-

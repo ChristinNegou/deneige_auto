@@ -50,7 +50,6 @@ import '../../features/admin/presentation/pages/admin_reports_page.dart';
 import '../../features/admin/presentation/bloc/admin_bloc.dart';
 import '../../features/admin/presentation/bloc/admin_event.dart';
 
-
 /// Classe qui gère la génération et la navigation des routes
 class AppRouter {
   // Empêche l'instanciation
@@ -59,7 +58,7 @@ class AppRouter {
   /// Génère les routes de l'application
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
-    // Routes d'authentification
+      // Routes d'authentification
       // Routes d'authentification - utilisent le AuthBloc singleton fourni au niveau app
       case AppRoutes.onboarding:
         return MaterialPageRoute(
@@ -102,8 +101,8 @@ class AppRouter {
 
       case AppRoutes.forgotPassword:
         return MaterialPageRoute(
-            builder: (_) => const ForgotPasswordScreen(),
-            settings: settings,
+          builder: (_) => const ForgotPasswordScreen(),
+          settings: settings,
         );
 
       case AppRoutes.resetPassword:
@@ -113,7 +112,7 @@ class AppRouter {
           settings: settings,
         );
 
-    // Routes principales
+      // Routes principales
       case AppRoutes.home:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -123,13 +122,11 @@ class AppRouter {
           settings: settings,
         );
 
-
       case AppRoutes.reservations:
         return MaterialPageRoute(
           builder: (_) => const ReservationsPage(),
           settings: settings,
         );
-
 
       case AppRoutes.newReservation:
         return MaterialPageRoute(
@@ -139,7 +136,6 @@ class AppRouter {
           ),
           settings: settings,
         );
-
 
       case AppRoutes.reservationDetails:
         final reservationId = settings.arguments as String?;
@@ -234,7 +230,7 @@ class AppRouter {
           settings: settings,
         );
 
-    // Routes d'activités
+      // Routes d'activités
       case AppRoutes.activities:
         return MaterialPageRoute(
           builder: (_) => const ActivitiesScreen(),
@@ -250,7 +246,7 @@ class AppRouter {
           settings: settings,
         );
 
-    // Routes déneigeur
+      // Routes déneigeur
       case AppRoutes.snowWorkerDashboard:
         return MaterialPageRoute(
           builder: (_) => const SnowWorkerDashboardPage(),
@@ -360,7 +356,8 @@ class AppRouter {
           final reservationId = settings.arguments as String?;
           if (reservationId != null && reservationId.isNotEmpty) {
             return MaterialPageRoute(
-              builder: (_) => ReservationDetailsPage(reservationId: reservationId),
+              builder: (_) =>
+                  ReservationDetailsPage(reservationId: reservationId),
               settings: settings,
             );
           }
@@ -412,16 +409,17 @@ class AppRouter {
 
   /// Méthodes utilitaires de navigation
 
-  static Future<T?> navigateTo<T>(BuildContext context, String routeName, {Object? arguments}) {
+  static Future<T?> navigateTo<T>(BuildContext context, String routeName,
+      {Object? arguments}) {
     return Navigator.pushNamed<T>(context, routeName, arguments: arguments);
   }
 
   static Future<T?> navigateToAndReplace<T, TO extends Object?>(
-      BuildContext context,
-      String routeName, {
-        Object? arguments,
-        TO? result,
-      }) {
+    BuildContext context,
+    String routeName, {
+    Object? arguments,
+    TO? result,
+  }) {
     return Navigator.pushReplacementNamed<T, TO>(
       context,
       routeName,
@@ -431,14 +429,14 @@ class AppRouter {
   }
 
   static Future<T?> navigateToAndClearStack<T>(
-      BuildContext context,
-      String routeName, {
-        Object? arguments,
-      }) {
+    BuildContext context,
+    String routeName, {
+    Object? arguments,
+  }) {
     return Navigator.pushNamedAndRemoveUntil<T>(
       context,
       routeName,
-          (route) => false,
+      (route) => false,
       arguments: arguments,
     );
   }
@@ -449,7 +447,3 @@ class AppRouter {
 }
 
 // ======================= PAGE PLACEHOLDER ===================
-
-
-
-

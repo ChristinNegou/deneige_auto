@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 class AppSnackBar {
   static void show(
-      BuildContext context, {
-        required String message,
-        SnackBarType type = SnackBarType.info,
-        Duration duration = const Duration(seconds: 3),
-        VoidCallback? onAction,
-        String? actionLabel,
-      }) {
+    BuildContext context, {
+    required String message,
+    SnackBarType type = SnackBarType.info,
+    Duration duration = const Duration(seconds: 3),
+    VoidCallback? onAction,
+    String? actionLabel,
+  }) {
     final color = _getColorForType(type);
     final icon = _getIconForType(type);
 
@@ -35,10 +35,10 @@ class AppSnackBar {
         ),
         action: onAction != null && actionLabel != null
             ? SnackBarAction(
-          label: actionLabel,
-          textColor: Colors.white,
-          onPressed: onAction,
-        )
+                label: actionLabel,
+                textColor: Colors.white,
+                onPressed: onAction,
+              )
             : null,
       ),
     );

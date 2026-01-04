@@ -114,5 +114,6 @@ class UserSuspended extends AuthState {
   });
 
   @override
-  List<Object?> get props => [message, reason, suspendedUntil, suspendedUntilDisplay];
+  List<Object?> get props =>
+      [message, reason, suspendedUntil, suspendedUntilDisplay];
 }

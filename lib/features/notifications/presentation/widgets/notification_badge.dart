@@ -210,7 +210,8 @@ class PollingNotificationBadge extends StatefulWidget {
   });
 
   @override
-  State<PollingNotificationBadge> createState() => _PollingNotificationBadgeState();
+  State<PollingNotificationBadge> createState() =>
+      _PollingNotificationBadgeState();
 }
 
 class _PollingNotificationBadgeState extends State<PollingNotificationBadge> {

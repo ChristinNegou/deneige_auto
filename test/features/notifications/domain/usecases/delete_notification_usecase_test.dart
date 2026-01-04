@@ -28,7 +28,8 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      verify(() => mockRepository.deleteNotification(tNotificationId)).called(1);
+      verify(() => mockRepository.deleteNotification(tNotificationId))
+          .called(1);
     });
 
     test('should return ServerFailure when notification not found', () async {

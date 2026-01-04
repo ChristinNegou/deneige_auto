@@ -118,7 +118,7 @@ class TaxService {
   /// Obtenir les infos de taxe pour une province
   ProvinceTaxInfo getTaxInfo(String provinceCode) {
     return _provinceTaxes[provinceCode.toUpperCase()] ??
-           _provinceTaxes[defaultProvinceCode]!;
+        _provinceTaxes[defaultProvinceCode]!;
   }
 
   /// Détecter la province à partir d'une adresse
@@ -261,10 +261,10 @@ class TaxService {
 class ProvinceTaxInfo {
   final String code;
   final String name;
-  final double gstRate;      // Taux GST/TPS fédéral
-  final double pstRate;      // Taux PST/TVQ provincial
-  final bool isHST;          // Si utilise HST combinée
-  final double hstRate;      // Taux HST si applicable
+  final double gstRate; // Taux GST/TPS fédéral
+  final double pstRate; // Taux PST/TVQ provincial
+  final bool isHST; // Si utilise HST combinée
+  final double hstRate; // Taux HST si applicable
   final String federalTaxName;
   final String provincialTaxName;
 
@@ -315,8 +315,7 @@ class TaxCalculation {
   String get federalTaxLabel =>
       '$federalTaxName (${(federalTaxRate * 100).toStringAsFixed(isHST ? 0 : 0)}%)';
 
-  String get provincialTaxLabel =>
-      provincialTaxRate > 0
-          ? '$provincialTaxName (${(provincialTaxRate * 100).toStringAsFixed(provincialTaxRate == 0.09975 ? 3 : 0)}%)'
-          : '';
+  String get provincialTaxLabel => provincialTaxRate > 0
+      ? '$provincialTaxName (${(provincialTaxRate * 100).toStringAsFixed(provincialTaxRate == 0.09975 ? 3 : 0)}%)'
+      : '';
 }

@@ -32,12 +32,12 @@ void main() {
     test('should return User when registration is successful', () async {
       // Arrange
       when(() => mockRepository.register(
-        tEmail,
-        tPassword,
-        '$tFirstName $tLastName',
-        phone: tPhone,
-        role: UserRole.client,
-      )).thenAnswer((_) async => Right(tUser));
+            tEmail,
+            tPassword,
+            '$tFirstName $tLastName',
+            phone: tPhone,
+            role: UserRole.client,
+          )).thenAnswer((_) async => Right(tUser));
 
       // Act
       final result = await usecase(
@@ -52,24 +52,24 @@ void main() {
       // Assert
       expect(result, Right(tUser));
       verify(() => mockRepository.register(
-        tEmail,
-        tPassword,
-        '$tFirstName $tLastName',
-        phone: tPhone,
-        role: UserRole.client,
-      )).called(1);
+            tEmail,
+            tPassword,
+            '$tFirstName $tLastName',
+            phone: tPhone,
+            role: UserRole.client,
+          )).called(1);
     });
 
     test('should register worker role correctly', () async {
       // Arrange
       final workerUser = UserFixtures.createWorker(email: tEmail);
       when(() => mockRepository.register(
-        tEmail,
-        tPassword,
-        '$tFirstName $tLastName',
-        phone: tPhone,
-        role: UserRole.snowWorker,
-      )).thenAnswer((_) async => Right(workerUser));
+            tEmail,
+            tPassword,
+            '$tFirstName $tLastName',
+            phone: tPhone,
+            role: UserRole.snowWorker,
+          )).thenAnswer((_) async => Right(workerUser));
 
       // Act
       final result = await usecase(
@@ -92,12 +92,12 @@ void main() {
     test('should register without phone number', () async {
       // Arrange
       when(() => mockRepository.register(
-        tEmail,
-        tPassword,
-        '$tFirstName $tLastName',
-        phone: null,
-        role: UserRole.client,
-      )).thenAnswer((_) async => Right(tUser));
+            tEmail,
+            tPassword,
+            '$tFirstName $tLastName',
+            phone: null,
+            role: UserRole.client,
+          )).thenAnswer((_) async => Right(tUser));
 
       // Act
       final result = await usecase(
@@ -117,12 +117,12 @@ void main() {
       // Arrange
       const failure = ValidationFailure(message: 'Cet email est deja utilise');
       when(() => mockRepository.register(
-        tEmail,
-        tPassword,
-        '$tFirstName $tLastName',
-        phone: tPhone,
-        role: UserRole.client,
-      )).thenAnswer((_) async => const Left(failure));
+            tEmail,
+            tPassword,
+            '$tFirstName $tLastName',
+            phone: tPhone,
+            role: UserRole.client,
+          )).thenAnswer((_) async => const Left(failure));
 
       // Act
       final result = await usecase(
@@ -141,12 +141,12 @@ void main() {
     test('should return ServerFailure on server error', () async {
       // Arrange
       when(() => mockRepository.register(
-        tEmail,
-        tPassword,
-        '$tFirstName $tLastName',
-        phone: tPhone,
-        role: UserRole.client,
-      )).thenAnswer((_) async => const Left(serverFailure));
+            tEmail,
+            tPassword,
+            '$tFirstName $tLastName',
+            phone: tPhone,
+            role: UserRole.client,
+          )).thenAnswer((_) async => const Left(serverFailure));
 
       // Act
       final result = await usecase(

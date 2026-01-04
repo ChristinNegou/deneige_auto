@@ -42,6 +42,7 @@ class UserFixtures {
       role: UserRole.snowWorker,
     );
   }
+
   /// Cree un utilisateur client pour les tests
   static User createClient({
     String? id,

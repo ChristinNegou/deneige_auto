@@ -9,7 +9,8 @@ class UpdateReservationUseCase {
 
   UpdateReservationUseCase(this.repository);
 
-  Future<Either<Failure, Reservation>> call(UpdateReservationParams params) async {
+  Future<Either<Failure, Reservation>> call(
+      UpdateReservationParams params) async {
     // Validation supplémentaire côté domaine
     final validation = _validateParams(params);
     if (validation != null) {
@@ -34,7 +35,8 @@ class UpdateReservationUseCase {
 
   String? _validateParams(UpdateReservationParams params) {
     final now = DateTime.now();
-    final minTime = now.add(Duration(minutes: AppConfig.minReservationTimeMinutes));
+    final minTime =
+        now.add(Duration(minutes: AppConfig.minReservationTimeMinutes));
 
     if (params.departureTime.isBefore(minTime)) {
       return 'Le départ doit être dans au moins ${AppConfig.minReservationTimeMinutes} minutes';

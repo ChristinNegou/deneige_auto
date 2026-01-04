@@ -75,7 +75,8 @@ class PaymentMethodsState extends Equatable {
       methods: methods ?? this.methods,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: clearMessages ? null : (errorMessage ?? this.errorMessage),
-      successMessage: clearMessages ? null : (successMessage ?? this.successMessage),
+      successMessage:
+          clearMessages ? null : (successMessage ?? this.successMessage),
     );
   }
 
@@ -84,7 +85,8 @@ class PaymentMethodsState extends Equatable {
 }
 
 // BLoC
-class PaymentMethodsBloc extends Bloc<PaymentMethodsEvent, PaymentMethodsState> {
+class PaymentMethodsBloc
+    extends Bloc<PaymentMethodsEvent, PaymentMethodsState> {
   final GetPaymentMethodsUseCase getPaymentMethods;
   final SavePaymentMethodUseCase savePaymentMethod;
   final DeletePaymentMethodUseCase deletePaymentMethod;

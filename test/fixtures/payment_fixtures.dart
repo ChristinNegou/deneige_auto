@@ -151,7 +151,8 @@ class PaymentFixtures {
   }
 
   /// Cree une liste de methodes de paiement
-  static List<PaymentMethod> createPaymentMethodList(int count, {bool withDefault = true}) {
+  static List<PaymentMethod> createPaymentMethodList(int count,
+      {bool withDefault = true}) {
     return List.generate(
       count,
       (index) => createPaymentMethod(

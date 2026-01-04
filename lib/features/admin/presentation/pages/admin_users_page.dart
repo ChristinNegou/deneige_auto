@@ -105,7 +105,9 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         _searchController.clear();
-                        context.read<AdminBloc>().add(LoadUsers(role: _selectedRole));
+                        context
+                            .read<AdminBloc>()
+                            .add(LoadUsers(role: _selectedRole));
                       },
                     )
                   : null,
@@ -236,9 +238,12 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundColor: _getRoleColor(user.role).withValues(alpha: 0.2),
+                backgroundColor:
+                    _getRoleColor(user.role).withValues(alpha: 0.2),
                 child: Text(
-                  user.firstName.isNotEmpty ? user.firstName[0].toUpperCase() : '?',
+                  user.firstName.isNotEmpty
+                      ? user.firstName[0].toUpperCase()
+                      : '?',
                   style: TextStyle(
                     color: _getRoleColor(user.role),
                     fontWeight: FontWeight.bold,
@@ -305,10 +310,12 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         ],
                         if (user.role == 'snowWorker' &&
                             user.workerProfile != null) ...[
-                          Icon(Icons.star, size: 14, color: Colors.amber.shade600),
+                          Icon(Icons.star,
+                              size: 14, color: Colors.amber.shade600),
                           const SizedBox(width: 2),
                           Text(
-                            user.workerProfile!.averageRating.toStringAsFixed(1),
+                            user.workerProfile!.averageRating
+                                .toStringAsFixed(1),
                             style: TextStyle(
                               color: Colors.grey.shade700,
                               fontSize: 12,
@@ -458,7 +465,8 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                   children: [
                     CircleAvatar(
                       radius: 40,
-                      backgroundColor: _getRoleColor(user.role).withValues(alpha: 0.2),
+                      backgroundColor:
+                          _getRoleColor(user.role).withValues(alpha: 0.2),
                       child: Text(
                         user.firstName.isNotEmpty
                             ? user.firstName[0].toUpperCase()
@@ -529,13 +537,15 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         ],
                         if (user.suspendedUntil != null) ...[
                           const SizedBox(height: 4),
-                          Text('Jusqu\'au: ${_formatDate(user.suspendedUntil!)}'),
+                          Text(
+                              'Jusqu\'au: ${_formatDate(user.suspendedUntil!)}'),
                         ],
                       ],
                     ),
                   ),
                 ],
-                if (user.role == 'snowWorker' && user.workerProfile != null) ...[
+                if (user.role == 'snowWorker' &&
+                    user.workerProfile != null) ...[
                   const Divider(height: 32),
                   const Text(
                     'Statistiques Déneigeur',
@@ -807,12 +817,12 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
               onPressed: () {
                 Navigator.pop(dialogContext);
                 adminBloc.add(SuspendUser(
-                      userId: user.id,
-                      reason: reasonController.text.isNotEmpty
-                          ? reasonController.text
-                          : null,
-                      days: selectedDays,
-                    ));
+                  userId: user.id,
+                  reason: reasonController.text.isNotEmpty
+                      ? reasonController.text
+                      : null,
+                  days: selectedDays,
+                ));
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Suspendre'),

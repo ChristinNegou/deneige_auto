@@ -3,7 +3,8 @@ import 'package:dio/dio.dart';
 import '../../../../service/secure_storage_service.dart';
 
 /// Callback pour notifier la suspension d'un utilisateur
-typedef SuspensionCallback = void Function(Map<String, dynamic> suspensionDetails);
+typedef SuspensionCallback = void Function(
+    Map<String, dynamic> suspensionDetails);
 
 /// Intercepteur pour ajouter le token d'authentification aux requêtes
 class AuthInterceptor extends Interceptor {
@@ -17,15 +18,16 @@ class AuthInterceptor extends Interceptor {
       StreamController<Map<String, dynamic>>.broadcast();
 
   /// Stream des événements de suspension
-  static Stream<Map<String, dynamic>> get suspensionStream => _suspensionController.stream;
+  static Stream<Map<String, dynamic>> get suspensionStream =>
+      _suspensionController.stream;
 
   AuthInterceptor({required this.secureStorage});
 
   @override
   void onRequest(
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-      ) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     // Récupérer le token
     final token = await secureStorage.getToken();
 
@@ -60,7 +62,8 @@ class AuthInterceptor extends Interceptor {
         final refreshToken = await secureStorage.getRefreshToken();
 
         if (refreshToken != null) {
-          final newToken = await _refreshToken(refreshToken, err.requestOptions.baseUrl);
+          final newToken =
+              await _refreshToken(refreshToken, err.requestOptions.baseUrl);
 
           if (newToken != null) {
             // Sauvegarder le nouveau token
@@ -114,14 +117,16 @@ class LoggingInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print('✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
+    print(
+        '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
     print('📥 Data: ${response.data}');
     return super.onResponse(response, handler);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    print('❌ ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}');
+    print(
+        '❌ ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}');
     print('🔥 Message: ${err.message}');
     print('📛 Response: ${err.response?.data}');
     return super.onError(err, handler);

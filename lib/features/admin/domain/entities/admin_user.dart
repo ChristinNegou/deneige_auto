@@ -66,7 +66,8 @@ class AdminUser {
       workerProfile: json['workerProfile'] != null
           ? WorkerProfile.fromJson(json['workerProfile'])
           : null,
-      reservationsCount: _toInt(json['reservationsCount'] ?? json['stats']?['totalReservations']),
+      reservationsCount: _toInt(
+          json['reservationsCount'] ?? json['stats']?['totalReservations']),
       totalSpent: _toDouble(json['totalSpent'] ?? json['stats']?['totalSpent']),
     );
   }

@@ -50,9 +50,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
         body: BlocConsumer<PaymentMethodsBloc, PaymentMethodsState>(
           listener: (context, state) {
-            if (state.methods.isNotEmpty && _selectedPaymentMethod == null && !_useNewCard) {
+            if (state.methods.isNotEmpty &&
+                _selectedPaymentMethod == null &&
+                !_useNewCard) {
               setState(() {
-                _selectedPaymentMethod = state.defaultMethod ?? state.methods.first;
+                _selectedPaymentMethod =
+                    state.defaultMethod ?? state.methods.first;
               });
             }
           },
@@ -75,7 +78,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(height: 12),
 
                   if (state.methods.isNotEmpty) ...[
-                    ...state.methods.map((method) => _buildPaymentMethodTile(method)),
+                    ...state.methods
+                        .map((method) => _buildPaymentMethodTile(method)),
                   ],
 
                   _buildNewCardTile(),
@@ -162,7 +166,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Widget _buildPaymentMethodTile(PaymentMethod method) {
     final isSelected = !_useNewCard &&
-        _selectedPaymentMethod?.stripePaymentMethodId == method.stripePaymentMethodId;
+        _selectedPaymentMethod?.stripePaymentMethodId ==
+            method.stripePaymentMethodId;
 
     return GestureDetector(
       onTap: () {
@@ -175,7 +180,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.05)
+              : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected ? AppTheme.primary : Colors.grey[200]!,
@@ -211,7 +218,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Center(
-                child: Icon(Icons.credit_card, size: 18, color: Colors.grey[600]),
+                child:
+                    Icon(Icons.credit_card, size: 18, color: Colors.grey[600]),
               ),
             ),
             const SizedBox(width: 12),
@@ -233,7 +241,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       if (method.isDefault) ...[
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
@@ -277,7 +286,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.05)
+              : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSelected ? AppTheme.primary : Colors.grey[200]!,
@@ -368,7 +379,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildPaymentButton() {
-    final canPay = (_selectedPaymentMethod != null || _useNewCard) && !_isLoading;
+    final canPay =
+        (_selectedPaymentMethod != null || _useNewCard) && !_isLoading;
 
     return SizedBox(
       width: double.infinity,
@@ -379,18 +391,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
           foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey[300],
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 0,
         ),
         child: _isLoading
             ? const SizedBox(
                 height: 20,
                 width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.white),
               )
             : Text(
                 'Payer ${widget.amount.toStringAsFixed(2)} \$',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
       ),
     );
@@ -418,7 +433,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
       child: Text(
         text,
-        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+        style: TextStyle(
+            fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[600]),
       ),
     );
   }
@@ -451,7 +467,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Paiement réussi !'), backgroundColor: Colors.green),
+          const SnackBar(
+              content: Text('Paiement réussi !'),
+              backgroundColor: Colors.green),
         );
         Navigator.of(context).pop({
           'success': true,

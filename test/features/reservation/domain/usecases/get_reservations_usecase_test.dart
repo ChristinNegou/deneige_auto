@@ -79,7 +79,8 @@ void main() {
 
     test('should return ServerFailure on server error', () async {
       // Arrange
-      when(() => mockRepository.getReservations(upcoming: any(named: 'upcoming')))
+      when(() =>
+              mockRepository.getReservations(upcoming: any(named: 'upcoming')))
           .thenAnswer((_) async => const Left(serverFailure));
 
       // Act

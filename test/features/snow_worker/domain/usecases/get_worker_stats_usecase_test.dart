@@ -56,7 +56,8 @@ void main() {
 
     test('should return stats when worker is unavailable', () async {
       // Arrange
-      final unavailableStats = WorkerFixtures.createWorkerStats(isAvailable: false);
+      final unavailableStats =
+          WorkerFixtures.createWorkerStats(isAvailable: false);
       when(() => mockRepository.getStats())
           .thenAnswer((_) async => Right(unavailableStats));
 

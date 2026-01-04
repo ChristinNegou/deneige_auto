@@ -31,11 +31,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-        LoginRequested(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        ),
-      );
+            LoginRequested(
+              email: _emailController.text.trim(),
+              password: _passwordController.text,
+            ),
+          );
     }
   }
 
@@ -182,7 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
               if (value == null || value.isEmpty) {
                 return 'Veuillez entrer votre email';
               }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                  .hasMatch(value)) {
                 return 'Email invalide';
               }
               return null;
@@ -200,7 +201,9 @@ class _LoginScreenState extends State<LoginScreen> {
             suffixIcon: GestureDetector(
               onTap: () => setState(() => _obscurePassword = !_obscurePassword),
               child: Icon(
-                _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                _obscurePassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 color: AppTheme.textTertiary,
                 size: 20,
               ),
@@ -219,7 +222,8 @@ class _LoginScreenState extends State<LoginScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () => Navigator.of(context).pushNamed(AppRoutes.forgotPassword),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.forgotPassword),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 minimumSize: Size.zero,
@@ -273,22 +277,26 @@ class _LoginScreenState extends State<LoginScreen> {
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTheme.bodyMedium.copyWith(color: AppTheme.textTertiary),
+            hintStyle:
+                AppTheme.bodyMedium.copyWith(color: AppTheme.textTertiary),
             prefixIcon: Container(
               margin: const EdgeInsets.only(left: 12, right: 8),
               child: Icon(icon, color: AppTheme.textSecondary, size: 20),
             ),
-            prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             suffixIcon: suffixIcon != null
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: suffixIcon,
-                )
-              : null,
-            suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: suffixIcon,
+                  )
+                : null,
+            suffixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             filled: true,
             fillColor: AppTheme.background,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               borderSide: BorderSide.none,

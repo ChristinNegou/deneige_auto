@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,27 +17,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<OnboardingContent> _pages = [
     OnboardingContent(
       title: 'Bienvenue sur Déneige Auto',
-      description: 'La solution moderne pour gérer le déneigement de votre propriété en toute simplicité',
-      icon: Icons.ac_unit,
-      color: const Color(0xFF1E3A8A),
+      description:
+          'La solution moderne pour gérer le déneigement de votre propriété en toute simplicité',
+      illustrationType: IllustrationType.welcome,
+      accentColor: const Color(0xFF00D4FF),
     ),
     OnboardingContent(
       title: 'Réservez en quelques clics',
-      description: 'Planifiez vos services de déneigement selon vos besoins et votre horaire',
-      icon: Icons.calendar_today,
-      color: const Color(0xFF3B82F6),
+      description:
+          'Planifiez vos services de déneigement selon vos besoins et votre horaire',
+      illustrationType: IllustrationType.calendar,
+      accentColor: const Color(0xFF3B82F6),
     ),
     OnboardingContent(
       title: 'Suivi en temps réel',
-      description: 'Suivez l\'avancement du déneigement et recevez des notifications instantanées',
-      icon: Icons.location_on,
-      color: const Color(0xFF60A5FA),
+      description:
+          'Suivez l\'avancement du déneigement et recevez des notifications instantanées',
+      illustrationType: IllustrationType.location,
+      accentColor: const Color(0xFF10B981),
     ),
     OnboardingContent(
       title: 'Paiement sécurisé',
       description: 'Payez en toute sécurité et gérez vos factures facilement',
-      icon: Icons.payment,
-      color: const Color(0xFF2563EB),
+      illustrationType: IllustrationType.payment,
+      accentColor: const Color(0xFF8B5CF6),
     ),
   ];
 
@@ -73,15 +78,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.background,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              _pages[_currentPage].color,
-              _pages[_currentPage].color.withOpacity(0.8),
+              AppTheme.background,
+              _pages[_currentPage].accentColor.withValues(alpha: 0.15),
+              AppTheme.background,
             ],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
@@ -94,10 +102,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: TextButton(
                     onPressed: _skipOnboarding,
-                    child: const Text(
+                    child: Text(
                       'Passer',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppTheme.textSecondary,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -125,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
                     _pages.length,
-                        (index) => _buildPageIndicator(index),
+                    (index) => _buildPageIndicator(index),
                   ),
                 ),
               ),
@@ -139,9 +147,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: ElevatedButton(
                     onPressed: _nextPage,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: _pages[_currentPage].color,
+                      backgroundColor: _pages[_currentPage].accentColor,
+                      foregroundColor: Colors.white,
                       elevation: 8,
+                      shadowColor: _pages[_currentPage]
+                          .accentColor
+                          .withValues(alpha: 0.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -167,46 +178,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildPage(OnboardingContent content) {
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: const EdgeInsets.symmetric(horizontal: 32.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Icône
-          Container(
-            width: 150,
-            height: 150,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              content.icon,
-              size: 80,
-              color: Colors.white,
-            ),
+          // Image 3D
+          AppIllustration(
+            type: content.illustrationType,
+            width: 220,
+            height: 220,
           ),
-          const SizedBox(height: 60),
+          const SizedBox(height: 48),
 
           // Titre
           Text(
             content.title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: content.accentColor,
               height: 1.3,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
           // Description
           Text(
             content.description,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.white,
+              color: AppTheme.textSecondary,
               height: 1.5,
             ),
           ),
@@ -216,15 +219,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildPageIndicator(int index) {
+    final isActive = _currentPage == index;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 4.0),
       height: 8,
-      width: _currentPage == index ? 24 : 8,
+      width: isActive ? 24 : 8,
       decoration: BoxDecoration(
-        color: _currentPage == index
-            ? Colors.white
-            : Colors.white.withOpacity(0.4),
+        color: isActive
+            ? _pages[_currentPage].accentColor
+            : AppTheme.textTertiary.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(4),
       ),
     );
@@ -235,13 +239,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class OnboardingContent {
   final String title;
   final String description;
-  final IconData icon;
-  final Color color;
+  final IllustrationType illustrationType;
+  final Color accentColor;
 
   OnboardingContent({
     required this.title,
     required this.description,
-    required this.icon,
-    required this.color,
+    required this.illustrationType,
+    required this.accentColor,
   });
 }

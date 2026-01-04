@@ -81,13 +81,12 @@ class ReservationSummaryCard extends StatelessWidget {
                       label: 'Départ',
                       value: state.departureDateTime != null
                           ? DateFormat('d MMM yyyy, HH:mm', 'fr_CA')
-                          .format(state.departureDateTime!)
+                              .format(state.departureDateTime!)
                           : '-',
                     ),
 
                     if (state.selectedOptions.isNotEmpty) ...[
                       const Divider(height: 24),
-
                       _SummaryRow(
                         icon: Icons.tune,
                         label: 'Options',
@@ -99,7 +98,6 @@ class ReservationSummaryCard extends StatelessWidget {
 
                     if (state.snowDepthCm != null) ...[
                       const Divider(height: 24),
-
                       _SummaryRow(
                         icon: Icons.ac_unit,
                         label: 'Neige',
@@ -124,7 +122,8 @@ class ReservationSummaryCard extends StatelessWidget {
     }
 
     // 2. Si un numéro de place manuel est entré
-    if (state.parkingSpotNumber != null && state.parkingSpotNumber!.isNotEmpty) {
+    if (state.parkingSpotNumber != null &&
+        state.parkingSpotNumber!.isNotEmpty) {
       return 'Place ${state.parkingSpotNumber}';
     }
 

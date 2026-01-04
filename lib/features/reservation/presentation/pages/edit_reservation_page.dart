@@ -17,8 +17,8 @@ class EditReservationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<EditReservationBloc>()
-        ..add(LoadEditReservationData(reservation)),
+      create: (context) =>
+          sl<EditReservationBloc>()..add(LoadEditReservationData(reservation)),
       child: const EditReservationView(),
     );
   }
@@ -65,7 +65,9 @@ class _EditReservationViewState extends State<EditReservationView> {
         }
 
         // Initialize address controller when data is loaded
-        if (!state.isLoadingData && state.locationAddress != null && _addressController.text.isEmpty) {
+        if (!state.isLoadingData &&
+            state.locationAddress != null &&
+            _addressController.text.isEmpty) {
           _addressController.text = state.locationAddress!;
         }
       },
@@ -78,7 +80,8 @@ class _EditReservationViewState extends State<EditReservationView> {
         }
 
         // Vérifier si la réservation peut être éditée
-        if (state.originalReservation != null && !state.originalReservation!.canBeEdited) {
+        if (state.originalReservation != null &&
+            !state.originalReservation!.canBeEdited) {
           return Scaffold(
             appBar: AppBar(title: const Text('Modifier la réservation')),
             body: Center(
@@ -150,25 +153,18 @@ class _EditReservationViewState extends State<EditReservationView> {
                   ),
                 ),
               if (!state.hasChanges) const SizedBox(height: 16),
-
               _buildVehicleSection(context, state),
               const SizedBox(height: 16),
-
               _buildParkingSpotSection(context, state),
               const SizedBox(height: 16),
-
               _buildLocationSection(context, state),
               const SizedBox(height: 16),
-
               _buildDepartureTimeSection(context, state),
               const SizedBox(height: 16),
-
               _buildServiceOptionsSection(context, state),
               const SizedBox(height: 16),
-
               _buildPriceCard(context, state),
               const SizedBox(height: 24),
-
               _buildSubmitButton(context, state),
             ],
           ),
@@ -177,7 +173,8 @@ class _EditReservationViewState extends State<EditReservationView> {
     );
   }
 
-  Widget _buildVehicleSection(BuildContext context, EditReservationState state) {
+  Widget _buildVehicleSection(
+      BuildContext context, EditReservationState state) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -209,7 +206,9 @@ class _EditReservationViewState extends State<EditReservationView> {
                   final vehicle = _getAllVehicles(state).firstWhere(
                     (v) => v.id == value,
                   );
-                  context.read<EditReservationBloc>().add(UpdateVehicle(vehicle));
+                  context
+                      .read<EditReservationBloc>()
+                      .add(UpdateVehicle(vehicle));
                 }
               },
             ),
@@ -219,7 +218,8 @@ class _EditReservationViewState extends State<EditReservationView> {
     );
   }
 
-  Widget _buildParkingSpotSection(BuildContext context, EditReservationState state) {
+  Widget _buildParkingSpotSection(
+      BuildContext context, EditReservationState state) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -251,7 +251,9 @@ class _EditReservationViewState extends State<EditReservationView> {
                   final spot = _getAllParkingSpots(state).firstWhere(
                     (s) => s.id == value,
                   );
-                  context.read<EditReservationBloc>().add(UpdateParkingSpot(spot));
+                  context
+                      .read<EditReservationBloc>()
+                      .add(UpdateParkingSpot(spot));
                 }
               },
             ),
@@ -261,7 +263,8 @@ class _EditReservationViewState extends State<EditReservationView> {
     );
   }
 
-  Widget _buildLocationSection(BuildContext context, EditReservationState state) {
+  Widget _buildLocationSection(
+      BuildContext context, EditReservationState state) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -305,7 +308,8 @@ class _EditReservationViewState extends State<EditReservationView> {
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _searchAddress(context),
             ),
-            if (state.locationAddress != null && state.locationLatitude != null) ...[
+            if (state.locationAddress != null &&
+                state.locationLatitude != null) ...[
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(8),
@@ -316,7 +320,8 @@ class _EditReservationViewState extends State<EditReservationView> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green.shade700, size: 16),
+                    Icon(Icons.check_circle,
+                        color: Colors.green.shade700, size: 16),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -389,7 +394,8 @@ class _EditReservationViewState extends State<EditReservationView> {
     }
   }
 
-  Widget _buildDepartureTimeSection(BuildContext context, EditReservationState state) {
+  Widget _buildDepartureTimeSection(
+      BuildContext context, EditReservationState state) {
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
 
     return Card(
@@ -442,9 +448,11 @@ class _EditReservationViewState extends State<EditReservationView> {
     );
   }
 
-  Future<void> _selectDateTime(BuildContext context, EditReservationState state) async {
+  Future<void> _selectDateTime(
+      BuildContext context, EditReservationState state) async {
     final now = DateTime.now();
-    final initialDate = state.departureTime ?? now.add(const Duration(hours: 2));
+    final initialDate =
+        state.departureTime ?? now.add(const Duration(hours: 2));
 
     final selectedDate = await showDatePicker(
       context: context,
@@ -468,12 +476,15 @@ class _EditReservationViewState extends State<EditReservationView> {
           selectedTime.minute,
         );
 
-        context.read<EditReservationBloc>().add(UpdateDepartureTime(newDateTime));
+        context
+            .read<EditReservationBloc>()
+            .add(UpdateDepartureTime(newDateTime));
       }
     }
   }
 
-  Widget _buildServiceOptionsSection(BuildContext context, EditReservationState state) {
+  Widget _buildServiceOptionsSection(
+      BuildContext context, EditReservationState state) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -532,7 +543,9 @@ class _EditReservationViewState extends State<EditReservationView> {
     return CheckboxListTile(
       value: isSelected,
       onChanged: (_) {
-        context.read<EditReservationBloc>().add(ToggleServiceOptionEdit(option));
+        context
+            .read<EditReservationBloc>()
+            .add(ToggleServiceOptionEdit(option));
       },
       title: Text(title),
       subtitle: Text(price),
@@ -608,7 +621,9 @@ class _EditReservationViewState extends State<EditReservationView> {
       child: ElevatedButton.icon(
         onPressed: canSubmit && !state.isLoading
             ? () {
-                context.read<EditReservationBloc>().add(SubmitReservationUpdate());
+                context
+                    .read<EditReservationBloc>()
+                    .add(SubmitReservationUpdate());
               }
             : null,
         icon: state.isLoading
@@ -647,7 +662,8 @@ class _EditReservationViewState extends State<EditReservationView> {
 
     // Ajouter le véhicule sélectionné s'il n'est pas déjà dans la liste
     if (state.selectedVehicle != null) {
-      final isAlreadyInList = allVehicles.any((v) => v.id == state.selectedVehicle!.id);
+      final isAlreadyInList =
+          allVehicles.any((v) => v.id == state.selectedVehicle!.id);
       if (!isAlreadyInList) {
         allVehicles.add(state.selectedVehicle!);
       }
@@ -657,7 +673,8 @@ class _EditReservationViewState extends State<EditReservationView> {
   }
 
   /// Construit les items du dropdown véhicules
-  List<DropdownMenuItem<String>> _buildVehicleItems(EditReservationState state) {
+  List<DropdownMenuItem<String>> _buildVehicleItems(
+      EditReservationState state) {
     return _getAllVehicles(state).map((vehicle) {
       return DropdownMenuItem(
         value: vehicle.id,
@@ -685,7 +702,8 @@ class _EditReservationViewState extends State<EditReservationView> {
 
     // Ajouter la place sélectionnée si elle n'est pas déjà dans la liste
     if (state.selectedParkingSpot != null) {
-      final isAlreadyInList = allSpots.any((s) => s.id == state.selectedParkingSpot!.id);
+      final isAlreadyInList =
+          allSpots.any((s) => s.id == state.selectedParkingSpot!.id);
       if (!isAlreadyInList) {
         allSpots.add(state.selectedParkingSpot!);
       }
@@ -695,7 +713,8 @@ class _EditReservationViewState extends State<EditReservationView> {
   }
 
   /// Construit les items du dropdown places de parking
-  List<DropdownMenuItem<String>> _buildParkingSpotItems(EditReservationState state) {
+  List<DropdownMenuItem<String>> _buildParkingSpotItems(
+      EditReservationState state) {
     return _getAllParkingSpots(state).map((spot) {
       return DropdownMenuItem(
         value: spot.id,

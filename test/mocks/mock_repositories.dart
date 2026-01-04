@@ -15,7 +15,8 @@ class MockReservationRepository extends Mock implements ReservationRepository {}
 class MockPaymentRepository extends Mock implements PaymentRepository {}
 
 /// Mock pour NotificationRepository
-class MockNotificationRepository extends Mock implements NotificationRepository {}
+class MockNotificationRepository extends Mock
+    implements NotificationRepository {}
 
 /// Mock pour WorkerRepository
 class MockWorkerRepository extends Mock implements WorkerRepository {}

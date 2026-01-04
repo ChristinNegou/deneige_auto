@@ -37,7 +37,8 @@ class PriceSummaryCard extends StatelessWidget {
                   child: Column(
                     children: [
                       // Services de base
-                      _buildPriceRow('Déneigement de base', breakdown.basePrice),
+                      _buildPriceRow(
+                          'Déneigement de base', breakdown.basePrice),
 
                       if (breakdown.vehicleAdjustment != 0)
                         _buildPriceRow(
@@ -54,10 +55,12 @@ class PriceSummaryCard extends StatelessWidget {
                         ),
 
                       if (breakdown.snowSurcharge > 0)
-                        _buildPriceRow('Supplément neige', breakdown.snowSurcharge),
+                        _buildPriceRow(
+                            'Supplément neige', breakdown.snowSurcharge),
 
                       if (breakdown.optionsCost > 0)
-                        _buildPriceRow('Options supplémentaires', breakdown.optionsCost),
+                        _buildPriceRow(
+                            'Options supplémentaires', breakdown.optionsCost),
 
                       if (breakdown.urgencyFee > 0)
                         _buildPriceRow(
@@ -124,7 +127,8 @@ class PriceSummaryCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.location_on_outlined, size: 14, color: Colors.grey[400]),
+                          Icon(Icons.location_on_outlined,
+                              size: 14, color: Colors.grey[400]),
                           const SizedBox(width: 4),
                           Text(
                             'Taxes calculées pour: ${breakdown.provinceName}',
@@ -275,7 +279,8 @@ class PriceSummaryCard extends StatelessWidget {
             '${isAdjustment ? (isNegative ? '' : '+') : ''}${amount.toStringAsFixed(2)} \$',
             style: TextStyle(
               fontSize: isSmall ? 12 : 13,
-              fontWeight: isBold || highlight ? FontWeight.w600 : FontWeight.normal,
+              fontWeight:
+                  isBold || highlight ? FontWeight.w600 : FontWeight.normal,
               color: textColor,
             ),
           ),

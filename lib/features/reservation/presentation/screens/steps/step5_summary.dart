@@ -97,10 +97,26 @@ class Step5SummaryScreen extends StatelessWidget {
 
   Widget _buildGuarantees() {
     final guarantees = [
-      {'icon': Icons.cancel_outlined, 'title': 'Annulation gratuite', 'subtitle': 'Jusqu\'à 2h avant'},
-      {'icon': Icons.verified_outlined, 'title': 'Garantie qualité', 'subtitle': 'Satisfait ou remboursé'},
-      {'icon': Icons.camera_alt_outlined, 'title': 'Photos après', 'subtitle': 'Preuve de service'},
-      {'icon': Icons.timer_outlined, 'title': 'Ponctualité', 'subtitle': 'Remise si retard'},
+      {
+        'icon': Icons.cancel_outlined,
+        'title': 'Annulation gratuite',
+        'subtitle': 'Jusqu\'à 2h avant'
+      },
+      {
+        'icon': Icons.verified_outlined,
+        'title': 'Garantie qualité',
+        'subtitle': 'Satisfait ou remboursé'
+      },
+      {
+        'icon': Icons.camera_alt_outlined,
+        'title': 'Photos après',
+        'subtitle': 'Preuve de service'
+      },
+      {
+        'icon': Icons.timer_outlined,
+        'title': 'Ponctualité',
+        'subtitle': 'Remise si retard'
+      },
     ];
 
     return Container(
@@ -145,7 +161,8 @@ class Step5SummaryScreen extends StatelessWidget {
                         ),
                         Text(
                           item['subtitle'] as String,
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[600]),
                         ),
                       ],
                     ),

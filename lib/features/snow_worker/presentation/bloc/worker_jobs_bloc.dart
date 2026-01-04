@@ -468,7 +468,8 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     final result = await acceptJobUseCase(event.jobId);
 
     result.fold(
-      (failure) => emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
+      (failure) =>
+          emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
       (job) {
         // Update lists
         final updatedAvailable = previousLoaded.availableJobs
@@ -496,12 +497,14 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     Emitter<WorkerJobsState> emit,
   ) async {
     final currentState = state;
-    final previousLoaded = currentState is WorkerJobsLoaded ? currentState : null;
+    final previousLoaded =
+        currentState is WorkerJobsLoaded ? currentState : null;
 
     emit(JobActionLoading(
       jobId: event.jobId,
       action: 'en-route',
-      previousState: previousLoaded ?? const WorkerJobsLoaded(availableJobs: [], myJobs: []),
+      previousState: previousLoaded ??
+          const WorkerJobsLoaded(availableJobs: [], myJobs: []),
     ));
 
     final result = await markEnRouteUseCase(
@@ -512,7 +515,8 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     );
 
     result.fold(
-      (failure) => emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
+      (failure) =>
+          emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
       (job) {
         emit(JobActionSuccess(
           job: job,
@@ -538,18 +542,21 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     Emitter<WorkerJobsState> emit,
   ) async {
     final currentState = state;
-    final previousLoaded = currentState is WorkerJobsLoaded ? currentState : null;
+    final previousLoaded =
+        currentState is WorkerJobsLoaded ? currentState : null;
 
     emit(JobActionLoading(
       jobId: event.jobId,
       action: 'start',
-      previousState: previousLoaded ?? const WorkerJobsLoaded(availableJobs: [], myJobs: []),
+      previousState: previousLoaded ??
+          const WorkerJobsLoaded(availableJobs: [], myJobs: []),
     ));
 
     final result = await startJobUseCase(event.jobId);
 
     result.fold(
-      (failure) => emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
+      (failure) =>
+          emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
       (job) {
         emit(JobActionSuccess(
           job: job,
@@ -564,7 +571,8 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
               .toList();
           emit(previousLoaded.copyWith(myJobs: updatedMyJobs, activeJob: job));
         } else {
-          emit(WorkerJobsLoaded(availableJobs: const [], myJobs: [job], activeJob: job));
+          emit(WorkerJobsLoaded(
+              availableJobs: const [], myJobs: [job], activeJob: job));
         }
       },
     );
@@ -575,12 +583,14 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     Emitter<WorkerJobsState> emit,
   ) async {
     final currentState = state;
-    final previousLoaded = currentState is WorkerJobsLoaded ? currentState : null;
+    final previousLoaded =
+        currentState is WorkerJobsLoaded ? currentState : null;
 
     emit(JobActionLoading(
       jobId: event.jobId,
       action: 'complete',
-      previousState: previousLoaded ?? const WorkerJobsLoaded(availableJobs: [], myJobs: []),
+      previousState: previousLoaded ??
+          const WorkerJobsLoaded(availableJobs: [], myJobs: []),
     ));
 
     final result = await completeJobUseCase(
@@ -589,7 +599,8 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     );
 
     result.fold(
-      (failure) => emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
+      (failure) =>
+          emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
       (job) {
         emit(JobActionSuccess(
           job: job,
@@ -598,9 +609,8 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
         ));
 
         if (previousLoaded != null) {
-          final updatedMyJobs = previousLoaded.myJobs
-              .where((j) => j.id != event.jobId)
-              .toList();
+          final updatedMyJobs =
+              previousLoaded.myJobs.where((j) => j.id != event.jobId).toList();
           emit(previousLoaded.copyWith(myJobs: updatedMyJobs, activeJob: null));
         } else {
           emit(const WorkerJobsLoaded(availableJobs: [], myJobs: []));
@@ -646,7 +656,9 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     Emitter<WorkerJobsState> emit,
   ) async {
     final currentState = state;
-    if (currentState is! JobHistoryLoaded || currentState.isLoadingMore || !currentState.hasMore) {
+    if (currentState is! JobHistoryLoaded ||
+        currentState.isLoadingMore ||
+        !currentState.hasMore) {
       return;
     }
 
@@ -681,12 +693,14 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     }
 
     final currentState = state;
-    final previousLoaded = currentState is WorkerJobsLoaded ? currentState : null;
+    final previousLoaded =
+        currentState is WorkerJobsLoaded ? currentState : null;
 
     emit(JobActionLoading(
       jobId: event.jobId,
       action: 'cancel',
-      previousState: previousLoaded ?? const WorkerJobsLoaded(availableJobs: [], myJobs: []),
+      previousState: previousLoaded ??
+          const WorkerJobsLoaded(availableJobs: [], myJobs: []),
     ));
 
     final result = await cancelJobUseCase!(
@@ -697,17 +711,19 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     );
 
     result.fold(
-      (failure) => emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
+      (failure) =>
+          emit(WorkerJobsError(failure.message, previousState: previousLoaded)),
       (cancellationResult) {
         // Supprimer le job de la liste
         WorkerJobsLoaded? updatedState;
         if (previousLoaded != null) {
-          final updatedMyJobs = previousLoaded.myJobs
-              .where((j) => j.id != event.jobId)
-              .toList();
+          final updatedMyJobs =
+              previousLoaded.myJobs.where((j) => j.id != event.jobId).toList();
           updatedState = previousLoaded.copyWith(
             myJobs: updatedMyJobs,
-            activeJob: previousLoaded.activeJob?.id == event.jobId ? null : previousLoaded.activeJob,
+            activeJob: previousLoaded.activeJob?.id == event.jobId
+                ? null
+                : previousLoaded.activeJob,
           );
         }
 

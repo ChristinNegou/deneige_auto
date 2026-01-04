@@ -93,12 +93,12 @@ class QuickActionsPanel extends StatelessWidget {
   }
 
   Widget _buildActionButton(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        required Color color,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return Material(
       color: color.withOpacity(0.1),
       borderRadius: BorderRadius.circular(12),

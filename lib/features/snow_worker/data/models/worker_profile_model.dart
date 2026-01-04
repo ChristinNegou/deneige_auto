@@ -77,7 +77,8 @@ class WorkerProfileModel extends WorkerProfile {
         .toList();
 
     // Parse equipment list
-    final equipmentJson = workerProfile['equipmentList'] as List<dynamic>? ?? [];
+    final equipmentJson =
+        workerProfile['equipmentList'] as List<dynamic>? ?? [];
     final equipmentList = equipmentJson.map((e) => e.toString()).toList();
 
     // Parse vehicle type

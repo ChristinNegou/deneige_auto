@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
@@ -133,7 +132,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                 ),
                 content: _buildServiceTypeStep(),
                 isActive: _currentStep >= 0,
-                state: _currentStep > 0 ? StepState.complete : StepState.indexed,
+                state:
+                    _currentStep > 0 ? StepState.complete : StepState.indexed,
               ),
               Step(
                 title: const Text(
@@ -142,7 +142,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                 ),
                 content: _buildAddressStep(),
                 isActive: _currentStep >= 1,
-                state: _currentStep > 1 ? StepState.complete : StepState.indexed,
+                state:
+                    _currentStep > 1 ? StepState.complete : StepState.indexed,
               ),
               Step(
                 title: const Text(
@@ -151,7 +152,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                 ),
                 content: _buildDateTimeStep(),
                 isActive: _currentStep >= 2,
-                state: _currentStep > 2 ? StepState.complete : StepState.indexed,
+                state:
+                    _currentStep > 2 ? StepState.complete : StepState.indexed,
               ),
               Step(
                 title: const Text(
@@ -201,14 +203,11 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white
-              : Colors.white.withOpacity(0.1),
+          color: isSelected ? Colors.white : Colors.white.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? service['color']
-                : Colors.white.withOpacity(0.3),
+            color:
+                isSelected ? service['color'] : Colors.white.withOpacity(0.3),
             width: 2,
           ),
         ),
@@ -451,7 +450,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                   Expanded(
                     child: Text(
                       _selectedDate != null
-                          ? DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(_selectedDate!)
+                          ? DateFormat('EEEE d MMMM yyyy', 'fr_FR')
+                              .format(_selectedDate!)
                           : 'Sélectionner une date',
                       style: TextStyle(
                         fontSize: 16,
@@ -461,7 +461,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                       ),
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.grey, size: 16),
                 ],
               ),
             ),
@@ -510,7 +511,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                       ),
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.grey, size: 16),
                 ],
               ),
             ),
@@ -561,7 +563,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
 
   Widget _buildConfirmationStep() {
     final service = _serviceTypes.firstWhere(
-          (s) => s['id'] == _selectedServiceType,
+      (s) => s['id'] == _selectedServiceType,
     );
 
     return Container(
@@ -582,7 +584,6 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             ),
           ),
           const SizedBox(height: 20),
-
           _buildSummaryRow(
             icon: Icons.ac_unit,
             label: 'Service',
@@ -590,7 +591,6 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             color: service['color'],
           ),
           const Divider(height: 24),
-
           _buildSummaryRow(
             icon: Icons.location_on,
             label: 'Adresse',
@@ -598,7 +598,6 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             color: const Color(0xFF3B82F6),
           ),
           const Divider(height: 24),
-
           _buildSummaryRow(
             icon: Icons.calendar_today,
             label: 'Date',
@@ -608,7 +607,6 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             color: const Color(0xFF10B981),
           ),
           const Divider(height: 24),
-
           _buildSummaryRow(
             icon: Icons.access_time,
             label: 'Heure',
@@ -617,7 +615,6 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                 : 'Non sélectionnée',
             color: const Color(0xFFFFA000),
           ),
-
           if (_notes.isNotEmpty) ...[
             const Divider(height: 24),
             _buildSummaryRow(
@@ -627,9 +624,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
               color: const Color(0xFF8B5CF6),
             ),
           ],
-
           const Divider(height: 24),
-
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -743,7 +738,6 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
     }
   }
 
-
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -833,7 +827,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
         ),
         content: const Text(
           'Votre réservation a été confirmée avec succès. '
-              'Un déneigeur vous sera assigné sous peu.',
+          'Un déneigeur vous sera assigné sous peu.',
         ),
         actions: [
           ElevatedButton(

@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../domain/entities/vehicle.dart';
@@ -12,8 +11,10 @@ abstract class ReservationRemoteDataSource {
   Future<List<ReservationModel>> getReservations({bool? upcoming});
   Future<ReservationModel> getReservationById(String reservationId);
   Future<ReservationModel> createReservation(Map<String, dynamic> data);
-  Future<CancellationResult> cancelReservation(String reservationId, {String? reason});
-  Future<ReservationModel> updateReservation(String reservationId, Map<String, dynamic> data);
+  Future<CancellationResult> cancelReservation(String reservationId,
+      {String? reason});
+  Future<ReservationModel> updateReservation(
+      String reservationId, Map<String, dynamic> data);
   Future<Vehicle> addVehicle(Map<String, dynamic> data);
   Future<CancellationPolicy> getCancellationPolicy();
   Future<Map<String, dynamic>> rateReservation({
@@ -61,8 +62,10 @@ class CancellationResult {
       reservationId: reservation['id'] as String? ?? '',
       previousStatus: reservation['previousStatus'] as String? ?? '',
       originalPrice: (billing['originalPrice'] as num?)?.toDouble() ?? 0.0,
-      cancellationFeePercent: (billing['cancellationFeePercent'] as num?)?.toDouble() ?? 0.0,
-      cancellationFeeAmount: (billing['cancellationFeeAmount'] as num?)?.toDouble() ?? 0.0,
+      cancellationFeePercent:
+          (billing['cancellationFeePercent'] as num?)?.toDouble() ?? 0.0,
+      cancellationFeeAmount:
+          (billing['cancellationFeeAmount'] as num?)?.toDouble() ?? 0.0,
       refundAmount: (billing['refundAmount'] as num?)?.toDouble() ?? 0.0,
     );
   }
@@ -136,7 +139,8 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
   }
 
   @override
-  Future<List<ParkingSpotModel>> getParkingSpots({bool availableOnly = false}) async {
+  Future<List<ParkingSpotModel>> getParkingSpots(
+      {bool availableOnly = false}) async {
     try {
       final queryParams = {'available': availableOnly};
 
@@ -146,7 +150,8 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['parkingSpots'] ?? response.data;
+        final List<dynamic> data =
+            response.data['parkingSpots'] ?? response.data;
         return data.map((json) => ParkingSpotModel.fromJson(json)).toList();
       } else {
         throw ServerException(
@@ -170,7 +175,8 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['reservations'] ?? response.data;
+        final List<dynamic> data =
+            response.data['reservations'] ?? response.data;
         return data.map((json) => ReservationModel.fromJson(json)).toList();
       } else {
         throw ServerException(
@@ -214,7 +220,8 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
       final response = await dio.post('/reservations', data: data);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return ReservationModel.fromJson(response.data['reservation'] ?? response.data);
+        return ReservationModel.fromJson(
+            response.data['reservation'] ?? response.data);
       } else {
         throw ServerException(
           message: 'Erreur de création de réservation',
@@ -239,7 +246,8 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
         return VehicleModel.fromJson(response.data['vehicle']);
       } else {
         throw ServerException(
-          message: response.data['message'] ?? 'Erreur lors de l\'ajout du véhicule',
+          message:
+              response.data['message'] ?? 'Erreur lors de l\'ajout du véhicule',
           statusCode: response.statusCode ?? 500,
         );
       }
@@ -248,10 +256,9 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
     }
   }
 
-
-
   @override
-  Future<CancellationResult> cancelReservation(String reservationId, {String? reason}) async {
+  Future<CancellationResult> cancelReservation(String reservationId,
+      {String? reason}) async {
     try {
       final response = await dio.patch(
         '/reservations/$reservationId/cancel-by-client',
@@ -261,17 +268,20 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        return CancellationResult.fromJson(response.data as Map<String, dynamic>);
+        return CancellationResult.fromJson(
+            response.data as Map<String, dynamic>);
       } else {
         throw ServerException(
-          message: response.data['message'] ?? 'Erreur d\'annulation de réservation',
+          message:
+              response.data['message'] ?? 'Erreur d\'annulation de réservation',
           statusCode: response.statusCode,
         );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
         throw ServerException(
-          message: e.response?.data['message'] ?? 'Réservation non trouvée ou déjà annulée',
+          message: e.response?.data['message'] ??
+              'Réservation non trouvée ou déjà annulée',
           statusCode: 404,
         );
       }
@@ -282,10 +292,12 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
   @override
   Future<CancellationPolicy> getCancellationPolicy() async {
     try {
-      final response = await dio.get('/reservations/client/cancellation-policy');
+      final response =
+          await dio.get('/reservations/client/cancellation-policy');
 
       if (response.statusCode == 200) {
-        return CancellationPolicy.fromJson(response.data as Map<String, dynamic>);
+        return CancellationPolicy.fromJson(
+            response.data as Map<String, dynamic>);
       } else {
         throw ServerException(
           message: 'Erreur de récupération de la politique d\'annulation',
@@ -298,12 +310,15 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
   }
 
   @override
-  Future<ReservationModel> updateReservation(String reservationId, Map<String, dynamic> data) async {
+  Future<ReservationModel> updateReservation(
+      String reservationId, Map<String, dynamic> data) async {
     try {
-      final response = await dio.put('/reservations/$reservationId', data: data);
+      final response =
+          await dio.put('/reservations/$reservationId', data: data);
 
       if (response.statusCode == 200) {
-        return ReservationModel.fromJson(response.data['reservation'] ?? response.data);
+        return ReservationModel.fromJson(
+            response.data['reservation'] ?? response.data);
       } else {
         throw ServerException(
           message: 'Erreur de mise à jour de réservation',
@@ -339,18 +354,22 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
         };
       } else {
         throw ServerException(
-          message: response.data['message'] ?? 'Erreur lors de l\'enregistrement de la note',
+          message: response.data['message'] ??
+              'Erreur lors de l\'enregistrement de la note',
           statusCode: response.statusCode,
         );
       }
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
-      throw ServerException(message: message, statusCode: e.response?.statusCode);
+      final message =
+          e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
+      throw ServerException(
+          message: message, statusCode: e.response?.statusCode);
     }
   }
 
   @override
-  Future<Map<String, dynamic>> getReservationRating(String reservationId) async {
+  Future<Map<String, dynamic>> getReservationRating(
+      String reservationId) async {
     try {
       final response = await dio.get('/reservations/$reservationId/rating');
 
@@ -396,13 +415,16 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
         };
       } else {
         throw ServerException(
-          message: response.data['message'] ?? 'Erreur lors de l\'envoi du pourboire',
+          message: response.data['message'] ??
+              'Erreur lors de l\'envoi du pourboire',
           statusCode: response.statusCode,
         );
       }
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
-      throw ServerException(message: message, statusCode: e.response?.statusCode);
+      final message =
+          e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
+      throw ServerException(
+          message: message, statusCode: e.response?.statusCode);
     }
   }
 
@@ -413,7 +435,8 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
 
       if (response.statusCode != 200) {
         throw ServerException(
-          message: response.data['message'] ?? 'Erreur lors de la suppression du véhicule',
+          message: response.data['message'] ??
+              'Erreur lors de la suppression du véhicule',
           statusCode: response.statusCode,
         );
       }

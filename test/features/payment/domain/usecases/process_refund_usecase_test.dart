@@ -30,11 +30,11 @@ void main() {
     test('should process refund successfully', () async {
       // Arrange
       when(() => mockRepository.processRefund(
-        reservationId: tReservationId,
-        amount: any(named: 'amount'),
-        reason: tReason,
-        note: any(named: 'note'),
-      )).thenAnswer((_) async => Right(tRefund));
+            reservationId: tReservationId,
+            amount: any(named: 'amount'),
+            reason: tReason,
+            note: any(named: 'note'),
+          )).thenAnswer((_) async => Right(tRefund));
 
       // Act
       final result = await usecase(
@@ -45,22 +45,22 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       verify(() => mockRepository.processRefund(
-        reservationId: tReservationId,
-        amount: null,
-        reason: tReason,
-        note: null,
-      )).called(1);
+            reservationId: tReservationId,
+            amount: null,
+            reason: tReason,
+            note: null,
+          )).called(1);
     });
 
     test('should process partial refund with specific amount', () async {
       // Arrange
       final partialRefund = PaymentFixtures.createRefund(amount: 15.0);
       when(() => mockRepository.processRefund(
-        reservationId: tReservationId,
-        amount: 15.0,
-        reason: tReason,
-        note: any(named: 'note'),
-      )).thenAnswer((_) async => Right(partialRefund));
+            reservationId: tReservationId,
+            amount: 15.0,
+            reason: tReason,
+            note: any(named: 'note'),
+          )).thenAnswer((_) async => Right(partialRefund));
 
       // Act
       final result = await usecase(
@@ -77,7 +77,8 @@ void main() {
       );
     });
 
-    test('should return ValidationFailure when reservationId is empty', () async {
+    test('should return ValidationFailure when reservationId is empty',
+        () async {
       // Act
       final result = await usecase(
         reservationId: '',
@@ -94,11 +95,11 @@ void main() {
         (_) => fail('Should be Left'),
       );
       verifyNever(() => mockRepository.processRefund(
-        reservationId: any(named: 'reservationId'),
-        amount: any(named: 'amount'),
-        reason: any(named: 'reason'),
-        note: any(named: 'note'),
-      ));
+            reservationId: any(named: 'reservationId'),
+            amount: any(named: 'amount'),
+            reason: any(named: 'reason'),
+            note: any(named: 'note'),
+          ));
     });
 
     test('should return ValidationFailure when amount is negative', () async {
@@ -135,11 +136,11 @@ void main() {
     test('should process refund with note', () async {
       // Arrange
       when(() => mockRepository.processRefund(
-        reservationId: tReservationId,
-        amount: any(named: 'amount'),
-        reason: tReason,
-        note: 'Client mecontent',
-      )).thenAnswer((_) async => Right(tRefund));
+            reservationId: tReservationId,
+            amount: any(named: 'amount'),
+            reason: tReason,
+            note: 'Client mecontent',
+          )).thenAnswer((_) async => Right(tRefund));
 
       // Act
       final result = await usecase(
@@ -155,11 +156,11 @@ void main() {
     test('should return ServerFailure on server error', () async {
       // Arrange
       when(() => mockRepository.processRefund(
-        reservationId: any(named: 'reservationId'),
-        amount: any(named: 'amount'),
-        reason: any(named: 'reason'),
-        note: any(named: 'note'),
-      )).thenAnswer((_) async => const Left(serverFailure));
+            reservationId: any(named: 'reservationId'),
+            amount: any(named: 'amount'),
+            reason: any(named: 'reason'),
+            note: any(named: 'note'),
+          )).thenAnswer((_) async => const Left(serverFailure));
 
       // Act
       final result = await usecase(

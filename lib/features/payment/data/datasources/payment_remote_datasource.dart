@@ -135,7 +135,8 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
   @override
   Future<void> deletePaymentMethod(String paymentMethodId) async {
     try {
-      final response = await dio.delete('/payments/payment-methods/$paymentMethodId');
+      final response =
+          await dio.delete('/payments/payment-methods/$paymentMethodId');
 
       if (response.statusCode != 200 || response.data['success'] != true) {
         throw ServerException(
@@ -151,7 +152,8 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
   @override
   Future<void> setDefaultPaymentMethod(String paymentMethodId) async {
     try {
-      final response = await dio.patch('/payments/payment-methods/$paymentMethodId/default');
+      final response =
+          await dio.patch('/payments/payment-methods/$paymentMethodId/default');
 
       if (response.statusCode != 200 || response.data['success'] != true) {
         throw ServerException(

@@ -84,20 +84,33 @@ class ReservationListState extends Equatable {
   }) {
     return ReservationListState(
       reservations: reservations ?? this.reservations,
-      selectedReservation: clearSelectedReservation ? null : (selectedReservation ?? this.selectedReservation),
+      selectedReservation: clearSelectedReservation
+          ? null
+          : (selectedReservation ?? this.selectedReservation),
       isLoading: isLoading ?? this.isLoading,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-      successMessage: clearSuccess ? null : (successMessage ?? this.successMessage),
-      lastCancellationResult: clearCancellationResult ? null : (lastCancellationResult ?? this.lastCancellationResult),
+      successMessage:
+          clearSuccess ? null : (successMessage ?? this.successMessage),
+      lastCancellationResult: clearCancellationResult
+          ? null
+          : (lastCancellationResult ?? this.lastCancellationResult),
     );
   }
 
   @override
-  List<Object?> get props => [reservations, selectedReservation, isLoading, errorMessage, successMessage, lastCancellationResult];
+  List<Object?> get props => [
+        reservations,
+        selectedReservation,
+        isLoading,
+        errorMessage,
+        successMessage,
+        lastCancellationResult
+      ];
 }
 
 // BLoC
-class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListState> {
+class ReservationListBloc
+    extends Bloc<ReservationListEvent, ReservationListState> {
   final GetReservationsUseCase getReservations;
   final GetReservationByIdUseCase getReservationById;
   final CancelReservationUseCase cancelReservation;
@@ -115,27 +128,28 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
   }
 
   Future<void> _onLoadReservations(
-      LoadReservations event,
-      Emitter<ReservationListState> emit,
-      ) async {
+    LoadReservations event,
+    Emitter<ReservationListState> emit,
+  ) async {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     final result = await getReservations(upcoming: event.upcomingOnly);
 
     result.fold(
-          (failure) => emit(state.copyWith(
+      (failure) => emit(state.copyWith(
         isLoading: false,
         errorMessage: failure.message,
       )),
-          (reservations) {
+      (reservations) {
         // Filtrer pour afficher uniquement les réservations actives et non passées
-        final activeReservations = reservations.where((r) =>
-          !r.isPast &&
-          (r.status == ReservationStatus.pending ||
-           r.status == ReservationStatus.assigned ||
-           r.status == ReservationStatus.enRoute ||
-           r.status == ReservationStatus.inProgress)
-        ).toList();
+        final activeReservations = reservations
+            .where((r) =>
+                !r.isPast &&
+                (r.status == ReservationStatus.pending ||
+                    r.status == ReservationStatus.assigned ||
+                    r.status == ReservationStatus.enRoute ||
+                    r.status == ReservationStatus.inProgress))
+            .toList();
 
         emit(state.copyWith(
           isLoading: false,
@@ -147,22 +161,23 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
   }
 
   Future<void> _onRefreshReservations(
-      RefreshReservations event,
-      Emitter<ReservationListState> emit,
-      ) async {
+    RefreshReservations event,
+    Emitter<ReservationListState> emit,
+  ) async {
     final result = await getReservations(upcoming: false);
 
     result.fold(
-          (failure) => emit(state.copyWith(errorMessage: failure.message)),
-          (reservations) {
+      (failure) => emit(state.copyWith(errorMessage: failure.message)),
+      (reservations) {
         // Filtrer pour afficher uniquement les réservations actives et non passées
-        final activeReservations = reservations.where((r) =>
-          !r.isPast &&
-          (r.status == ReservationStatus.pending ||
-           r.status == ReservationStatus.assigned ||
-           r.status == ReservationStatus.enRoute ||
-           r.status == ReservationStatus.inProgress)
-        ).toList();
+        final activeReservations = reservations
+            .where((r) =>
+                !r.isPast &&
+                (r.status == ReservationStatus.pending ||
+                    r.status == ReservationStatus.assigned ||
+                    r.status == ReservationStatus.enRoute ||
+                    r.status == ReservationStatus.inProgress))
+            .toList();
 
         emit(state.copyWith(
           reservations: activeReservations,
@@ -173,19 +188,21 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
   }
 
   Future<void> _onCancelReservation(
-      CancelReservationEvent event,
-      Emitter<ReservationListState> emit,
-      ) async {
-    emit(state.copyWith(isLoading: true, clearError: true, clearCancellationResult: true));
+    CancelReservationEvent event,
+    Emitter<ReservationListState> emit,
+  ) async {
+    emit(state.copyWith(
+        isLoading: true, clearError: true, clearCancellationResult: true));
 
-    final result = await cancelReservation(event.reservationId, reason: event.reason);
+    final result =
+        await cancelReservation(event.reservationId, reason: event.reason);
 
     result.fold(
-          (failure) => emit(state.copyWith(
+      (failure) => emit(state.copyWith(
         isLoading: false,
         errorMessage: failure.message,
       )),
-          (cancellationResult) {
+      (cancellationResult) {
         // Supprimer la réservation de la liste
         final updatedReservations = state.reservations
             .where((r) => r.id != event.reservationId)
@@ -194,10 +211,12 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
         // Construire le message de succès avec les infos de facturation
         String successMessage = cancellationResult.message;
         if (cancellationResult.cancellationFeeAmount > 0) {
-          successMessage += '\nFrais: ${cancellationResult.cancellationFeeAmount.toStringAsFixed(2)}\$';
+          successMessage +=
+              '\nFrais: ${cancellationResult.cancellationFeeAmount.toStringAsFixed(2)}\$';
         }
         if (cancellationResult.refundAmount > 0) {
-          successMessage += '\nRemboursement: ${cancellationResult.refundAmount.toStringAsFixed(2)}\$';
+          successMessage +=
+              '\nRemboursement: ${cancellationResult.refundAmount.toStringAsFixed(2)}\$';
         }
 
         emit(state.copyWith(
@@ -212,9 +231,9 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
   }
 
   Future<void> _onLoadReservationById(
-      LoadReservationById event,
-      Emitter<ReservationListState> emit,
-      ) async {
+    LoadReservationById event,
+    Emitter<ReservationListState> emit,
+  ) async {
     // Ne montrer le loading que si on n'a pas encore de réservation (premier chargement)
     final isInitialLoad = state.selectedReservation == null;
     if (isInitialLoad) {
@@ -224,11 +243,11 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
     final result = await getReservationById(event.reservationId);
 
     result.fold(
-          (failure) => emit(state.copyWith(
+      (failure) => emit(state.copyWith(
         isLoading: false,
         errorMessage: failure.message,
       )),
-          (reservation) {
+      (reservation) {
         emit(state.copyWith(
           isLoading: false,
           selectedReservation: reservation,
@@ -241,31 +260,32 @@ class ReservationListBloc extends Bloc<ReservationListEvent, ReservationListStat
   /// Charge toutes les réservations (incluant en cours et terminées)
   /// pour la page "Activités"
   Future<void> _onLoadAllReservations(
-      LoadAllReservations event,
-      Emitter<ReservationListState> emit,
-      ) async {
+    LoadAllReservations event,
+    Emitter<ReservationListState> emit,
+  ) async {
     emit(state.copyWith(isLoading: true, clearError: true));
 
     final result = await getReservations(upcoming: false);
 
     result.fold(
-          (failure) => emit(state.copyWith(
+      (failure) => emit(state.copyWith(
         isLoading: false,
         errorMessage: failure.message,
       )),
-          (reservations) {
+      (reservations) {
         // Filtrer pour afficher les réservations en cours et terminées
         // Exclure: pending (en attente), cancelled (annulées)
-        final activityReservations = reservations.where((r) =>
-          r.status == ReservationStatus.assigned ||
-          r.status == ReservationStatus.enRoute ||
-          r.status == ReservationStatus.inProgress ||
-          r.status == ReservationStatus.completed
-        ).toList();
+        final activityReservations = reservations
+            .where((r) =>
+                r.status == ReservationStatus.assigned ||
+                r.status == ReservationStatus.enRoute ||
+                r.status == ReservationStatus.inProgress ||
+                r.status == ReservationStatus.completed)
+            .toList();
 
         // Trier par date (les plus récentes en premier)
-        activityReservations.sort((a, b) =>
-          b.departureTime.compareTo(a.departureTime));
+        activityReservations
+            .sort((a, b) => b.departureTime.compareTo(a.departureTime));
 
         emit(state.copyWith(
           isLoading: false,

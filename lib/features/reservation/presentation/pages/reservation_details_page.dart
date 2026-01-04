@@ -19,7 +19,6 @@ import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../chat/presentation/bloc/chat_bloc.dart';
 import '../../../chat/presentation/pages/chat_screen.dart';
 
-
 class ReservationDetailsPage extends StatelessWidget {
   final String reservationId;
 
@@ -28,7 +27,8 @@ class ReservationDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<ReservationListBloc>()..add(LoadReservationById(reservationId)),
+      create: (context) =>
+          sl<ReservationListBloc>()..add(LoadReservationById(reservationId)),
       child: ReservationDetailsView(reservationId: reservationId),
     );
   }
@@ -68,7 +68,9 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         final reservation = state.selectedReservation;
         // Ne rafraîchir que si la réservation est active
         if (reservation != null && _isActiveReservation(reservation.status)) {
-          context.read<ReservationListBloc>().add(LoadReservationById(widget.reservationId));
+          context
+              .read<ReservationListBloc>()
+              .add(LoadReservationById(widget.reservationId));
         }
       }
     });
@@ -76,9 +78,9 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
 
   bool _isActiveReservation(ReservationStatus status) {
     return status == ReservationStatus.pending ||
-           status == ReservationStatus.assigned ||
-           status == ReservationStatus.enRoute ||
-           status == ReservationStatus.inProgress;
+        status == ReservationStatus.assigned ||
+        status == ReservationStatus.enRoute ||
+        status == ReservationStatus.inProgress;
   }
 
   @override
@@ -132,7 +134,9 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
                     onPressed: () {
-                      context.read<ReservationListBloc>().add(LoadReservationById(widget.reservationId));
+                      context
+                          .read<ReservationListBloc>()
+                          .add(LoadReservationById(widget.reservationId));
                     },
                     icon: const Icon(Icons.refresh),
                     label: const Text('Actualiser'),
@@ -184,7 +188,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                           color: Colors.white.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.arrow_back, color: Colors.white),
+                        child:
+                            const Icon(Icons.arrow_back, color: Colors.white),
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -285,13 +290,15 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                                 const SizedBox(height: 24),
 
                                 // Rating section (if completed and not rated)
-                                if (reservation.status == ReservationStatus.completed)
+                                if (reservation.status ==
+                                    ReservationStatus.completed)
                                   _buildRatingSection(context, reservation),
 
                                 // Action Buttons
                                 if (reservation.canBeEdited)
                                   _buildEditButton(context, reservation),
-                                if (reservation.canBeEdited && reservation.canBeCancelled)
+                                if (reservation.canBeEdited &&
+                                    reservation.canBeCancelled)
                                   const SizedBox(height: 12),
                                 if (reservation.canBeCancelled)
                                   _buildCancelButton(context, reservation),
@@ -490,7 +497,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                    color: isCurrent ? _getStatusColor(status) : Colors.grey[600],
+                    color:
+                        isCurrent ? _getStatusColor(status) : Colors.grey[600],
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
@@ -616,7 +624,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 ),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 20),
+              child: const Icon(Icons.chat_bubble_rounded,
+                  color: Colors.white, size: 20),
             ),
           ),
           if (reservation.workerPhone != null) ...[
@@ -890,7 +899,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     );
   }
 
-  Widget _buildServiceOptionsCard(BuildContext context, Reservation reservation) {
+  Widget _buildServiceOptionsCard(
+      BuildContext context, Reservation reservation) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1065,7 +1075,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   color: Colors.green[50],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.photo_camera, color: Colors.green[600], size: 20),
+                child: Icon(Icons.photo_camera,
+                    color: Colors.green[600], size: 20),
               ),
               const SizedBox(width: 12),
               const Text(
@@ -1202,7 +1213,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     );
   }
 
-  void _showPhotoFullscreen(BuildContext context, String imageUrl, String title) {
+  void _showPhotoFullscreen(
+      BuildContext context, String imageUrl, String title) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -1395,7 +1407,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                       );
                     }),
                   ),
-                  if (reservation.review != null && reservation.review!.isNotEmpty) ...[
+                  if (reservation.review != null &&
+                      reservation.review!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
                       '"${reservation.review}"',
@@ -1470,9 +1483,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             SnackBar(
                               content: Row(
                                 children: [
-                                  const Icon(Icons.warning, color: Colors.white),
+                                  const Icon(Icons.warning,
+                                      color: Colors.white),
                                   const SizedBox(width: 12),
-                                  Text('Évaluation envoyée, mais erreur pourboire: ${failure.message}'),
+                                  Text(
+                                      'Évaluation envoyée, mais erreur pourboire: ${failure.message}'),
                                 ],
                               ),
                               backgroundColor: Colors.orange,
@@ -1488,9 +1503,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             SnackBar(
                               content: Row(
                                 children: [
-                                  const Icon(Icons.check_circle, color: Colors.white),
+                                  const Icon(Icons.check_circle,
+                                      color: Colors.white),
                                   const SizedBox(width: 12),
-                                  Text('Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé'),
+                                  Text(
+                                      'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé'),
                                 ],
                               ),
                               backgroundColor: Colors.green,
@@ -1568,7 +1585,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     ],
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+                const Icon(Icons.arrow_forward_ios,
+                    color: Colors.white, size: 18),
               ],
             ),
           ),
@@ -1693,12 +1711,14 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         break;
       case ReservationStatus.enRoute:
         feePercent = 50;
-        feeMessage = 'Le déneigeur est en route.\nFrais d\'annulation: 50% (${(reservation.totalPrice * 0.5).toStringAsFixed(2)}\$)';
+        feeMessage =
+            'Le déneigeur est en route.\nFrais d\'annulation: 50% (${(reservation.totalPrice * 0.5).toStringAsFixed(2)}\$)';
         feeColor = Colors.orange;
         break;
       case ReservationStatus.inProgress:
         feePercent = 100;
-        feeMessage = 'Le travail a commencé.\nAucun remboursement (100% facturé)';
+        feeMessage =
+            'Le travail a commencé.\nAucun remboursement (100% facturé)';
         feeColor = Colors.red;
         break;
       default:
@@ -1824,7 +1844,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Future<void> _openMap(Reservation reservation) async {
-    if (reservation.locationLatitude != null && reservation.locationLongitude != null) {
+    if (reservation.locationLatitude != null &&
+        reservation.locationLongitude != null) {
       final uri = Uri.parse(
         'https://www.google.com/maps/search/?api=1&query=${reservation.locationLatitude},${reservation.locationLongitude}',
       );

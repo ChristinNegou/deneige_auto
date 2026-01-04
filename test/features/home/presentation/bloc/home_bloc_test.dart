@@ -15,8 +15,11 @@ import '../../../../fixtures/user_fixtures.dart';
 import '../../../../fixtures/reservation_fixtures.dart';
 
 class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
+
 class MockGetWeatherUseCase extends Mock implements GetWeatherUseCase {}
-class MockGetReservationsUseCase extends Mock implements GetReservationsUseCase {}
+
+class MockGetReservationsUseCase extends Mock
+    implements GetReservationsUseCase {}
 
 void main() {
   late HomeBloc bloc;
@@ -73,8 +76,7 @@ void main() {
         build: () {
           when(() => mockGetCurrentUser())
               .thenAnswer((_) async => Right(tUser));
-          when(() => mockGetWeather())
-              .thenAnswer((_) async => Right(tWeather));
+          when(() => mockGetWeather()).thenAnswer((_) async => Right(tWeather));
           when(() => mockGetReservations(upcoming: true))
               .thenAnswer((_) async => Right(tReservations));
           return bloc;
@@ -97,8 +99,7 @@ void main() {
           when(() => mockGetCurrentUser()).thenAnswer(
             (_) async => const Left(ServerFailure(message: 'User error')),
           );
-          when(() => mockGetWeather())
-              .thenAnswer((_) async => Right(tWeather));
+          when(() => mockGetWeather()).thenAnswer((_) async => Right(tWeather));
           when(() => mockGetReservations(upcoming: true))
               .thenAnswer((_) async => Right(tReservations));
           return bloc;
@@ -137,8 +138,7 @@ void main() {
       blocTest<HomeBloc, HomeState>(
         'updates weather when RefreshWeather succeeds',
         build: () {
-          when(() => mockGetWeather())
-              .thenAnswer((_) async => Right(tWeather));
+          when(() => mockGetWeather()).thenAnswer((_) async => Right(tWeather));
           return bloc;
         },
         act: (bloc) => bloc.add(RefreshWeather()),
@@ -182,7 +182,8 @@ void main() {
         'sets error when RefreshReservations fails',
         build: () {
           when(() => mockGetReservations(upcoming: true)).thenAnswer(
-            (_) async => const Left(ServerFailure(message: 'Reservations error')),
+            (_) async =>
+                const Left(ServerFailure(message: 'Reservations error')),
           );
           return bloc;
         },

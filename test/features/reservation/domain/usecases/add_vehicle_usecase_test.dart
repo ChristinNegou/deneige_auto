@@ -40,15 +40,15 @@ void main() {
       // Arrange
       final params = createValidParams();
       when(() => mockRepository.addVehicle(
-        make: any(named: 'make'),
-        model: any(named: 'model'),
-        year: any(named: 'year'),
-        color: any(named: 'color'),
-        licensePlate: any(named: 'licensePlate'),
-        type: any(named: 'type'),
-        photoUrl: any(named: 'photoUrl'),
-        isDefault: any(named: 'isDefault'),
-      )).thenAnswer((_) async => Right(tVehicle));
+            make: any(named: 'make'),
+            model: any(named: 'model'),
+            year: any(named: 'year'),
+            color: any(named: 'color'),
+            licensePlate: any(named: 'licensePlate'),
+            type: any(named: 'type'),
+            photoUrl: any(named: 'photoUrl'),
+            isDefault: any(named: 'isDefault'),
+          )).thenAnswer((_) async => Right(tVehicle));
 
       // Act
       final result = await usecase(params);
@@ -56,15 +56,15 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       verify(() => mockRepository.addVehicle(
-        make: 'Honda',
-        model: 'Civic',
-        year: 2022,
-        color: 'Noir',
-        licensePlate: 'ABC 123',
-        type: VehicleType.car,
-        photoUrl: null,
-        isDefault: true,
-      )).called(1);
+            make: 'Honda',
+            model: 'Civic',
+            year: 2022,
+            color: 'Noir',
+            licensePlate: 'ABC 123',
+            type: VehicleType.car,
+            photoUrl: null,
+            isDefault: true,
+          )).called(1);
     });
 
     test('should add vehicle with photo URL', () async {
@@ -80,15 +80,15 @@ void main() {
         isDefault: false,
       );
       when(() => mockRepository.addVehicle(
-        make: any(named: 'make'),
-        model: any(named: 'model'),
-        year: any(named: 'year'),
-        color: any(named: 'color'),
-        licensePlate: any(named: 'licensePlate'),
-        type: any(named: 'type'),
-        photoUrl: any(named: 'photoUrl'),
-        isDefault: any(named: 'isDefault'),
-      )).thenAnswer((_) async => Right(tVehicle));
+            make: any(named: 'make'),
+            model: any(named: 'model'),
+            year: any(named: 'year'),
+            color: any(named: 'color'),
+            licensePlate: any(named: 'licensePlate'),
+            type: any(named: 'type'),
+            photoUrl: any(named: 'photoUrl'),
+            isDefault: any(named: 'isDefault'),
+          )).thenAnswer((_) async => Right(tVehicle));
 
       // Act
       final result = await usecase(params);
@@ -101,15 +101,15 @@ void main() {
       // Arrange
       final params = createValidParams();
       when(() => mockRepository.addVehicle(
-        make: any(named: 'make'),
-        model: any(named: 'model'),
-        year: any(named: 'year'),
-        color: any(named: 'color'),
-        licensePlate: any(named: 'licensePlate'),
-        type: any(named: 'type'),
-        photoUrl: any(named: 'photoUrl'),
-        isDefault: any(named: 'isDefault'),
-      )).thenAnswer((_) async => const Left(serverFailure));
+            make: any(named: 'make'),
+            model: any(named: 'model'),
+            year: any(named: 'year'),
+            color: any(named: 'color'),
+            licensePlate: any(named: 'licensePlate'),
+            type: any(named: 'type'),
+            photoUrl: any(named: 'photoUrl'),
+            isDefault: any(named: 'isDefault'),
+          )).thenAnswer((_) async => const Left(serverFailure));
 
       // Act
       final result = await usecase(params);
@@ -118,19 +118,20 @@ void main() {
       expect(result, const Left(serverFailure));
     });
 
-    test('should return ValidationFailure for duplicate license plate', () async {
+    test('should return ValidationFailure for duplicate license plate',
+        () async {
       // Arrange
       final params = createValidParams();
       when(() => mockRepository.addVehicle(
-        make: any(named: 'make'),
-        model: any(named: 'model'),
-        year: any(named: 'year'),
-        color: any(named: 'color'),
-        licensePlate: any(named: 'licensePlate'),
-        type: any(named: 'type'),
-        photoUrl: any(named: 'photoUrl'),
-        isDefault: any(named: 'isDefault'),
-      )).thenAnswer((_) async => const Left(validationFailure));
+            make: any(named: 'make'),
+            model: any(named: 'model'),
+            year: any(named: 'year'),
+            color: any(named: 'color'),
+            licensePlate: any(named: 'licensePlate'),
+            type: any(named: 'type'),
+            photoUrl: any(named: 'photoUrl'),
+            isDefault: any(named: 'isDefault'),
+          )).thenAnswer((_) async => const Left(validationFailure));
 
       // Act
       final result = await usecase(params);

@@ -122,27 +122,40 @@ class AdminState {
       usersPage: usersPage ?? this.usersPage,
       usersTotalPages: usersTotalPages ?? this.usersTotalPages,
       usersStatus: usersStatus ?? this.usersStatus,
-      selectedUser: clearSelectedUser ? null : (selectedUser ?? this.selectedUser),
+      selectedUser:
+          clearSelectedUser ? null : (selectedUser ?? this.selectedUser),
       userDetailsStatus: userDetailsStatus ?? this.userDetailsStatus,
 
       // Reservations
       reservations: reservations ?? this.reservations,
       reservationsTotal: reservationsTotal ?? this.reservationsTotal,
       reservationsPage: reservationsPage ?? this.reservationsPage,
-      reservationsTotalPages: reservationsTotalPages ?? this.reservationsTotalPages,
+      reservationsTotalPages:
+          reservationsTotalPages ?? this.reservationsTotalPages,
       reservationsStatus: reservationsStatus ?? this.reservationsStatus,
-      selectedReservation: clearSelectedReservation ? null : (selectedReservation ?? this.selectedReservation),
-      reservationDetailsStatus: reservationDetailsStatus ?? this.reservationDetailsStatus,
+      selectedReservation: clearSelectedReservation
+          ? null
+          : (selectedReservation ?? this.selectedReservation),
+      reservationDetailsStatus:
+          reservationDetailsStatus ?? this.reservationDetailsStatus,
 
       // Filters
-      usersRoleFilter: clearUsersRoleFilter ? null : (usersRoleFilter ?? this.usersRoleFilter),
-      usersSearchQuery: clearUsersSearchQuery ? null : (usersSearchQuery ?? this.usersSearchQuery),
-      reservationsStatusFilter: clearReservationsStatusFilter ? null : (reservationsStatusFilter ?? this.reservationsStatusFilter),
+      usersRoleFilter: clearUsersRoleFilter
+          ? null
+          : (usersRoleFilter ?? this.usersRoleFilter),
+      usersSearchQuery: clearUsersSearchQuery
+          ? null
+          : (usersSearchQuery ?? this.usersSearchQuery),
+      reservationsStatusFilter: clearReservationsStatusFilter
+          ? null
+          : (reservationsStatusFilter ?? this.reservationsStatusFilter),
 
       // Actions
       actionStatus: actionStatus ?? this.actionStatus,
-      successMessage: clearSuccessMessage ? null : (successMessage ?? this.successMessage),
-      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
+      successMessage:
+          clearSuccessMessage ? null : (successMessage ?? this.successMessage),
+      errorMessage:
+          clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
     );
   }
 }

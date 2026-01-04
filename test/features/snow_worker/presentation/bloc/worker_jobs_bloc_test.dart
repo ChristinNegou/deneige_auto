@@ -11,12 +11,19 @@ import 'package:deneige_auto/features/snow_worker/presentation/bloc/worker_jobs_
 
 import '../../../../fixtures/worker_fixtures.dart';
 
-class MockGetAvailableJobsUseCase extends Mock implements GetAvailableJobsUseCase {}
+class MockGetAvailableJobsUseCase extends Mock
+    implements GetAvailableJobsUseCase {}
+
 class MockGetMyJobsUseCase extends Mock implements GetMyJobsUseCase {}
+
 class MockGetJobHistoryUseCase extends Mock implements GetJobHistoryUseCase {}
+
 class MockAcceptJobUseCase extends Mock implements AcceptJobUseCase {}
+
 class MockMarkEnRouteUseCase extends Mock implements MarkEnRouteUseCase {}
+
 class MockStartJobUseCase extends Mock implements StartJobUseCase {}
+
 class MockCompleteJobUseCase extends Mock implements CompleteJobUseCase {}
 
 void main() {
@@ -65,10 +72,10 @@ void main() {
         'emits [loading, loaded] when LoadAvailableJobs succeeds',
         build: () {
           when(() => mockGetAvailableJobs(
-            latitude: any(named: 'latitude'),
-            longitude: any(named: 'longitude'),
-            radiusKm: any(named: 'radiusKm'),
-          )).thenAnswer((_) async => Right(tJobs));
+                latitude: any(named: 'latitude'),
+                longitude: any(named: 'longitude'),
+                radiusKm: any(named: 'radiusKm'),
+              )).thenAnswer((_) async => Right(tJobs));
           when(() => mockGetMyJobs()).thenAnswer((_) async => const Right([]));
           return bloc;
         },
@@ -86,10 +93,12 @@ void main() {
         'emits [loading, error] when LoadAvailableJobs fails',
         build: () {
           when(() => mockGetAvailableJobs(
-            latitude: any(named: 'latitude'),
-            longitude: any(named: 'longitude'),
-            radiusKm: any(named: 'radiusKm'),
-          )).thenAnswer((_) async => const Left(ServerFailure(message: 'Error')));
+                    latitude: any(named: 'latitude'),
+                    longitude: any(named: 'longitude'),
+                    radiusKm: any(named: 'radiusKm'),
+                  ))
+              .thenAnswer(
+                  (_) async => const Left(ServerFailure(message: 'Error')));
           // Also stub getMyJobs since it's called after getAvailableJobs
           when(() => mockGetMyJobs()).thenAnswer((_) async => const Right([]));
           return bloc;
@@ -144,9 +153,9 @@ void main() {
         'emits [loading, history loaded] when LoadJobHistory succeeds',
         build: () {
           when(() => mockGetJobHistory(
-            page: any(named: 'page'),
-            limit: any(named: 'limit'),
-          )).thenAnswer((_) async => Right(tJobs));
+                page: any(named: 'page'),
+                limit: any(named: 'limit'),
+              )).thenAnswer((_) async => Right(tJobs));
           return bloc;
         },
         act: (bloc) => bloc.add(const LoadJobHistory()),
@@ -165,9 +174,9 @@ void main() {
         'emits error when LoadJobHistory fails',
         build: () {
           when(() => mockGetJobHistory(
-            page: any(named: 'page'),
-            limit: any(named: 'limit'),
-          )).thenAnswer(
+                page: any(named: 'page'),
+                limit: any(named: 'limit'),
+              )).thenAnswer(
             (_) async => const Left(ServerFailure(message: 'Error')),
           );
           return bloc;
@@ -240,9 +249,9 @@ void main() {
         'emits success states when CompleteJob succeeds',
         build: () {
           when(() => mockCompleteJob(
-            jobId: any(named: 'jobId'),
-            workerNotes: any(named: 'workerNotes'),
-          )).thenAnswer((_) async => Right(tJob));
+                jobId: any(named: 'jobId'),
+                workerNotes: any(named: 'workerNotes'),
+              )).thenAnswer((_) async => Right(tJob));
           return bloc;
         },
         act: (bloc) => bloc.add(const CompleteJob('job-123')),

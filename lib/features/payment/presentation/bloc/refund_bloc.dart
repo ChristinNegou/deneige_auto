@@ -53,12 +53,14 @@ class RefundState extends Equatable {
       isProcessing: isProcessing ?? this.isProcessing,
       refund: refund ?? this.refund,
       errorMessage: clearMessages ? null : (errorMessage ?? this.errorMessage),
-      successMessage: clearMessages ? null : (successMessage ?? this.successMessage),
+      successMessage:
+          clearMessages ? null : (successMessage ?? this.successMessage),
     );
   }
 
   @override
-  List<Object?> get props => [isProcessing, refund, errorMessage, successMessage];
+  List<Object?> get props =>
+      [isProcessing, refund, errorMessage, successMessage];
 }
 
 // BLoC

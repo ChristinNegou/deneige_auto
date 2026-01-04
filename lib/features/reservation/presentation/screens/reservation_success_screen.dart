@@ -1,174 +1,216 @@
-
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 
-class ReservationSuccessScreen extends StatelessWidget {
+class ReservationSuccessScreen extends StatefulWidget {
   final String? reservationId;
 
   const ReservationSuccessScreen({
-    Key? key,
+    super.key,
     this.reservationId,
-  }) : super(key: key);
+  });
+
+  @override
+  State<ReservationSuccessScreen> createState() =>
+      _ReservationSuccessScreenState();
+}
+
+class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
+  late ConfettiController _confettiController;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController.play();
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Icône de succès animée
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  shape: BoxShape.circle,
+      backgroundColor: AppTheme.background,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom -
+                      48,
                 ),
-                child: const Icon(
-                  Icons.check_circle,
-                  size: 80,
-                  color: Colors.green,
-                ),
-              ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
 
-              const SizedBox(height: 32),
+                    // Animation Lottie de succès
+                    const AppIllustration(
+                      type: IllustrationType.success,
+                      width: 150,
+                      height: 150,
+                    ),
 
-              Text(
-                'Réservation confirmée !',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
-                textAlign: TextAlign.center,
-              ),
+                    const SizedBox(height: 24),
 
-              const SizedBox(height: 16),
-
-              Text(
-                'Votre demande de déneigement a été enregistrée avec succès.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.grey[700],
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              if (reservationId != null) ...[
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Numéro de réservation',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                    Text(
+                      'Réservation confirmée !',
+                      style: AppTheme.headlineLarge.copyWith(
+                        color: AppTheme.success,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        reservationId!,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      textAlign: TextAlign.center,
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Text(
+                      'Votre demande de déneigement a été enregistrée avec succès.',
+                      style: AppTheme.bodyLarge.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    if (widget.reservationId != null) ...[
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surface,
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusMD),
+                          boxShadow: AppTheme.shadowSM,
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Numéro de réservation',
+                              style: AppTheme.labelSmall,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.reservationId!,
+                              style: AppTheme.headlineSmall.copyWith(
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ],
 
-              const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
-              // Informations supplémentaires
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue[200]!),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: Colors.blue[700],
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Prochaines étapes',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue[900],
+                    // Informations supplémentaires
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryLight,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                        border: Border.all(
+                            color: AppTheme.primary.withValues(alpha: 0.3)),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                color: AppTheme.primary,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Prochaines étapes',
+                                style: AppTheme.labelLarge.copyWith(
+                                  color: AppTheme.primary,
+                                ),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 12),
+                          _buildInfoRow(
+                              '1. Un déneigeur sera assigné sous peu'),
+                          _buildInfoRow('2. Vous recevrez une notification'),
+                          _buildInfoRow(
+                              '3. Suivez l\'avancement en temps réel'),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Boutons d'action
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            AppRoutes.home,
+                            (route) => false,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.success,
+                          padding: const EdgeInsets.all(16),
                         ),
-                      ],
+                        child: const Text('Retour à l\'accueil'),
+                      ),
                     ),
+
                     const SizedBox(height: 12),
-                    _buildInfoRow(
-                      '1. Un déneigeur sera assigné sous peu',
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            AppRoutes.reservations,
+                            (route) => false,
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(16),
+                        ),
+                        child: const Text('Voir mes réservations'),
+                      ),
                     ),
-                    _buildInfoRow(
-                      '2. Vous recevrez une notification',
-                    ),
-                    _buildInfoRow(
-                      '3. Suivez l\'avancement en temps réel',
-                    ),
+
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-
-              const Spacer(),
-
-              // Boutons d'action
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.home,
-                          (route) => false,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(16),
-                    backgroundColor: Theme.of(context).primaryColor,
-                  ),
-
-                  child: const Text('Accueil'),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.reservations,
-                          (route) => false,
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(16),
-                  ),
-                  child: const Text('Voir mes réservations'),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          // Confetti
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: false,
+              colors: const [
+                AppTheme.success,
+                AppTheme.primary,
+                AppTheme.secondary,
+                Colors.white,
+              ],
+              numberOfParticles: 30,
+              gravity: 0.2,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -181,15 +223,14 @@ class ReservationSuccessScreen extends StatelessWidget {
           Icon(
             Icons.check_circle_outline,
             size: 16,
-            color: Colors.blue[700],
+            color: AppTheme.primary,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.blue[900],
+              style: AppTheme.bodySmall.copyWith(
+                color: AppTheme.primary,
               ),
             ),
           ),

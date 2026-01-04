@@ -184,7 +184,8 @@ class WorkerFixtures {
     return WorkerStats(
       today: today ?? createTodayStats(),
       week: week ?? createPeriodStats(),
-      month: month ?? createPeriodStats(completed: 45, earnings: 1125.0, tips: 225.0),
+      month: month ??
+          createPeriodStats(completed: 45, earnings: 1125.0, tips: 225.0),
       allTime: allTime ?? createAllTimeStats(),
       isAvailable: isAvailable,
     );

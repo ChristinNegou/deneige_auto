@@ -9,8 +9,11 @@ import 'package:deneige_auto/features/snow_worker/presentation/bloc/worker_avail
 
 import '../../../../fixtures/worker_fixtures.dart';
 
-class MockToggleAvailabilityUseCase extends Mock implements ToggleAvailabilityUseCase {}
+class MockToggleAvailabilityUseCase extends Mock
+    implements ToggleAvailabilityUseCase {}
+
 class MockUpdateLocationUseCase extends Mock implements UpdateLocationUseCase {}
+
 class MockWorkerRepository extends Mock implements WorkerRepository {}
 
 void main() {
@@ -132,9 +135,9 @@ void main() {
         'silently updates location when successful',
         build: () {
           when(() => mockUpdateLocation(
-            latitude: any(named: 'latitude'),
-            longitude: any(named: 'longitude'),
-          )).thenAnswer((_) async => const Right(null));
+                latitude: any(named: 'latitude'),
+                longitude: any(named: 'longitude'),
+              )).thenAnswer((_) async => const Right(null));
           return bloc;
         },
         act: (bloc) => bloc.add(const UpdateLocation(
@@ -144,9 +147,9 @@ void main() {
         expect: () => [],
         verify: (_) {
           verify(() => mockUpdateLocation(
-            latitude: 46.34,
-            longitude: -72.55,
-          )).called(1);
+                latitude: 46.34,
+                longitude: -72.55,
+              )).called(1);
         },
       );
 
@@ -154,9 +157,9 @@ void main() {
         'silently fails when location update fails',
         build: () {
           when(() => mockUpdateLocation(
-            latitude: any(named: 'latitude'),
-            longitude: any(named: 'longitude'),
-          )).thenAnswer(
+                latitude: any(named: 'latitude'),
+                longitude: any(named: 'longitude'),
+              )).thenAnswer(
             (_) async => const Left(ServerFailure(message: 'Error')),
           );
           return bloc;
@@ -197,11 +200,11 @@ void main() {
         'emits success states when UpdateProfile succeeds',
         build: () {
           when(() => mockRepository.updateProfile(
-            preferredZones: any(named: 'preferredZones'),
-            equipmentList: any(named: 'equipmentList'),
-            vehicleType: any(named: 'vehicleType'),
-            maxActiveJobs: any(named: 'maxActiveJobs'),
-          )).thenAnswer((_) async => Right(tUpdatedProfile));
+                preferredZones: any(named: 'preferredZones'),
+                equipmentList: any(named: 'equipmentList'),
+                vehicleType: any(named: 'vehicleType'),
+                maxActiveJobs: any(named: 'maxActiveJobs'),
+              )).thenAnswer((_) async => Right(tUpdatedProfile));
           return bloc;
         },
         seed: () => WorkerAvailabilityLoaded(

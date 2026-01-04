@@ -44,8 +44,7 @@ class Refund extends Equatable {
   });
 
   bool get isProcessing {
-    return status == RefundStatus.pending ||
-           status == RefundStatus.processing;
+    return status == RefundStatus.pending || status == RefundStatus.processing;
   }
 
   bool get isCompleted {
@@ -82,16 +81,16 @@ class Refund extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    paymentId,
-    reservationId,
-    amount,
-    status,
-    reason,
-    reasonNote,
-    createdAt,
-    processedAt,
-    failureReason,
-    stripeRefundId,
-  ];
+        id,
+        paymentId,
+        reservationId,
+        amount,
+        status,
+        reason,
+        reasonNote,
+        createdAt,
+        processedAt,
+        failureReason,
+        stripeRefundId,
+      ];
 }

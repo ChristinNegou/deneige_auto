@@ -57,7 +57,8 @@ class AllTimeStats extends Equatable {
   double get totalEarnings => earnings + tips;
 
   @override
-  List<Object?> get props => [completed, earnings, tips, averageRating, totalRatings];
+  List<Object?> get props =>
+      [completed, earnings, tips, averageRating, totalRatings];
 }
 
 class WorkerStats extends Equatable {

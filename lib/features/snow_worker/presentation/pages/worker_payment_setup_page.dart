@@ -190,7 +190,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  isConfigured ? Icons.account_balance : Icons.account_balance_wallet,
+                  isConfigured
+                      ? Icons.account_balance
+                      : Icons.account_balance_wallet,
                   color: Colors.white,
                   size: 24,
                 ),
@@ -201,7 +203,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isConfigured ? 'Compte configure' : 'Configurez vos paiements',
+                      isConfigured
+                          ? 'Compte configure'
+                          : 'Configurez vos paiements',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -264,8 +268,11 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                   elevation: 0,
                 ),
                 child: Text(
-                  _hasAccount ? 'Continuer la configuration' : 'Configurer maintenant',
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                  _hasAccount
+                      ? 'Continuer la configuration'
+                      : 'Configurer maintenant',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 15),
                 ),
               ),
             ),
@@ -282,7 +289,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
           width: 20,
           height: 20,
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.3),
+            color:
+                isActive ? Colors.white : Colors.white.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -319,7 +327,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.account_balance_wallet, color: Colors.green[600], size: 20),
+              Icon(Icons.account_balance_wallet,
+                  color: Colors.green[600], size: 20),
               const SizedBox(width: 10),
               const Text(
                 'Solde',
@@ -391,7 +400,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
   }
 
   Widget _buildCommissionInfo() {
-    final platformPercent = ((_feeConfig?['platformFeePercent'] ?? 0.25) * 100).toInt();
+    final platformPercent =
+        ((_feeConfig?['platformFeePercent'] ?? 0.25) * 100).toInt();
     final workerPercent = 100 - platformPercent;
 
     return Container(
@@ -453,7 +463,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
     );
   }
 
-  Widget _buildCommissionRow(String label, String percent, Color color, double progress) {
+  Widget _buildCommissionRow(
+      String label, String percent, Color color, double progress) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -463,7 +474,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
             Text(label, style: const TextStyle(fontSize: 14)),
             Text(
               percent,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color),
+              style: TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.w600, color: color),
             ),
           ],
         ),
@@ -498,7 +510,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
           ),
           const SizedBox(height: 16),
           _buildStep(1, 'Le client paie', 'Le paiement est traite par Stripe'),
-          _buildStep(2, 'Repartition automatique', 'Votre part est calculee instantanement'),
+          _buildStep(2, 'Repartition automatique',
+              'Votre part est calculee instantanement'),
           _buildStep(3, 'Depot sur votre compte', 'Sous 2-3 jours ouvrables'),
         ],
       ),
@@ -535,7 +548,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 Text(
                   subtitle,
@@ -559,7 +573,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.verified_user_outlined, color: Colors.green[700], size: 20),
+          Icon(Icons.verified_user_outlined,
+              color: Colors.green[700], size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

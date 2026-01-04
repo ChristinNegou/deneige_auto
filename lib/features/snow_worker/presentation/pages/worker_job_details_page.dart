@@ -72,7 +72,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           _isJobCancelled = true;
           _statusCheckTimer?.cancel();
 
-          final cancelReason = data['cancelReason'] as String? ?? 'Le client a annulé la réservation';
+          final cancelReason = data['cancelReason'] as String? ??
+              'Le client a annulé la réservation';
           final cancelledBy = data['cancelledBy'] as String? ?? 'client';
 
           _showJobCancelledDialog(cancelReason, cancelledBy);
@@ -120,7 +121,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 decoration: BoxDecoration(
                   color: AppTheme.errorLight,
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                  border:
+                      Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -205,7 +207,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     _buildServiceCard(),
                     const SizedBox(height: 16),
                     _buildPricingCard(),
-                    if (job.clientNotes != null && job.clientNotes!.isNotEmpty) ...[
+                    if (job.clientNotes != null &&
+                        job.clientNotes!.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       _buildNotesCard(),
                     ],
@@ -278,7 +281,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   color: AppTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
-                child: const Icon(Icons.person_rounded, color: AppTheme.primary, size: 22),
+                child: const Icon(Icons.person_rounded,
+                    color: AppTheme.primary, size: 22),
               ),
               const SizedBox(width: 12),
               Text('Client', style: AppTheme.headlineSmall),
@@ -451,7 +455,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   color: AppTheme.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
-                child: const Icon(Icons.location_on_rounded, color: AppTheme.error, size: 22),
+                child: const Icon(Icons.location_on_rounded,
+                    color: AppTheme.error, size: 22),
               ),
               const SizedBox(width: 12),
               Text('Adresse', style: AppTheme.headlineSmall),
@@ -462,10 +467,13 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.directions_rounded, size: 16, color: AppTheme.textTertiary),
+              Icon(Icons.directions_rounded,
+                  size: 16, color: AppTheme.textTertiary),
               const SizedBox(width: 4),
               Text(
-                job.distanceKm != null ? '${job.distanceKm!.toStringAsFixed(1)} km' : 'N/A',
+                job.distanceKm != null
+                    ? '${job.distanceKm!.toStringAsFixed(1)} km'
+                    : 'N/A',
                 style: AppTheme.bodySmall,
               ),
             ],
@@ -476,7 +484,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => _openMaps(job.location!.latitude, job.location!.longitude),
+                    onPressed: () => _openMaps(
+                        job.location!.latitude, job.location!.longitude),
                     icon: const Icon(Icons.map_rounded, size: 18),
                     label: const Text('Google Maps'),
                     style: OutlinedButton.styleFrom(
@@ -491,7 +500,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => _openWaze(job.location!.latitude, job.location!.longitude),
+                    onPressed: () => _openWaze(
+                        job.location!.latitude, job.location!.longitude),
                     icon: const Icon(Icons.navigation_rounded, size: 18),
                     label: const Text('Waze'),
                     style: OutlinedButton.styleFrom(
@@ -531,7 +541,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   color: AppTheme.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
-                child: const Icon(Icons.directions_car_rounded, color: AppTheme.secondary, size: 22),
+                child: const Icon(Icons.directions_car_rounded,
+                    color: AppTheme.secondary, size: 22),
               ),
               const SizedBox(width: 12),
               Text('Véhicule', style: AppTheme.headlineSmall),
@@ -568,7 +579,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   color: AppTheme.info.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
-                child: const Icon(Icons.ac_unit_rounded, color: AppTheme.info, size: 22),
+                child: const Icon(Icons.ac_unit_rounded,
+                    color: AppTheme.info, size: 22),
               ),
               const SizedBox(width: 12),
               Text('Service', style: AppTheme.headlineSmall),
@@ -578,18 +590,21 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           _buildInfoRow('Type', 'Déneigement'),
           if (job.serviceOptions.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text('Options:', style: AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w600)),
+            Text('Options:',
+                style:
+                    AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             ...job.serviceOptions.map((option) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                children: [
-                  Icon(Icons.check_circle_rounded, color: AppTheme.success, size: 16),
-                  const SizedBox(width: 8),
-                  Text(_getOptionLabel(option), style: AppTheme.bodyMedium),
-                ],
-              ),
-            )),
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle_rounded,
+                          color: AppTheme.success, size: 16),
+                      const SizedBox(width: 8),
+                      Text(_getOptionLabel(option), style: AppTheme.bodyMedium),
+                    ],
+                  ),
+                )),
           ],
         ],
       ),
@@ -616,7 +631,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   color: AppTheme.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
-                child: const Icon(Icons.attach_money_rounded, color: AppTheme.success, size: 22),
+                child: const Icon(Icons.attach_money_rounded,
+                    color: AppTheme.success, size: 22),
               ),
               const SizedBox(width: 12),
               Text('Tarification', style: AppTheme.headlineSmall),
@@ -629,7 +645,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               Text('Prix total', style: AppTheme.bodyMedium),
               Text(
                 '${job.totalPrice.toStringAsFixed(2)} \$',
-                style: AppTheme.headlineMedium.copyWith(color: AppTheme.success),
+                style:
+                    AppTheme.headlineMedium.copyWith(color: AppTheme.success),
               ),
             ],
           ),
@@ -640,7 +657,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               children: [
                 Text('Pourboire', style: AppTheme.bodyMedium),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppTheme.warning.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radiusFull),
@@ -681,7 +699,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   color: AppTheme.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
-                child: const Icon(Icons.note_rounded, color: AppTheme.warning, size: 22),
+                child: const Icon(Icons.note_rounded,
+                    color: AppTheme.warning, size: 22),
               ),
               const SizedBox(width: 12),
               Text('Notes du client', style: AppTheme.headlineSmall),
@@ -701,7 +720,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: AppTheme.bodySmall),
-          Text(value, style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w500)),
+          Text(value,
+              style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -723,7 +743,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               ),
               backgroundColor: AppTheme.success,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
             ),
           );
           Navigator.pop(context, true);
@@ -740,7 +761,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               ),
               backgroundColor: AppTheme.error,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
             ),
           );
         }
@@ -798,7 +820,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Icon(Icons.check_circle_rounded, color: Colors.white, size: 24),
+                            Icon(Icons.check_circle_rounded,
+                                color: Colors.white, size: 24),
                             SizedBox(width: 8),
                             Text(
                               'Accepter ce job',
@@ -922,15 +945,16 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
     double finalLat = lat;
     double finalLng = lng;
 
-    final isEmulatorLocation = (lat - 37.4219983).abs() < 0.5 &&
-        (lng - (-122.084)).abs() < 0.5;
+    final isEmulatorLocation =
+        (lat - 37.4219983).abs() < 0.5 && (lng - (-122.084)).abs() < 0.5;
 
     if (isEmulatorLocation) {
       finalLat = 46.3432;
       finalLng = -72.5476;
     }
 
-    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$finalLat,$finalLng');
+    final uri = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$finalLat,$finalLng');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -940,15 +964,16 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
     double finalLat = lat;
     double finalLng = lng;
 
-    final isEmulatorLocation = (lat - 37.4219983).abs() < 0.5 &&
-        (lng - (-122.084)).abs() < 0.5;
+    final isEmulatorLocation =
+        (lat - 37.4219983).abs() < 0.5 && (lng - (-122.084)).abs() < 0.5;
 
     if (isEmulatorLocation) {
       finalLat = 46.3432;
       finalLng = -72.5476;
     }
 
-    final uri = Uri.parse('https://waze.com/ul?ll=$finalLat,$finalLng&navigate=yes');
+    final uri =
+        Uri.parse('https://waze.com/ul?ll=$finalLat,$finalLng&navigate=yes');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -1032,8 +1057,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         }
       },
       builder: (context, state) {
-        final isLoading =
-            state is JobActionLoading && state.action == 'cancel';
+        final isLoading = state is JobActionLoading && state.action == 'cancel';
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -1049,9 +1073,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           ),
           child: SafeArea(
             child: GestureDetector(
-              onTap: isLoading
-                  ? null
-                  : () => _showCancelDialog(context),
+              onTap: isLoading ? null : () => _showCancelDialog(context),
               child: Container(
                 height: 56,
                 decoration: BoxDecoration(
@@ -1169,7 +1191,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   decoration: BoxDecoration(
                     color: Colors.orange[50],
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                    border:
+                        Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: const [
@@ -1199,15 +1222,17 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     setState(() => selectedReasonCode = value);
                   },
                   child: Column(
-                    children: reasons.entries.map((entry) => RadioListTile<String>(
-                      title: Text(entry.value.label,
-                          style: const TextStyle(fontSize: 14)),
-                      subtitle: Text(entry.value.description,
-                          style: const TextStyle(fontSize: 11)),
-                      value: entry.key,
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
-                    )).toList(),
+                    children: reasons.entries
+                        .map((entry) => RadioListTile<String>(
+                              title: Text(entry.value.label,
+                                  style: const TextStyle(fontSize: 14)),
+                              subtitle: Text(entry.value.description,
+                                  style: const TextStyle(fontSize: 11)),
+                              value: entry.key,
+                              contentPadding: EdgeInsets.zero,
+                              dense: true,
+                            ))
+                        .toList(),
                   ),
                 ),
                 const SizedBox(height: 8),

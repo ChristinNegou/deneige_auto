@@ -110,15 +110,15 @@ class Weather extends Equatable {
 
   @override
   List<Object?> get props => [
-    location,
-    temperature,
-    condition,
-    conditionCode,
-    humidity,
-    windSpeed,
-    snowDepth,
-    nextSnowfall,
-    iconUrl,
-    timestamp,
-  ];
+        location,
+        temperature,
+        condition,
+        conditionCode,
+        humidity,
+        windSpeed,
+        snowDepth,
+        nextSnowfall,
+        iconUrl,
+        timestamp,
+      ];
 }

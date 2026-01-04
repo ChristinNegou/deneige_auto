@@ -28,7 +28,8 @@ void main() {
 
       // Assert
       expect(result.isRight(), true);
-      verify(() => mockRepository.deletePaymentMethod(tPaymentMethodId)).called(1);
+      verify(() => mockRepository.deletePaymentMethod(tPaymentMethodId))
+          .called(1);
     });
 
     test('should return ServerFailure when payment method not found', () async {

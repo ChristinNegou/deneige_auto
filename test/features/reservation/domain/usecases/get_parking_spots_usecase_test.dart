@@ -29,10 +29,12 @@ void main() {
 
       // Assert
       expect(result, Right(tParkingSpots));
-      verify(() => mockRepository.getParkingSpots(availableOnly: false)).called(1);
+      verify(() => mockRepository.getParkingSpots(availableOnly: false))
+          .called(1);
     });
 
-    test('should return only available spots when availableOnly is true', () async {
+    test('should return only available spots when availableOnly is true',
+        () async {
       // Arrange
       final availableSpots = tParkingSpots.take(3).toList();
       when(() => mockRepository.getParkingSpots(availableOnly: true))
@@ -47,12 +49,14 @@ void main() {
         (l) => fail('Should be Right'),
         (spots) => expect(spots.length, 3),
       );
-      verify(() => mockRepository.getParkingSpots(availableOnly: true)).called(1);
+      verify(() => mockRepository.getParkingSpots(availableOnly: true))
+          .called(1);
     });
 
     test('should return empty list when no parking spots', () async {
       // Arrange
-      when(() => mockRepository.getParkingSpots(availableOnly: any(named: 'availableOnly')))
+      when(() => mockRepository.getParkingSpots(
+              availableOnly: any(named: 'availableOnly')))
           .thenAnswer((_) async => const Right([]));
 
       // Act
@@ -68,7 +72,8 @@ void main() {
 
     test('should return ServerFailure on server error', () async {
       // Arrange
-      when(() => mockRepository.getParkingSpots(availableOnly: any(named: 'availableOnly')))
+      when(() => mockRepository.getParkingSpots(
+              availableOnly: any(named: 'availableOnly')))
           .thenAnswer((_) async => const Left(serverFailure));
 
       // Act

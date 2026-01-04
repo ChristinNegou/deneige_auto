@@ -60,7 +60,8 @@ class NewReservationState extends Equatable {
     this.locationError,
   });
 
-  bool get hasValidLocation => locationLatitude != null && locationLongitude != null;
+  bool get hasValidLocation =>
+      locationLatitude != null && locationLongitude != null;
 
   bool get canProceedStep1 {
     // Un véhicule doit être sélectionné
@@ -70,8 +71,9 @@ class NewReservationState extends Equatable {
     if (selectedParkingSpot != null) return true;
 
     // SOIT un numéro/emplacement manuel est renseigné
-    final hasManualLocation = (parkingSpotNumber != null && parkingSpotNumber!.trim().isNotEmpty) ||
-        (customLocation != null && customLocation!.trim().isNotEmpty);
+    final hasManualLocation =
+        (parkingSpotNumber != null && parkingSpotNumber!.trim().isNotEmpty) ||
+            (customLocation != null && customLocation!.trim().isNotEmpty);
 
     return hasManualLocation;
   }
@@ -83,7 +85,8 @@ class NewReservationState extends Equatable {
 
   // Step 3: Date/Heure (anciennement step2)
   bool get canProceedStep3 {
-    return departureDateTime != null && _validateDateTime(departureDateTime) == null;
+    return departureDateTime != null &&
+        _validateDateTime(departureDateTime) == null;
   }
 
   // Step 4: Options (anciennement step3)
@@ -92,14 +95,18 @@ class NewReservationState extends Equatable {
   }
 
   bool get canSubmit {
-    return canProceedStep1 && canProceedStep2 && canProceedStep3 && calculatedPrice != null;
+    return canProceedStep1 &&
+        canProceedStep2 &&
+        canProceedStep3 &&
+        calculatedPrice != null;
   }
 
   String? _validateDateTime(DateTime? dateTime) {
     if (dateTime == null) return 'Date requise';
 
     final now = DateTime.now();
-    final minTime = now.add(Duration(minutes: AppConfig.minReservationTimeMinutes));
+    final minTime =
+        now.add(Duration(minutes: AppConfig.minReservationTimeMinutes));
 
     if (dateTime.isBefore(minTime)) {
       return 'Le départ doit être dans au moins ${AppConfig.minReservationTimeMinutes} minutes';
@@ -149,7 +156,8 @@ class NewReservationState extends Equatable {
       selectedVehicle: selectedVehicle ?? this.selectedVehicle,
       selectedParkingSpot: selectedParkingSpot ?? this.selectedParkingSpot,
       availableVehicles: availableVehicles ?? this.availableVehicles,
-      availableParkingSpots: availableParkingSpots ?? this.availableParkingSpots,
+      availableParkingSpots:
+          availableParkingSpots ?? this.availableParkingSpots,
       departureDateTime: departureDateTime ?? this.departureDateTime,
       deadlineTime: deadlineTime ?? this.deadlineTime,
       isUrgent: isUrgent ?? this.isUrgent,
@@ -175,32 +183,32 @@ class NewReservationState extends Equatable {
 
   @override
   List<Object?> get props => [
-    currentStep,
-    selectedVehicle,
-    selectedParkingSpot,
-    availableVehicles,
-    availableParkingSpots,
-    departureDateTime,
-    deadlineTime,
-    isUrgent,
-    selectedOptions,
-    snowDepthCm,
-    calculatedPrice,
-    priceBreakdown,
-    isLoading,
-    isLoadingData,
-    errorMessage,
-    isSubmitted,
-    reservationId,
-    parkingSpotNumber,
-    customLocation,
-    locationLatitude,
-    locationLongitude,
-    locationAddress,
-    isGettingLocation,
-    needsManualAddress,
-    locationError,
-  ];
+        currentStep,
+        selectedVehicle,
+        selectedParkingSpot,
+        availableVehicles,
+        availableParkingSpots,
+        departureDateTime,
+        deadlineTime,
+        isUrgent,
+        selectedOptions,
+        snowDepthCm,
+        calculatedPrice,
+        priceBreakdown,
+        isLoading,
+        isLoadingData,
+        errorMessage,
+        isSubmitted,
+        reservationId,
+        parkingSpotNumber,
+        customLocation,
+        locationLatitude,
+        locationLongitude,
+        locationAddress,
+        isGettingLocation,
+        needsManualAddress,
+        locationError,
+      ];
 }
 
 class PriceBreakdown extends Equatable {
@@ -210,20 +218,20 @@ class PriceBreakdown extends Equatable {
   final double snowSurcharge;
   final double optionsCost;
   final double urgencyFee;
-  final double subtotal;           // Sous-total avant taxes
-  final double serviceFee;         // Frais de service
-  final double insuranceFee;       // Frais d'assurance
+  final double subtotal; // Sous-total avant taxes
+  final double serviceFee; // Frais de service
+  final double insuranceFee; // Frais d'assurance
 
   // Taxes dynamiques selon la province
-  final double federalTax;         // TPS/GST/HST
+  final double federalTax; // TPS/GST/HST
   final double federalTaxRate;
-  final String federalTaxName;     // "TPS", "GST", "HST"
-  final double provincialTax;      // TVQ/PST (0 si HST)
+  final String federalTaxName; // "TPS", "GST", "HST"
+  final double provincialTax; // TVQ/PST (0 si HST)
   final double provincialTaxRate;
-  final String provincialTaxName;  // "TVQ", "PST", ""
-  final String provinceCode;       // "QC", "ON", etc.
-  final String provinceName;       // "Québec", "Ontario", etc.
-  final bool isHST;                // Si taxe harmonisée
+  final String provincialTaxName; // "TVQ", "PST", ""
+  final String provinceCode; // "QC", "ON", etc.
+  final String provinceName; // "Québec", "Ontario", etc.
+  final bool isHST; // Si taxe harmonisée
 
   final double totalPrice;
 
@@ -251,7 +259,9 @@ class PriceBreakdown extends Equatable {
 
   /// Libellé formaté pour la taxe fédérale
   String get federalTaxLabel {
-    final rateStr = federalTaxRate == 0.13 || federalTaxRate == 0.15 || federalTaxRate == 0.05
+    final rateStr = federalTaxRate == 0.13 ||
+            federalTaxRate == 0.15 ||
+            federalTaxRate == 0.05
         ? (federalTaxRate * 100).toStringAsFixed(0)
         : (federalTaxRate * 100).toStringAsFixed(2);
     return '$federalTaxName ($rateStr%)';
@@ -268,24 +278,24 @@ class PriceBreakdown extends Equatable {
 
   @override
   List<Object?> get props => [
-    basePrice,
-    vehicleAdjustment,
-    parkingAdjustment,
-    snowSurcharge,
-    optionsCost,
-    urgencyFee,
-    subtotal,
-    serviceFee,
-    insuranceFee,
-    federalTax,
-    federalTaxRate,
-    federalTaxName,
-    provincialTax,
-    provincialTaxRate,
-    provincialTaxName,
-    provinceCode,
-    provinceName,
-    isHST,
-    totalPrice,
-  ];
+        basePrice,
+        vehicleAdjustment,
+        parkingAdjustment,
+        snowSurcharge,
+        optionsCost,
+        urgencyFee,
+        subtotal,
+        serviceFee,
+        insuranceFee,
+        federalTax,
+        federalTaxRate,
+        federalTaxName,
+        provincialTax,
+        provincialTaxRate,
+        provincialTaxName,
+        provinceCode,
+        provinceName,
+        isHST,
+        totalPrice,
+      ];
 }

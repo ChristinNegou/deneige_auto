@@ -15,7 +15,8 @@ class JobsListPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => sl<WorkerJobsBloc>()
         ..add(const LoadMyJobs())
-        ..add(const LoadAvailableJobs(latitude: 45.5017, longitude: -73.5673, radiusKm: 50)),
+        ..add(const LoadAvailableJobs(
+            latitude: 45.5017, longitude: -73.5673, radiusKm: 50)),
       child: const JobsListView(),
     );
   }
@@ -28,7 +29,8 @@ class JobsListView extends StatefulWidget {
   State<JobsListView> createState() => _JobsListViewState();
 }
 
-class _JobsListViewState extends State<JobsListView> with SingleTickerProviderStateMixin {
+class _JobsListViewState extends State<JobsListView>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -104,7 +106,8 @@ class _JobsListViewState extends State<JobsListView> with SingleTickerProviderSt
             onTap: () {
               context.read<WorkerJobsBloc>()
                 ..add(const LoadMyJobs())
-                ..add(const LoadAvailableJobs(latitude: 45.5017, longitude: -73.5673, radiusKm: 50));
+                ..add(const LoadAvailableJobs(
+                    latitude: 45.5017, longitude: -73.5673, radiusKm: 50));
             },
             child: Container(
               width: 40,
@@ -172,14 +175,16 @@ class _JobsListViewState extends State<JobsListView> with SingleTickerProviderSt
 
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<WorkerJobsBloc>().add(const LoadAvailableJobs(latitude: 45.5017, longitude: -73.5673, radiusKm: 50));
+              context.read<WorkerJobsBloc>().add(const LoadAvailableJobs(
+                  latitude: 45.5017, longitude: -73.5673, radiusKm: 50));
             },
             color: AppTheme.primary,
             child: ListView.builder(
               padding: const EdgeInsets.all(AppTheme.paddingLG),
               itemCount: state.availableJobs.length,
               itemBuilder: (context, index) {
-                return _buildJobCard(context, state.availableJobs[index], isAvailable: true);
+                return _buildJobCard(context, state.availableJobs[index],
+                    isAvailable: true);
               },
             ),
           );
@@ -196,7 +201,8 @@ class _JobsListViewState extends State<JobsListView> with SingleTickerProviderSt
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    context.read<WorkerJobsBloc>().add(const LoadAvailableJobs(latitude: 45.5017, longitude: -73.5673, radiusKm: 50));
+                    context.read<WorkerJobsBloc>().add(const LoadAvailableJobs(
+                        latitude: 45.5017, longitude: -73.5673, radiusKm: 50));
                   },
                   child: const Text('Réessayer'),
                 ),
@@ -241,7 +247,8 @@ class _JobsListViewState extends State<JobsListView> with SingleTickerProviderSt
               padding: const EdgeInsets.all(AppTheme.paddingLG),
               itemCount: state.myJobs.length,
               itemBuilder: (context, index) {
-                return _buildJobCard(context, state.myJobs[index], isAvailable: false);
+                return _buildJobCard(context, state.myJobs[index],
+                    isAvailable: false);
               },
             ),
           );
@@ -283,7 +290,8 @@ class _JobsListViewState extends State<JobsListView> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildJobCard(BuildContext context, WorkerJob job, {required bool isAvailable}) {
+  Widget _buildJobCard(BuildContext context, WorkerJob job,
+      {required bool isAvailable}) {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
@@ -299,7 +307,8 @@ class _JobsListViewState extends State<JobsListView> with SingleTickerProviderSt
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
           border: isAvailable
-              ? Border.all(color: AppTheme.success.withValues(alpha: 0.3), width: 1.5)
+              ? Border.all(
+                  color: AppTheme.success.withValues(alpha: 0.3), width: 1.5)
               : null,
           boxShadow: AppTheme.shadowSM,
         ),
@@ -328,7 +337,8 @@ class _JobsListViewState extends State<JobsListView> with SingleTickerProviderSt
                     children: [
                       Text(
                         '${job.vehicle.make} ${job.vehicle.model}',
-                        style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                        style: AppTheme.labelLarge
+                            .copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -382,7 +392,8 @@ class _JobsListViewState extends State<JobsListView> with SingleTickerProviderSt
                 const Spacer(),
                 if (isAvailable)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppTheme.success,
                       borderRadius: BorderRadius.circular(AppTheme.radiusFull),

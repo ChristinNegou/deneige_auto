@@ -46,37 +46,45 @@ void main() {
 
     group('detectProvinceFromAddress', () {
       test('should detect Quebec from postal code starting with G', () {
-        final province = taxService.detectProvinceFromAddress('123 Rue Main, G1R 2H3');
+        final province =
+            taxService.detectProvinceFromAddress('123 Rue Main, G1R 2H3');
         expect(province, 'QC');
       });
 
       test('should detect Quebec from postal code starting with H', () {
-        final province = taxService.detectProvinceFromAddress('123 Rue Main, H2X 3P2');
+        final province =
+            taxService.detectProvinceFromAddress('123 Rue Main, H2X 3P2');
         expect(province, 'QC');
       });
 
       test('should detect Ontario from postal code starting with M', () {
-        final province = taxService.detectProvinceFromAddress('123 Street, M5V 2T6');
+        final province =
+            taxService.detectProvinceFromAddress('123 Street, M5V 2T6');
         expect(province, 'ON');
       });
 
-      test('should detect British Columbia from postal code starting with V', () {
-        final province = taxService.detectProvinceFromAddress('123 Street, V6B 2W2');
+      test('should detect British Columbia from postal code starting with V',
+          () {
+        final province =
+            taxService.detectProvinceFromAddress('123 Street, V6B 2W2');
         expect(province, 'BC');
       });
 
       test('should detect Alberta from postal code starting with T', () {
-        final province = taxService.detectProvinceFromAddress('123 Street, T2P 3C4');
+        final province =
+            taxService.detectProvinceFromAddress('123 Street, T2P 3C4');
         expect(province, 'AB');
       });
 
       test('should detect province from name in address', () {
-        final province = taxService.detectProvinceFromAddress('Toronto, Ontario, Canada');
+        final province =
+            taxService.detectProvinceFromAddress('Toronto, Ontario, Canada');
         expect(province, 'ON');
       });
 
       test('should detect Quebec from French name', () {
-        final province = taxService.detectProvinceFromAddress('Montréal, Québec');
+        final province =
+            taxService.detectProvinceFromAddress('Montréal, Québec');
         expect(province, 'QC');
       });
 

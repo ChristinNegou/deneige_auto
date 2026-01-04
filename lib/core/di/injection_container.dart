@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,7 +25,6 @@ import '../services/location_service.dart';
 import '../services/push_notification_service.dart';
 import '../services/socket_service.dart';
 import '../services/analytics_service.dart';
-
 
 // Auth
 import '../../features/auth/data/datasources/auth_remote_datasource.dart';
@@ -110,8 +108,6 @@ import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/reservation/presentation/bloc/new_reservation_bloc.dart';
 
-
-
 final sl = GetIt.instance; // sl = Service Locator
 
 /// Initialise toutes les dépendances de l'application
@@ -121,7 +117,8 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<LocationService>(() => LocationService());
   sl.registerLazySingleton<DioClient>(() => DioClient(secureStorage: sl()));
   sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);
-  sl.registerLazySingleton<PushNotificationService>(() => PushNotificationService());
+  sl.registerLazySingleton<PushNotificationService>(
+      () => PushNotificationService());
   sl.registerLazySingleton<SocketService>(() => SocketService());
   sl.registerLazySingleton<AnalyticsService>(() => AnalyticsService.instance);
 
@@ -136,54 +133,54 @@ Future<void> initializeDependencies() async {
 
   //! Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-        () => AuthRemoteDataSourceImpl(dio: sl(), secureStorage: sl()),
+    () => AuthRemoteDataSourceImpl(dio: sl(), secureStorage: sl()),
   );
   sl.registerLazySingleton<ReservationRemoteDataSource>(
-        () => ReservationRemoteDataSourceImpl(dio: sl()),
+    () => ReservationRemoteDataSourceImpl(dio: sl()),
   );
   sl.registerLazySingleton<WeatherRemoteDatasource>(
-        () => WeatherRemoteDatasourceImpl(dio: sl()),
+    () => WeatherRemoteDatasourceImpl(dio: sl()),
   );
   sl.registerLazySingleton<PaymentRemoteDataSource>(
-        () => PaymentRemoteDataSourceImpl(dio: sl()),
+    () => PaymentRemoteDataSourceImpl(dio: sl()),
   );
   sl.registerLazySingleton<NotificationRemoteDataSource>(
-        () => NotificationRemoteDataSourceImpl(dio: sl()),
+    () => NotificationRemoteDataSourceImpl(dio: sl()),
   );
   sl.registerLazySingleton<WorkerRemoteDataSource>(
-        () => WorkerRemoteDataSourceImpl(dio: sl()),
+    () => WorkerRemoteDataSourceImpl(dio: sl()),
   );
   sl.registerLazySingleton<AdminRemoteDataSource>(
-        () => AdminRemoteDataSourceImpl(dio: sl()),
+    () => AdminRemoteDataSourceImpl(dio: sl()),
   );
   sl.registerLazySingleton<ChatRemoteDataSource>(
-        () => ChatRemoteDataSourceImpl(dio: sl()),
+    () => ChatRemoteDataSourceImpl(dio: sl()),
   );
 
   //! Repositories
   sl.registerLazySingleton<AuthRepository>(
-        () => AuthRepositoryImpl(remoteDataSource: sl()),
+    () => AuthRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<ReservationRepository>(
-        () => ReservationRepositoryImpl(remoteDataSource: sl()),
+    () => ReservationRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<WeatherRepository>(
-        () => WeatherRepositoryImpl(remoteDatasource: sl()),
+    () => WeatherRepositoryImpl(remoteDatasource: sl()),
   );
   sl.registerLazySingleton<PaymentRepository>(
-        () => PaymentRepositoryImpl(remoteDataSource: sl()),
+    () => PaymentRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<NotificationRepository>(
-        () => NotificationRepositoryImpl(remoteDataSource: sl()),
+    () => NotificationRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<WorkerRepository>(
-        () => WorkerRepositoryImpl(remoteDataSource: sl()),
+    () => WorkerRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<AdminRepository>(
-        () => AdminRepositoryImpl(remoteDataSource: sl()),
+    () => AdminRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<ChatRepository>(
-        () => ChatRepositoryImpl(remoteDataSource: sl()),
+    () => ChatRepositoryImpl(remoteDataSource: sl()),
   );
 
   //! Use cases
@@ -204,9 +201,9 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => CancelReservationUseCase(sl()));
   sl.registerLazySingleton(() => UpdateReservationUseCase(sl()));
   sl.registerLazySingleton(() => GetWeatherUseCase(
-    repository: sl(),
-    locationService: sl(),
-  ));
+        repository: sl(),
+        locationService: sl(),
+      ));
   sl.registerLazySingleton(() => GetPaymentHistoryUseCase(sl()));
   sl.registerLazySingleton(() => GetPaymentMethodsUseCase(sl()));
   sl.registerLazySingleton(() => SavePaymentMethodUseCase(sl()));
@@ -237,102 +234,101 @@ Future<void> initializeDependencies() async {
   // AuthBloc doit être un singleton pour maintenir l'état d'authentification
   // cohérent dans toute l'application
   sl.registerLazySingleton(() => AuthBloc(
-    login: sl(),
-    register: sl(),
-    logout: sl(),
-    getCurrentUser: sl(),
-    forgotPassword: sl(),
-    resetPassword: sl(),
-    updateProfile: sl(),
-    authRepository: sl(),
-  ));
+        login: sl(),
+        register: sl(),
+        logout: sl(),
+        getCurrentUser: sl(),
+        forgotPassword: sl(),
+        resetPassword: sl(),
+        updateProfile: sl(),
+        authRepository: sl(),
+      ));
 
   sl.registerFactory(() => NewReservationBloc(
-    getVehicles: sl(),
-    getParkingSpots: sl(),
-    createReservation: sl(),
-  ));
+        getVehicles: sl(),
+        getParkingSpots: sl(),
+        createReservation: sl(),
+      ));
 
   sl.registerFactory(
-        () => VehicleBloc(
+    () => VehicleBloc(
       getVehicles: sl(),
       addVehicle: sl(),
       deleteVehicle: sl(),
     ),
   );
 
-
   sl.registerFactory(() => ReservationListBloc(
-    getReservations: sl(),
-    getReservationById: sl(),
-    cancelReservation: sl(),
-  ));
+        getReservations: sl(),
+        getReservationById: sl(),
+        cancelReservation: sl(),
+      ));
 
   sl.registerFactory(() => EditReservationBloc(
-    getVehicles: sl(),
-    getParkingSpots: sl(),
-    updateReservation: sl(),
-  ));
+        getVehicles: sl(),
+        getParkingSpots: sl(),
+        updateReservation: sl(),
+      ));
 
   sl.registerFactory(() => HomeBloc(
-    getCurrentUser: sl(),
-    getWeather: sl(),
-    getReservations: sl(),
-  ));
+        getCurrentUser: sl(),
+        getWeather: sl(),
+        getReservations: sl(),
+      ));
 
   sl.registerFactory(() => PaymentHistoryBloc(
-    getPaymentHistory: sl(),
-  ));
+        getPaymentHistory: sl(),
+      ));
 
   sl.registerFactory(() => PaymentMethodsBloc(
-    getPaymentMethods: sl(),
-    savePaymentMethod: sl(),
-    deletePaymentMethod: sl(),
-    setDefaultPaymentMethod: sl(),
-  ));
+        getPaymentMethods: sl(),
+        savePaymentMethod: sl(),
+        deletePaymentMethod: sl(),
+        setDefaultPaymentMethod: sl(),
+      ));
 
   sl.registerFactory(() => RefundBloc(
-    processRefund: sl(),
-  ));
+        processRefund: sl(),
+      ));
 
   sl.registerFactory(() => NotificationBloc(
-    getNotifications: sl(),
-    getUnreadCount: sl(),
-    markAsRead: sl(),
-    markAllAsRead: sl(),
-    deleteNotification: sl(),
-    clearAllNotifications: sl(),
-  ));
+        getNotifications: sl(),
+        getUnreadCount: sl(),
+        markAsRead: sl(),
+        markAllAsRead: sl(),
+        deleteNotification: sl(),
+        clearAllNotifications: sl(),
+      ));
 
   // Worker BLoCs
   sl.registerFactory(() => WorkerJobsBloc(
-    getAvailableJobsUseCase: sl(),
-    getMyJobsUseCase: sl(),
-    getJobHistoryUseCase: sl(),
-    acceptJobUseCase: sl(),
-    markEnRouteUseCase: sl(),
-    startJobUseCase: sl(),
-    completeJobUseCase: sl(),
-  ));
+        getAvailableJobsUseCase: sl(),
+        getMyJobsUseCase: sl(),
+        getJobHistoryUseCase: sl(),
+        acceptJobUseCase: sl(),
+        markEnRouteUseCase: sl(),
+        startJobUseCase: sl(),
+        completeJobUseCase: sl(),
+      ));
 
   sl.registerFactory(() => WorkerStatsBloc(
-    getWorkerStatsUseCase: sl(),
-    getEarningsUseCase: sl(),
-  ));
+        getWorkerStatsUseCase: sl(),
+        getEarningsUseCase: sl(),
+      ));
 
   sl.registerFactory(() => WorkerAvailabilityBloc(
-    toggleAvailabilityUseCase: sl(),
-    updateLocationUseCase: sl(),
-    repository: sl(),
-  ));
+        toggleAvailabilityUseCase: sl(),
+        updateLocationUseCase: sl(),
+        repository: sl(),
+      ));
 
   // Admin BLoC
   sl.registerFactory(() => AdminBloc(
-    repository: sl(),
-  ));
+        repository: sl(),
+      ));
 
   sl.registerFactory(() => ChatBloc(
-    repository: sl(),
-    socketService: sl(),
-  ));
+        repository: sl(),
+        socketService: sl(),
+      ));
 }

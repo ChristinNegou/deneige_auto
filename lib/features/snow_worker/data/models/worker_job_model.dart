@@ -198,9 +198,11 @@ class WorkerJobModel extends WorkerJob {
     // Parse vehicle
     VehicleInfo vehicle;
     if (json['vehicle'] != null && json['vehicle'] is Map) {
-      vehicle = VehicleInfoModel.fromJson(json['vehicle'] as Map<String, dynamic>);
+      vehicle =
+          VehicleInfoModel.fromJson(json['vehicle'] as Map<String, dynamic>);
     } else if (json['vehicleInfo'] != null) {
-      vehicle = VehicleInfoModel.fromJson(json['vehicleInfo'] as Map<String, dynamic>);
+      vehicle = VehicleInfoModel.fromJson(
+          json['vehicleInfo'] as Map<String, dynamic>);
     } else {
       vehicle = const VehicleInfoModel(id: '', make: 'Véhicule', model: '');
     }
@@ -208,7 +210,8 @@ class WorkerJobModel extends WorkerJob {
     // Parse location
     JobLocation? location;
     if (json['location'] != null && json['location'] is Map) {
-      location = JobLocationModel.fromJson(json['location'] as Map<String, dynamic>);
+      location =
+          JobLocationModel.fromJson(json['location'] as Map<String, dynamic>);
     }
 
     // Parse tip
@@ -245,9 +248,8 @@ class WorkerJobModel extends WorkerJob {
       assignedAt: json['assignedAt'] != null
           ? DateTime.parse(json['assignedAt'])
           : null,
-      startedAt: json['startedAt'] != null
-          ? DateTime.parse(json['startedAt'])
-          : null,
+      startedAt:
+          json['startedAt'] != null ? DateTime.parse(json['startedAt']) : null,
       completedAt: json['completedAt'] != null
           ? DateTime.parse(json['completedAt'])
           : null,

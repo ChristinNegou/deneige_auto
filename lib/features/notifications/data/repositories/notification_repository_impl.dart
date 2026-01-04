@@ -50,7 +50,8 @@ class NotificationRepositoryImpl implements NotificationRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteNotification(String notificationId) async {
+  Future<Either<Failure, void>> deleteNotification(
+      String notificationId) async {
     try {
       await remoteDataSource.deleteNotification(notificationId);
       return const Right(null);

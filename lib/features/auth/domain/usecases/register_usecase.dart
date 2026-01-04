@@ -13,7 +13,7 @@ class RegisterUseCase {
     required String password,
     required String firstName,
     required String lastName,
-    String? phone,  // Changé en nullable
+    String? phone, // Changé en nullable
     required UserRole role,
   }) async {
     return await repository.register(

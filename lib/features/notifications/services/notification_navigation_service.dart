@@ -11,7 +11,8 @@ import '../domain/entities/notification.dart';
 /// Service de navigation basé sur les notifications
 /// Implémente le deep-linking moderne comme les apps Uber, DoorDash, etc.
 class NotificationNavigationService {
-  static final NotificationNavigationService _instance = NotificationNavigationService._internal();
+  static final NotificationNavigationService _instance =
+      NotificationNavigationService._internal();
   factory NotificationNavigationService() => _instance;
   NotificationNavigationService._internal();
 
@@ -36,7 +37,8 @@ class NotificationNavigationService {
 
     // Vérifier si on a besoin d'un reservationId mais qu'il est null
     if (_routeRequiresReservationId(route) &&
-        (notification.reservationId == null || notification.reservationId!.isEmpty)) {
+        (notification.reservationId == null ||
+            notification.reservationId!.isEmpty)) {
       // Fallback vers la liste des réservations
       Navigator.of(context).pushNamed(AppRoutes.reservations);
       return;
@@ -47,7 +49,8 @@ class NotificationNavigationService {
 
   /// Navigation vers le chat pour les notifications de message
   void _navigateToChat(BuildContext context, AppNotification notification) {
-    if (notification.reservationId == null || notification.reservationId!.isEmpty) {
+    if (notification.reservationId == null ||
+        notification.reservationId!.isEmpty) {
       // Fallback vers les réservations si pas de reservationId
       Navigator.of(context).pushNamed(AppRoutes.reservations);
       return;
@@ -68,14 +71,15 @@ class NotificationNavigationService {
     String otherUserName = 'Utilisateur';
     if (notification.metadata != null) {
       otherUserName = notification.metadata!['senderName'] as String? ??
-                      notification.metadata!['workerName'] as String? ??
-                      'Utilisateur';
+          notification.metadata!['workerName'] as String? ??
+          'Utilisateur';
     }
 
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => BlocProvider(
-          create: (_) => sl<ChatBloc>()..add(LoadMessages(notification.reservationId!)),
+          create: (_) =>
+              sl<ChatBloc>()..add(LoadMessages(notification.reservationId!)),
           child: ChatScreen(
             reservationId: notification.reservationId!,
             otherUserName: otherUserName,

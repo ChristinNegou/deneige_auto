@@ -81,7 +81,8 @@ class _NotificationBannerState extends State<NotificationBanner>
   @override
   Widget build(BuildContext context) {
     final navigationService = NotificationNavigationService();
-    final action = navigationService.getActionForNotification(widget.notification);
+    final action =
+        navigationService.getActionForNotification(widget.notification);
 
     return SlideTransition(
       position: _slideAnimation,

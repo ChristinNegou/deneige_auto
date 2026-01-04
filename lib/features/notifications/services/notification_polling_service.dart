@@ -7,7 +7,8 @@ import '../domain/usecases/get_unread_count_usecase.dart';
 /// Service de polling temps réel pour les notifications
 /// Inspiré des patterns Uber, DoorDash pour les mises à jour en temps réel
 class NotificationPollingService {
-  static final NotificationPollingService _instance = NotificationPollingService._internal();
+  static final NotificationPollingService _instance =
+      NotificationPollingService._internal();
   factory NotificationPollingService() => _instance;
   NotificationPollingService._internal();
 
@@ -35,9 +36,11 @@ class NotificationPollingService {
       StreamController<AppNotification>.broadcast();
 
   // Streams publics
-  Stream<List<AppNotification>> get notificationsStream => _notificationsController.stream;
+  Stream<List<AppNotification>> get notificationsStream =>
+      _notificationsController.stream;
   Stream<int> get unreadCountStream => _unreadCountController.stream;
-  Stream<AppNotification> get newNotificationStream => _newNotificationController.stream;
+  Stream<AppNotification> get newNotificationStream =>
+      _newNotificationController.stream;
 
   // Dernier état connu
   List<AppNotification> _lastNotifications = [];
@@ -106,7 +109,8 @@ class NotificationPollingService {
       }
     });
 
-    debugPrint('[NotificationPolling] Entered urgent mode for ${duration.inMinutes} minutes');
+    debugPrint(
+        '[NotificationPolling] Entered urgent mode for ${duration.inMinutes} minutes');
   }
 
   /// Passe en mode background (polling moins fréquent)
@@ -193,7 +197,8 @@ class NotificationPollingService {
       if (!existingIds.contains(notification.id)) {
         // Nouvelle notification détectée!
         _newNotificationController.add(notification);
-        debugPrint('[NotificationPolling] New notification: ${notification.title}');
+        debugPrint(
+            '[NotificationPolling] New notification: ${notification.title}');
 
         // Si notification urgente, activer le mode urgent
         if (notification.isUrgent) {
@@ -219,7 +224,8 @@ class NotificationPollingService {
   // Getters
   bool get isPolling => _isPolling;
   bool get isInActiveJobMode => _isInActiveJob;
-  List<AppNotification> get lastNotifications => List.unmodifiable(_lastNotifications);
+  List<AppNotification> get lastNotifications =>
+      List.unmodifiable(_lastNotifications);
   int get lastUnreadCount => _lastUnreadCount;
 }
 
@@ -236,11 +242,13 @@ class NotificationPollingHelper {
   }) {
     final service = NotificationPollingService();
 
-    _notificationsSub = service.notificationsStream.listen(onNotificationsUpdated);
+    _notificationsSub =
+        service.notificationsStream.listen(onNotificationsUpdated);
     _unreadCountSub = service.unreadCountStream.listen(onUnreadCountUpdated);
 
     if (onNewNotification != null) {
-      _newNotificationSub = service.newNotificationStream.listen(onNewNotification);
+      _newNotificationSub =
+          service.newNotificationStream.listen(onNewNotification);
     }
   }
 

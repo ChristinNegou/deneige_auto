@@ -26,32 +26,41 @@ class NotificationPreferencesService {
 
   /// Son activé
   bool get isSoundEnabled => _prefs.getBool(_keySoundEnabled) ?? true;
-  Future<void> setSoundEnabled(bool value) => _prefs.setBool(_keySoundEnabled, value);
+  Future<void> setSoundEnabled(bool value) =>
+      _prefs.setBool(_keySoundEnabled, value);
 
   /// Vibration activée
   bool get isVibrationEnabled => _prefs.getBool(_keyVibrationEnabled) ?? true;
-  Future<void> setVibrationEnabled(bool value) => _prefs.setBool(_keyVibrationEnabled, value);
+  Future<void> setVibrationEnabled(bool value) =>
+      _prefs.setBool(_keyVibrationEnabled, value);
 
   /// Badge sur l'icône de l'app
   bool get isBadgeEnabled => _prefs.getBool(_keyBadgeEnabled) ?? true;
-  Future<void> setBadgeEnabled(bool value) => _prefs.setBool(_keyBadgeEnabled, value);
+  Future<void> setBadgeEnabled(bool value) =>
+      _prefs.setBool(_keyBadgeEnabled, value);
 
   /// Aperçu du contenu dans les notifications
   bool get isPreviewEnabled => _prefs.getBool(_keyPreviewEnabled) ?? true;
-  Future<void> setPreviewEnabled(bool value) => _prefs.setBool(_keyPreviewEnabled, value);
+  Future<void> setPreviewEnabled(bool value) =>
+      _prefs.setBool(_keyPreviewEnabled, value);
 
   // ===== Mode silencieux (Quiet Hours) =====
 
-  bool get isQuietHoursEnabled => _prefs.getBool(_keyQuietHoursEnabled) ?? false;
-  Future<void> setQuietHoursEnabled(bool value) => _prefs.setBool(_keyQuietHoursEnabled, value);
+  bool get isQuietHoursEnabled =>
+      _prefs.getBool(_keyQuietHoursEnabled) ?? false;
+  Future<void> setQuietHoursEnabled(bool value) =>
+      _prefs.setBool(_keyQuietHoursEnabled, value);
 
   /// Heure de début du mode silencieux (format: "HH:mm")
-  String get quietHoursStart => _prefs.getString(_keyQuietHoursStart) ?? '22:00';
-  Future<void> setQuietHoursStart(String time) => _prefs.setString(_keyQuietHoursStart, time);
+  String get quietHoursStart =>
+      _prefs.getString(_keyQuietHoursStart) ?? '22:00';
+  Future<void> setQuietHoursStart(String time) =>
+      _prefs.setString(_keyQuietHoursStart, time);
 
   /// Heure de fin du mode silencieux (format: "HH:mm")
   String get quietHoursEnd => _prefs.getString(_keyQuietHoursEnd) ?? '07:00';
-  Future<void> setQuietHoursEnd(String time) => _prefs.setString(_keyQuietHoursEnd, time);
+  Future<void> setQuietHoursEnd(String time) =>
+      _prefs.setString(_keyQuietHoursEnd, time);
 
   /// Vérifie si on est actuellement en mode silencieux
   bool get isCurrentlyQuietHours {
@@ -66,7 +75,8 @@ class NotificationPreferencesService {
     final endHour = int.parse(endParts[0]);
     final endMinute = int.parse(endParts[1]);
 
-    final startTime = DateTime(now.year, now.month, now.day, startHour, startMinute);
+    final startTime =
+        DateTime(now.year, now.month, now.day, startHour, startMinute);
     var endTime = DateTime(now.year, now.month, now.day, endHour, endMinute);
 
     // Si l'heure de fin est avant l'heure de début, c'est le lendemain
@@ -106,11 +116,13 @@ class NotificationPreferencesService {
   }
 
   /// Définit une priorité personnalisée pour un type
-  Future<void> setTypeCustomPriority(NotificationType type, NotificationPriority? priority) {
+  Future<void> setTypeCustomPriority(
+      NotificationType type, NotificationPriority? priority) {
     if (priority == null) {
       return _prefs.remove('${_keyPrefix}priority_${type.name}');
     }
-    return _prefs.setString('${_keyPrefix}priority_${type.name}', priority.name);
+    return _prefs.setString(
+        '${_keyPrefix}priority_${type.name}', priority.name);
   }
 
   // ===== Catégories de notifications =====
@@ -175,7 +187,8 @@ class NotificationPreferencesService {
     if (!isTypeEnabled(notification.type)) return false;
 
     // En mode silencieux? (sauf urgentes)
-    if (isCurrentlyQuietHours && notification.priority != NotificationPriority.urgent) {
+    if (isCurrentlyQuietHours &&
+        notification.priority != NotificationPriority.urgent) {
       return false;
     }
 
@@ -186,7 +199,8 @@ class NotificationPreferencesService {
   bool shouldPlaySound(AppNotification notification) {
     if (!shouldShowNotification(notification)) return false;
     if (!isSoundEnabled) return false;
-    if (isCurrentlyQuietHours && notification.priority != NotificationPriority.urgent) {
+    if (isCurrentlyQuietHours &&
+        notification.priority != NotificationPriority.urgent) {
       return false;
     }
     return true;
@@ -196,7 +210,8 @@ class NotificationPreferencesService {
   bool shouldVibrate(AppNotification notification) {
     if (!shouldShowNotification(notification)) return false;
     if (!isVibrationEnabled) return false;
-    if (isCurrentlyQuietHours && notification.priority != NotificationPriority.urgent) {
+    if (isCurrentlyQuietHours &&
+        notification.priority != NotificationPriority.urgent) {
       return false;
     }
     return true;

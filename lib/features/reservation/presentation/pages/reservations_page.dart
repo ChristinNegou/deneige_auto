@@ -1,4 +1,3 @@
-
 import 'package:deneige_auto/features/reservation/domain/entities/reservation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,8 +5,8 @@ import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../../reservation/presentation/bloc/reservation_list_bloc.dart';
-
 
 class ReservationsPage extends StatelessWidget {
   const ReservationsPage({super.key});
@@ -15,7 +14,8 @@ class ReservationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<ReservationListBloc>()..add(const LoadReservations()),
+      create: (context) =>
+          sl<ReservationListBloc>()..add(const LoadReservations()),
       child: const ReservationsView(),
     );
   }
@@ -73,31 +73,13 @@ class ReservationsView extends StatelessWidget {
           }
 
           if (state.reservations.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.event_busy,
-                    size: 80,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Aucune réservation',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Commencez par créer votre première réservation',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-
-                ],
-              ),
+            return EmptyStateWidget(
+              illustrationType: IllustrationType.emptyReservations,
+              title: 'Aucune réservation',
+              subtitle: 'Commencez par créer votre première réservation',
+              buttonText: 'Nouvelle réservation',
+              onButtonPressed: () =>
+                  Navigator.pushNamed(context, AppRoutes.newReservation),
             );
           }
 
@@ -114,7 +96,8 @@ class ReservationsView extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: _getStatusColor(reservation.status).withOpacity(0.2),
+                      backgroundColor:
+                          _getStatusColor(reservation.status).withOpacity(0.2),
                       child: Text(
                         reservation.status.icon,
                         style: const TextStyle(fontSize: 20),
@@ -126,7 +109,8 @@ class ReservationsView extends StatelessWidget {
                       children: [
                         Text('Place ${reservation.parkingSpot.displayName}'),
                         Text(
-                          DateFormat('d MMM yyyy, HH:mm').format(reservation.departureTime),
+                          DateFormat('d MMM yyyy, HH:mm')
+                              .format(reservation.departureTime),
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],
@@ -144,7 +128,8 @@ class ReservationsView extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: _getStatusColor(reservation.status).withOpacity(0.2),
+                            color: _getStatusColor(reservation.status)
+                                .withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(

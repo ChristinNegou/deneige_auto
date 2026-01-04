@@ -33,7 +33,8 @@ void main() {
       return CreateReservationParams(
         vehicleId: 'vehicle-123',
         parkingSpotId: 'spot-123',
-        departureTime: departureTime ?? DateTime.now().add(const Duration(hours: 2)),
+        departureTime:
+            departureTime ?? DateTime.now().add(const Duration(hours: 2)),
         deadlineTime: DateTime.now().add(const Duration(hours: 1, minutes: 30)),
         serviceOptions: [ServiceOption.windowScraping],
         snowDepthCm: 10,
@@ -49,18 +50,18 @@ void main() {
       // Arrange
       final params = createValidParams();
       when(() => mockRepository.createReservation(
-        vehicleId: any(named: 'vehicleId'),
-        parkingSpotId: any(named: 'parkingSpotId'),
-        departureTime: any(named: 'departureTime'),
-        deadlineTime: any(named: 'deadlineTime'),
-        serviceOptions: any(named: 'serviceOptions'),
-        snowDepthCm: any(named: 'snowDepthCm'),
-        totalPrice: any(named: 'totalPrice'),
-        paymentMethod: any(named: 'paymentMethod'),
-        latitude: any(named: 'latitude'),
-        longitude: any(named: 'longitude'),
-        address: any(named: 'address'),
-      )).thenAnswer((_) async => Right(tReservation));
+            vehicleId: any(named: 'vehicleId'),
+            parkingSpotId: any(named: 'parkingSpotId'),
+            departureTime: any(named: 'departureTime'),
+            deadlineTime: any(named: 'deadlineTime'),
+            serviceOptions: any(named: 'serviceOptions'),
+            snowDepthCm: any(named: 'snowDepthCm'),
+            totalPrice: any(named: 'totalPrice'),
+            paymentMethod: any(named: 'paymentMethod'),
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+            address: any(named: 'address'),
+          )).thenAnswer((_) async => Right(tReservation));
 
       // Act
       final result = await usecase(params);
@@ -68,24 +69,26 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       verify(() => mockRepository.createReservation(
-        vehicleId: 'vehicle-123',
-        parkingSpotId: 'spot-123',
-        departureTime: any(named: 'departureTime'),
-        deadlineTime: any(named: 'deadlineTime'),
-        serviceOptions: ['windowScraping'],
-        snowDepthCm: 10,
-        totalPrice: 25.0,
-        paymentMethod: 'pm_card_visa',
-        latitude: 46.3432,
-        longitude: -72.5476,
-        address: 'Trois-Rivieres, QC',
-      )).called(1);
+            vehicleId: 'vehicle-123',
+            parkingSpotId: 'spot-123',
+            departureTime: any(named: 'departureTime'),
+            deadlineTime: any(named: 'deadlineTime'),
+            serviceOptions: ['windowScraping'],
+            snowDepthCm: 10,
+            totalPrice: 25.0,
+            paymentMethod: 'pm_card_visa',
+            latitude: 46.3432,
+            longitude: -72.5476,
+            address: 'Trois-Rivieres, QC',
+          )).called(1);
     });
 
-    test('should return ValidationFailure when departure time is too soon', () async {
+    test('should return ValidationFailure when departure time is too soon',
+        () async {
       // Arrange
       final params = createValidParams(
-        departureTime: DateTime.now().add(const Duration(minutes: 30)), // Too soon
+        departureTime:
+            DateTime.now().add(const Duration(minutes: 30)), // Too soon
       );
 
       // Act
@@ -96,26 +99,28 @@ void main() {
       result.fold(
         (failure) {
           expect(failure, isA<ValidationFailure>());
-          expect(failure.message, contains('${AppConfig.minReservationTimeMinutes}'));
+          expect(failure.message,
+              contains('${AppConfig.minReservationTimeMinutes}'));
         },
         (_) => fail('Should be Left'),
       );
       verifyNever(() => mockRepository.createReservation(
-        vehicleId: any(named: 'vehicleId'),
-        parkingSpotId: any(named: 'parkingSpotId'),
-        departureTime: any(named: 'departureTime'),
-        deadlineTime: any(named: 'deadlineTime'),
-        serviceOptions: any(named: 'serviceOptions'),
-        snowDepthCm: any(named: 'snowDepthCm'),
-        totalPrice: any(named: 'totalPrice'),
-        paymentMethod: any(named: 'paymentMethod'),
-        latitude: any(named: 'latitude'),
-        longitude: any(named: 'longitude'),
-        address: any(named: 'address'),
-      ));
+            vehicleId: any(named: 'vehicleId'),
+            parkingSpotId: any(named: 'parkingSpotId'),
+            departureTime: any(named: 'departureTime'),
+            deadlineTime: any(named: 'deadlineTime'),
+            serviceOptions: any(named: 'serviceOptions'),
+            snowDepthCm: any(named: 'snowDepthCm'),
+            totalPrice: any(named: 'totalPrice'),
+            paymentMethod: any(named: 'paymentMethod'),
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+            address: any(named: 'address'),
+          ));
     });
 
-    test('should return ValidationFailure when price is zero or negative', () async {
+    test('should return ValidationFailure when price is zero or negative',
+        () async {
       // Arrange
       final params = createValidParams(totalPrice: 0);
 
@@ -137,18 +142,18 @@ void main() {
       // Arrange
       final params = createValidParams();
       when(() => mockRepository.createReservation(
-        vehicleId: any(named: 'vehicleId'),
-        parkingSpotId: any(named: 'parkingSpotId'),
-        departureTime: any(named: 'departureTime'),
-        deadlineTime: any(named: 'deadlineTime'),
-        serviceOptions: any(named: 'serviceOptions'),
-        snowDepthCm: any(named: 'snowDepthCm'),
-        totalPrice: any(named: 'totalPrice'),
-        paymentMethod: any(named: 'paymentMethod'),
-        latitude: any(named: 'latitude'),
-        longitude: any(named: 'longitude'),
-        address: any(named: 'address'),
-      )).thenAnswer((_) async => const Left(serverFailure));
+            vehicleId: any(named: 'vehicleId'),
+            parkingSpotId: any(named: 'parkingSpotId'),
+            departureTime: any(named: 'departureTime'),
+            deadlineTime: any(named: 'deadlineTime'),
+            serviceOptions: any(named: 'serviceOptions'),
+            snowDepthCm: any(named: 'snowDepthCm'),
+            totalPrice: any(named: 'totalPrice'),
+            paymentMethod: any(named: 'paymentMethod'),
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+            address: any(named: 'address'),
+          )).thenAnswer((_) async => const Left(serverFailure));
 
       // Act
       final result = await usecase(params);

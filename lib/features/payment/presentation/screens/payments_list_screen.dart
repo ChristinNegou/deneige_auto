@@ -32,7 +32,8 @@ class PaymentsListScreenContent extends StatefulWidget {
   const PaymentsListScreenContent({super.key});
 
   @override
-  State<PaymentsListScreenContent> createState() => _PaymentsListScreenContentState();
+  State<PaymentsListScreenContent> createState() =>
+      _PaymentsListScreenContentState();
 }
 
 class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
@@ -175,7 +176,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
         if (state.errorMessage != null && state.payments.isEmpty) {
           return _buildErrorState(
             state.errorMessage!,
-            () => context.read<PaymentHistoryBloc>().add(RefreshPaymentHistory()),
+            () =>
+                context.read<PaymentHistoryBloc>().add(RefreshPaymentHistory()),
           );
         }
 
@@ -355,9 +357,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
               _buildEmptyMethodsMessage()
             else
               ...state.methods.map((method) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _buildMethodCard(method),
-              )),
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _buildMethodCard(method),
+                  )),
             const SizedBox(height: 8),
             _buildAddCardButton(),
           ],
@@ -376,7 +378,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       ),
       child: Column(
         children: [
-          Icon(Icons.credit_card_off_outlined, size: 48, color: Colors.grey[400]),
+          Icon(Icons.credit_card_off_outlined,
+              size: 48, color: Colors.grey[400]),
           const SizedBox(height: 12),
           const Text(
             'Aucune carte enregistrée',
@@ -400,7 +403,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: method.isDefault ? Colors.green.withValues(alpha: 0.5) : Colors.grey[200]!,
+          color: method.isDefault
+              ? Colors.green.withValues(alpha: 0.5)
+              : Colors.grey[200]!,
           width: method.isDefault ? 1.5 : 1,
         ),
       ),
@@ -416,7 +421,11 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             ),
             child: Center(
               child: Text(
-                method.brand.displayName.substring(0, method.brand.displayName.length > 4 ? 4 : method.brand.displayName.length),
+                method.brand.displayName.substring(
+                    0,
+                    method.brand.displayName.length > 4
+                        ? 4
+                        : method.brand.displayName.length),
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
@@ -444,7 +453,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                     if (method.isDefault) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.green.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
@@ -476,12 +486,13 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
           // Menu actions
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert, color: Colors.grey[400], size: 20),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             onSelected: (value) {
               if (value == 'default') {
                 context.read<PaymentMethodsBloc>().add(
-                  SetDefaultPaymentMethod(method.stripePaymentMethodId!),
-                );
+                      SetDefaultPaymentMethod(method.stripePaymentMethodId!),
+                    );
               } else if (value == 'delete') {
                 _showDeleteConfirmation(context, method);
               }
@@ -509,7 +520,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text('Supprimer la carte'),
-        content: Text('Voulez-vous vraiment supprimer la carte ${method.displayNumber} ?'),
+        content: Text(
+            'Voulez-vous vraiment supprimer la carte ${method.displayNumber} ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -519,8 +531,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<PaymentMethodsBloc>().add(
-                DeletePaymentMethod(method.stripePaymentMethodId!),
-              );
+                    DeletePaymentMethod(method.stripePaymentMethodId!),
+                  );
             },
             child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
           ),
@@ -532,7 +544,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   Widget _buildAddCardButton() {
     return GestureDetector(
       onTap: () async {
-        final result = await Navigator.pushNamed(context, AppRoutes.addPaymentMethod);
+        final result =
+            await Navigator.pushNamed(context, AppRoutes.addPaymentMethod);
         if (result == true && mounted) {
           context.read<PaymentMethodsBloc>().add(LoadPaymentMethods());
         }

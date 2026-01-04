@@ -39,7 +39,8 @@ class RegisterRequested extends AuthEvent {
   });
 
   @override
-  List<Object?> get props => [email, password, firstName, lastName, phone, role];
+  List<Object?> get props =>
+      [email, password, firstName, lastName, phone, role];
 }
 
 class LogoutRequested extends AuthEvent {}
@@ -66,7 +67,6 @@ class ResetPasswordEvent extends AuthEvent {
 
   @override
   List<Object?> get props => [token, newPassword];
-
 }
 
 class UpdateProfile extends AuthEvent {
@@ -105,7 +105,8 @@ class SendPhoneVerificationCode extends AuthEvent {
   });
 
   @override
-  List<Object?> get props => [phoneNumber, email, password, firstName, lastName, role];
+  List<Object?> get props =>
+      [phoneNumber, email, password, firstName, lastName, role];
 }
 
 /// Vérifie le code SMS entré par l'utilisateur
@@ -147,5 +148,6 @@ class ForcedLogout extends AuthEvent {
   });
 
   @override
-  List<Object?> get props => [reason, suspensionReason, suspendedUntil, suspendedUntilDisplay];
+  List<Object?> get props =>
+      [reason, suspensionReason, suspendedUntil, suspendedUntilDisplay];
 }

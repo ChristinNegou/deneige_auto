@@ -1,4 +1,3 @@
-
 import 'package:deneige_auto/features/reservation/data/models/vehicule_model.dart';
 
 import '../../domain/entities/reservation.dart';
@@ -54,12 +53,15 @@ class ReservationModel extends Reservation {
           : null,
       status: _parseReservationStatus(json['status'] as String),
       serviceOptions: (json['serviceOptions'] as List<dynamic>?)
-          ?.map((e) => _parseServiceOption(e as String))
-          .toList() ?? [],
+              ?.map((e) => _parseServiceOption(e as String))
+              .toList() ??
+          [],
       basePrice: (json['basePrice'] as num).toDouble(),
       totalPrice: (json['totalPrice'] as num).toDouble(),
-      beforePhotoUrl: _parsePhotoUrl(json['photos'], 'before') ?? json['beforePhotoUrl'] as String?,
-      afterPhotoUrl: _parsePhotoUrl(json['photos'], 'after') ?? json['afterPhotoUrl'] as String?,
+      beforePhotoUrl: _parsePhotoUrl(json['photos'], 'before') ??
+          json['beforePhotoUrl'] as String?,
+      afterPhotoUrl: _parsePhotoUrl(json['photos'], 'after') ??
+          json['afterPhotoUrl'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
@@ -73,7 +75,8 @@ class ReservationModel extends Reservation {
           ? DateTime.parse(json['completedAt'] as String)
           : null,
       workerNotes: json['workerNotes'] as String?,
-      rating: json['rating'] != null ? (json['rating'] as num).toDouble() : null,
+      rating:
+          json['rating'] != null ? (json['rating'] as num).toDouble() : null,
       review: json['review'] as String?,
       tip: _parseTip(json['tip']),
       isPriority: json['isPriority'] as bool? ?? false,
@@ -157,7 +160,6 @@ class ReservationModel extends Reservation {
     return null;
   }
 
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -168,7 +170,8 @@ class ReservationModel extends Reservation {
       'departureTime': departureTime.toIso8601String(),
       'deadlineTime': deadlineTime?.toIso8601String(),
       'status': _reservationStatusToString(status),
-      'serviceOptions': serviceOptions.map((e) => _serviceOptionToString(e)).toList(),
+      'serviceOptions':
+          serviceOptions.map((e) => _serviceOptionToString(e)).toList(),
       'basePrice': basePrice,
       'totalPrice': totalPrice,
       'beforePhotoUrl': beforePhotoUrl,
@@ -369,18 +372,21 @@ class ReservationModel extends Reservation {
     }
 
     // Cas 4: Aucune donnée de véhicule - erreur
-    throw Exception('Vehicle data is required but was null (neither vehicle nor vehicleId found)');
+    throw Exception(
+        'Vehicle data is required but was null (neither vehicle nor vehicleId found)');
   }
 
   static ParkingSpotModel _parseParkingSpot(Map<String, dynamic> json) {
     // Cas 1: L'objet parkingSpot complet est fourni dans 'parkingSpot'
     if (json['parkingSpot'] != null && json['parkingSpot'] is Map) {
-      return ParkingSpotModel.fromJson(json['parkingSpot'] as Map<String, dynamic>);
+      return ParkingSpotModel.fromJson(
+          json['parkingSpot'] as Map<String, dynamic>);
     }
 
     // Cas 2: L'objet parkingSpot complet est fourni dans 'parkingSpotId' (incohérence backend)
     if (json['parkingSpotId'] != null && json['parkingSpotId'] is Map) {
-      return ParkingSpotModel.fromJson(json['parkingSpotId'] as Map<String, dynamic>);
+      return ParkingSpotModel.fromJson(
+          json['parkingSpotId'] as Map<String, dynamic>);
     }
 
     // Cas 3: Seulement l'ID de la place est fourni (String)
@@ -398,7 +404,8 @@ class ReservationModel extends Reservation {
 
     // Cas 3: Données manuelles (parkingSpotNumber ou customLocation)
     if (json['customLocation'] != null || json['parkingSpotNumber'] != null) {
-      final spotNumber = json['parkingSpotNumber'] ?? json['customLocation'] ?? 'N/A';
+      final spotNumber =
+          json['parkingSpotNumber'] ?? json['customLocation'] ?? 'N/A';
       // ✅ Inclure le numéro dans l'ID pour préserver l'information lors de l'édition
       final spotId = json['customLocation'] != null
           ? 'custom-$spotNumber'

@@ -228,14 +228,16 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
           foregroundColor: Colors.white,
           disabledBackgroundColor: Colors.grey[300],
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 0,
         ),
         child: _isLoading
             ? const SizedBox(
                 height: 20,
                 width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.white),
               )
             : const Text(
                 'Ajouter la carte',
@@ -267,7 +269,8 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       ),
       child: Text(
         text,
-        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+        style: TextStyle(
+            fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[600]),
       ),
     );
   }
@@ -296,11 +299,11 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
 
       if (mounted) {
         context.read<PaymentMethodsBloc>().add(
-          SavePaymentMethod(
-            paymentMethod.id,
-            setAsDefault: _setAsDefault,
-          ),
-        );
+              SavePaymentMethod(
+                paymentMethod.id,
+                setAsDefault: _setAsDefault,
+              ),
+            );
       }
     } catch (e) {
       setState(() => _isLoading = false);

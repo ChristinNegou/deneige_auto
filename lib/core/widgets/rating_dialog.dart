@@ -128,7 +128,9 @@ class _RatingDialogState extends State<RatingDialog>
     setState(() => _isSubmitting = true);
     widget.onSubmit(
       _selectedRating,
-      _reviewController.text.trim().isEmpty ? null : _reviewController.text.trim(),
+      _reviewController.text.trim().isEmpty
+          ? null
+          : _reviewController.text.trim(),
     );
   }
 
