@@ -2,9 +2,8 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:deneige_auto/features/reservation/presentation/bloc/reservation_list_bloc.dart';
-import 'package:deneige_auto/features/reservation/domain/entities/reservation.dart';
 import 'package:deneige_auto/features/reservation/data/datasources/reservation_remote_datasource.dart';
+import 'package:deneige_auto/features/reservation/presentation/bloc/reservation_list_bloc.dart';
 
 import '../../../../mocks/mock_usecases.dart';
 import '../../../../fixtures/reservation_fixtures.dart';

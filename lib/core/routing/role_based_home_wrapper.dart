@@ -51,17 +51,6 @@ class RoleBasedHomeWrapper extends StatelessWidget {
                 create: (context) => sl<AdminBloc>()..add(LoadDashboardStats()),
                 child: const AdminDashboardPage(),
               );
-
-            default:
-              return MultiBlocProvider(
-                key: uniqueKey,
-                providers: [
-                  BlocProvider(create: (context) => sl<HomeBloc>()),
-                  BlocProvider(create: (context) => sl<ReservationListBloc>()),
-                  BlocProvider(create: (context) => sl<NotificationBloc>()),
-                ],
-                child: const ClientHomeScreen(),
-              );
           }
         }
 
