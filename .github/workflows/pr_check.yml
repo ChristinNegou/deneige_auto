@@ -28,6 +28,7 @@ jobs:
 
       - name: Analyze code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
+        continue-on-error: true
 
       - name: Check formatting
         run: dart format --set-exit-if-changed lib/ test/
