@@ -303,10 +303,6 @@ class EditReservationBloc
     // Calculer la deadline (30 minutes avant le départ)
     final deadline = event.departureTime.subtract(const Duration(minutes: 30));
 
-    // Vérifier si c'est urgent (moins de 45 minutes)
-    final now = DateTime.now();
-    final minutesUntilDeparture = event.departureTime.difference(now).inMinutes;
-
     emit(state.copyWith(
       departureTime: event.departureTime,
       deadlineTime: deadline,

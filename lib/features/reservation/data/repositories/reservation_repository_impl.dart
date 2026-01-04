@@ -6,7 +6,6 @@ import '../../domain/entities/reservation.dart';
 import '../../domain/entities/vehicle.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../datasources/reservation_remote_datasource.dart';
-import '../models/reservation_model.dart';
 
 export '../datasources/reservation_remote_datasource.dart'
     show CancellationResult, CancellationPolicy, CancellationPolicyItem;
@@ -92,7 +91,7 @@ class ReservationRepositoryImpl implements ReservationRepository {
     try {
       final data = {
         'vehicleId': vehicleId,
-        if (parkingSpotId != null) 'parkingSpotId': parkingSpotId,
+        'parkingSpotId': parkingSpotId,
         if (parkingSpotNumber != null) 'parkingSpotNumber': parkingSpotNumber,
         if (customLocation != null) 'customLocation': customLocation,
         'departureTime': departureTime.toIso8601String(),
@@ -309,37 +308,5 @@ class ReservationRepositoryImpl implements ReservationRepository {
     } catch (e) {
       return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
     }
-  }
-
-  /// Convertit une entité Reservation en Map pour l'API
-  Map<String, dynamic> _reservationToMap(Reservation reservation) {
-    // Si c'est déjà un ReservationModel, utiliser sa méthode toJson
-    if (reservation is ReservationModel) {
-      return reservation.toJson();
-    }
-
-    // Sinon, créer manuellement le Map
-    return {
-      'userId': reservation.userId,
-      'workerId': reservation.workerId,
-      'parkingSpot': {
-        'id': reservation.parkingSpot.id,
-        'spotNumber': reservation.parkingSpot.spotNumber,
-        'level': reservation.parkingSpot.level.name,
-      },
-      'vehicle': {
-        'id': reservation.vehicle.id,
-        'make': reservation.vehicle.make,
-        'model': reservation.vehicle.model,
-        'color': reservation.vehicle.color,
-      },
-      'departureTime': reservation.departureTime.toIso8601String(),
-      'deadlineTime': reservation.deadlineTime?.toIso8601String(),
-      'serviceOptions': reservation.serviceOptions.map((e) => e.name).toList(),
-      'basePrice': reservation.basePrice,
-      'totalPrice': reservation.totalPrice,
-      'isPriority': reservation.isPriority,
-      'snowDepthCm': reservation.snowDepthCm,
-    };
   }
 }
