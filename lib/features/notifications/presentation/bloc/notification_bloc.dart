@@ -236,7 +236,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     result.fold(
       (failure) => emit(state.copyWith(
-          errorMessage: failure.message ?? 'Erreur lors de la mise à jour')),
+          errorMessage: failure.message)),
       (_) {
         // Update local state
         final updatedNotifications = state.notifications.map((notification) {
@@ -284,7 +284,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     result.fold(
       (failure) => emit(state.copyWith(
-          errorMessage: failure.message ?? 'Erreur lors de la mise à jour')),
+          errorMessage: failure.message)),
       (_) {
         // Mark all notifications as read locally
         final updatedNotifications = state.notifications
@@ -319,7 +319,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     result.fold(
       (failure) => emit(state.copyWith(
-          errorMessage: failure.message ?? 'Erreur lors de la suppression')),
+          errorMessage: failure.message)),
       (_) {
         // Retirer la notification localement
         final updatedNotifications = state.notifications
@@ -351,7 +351,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     result.fold(
       (failure) => emit(state.copyWith(
-          errorMessage: failure.message ?? 'Erreur lors de la suppression')),
+          errorMessage: failure.message)),
       (_) {
         emit(state.copyWith(
           notifications: [],

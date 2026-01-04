@@ -7,7 +7,7 @@ import '../../domain/usecases/get_my_jobs_usecase.dart';
 import '../../domain/usecases/get_job_history_usecase.dart';
 import '../../domain/usecases/job_actions_usecase.dart';
 import '../../data/datasources/worker_remote_datasource.dart'
-    show WorkerCancellationResult, WorkerCancellationConsequence;
+    show WorkerCancellationResult;
 
 // Events
 abstract class WorkerJobsEvent extends Equatable {

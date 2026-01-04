@@ -9,7 +9,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../bloc/reservation_list_bloc.dart';
@@ -1810,24 +1809,6 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   Future<void> _callWorker(Reservation reservation) async {
     if (reservation.workerPhone != null) {
       final uri = Uri.parse('tel:${reservation.workerPhone}');
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-      }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Numéro de téléphone non disponible'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _messageWorker(Reservation reservation) async {
-    if (reservation.workerPhone != null) {
-      final uri = Uri.parse('sms:${reservation.workerPhone}');
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       }
