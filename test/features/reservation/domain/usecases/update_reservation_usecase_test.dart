@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:deneige_auto/features/reservation/domain/usecases/update_reservation_usecase.dart';
-import 'package:deneige_auto/features/reservation/domain/entities/reservation.dart';
 import 'package:deneige_auto/core/config/app_config.dart';
 import 'package:deneige_auto/core/errors/failures.dart';
 
