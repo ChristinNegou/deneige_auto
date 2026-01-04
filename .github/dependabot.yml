@@ -1,0 +1,42 @@
+version: 2
+updates:
+  # Maintain dependencies for pub (Flutter/Dart)
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Toronto"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "flutter"
+    commit-message:
+      prefix: "deps(flutter):"
+    groups:
+      flutter-dependencies:
+        patterns:
+          - "flutter*"
+          - "dart*"
+      firebase:
+        patterns:
+          - "firebase*"
+          - "cloud_*"
+      ui:
+        patterns:
+          - "*_bloc"
+          - "equatable"
+          - "dartz"
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci:"

@@ -3,6 +3,12 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Cache & Offline
+import '../cache/reservation_cache.dart';
+import '../cache/sync_queue.dart';
+import '../cache/sync_service.dart';
+import '../cache/network_status.dart';
+
 // Config
 import '../../features/auth/domain/usecases/reset_password_usecase.dart';
 import '../../features/auth/domain/usecases/update_profile_usecase.dart';
@@ -121,6 +127,12 @@ Future<void> initializeDependencies() async {
 
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+
+  //! Cache & Offline
+  sl.registerLazySingleton<NetworkStatus>(() => NetworkStatus());
+  sl.registerLazySingleton<ReservationCache>(() => ReservationCache());
+  sl.registerLazySingleton<SyncQueue>(() => SyncQueue());
+  sl.registerLazySingleton<SyncService>(() => SyncService());
 
   //! Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
