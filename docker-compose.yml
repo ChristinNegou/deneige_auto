@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # Service principal Flutter
+  flutter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /app
+    environment:
+      - FLUTTER_HOME=/sdks/flutter
+    tty: true
+
+  # Exécuter tous les checks CI (analyse + format + tests)
+  ci:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /app
+    command: >
+      bash -c "
+        echo '=== Flutter CI Pipeline ===' &&
+        echo '' &&
+        echo '1. Getting dependencies...' &&
+        flutter pub get &&
+        echo '' &&
+        echo '2. Analyzing code...' &&
+        flutter analyze --no-fatal-infos --no-fatal-warnings &&
+        echo '' &&
+        echo '3. Checking formatting...' &&
+        dart format --set-exit-if-changed lib/ test/ &&
+        echo '' &&
+        echo '4. Running tests...' &&
+        flutter test &&
+        echo '' &&
+        echo '=== CI Pipeline PASSED ==='
+      "
+
+  # Analyse du code uniquement
+  analyze:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /app
+    command: bash -c "flutter pub get && flutter analyze --no-fatal-infos --no-fatal-warnings"
+
+  # Vérification du formatage
+  format:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /app
+    command: bash -c "flutter pub get && dart format --set-exit-if-changed lib/ test/"
+
+  # Formater le code (appliquer les corrections)
+  format-fix:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /app
+    command: bash -c "flutter pub get && dart format lib/ test/"
+
+  # Exécuter les tests
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /app
+    command: bash -c "flutter pub get && flutter test"
+
+  # Exécuter les tests avec couverture
+  test-coverage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /app
+    command: bash -c "flutter pub get && flutter test --coverage"
+
+  # Build Android APK (debug)
+  build-android:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+      - gradle_cache:/root/.gradle
+    working_dir: /app
+    command: bash -c "flutter pub get && flutter build apk --debug"
+
+  # Shell interactif pour debug
+  shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - flutter_pub_cache:/root/.pub-cache
+    working_dir: /app
+    command: bash
+    stdin_open: true
+    tty: true
+
+volumes:
+  flutter_pub_cache:
+  gradle_cache:
