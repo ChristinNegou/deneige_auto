@@ -93,10 +93,11 @@ void main() {
 
     group('register', () {
       test('should return User when registration is successful', () async {
+        // The repository splits 'John Doe' into firstName='John' and lastName='Doe'
         when(() => mockDataSource.register(
-          any(), any(), any(), any(),
-          phone: any(named: 'phone'),
-          role: any(named: 'role'),
+          tEmail, tPassword, 'John', 'Doe',
+          phone: '+1234567890',
+          role: UserRole.client,
         )).thenAnswer((_) async => tUser);
 
         final result = await repository.register(
@@ -109,9 +110,9 @@ void main() {
 
       test('should return AuthFailure when AuthException is thrown', () async {
         when(() => mockDataSource.register(
-          any(), any(), any(), any(),
-          phone: any(named: 'phone'),
-          role: any(named: 'role'),
+          tEmail, tPassword, 'John', 'Doe',
+          phone: null,
+          role: UserRole.client,
         )).thenThrow(const AuthException(message: 'Email already exists'));
 
         final result = await repository.register(tEmail, tPassword, 'John Doe');

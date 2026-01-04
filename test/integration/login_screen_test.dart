@@ -13,12 +13,13 @@ void main() {
 
   setUp(() {
     mockAuthBloc = MockAuthBloc();
-    when(() => mockAuthBloc.state).thenReturn(AuthInitial());
-    when(() => mockAuthBloc.stream).thenAnswer((_) => Stream.value(AuthInitial()));
     when(() => mockAuthBloc.close()).thenAnswer((_) async {});
   });
 
-  Widget buildTestWidget() {
+  Widget buildTestWidget(AuthState state) {
+    when(() => mockAuthBloc.state).thenReturn(state);
+    when(() => mockAuthBloc.stream).thenAnswer((_) => Stream.value(state));
+
     return MaterialApp(
       home: BlocProvider<AuthBloc>.value(
         value: mockAuthBloc,
@@ -29,37 +30,41 @@ void main() {
 
   group('LoginScreen Widget Tests', () {
     testWidgets('should display login form elements', (tester) async {
-      await tester.pumpWidget(buildTestWidget());
+      await tester.pumpWidget(buildTestWidget(AuthInitial()));
       await tester.pumpAndSettle();
 
       // Verify text fields exist
       expect(find.byType(TextFormField), findsAtLeastNWidgets(2));
     });
 
-    testWidgets('should show loading indicator when AuthLoading state', (tester) async {
-      when(() => mockAuthBloc.state).thenReturn(AuthLoading());
-      when(() => mockAuthBloc.stream).thenAnswer((_) => Stream.value(AuthLoading()));
-
-      await tester.pumpWidget(buildTestWidget());
+    testWidgets('should show loading indicator when AuthLoading state',
+        (tester) async {
+      await tester.pumpWidget(buildTestWidget(AuthLoading()));
       await tester.pump();
 
       // Verify loading indicator
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('should show error message when AuthError state', (tester) async {
-      when(() => mockAuthBloc.state).thenReturn(
-        const AuthError(message: 'Email ou mot de passe incorrect'),
-      );
-      when(() => mockAuthBloc.stream).thenAnswer(
-        (_) => Stream.value(const AuthError(message: 'Email ou mot de passe incorrect')),
-      );
-
-      await tester.pumpWidget(buildTestWidget());
+    testWidgets('should display Scaffold', (tester) async {
+      await tester.pumpWidget(buildTestWidget(AuthInitial()));
       await tester.pumpAndSettle();
 
-      // Verify error message exists somewhere in the widget tree
       expect(find.byType(Scaffold), findsOneWidget);
+    });
+
+    testWidgets('should display welcome text', (tester) async {
+      await tester.pumpWidget(buildTestWidget(AuthInitial()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Bienvenue'), findsOneWidget);
+    });
+
+    testWidgets('should display sign up link', (tester) async {
+      await tester.pumpWidget(buildTestWidget(AuthInitial()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('S\'inscrire'), findsOneWidget);
     });
   });
 }

@@ -1,5 +1,6 @@
 import 'package:deneige_auto/features/snow_worker/domain/entities/worker_job.dart';
 import 'package:deneige_auto/features/snow_worker/domain/entities/worker_stats.dart';
+import 'package:deneige_auto/features/snow_worker/domain/entities/worker_profile.dart';
 
 /// Fixtures pour les tests de snow worker
 class WorkerFixtures {
@@ -186,6 +187,45 @@ class WorkerFixtures {
       month: month ?? createPeriodStats(completed: 45, earnings: 1125.0, tips: 225.0),
       allTime: allTime ?? createAllTimeStats(),
       isAvailable: isAvailable,
+    );
+  }
+
+  /// Cree un WorkerJob generique (alias de createPendingJob)
+  static WorkerJob createWorkerJob({
+    String? id,
+    JobStatus status = JobStatus.pending,
+  }) {
+    return createPendingJob(id: id).copyWith(status: status);
+  }
+
+  /// Cree une liste de WorkerJob
+  static List<WorkerJob> createWorkerJobList(int count, {JobStatus? status}) {
+    return createJobList(count, status: status);
+  }
+
+  /// Cree un WorkerProfile
+  static WorkerProfile createWorkerProfile({
+    String? id,
+    String email = 'worker@example.com',
+    String firstName = 'Jean',
+    String lastName = 'Travailleur',
+    bool isAvailable = true,
+    int maxActiveJobs = 3,
+  }) {
+    return WorkerProfile(
+      id: id ?? 'worker-123',
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      isAvailable: isAvailable,
+      maxActiveJobs: maxActiveJobs,
+      vehicleType: VehicleType.car,
+      equipmentList: const ['Pelle', 'Balai'],
+      totalJobsCompleted: 150,
+      totalEarnings: 3750.0,
+      totalTipsReceived: 750.0,
+      averageRating: 4.8,
+      totalRatingsCount: 120,
     );
   }
 }
