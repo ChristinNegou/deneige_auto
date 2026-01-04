@@ -37,7 +37,8 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<void> suspendUser(String userId, {String? reason, int days = 7}) async {
+  Future<void> suspendUser(String userId,
+      {String? reason, int days = 7}) async {
     await remoteDataSource.suspendUser(userId, reason: reason, days: days);
   }
 
@@ -62,12 +63,14 @@ class AdminRepositoryImpl implements AdminRepository {
 
   @override
   Future<AdminReservation> getReservationDetails(String reservationId) async {
-    final response = await remoteDataSource.getReservationDetails(reservationId);
+    final response =
+        await remoteDataSource.getReservationDetails(reservationId);
     return AdminReservation.fromJson(response['reservation']);
   }
 
   @override
-  Future<RefundResult> refundReservation(String reservationId, {double? amount, String? reason}) async {
+  Future<RefundResult> refundReservation(String reservationId,
+      {double? amount, String? reason}) async {
     final response = await remoteDataSource.refundReservation(
       reservationId,
       amount: amount,

@@ -27,7 +27,8 @@ class ChatMessageModel extends ChatMessage {
 
     if (sender is Map<String, dynamic>) {
       senderId = sender['_id'] as String? ?? '';
-      senderName = '${sender['firstName'] ?? ''} ${sender['lastName'] ?? ''}'.trim();
+      senderName =
+          '${sender['firstName'] ?? ''} ${sender['lastName'] ?? ''}'.trim();
       senderPhoto = sender['profilePhoto'] as String?;
     } else {
       senderId = sender as String? ?? '';

@@ -48,7 +48,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   void initState() {
     super.initState();
     _currentJob = widget.job;
-    if (_currentJob.status == JobStatus.inProgress && _currentJob.startedAt != null) {
+    if (_currentJob.status == JobStatus.inProgress &&
+        _currentJob.startedAt != null) {
       _elapsed = DateTime.now().difference(_currentJob.startedAt!);
       _startTimer();
     }
@@ -89,7 +90,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           _timer?.cancel();
           _statusCheckTimer?.cancel();
 
-          final cancelReason = data['cancelReason'] as String? ?? 'Le client a annulé la réservation';
+          final cancelReason = data['cancelReason'] as String? ??
+              'Le client a annulé la réservation';
           final cancelledBy = data['cancelledBy'] as String? ?? 'client';
 
           _showJobCancelledDialog(cancelReason, cancelledBy);
@@ -142,7 +144,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 decoration: BoxDecoration(
                   color: AppTheme.errorLight,
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                  border:
+                      Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -171,7 +174,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               const SizedBox(height: 8),
               Text(
                 'Vous ne serez pas facturé pour ce job.',
-                style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                style:
+                    AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -246,7 +250,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           } else if (state.updatedJob != null) {
             setState(() {
               _currentJob = state.updatedJob!;
-              if (_currentJob.status == JobStatus.inProgress && _timer == null) {
+              if (_currentJob.status == JobStatus.inProgress &&
+                  _timer == null) {
                 _startTimer();
               }
             });
@@ -256,7 +261,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const Icon(Icons.error_outline,
+                      color: Colors.white, size: 20),
                   const SizedBox(width: 12),
                   Expanded(child: Text(state.message)),
                 ],
@@ -292,8 +298,10 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                       const SizedBox(height: 12),
                       _buildVehicleCard(),
                       const SizedBox(height: 16),
-                      if (_currentJob.location != null) _buildNavigationButtons(),
-                      if (_currentJob.location != null) const SizedBox(height: 16),
+                      if (_currentJob.location != null)
+                        _buildNavigationButtons(),
+                      if (_currentJob.location != null)
+                        const SizedBox(height: 16),
                       _buildActionSection(),
                       const SizedBox(height: 100),
                     ],
@@ -545,12 +553,14 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   children: [
                     Text(
                       _currentJob.client.fullName,
-                      style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                      style: AppTheme.labelLarge
+                          .copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.location_on_outlined, size: 14, color: AppTheme.textTertiary),
+                        Icon(Icons.location_on_outlined,
+                            size: 14, color: AppTheme.textTertiary),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -635,7 +645,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.chat_bubble_rounded, size: 20, color: Colors.white),
+                        const Icon(Icons.chat_bubble_rounded,
+                            size: 20, color: Colors.white),
                         const SizedBox(width: 6),
                         const Text(
                           'Chat',
@@ -725,12 +736,14 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               children: [
                 Text(
                   _currentJob.vehicle.displayName,
-                  style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                  style:
+                      AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
                 ),
                 if (_currentJob.vehicle.licensePlate != null)
                   Container(
                     margin: const EdgeInsets.only(top: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppTheme.background,
                       borderRadius: BorderRadius.circular(6),
@@ -781,7 +794,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               decoration: BoxDecoration(
                 color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+                border:
+                    Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
                 boxShadow: AppTheme.shadowSM,
               ),
               child: Row(
@@ -819,7 +833,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.navigation_rounded, size: 20, color: AppTheme.info),
+                  Icon(Icons.navigation_rounded,
+                      size: 20, color: AppTheme.info),
                   const SizedBox(width: 8),
                   Text(
                     'Waze',
@@ -840,7 +855,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   Widget _buildActionSection() {
     return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
       builder: (context, state) {
-        final isLoading = state is JobActionLoading && state.jobId == _currentJob.id;
+        final isLoading =
+            state is JobActionLoading && state.jobId == _currentJob.id;
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -861,7 +877,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                       color: AppTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                     ),
-                    child: const Icon(Icons.flash_on_rounded, color: AppTheme.primary, size: 20),
+                    child: const Icon(Icons.flash_on_rounded,
+                        color: AppTheme.primary, size: 20),
                   ),
                   const SizedBox(width: 12),
                   Text('Actions', style: AppTheme.headlineSmall),
@@ -875,7 +892,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   gradientColors: [AppTheme.primary, AppTheme.secondary],
                   isLoading: isLoading,
                   onPressed: () async {
-                    context.read<WorkerJobsBloc>().add(MarkEnRoute(_currentJob.id));
+                    context
+                        .read<WorkerJobsBloc>()
+                        .add(MarkEnRoute(_currentJob.id));
                     if (_currentJob.location != null) {
                       await _openMaps(
                         _currentJob.location!.latitude,
@@ -887,15 +906,19 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                           SnackBar(
                             content: Row(
                               children: [
-                                const Icon(Icons.warning, color: Colors.white, size: 20),
+                                const Icon(Icons.warning,
+                                    color: Colors.white, size: 20),
                                 const SizedBox(width: 12),
-                                const Expanded(child: Text('Coordonnées GPS non disponibles')),
+                                const Expanded(
+                                    child: Text(
+                                        'Coordonnées GPS non disponibles')),
                               ],
                             ),
                             backgroundColor: AppTheme.warning,
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                              borderRadius:
+                                  BorderRadius.circular(AppTheme.radiusMD),
                             ),
                           ),
                         );
@@ -946,12 +969,16 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 const SizedBox(height: 16),
                 _buildGradientActionButton(
                   label: _photoUploaded ? 'Terminer le job' : 'Photo requise',
-                  icon: _photoUploaded ? Icons.check_circle_rounded : Icons.camera_alt_rounded,
+                  icon: _photoUploaded
+                      ? Icons.check_circle_rounded
+                      : Icons.camera_alt_rounded,
                   gradientColors: _photoUploaded
                       ? [AppTheme.success, const Color(0xFF059669)]
                       : [AppTheme.textTertiary, AppTheme.textSecondary],
                   isLoading: isLoading,
-                  onPressed: _photoUploaded ? () => _showCompleteDialog(context) : null,
+                  onPressed: _photoUploaded
+                      ? () => _showCompleteDialog(context)
+                      : null,
                 ),
               ],
             ],
@@ -977,7 +1004,10 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDisabled
-                ? [AppTheme.textTertiary.withValues(alpha: 0.5), AppTheme.textSecondary.withValues(alpha: 0.5)]
+                ? [
+                    AppTheme.textTertiary.withValues(alpha: 0.5),
+                    AppTheme.textSecondary.withValues(alpha: 0.5)
+                  ]
                 : gradientColors,
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
@@ -1060,9 +1090,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _photoUploaded
-            ? AppTheme.successLight
-            : AppTheme.warningLight,
+        color: _photoUploaded ? AppTheme.successLight : AppTheme.warningLight,
         borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         border: Border.all(
           color: _photoUploaded
@@ -1086,7 +1114,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
                 child: Icon(
-                  _photoUploaded ? Icons.check_circle_rounded : Icons.camera_alt_rounded,
+                  _photoUploaded
+                      ? Icons.check_circle_rounded
+                      : Icons.camera_alt_rounded,
                   color: _photoUploaded ? AppTheme.success : AppTheme.warning,
                   size: 24,
                 ),
@@ -1097,10 +1127,14 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _photoUploaded ? 'Photo envoyée!' : 'Photo du travail terminé',
+                      _photoUploaded
+                          ? 'Photo envoyée!'
+                          : 'Photo du travail terminé',
                       style: AppTheme.labelLarge.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: _photoUploaded ? AppTheme.success : AppTheme.warning,
+                        color: _photoUploaded
+                            ? AppTheme.success
+                            : AppTheme.warning,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -1160,7 +1194,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                               ),
                             )
                           else
-                            const Icon(Icons.cloud_upload_rounded, color: Colors.white, size: 18),
+                            const Icon(Icons.cloud_upload_rounded,
+                                color: Colors.white, size: 18),
                           const SizedBox(width: 6),
                           Text(
                             _isUploadingPhoto ? 'Envoi...' : 'Envoyer',
@@ -1226,7 +1261,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 22),
+                    const Icon(Icons.camera_alt_rounded,
+                        color: Colors.white, size: 22),
                     const SizedBox(width: 10),
                     const Text(
                       'Prendre une photo',
@@ -1317,7 +1353,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               SnackBar(
                 content: Row(
                   children: [
-                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const Icon(Icons.check_circle,
+                        color: Colors.white, size: 20),
                     const SizedBox(width: 12),
                     const Text('Photo envoyée avec succès!'),
                   ],
@@ -1460,7 +1497,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             color: AppTheme.successLight,
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.check_circle_rounded, color: AppTheme.success, size: 40),
+          child: Icon(Icons.check_circle_rounded,
+              color: AppTheme.success, size: 40),
         ),
         title: const Text('Position confirmée!'),
         content: Text(
@@ -1469,7 +1507,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Annuler', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text('Annuler',
+                style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -1548,7 +1587,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             color: AppTheme.errorLight,
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.location_off_rounded, color: AppTheme.error, size: 40),
+          child:
+              Icon(Icons.location_off_rounded, color: AppTheme.error, size: 40),
         ),
         title: const Text('Trop loin'),
         content: Text(
@@ -1625,14 +1665,17 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             color: AppTheme.successLight,
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.task_alt_rounded, color: AppTheme.success, size: 40),
+          child:
+              Icon(Icons.task_alt_rounded, color: AppTheme.success, size: 40),
         ),
         title: const Text('Terminer le job'),
-        content: const Text('Êtes-vous sûr de vouloir marquer ce job comme terminé?'),
+        content: const Text(
+            'Êtes-vous sûr de vouloir marquer ce job comme terminé?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Annuler', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text('Annuler',
+                style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1727,7 +1770,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
 
   /// Gère l'appel du client avec vérification du numéro
   void _handleCallClient() {
-    if (_currentJob.client.phoneNumber != null && _currentJob.client.phoneNumber!.isNotEmpty) {
+    if (_currentJob.client.phoneNumber != null &&
+        _currentJob.client.phoneNumber!.isNotEmpty) {
       _callClient(_currentJob.client.phoneNumber!);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1752,7 +1796,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
 
   /// Gère l'envoi de SMS au client avec vérification du numéro
   void _handleMessageClient() {
-    if (_currentJob.client.phoneNumber != null && _currentJob.client.phoneNumber!.isNotEmpty) {
+    if (_currentJob.client.phoneNumber != null &&
+        _currentJob.client.phoneNumber!.isNotEmpty) {
       _messageClient(_currentJob.client.phoneNumber!);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1813,15 +1858,16 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     double finalLat = lat;
     double finalLng = lng;
 
-    final isEmulatorLocation = (lat - 37.4219983).abs() < 0.5 &&
-        (lng - (-122.084)).abs() < 0.5;
+    final isEmulatorLocation =
+        (lat - 37.4219983).abs() < 0.5 && (lng - (-122.084)).abs() < 0.5;
 
     if (isEmulatorLocation) {
       finalLat = 46.3432;
       finalLng = -72.5476;
     }
 
-    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$finalLat,$finalLng');
+    final uri = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$finalLat,$finalLng');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -1831,15 +1877,16 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     double finalLat = lat;
     double finalLng = lng;
 
-    final isEmulatorLocation = (lat - 37.4219983).abs() < 0.5 &&
-        (lng - (-122.084)).abs() < 0.5;
+    final isEmulatorLocation =
+        (lat - 37.4219983).abs() < 0.5 && (lng - (-122.084)).abs() < 0.5;
 
     if (isEmulatorLocation) {
       finalLat = 46.3432;
       finalLng = -72.5476;
     }
 
-    final uri = Uri.parse('https://waze.com/ul?ll=$finalLat,$finalLng&navigate=yes');
+    final uri =
+        Uri.parse('https://waze.com/ul?ll=$finalLat,$finalLng&navigate=yes');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }

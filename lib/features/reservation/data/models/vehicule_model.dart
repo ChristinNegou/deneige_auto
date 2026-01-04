@@ -1,4 +1,3 @@
-
 import '../../domain/entities/vehicle.dart';
 
 class VehicleModel extends Vehicle {

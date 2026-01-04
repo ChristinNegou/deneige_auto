@@ -90,8 +90,8 @@ class WeatherView extends StatelessWidget {
                   Text(
                     '${weather.temperature.round()}°C',
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
 
@@ -164,7 +164,8 @@ class WeatherView extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    weather.alertDescription ?? 'Prévision de chutes de neige importantes',
+                                    weather.alertDescription ??
+                                        'Prévision de chutes de neige importantes',
                                     style: TextStyle(
                                       color: Colors.orange.shade800,
                                     ),
@@ -197,11 +198,11 @@ class WeatherView extends StatelessWidget {
   }
 
   Widget _buildWeatherInfo(
-      BuildContext context,
-      IconData icon,
-      String label,
-      String value,
-      ) {
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(

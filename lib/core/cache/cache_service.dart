@@ -108,7 +108,8 @@ class ExpiringCacheService implements CacheService {
     return _cache.get<T>(key);
   }
 
-  Future<void> putWithExpiration<T>(String key, T value, {Duration? expiration}) async {
+  Future<void> putWithExpiration<T>(String key, T value,
+      {Duration? expiration}) async {
     final exp = expiration ?? defaultExpiration;
     final expirationDate = DateTime.now().add(exp);
     final expirationKey = '$key$_expirationSuffix';

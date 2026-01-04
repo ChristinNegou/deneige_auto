@@ -85,10 +85,10 @@ void main() {
       blocTest<NewReservationBloc, NewReservationState>(
         'emits empty lists when LoadInitialData fails',
         build: () {
-          when(() => mockGetVehicles())
-              .thenAnswer((_) async => const Left(ServerFailure(message: 'Error')));
-          when(() => mockGetParkingSpots(availableOnly: true))
-              .thenAnswer((_) async => const Left(ServerFailure(message: 'Error')));
+          when(() => mockGetVehicles()).thenAnswer(
+              (_) async => const Left(ServerFailure(message: 'Error')));
+          when(() => mockGetParkingSpots(availableOnly: true)).thenAnswer(
+              (_) async => const Left(ServerFailure(message: 'Error')));
           return bloc;
         },
         act: (bloc) => bloc.add(LoadInitialData()),
@@ -181,9 +181,11 @@ void main() {
               .thenAnswer((_) async => const Right([]));
           return bloc;
         },
-        act: (bloc) => bloc.add(const ToggleServiceOption(ServiceOption.windowScraping)),
+        act: (bloc) =>
+            bloc.add(const ToggleServiceOption(ServiceOption.windowScraping)),
         verify: (bloc) {
-          expect(bloc.state.selectedOptions, contains(ServiceOption.windowScraping));
+          expect(bloc.state.selectedOptions,
+              contains(ServiceOption.windowScraping));
         },
       );
 
@@ -193,7 +195,8 @@ void main() {
         seed: () => const NewReservationState(
           selectedOptions: [ServiceOption.windowScraping],
         ),
-        act: (bloc) => bloc.add(const ToggleServiceOption(ServiceOption.windowScraping)),
+        act: (bloc) =>
+            bloc.add(const ToggleServiceOption(ServiceOption.windowScraping)),
         verify: (bloc) {
           expect(bloc.state.selectedOptions, isEmpty);
         },

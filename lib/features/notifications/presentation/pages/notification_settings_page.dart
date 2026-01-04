@@ -8,7 +8,8 @@ class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
 
   @override
-  State<NotificationSettingsPage> createState() => _NotificationSettingsPageState();
+  State<NotificationSettingsPage> createState() =>
+      _NotificationSettingsPageState();
 }
 
 class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
@@ -277,7 +278,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                         Expanded(
                           child: Text(
                             'Mode silencieux actuellement actif',
-                            style: TextStyle(color: Colors.orange, fontSize: 13),
+                            style:
+                                TextStyle(color: Colors.orange, fontSize: 13),
                           ),
                         ),
                       ],
@@ -327,7 +329,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   Widget _buildCategoryCard(String categoryName, List<NotificationType> types) {
     final isFullyEnabled = _prefsService!.isCategoryFullyEnabled(categoryName);
-    final isPartiallyEnabled = _prefsService!.isCategoryPartiallyEnabled(categoryName);
+    final isPartiallyEnabled =
+        _prefsService!.isCategoryPartiallyEnabled(categoryName);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

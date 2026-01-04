@@ -23,7 +23,8 @@ abstract class AdminRepository {
     String? status,
   });
   Future<AdminReservation> getReservationDetails(String reservationId);
-  Future<RefundResult> refundReservation(String reservationId, {double? amount, String? reason});
+  Future<RefundResult> refundReservation(String reservationId,
+      {double? amount, String? reason});
 
   // Notifications
   Future<void> broadcastNotification({

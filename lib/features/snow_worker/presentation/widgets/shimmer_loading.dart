@@ -429,7 +429,8 @@ class _AnimatedCounterState extends State<AnimatedCounter>
     if (oldWidget.value != widget.value) {
       _previousValue = oldWidget.value;
       _animation = Tween<double>(begin: _previousValue, end: widget.value)
-          .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+          .animate(
+              CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
       _controller.forward(from: 0);
     }
   }

@@ -18,12 +18,14 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 /// Service pour gérer les notifications push Firebase
 class PushNotificationService {
-  static final PushNotificationService _instance = PushNotificationService._internal();
+  static final PushNotificationService _instance =
+      PushNotificationService._internal();
   factory PushNotificationService() => _instance;
   PushNotificationService._internal();
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
   String? _fcmToken;
@@ -45,7 +47,8 @@ class PushNotificationService {
       }
 
       // Configurer le handler pour les messages en arrière-plan
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler);
 
       // Demander les permissions
       await _requestPermissions();
@@ -81,7 +84,8 @@ class PushNotificationService {
       carPlay: false,
     );
 
-    debugPrint('Notification permission status: ${settings.authorizationStatus}');
+    debugPrint(
+        'Notification permission status: ${settings.authorizationStatus}');
 
     if (settings.authorizationStatus == AuthorizationStatus.denied) {
       debugPrint('User denied notification permissions');
@@ -90,7 +94,8 @@ class PushNotificationService {
 
   /// Initialiser les notifications locales
   Future<void> _initializeLocalNotifications() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -119,7 +124,8 @@ class PushNotificationService {
       );
 
       await _localNotifications
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
     }
   }

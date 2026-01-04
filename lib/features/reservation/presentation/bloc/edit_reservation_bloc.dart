@@ -135,7 +135,8 @@ class EditReservationState extends Equatable {
     return selectedVehicle?.id != originalReservation!.vehicle.id ||
         selectedParkingSpot?.id != originalReservation!.parkingSpot.id ||
         departureTime != originalReservation!.departureTime ||
-        !_serviceOptionsEqual(selectedOptions, originalReservation!.serviceOptions) ||
+        !_serviceOptionsEqual(
+            selectedOptions, originalReservation!.serviceOptions) ||
         locationAddress != originalReservation!.locationAddress;
   }
 
@@ -166,7 +167,8 @@ class EditReservationState extends Equatable {
     return EditReservationState(
       originalReservation: originalReservation ?? this.originalReservation,
       availableVehicles: availableVehicles ?? this.availableVehicles,
-      availableParkingSpots: availableParkingSpots ?? this.availableParkingSpots,
+      availableParkingSpots:
+          availableParkingSpots ?? this.availableParkingSpots,
       selectedVehicle: selectedVehicle ?? this.selectedVehicle,
       selectedParkingSpot: selectedParkingSpot ?? this.selectedParkingSpot,
       departureTime: departureTime ?? this.departureTime,
@@ -206,7 +208,8 @@ class EditReservationState extends Equatable {
 
 // ==================== BLOC ====================
 
-class EditReservationBloc extends Bloc<EditReservationEvent, EditReservationState> {
+class EditReservationBloc
+    extends Bloc<EditReservationEvent, EditReservationState> {
   final GetVehiclesUseCase getVehicles;
   final GetParkingSpotsUseCase getParkingSpots;
   final UpdateReservationUseCase updateReservation;
@@ -350,7 +353,8 @@ class EditReservationBloc extends Bloc<EditReservationEvent, EditReservationStat
     // Calcul du supplément neige (si disponible dans la réservation originale)
     if (state.originalReservation?.snowDepthCm != null &&
         state.originalReservation!.snowDepthCm! > 10) {
-      final snowSurcharge = (state.originalReservation!.snowDepthCm! - 10) * AppConfig.pricePerCm;
+      final snowSurcharge =
+          (state.originalReservation!.snowDepthCm! - 10) * AppConfig.pricePerCm;
       price += snowSurcharge;
     }
 
@@ -374,7 +378,8 @@ class EditReservationBloc extends Bloc<EditReservationEvent, EditReservationStat
     // Calcul des frais d'urgence (si départ dans moins de 45 minutes)
     if (state.departureTime != null) {
       final now = DateTime.now();
-      final minutesUntilDeparture = state.departureTime!.difference(now).inMinutes;
+      final minutesUntilDeparture =
+          state.departureTime!.difference(now).inMinutes;
 
       if (minutesUntilDeparture < AppConfig.urgencyThresholdMinutes) {
         final urgencyFee = price * AppConfig.urgencyFeePercentage;

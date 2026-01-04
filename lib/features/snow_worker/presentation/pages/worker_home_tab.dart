@@ -28,7 +28,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   Position? _currentPosition;
   Timer? _refreshTimer;
-  final WorkerNotificationService _notificationService = WorkerNotificationService();
+  final WorkerNotificationService _notificationService =
+      WorkerNotificationService();
   Set<String> _previousJobIds = {};
   late AnimationController _pulseController;
   bool _isFirstLoad = true;
@@ -68,7 +69,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     final newJobIds = currentIds.difference(_previousJobIds);
 
     if (newJobIds.isNotEmpty) {
-      final newJobs = currentJobs.where((j) => newJobIds.contains(j.id)).toList();
+      final newJobs =
+          currentJobs.where((j) => newJobIds.contains(j.id)).toList();
       final hasUrgent = newJobs.any((j) => j.isPriority);
 
       _notificationService.notifyNewJob(newJobs.first);
@@ -98,7 +100,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        newJobs.length == 1 ? 'Nouveau job!' : '${newJobs.length} nouveaux jobs!',
+                        newJobs.length == 1
+                            ? 'Nouveau job!'
+                            : '${newJobs.length} nouveaux jobs!',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -168,8 +172,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      final isEmulatorLocation = (position.latitude - 37.4219983).abs() < 0.01 &&
-          (position.longitude - (-122.084)).abs() < 0.01;
+      final isEmulatorLocation =
+          (position.latitude - 37.4219983).abs() < 0.01 &&
+              (position.longitude - (-122.084)).abs() < 0.01;
 
       if (isEmulatorLocation) {
         _loadDataWithDefaultLocation();
@@ -323,12 +328,15 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: isAvailable ? AppTheme.success : AppTheme.textTertiary,
+                            color: isAvailable
+                                ? AppTheme.success
+                                : AppTheme.textTertiary,
                             shape: BoxShape.circle,
                             boxShadow: isAvailable
                                 ? [
                                     BoxShadow(
-                                      color: AppTheme.success.withValues(alpha: 0.4),
+                                      color: AppTheme.success
+                                          .withValues(alpha: 0.4),
                                       blurRadius: 6,
                                       spreadRadius: 1,
                                     ),
@@ -393,7 +401,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               ? null
               : () {
                   HapticFeedback.mediumImpact();
-                  context.read<WorkerAvailabilityBloc>().add(const ToggleAvailability());
+                  context
+                      .read<WorkerAvailabilityBloc>()
+                      .add(const ToggleAvailability());
                 },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -444,8 +454,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                           ),
                         )
                       : Icon(
-                          isAvailable ? Icons.work_rounded : Icons.work_off_rounded,
-                          color: isAvailable ? Colors.white : AppTheme.textTertiary,
+                          isAvailable
+                              ? Icons.work_rounded
+                              : Icons.work_off_rounded,
+                          color: isAvailable
+                              ? Colors.white
+                              : AppTheme.textTertiary,
                           size: 28,
                         ),
                 ),
@@ -455,9 +469,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isAvailable ? 'Vous etes disponible' : 'Vous etes hors ligne',
+                        isAvailable
+                            ? 'Vous etes disponible'
+                            : 'Vous etes hors ligne',
                         style: TextStyle(
-                          color: isAvailable ? Colors.white : AppTheme.textPrimary,
+                          color:
+                              isAvailable ? Colors.white : AppTheme.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                         ),
@@ -491,7 +508,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                         ? null
                         : (_) {
                             HapticFeedback.mediumImpact();
-                            context.read<WorkerAvailabilityBloc>().add(const ToggleAvailability());
+                            context
+                                .read<WorkerAvailabilityBloc>()
+                                .add(const ToggleAvailability());
                           },
                     activeColor: Colors.white,
                     activeTrackColor: Colors.white.withValues(alpha: 0.3),
@@ -664,7 +683,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [AppTheme.secondary, AppTheme.primary],
@@ -789,10 +809,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                                   ),
                                 ],
                               ),
-                              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                              borderRadius:
+                                  BorderRadius.circular(AppTheme.radiusFull),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.warning.withValues(alpha: 0.3),
+                                  color:
+                                      AppTheme.warning.withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -825,7 +847,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 ),
                 if (availableJobs.isNotEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppTheme.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppTheme.radiusFull),

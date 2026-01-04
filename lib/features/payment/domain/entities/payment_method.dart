@@ -36,8 +36,7 @@ class PaymentMethod extends Equatable {
   // Business logic
   bool get isExpired {
     final now = DateTime.now();
-    return expYear < now.year ||
-           (expYear == now.year && expMonth < now.month);
+    return expYear < now.year || (expYear == now.year && expMonth < now.month);
   }
 
   bool get isExpiringSoon {
@@ -77,23 +76,24 @@ class PaymentMethod extends Equatable {
       isDefault: isDefault ?? this.isDefault,
       createdAt: createdAt ?? this.createdAt,
       billingName: billingName ?? this.billingName,
-      stripePaymentMethodId: stripePaymentMethodId ?? this.stripePaymentMethodId,
+      stripePaymentMethodId:
+          stripePaymentMethodId ?? this.stripePaymentMethodId,
     );
   }
 
   @override
   List<Object?> get props => [
-    id,
-    userId,
-    brand,
-    last4,
-    expMonth,
-    expYear,
-    isDefault,
-    createdAt,
-    billingName,
-    stripePaymentMethodId,
-  ];
+        id,
+        userId,
+        brand,
+        last4,
+        expMonth,
+        expYear,
+        isDefault,
+        createdAt,
+        billingName,
+        stripePaymentMethodId,
+      ];
 }
 
 extension CardBrandExtension on CardBrand {

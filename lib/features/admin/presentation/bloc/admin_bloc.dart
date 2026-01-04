@@ -180,7 +180,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   ) async {
     emit(state.copyWith(reservationDetailsStatus: AdminStatus.loading));
     try {
-      final reservation = await repository.getReservationDetails(event.reservationId);
+      final reservation =
+          await repository.getReservationDetails(event.reservationId);
       emit(state.copyWith(
         selectedReservation: reservation,
         reservationDetailsStatus: AdminStatus.success,
@@ -207,7 +208,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       if (result.success) {
         emit(state.copyWith(
           actionStatus: AdminStatus.success,
-          successMessage: 'Remboursement effectué: ${result.refundAmount?.toStringAsFixed(2)} \$',
+          successMessage:
+              'Remboursement effectué: ${result.refundAmount?.toStringAsFixed(2)} \$',
         ));
         // Reload reservations list
         add(LoadReservations(

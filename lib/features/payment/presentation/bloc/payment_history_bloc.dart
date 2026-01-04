@@ -44,13 +44,13 @@ class PaymentHistoryState extends Equatable {
       .fold(0.0, (sum, p) => sum + p.amount);
 
   double get totalRefunded => payments
-      .where((p) => p.status == PaymentStatus.refunded ||
-                   p.status == PaymentStatus.partiallyRefunded)
+      .where((p) =>
+          p.status == PaymentStatus.refunded ||
+          p.status == PaymentStatus.partiallyRefunded)
       .fold(0.0, (sum, p) => sum + (p.refundedAmount ?? 0.0));
 
-  int get transactionCount => payments
-      .where((p) => p.status == PaymentStatus.succeeded)
-      .length;
+  int get transactionCount =>
+      payments.where((p) => p.status == PaymentStatus.succeeded).length;
 
   double get averagePerTransaction =>
       transactionCount > 0 ? totalSpent / transactionCount : 0.0;
@@ -74,16 +74,17 @@ class PaymentHistoryState extends Equatable {
 
   @override
   List<Object?> get props => [
-    payments,
-    filteredPayments,
-    isLoading,
-    errorMessage,
-    currentFilter,
-  ];
+        payments,
+        filteredPayments,
+        isLoading,
+        errorMessage,
+        currentFilter,
+      ];
 }
 
 // BLoC
-class PaymentHistoryBloc extends Bloc<PaymentHistoryEvent, PaymentHistoryState> {
+class PaymentHistoryBloc
+    extends Bloc<PaymentHistoryEvent, PaymentHistoryState> {
   final GetPaymentHistoryUseCase getPaymentHistory;
 
   PaymentHistoryBloc({
@@ -139,7 +140,9 @@ class PaymentHistoryBloc extends Bloc<PaymentHistoryEvent, PaymentHistoryState> 
 
         // Reapply current filter
         final filtered = state.currentFilter != null
-            ? sortedPayments.where((p) => p.status == state.currentFilter).toList()
+            ? sortedPayments
+                .where((p) => p.status == state.currentFilter)
+                .toList()
             : sortedPayments;
 
         emit(state.copyWith(
@@ -163,9 +166,8 @@ class PaymentHistoryBloc extends Bloc<PaymentHistoryEvent, PaymentHistoryState> 
       ));
     } else {
       // Filter by status
-      final filtered = state.payments
-          .where((p) => p.status == event.status)
-          .toList();
+      final filtered =
+          state.payments.where((p) => p.status == event.status).toList();
 
       emit(state.copyWith(
         filteredPayments: filtered,

@@ -40,10 +40,10 @@ class HomeState extends Equatable {
 
   @override
   List<Object?> get props => [
-    isLoading,
-    user,
-    weather,
-    upcomingReservations,
-    errorMessage,
-  ];
+        isLoading,
+        user,
+        weather,
+        upcomingReservations,
+        errorMessage,
+      ];
 }

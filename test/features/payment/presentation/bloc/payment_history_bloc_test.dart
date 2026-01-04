@@ -36,11 +36,13 @@ void main() {
         },
         act: (bloc) => bloc.add(LoadPaymentHistory()),
         expect: () => [
-          isA<PaymentHistoryState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentHistoryState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentHistoryState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.payments.length, 'payments.length', 5)
-              .having((s) => s.filteredPayments.length, 'filteredPayments.length', 5)
+              .having((s) => s.filteredPayments.length,
+                  'filteredPayments.length', 5)
               .having((s) => s.errorMessage, 'errorMessage', null),
         ],
         verify: (_) {
@@ -57,10 +59,12 @@ void main() {
         },
         act: (bloc) => bloc.add(LoadPaymentHistory()),
         expect: () => [
-          isA<PaymentHistoryState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentHistoryState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentHistoryState>()
               .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.errorMessage, 'errorMessage', serverFailure.message),
+              .having(
+                  (s) => s.errorMessage, 'errorMessage', serverFailure.message),
         ],
       );
 
@@ -73,7 +77,8 @@ void main() {
         },
         act: (bloc) => bloc.add(LoadPaymentHistory()),
         expect: () => [
-          isA<PaymentHistoryState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentHistoryState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentHistoryState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.payments, 'payments', isEmpty),
@@ -106,8 +111,8 @@ void main() {
         },
         act: (bloc) => bloc.add(RefreshPaymentHistory()),
         expect: () => [
-          isA<PaymentHistoryState>()
-              .having((s) => s.errorMessage, 'errorMessage', networkFailure.message),
+          isA<PaymentHistoryState>().having(
+              (s) => s.errorMessage, 'errorMessage', networkFailure.message),
         ],
       );
     });
@@ -120,12 +125,17 @@ void main() {
           payments: tMixedPayments,
           filteredPayments: tMixedPayments,
         ),
-        act: (bloc) => bloc.add(FilterPaymentsByStatus(PaymentStatus.succeeded)),
+        act: (bloc) =>
+            bloc.add(FilterPaymentsByStatus(PaymentStatus.succeeded)),
         expect: () => [
           isA<PaymentHistoryState>()
-              .having((s) => s.currentFilter, 'currentFilter', PaymentStatus.succeeded)
-              .having((s) => s.filteredPayments.every((p) => p.status == PaymentStatus.succeeded),
-                      'all succeeded', true),
+              .having((s) => s.currentFilter, 'currentFilter',
+                  PaymentStatus.succeeded)
+              .having(
+                  (s) => s.filteredPayments
+                      .every((p) => p.status == PaymentStatus.succeeded),
+                  'all succeeded',
+                  true),
         ],
       );
 
@@ -138,8 +148,8 @@ void main() {
         ),
         act: (bloc) => bloc.add(FilterPaymentsByStatus(null)),
         expect: () => [
-          isA<PaymentHistoryState>()
-              .having((s) => s.filteredPayments.length, 'filteredPayments.length', tMixedPayments.length),
+          isA<PaymentHistoryState>().having((s) => s.filteredPayments.length,
+              'filteredPayments.length', tMixedPayments.length),
         ],
       );
 
@@ -152,8 +162,8 @@ void main() {
         ),
         act: (bloc) => bloc.add(FilterPaymentsByStatus(PaymentStatus.failed)),
         expect: () => [
-          isA<PaymentHistoryState>()
-              .having((s) => s.currentFilter, 'currentFilter', PaymentStatus.failed),
+          isA<PaymentHistoryState>().having(
+              (s) => s.currentFilter, 'currentFilter', PaymentStatus.failed),
         ],
       );
     });

@@ -28,9 +28,8 @@ class NotificationModel extends AppNotification {
       reservationId: json['reservationId'] is Map
           ? json['reservationId']['_id']
           : json['reservationId'],
-      workerId: json['workerId'] is Map
-          ? json['workerId']['_id']
-          : json['workerId'],
+      workerId:
+          json['workerId'] is Map ? json['workerId']['_id'] : json['workerId'],
       metadata: json['metadata'] != null
           ? Map<String, dynamic>.from(json['metadata'])
           : null,

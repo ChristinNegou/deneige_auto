@@ -18,7 +18,8 @@ void main() {
   });
 
   group('GetMyJobsUseCase', () {
-    final tAssignedJobs = WorkerFixtures.createJobList(3, status: JobStatus.assigned);
+    final tAssignedJobs =
+        WorkerFixtures.createJobList(3, status: JobStatus.assigned);
 
     test('should return list of my jobs when successful', () async {
       // Arrange

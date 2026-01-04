@@ -97,8 +97,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         );
       }
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
-      throw ServerException(message: message, statusCode: e.response?.statusCode);
+      final message =
+          e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
+      throw ServerException(
+          message: message, statusCode: e.response?.statusCode);
     }
   }
 

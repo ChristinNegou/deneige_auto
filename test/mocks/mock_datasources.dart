@@ -9,13 +9,17 @@ import 'package:deneige_auto/features/snow_worker/data/datasources/worker_remote
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
 // ==================== RESERVATION DATASOURCES ====================
-class MockReservationRemoteDataSource extends Mock implements ReservationRemoteDataSource {}
+class MockReservationRemoteDataSource extends Mock
+    implements ReservationRemoteDataSource {}
 
 // ==================== PAYMENT DATASOURCES ====================
-class MockPaymentRemoteDataSource extends Mock implements PaymentRemoteDataSource {}
+class MockPaymentRemoteDataSource extends Mock
+    implements PaymentRemoteDataSource {}
 
 // ==================== NOTIFICATION DATASOURCES ====================
-class MockNotificationRemoteDataSource extends Mock implements NotificationRemoteDataSource {}
+class MockNotificationRemoteDataSource extends Mock
+    implements NotificationRemoteDataSource {}
 
 // ==================== WORKER DATASOURCES ====================
-class MockWorkerRemoteDataSource extends Mock implements WorkerRemoteDataSource {}
+class MockWorkerRemoteDataSource extends Mock
+    implements WorkerRemoteDataSource {}

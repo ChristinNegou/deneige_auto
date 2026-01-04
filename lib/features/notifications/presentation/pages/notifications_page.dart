@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../domain/entities/notification.dart';
 import '../../services/notification_navigation_service.dart';
 import '../bloc/notification_bloc.dart';
@@ -68,7 +69,9 @@ class NotificationsPageContent extends StatelessWidget {
 
                   return RefreshIndicator(
                     onRefresh: () async {
-                      context.read<NotificationBloc>().add(RefreshNotifications());
+                      context
+                          .read<NotificationBloc>()
+                          .add(RefreshNotifications());
                     },
                     color: AppTheme.primary,
                     child: ListView(
@@ -82,7 +85,8 @@ class NotificationsPageContent extends StatelessWidget {
                           _buildSectionHeader('Aujourd\'hui'),
                           const SizedBox(height: 8),
                           ...state.todayNotifications.map(
-                            (notification) => _buildNotificationCard(context, notification),
+                            (notification) =>
+                                _buildNotificationCard(context, notification),
                           ),
                           const SizedBox(height: 16),
                         ],
@@ -90,7 +94,8 @@ class NotificationsPageContent extends StatelessWidget {
                           _buildSectionHeader('Plus tôt'),
                           const SizedBox(height: 8),
                           ...state.earlierNotifications.map(
-                            (notification) => _buildNotificationCard(context, notification),
+                            (notification) =>
+                                _buildNotificationCard(context, notification),
                           ),
                         ],
                       ],
@@ -138,10 +143,13 @@ class NotificationsPageContent extends StatelessWidget {
               if (state.unreadCount > 0) {
                 return GestureDetector(
                   onTap: () {
-                    context.read<NotificationBloc>().add(MarkAllNotificationsAsRead());
+                    context
+                        .read<NotificationBloc>()
+                        .add(MarkAllNotificationsAsRead());
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppTheme.radiusFull),
@@ -176,35 +184,10 @@ class NotificationsPageContent extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-            ),
-            child: const Icon(
-              Icons.notifications_none_rounded,
-              size: 40,
-              color: AppTheme.primary,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Aucune notification',
-            style: AppTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Vous n\'avez pas de nouvelles notifications',
-            style: AppTheme.bodySmall,
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      illustrationType: IllustrationType.emptyNotifications,
+      title: 'Aucune notification',
+      subtitle: 'Vous n\'avez pas de nouvelles notifications',
     );
   }
 
@@ -256,14 +239,17 @@ class NotificationsPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationCard(BuildContext context, AppNotification notification) {
+  Widget _buildNotificationCard(
+      BuildContext context, AppNotification notification) {
     final action = _navigationService.getActionForNotification(notification);
 
     return Dismissible(
       key: Key(notification.id),
       direction: DismissDirection.endToStart,
       onDismissed: (_) {
-        context.read<NotificationBloc>().add(DeleteNotification(notification.id));
+        context
+            .read<NotificationBloc>()
+            .add(DeleteNotification(notification.id));
       },
       background: Container(
         alignment: Alignment.centerRight,
@@ -278,7 +264,9 @@ class NotificationsPageContent extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           if (!notification.isRead) {
-            context.read<NotificationBloc>().add(MarkNotificationAsRead(notification.id));
+            context
+                .read<NotificationBloc>()
+                .add(MarkNotificationAsRead(notification.id));
           }
           _navigationService.handleNotificationTap(context, notification);
         },
@@ -286,10 +274,13 @@ class NotificationsPageContent extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: notification.isRead ? AppTheme.surface : AppTheme.primaryLight,
+            color:
+                notification.isRead ? AppTheme.surface : AppTheme.primaryLight,
             borderRadius: BorderRadius.circular(AppTheme.radiusMD),
             border: Border.all(
-              color: notification.isRead ? AppTheme.border : AppTheme.primary.withValues(alpha: 0.3),
+              color: notification.isRead
+                  ? AppTheme.border
+                  : AppTheme.primary.withValues(alpha: 0.3),
               width: notification.isRead ? 1 : 1.5,
             ),
             boxShadow: AppTheme.shadowSM,
@@ -307,8 +298,10 @@ class NotificationsPageContent extends StatelessWidget {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: _getNotificationColor(notification.type).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                          color: _getNotificationColor(notification.type)
+                              .withValues(alpha: 0.1),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusSM),
                         ),
                         child: Icon(
                           _getNotificationIcon(notification.type),
@@ -344,7 +337,9 @@ class NotificationsPageContent extends StatelessWidget {
                               child: Text(
                                 notification.title,
                                 style: AppTheme.labelLarge.copyWith(
-                                  fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.w700,
+                                  fontWeight: notification.isRead
+                                      ? FontWeight.w500
+                                      : FontWeight.w700,
                                 ),
                               ),
                             ),
@@ -362,7 +357,8 @@ class NotificationsPageContent extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           notification.message,
-                          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                          style: AppTheme.bodySmall
+                              .copyWith(color: AppTheme.textSecondary),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -382,7 +378,8 @@ class NotificationsPageContent extends StatelessWidget {
                             if (notification.isUrgent) ...[
                               const SizedBox(width: 12),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: AppTheme.error.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4),
@@ -418,13 +415,18 @@ class NotificationsPageContent extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      context.read<NotificationBloc>().add(MarkNotificationAsRead(notification.id));
-                      _navigationService.handleNotificationTap(context, notification);
+                      context
+                          .read<NotificationBloc>()
+                          .add(MarkNotificationAsRead(notification.id));
+                      _navigationService.handleNotificationTap(
+                          context, notification);
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: action.isUrgent ? AppTheme.error : AppTheme.primary,
+                      foregroundColor:
+                          action.isUrgent ? AppTheme.error : AppTheme.primary,
                       side: BorderSide(
-                        color: action.isUrgent ? AppTheme.error : AppTheme.primary,
+                        color:
+                            action.isUrgent ? AppTheme.error : AppTheme.primary,
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(

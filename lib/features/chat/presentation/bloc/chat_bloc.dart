@@ -152,7 +152,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       if (messageData != null) {
         // Vérifier si c'est pour cette conversation
         final msgResId = messageData['reservationId'] as String?;
-        if (msgResId == reservationId || msgReservationId == reservationId || msgResId == null) {
+        if (msgResId == reservationId ||
+            msgReservationId == reservationId ||
+            msgResId == null) {
           final message = ChatMessageModel.fromJson(messageData);
           add(MessageReceived(message));
         }

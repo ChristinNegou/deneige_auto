@@ -69,5 +69,7 @@ class BroadcastNotification extends AdminEvent {
 
 // Clear Events
 class ClearUserDetails extends AdminEvent {}
+
 class ClearReservationDetails extends AdminEvent {}
+
 class ClearError extends AdminEvent {}

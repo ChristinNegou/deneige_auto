@@ -103,7 +103,7 @@ class Reservation extends Equatable {
   /// Vérifie si la réservation est à venir et active (non passée et statut pending/assigned)
   bool get isUpcoming {
     return !isPast &&
-           (status == ReservationStatus.pending ||
+        (status == ReservationStatus.pending ||
             status == ReservationStatus.assigned);
   }
 
@@ -180,7 +180,8 @@ class Reservation extends Equatable {
       tip: tip ?? this.tip,
       isPriority: isPriority ?? this.isPriority,
       snowDepthCm: snowDepthCm ?? this.snowDepthCm,
-      estimatedArrivalMinutes: estimatedArrivalMinutes ?? this.estimatedArrivalMinutes,
+      estimatedArrivalMinutes:
+          estimatedArrivalMinutes ?? this.estimatedArrivalMinutes,
       locationLatitude: locationLatitude ?? this.locationLatitude,
       locationLongitude: locationLongitude ?? this.locationLongitude,
       locationAddress: locationAddress ?? this.locationAddress,
@@ -189,36 +190,36 @@ class Reservation extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    userId,
-    workerId,
-    workerName,
-    workerPhone,
-    parkingSpot,
-    vehicle,
-    departureTime,
-    deadlineTime,
-    status,
-    serviceOptions,
-    basePrice,
-    totalPrice,
-    beforePhotoUrl,
-    afterPhotoUrl,
-    createdAt,
-    assignedAt,
-    startedAt,
-    completedAt,
-    workerNotes,
-    rating,
-    review,
-    tip,
-    isPriority,
-    snowDepthCm,
-    estimatedArrivalMinutes,
-    locationLatitude,
-    locationLongitude,
-    locationAddress,
-  ];
+        id,
+        userId,
+        workerId,
+        workerName,
+        workerPhone,
+        parkingSpot,
+        vehicle,
+        departureTime,
+        deadlineTime,
+        status,
+        serviceOptions,
+        basePrice,
+        totalPrice,
+        beforePhotoUrl,
+        afterPhotoUrl,
+        createdAt,
+        assignedAt,
+        startedAt,
+        completedAt,
+        workerNotes,
+        rating,
+        review,
+        tip,
+        isPriority,
+        snowDepthCm,
+        estimatedArrivalMinutes,
+        locationLatitude,
+        locationLongitude,
+        locationAddress,
+      ];
 }
 
 extension ReservationStatusExtension on ReservationStatus {

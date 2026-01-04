@@ -7,7 +7,6 @@ import '../../domain/usecases/get_weather_usecase.dart';
 import 'home_event.dart';
 import 'home_state.dart';
 
-
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetCurrentUserUseCase getCurrentUser;
   final GetWeatherUseCase getWeather;
@@ -28,16 +27,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, clearError: true));
-    
+
     try {
       // Exécution séquentielle pour éviter les problèmes de typage
       final userResult = await getCurrentUser();
       final weatherResult = await getWeather();
       final reservationsResult = await getReservations(upcoming: true);
-      
+
       // Collecter les erreurs
       final errors = <String>[];
-      
+
       final user = userResult.fold(
         (failure) {
           errors.add('Erreur utilisateur: ${failure.message}');
@@ -45,7 +44,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         },
         (user) => user,
       );
-      
+
       final weather = weatherResult.fold(
         (failure) {
           errors.add('Erreur météo: ${failure.message}');
@@ -53,7 +52,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         },
         (weather) => weather,
       );
-      
+
       final reservations = reservationsResult.fold(
         (failure) {
           errors.add('Erreur réservations: ${failure.message}');
@@ -61,7 +60,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         },
         (reservations) => reservations,
       );
-      
+
       emit(state.copyWith(
         isLoading: false,
         user: user,
@@ -82,7 +81,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     final weatherResult = await getWeather();
-    
+
     weatherResult.fold(
       (failure) {
         emit(state.copyWith(
@@ -100,7 +99,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     final reservationsResult = await getReservations(upcoming: true);
-    
+
     reservationsResult.fold(
       (failure) {
         emit(state.copyWith(

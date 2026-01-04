@@ -15,15 +15,15 @@ class SubscriptionPage extends StatelessWidget {
           Text(
             'Choisissez votre plan',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             'Économisez avec nos forfaits saisonniers',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
-            ),
+                  color: Colors.grey[600],
+                ),
           ),
           const SizedBox(height: 24),
           _buildSubscriptionCard(
@@ -74,22 +74,22 @@ class SubscriptionPage extends StatelessWidget {
   }
 
   Widget _buildSubscriptionCard(
-      BuildContext context, {
-        required String title,
-        required String price,
-        required String period,
-        required List<String> features,
-        required Color color,
-        bool recommended = false,
-      }) {
+    BuildContext context, {
+    required String title,
+    required String price,
+    required String period,
+    required List<String> features,
+    required Color color,
+    bool recommended = false,
+  }) {
     return Card(
       elevation: recommended ? 8 : 2,
       child: Container(
         decoration: recommended
             ? BoxDecoration(
-          border: Border.all(color: color, width: 2),
-          borderRadius: BorderRadius.circular(12),
-        )
+                border: Border.all(color: color, width: 2),
+                borderRadius: BorderRadius.circular(12),
+              )
             : null,
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -98,7 +98,8 @@ class SubscriptionPage extends StatelessWidget {
             children: [
               if (recommended)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: color,
                     borderRadius: BorderRadius.circular(4),
@@ -116,8 +117,8 @@ class SubscriptionPage extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 8),
               Row(
@@ -126,9 +127,9 @@ class SubscriptionPage extends StatelessWidget {
                   Text(
                     '\$$price',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
                   ),
                   const SizedBox(width: 4),
                   Padding(
@@ -142,20 +143,20 @@ class SubscriptionPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ...features.map((feature) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: color, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        feature,
-                        style: const TextStyle(fontSize: 14),
-                      ),
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: color, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            feature,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )),
+                  )),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -179,11 +180,11 @@ class SubscriptionPage extends StatelessWidget {
   }
 
   void _showSubscriptionDialog(
-      BuildContext context,
-      String planName,
-      String price,
-      String period,
-      ) {
+    BuildContext context,
+    String planName,
+    String price,
+    String period,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

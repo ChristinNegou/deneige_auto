@@ -8,15 +8,14 @@ abstract class WeatherRepository {
   Future<Either<Failure, Weather>> getCurrentWeather();
 
   Future<Either<Failure, Weather>> getWeatherByLocation(
-      double latitude,
-      double longitude,
-      );
+    double latitude,
+    double longitude,
+  );
 
   Future<Either<Failure, Weather>> getWeatherForecast(
-      DateTime date, {
-        String? city,
-        double? lat,
-        double? lon,
-      });
-
+    DateTime date, {
+    String? city,
+    double? lat,
+    double? lon,
+  });
 }

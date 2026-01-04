@@ -45,7 +45,8 @@ void main() {
         },
         act: (bloc) => bloc.add(const LoadReservations()),
         expect: () => [
-          isA<ReservationListState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<ReservationListState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<ReservationListState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.errorMessage, 'errorMessage', null),
@@ -64,10 +65,12 @@ void main() {
         },
         act: (bloc) => bloc.add(const LoadReservations()),
         expect: () => [
-          isA<ReservationListState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<ReservationListState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<ReservationListState>()
               .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.errorMessage, 'errorMessage', serverFailure.message),
+              .having(
+                  (s) => s.errorMessage, 'errorMessage', serverFailure.message),
         ],
       );
 
@@ -95,7 +98,8 @@ void main() {
         },
         act: (bloc) => bloc.add(RefreshReservations()),
         expect: () => [
-          isA<ReservationListState>().having((s) => s.errorMessage, 'errorMessage', null),
+          isA<ReservationListState>()
+              .having((s) => s.errorMessage, 'errorMessage', null),
         ],
       );
 
@@ -108,8 +112,8 @@ void main() {
         },
         act: (bloc) => bloc.add(RefreshReservations()),
         expect: () => [
-          isA<ReservationListState>()
-              .having((s) => s.errorMessage, 'errorMessage', networkFailure.message),
+          isA<ReservationListState>().having(
+              (s) => s.errorMessage, 'errorMessage', networkFailure.message),
         ],
       );
     });
@@ -124,10 +128,12 @@ void main() {
         },
         act: (bloc) => bloc.add(const LoadReservationById('reservation-123')),
         expect: () => [
-          isA<ReservationListState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<ReservationListState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<ReservationListState>()
               .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.selectedReservation, 'selectedReservation', isNotNull),
+              .having((s) => s.selectedReservation, 'selectedReservation',
+                  isNotNull),
         ],
       );
 
@@ -140,10 +146,12 @@ void main() {
         },
         act: (bloc) => bloc.add(const LoadReservationById('invalid-id')),
         expect: () => [
-          isA<ReservationListState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<ReservationListState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<ReservationListState>()
               .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.errorMessage, 'errorMessage', serverFailure.message),
+              .having(
+                  (s) => s.errorMessage, 'errorMessage', serverFailure.message),
         ],
       );
     });
@@ -163,33 +171,41 @@ void main() {
       blocTest<ReservationListBloc, ReservationListState>(
         'emits success when CancelReservationEvent succeeds',
         build: () {
-          when(() => mockCancelReservation('reservation-123', reason: any(named: 'reason')))
+          when(() => mockCancelReservation('reservation-123',
+                  reason: any(named: 'reason')))
               .thenAnswer((_) async => Right(tCancellationResult));
           return bloc;
         },
-        act: (bloc) => bloc.add(const CancelReservationEvent('reservation-123', reason: 'Test')),
+        act: (bloc) => bloc.add(
+            const CancelReservationEvent('reservation-123', reason: 'Test')),
         expect: () => [
-          isA<ReservationListState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<ReservationListState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<ReservationListState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.successMessage, 'successMessage', isNotNull)
-              .having((s) => s.lastCancellationResult, 'lastCancellationResult', isNotNull),
+              .having((s) => s.lastCancellationResult, 'lastCancellationResult',
+                  isNotNull),
         ],
       );
 
       blocTest<ReservationListBloc, ReservationListState>(
         'emits error when CancelReservationEvent fails',
         build: () {
-          when(() => mockCancelReservation('reservation-123', reason: any(named: 'reason')))
+          when(() => mockCancelReservation('reservation-123',
+                  reason: any(named: 'reason')))
               .thenAnswer((_) async => const Left(serverFailure));
           return bloc;
         },
-        act: (bloc) => bloc.add(const CancelReservationEvent('reservation-123')),
+        act: (bloc) =>
+            bloc.add(const CancelReservationEvent('reservation-123')),
         expect: () => [
-          isA<ReservationListState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<ReservationListState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<ReservationListState>()
               .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.errorMessage, 'errorMessage', serverFailure.message),
+              .having(
+                  (s) => s.errorMessage, 'errorMessage', serverFailure.message),
         ],
       );
     });
@@ -204,7 +220,8 @@ void main() {
         },
         act: (bloc) => bloc.add(const LoadAllReservations()),
         expect: () => [
-          isA<ReservationListState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<ReservationListState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<ReservationListState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.errorMessage, 'errorMessage', null),

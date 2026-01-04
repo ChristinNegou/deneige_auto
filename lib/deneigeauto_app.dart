@@ -94,7 +94,7 @@ class AuthWrapper extends StatelessWidget {
         } else if (state is AuthUnauthenticated) {
           Navigator.of(context).pushNamedAndRemoveUntil(
             AppRoutes.accountType,
-                (route) => false,
+            (route) => false,
           );
         }
       },
@@ -129,7 +129,7 @@ class AuthWrapper extends StatelessWidget {
 
     Navigator.of(context).pushNamedAndRemoveUntil(
       route,
-          (route) => false,
+      (route) => false,
     );
   }
 
@@ -142,7 +142,8 @@ class AuthWrapper extends StatelessWidget {
           child: const Scaffold(body: Center(child: Text('Client Home'))),
         );
       case UserRole.snowWorker:
-        return const Scaffold(body: Center(child: Text('Snow Worker Dashboard')));
+        return const Scaffold(
+            body: Center(child: Text('Snow Worker Dashboard')));
       case UserRole.admin:
         return const Scaffold(body: Center(child: Text('Admin Dashboard')));
     }

@@ -88,7 +88,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.getPaymentHistory())
             .thenThrow(const ServerException(message: 'Server error'));
 
@@ -101,7 +102,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when AuthException is thrown', () async {
+      test('should return ServerFailure when AuthException is thrown',
+          () async {
         when(() => mockDataSource.getPaymentHistory())
             .thenThrow(const AuthException(message: 'Not authenticated'));
 
@@ -146,7 +148,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.getPaymentMethods())
             .thenThrow(const ServerException(message: 'Server error'));
 
@@ -175,7 +178,8 @@ void main() {
         expect(result, const Right(null));
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.savePaymentMethod(
               paymentMethodId: any(named: 'paymentMethodId'),
               setAsDefault: any(named: 'setAsDefault'),
@@ -204,7 +208,8 @@ void main() {
         verify(() => mockDataSource.deletePaymentMethod('pm-123')).called(1);
       });
 
-      test('should return ServerFailure when payment method not found', () async {
+      test('should return ServerFailure when payment method not found',
+          () async {
         when(() => mockDataSource.deletePaymentMethod('pm-123'))
             .thenThrow(const ServerException(message: 'Not found'));
 
@@ -226,10 +231,12 @@ void main() {
         final result = await repository.setDefaultPaymentMethod('pm-123');
 
         expect(result, const Right(null));
-        verify(() => mockDataSource.setDefaultPaymentMethod('pm-123')).called(1);
+        verify(() => mockDataSource.setDefaultPaymentMethod('pm-123'))
+            .called(1);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.setDefaultPaymentMethod('pm-123'))
             .thenThrow(const ServerException(message: 'Set default failed'));
 
@@ -261,7 +268,8 @@ void main() {
         expect(result.isRight(), true);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.processRefund(
               reservationId: any(named: 'reservationId'),
               amount: any(named: 'amount'),

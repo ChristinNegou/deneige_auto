@@ -5,7 +5,8 @@ import 'package:deneige_auto/core/services/socket_service.dart';
 import 'package:deneige_auto/service/secure_storage_service.dart';
 
 /// Mock pour PushNotificationService
-class MockPushNotificationService extends Mock implements PushNotificationService {}
+class MockPushNotificationService extends Mock
+    implements PushNotificationService {}
 
 /// Mock pour AnalyticsService
 class MockAnalyticsService extends Mock implements AnalyticsService {}

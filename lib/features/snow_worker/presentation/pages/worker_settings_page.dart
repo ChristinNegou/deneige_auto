@@ -16,7 +16,8 @@ class WorkerSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<WorkerAvailabilityBloc>()..add(const LoadAvailability()),
+      create: (context) =>
+          sl<WorkerAvailabilityBloc>()..add(const LoadAvailability()),
       child: const _WorkerSettingsView(),
     );
   }
@@ -70,7 +71,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 SnackBar(
                   content: Row(
                     children: [
-                      const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                      const Icon(Icons.check_circle,
+                          color: Colors.white, size: 20),
                       const SizedBox(width: 12),
                       const Text('Paramètres sauvegardés'),
                     ],
@@ -87,7 +89,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 SnackBar(
                   content: Row(
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                      const Icon(Icons.error_outline,
+                          color: Colors.white, size: 20),
                       const SizedBox(width: 12),
                       Expanded(child: Text(state.message)),
                     ],
@@ -292,7 +295,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   color: AppTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.build_rounded, color: AppTheme.primary, size: 20),
+                child: const Icon(Icons.build_rounded,
+                    color: AppTheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Mon équipement', style: AppTheme.headlineSmall),
@@ -356,7 +360,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 Expanded(
                   child: Text(
                     label,
-                    style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w500),
+                    style: AppTheme.bodyMedium
+                        .copyWith(fontWeight: FontWeight.w500),
                   ),
                 ),
                 Container(
@@ -365,7 +370,9 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   decoration: BoxDecoration(
                     color: value ? AppTheme.success : AppTheme.background,
                     borderRadius: BorderRadius.circular(6),
-                    border: value ? null : Border.all(color: AppTheme.border, width: 2),
+                    border: value
+                        ? null
+                        : Border.all(color: AppTheme.border, width: 2),
                   ),
                   child: value
                       ? const Icon(Icons.check, color: Colors.white, size: 16)
@@ -400,7 +407,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   color: AppTheme.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.directions_car_rounded, color: AppTheme.secondary, size: 20),
+                child: const Icon(Icons.directions_car_rounded,
+                    color: AppTheme.secondary, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Mon véhicule', style: AppTheme.headlineSmall),
@@ -423,7 +431,9 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withValues(alpha: 0.08) : AppTheme.background,
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.08)
+              : AppTheme.background,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
           border: isSelected
               ? Border.all(color: AppTheme.primary, width: 2)
@@ -441,7 +451,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                     _getVehicleLabel(type),
                     style: AppTheme.labelLarge.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? AppTheme.primary : AppTheme.textPrimary,
+                      color:
+                          isSelected ? AppTheme.primary : AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -492,7 +503,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   color: AppTheme.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.tune_rounded, color: AppTheme.success, size: 20),
+                child: const Icon(Icons.tune_rounded,
+                    color: AppTheme.success, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Préférences de travail', style: AppTheme.headlineSmall),
@@ -613,7 +625,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   color: AppTheme.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.location_on_rounded, color: AppTheme.warning, size: 20),
+                child: const Icon(Icons.location_on_rounded,
+                    color: AppTheme.warning, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -640,11 +653,13 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               GestureDetector(
                 onTap: () => _showAddZoneDialog(context),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: AppTheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                    border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppTheme.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -734,7 +749,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   color: AppTheme.info.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.notifications_rounded, color: AppTheme.info, size: 20),
+                child: const Icon(Icons.notifications_rounded,
+                    color: AppTheme.info, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Notifications', style: AppTheme.headlineSmall),
@@ -791,7 +807,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               children: [
                 Text(
                   title,
-                  style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                  style:
+                      AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
                 ),
                 Text(subtitle, style: AppTheme.bodySmall),
               ],
@@ -806,7 +823,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               decoration: BoxDecoration(
                 color: value ? AppTheme.success : AppTheme.background,
                 borderRadius: BorderRadius.circular(14),
-                border: value ? null : Border.all(color: AppTheme.border, width: 2),
+                border:
+                    value ? null : Border.all(color: AppTheme.border, width: 2),
               ),
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 200),
@@ -982,12 +1000,12 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       if (_hasSnowBlower) equipment.add('snow_blower');
 
       context.read<WorkerAvailabilityBloc>().add(
-        UpdateProfile(
-          vehicleType: _selectedVehicle,
-          equipmentList: equipment,
-          maxActiveJobs: _maxActiveJobs,
-        ),
-      );
+            UpdateProfile(
+              vehicleType: _selectedVehicle,
+              equipmentList: equipment,
+              maxActiveJobs: _maxActiveJobs,
+            ),
+          );
     }
   }
 
@@ -1012,7 +1030,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   color: AppTheme.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+                child: const Icon(Icons.logout_rounded,
+                    color: AppTheme.error, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Compte', style: AppTheme.headlineSmall),
@@ -1027,7 +1046,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               decoration: BoxDecoration(
                 color: AppTheme.error.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                border:
+                    Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1065,7 +1085,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 color: AppTheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSM),
               ),
-              child: Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+              child:
+                  Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('Déconnexion'),

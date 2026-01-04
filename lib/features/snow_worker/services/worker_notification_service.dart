@@ -6,17 +6,20 @@ import 'package:vibration/vibration.dart';
 import '../domain/entities/worker_job.dart';
 
 class WorkerNotificationService {
-  static final WorkerNotificationService _instance = WorkerNotificationService._internal();
+  static final WorkerNotificationService _instance =
+      WorkerNotificationService._internal();
   factory WorkerNotificationService() => _instance;
   WorkerNotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
 
   Future<void> initialize() async {
     if (_isInitialized) return;
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -36,16 +39,21 @@ class WorkerNotificationService {
     await _vibrate(isUrgent: job.isPriority);
     await _showNotification(
       title: job.isPriority ? '🚨 JOB URGENT!' : '📍 Nouveau job disponible',
-      body: '${job.displayAddress}\n${job.totalPrice.toStringAsFixed(2)}\$ - ${job.distanceKm?.toStringAsFixed(1) ?? "?"} km',
+      body:
+          '${job.displayAddress}\n${job.totalPrice.toStringAsFixed(2)}\$ - ${job.distanceKm?.toStringAsFixed(1) ?? "?"} km',
       isUrgent: job.isPriority,
     );
   }
 
-  Future<void> notifyMultipleNewJobs(int count, {bool hasUrgent = false}) async {
+  Future<void> notifyMultipleNewJobs(int count,
+      {bool hasUrgent = false}) async {
     await _vibrate(isUrgent: hasUrgent);
     await _showNotification(
-      title: hasUrgent ? '🚨 Nouveaux jobs urgents!' : '📍 Nouveaux jobs disponibles',
-      body: '$count nouveau${count > 1 ? 'x' : ''} job${count > 1 ? 's' : ''} près de vous!',
+      title: hasUrgent
+          ? '🚨 Nouveaux jobs urgents!'
+          : '📍 Nouveaux jobs disponibles',
+      body:
+          '$count nouveau${count > 1 ? 'x' : ''} job${count > 1 ? 's' : ''} près de vous!',
       isUrgent: hasUrgent,
     );
   }
@@ -147,4 +155,3 @@ class WorkerNotificationService {
     }
   }
 }
-

@@ -48,7 +48,6 @@ class UpdateCustomLocation extends NewReservationEvent {
   List<Object?> get props => [location];
 }
 
-
 // Step 2 Events
 class SelectDateTime extends NewReservationEvent {
   final DateTime departureDateTime;
@@ -86,12 +85,13 @@ class SubmitReservation extends NewReservationEvent {
 
   @override
   List<Object?> get props => [paymentMethod, paymentIntentId];
-
 }
 
 // Navigation Events
 class GoToNextStep extends NewReservationEvent {}
+
 class GoToPreviousStep extends NewReservationEvent {}
+
 class ResetReservation extends NewReservationEvent {}
 
 // Location Events

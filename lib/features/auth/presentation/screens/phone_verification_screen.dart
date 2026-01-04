@@ -27,7 +27,8 @@ class PhoneVerificationScreen extends StatefulWidget {
   });
 
   @override
-  State<PhoneVerificationScreen> createState() => _PhoneVerificationScreenState();
+  State<PhoneVerificationScreen> createState() =>
+      _PhoneVerificationScreenState();
 }
 
 class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
@@ -86,15 +87,15 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
   void _sendVerificationCode() {
     context.read<AuthBloc>().add(
-      SendPhoneVerificationCode(
-        phoneNumber: widget.phoneNumber,
-        email: widget.email,
-        password: widget.password,
-        firstName: widget.firstName,
-        lastName: widget.lastName,
-        role: widget.role,
-      ),
-    );
+          SendPhoneVerificationCode(
+            phoneNumber: widget.phoneNumber,
+            email: widget.email,
+            password: widget.password,
+            firstName: widget.firstName,
+            lastName: widget.lastName,
+            role: widget.role,
+          ),
+        );
   }
 
   void _resendCode() {
@@ -102,8 +103,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     _clearCode();
     _startResendTimer();
     context.read<AuthBloc>().add(
-      ResendPhoneVerificationCode(phoneNumber: widget.phoneNumber),
-    );
+          ResendPhoneVerificationCode(phoneNumber: widget.phoneNumber),
+        );
   }
 
   void _clearCode() {
@@ -132,11 +133,11 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     });
 
     context.read<AuthBloc>().add(
-      VerifyPhoneCode(
-        phoneNumber: widget.phoneNumber,
-        code: code,
-      ),
-    );
+          VerifyPhoneCode(
+            phoneNumber: widget.phoneNumber,
+            code: code,
+          ),
+        );
   }
 
   void _onDigitEntered(int index, String value) {

@@ -33,7 +33,8 @@ void main() {
 
     test('should cancel reservation successfully', () async {
       // Arrange
-      when(() => mockRepository.cancelReservation(tReservationId, reason: tReason))
+      when(() =>
+              mockRepository.cancelReservation(tReservationId, reason: tReason))
           .thenAnswer((_) async => Right(tCancellationResult));
 
       // Act
@@ -48,7 +49,9 @@ void main() {
           expect(cancellation.refundAmount, 25.0);
         },
       );
-      verify(() => mockRepository.cancelReservation(tReservationId, reason: tReason)).called(1);
+      verify(() =>
+              mockRepository.cancelReservation(tReservationId, reason: tReason))
+          .called(1);
     });
 
     test('should cancel reservation without reason', () async {
@@ -64,7 +67,8 @@ void main() {
       verify(() => mockRepository.cancelReservation(tReservationId)).called(1);
     });
 
-    test('should return cancellation with fee when late cancellation', () async {
+    test('should return cancellation with fee when late cancellation',
+        () async {
       // Arrange
       final lateCancellationResult = CancellationResult(
         success: true,
@@ -76,7 +80,8 @@ void main() {
         cancellationFeeAmount: 5.0,
         refundAmount: 20.0,
       );
-      when(() => mockRepository.cancelReservation(tReservationId, reason: any(named: 'reason')))
+      when(() => mockRepository.cancelReservation(tReservationId,
+              reason: any(named: 'reason')))
           .thenAnswer((_) async => Right(lateCancellationResult));
 
       // Act
@@ -95,7 +100,8 @@ void main() {
 
     test('should return ServerFailure on server error', () async {
       // Arrange
-      when(() => mockRepository.cancelReservation(tReservationId, reason: any(named: 'reason')))
+      when(() => mockRepository.cancelReservation(tReservationId,
+              reason: any(named: 'reason')))
           .thenAnswer((_) async => const Left(serverFailure));
 
       // Act
@@ -105,9 +111,11 @@ void main() {
       expect(result, const Left(serverFailure));
     });
 
-    test('should return ValidationFailure when reservation not found', () async {
+    test('should return ValidationFailure when reservation not found',
+        () async {
       // Arrange
-      when(() => mockRepository.cancelReservation('invalid-id', reason: any(named: 'reason')))
+      when(() => mockRepository.cancelReservation('invalid-id',
+              reason: any(named: 'reason')))
           .thenAnswer((_) async => const Left(validationFailure));
 
       // Act

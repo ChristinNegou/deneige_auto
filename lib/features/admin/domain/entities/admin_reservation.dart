@@ -90,7 +90,9 @@ class AdminReservation {
     return AdminReservation(
       id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
       status: json['status']?.toString() ?? 'pending',
-      departureTime: DateTime.tryParse(json['departureTime']?.toString() ?? '') ?? DateTime.now(),
+      departureTime:
+          DateTime.tryParse(json['departureTime']?.toString() ?? '') ??
+              DateTime.now(),
       completedAt: json['completedAt'] != null
           ? DateTime.tryParse(json['completedAt'].toString())
           : null,
@@ -102,22 +104,28 @@ class AdminReservation {
       workerPayout: _toDouble(json['workerPayout']),
       paymentStatus: json['paymentStatus']?.toString(),
       paymentIntentId: json['paymentIntentId']?.toString(),
-      client: json['userId'] != null ? ReservationClient.fromJson(
-          json['userId'] is Map ? json['userId'] : {'_id': json['userId']}
-      ) : null,
-      worker: json['workerId'] != null ? ReservationWorker.fromJson(
-          json['workerId'] is Map ? json['workerId'] : {'_id': json['workerId']}
-      ) : null,
-      vehicle: json['vehicle'] != null ? ReservationVehicle.fromJson(
-          json['vehicle'] is Map ? json['vehicle'] : {'_id': json['vehicle']}
-      ) : null,
+      client: json['userId'] != null
+          ? ReservationClient.fromJson(
+              json['userId'] is Map ? json['userId'] : {'_id': json['userId']})
+          : null,
+      worker: json['workerId'] != null
+          ? ReservationWorker.fromJson(json['workerId'] is Map
+              ? json['workerId']
+              : {'_id': json['workerId']})
+          : null,
+      vehicle: json['vehicle'] != null
+          ? ReservationVehicle.fromJson(json['vehicle'] is Map
+              ? json['vehicle']
+              : {'_id': json['vehicle']})
+          : null,
       parkingSpotNumber: json['parkingSpotNumber']?.toString(),
       notes: json['notes']?.toString(),
       serviceOptions: (json['serviceOptions'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+          DateTime.now(),
       cancellationReason: json['cancellationReason']?.toString(),
       isRefunded: json['isRefunded'] ?? false,
       refundAmount: _toDouble(json['refundAmount']),

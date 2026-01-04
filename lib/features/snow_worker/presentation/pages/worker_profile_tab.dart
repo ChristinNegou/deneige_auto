@@ -81,7 +81,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               SnackBar(
                 content: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                    const Icon(Icons.error_outline,
+                        color: Colors.white, size: 20),
                     const SizedBox(width: 12),
                     Expanded(child: Text(state.message)),
                   ],
@@ -182,7 +183,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.local_shipping_rounded, size: 14, color: AppTheme.warning),
+                Icon(Icons.local_shipping_rounded,
+                    size: 14, color: AppTheme.warning),
                 const SizedBox(width: 6),
                 Text(
                   'Deneigeur',
@@ -335,7 +337,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   color: AppTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.build_rounded, color: AppTheme.primary, size: 20),
+                child: const Icon(Icons.build_rounded,
+                    color: AppTheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Mon equipement', style: AppTheme.headlineSmall),
@@ -399,7 +402,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 Expanded(
                   child: Text(
                     label,
-                    style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w500),
+                    style: AppTheme.bodyMedium
+                        .copyWith(fontWeight: FontWeight.w500),
                   ),
                 ),
                 Container(
@@ -408,7 +412,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   decoration: BoxDecoration(
                     color: value ? AppTheme.success : AppTheme.background,
                     borderRadius: BorderRadius.circular(6),
-                    border: value ? null : Border.all(color: AppTheme.border, width: 2),
+                    border: value
+                        ? null
+                        : Border.all(color: AppTheme.border, width: 2),
                   ),
                   child: value
                       ? const Icon(Icons.check, color: Colors.white, size: 16)
@@ -443,7 +449,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   color: AppTheme.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.directions_car_rounded, color: AppTheme.secondary, size: 20),
+                child: const Icon(Icons.directions_car_rounded,
+                    color: AppTheme.secondary, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Mon vehicule', style: AppTheme.headlineSmall),
@@ -466,7 +473,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withValues(alpha: 0.08) : AppTheme.background,
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.08)
+              : AppTheme.background,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
           border: isSelected
               ? Border.all(color: AppTheme.primary, width: 2)
@@ -484,7 +493,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     _getVehicleLabel(type),
                     style: AppTheme.labelLarge.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? AppTheme.primary : AppTheme.textPrimary,
+                      color:
+                          isSelected ? AppTheme.primary : AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -535,7 +545,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   color: AppTheme.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.tune_rounded, color: AppTheme.success, size: 20),
+                child: const Icon(Icons.tune_rounded,
+                    color: AppTheme.success, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Preferences de travail', style: AppTheme.headlineSmall),
@@ -656,7 +667,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   color: AppTheme.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.location_on_rounded, color: AppTheme.warning, size: 20),
+                child: const Icon(Icons.location_on_rounded,
+                    color: AppTheme.warning, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -683,11 +695,13 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               GestureDetector(
                 onTap: () => _showAddZoneDialog(context),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: AppTheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                    border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppTheme.primary.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -777,7 +791,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   color: AppTheme.info.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.notifications_rounded, color: AppTheme.info, size: 20),
+                child: const Icon(Icons.notifications_rounded,
+                    color: AppTheme.info, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Notifications', style: AppTheme.headlineSmall),
@@ -834,7 +849,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               children: [
                 Text(
                   title,
-                  style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                  style:
+                      AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
                 ),
                 Text(subtitle, style: AppTheme.bodySmall),
               ],
@@ -849,7 +865,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               decoration: BoxDecoration(
                 color: value ? AppTheme.success : AppTheme.background,
                 borderRadius: BorderRadius.circular(14),
-                border: value ? null : Border.all(color: AppTheme.border, width: 2),
+                border:
+                    value ? null : Border.all(color: AppTheme.border, width: 2),
               ),
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 200),
@@ -939,7 +956,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   color: AppTheme.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+                child: const Icon(Icons.logout_rounded,
+                    color: AppTheme.error, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Compte', style: AppTheme.headlineSmall),
@@ -954,7 +972,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               decoration: BoxDecoration(
                 color: AppTheme.error.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                border:
+                    Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1107,7 +1126,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 color: AppTheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSM),
               ),
-              child: Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+              child:
+                  Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('Deconnexion'),

@@ -12,11 +12,11 @@ class SecureStorageService {
 
   SecureStorageService({FlutterSecureStorage? storage})
       : _storage = storage ??
-      const FlutterSecureStorage(
-        aOptions: AndroidOptions(
-          encryptedSharedPreferences: true,
-        ),
-      );
+            const FlutterSecureStorage(
+              aOptions: AndroidOptions(
+                encryptedSharedPreferences: true,
+              ),
+            );
 
   /// Sauvegarde le token d'authentification
   Future<void> saveToken(String token) async {

@@ -22,36 +22,40 @@ class Step4OptionsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section Options
-              _buildSectionHeader('Options supplémentaires', Icons.add_circle_outline_rounded),
+              _buildSectionHeader(
+                  'Options supplémentaires', Icons.add_circle_outline_rounded),
               const SizedBox(height: 12),
 
               ServiceOptionTile(
                 option: ServiceOption.windowScraping,
-                isSelected: state.selectedOptions.contains(ServiceOption.windowScraping),
+                isSelected: state.selectedOptions
+                    .contains(ServiceOption.windowScraping),
                 price: 5.0,
                 onToggle: () => context.read<NewReservationBloc>().add(
-                  const ToggleServiceOption(ServiceOption.windowScraping),
-                ),
+                      const ToggleServiceOption(ServiceOption.windowScraping),
+                    ),
               ),
               const SizedBox(height: 8),
 
               ServiceOptionTile(
                 option: ServiceOption.doorDeicing,
-                isSelected: state.selectedOptions.contains(ServiceOption.doorDeicing),
+                isSelected:
+                    state.selectedOptions.contains(ServiceOption.doorDeicing),
                 price: AppConfig.doorDeicingSurcharge,
                 onToggle: () => context.read<NewReservationBloc>().add(
-                  const ToggleServiceOption(ServiceOption.doorDeicing),
-                ),
+                      const ToggleServiceOption(ServiceOption.doorDeicing),
+                    ),
               ),
               const SizedBox(height: 8),
 
               ServiceOptionTile(
                 option: ServiceOption.wheelClearance,
-                isSelected: state.selectedOptions.contains(ServiceOption.wheelClearance),
+                isSelected: state.selectedOptions
+                    .contains(ServiceOption.wheelClearance),
                 price: AppConfig.wheelClearanceSurcharge,
                 onToggle: () => context.read<NewReservationBloc>().add(
-                  const ToggleServiceOption(ServiceOption.wheelClearance),
-                ),
+                      const ToggleServiceOption(ServiceOption.wheelClearance),
+                    ),
               ),
 
               const SizedBox(height: 28),
@@ -63,8 +67,8 @@ class Step4OptionsScreen extends StatelessWidget {
               SnowDepthInput(
                 initialValue: state.snowDepthCm,
                 onChanged: (value) => context.read<NewReservationBloc>().add(
-                  UpdateSnowDepth(value),
-                ),
+                      UpdateSnowDepth(value),
+                    ),
               ),
 
               const SizedBox(height: 28),

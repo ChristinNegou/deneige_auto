@@ -67,10 +67,14 @@ class WorkerStatsModel extends WorkerStats {
 
   factory WorkerStatsModel.fromJson(Map<String, dynamic> json) {
     return WorkerStatsModel(
-      today: TodayStatsModel.fromJson(json['today'] as Map<String, dynamic>? ?? {}),
-      week: PeriodStatsModel.fromJson(json['week'] as Map<String, dynamic>? ?? {}),
-      month: PeriodStatsModel.fromJson(json['month'] as Map<String, dynamic>? ?? {}),
-      allTime: AllTimeStatsModel.fromJson(json['allTime'] as Map<String, dynamic>? ?? {}),
+      today: TodayStatsModel.fromJson(
+          json['today'] as Map<String, dynamic>? ?? {}),
+      week: PeriodStatsModel.fromJson(
+          json['week'] as Map<String, dynamic>? ?? {}),
+      month: PeriodStatsModel.fromJson(
+          json['month'] as Map<String, dynamic>? ?? {}),
+      allTime: AllTimeStatsModel.fromJson(
+          json['allTime'] as Map<String, dynamic>? ?? {}),
       isAvailable: json['isAvailable'] as bool? ?? false,
     );
   }

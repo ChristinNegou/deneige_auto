@@ -33,16 +33,16 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
     final sorted = List<AdminUser>.from(workers);
     switch (_sortBy) {
       case 'rating':
-        sorted.sort((a, b) =>
-          (b.workerProfile?.averageRating ?? 0).compareTo(a.workerProfile?.averageRating ?? 0));
+        sorted.sort((a, b) => (b.workerProfile?.averageRating ?? 0)
+            .compareTo(a.workerProfile?.averageRating ?? 0));
         break;
       case 'jobs':
-        sorted.sort((a, b) =>
-          (b.workerProfile?.totalJobsCompleted ?? 0).compareTo(a.workerProfile?.totalJobsCompleted ?? 0));
+        sorted.sort((a, b) => (b.workerProfile?.totalJobsCompleted ?? 0)
+            .compareTo(a.workerProfile?.totalJobsCompleted ?? 0));
         break;
       case 'earnings':
-        sorted.sort((a, b) =>
-          (b.workerProfile?.totalEarnings ?? 0).compareTo(a.workerProfile?.totalEarnings ?? 0));
+        sorted.sort((a, b) => (b.workerProfile?.totalEarnings ?? 0)
+            .compareTo(a.workerProfile?.totalEarnings ?? 0));
         break;
       case 'name':
         sorted.sort((a, b) => a.fullName.compareTo(b.fullName));
@@ -88,7 +88,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                 value: 'earnings',
                 child: Row(
                   children: [
-                    if (_sortBy == 'earnings') const Icon(Icons.check, size: 18),
+                    if (_sortBy == 'earnings')
+                      const Icon(Icons.check, size: 18),
                     if (_sortBy == 'earnings') const SizedBox(width: 8),
                     const Text('Gains'),
                   ],
@@ -165,7 +166,9 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     _searchController.clear();
-                    context.read<AdminBloc>().add(LoadUsers(role: 'snowWorker'));
+                    context
+                        .read<AdminBloc>()
+                        .add(LoadUsers(role: 'snowWorker'));
                   },
                 )
               : null,
@@ -186,12 +189,13 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
 
   Widget _buildStatsHeader(BuildContext context, AdminState state) {
     final workers = state.users.where((u) => u.role == 'snowWorker').toList();
-    final activeCount = workers.where((w) =>
-      w.workerProfile?.isAvailable == true && !w.isSuspended).length;
-    final verifiedCount = workers.where((w) =>
-      w.workerProfile?.isVerified == true).length;
+    final activeCount = workers
+        .where((w) => w.workerProfile?.isAvailable == true && !w.isSuspended)
+        .length;
+    final verifiedCount =
+        workers.where((w) => w.workerProfile?.isVerified == true).length;
     final totalEarnings = workers.fold<double>(
-      0, (sum, w) => sum + (w.workerProfile?.totalEarnings ?? 0));
+        0, (sum, w) => sum + (w.workerProfile?.totalEarnings ?? 0));
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -259,7 +263,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
             Text(state.errorMessage ?? 'Une erreur est survenue'),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => context.read<AdminBloc>().add(LoadUsers(role: 'snowWorker')),
+              onPressed: () =>
+                  context.read<AdminBloc>().add(LoadUsers(role: 'snowWorker')),
               child: const Text('Réessayer'),
             ),
           ],
@@ -267,7 +272,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
       );
     }
 
-    final workers = _sortWorkers(state.users.where((u) => u.role == 'snowWorker').toList());
+    final workers =
+        _sortWorkers(state.users.where((u) => u.role == 'snowWorker').toList());
 
     if (workers.isEmpty) {
       return const Center(
@@ -322,11 +328,12 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                     children: [
                       CircleAvatar(
                         radius: 32,
-                        backgroundColor: _getRankColor(index).withValues(alpha: 0.2),
+                        backgroundColor:
+                            _getRankColor(index).withValues(alpha: 0.2),
                         child: Text(
                           worker.firstName.isNotEmpty
-                            ? worker.firstName[0].toUpperCase()
-                            : '?',
+                              ? worker.firstName[0].toUpperCase()
+                              : '?',
                           style: TextStyle(
                             color: _getRankColor(index),
                             fontWeight: FontWeight.bold,
@@ -374,7 +381,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             ),
                             if (profile?.isVerified == true)
                               Icon(Icons.verified,
-                                color: Colors.blue.shade600, size: 20),
+                                  color: Colors.blue.shade600, size: 20),
                           ],
                         ),
                         const SizedBox(height: 4),
@@ -459,7 +466,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
     );
   }
 
-  Widget _buildWorkerStat(IconData icon, Color color, String value, String label) {
+  Widget _buildWorkerStat(
+      IconData icon, Color color, String value, String label) {
     return Column(
       children: [
         Row(
@@ -540,7 +548,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundColor: AppTheme.primary.withValues(alpha: 0.2),
+                        backgroundColor:
+                            AppTheme.primary.withValues(alpha: 0.2),
                         child: Text(
                           worker.firstName.isNotEmpty
                               ? worker.firstName[0].toUpperCase()
@@ -630,13 +639,15 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                     Expanded(
                       child: _buildDetailStatCard(
                         'Statut',
-                        profile?.isAvailable == true ? 'Disponible' : 'Indisponible',
                         profile?.isAvailable == true
-                          ? Icons.check_circle
-                          : Icons.cancel,
+                            ? 'Disponible'
+                            : 'Indisponible',
                         profile?.isAvailable == true
-                          ? Colors.green
-                          : Colors.grey,
+                            ? Icons.check_circle
+                            : Icons.cancel,
+                        profile?.isAvailable == true
+                            ? Colors.green
+                            : Colors.grey,
                       ),
                     ),
                   ],
@@ -688,7 +699,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                         ],
                         if (worker.suspendedUntil != null) ...[
                           const SizedBox(height: 4),
-                          Text('Jusqu\'au: ${_formatDate(worker.suspendedUntil!)}'),
+                          Text(
+                              'Jusqu\'au: ${_formatDate(worker.suspendedUntil!)}'),
                         ],
                       ],
                     ),
@@ -835,12 +847,12 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
               onPressed: () {
                 Navigator.pop(dialogContext);
                 adminBloc.add(SuspendUser(
-                      userId: worker.id,
-                      reason: reasonController.text.isNotEmpty
-                          ? reasonController.text
-                          : null,
-                      days: selectedDays,
-                    ));
+                  userId: worker.id,
+                  reason: reasonController.text.isNotEmpty
+                      ? reasonController.text
+                      : null,
+                  days: selectedDays,
+                ));
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Suspendre'),

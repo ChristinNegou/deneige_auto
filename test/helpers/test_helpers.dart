@@ -23,6 +23,7 @@ SuspendedFailure createSuspendedFailure({
   return SuspendedFailure(
     message: message,
     reason: reason,
-    suspendedUntil: suspendedUntil ?? DateTime.now().add(const Duration(days: 7)),
+    suspendedUntil:
+        suspendedUntil ?? DateTime.now().add(const Duration(days: 7)),
   );
 }

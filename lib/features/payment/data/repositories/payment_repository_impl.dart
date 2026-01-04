@@ -61,7 +61,8 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deletePaymentMethod(String paymentMethodId) async {
+  Future<Either<Failure, void>> deletePaymentMethod(
+      String paymentMethodId) async {
     try {
       await remoteDataSource.deletePaymentMethod(paymentMethodId);
       return const Right(null);
@@ -75,7 +76,8 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   @override
-  Future<Either<Failure, void>> setDefaultPaymentMethod(String paymentMethodId) async {
+  Future<Either<Failure, void>> setDefaultPaymentMethod(
+      String paymentMethodId) async {
     try {
       await remoteDataSource.setDefaultPaymentMethod(paymentMethodId);
       return const Right(null);

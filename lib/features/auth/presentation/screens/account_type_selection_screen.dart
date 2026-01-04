@@ -94,7 +94,6 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pushNamed(AppRoutes.login);
                       },
-
                       child: const Text(
                         'Se connecter',
                         style: TextStyle(
@@ -153,7 +152,8 @@ class _AccountTypeCard extends StatelessWidget {
                 child: Icon(
                   icon,
                   size: 40,
-                  color: color == Colors.white ? const Color(0xFF1E3A8A) : color,
+                  color:
+                      color == Colors.white ? const Color(0xFF1E3A8A) : color,
                 ),
               ),
               const SizedBox(width: 16),

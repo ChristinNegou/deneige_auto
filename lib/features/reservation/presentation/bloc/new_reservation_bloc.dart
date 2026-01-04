@@ -11,7 +11,8 @@ import '../../domain/usecases/get_vehicules_usecase.dart';
 import 'new_reservation_event.dart';
 import 'new_reservation_state.dart';
 
-class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> {
+class NewReservationBloc
+    extends Bloc<NewReservationEvent, NewReservationState> {
   final GetVehiclesUseCase getVehicles;
   final GetParkingSpotsUseCase getParkingSpots;
   final CreateReservationUseCase createReservation;
@@ -58,7 +59,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
           emit(state.copyWith(
             isGettingLocation: false,
             needsManualAddress: true,
-            locationError: 'Permission de localisation refusée. Veuillez entrer votre adresse.',
+            locationError:
+                'Permission de localisation refusée. Veuillez entrer votre adresse.',
           ));
           return;
         }
@@ -68,7 +70,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
         emit(state.copyWith(
           isGettingLocation: false,
           needsManualAddress: true,
-          locationError: 'Permission refusée définitivement. Veuillez entrer votre adresse.',
+          locationError:
+              'Permission refusée définitivement. Veuillez entrer votre adresse.',
         ));
         return;
       }
@@ -86,8 +89,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       double latitude = position.latitude;
       double longitude = position.longitude;
 
-      final isEmulatorLocation = (position.latitude - 37.4219983).abs() < 0.01 &&
-          (position.longitude - (-122.084)).abs() < 0.01;
+      final isEmulatorLocation =
+          (position.latitude - 37.4219983).abs() < 0.01 &&
+              (position.longitude - (-122.084)).abs() < 0.01;
 
       if (isEmulatorLocation) {
         // Utiliser les coordonnées de Trois-Rivières pour les tests
@@ -104,7 +108,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
         );
         if (placemarks.isNotEmpty) {
           final p = placemarks.first;
-          address = '${p.street ?? ''}, ${p.locality ?? ''}, ${p.country ?? ''}'.trim();
+          address = '${p.street ?? ''}, ${p.locality ?? ''}, ${p.country ?? ''}'
+              .trim();
           if (address.startsWith(',')) address = address.substring(1).trim();
         }
       } catch (_) {
@@ -118,7 +123,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
         isGettingLocation: false,
         locationLatitude: latitude,
         locationLongitude: longitude,
-        locationAddress: address ?? state.customLocation ?? state.parkingSpotNumber,
+        locationAddress:
+            address ?? state.customLocation ?? state.parkingSpotNumber,
         needsManualAddress: false,
         locationError: null,
       ));
@@ -126,7 +132,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       emit(state.copyWith(
         isGettingLocation: false,
         needsManualAddress: true,
-        locationError: 'Impossible d\'obtenir votre position. Veuillez entrer votre adresse.',
+        locationError:
+            'Impossible d\'obtenir votre position. Veuillez entrer votre adresse.',
       ));
     }
   }
@@ -152,7 +159,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       if (locations.isEmpty) {
         emit(state.copyWith(
           isGettingLocation: false,
-          locationError: 'Adresse non trouvée. Veuillez réessayer avec une adresse plus précise.',
+          locationError:
+              'Adresse non trouvée. Veuillez réessayer avec une adresse plus précise.',
         ));
         return;
       }
@@ -169,7 +177,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
     } catch (e) {
       emit(state.copyWith(
         isGettingLocation: false,
-        locationError: 'Erreur lors de la recherche de l\'adresse. Veuillez réessayer.',
+        locationError:
+            'Erreur lors de la recherche de l\'adresse. Veuillez réessayer.',
       ));
     }
   }
@@ -182,9 +191,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   Future<void> _onLoadInitialData(
-      LoadInitialData event,
-      Emitter<NewReservationState> emit,
-      ) async {
+    LoadInitialData event,
+    Emitter<NewReservationState> emit,
+  ) async {
     emit(state.copyWith(isLoadingData: true));
 
     try {
@@ -194,12 +203,12 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       emit(state.copyWith(
         isLoadingData: false,
         availableVehicles: vehiclesResult.fold(
-              (failure) => [],
-              (vehicles) => vehicles,
+          (failure) => [],
+          (vehicles) => vehicles,
         ),
         availableParkingSpots: parkingSpotsResult.fold(
-              (failure) => [],
-              (spots) => spots,
+          (failure) => [],
+          (spots) => spots,
         ),
       ));
     } catch (e) {
@@ -211,9 +220,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onSelectVehicle(
-      SelectVehicle event,
-      Emitter<NewReservationState> emit,
-      ) {
+    SelectVehicle event,
+    Emitter<NewReservationState> emit,
+  ) {
     emit(state.copyWith(selectedVehicle: event.vehicle));
     if (state.currentStep >= 2) {
       add(CalculatePrice());
@@ -221,9 +230,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onSelectParkingSpot(
-      SelectParkingSpot event,
-      Emitter<NewReservationState> emit,
-      ) {
+    SelectParkingSpot event,
+    Emitter<NewReservationState> emit,
+  ) {
     emit(state.copyWith(selectedParkingSpot: event.parkingSpot));
     if (state.currentStep >= 2) {
       add(CalculatePrice());
@@ -231,9 +240,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onUpdateParkingSpotNumber(
-      UpdateParkingSpotNumber event,
-      Emitter<NewReservationState> emit,
-      ) {
+    UpdateParkingSpotNumber event,
+    Emitter<NewReservationState> emit,
+  ) {
     emit(state.copyWith(
       parkingSpotNumber: event.spotNumber,
       customLocation: null,
@@ -241,9 +250,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onUpdateCustomLocation(
-      UpdateCustomLocation event,
-      Emitter<NewReservationState> emit,
-      ) {
+    UpdateCustomLocation event,
+    Emitter<NewReservationState> emit,
+  ) {
     emit(state.copyWith(
       customLocation: event.location,
       parkingSpotNumber: null, // ✅ Réinitialiser l'autre option
@@ -251,9 +260,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onSelectDateTime(
-      SelectDateTime event,
-      Emitter<NewReservationState> emit,
-      ) {
+    SelectDateTime event,
+    Emitter<NewReservationState> emit,
+  ) {
     final now = DateTime.now();
     final timeDifference = event.departureDateTime.difference(now);
 
@@ -261,7 +270,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       const Duration(minutes: 30),
     );
 
-    final isUrgent = timeDifference.inMinutes < AppConfig.minReservationTimeMinutes;
+    final isUrgent =
+        timeDifference.inMinutes < AppConfig.minReservationTimeMinutes;
 
     emit(state.copyWith(
       departureDateTime: event.departureDateTime,
@@ -275,9 +285,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onToggleServiceOption(
-      ToggleServiceOption event,
-      Emitter<NewReservationState> emit,
-      ) {
+    ToggleServiceOption event,
+    Emitter<NewReservationState> emit,
+  ) {
     final options = List<ServiceOption>.from(state.selectedOptions);
 
     if (options.contains(event.option)) {
@@ -291,17 +301,17 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onUpdateSnowDepth(
-      UpdateSnowDepth event,
-      Emitter<NewReservationState> emit,
-      ) {
+    UpdateSnowDepth event,
+    Emitter<NewReservationState> emit,
+  ) {
     emit(state.copyWith(snowDepthCm: event.snowDepthCm));
     add(CalculatePrice());
   }
 
   void _onCalculatePrice(
-      CalculatePrice event,
-      Emitter<NewReservationState> emit,
-      ) {
+    CalculatePrice event,
+    Emitter<NewReservationState> emit,
+  ) {
     // ✅ Vérifier qu'il y a un véhicule
     if (state.selectedVehicle == null) {
       return;
@@ -309,8 +319,10 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
 
     // ✅ Vérifier qu'il y a UNE place (spot complet OU numéro manuel OU emplacement perso)
     final hasParkingInfo = state.selectedParkingSpot != null ||
-        (state.parkingSpotNumber != null && state.parkingSpotNumber!.trim().isNotEmpty) ||
-        (state.customLocation != null && state.customLocation!.trim().isNotEmpty);
+        (state.parkingSpotNumber != null &&
+            state.parkingSpotNumber!.trim().isNotEmpty) ||
+        (state.customLocation != null &&
+            state.customLocation!.trim().isNotEmpty);
 
     if (!hasParkingInfo) {
       return;
@@ -374,7 +386,8 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
 
     // ✅ Détecter la province à partir de l'adresse
     final taxService = TaxService();
-    final provinceCode = taxService.detectProvinceFromAddress(state.locationAddress);
+    final provinceCode =
+        taxService.detectProvinceFromAddress(state.locationAddress);
 
     // ✅ Calcul des taxes selon la province
     final taxCalc = taxService.calculateTaxes(price, provinceCode);
@@ -407,17 +420,17 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
     ));
   }
 
-
   Future<void> _onSubmitReservation(
-      SubmitReservation event,
-      Emitter<NewReservationState> emit,
-      ) async {
+    SubmitReservation event,
+    Emitter<NewReservationState> emit,
+  ) async {
     if (!state.canSubmit) return;
 
     // Vérifier que la localisation est disponible
     if (!state.hasValidLocation) {
       emit(state.copyWith(
-        errorMessage: 'La localisation est requise. Veuillez activer le GPS ou entrer une adresse.',
+        errorMessage:
+            'La localisation est requise. Veuillez activer le GPS ou entrer une adresse.',
         needsManualAddress: true,
       ));
       return;
@@ -431,10 +444,12 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
       if (state.selectedParkingSpot != null) {
         // Cas 1: Place complète sélectionnée
         parkingSpotId = state.selectedParkingSpot!.id;
-      } else if (state.parkingSpotNumber != null && state.parkingSpotNumber!.trim().isNotEmpty) {
+      } else if (state.parkingSpotNumber != null &&
+          state.parkingSpotNumber!.trim().isNotEmpty) {
         // Cas 2: Numéro manuel → utiliser le numéro comme ID temporaire
         parkingSpotId = 'manual-${state.parkingSpotNumber!.trim()}';
-      } else if (state.customLocation != null && state.customLocation!.trim().isNotEmpty) {
+      } else if (state.customLocation != null &&
+          state.customLocation!.trim().isNotEmpty) {
         // Cas 3: Emplacement personnalisé
         parkingSpotId = 'custom-${state.customLocation!.trim()}';
       } else {
@@ -457,17 +472,19 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
         paymentMethod: event.paymentMethod,
         latitude: state.locationLatitude,
         longitude: state.locationLongitude,
-        address: state.locationAddress ?? state.customLocation ?? state.parkingSpotNumber,
+        address: state.locationAddress ??
+            state.customLocation ??
+            state.parkingSpotNumber,
       ));
 
       result.fold(
-            (failure) {
+        (failure) {
           emit(state.copyWith(
             isLoading: false,
             errorMessage: failure.message,
           ));
         },
-            (reservation) {
+        (reservation) {
           emit(state.copyWith(
             isLoading: false,
             isSubmitted: true,
@@ -484,9 +501,9 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onGoToNextStep(
-      GoToNextStep event,
-      Emitter<NewReservationState> emit,
-      ) {
+    GoToNextStep event,
+    Emitter<NewReservationState> emit,
+  ) {
     // 5 steps: 0=Vehicle/Parking, 1=Location, 2=DateTime, 3=Options, 4=Summary
     if (state.currentStep < 4) {
       final nextStep = state.currentStep + 1;
@@ -500,18 +517,18 @@ class NewReservationBloc extends Bloc<NewReservationEvent, NewReservationState> 
   }
 
   void _onGoToPreviousStep(
-      GoToPreviousStep event,
-      Emitter<NewReservationState> emit,
-      ) {
+    GoToPreviousStep event,
+    Emitter<NewReservationState> emit,
+  ) {
     if (state.currentStep > 0) {
       emit(state.copyWith(currentStep: state.currentStep - 1));
     }
   }
 
   void _onResetReservation(
-      ResetReservation event,
-      Emitter<NewReservationState> emit,
-      ) {
+    ResetReservation event,
+    Emitter<NewReservationState> emit,
+  ) {
     emit(const NewReservationState());
   }
 }

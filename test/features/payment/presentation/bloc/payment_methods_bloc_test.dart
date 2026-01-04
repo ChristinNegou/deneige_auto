@@ -45,7 +45,8 @@ void main() {
         },
         act: (bloc) => bloc.add(LoadPaymentMethods()),
         expect: () => [
-          isA<PaymentMethodsState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentMethodsState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentMethodsState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.methods.length, 'methods.length', 3)
@@ -65,10 +66,12 @@ void main() {
         },
         act: (bloc) => bloc.add(LoadPaymentMethods()),
         expect: () => [
-          isA<PaymentMethodsState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentMethodsState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentMethodsState>()
               .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.errorMessage, 'errorMessage', serverFailure.message),
+              .having(
+                  (s) => s.errorMessage, 'errorMessage', serverFailure.message),
         ],
       );
 
@@ -81,7 +84,8 @@ void main() {
         },
         act: (bloc) => bloc.add(LoadPaymentMethods()),
         expect: () => [
-          isA<PaymentMethodsState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentMethodsState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentMethodsState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.methods, 'methods', isEmpty),
@@ -113,14 +117,15 @@ void main() {
         'emits error when SavePaymentMethod fails',
         build: () {
           when(() => mockSavePaymentMethod(
-            paymentMethodId: any(named: 'paymentMethodId'),
-            setAsDefault: any(named: 'setAsDefault'),
-          )).thenAnswer((_) async => const Left(validationFailure));
+                paymentMethodId: any(named: 'paymentMethodId'),
+                setAsDefault: any(named: 'setAsDefault'),
+              )).thenAnswer((_) async => const Left(validationFailure));
           return bloc;
         },
         act: (bloc) => bloc.add(SavePaymentMethod('invalid_pm')),
         expect: () => [
-          isA<PaymentMethodsState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentMethodsState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentMethodsState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.errorMessage, 'errorMessage', isNotNull),
@@ -139,7 +144,8 @@ void main() {
         seed: () => PaymentMethodsState(methods: tPaymentMethods),
         act: (bloc) => bloc.add(DeletePaymentMethod('pm_stripe_123')),
         expect: () => [
-          isA<PaymentMethodsState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentMethodsState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentMethodsState>()
               .having((s) => s.isLoading, 'isLoading', false)
               .having((s) => s.successMessage, 'successMessage', isNotNull),
@@ -159,10 +165,12 @@ void main() {
         seed: () => PaymentMethodsState(methods: tPaymentMethods),
         act: (bloc) => bloc.add(DeletePaymentMethod('pm-123')),
         expect: () => [
-          isA<PaymentMethodsState>().having((s) => s.isLoading, 'isLoading', true),
+          isA<PaymentMethodsState>()
+              .having((s) => s.isLoading, 'isLoading', true),
           isA<PaymentMethodsState>()
               .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.errorMessage, 'errorMessage', serverFailure.message),
+              .having(
+                  (s) => s.errorMessage, 'errorMessage', serverFailure.message),
         ],
       );
     });
@@ -189,7 +197,8 @@ void main() {
 
     group('State helpers', () {
       test('defaultMethod returns correct method', () {
-        final methodsWithDefault = PaymentFixtures.createPaymentMethodList(3, withDefault: true);
+        final methodsWithDefault =
+            PaymentFixtures.createPaymentMethodList(3, withDefault: true);
         final state = PaymentMethodsState(methods: methodsWithDefault);
 
         expect(state.defaultMethod, isNotNull);
@@ -197,7 +206,8 @@ void main() {
       });
 
       test('defaultMethod returns null when no default', () {
-        final methodsNoDefault = PaymentFixtures.createPaymentMethodList(3, withDefault: false);
+        final methodsNoDefault =
+            PaymentFixtures.createPaymentMethodList(3, withDefault: false);
         final state = PaymentMethodsState(methods: methodsNoDefault);
 
         expect(state.defaultMethod, null);

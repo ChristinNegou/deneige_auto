@@ -1,21 +1,21 @@
 import 'package:equatable/equatable.dart';
 
 enum NotificationType {
-  reservationAssigned,      // Déneigeur a accepté la tâche
-  workerEnRoute,           // Déneigeur est en route
-  workStarted,             // Travail a commencé
-  workCompleted,           // Travail terminé
-  reservationCancelled,    // Réservation annulée
-  paymentSuccess,          // Paiement réussi
-  paymentFailed,           // Paiement échoué
-  refundProcessed,         // Remboursement effectué
-  weatherAlert,            // Alerte météo (neige prévue)
-  urgentRequest,           // Demande urgente
-  workerMessage,           // Message du déneigeur
-  newMessage,              // Nouveau message de chat
-  tipReceived,             // Pourboire reçu par le déneigeur
-  rating,                  // Évaluation reçue par le déneigeur
-  systemNotification,      // Notification système
+  reservationAssigned, // Déneigeur a accepté la tâche
+  workerEnRoute, // Déneigeur est en route
+  workStarted, // Travail a commencé
+  workCompleted, // Travail terminé
+  reservationCancelled, // Réservation annulée
+  paymentSuccess, // Paiement réussi
+  paymentFailed, // Paiement échoué
+  refundProcessed, // Remboursement effectué
+  weatherAlert, // Alerte météo (neige prévue)
+  urgentRequest, // Demande urgente
+  workerMessage, // Message du déneigeur
+  newMessage, // Nouveau message de chat
+  tipReceived, // Pourboire reçu par le déneigeur
+  rating, // Évaluation reçue par le déneigeur
+  systemNotification, // Notification système
 }
 
 enum NotificationPriority {
@@ -64,8 +64,8 @@ class AppNotification extends Equatable {
   bool get isToday {
     final now = DateTime.now();
     return createdAt.year == now.year &&
-           createdAt.month == now.month &&
-           createdAt.day == now.day;
+        createdAt.month == now.month &&
+        createdAt.day == now.day;
   }
 
   String get timeAgo {

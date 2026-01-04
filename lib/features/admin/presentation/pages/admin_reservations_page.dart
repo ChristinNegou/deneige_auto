@@ -147,7 +147,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
             Text(state.errorMessage ?? 'Une erreur est survenue'),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => context.read<AdminBloc>().add(LoadReservations()),
+              onPressed: () =>
+                  context.read<AdminBloc>().add(LoadReservations()),
               child: const Text('Réessayer'),
             ),
           ],
@@ -170,7 +171,9 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        context.read<AdminBloc>().add(LoadReservations(status: _selectedStatus));
+        context
+            .read<AdminBloc>()
+            .add(LoadReservations(status: _selectedStatus));
       },
       child: Column(
         children: [
@@ -191,7 +194,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
     );
   }
 
-  Widget _buildReservationCard(BuildContext context, AdminReservation reservation) {
+  Widget _buildReservationCard(
+      BuildContext context, AdminReservation reservation) {
     final statusColor = _getStatusColor(reservation.status);
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
@@ -209,7 +213,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: statusColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
@@ -236,7 +241,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: 16, color: Colors.grey.shade600),
+                  Icon(Icons.calendar_today,
+                      size: 16, color: Colors.grey.shade600),
                   const SizedBox(width: 8),
                   Text(
                     dateFormat.format(reservation.departureTime),
@@ -280,7 +286,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.directions_car, size: 16, color: Colors.grey.shade600),
+                    Icon(Icons.directions_car,
+                        size: 16, color: Colors.grey.shade600),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -299,7 +306,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.refresh, size: 18),
                         label: const Text('Rembourser'),
-                        onPressed: () => _showRefundDialog(context, reservation),
+                        onPressed: () =>
+                            _showRefundDialog(context, reservation),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.orange,
                         ),
@@ -310,7 +318,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.visibility, size: 18),
                       label: const Text('Détails'),
-                      onPressed: () => _showReservationDetails(context, reservation),
+                      onPressed: () =>
+                          _showReservationDetails(context, reservation),
                     ),
                   ),
                 ],
@@ -378,7 +387,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
     );
   }
 
-  void _showReservationDetails(BuildContext context, AdminReservation reservation) {
+  void _showReservationDetails(
+      BuildContext context, AdminReservation reservation) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
     final statusColor = _getStatusColor(reservation.status);
     final pageContext = context; // Capture avant le shadowing
@@ -444,23 +454,33 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                 const SizedBox(height: 24),
                 _buildInfoSection('Informations de la réservation', [
                   _buildInfoRow('ID', reservation.id),
-                  _buildInfoRow('Date prévue', dateFormat.format(reservation.departureTime)),
-                  _buildInfoRow('Créée le', dateFormat.format(reservation.createdAt)),
+                  _buildInfoRow('Date prévue',
+                      dateFormat.format(reservation.departureTime)),
+                  _buildInfoRow(
+                      'Créée le', dateFormat.format(reservation.createdAt)),
                   if (reservation.completedAt != null)
-                    _buildInfoRow('Terminée le', dateFormat.format(reservation.completedAt!)),
+                    _buildInfoRow('Terminée le',
+                        dateFormat.format(reservation.completedAt!)),
                   if (reservation.cancelledAt != null)
-                    _buildInfoRow('Annulée le', dateFormat.format(reservation.cancelledAt!)),
+                    _buildInfoRow('Annulée le',
+                        dateFormat.format(reservation.cancelledAt!)),
                   if (reservation.parkingSpotNumber != null)
-                    _buildInfoRow('Place de parking', reservation.parkingSpotNumber!),
+                    _buildInfoRow(
+                        'Place de parking', reservation.parkingSpotNumber!),
                 ]),
                 const SizedBox(height: 20),
                 _buildInfoSection('Détails financiers', [
-                  _buildInfoRow('Prix total', '${reservation.totalPrice.toStringAsFixed(2)} \$'),
-                  _buildInfoRow('Commission plateforme', '${reservation.platformFee.toStringAsFixed(2)} \$'),
-                  _buildInfoRow('Paiement déneigeur', '${reservation.workerPayout.toStringAsFixed(2)} \$'),
-                  _buildInfoRow('Statut paiement', reservation.paymentStatus ?? 'N/A'),
+                  _buildInfoRow('Prix total',
+                      '${reservation.totalPrice.toStringAsFixed(2)} \$'),
+                  _buildInfoRow('Commission plateforme',
+                      '${reservation.platformFee.toStringAsFixed(2)} \$'),
+                  _buildInfoRow('Paiement déneigeur',
+                      '${reservation.workerPayout.toStringAsFixed(2)} \$'),
+                  _buildInfoRow(
+                      'Statut paiement', reservation.paymentStatus ?? 'N/A'),
                   if (reservation.isRefunded)
-                    _buildInfoRow('Remboursé', '${reservation.refundAmount?.toStringAsFixed(2) ?? 0} \$'),
+                    _buildInfoRow('Remboursé',
+                        '${reservation.refundAmount?.toStringAsFixed(2) ?? 0} \$'),
                 ]),
                 if (reservation.client != null) ...[
                   const SizedBox(height: 20),
@@ -469,7 +489,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                     if (reservation.client!.email != null)
                       _buildInfoRow('Email', reservation.client!.email!),
                     if (reservation.client!.phoneNumber != null)
-                      _buildInfoRow('Téléphone', reservation.client!.phoneNumber!),
+                      _buildInfoRow(
+                          'Téléphone', reservation.client!.phoneNumber!),
                   ]),
                 ],
                 if (reservation.worker != null) ...[
@@ -477,9 +498,11 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                   _buildInfoSection('Déneigeur', [
                     _buildInfoRow('Nom', reservation.worker!.fullName),
                     if (reservation.worker!.phoneNumber != null)
-                      _buildInfoRow('Téléphone', reservation.worker!.phoneNumber!),
+                      _buildInfoRow(
+                          'Téléphone', reservation.worker!.phoneNumber!),
                     if (reservation.worker!.rating != null)
-                      _buildInfoRow('Note', reservation.worker!.rating!.toStringAsFixed(1)),
+                      _buildInfoRow('Note',
+                          reservation.worker!.rating!.toStringAsFixed(1)),
                   ]),
                 ],
                 if (reservation.vehicle != null) ...[
@@ -489,13 +512,15 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                     if (reservation.vehicle!.color != null)
                       _buildInfoRow('Couleur', reservation.vehicle!.color!),
                     if (reservation.vehicle!.licensePlate != null)
-                      _buildInfoRow('Plaque', reservation.vehicle!.licensePlate!),
+                      _buildInfoRow(
+                          'Plaque', reservation.vehicle!.licensePlate!),
                   ]),
                 ],
                 if (reservation.serviceOptions.isNotEmpty) ...[
                   const SizedBox(height: 20),
                   _buildInfoSection('Services', [
-                    _buildInfoRow('Options', reservation.serviceOptions.join(', ')),
+                    _buildInfoRow(
+                        'Options', reservation.serviceOptions.join(', ')),
                   ]),
                 ],
                 if (reservation.notes != null) ...[
@@ -668,7 +693,9 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
           ElevatedButton(
             onPressed: () {
               final amount = double.tryParse(amountController.text);
-              if (amount == null || amount <= 0 || amount > reservation.totalPrice) {
+              if (amount == null ||
+                  amount <= 0 ||
+                  amount > reservation.totalPrice) {
                 ScaffoldMessenger.of(dialogContext).showSnackBar(
                   const SnackBar(
                     content: Text('Montant invalide'),
@@ -679,12 +706,12 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
               }
               Navigator.pop(dialogContext);
               adminBloc.add(RefundReservation(
-                    reservationId: reservation.id,
-                    amount: amount,
-                    reason: reasonController.text.isNotEmpty
-                        ? reasonController.text
-                        : null,
-                  ));
+                reservationId: reservation.id,
+                amount: amount,
+                reason: reasonController.text.isNotEmpty
+                    ? reasonController.text
+                    : null,
+              ));
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
             child: const Text('Rembourser'),

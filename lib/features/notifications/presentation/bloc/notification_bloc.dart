@@ -23,7 +23,8 @@ class MarkNotificationAsRead extends NotificationEvent {
   final String notificationId;
   final bool autoDeleteAfterRead;
 
-  MarkNotificationAsRead(this.notificationId, {this.autoDeleteAfterRead = false});
+  MarkNotificationAsRead(this.notificationId,
+      {this.autoDeleteAfterRead = false});
 
   @override
   List<Object?> get props => [notificationId, autoDeleteAfterRead];
@@ -105,9 +106,11 @@ class NotificationState extends Equatable {
       unreadCount: unreadCount ?? this.unreadCount,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: clearMessages ? null : (errorMessage ?? this.errorMessage),
-      successMessage: clearMessages ? null : (successMessage ?? this.successMessage),
+      successMessage:
+          clearMessages ? null : (successMessage ?? this.successMessage),
       autoDeleteEnabled: autoDeleteEnabled ?? this.autoDeleteEnabled,
-      autoDeleteDelaySeconds: autoDeleteDelaySeconds ?? this.autoDeleteDelaySeconds,
+      autoDeleteDelaySeconds:
+          autoDeleteDelaySeconds ?? this.autoDeleteDelaySeconds,
     );
   }
 
@@ -205,7 +208,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
     if (result.isLeft()) {
       final failure = result.fold((l) => l, (r) => null);
-      emit(state.copyWith(errorMessage: failure?.message ?? 'Erreur lors du rafraîchissement'));
+      emit(state.copyWith(
+          errorMessage: failure?.message ?? 'Erreur lors du rafraîchissement'));
       return;
     }
 
@@ -231,7 +235,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     final result = await markAsRead(event.notificationId);
 
     result.fold(
-      (failure) => emit(state.copyWith(errorMessage: failure.message ?? 'Erreur lors de la mise à jour')),
+      (failure) => emit(state.copyWith(
+          errorMessage: failure.message ?? 'Erreur lors de la mise à jour')),
       (_) {
         // Update local state
         final updatedNotifications = state.notifications.map((notification) {
@@ -241,7 +246,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           return notification;
         }).toList();
 
-        final newUnreadCount = updatedNotifications.where((n) => !n.isRead).length;
+        final newUnreadCount =
+            updatedNotifications.where((n) => !n.isRead).length;
 
         emit(state.copyWith(
           notifications: updatedNotifications,
@@ -277,7 +283,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     final result = await markAllAsRead();
 
     result.fold(
-      (failure) => emit(state.copyWith(errorMessage: failure.message ?? 'Erreur lors de la mise à jour')),
+      (failure) => emit(state.copyWith(
+          errorMessage: failure.message ?? 'Erreur lors de la mise à jour')),
       (_) {
         // Mark all notifications as read locally
         final updatedNotifications = state.notifications
@@ -311,14 +318,16 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     final result = await deleteNotification(event.notificationId);
 
     result.fold(
-      (failure) => emit(state.copyWith(errorMessage: failure.message ?? 'Erreur lors de la suppression')),
+      (failure) => emit(state.copyWith(
+          errorMessage: failure.message ?? 'Erreur lors de la suppression')),
       (_) {
         // Retirer la notification localement
         final updatedNotifications = state.notifications
             .where((n) => n.id != event.notificationId)
             .toList();
 
-        final newUnreadCount = updatedNotifications.where((n) => !n.isRead).length;
+        final newUnreadCount =
+            updatedNotifications.where((n) => !n.isRead).length;
 
         emit(state.copyWith(
           notifications: updatedNotifications,
@@ -341,7 +350,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     final result = await clearAllNotifications();
 
     result.fold(
-      (failure) => emit(state.copyWith(errorMessage: failure.message ?? 'Erreur lors de la suppression')),
+      (failure) => emit(state.copyWith(
+          errorMessage: failure.message ?? 'Erreur lors de la suppression')),
       (_) {
         emit(state.copyWith(
           notifications: [],
@@ -357,10 +367,12 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     // Supprimer uniquement les notifications lues
-    final readNotifications = state.notifications.where((n) => n.isRead).toList();
+    final readNotifications =
+        state.notifications.where((n) => n.isRead).toList();
 
     if (readNotifications.isEmpty) {
-      emit(state.copyWith(successMessage: 'Aucune notification lue à supprimer'));
+      emit(state.copyWith(
+          successMessage: 'Aucune notification lue à supprimer'));
       return;
     }
 
@@ -380,14 +392,18 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     if (hasError) {
       // Rafraîchir pour synchroniser l'état
       add(RefreshNotifications());
-      emit(state.copyWith(errorMessage: 'Certaines notifications n\'ont pas pu être supprimées'));
+      emit(state.copyWith(
+          errorMessage:
+              'Certaines notifications n\'ont pas pu être supprimées'));
     } else {
       // Garder uniquement les notifications non lues
-      final unreadNotifications = state.notifications.where((n) => !n.isRead).toList();
+      final unreadNotifications =
+          state.notifications.where((n) => !n.isRead).toList();
 
       emit(state.copyWith(
         notifications: unreadNotifications,
-        successMessage: '${readNotifications.length} notification${readNotifications.length > 1 ? 's' : ''} supprimée${readNotifications.length > 1 ? 's' : ''}',
+        successMessage:
+            '${readNotifications.length} notification${readNotifications.length > 1 ? 's' : ''} supprimée${readNotifications.length > 1 ? 's' : ''}',
       ));
     }
   }

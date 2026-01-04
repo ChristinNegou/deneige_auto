@@ -54,7 +54,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.getNotifications())
             .thenThrow(const ServerException(message: 'Server error'));
 
@@ -70,8 +71,7 @@ void main() {
 
     group('getUnreadCount', () {
       test('should return unread count when successful', () async {
-        when(() => mockDataSource.getUnreadCount())
-            .thenAnswer((_) async => 7);
+        when(() => mockDataSource.getUnreadCount()).thenAnswer((_) async => 7);
 
         final result = await repository.getUnreadCount();
 
@@ -79,7 +79,8 @@ void main() {
         verify(() => mockDataSource.getUnreadCount()).called(1);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.getUnreadCount())
             .thenThrow(const ServerException(message: 'Server error'));
 
@@ -105,8 +106,8 @@ void main() {
       });
 
       test('should return ServerFailure when notification not found', () async {
-        when(() => mockDataSource.markAsRead('notif-123'))
-            .thenThrow(const ServerException(message: 'Notification not found'));
+        when(() => mockDataSource.markAsRead('notif-123')).thenThrow(
+            const ServerException(message: 'Notification not found'));
 
         final result = await repository.markAsRead('notif-123');
 
@@ -120,8 +121,7 @@ void main() {
 
     group('markAllAsRead', () {
       test('should return Right(null) when successful', () async {
-        when(() => mockDataSource.markAllAsRead())
-            .thenAnswer((_) async {});
+        when(() => mockDataSource.markAllAsRead()).thenAnswer((_) async {});
 
         final result = await repository.markAllAsRead();
 
@@ -129,7 +129,8 @@ void main() {
         verify(() => mockDataSource.markAllAsRead()).called(1);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.markAllAsRead())
             .thenThrow(const ServerException(message: 'Mark all failed'));
 
@@ -155,8 +156,8 @@ void main() {
       });
 
       test('should return ServerFailure when notification not found', () async {
-        when(() => mockDataSource.deleteNotification('notif-123'))
-            .thenThrow(const ServerException(message: 'Notification not found'));
+        when(() => mockDataSource.deleteNotification('notif-123')).thenThrow(
+            const ServerException(message: 'Notification not found'));
 
         final result = await repository.deleteNotification('notif-123');
 
@@ -179,7 +180,8 @@ void main() {
         verify(() => mockDataSource.clearAllNotifications()).called(1);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.clearAllNotifications())
             .thenThrow(const ServerException(message: 'Clear failed'));
 

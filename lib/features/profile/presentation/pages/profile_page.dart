@@ -200,7 +200,8 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w500),
+                style:
+                    AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -308,7 +309,8 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                    style: AppTheme.labelLarge
+                        .copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -376,7 +378,8 @@ class ProfilePage extends StatelessWidget {
                 color: AppTheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSM),
               ),
-              child: Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+              child:
+                  Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('Déconnexion'),

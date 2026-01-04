@@ -26,7 +26,8 @@ class _SnowWorkerDashboardView extends StatefulWidget {
   const _SnowWorkerDashboardView();
 
   @override
-  State<_SnowWorkerDashboardView> createState() => _SnowWorkerDashboardViewState();
+  State<_SnowWorkerDashboardView> createState() =>
+      _SnowWorkerDashboardViewState();
 }
 
 class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
@@ -219,9 +220,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
       builder: (context, state) {
         final bool isWorking = state is WorkerJobsLoaded &&
             state.myJobs.any((j) =>
-              j.status == JobStatus.inProgress ||
-              j.status == JobStatus.enRoute
-            );
+                j.status == JobStatus.inProgress ||
+                j.status == JobStatus.enRoute);
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -331,15 +331,19 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
 
         if (state is WorkerJobsLoaded) {
           final today = DateTime.now();
-          todayJobs = state.myJobs.where((j) =>
-            j.departureTime.day == today.day &&
-            j.departureTime.month == today.month &&
-            j.departureTime.year == today.year
-          ).length;
-          completedJobs = state.myJobs.where((j) => j.status == JobStatus.completed).length;
-          pendingJobs = state.myJobs.where((j) =>
-            j.status == JobStatus.pending || j.status == JobStatus.assigned
-          ).length;
+          todayJobs = state.myJobs
+              .where((j) =>
+                  j.departureTime.day == today.day &&
+                  j.departureTime.month == today.month &&
+                  j.departureTime.year == today.year)
+              .length;
+          completedJobs =
+              state.myJobs.where((j) => j.status == JobStatus.completed).length;
+          pendingJobs = state.myJobs
+              .where((j) =>
+                  j.status == JobStatus.pending ||
+                  j.status == JobStatus.assigned)
+              .length;
           earnings = state.myJobs
               .where((j) => j.status == JobStatus.completed)
               .fold(0.0, (sum, j) => sum + j.totalPrice);
@@ -364,7 +368,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                     Navigator.pushNamed(context, AppRoutes.workerEarnings);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppTheme.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppTheme.radiusFull),
@@ -522,11 +527,12 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
     return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
       builder: (context, state) {
         if (state is WorkerJobsLoaded) {
-          final activeJob = state.myJobs.where((j) =>
-            j.status == JobStatus.inProgress ||
-            j.status == JobStatus.enRoute ||
-            j.status == JobStatus.assigned
-          ).toList();
+          final activeJob = state.myJobs
+              .where((j) =>
+                  j.status == JobStatus.inProgress ||
+                  j.status == JobStatus.enRoute ||
+                  j.status == JobStatus.assigned)
+              .toList();
 
           if (activeJob.isNotEmpty) {
             final job = activeJob.first;
@@ -580,7 +586,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                       borderRadius: BorderRadius.circular(AppTheme.radiusLG),
                       boxShadow: [
                         BoxShadow(
-                          color: _getStatusColor(job.status).withValues(alpha: 0.35),
+                          color: _getStatusColor(job.status)
+                              .withValues(alpha: 0.35),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
@@ -598,7 +605,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusFull),
                               ),
                               child: Text(
                                 job.vehicle.licensePlate ?? 'N/A',
@@ -615,7 +623,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusSM),
                               ),
                               child: const Icon(
                                 Icons.arrow_forward_rounded,
@@ -802,7 +811,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
         mainAxisSize: MainAxisSize.min,
         children: [
           PulseAnimation(
-            animate: status == JobStatus.inProgress || status == JobStatus.enRoute,
+            animate:
+                status == JobStatus.inProgress || status == JobStatus.enRoute,
             child: Icon(_getStatusIcon(status), color: color, size: 14),
           ),
           const SizedBox(width: 6),

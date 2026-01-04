@@ -50,7 +50,8 @@ void main() {
 
     test('should return methods with default marked', () async {
       // Arrange
-      final methodsWithDefault = PaymentFixtures.createPaymentMethodList(3, withDefault: true);
+      final methodsWithDefault =
+          PaymentFixtures.createPaymentMethodList(3, withDefault: true);
       when(() => mockRepository.getPaymentMethods())
           .thenAnswer((_) async => Right(methodsWithDefault));
 

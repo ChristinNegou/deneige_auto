@@ -31,7 +31,8 @@ class _ActivitiesScreenContent extends StatefulWidget {
   const _ActivitiesScreenContent();
 
   @override
-  State<_ActivitiesScreenContent> createState() => _ActivitiesScreenContentState();
+  State<_ActivitiesScreenContent> createState() =>
+      _ActivitiesScreenContentState();
 }
 
 class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
@@ -96,7 +97,9 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<ReservationListBloc>().add(const LoadAllReservations());
+                      context
+                          .read<ReservationListBloc>()
+                          .add(const LoadAllReservations());
                     },
                     child: const Text('Réessayer'),
                   ),
@@ -106,14 +109,17 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
           }
 
           // Filtrer les réservations en cours
-          final inProgressReservations = state.reservations.where((r) =>
-              r.status == ReservationStatus.enRoute ||
-              r.status == ReservationStatus.inProgress ||
-              r.status == ReservationStatus.assigned).toList();
+          final inProgressReservations = state.reservations
+              .where((r) =>
+                  r.status == ReservationStatus.enRoute ||
+                  r.status == ReservationStatus.inProgress ||
+                  r.status == ReservationStatus.assigned)
+              .toList();
 
           // Filtrer les réservations terminées
-          final completedReservations = state.reservations.where((r) =>
-              r.status == ReservationStatus.completed).toList();
+          final completedReservations = state.reservations
+              .where((r) => r.status == ReservationStatus.completed)
+              .toList();
 
           return TabBarView(
             controller: _tabController,
@@ -127,7 +133,8 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
     );
   }
 
-  Widget _buildActivityList(List<Reservation> reservations, {required bool isCompleted}) {
+  Widget _buildActivityList(List<Reservation> reservations,
+      {required bool isCompleted}) {
     if (reservations.isEmpty) {
       return Center(
         child: Column(

@@ -62,8 +62,8 @@ class Payment extends Equatable {
   // Business logic methods
   bool get isRefundable {
     return status == PaymentStatus.succeeded &&
-           refundedAmount == null &&
-           !isExpired;
+        refundedAmount == null &&
+        !isExpired;
   }
 
   bool get isExpired {
@@ -75,7 +75,7 @@ class Payment extends Equatable {
 
   bool get isPartiallyRefunded {
     return status == PaymentStatus.partiallyRefunded ||
-           (refundedAmount != null && refundedAmount! < amount);
+        (refundedAmount != null && refundedAmount! < amount);
   }
 
   double get refundableAmount {
@@ -137,25 +137,25 @@ class Payment extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    userId,
-    reservationId,
-    amount,
-    refundedAmount,
-    status,
-    methodType,
-    paymentIntentId,
-    last4,
-    cardBrand,
-    createdAt,
-    paidAt,
-    refundedAt,
-    failureMessage,
-    receiptUrl,
-    vehicleMake,
-    vehicleModel,
-    parkingSpotNumber,
-  ];
+        id,
+        userId,
+        reservationId,
+        amount,
+        refundedAmount,
+        status,
+        methodType,
+        paymentIntentId,
+        last4,
+        cardBrand,
+        createdAt,
+        paidAt,
+        refundedAt,
+        failureMessage,
+        receiptUrl,
+        vehicleMake,
+        vehicleModel,
+        parkingSpotNumber,
+      ];
 }
 
 // Extension for display helpers

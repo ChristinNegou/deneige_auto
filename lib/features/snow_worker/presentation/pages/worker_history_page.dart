@@ -99,7 +99,9 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                     return RefreshIndicator(
                       onRefresh: () async {
                         HapticFeedback.mediumImpact();
-                        context.read<WorkerJobsBloc>().add(const LoadJobHistory());
+                        context
+                            .read<WorkerJobsBloc>()
+                            .add(const LoadJobHistory());
                       },
                       color: AppTheme.primary,
                       backgroundColor: AppTheme.surface,
@@ -295,7 +297,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
             const SizedBox(width: 10),
             _buildFilterChip('month', 'Ce mois', Icons.calendar_month_rounded),
             const SizedBox(width: 10),
-            _buildFilterChip('tips', 'Avec pourboire', Icons.volunteer_activism_rounded),
+            _buildFilterChip(
+                'tips', 'Avec pourboire', Icons.volunteer_activism_rounded),
           ],
         ),
       ),
@@ -362,16 +365,20 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
     switch (_selectedFilter) {
       case 'week':
         final weekAgo = now.subtract(const Duration(days: 7));
-        return jobs.where((j) =>
-          j.completedAt != null && j.completedAt!.isAfter(weekAgo)
-        ).toList();
+        return jobs
+            .where(
+                (j) => j.completedAt != null && j.completedAt!.isAfter(weekAgo))
+            .toList();
       case 'month':
         final monthAgo = DateTime(now.year, now.month - 1, now.day);
-        return jobs.where((j) =>
-          j.completedAt != null && j.completedAt!.isAfter(monthAgo)
-        ).toList();
+        return jobs
+            .where((j) =>
+                j.completedAt != null && j.completedAt!.isAfter(monthAgo))
+            .toList();
       case 'tips':
-        return jobs.where((j) => j.tipAmount != null && j.tipAmount! > 0).toList();
+        return jobs
+            .where((j) => j.tipAmount != null && j.tipAmount! > 0)
+            .toList();
       default:
         return jobs;
     }
@@ -481,7 +488,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                 context.read<WorkerJobsBloc>().add(const LoadJobHistory());
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [AppTheme.primary, AppTheme.secondary],
@@ -579,7 +587,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -634,7 +643,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusMD),
                         ),
                         child: Center(
                           child: Text(
@@ -718,7 +728,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                             ),
                             decoration: BoxDecoration(
                               color: AppTheme.info.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                              borderRadius:
+                                  BorderRadius.circular(AppTheme.radiusSM),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -781,10 +792,12 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                                     AppTheme.warning.withValues(alpha: 0.8),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.radiusFull),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppTheme.warning.withValues(alpha: 0.25),
+                                    color: AppTheme.warning
+                                        .withValues(alpha: 0.25),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2),
                                   ),

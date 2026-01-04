@@ -80,11 +80,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  String get _roleTitle => widget.role == UserRole.client ? 'Client' : 'Déneigeur';
+  String get _roleTitle =>
+      widget.role == UserRole.client ? 'Client' : 'Déneigeur';
 
-  IconData get _roleIcon => widget.role == UserRole.client ? Icons.home_rounded : Icons.local_shipping_rounded;
+  IconData get _roleIcon => widget.role == UserRole.client
+      ? Icons.home_rounded
+      : Icons.local_shipping_rounded;
 
-  Color get _roleColor => widget.role == UserRole.client ? AppTheme.primary : AppTheme.success;
+  Color get _roleColor =>
+      widget.role == UserRole.client ? AppTheme.primary : AppTheme.success;
 
   @override
   Widget build(BuildContext context) {
@@ -293,7 +297,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               if (value == null || value.isEmpty) {
                 return 'Veuillez entrer votre email';
               }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                  .hasMatch(value)) {
                 return 'Email invalide';
               }
               return null;
@@ -344,7 +349,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             suffixIcon: GestureDetector(
               onTap: () => setState(() => _obscurePassword = !_obscurePassword),
               child: Icon(
-                _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                _obscurePassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 color: AppTheme.textTertiary,
                 size: 20,
               ),
@@ -369,9 +376,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             icon: Icons.lock_outline_rounded,
             obscureText: _obscureConfirmPassword,
             suffixIcon: GestureDetector(
-              onTap: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+              onTap: () => setState(
+                  () => _obscureConfirmPassword = !_obscureConfirmPassword),
               child: Icon(
-                _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                _obscureConfirmPassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 color: AppTheme.textTertiary,
                 size: 20,
               ),
@@ -425,22 +435,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary),
+            hintStyle:
+                AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary),
             prefixIcon: Container(
               margin: const EdgeInsets.only(left: 10, right: 6),
               child: Icon(icon, color: AppTheme.textTertiary, size: 18),
             ),
-            prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             suffixIcon: suffixIcon != null
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: suffixIcon,
-                )
-              : null,
-            suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: suffixIcon,
+                  )
+                : null,
+            suffixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             filled: true,
             fillColor: AppTheme.background,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusSM),
               borderSide: BorderSide.none,

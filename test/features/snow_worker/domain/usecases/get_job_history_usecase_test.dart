@@ -18,16 +18,17 @@ void main() {
   });
 
   group('GetJobHistoryUseCase', () {
-    final tCompletedJobs = WorkerFixtures.createJobList(10, status: JobStatus.completed);
+    final tCompletedJobs =
+        WorkerFixtures.createJobList(10, status: JobStatus.completed);
 
     test('should return job history when successful', () async {
       // Arrange
       when(() => mockRepository.getJobHistory(
-        page: any(named: 'page'),
-        limit: any(named: 'limit'),
-        startDate: any(named: 'startDate'),
-        endDate: any(named: 'endDate'),
-      )).thenAnswer((_) async => Right(tCompletedJobs));
+            page: any(named: 'page'),
+            limit: any(named: 'limit'),
+            startDate: any(named: 'startDate'),
+            endDate: any(named: 'endDate'),
+          )).thenAnswer((_) async => Right(tCompletedJobs));
 
       // Act
       final result = await usecase();
@@ -43,11 +44,11 @@ void main() {
     test('should return empty list when no job history', () async {
       // Arrange
       when(() => mockRepository.getJobHistory(
-        page: any(named: 'page'),
-        limit: any(named: 'limit'),
-        startDate: any(named: 'startDate'),
-        endDate: any(named: 'endDate'),
-      )).thenAnswer((_) async => const Right([]));
+            page: any(named: 'page'),
+            limit: any(named: 'limit'),
+            startDate: any(named: 'startDate'),
+            endDate: any(named: 'endDate'),
+          )).thenAnswer((_) async => const Right([]));
 
       // Act
       final result = await usecase();
@@ -63,11 +64,11 @@ void main() {
     test('should pass pagination parameters correctly', () async {
       // Arrange
       when(() => mockRepository.getJobHistory(
-        page: 2,
-        limit: 50,
-        startDate: any(named: 'startDate'),
-        endDate: any(named: 'endDate'),
-      )).thenAnswer((_) async => Right(tCompletedJobs));
+            page: 2,
+            limit: 50,
+            startDate: any(named: 'startDate'),
+            endDate: any(named: 'endDate'),
+          )).thenAnswer((_) async => Right(tCompletedJobs));
 
       // Act
       final result = await usecase(page: 2, limit: 50);
@@ -75,21 +76,21 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       verify(() => mockRepository.getJobHistory(
-        page: 2,
-        limit: 50,
-        startDate: null,
-        endDate: null,
-      )).called(1);
+            page: 2,
+            limit: 50,
+            startDate: null,
+            endDate: null,
+          )).called(1);
     });
 
     test('should return ServerFailure on server error', () async {
       // Arrange
       when(() => mockRepository.getJobHistory(
-        page: any(named: 'page'),
-        limit: any(named: 'limit'),
-        startDate: any(named: 'startDate'),
-        endDate: any(named: 'endDate'),
-      )).thenAnswer((_) async => const Left(serverFailure));
+            page: any(named: 'page'),
+            limit: any(named: 'limit'),
+            startDate: any(named: 'startDate'),
+            endDate: any(named: 'endDate'),
+          )).thenAnswer((_) async => const Left(serverFailure));
 
       // Act
       final result = await usecase();
@@ -101,11 +102,11 @@ void main() {
     test('should return AuthFailure when not authenticated', () async {
       // Arrange
       when(() => mockRepository.getJobHistory(
-        page: any(named: 'page'),
-        limit: any(named: 'limit'),
-        startDate: any(named: 'startDate'),
-        endDate: any(named: 'endDate'),
-      )).thenAnswer((_) async => const Left(authFailure));
+            page: any(named: 'page'),
+            limit: any(named: 'limit'),
+            startDate: any(named: 'startDate'),
+            endDate: any(named: 'endDate'),
+          )).thenAnswer((_) async => const Left(authFailure));
 
       // Act
       final result = await usecase();

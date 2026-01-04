@@ -21,9 +21,9 @@ class WeatherRepositoryImpl implements WeatherRepository {
 
   @override
   Future<Either<Failure, Weather>> getWeatherByLocation(
-      double lat,
-      double lon,
-      ) async {
+    double lat,
+    double lon,
+  ) async {
     try {
       final weather = await remoteDatasource.getWeatherByCoordinates(lat, lon);
       return Right(weather);
@@ -34,15 +34,16 @@ class WeatherRepositoryImpl implements WeatherRepository {
 
   @override
   Future<Either<Failure, Weather>> getWeatherForecast(
-      DateTime date, {
-        String? city,
-        double? lat,
-        double? lon,
-      }) async {
+    DateTime date, {
+    String? city,
+    double? lat,
+    double? lon,
+  }) async {
     try {
       // Si des coordonnées sont fournies, les utiliser
       if (lat != null && lon != null) {
-        final weather = await remoteDatasource.getWeatherByCoordinates(lat, lon);
+        final weather =
+            await remoteDatasource.getWeatherByCoordinates(lat, lon);
         return Right(weather);
       }
 
@@ -54,4 +55,3 @@ class WeatherRepositoryImpl implements WeatherRepository {
     }
   }
 }
-

@@ -76,7 +76,8 @@ void main() {
           isA<VehicleState>().having((s) => s.isLoading, 'isLoading', true),
           isA<VehicleState>()
               .having((s) => s.isLoading, 'isLoading', false)
-              .having((s) => s.errorMessage, 'errorMessage', serverFailure.message),
+              .having(
+                  (s) => s.errorMessage, 'errorMessage', serverFailure.message),
         ],
       );
 
@@ -117,7 +118,8 @@ void main() {
         },
         act: (bloc) => bloc.add(AddVehicle(tParams)),
         expect: () => [
-          isA<VehicleState>().having((s) => s.isSubmitting, 'isSubmitting', true),
+          isA<VehicleState>()
+              .having((s) => s.isSubmitting, 'isSubmitting', true),
           isA<VehicleState>()
               .having((s) => s.isSubmitting, 'isSubmitting', false)
               .having((s) => s.successMessage, 'successMessage', isNotNull)
@@ -134,7 +136,8 @@ void main() {
         },
         act: (bloc) => bloc.add(AddVehicle(tParams)),
         expect: () => [
-          isA<VehicleState>().having((s) => s.isSubmitting, 'isSubmitting', true),
+          isA<VehicleState>()
+              .having((s) => s.isSubmitting, 'isSubmitting', true),
           isA<VehicleState>()
               .having((s) => s.isSubmitting, 'isSubmitting', false)
               .having((s) => s.errorMessage, 'errorMessage', isNotNull),
@@ -153,7 +156,8 @@ void main() {
         seed: () => VehicleState(vehicles: tVehicles),
         act: (bloc) => bloc.add(const DeleteVehicle('vehicle-0')),
         expect: () => [
-          isA<VehicleState>().having((s) => s.isSubmitting, 'isSubmitting', true),
+          isA<VehicleState>()
+              .having((s) => s.isSubmitting, 'isSubmitting', true),
           isA<VehicleState>()
               .having((s) => s.isSubmitting, 'isSubmitting', false)
               .having((s) => s.successMessage, 'successMessage', isNotNull)
@@ -174,10 +178,12 @@ void main() {
         seed: () => VehicleState(vehicles: tVehicles),
         act: (bloc) => bloc.add(const DeleteVehicle('vehicle-123')),
         expect: () => [
-          isA<VehicleState>().having((s) => s.isSubmitting, 'isSubmitting', true),
+          isA<VehicleState>()
+              .having((s) => s.isSubmitting, 'isSubmitting', true),
           isA<VehicleState>()
               .having((s) => s.isSubmitting, 'isSubmitting', false)
-              .having((s) => s.errorMessage, 'errorMessage', serverFailure.message),
+              .having(
+                  (s) => s.errorMessage, 'errorMessage', serverFailure.message),
         ],
       );
     });

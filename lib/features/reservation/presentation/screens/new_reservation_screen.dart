@@ -72,9 +72,9 @@ class NewReservationView extends StatelessWidget {
   }
 
   PreferredSizeWidget _buildAppBar(
-      BuildContext context,
-      NewReservationState state,
-      ) {
+    BuildContext context,
+    NewReservationState state,
+  ) {
     return AppBar(
       title: const Text('Nouvelle réservation'),
       leading: IconButton(
@@ -125,11 +125,11 @@ class NewReservationView extends StatelessWidget {
     final isActive = index == currentStep;
 
     final stepIcons = [
-      Icons.directions_car,  // Step 1: Véhicule/Parking
-      Icons.location_on,     // Step 2: Localisation
-      Icons.access_time,     // Step 3: Date/Heure
-      Icons.tune,            // Step 4: Options
-      Icons.receipt_long,    // Step 5: Résumé
+      Icons.directions_car, // Step 1: Véhicule/Parking
+      Icons.location_on, // Step 2: Localisation
+      Icons.access_time, // Step 3: Date/Heure
+      Icons.tune, // Step 4: Options
+      Icons.receipt_long, // Step 5: Résumé
     ];
 
     Color getColor() {
@@ -155,10 +155,10 @@ class NewReservationView extends StatelessWidget {
             child: isCompleted
                 ? Icon(Icons.check, size: 18, color: theme.primaryColor)
                 : Icon(
-              stepIcons[index],
-              size: 18,
-              color: isActive ? Colors.white : Colors.grey[400],
-            ),
+                    stepIcons[index],
+                    size: 18,
+                    color: isActive ? Colors.white : Colors.grey[400],
+                  ),
           ),
         ),
         if (index < 4)
@@ -204,9 +204,9 @@ class NewReservationView extends StatelessWidget {
   }
 
   Widget _buildNavigationButtons(
-      BuildContext context,
-      NewReservationState state,
-      ) {
+    BuildContext context,
+    NewReservationState state,
+  ) {
     final bloc = context.read<NewReservationBloc>();
 
     return Container(
@@ -254,27 +254,27 @@ class NewReservationView extends StatelessWidget {
                 ),
                 child: state.isLoading
                     ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor:
-                    AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
                     : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(_getNextButtonText(state)),
-                    const SizedBox(width: 8),
-                    Icon(
-                      state.currentStep == 4
-                          ? Icons.check
-                          : Icons.arrow_forward,
-                      size: 20,
-                    ),
-                  ],
-                ),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(_getNextButtonText(state)),
+                          const SizedBox(width: 8),
+                          Icon(
+                            state.currentStep == 4
+                                ? Icons.check
+                                : Icons.arrow_forward,
+                            size: 20,
+                          ),
+                        ],
+                      ),
               ),
             ),
           ],
@@ -301,9 +301,9 @@ class NewReservationView extends StatelessWidget {
   }
 
   VoidCallback? _getNextButtonOnPressed(
-      BuildContext context,
-      NewReservationState state,
-      ) {
+    BuildContext context,
+    NewReservationState state,
+  ) {
     if (state.isLoading) return null;
 
     final bloc = context.read<NewReservationBloc>();

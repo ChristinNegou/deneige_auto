@@ -75,7 +75,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          icon:
+                              const Icon(Icons.arrow_back, color: Colors.white),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
@@ -135,7 +136,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     if (value == null || value.isEmpty) {
                                       return 'Veuillez entrer votre email';
                                     }
-                                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    if (!RegExp(
+                                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                         .hasMatch(value)) {
                                       return 'Email invalide';
                                     }
@@ -145,7 +147,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 const SizedBox(height: 24),
                                 AppButton(
                                   text: 'Envoyer le lien',
-                                  onPressed: isLoading ? null : _handleResetPassword,
+                                  onPressed:
+                                      isLoading ? null : _handleResetPassword,
                                   isLoading: isLoading,
                                 ),
                               ],

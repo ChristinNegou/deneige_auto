@@ -81,8 +81,7 @@ void main() {
     group('getStats', () {
       test('should return worker stats when successful', () async {
         final tStats = createStatsModel();
-        when(() => mockDataSource.getStats())
-            .thenAnswer((_) async => tStats);
+        when(() => mockDataSource.getStats()).thenAnswer((_) async => tStats);
 
         final result = await repository.getStats();
 
@@ -90,7 +89,8 @@ void main() {
         verify(() => mockDataSource.getStats()).called(1);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.getStats())
             .thenThrow(const ServerException(message: 'Server error'));
 
@@ -103,7 +103,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when AuthException is thrown', () async {
+      test('should return ServerFailure when AuthException is thrown',
+          () async {
         // Note: WorkerRepositoryImpl doesn't catch AuthException specifically,
         // it only catches DioException. Other exceptions fall through to ServerFailure.
         when(() => mockDataSource.getStats())
@@ -121,7 +122,10 @@ void main() {
 
     group('getAvailableJobs', () {
       test('should return list of available jobs when successful', () async {
-        final tJobs = [createJobModel(id: 'job-1'), createJobModel(id: 'job-2')];
+        final tJobs = [
+          createJobModel(id: 'job-1'),
+          createJobModel(id: 'job-2')
+        ];
         when(() => mockDataSource.getAvailableJobs(
               latitude: any(named: 'latitude'),
               longitude: any(named: 'longitude'),
@@ -141,7 +145,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when NetworkException is thrown', () async {
+      test('should return ServerFailure when NetworkException is thrown',
+          () async {
         // Note: WorkerRepositoryImpl doesn't catch NetworkException specifically,
         // it only catches DioException. Other exceptions fall through to ServerFailure.
         when(() => mockDataSource.getAvailableJobs(
@@ -165,9 +170,11 @@ void main() {
 
     group('getMyJobs', () {
       test('should return list of my jobs when successful', () async {
-        final tJobs = [createJobModel(id: 'job-1'), createJobModel(id: 'job-2')];
-        when(() => mockDataSource.getMyJobs())
-            .thenAnswer((_) async => tJobs);
+        final tJobs = [
+          createJobModel(id: 'job-1'),
+          createJobModel(id: 'job-2')
+        ];
+        when(() => mockDataSource.getMyJobs()).thenAnswer((_) async => tJobs);
 
         final result = await repository.getMyJobs();
 
@@ -178,7 +185,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.getMyJobs())
             .thenThrow(const ServerException(message: 'Server error'));
 
@@ -213,7 +221,8 @@ void main() {
         verify(() => mockDataSource.toggleAvailability(false)).called(1);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.toggleAvailability(true))
             .thenThrow(const ServerException(message: 'Toggle failed'));
 
@@ -265,7 +274,8 @@ void main() {
         verify(() => mockDataSource.completeJob(jobId: 'job-123')).called(1);
       });
 
-      test('should return ServerFailure when job cannot be completed', () async {
+      test('should return ServerFailure when job cannot be completed',
+          () async {
         when(() => mockDataSource.completeJob(jobId: 'job-123'))
             .thenThrow(const ServerException(message: 'Cannot complete job'));
 
@@ -281,7 +291,10 @@ void main() {
 
     group('getJobHistory', () {
       test('should return list of job history when successful', () async {
-        final tJobs = [createJobModel(id: 'job-1'), createJobModel(id: 'job-2')];
+        final tJobs = [
+          createJobModel(id: 'job-1'),
+          createJobModel(id: 'job-2')
+        ];
         when(() => mockDataSource.getJobHistory(
               page: any(named: 'page'),
               limit: any(named: 'limit'),

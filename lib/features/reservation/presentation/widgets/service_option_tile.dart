@@ -28,9 +28,8 @@ class ServiceOptionTile extends StatelessWidget {
               : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? Theme.of(context).primaryColor
-                : Colors.grey[300]!,
+            color:
+                isSelected ? Theme.of(context).primaryColor : Colors.grey[300]!,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -104,10 +103,10 @@ class ServiceOptionTile extends StatelessWidget {
                   ),
                   child: isSelected
                       ? const Icon(
-                    Icons.check,
-                    size: 16,
-                    color: Colors.white,
-                  )
+                          Icons.check,
+                          size: 16,
+                          color: Colors.white,
+                        )
                       : null,
                 ),
               ],

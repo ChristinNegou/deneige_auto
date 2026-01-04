@@ -56,8 +56,12 @@ class ParkingSpot extends Equatable {
     double dLat = _toRadians(lat - latitude!);
     double dLng = _toRadians(lng - longitude!);
 
-    double a = 0.5 - 0.5 * cos(2 * dLat) +
-        cos(_toRadians(latitude!)) * cos(_toRadians(lat)) * (1 - cos(2 * dLng)) / 2;
+    double a = 0.5 -
+        0.5 * cos(2 * dLat) +
+        cos(_toRadians(latitude!)) *
+            cos(_toRadians(lat)) *
+            (1 - cos(2 * dLng)) /
+            2;
 
     return earthRadius * 2 * asin(sqrt(a));
   }
@@ -98,20 +102,20 @@ class ParkingSpot extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    spotNumber,
-    buildingCode,
-    level,
-    section,
-    latitude,
-    longitude,
-    isAssigned,
-    assignedUserId,
-    isActive,
-    notes,
-    createdAt,
-    updatedAt,
-  ];
+        id,
+        spotNumber,
+        buildingCode,
+        level,
+        section,
+        latitude,
+        longitude,
+        isAssigned,
+        assignedUserId,
+        isActive,
+        notes,
+        createdAt,
+        updatedAt,
+      ];
 }
 
 enum ParkingLevel {

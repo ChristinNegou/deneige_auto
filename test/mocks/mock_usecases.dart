@@ -44,42 +44,85 @@ import 'package:deneige_auto/features/snow_worker/domain/usecases/get_worker_sta
 
 // ==================== AUTH USE CASES ====================
 class MockLoginUseCase extends Mock implements LoginUseCase {}
+
 class MockRegisterUseCase extends Mock implements RegisterUseCase {}
+
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
+
 class MockGetCurrentUserUseCase extends Mock implements GetCurrentUserUseCase {}
+
 class MockForgotPasswordUseCase extends Mock implements ForgotPasswordUseCase {}
+
 class MockResetPasswordUseCase extends Mock implements ResetPasswordUseCase {}
+
 class MockUpdateProfileUseCase extends Mock implements UpdateProfileUseCase {}
 
 // ==================== RESERVATION USE CASES ====================
-class MockCreateReservationUseCase extends Mock implements CreateReservationUseCase {}
-class MockGetReservationsUseCase extends Mock implements GetReservationsUseCase {}
-class MockGetReservationByIdUseCase extends Mock implements GetReservationByIdUseCase {}
-class MockCancelReservationUseCase extends Mock implements CancelReservationUseCase {}
-class MockUpdateReservationUseCase extends Mock implements UpdateReservationUseCase {}
+class MockCreateReservationUseCase extends Mock
+    implements CreateReservationUseCase {}
+
+class MockGetReservationsUseCase extends Mock
+    implements GetReservationsUseCase {}
+
+class MockGetReservationByIdUseCase extends Mock
+    implements GetReservationByIdUseCase {}
+
+class MockCancelReservationUseCase extends Mock
+    implements CancelReservationUseCase {}
+
+class MockUpdateReservationUseCase extends Mock
+    implements UpdateReservationUseCase {}
+
 class MockGetVehiclesUseCase extends Mock implements GetVehiclesUseCase {}
-class MockGetParkingSpotsUseCase extends Mock implements GetParkingSpotsUseCase {}
+
+class MockGetParkingSpotsUseCase extends Mock
+    implements GetParkingSpotsUseCase {}
+
 class MockAddVehicleUseCase extends Mock implements AddVehicleUseCase {}
+
 class MockDeleteVehicleUseCase extends Mock implements DeleteVehicleUseCase {}
 
 // ==================== PAYMENT USE CASES ====================
-class MockGetPaymentHistoryUseCase extends Mock implements GetPaymentHistoryUseCase {}
-class MockGetPaymentMethodsUseCase extends Mock implements GetPaymentMethodsUseCase {}
-class MockSavePaymentMethodUseCase extends Mock implements SavePaymentMethodUseCase {}
-class MockDeletePaymentMethodUseCase extends Mock implements DeletePaymentMethodUseCase {}
-class MockSetDefaultPaymentMethodUseCase extends Mock implements SetDefaultPaymentMethodUseCase {}
+class MockGetPaymentHistoryUseCase extends Mock
+    implements GetPaymentHistoryUseCase {}
+
+class MockGetPaymentMethodsUseCase extends Mock
+    implements GetPaymentMethodsUseCase {}
+
+class MockSavePaymentMethodUseCase extends Mock
+    implements SavePaymentMethodUseCase {}
+
+class MockDeletePaymentMethodUseCase extends Mock
+    implements DeletePaymentMethodUseCase {}
+
+class MockSetDefaultPaymentMethodUseCase extends Mock
+    implements SetDefaultPaymentMethodUseCase {}
+
 class MockProcessRefundUseCase extends Mock implements ProcessRefundUseCase {}
 
 // ==================== NOTIFICATION USE CASES ====================
-class MockGetNotificationsUseCase extends Mock implements GetNotificationsUseCase {}
+class MockGetNotificationsUseCase extends Mock
+    implements GetNotificationsUseCase {}
+
 class MockGetUnreadCountUseCase extends Mock implements GetUnreadCountUseCase {}
+
 class MockMarkAsReadUseCase extends Mock implements MarkAsReadUseCase {}
+
 class MockMarkAllAsReadUseCase extends Mock implements MarkAllAsReadUseCase {}
-class MockDeleteNotificationUseCase extends Mock implements DeleteNotificationUseCase {}
-class MockClearAllNotificationsUseCase extends Mock implements ClearAllNotificationsUseCase {}
+
+class MockDeleteNotificationUseCase extends Mock
+    implements DeleteNotificationUseCase {}
+
+class MockClearAllNotificationsUseCase extends Mock
+    implements ClearAllNotificationsUseCase {}
 
 // ==================== WORKER USE CASES ====================
-class MockGetAvailableJobsUseCase extends Mock implements GetAvailableJobsUseCase {}
+class MockGetAvailableJobsUseCase extends Mock
+    implements GetAvailableJobsUseCase {}
+
 class MockGetMyJobsUseCase extends Mock implements GetMyJobsUseCase {}
-class MockToggleAvailabilityUseCase extends Mock implements ToggleAvailabilityUseCase {}
+
+class MockToggleAvailabilityUseCase extends Mock
+    implements ToggleAvailabilityUseCase {}
+
 class MockGetWorkerStatsUseCase extends Mock implements GetWorkerStatsUseCase {}

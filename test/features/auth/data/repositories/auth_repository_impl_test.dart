@@ -47,7 +47,8 @@ void main() {
         );
       });
 
-      test('should return NetworkFailure when NetworkException is thrown', () async {
+      test('should return NetworkFailure when NetworkException is thrown',
+          () async {
         when(() => mockDataSource.login(tEmail, tPassword))
             .thenThrow(const NetworkException(message: 'No connection'));
 
@@ -60,7 +61,8 @@ void main() {
         );
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.login(tEmail, tPassword))
             .thenThrow(const ServerException(message: 'Server error'));
 
@@ -73,13 +75,14 @@ void main() {
         );
       });
 
-      test('should return SuspendedFailure when SuspendedException is thrown', () async {
+      test('should return SuspendedFailure when SuspendedException is thrown',
+          () async {
         when(() => mockDataSource.login(tEmail, tPassword))
             .thenThrow(SuspendedException(
-              message: 'Account suspended',
-              reason: 'Violation',
-              suspendedUntil: DateTime.now().add(const Duration(days: 7)),
-            ));
+          message: 'Account suspended',
+          reason: 'Violation',
+          suspendedUntil: DateTime.now().add(const Duration(days: 7)),
+        ));
 
         final result = await repository.login(tEmail, tPassword);
 
@@ -95,13 +98,18 @@ void main() {
       test('should return User when registration is successful', () async {
         // The repository splits 'John Doe' into firstName='John' and lastName='Doe'
         when(() => mockDataSource.register(
-          tEmail, tPassword, 'John', 'Doe',
-          phone: '+1234567890',
-          role: UserRole.client,
-        )).thenAnswer((_) async => tUser);
+              tEmail,
+              tPassword,
+              'John',
+              'Doe',
+              phone: '+1234567890',
+              role: UserRole.client,
+            )).thenAnswer((_) async => tUser);
 
         final result = await repository.register(
-          tEmail, tPassword, 'John Doe',
+          tEmail,
+          tPassword,
+          'John Doe',
           phone: '+1234567890',
         );
 
@@ -110,10 +118,13 @@ void main() {
 
       test('should return AuthFailure when AuthException is thrown', () async {
         when(() => mockDataSource.register(
-          tEmail, tPassword, 'John', 'Doe',
-          phone: null,
-          role: UserRole.client,
-        )).thenThrow(const AuthException(message: 'Email already exists'));
+              tEmail,
+              tPassword,
+              'John',
+              'Doe',
+              phone: null,
+              role: UserRole.client,
+            )).thenThrow(const AuthException(message: 'Email already exists'));
 
         final result = await repository.register(tEmail, tPassword, 'John Doe');
 
@@ -152,8 +163,7 @@ void main() {
 
     group('logout', () {
       test('should return Right(null) when logout is successful', () async {
-        when(() => mockDataSource.logout())
-            .thenAnswer((_) async => {});
+        when(() => mockDataSource.logout()).thenAnswer((_) async => {});
 
         final result = await repository.logout();
 
@@ -161,7 +171,8 @@ void main() {
         verify(() => mockDataSource.logout()).called(1);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.logout())
             .thenThrow(const ServerException(message: 'Logout failed'));
 
@@ -186,7 +197,8 @@ void main() {
         verify(() => mockDataSource.forgotPassword(tEmail)).called(1);
       });
 
-      test('should return NetworkFailure when NetworkException is thrown', () async {
+      test('should return NetworkFailure when NetworkException is thrown',
+          () async {
         when(() => mockDataSource.forgotPassword(tEmail))
             .thenThrow(const NetworkException(message: 'No connection'));
 
@@ -211,10 +223,12 @@ void main() {
         final result = await repository.resetPassword(tToken, tNewPassword);
 
         expect(result, const Right(null));
-        verify(() => mockDataSource.resetPassword(tToken, tNewPassword)).called(1);
+        verify(() => mockDataSource.resetPassword(tToken, tNewPassword))
+            .called(1);
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.resetPassword(tToken, tNewPassword))
             .thenThrow(const ServerException(message: 'Invalid token'));
 
@@ -251,11 +265,11 @@ void main() {
     group('updateProfile', () {
       test('should return User when profile update is successful', () async {
         when(() => mockDataSource.updateProfile(
-          firstName: any(named: 'firstName'),
-          lastName: any(named: 'lastName'),
-          phoneNumber: any(named: 'phoneNumber'),
-          photoUrl: any(named: 'photoUrl'),
-        )).thenAnswer((_) async => tUser);
+              firstName: any(named: 'firstName'),
+              lastName: any(named: 'lastName'),
+              phoneNumber: any(named: 'phoneNumber'),
+              photoUrl: any(named: 'photoUrl'),
+            )).thenAnswer((_) async => tUser);
 
         final result = await repository.updateProfile(
           firstName: 'Jane',
@@ -265,13 +279,14 @@ void main() {
         expect(result, Right(tUser));
       });
 
-      test('should return ServerFailure when ServerException is thrown', () async {
+      test('should return ServerFailure when ServerException is thrown',
+          () async {
         when(() => mockDataSource.updateProfile(
-          firstName: any(named: 'firstName'),
-          lastName: any(named: 'lastName'),
-          phoneNumber: any(named: 'phoneNumber'),
-          photoUrl: any(named: 'photoUrl'),
-        )).thenThrow(const ServerException(message: 'Update failed'));
+              firstName: any(named: 'firstName'),
+              lastName: any(named: 'lastName'),
+              phoneNumber: any(named: 'phoneNumber'),
+              photoUrl: any(named: 'photoUrl'),
+            )).thenThrow(const ServerException(message: 'Update failed'));
 
         final result = await repository.updateProfile(firstName: 'Jane');
 

@@ -38,7 +38,8 @@ class SyncService {
   }
 
   /// Ajoute une operation a la queue
-  Future<void> addOperation(SyncOperationType type, Map<String, dynamic> data) async {
+  Future<void> addOperation(
+      SyncOperationType type, Map<String, dynamic> data) async {
     await _queue.addOperation(type, data);
 
     // Tente de synchroniser immediatement si en ligne
@@ -115,7 +116,8 @@ class SyncService {
             await _queue.remove(item.id);
             processedCount++;
           } else {
-            final shouldRetry = await _queue.markFailed(item.id, 'Operation echouee');
+            final shouldRetry =
+                await _queue.markFailed(item.id, 'Operation echouee');
             if (!shouldRetry) {
               failedCount++;
             }

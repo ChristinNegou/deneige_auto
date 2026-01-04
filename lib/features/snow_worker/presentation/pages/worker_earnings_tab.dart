@@ -87,7 +87,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                   builder: (context, state) {
                     if (state is WorkerStatsLoading) {
                       return const Center(
-                        child: CircularProgressIndicator(color: AppTheme.primary),
+                        child:
+                            CircularProgressIndicator(color: AppTheme.primary),
                       );
                     }
 
@@ -390,7 +391,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
               ),
               const SizedBox(height: 20),
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
@@ -479,7 +481,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.emoji_events_rounded, color: AppTheme.warning, size: 16),
+                Icon(Icons.emoji_events_rounded,
+                    color: AppTheme.warning, size: 16),
                 const SizedBox(width: 4),
                 Text(
                   'Objectif atteint!',
@@ -652,7 +655,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                 color: AppTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppTheme.radiusSM),
               ),
-              child: const Icon(Icons.history_rounded, color: AppTheme.primary, size: 22),
+              child: const Icon(Icons.history_rounded,
+                  color: AppTheme.primary, size: 22),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -661,7 +665,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                 children: [
                   Text(
                     'Historique des jobs',
-                    style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                    style: AppTheme.labelLarge
+                        .copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -671,7 +676,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppTheme.textTertiary),
+            const Icon(Icons.chevron_right_rounded,
+                color: AppTheme.textTertiary),
           ],
         ),
       ),
@@ -682,7 +688,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
     if (earnings.daily.isEmpty) return const SizedBox.shrink();
 
     final days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-    final maxEarning = earnings.daily.map((d) => d.total).reduce((a, b) => a > b ? a : b);
+    final maxEarning =
+        earnings.daily.map((d) => d.total).reduce((a, b) => a > b ? a : b);
     final maxHeight = maxEarning > 0 ? maxEarning : 100.0;
 
     return Container(
@@ -706,7 +713,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                 final earning = index < earnings.daily.length
                     ? earnings.daily[index].total
                     : 0.0;
-                final height = maxHeight > 0 ? (earning / maxHeight) * 120 : 0.0;
+                final height =
+                    maxHeight > 0 ? (earning / maxHeight) * 120 : 0.0;
 
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -757,7 +765,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                   color: AppTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.analytics_rounded, color: AppTheme.primary, size: 20),
+                child: const Icon(Icons.analytics_rounded,
+                    color: AppTheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Statistiques globales', style: AppTheme.headlineSmall),
@@ -765,8 +774,10 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
           ),
           const SizedBox(height: 20),
           _buildAllTimeRow('Total jobs', allTime.completed.toString()),
-          _buildAllTimeRow('Revenus totaux', '${allTime.earnings.toStringAsFixed(2)} \$'),
-          _buildAllTimeRow('Pourboires totaux', '${allTime.tips.toStringAsFixed(2)} \$'),
+          _buildAllTimeRow(
+              'Revenus totaux', '${allTime.earnings.toStringAsFixed(2)} \$'),
+          _buildAllTimeRow(
+              'Pourboires totaux', '${allTime.tips.toStringAsFixed(2)} \$'),
           _buildAllTimeRow(
             'Note moyenne',
             allTime.averageRating > 0
@@ -785,7 +796,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: AppTheme.bodySmall),
-          Text(value, style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600)),
+          Text(value,
+              style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600)),
         ],
       ),
     );

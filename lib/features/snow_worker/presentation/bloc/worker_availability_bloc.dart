@@ -52,7 +52,8 @@ class UpdateProfile extends WorkerAvailabilityEvent {
   });
 
   @override
-  List<Object?> get props => [preferredZones, equipmentList, vehicleType, maxActiveJobs];
+  List<Object?> get props =>
+      [preferredZones, equipmentList, vehicleType, maxActiveJobs];
 }
 
 // States

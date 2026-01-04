@@ -4,7 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../reservation/domain/entities/vehicle.dart';
-import '../../../reservation/domain/usecases/add_vehicle_usecase.dart' show AddVehicleParams;
+import '../../../reservation/domain/usecases/add_vehicle_usecase.dart'
+    show AddVehicleParams;
 import '../bloc/vehicule_bloc.dart';
 
 class AddVehiclePage extends StatelessWidget {
@@ -196,7 +197,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 width: 16,
                 height: 16,
                 decoration: BoxDecoration(
-                  color: _colors.firstWhere((c) => c['name'] == _selectedColor)['color'] as Color,
+                  color: _colors.firstWhere(
+                      (c) => c['name'] == _selectedColor)['color'] as Color,
                   shape: BoxShape.circle,
                   border: Border.all(color: AppTheme.border),
                 ),
@@ -209,7 +211,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
               if (_licensePlateController.text.isNotEmpty) ...[
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppTheme.background,
                     borderRadius: BorderRadius.circular(4),
@@ -250,7 +253,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                   label: 'Marque',
                   hint: 'Toyota',
                   icon: Icons.directions_car_rounded,
-                  validator: (value) => value?.isEmpty ?? true ? 'Requis' : null,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Requis' : null,
                 ),
               ),
               const SizedBox(width: 12),
@@ -260,7 +264,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                   label: 'Modèle',
                   hint: 'Camry',
                   icon: Icons.directions_car_outlined,
-                  validator: (value) => value?.isEmpty ?? true ? 'Requis' : null,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Requis' : null,
                 ),
               ),
             ],
@@ -280,7 +285,9 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                   validator: (value) {
                     if (value?.isEmpty ?? true) return 'Requis';
                     final year = int.tryParse(value!);
-                    if (year == null || year < 1900 || year > DateTime.now().year + 1) {
+                    if (year == null ||
+                        year < 1900 ||
+                        year > DateTime.now().year + 1) {
                       return 'Invalide';
                     }
                     return null;
@@ -295,7 +302,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                   hint: 'ABC 123',
                   icon: Icons.badge_outlined,
                   textCapitalization: TextCapitalization.characters,
-                  validator: (value) => value?.isEmpty ?? true ? 'Requis' : null,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Requis' : null,
                 ),
               ),
             ],
@@ -326,7 +334,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppTheme.primary : Colors.transparent,
+                        color:
+                            isSelected ? AppTheme.primary : Colors.transparent,
                         borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                       ),
                       child: Column(
@@ -341,7 +350,9 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
-                              color: isSelected ? Colors.white : AppTheme.textSecondary,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppTheme.textSecondary,
                             ),
                           ),
                         ],
@@ -369,7 +380,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
             children: _colors.map((colorData) {
               final isSelected = colorData['name'] == _selectedColor;
               return GestureDetector(
-                onTap: () => setState(() => _selectedColor = colorData['name'] as String),
+                onTap: () => setState(
+                    () => _selectedColor = colorData['name'] as String),
                 child: Container(
                   width: 36,
                   height: 36,
@@ -380,19 +392,22 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                       color: isSelected ? AppTheme.primary : AppTheme.border,
                       width: isSelected ? 2.5 : 1,
                     ),
-                    boxShadow: isSelected ? [
-                      BoxShadow(
-                        color: AppTheme.primary.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ] : null,
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: AppTheme.primary.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
                   ),
                   child: isSelected
                       ? Icon(
                           Icons.check_rounded,
                           size: 18,
-                          color: colorData['name'] == 'Blanc' || colorData['name'] == 'Beige'
+                          color: colorData['name'] == 'Blanc' ||
+                                  colorData['name'] == 'Beige'
                               ? AppTheme.primary
                               : Colors.white,
                         )
@@ -418,7 +433,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
               ),
               title: Text(
                 'Définir comme véhicule par défaut',
-                style: AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w500),
+                style:
+                    AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w500),
               ),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: const EdgeInsets.symmetric(horizontal: 8),
@@ -462,15 +478,18 @@ class _AddVehicleViewState extends State<AddVehicleView> {
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary),
+            hintStyle:
+                AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary),
             prefixIcon: Container(
               margin: const EdgeInsets.only(left: 10, right: 6),
               child: Icon(icon, color: AppTheme.textTertiary, size: 18),
             ),
-            prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
             filled: true,
             fillColor: AppTheme.background,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusSM),
               borderSide: BorderSide.none,

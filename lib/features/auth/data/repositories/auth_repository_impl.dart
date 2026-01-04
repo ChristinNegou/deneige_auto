@@ -1,4 +1,3 @@
-
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
@@ -35,18 +34,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, User>> register(String email,
-      String password,
-      String name, {
-        String? phone,
-        UserRole role = UserRole.client,
-      }) async {
+  Future<Either<Failure, User>> register(
+    String email,
+    String password,
+    String name, {
+    String? phone,
+    UserRole role = UserRole.client,
+  }) async {
     try {
       final nameParts = name.split(' ');
       final firstName = nameParts.first;
-      final lastName = nameParts.length > 1
-          ? nameParts.sublist(1).join(' ')
-          : '';
+      final lastName =
+          nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
       final user = await remoteDataSource.register(
         email,
@@ -124,8 +123,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> resetPassword(String token,
-      String newPassword) async {
+  Future<Either<Failure, void>> resetPassword(
+      String token, String newPassword) async {
     try {
       await remoteDataSource.resetPassword(token, newPassword);
       return const Right(null);

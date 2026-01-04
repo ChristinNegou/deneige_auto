@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../bloc/vehicule_bloc.dart';
 
 class VehiclesListPage extends StatelessWidget {
@@ -115,7 +116,8 @@ class VehiclesListView extends StatelessWidget {
           const Spacer(),
           GestureDetector(
             onTap: () async {
-              final result = await Navigator.pushNamed(context, AppRoutes.addVehicle);
+              final result =
+                  await Navigator.pushNamed(context, AppRoutes.addVehicle);
               if (result == true && context.mounted) {
                 context.read<VehicleBloc>().add(LoadVehicles());
               }
@@ -147,59 +149,13 @@ class VehiclesListView extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-              ),
-              child: const Icon(
-                Icons.directions_car_outlined,
-                size: 50,
-                color: AppTheme.primary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Aucun véhicule enregistré',
-              style: AppTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Ajoutez votre premier véhicule pour\ncommencer à utiliser le service',
-              style: AppTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  ),
-                ),
-                icon: const Icon(Icons.add_rounded),
-                label: const Text(
-                  'Ajouter un véhicule',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      illustrationType: IllustrationType.emptyVehicles,
+      title: 'Aucun véhicule enregistré',
+      subtitle:
+          'Ajoutez votre premier véhicule pour\ncommencer à utiliser le service',
+      buttonText: 'Ajouter un véhicule',
+      onButtonPressed: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
     );
   }
 
@@ -211,7 +167,8 @@ class VehiclesListView extends StatelessWidget {
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         border: vehicle.isDefault
-            ? Border.all(color: AppTheme.success.withValues(alpha: 0.5), width: 1.5)
+            ? Border.all(
+                color: AppTheme.success.withValues(alpha: 0.5), width: 1.5)
             : null,
         boxShadow: AppTheme.shadowSM,
       ),
@@ -243,15 +200,18 @@ class VehiclesListView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         vehicle.displayName,
-                        style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                        style: AppTheme.labelLarge
+                            .copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                     if (vehicle.isDefault)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppTheme.success.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusFull),
                         ),
                         child: Text(
                           'Par défaut',
@@ -284,7 +244,8 @@ class VehiclesListView extends StatelessWidget {
                     if (vehicle.licensePlate != null) ...[
                       const SizedBox(width: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: AppTheme.background,
                           borderRadius: BorderRadius.circular(4),

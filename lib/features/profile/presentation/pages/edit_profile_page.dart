@@ -81,7 +81,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         }
       },
       builder: (context, state) {
-        final photoUrl = state is AuthAuthenticated ? state.user.photoUrl : null;
+        final photoUrl =
+            state is AuthAuthenticated ? state.user.photoUrl : null;
 
         return Scaffold(
           backgroundColor: AppTheme.background,
@@ -332,7 +333,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
           borderSide: const BorderSide(color: AppTheme.error),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
@@ -376,7 +378,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       context: context,
       backgroundColor: AppTheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXL)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXL)),
       ),
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
@@ -468,7 +471,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
             Text(
               title,
               style: AppTheme.labelLarge.copyWith(
-                color: iconColor == AppTheme.error ? AppTheme.error : AppTheme.textPrimary,
+                color: iconColor == AppTheme.error
+                    ? AppTheme.error
+                    : AppTheme.textPrimary,
               ),
             ),
           ],
@@ -497,7 +502,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 UpdateProfile(
                   firstName: _firstNameController.text,
                   lastName: _lastNameController.text,
-                  phoneNumber: _phoneController.text.isEmpty ? null : _phoneController.text,
+                  phoneNumber: _phoneController.text.isEmpty
+                      ? null
+                      : _phoneController.text,
                 ),
               );
         }

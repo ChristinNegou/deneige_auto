@@ -25,10 +25,10 @@ class AppConfig {
     }
   }
 
-
   // OpenWeatherMap API - Use --dart-define=OPENWEATHER_API_KEY=xxx or api_keys.dart
   static String get openWeatherMapApiKey {
-    const envKey = String.fromEnvironment('OPENWEATHER_API_KEY', defaultValue: '');
+    const envKey =
+        String.fromEnvironment('OPENWEATHER_API_KEY', defaultValue: '');
     return envKey.isNotEmpty ? envKey : ApiKeys.openWeatherMapApiKey;
   }
 
@@ -52,20 +52,21 @@ class AppConfig {
   static String get openWeatherApiKey => openWeatherMapApiKey;
 
   /// URL de base pour l'API OpenWeatherMap
-  static const String openWeatherBaseUrl = 'https://api.openweathermap.org/data/2.5';
+  static const String openWeatherBaseUrl =
+      'https://api.openweathermap.org/data/2.5';
 
   /// Coordonnées par défaut (Trois-Rivières, QC)
   static const double defaultLatitude = 46.3432;
   static const double defaultLongitude = -72.5476;
 
-
-
   // Business Rules
-  static const int minReservationTimeMinutes = 60; // 60 min avant l'heure de sortie
+  static const int minReservationTimeMinutes =
+      60; // 60 min avant l'heure de sortie
   static const int maxSimultaneousJobsPerWorker = 3;
   static const int lateToleranceMinutes = 15;
   static const double urgencyFeePercentage = 0.40; // +40% si < 45 min
-  static const int urgencyThresholdMinutes = 45; // 45 min avant l'heure de départ
+  static const int urgencyThresholdMinutes =
+      45; // 45 min avant l'heure de départ
 
   // Pricing (en CAD $)
   static const double basePrice = 15.0;
@@ -75,13 +76,14 @@ class AppConfig {
   static const double wheelClearanceSurcharge = 4.0;
 
   // Taxes (Québec)
-  static const double tpsRate = 0.05;      // TPS - Taxe fédérale (5%)
-  static const double tvqRate = 0.09975;   // TVQ - Taxe provinciale Québec (9.975%)
+  static const double tpsRate = 0.05; // TPS - Taxe fédérale (5%)
+  static const double tvqRate =
+      0.09975; // TVQ - Taxe provinciale Québec (9.975%)
 
   // Frais supplémentaires
-  static const double serviceFee = 1.50;           // Frais de service fixe
-  static const double processingFeeRate = 0.029;   // Frais de traitement (2.9%)
-  static const double insuranceFee = 0.75;         // Frais d'assurance
+  static const double serviceFee = 1.50; // Frais de service fixe
+  static const double processingFeeRate = 0.029; // Frais de traitement (2.9%)
+  static const double insuranceFee = 0.75; // Frais d'assurance
 
   // Subscriptions
   static const double weeklySubscriptionPrice = 39.0;
@@ -101,22 +103,25 @@ class AppConfig {
       defaultValue: '',
     );
   }
+
   static const String firebaseProjectId = 'deneigeauto';
 
   // Stripe - Configurez via --dart-define=STRIPE_PUBLISHABLE_KEY=xxx ou api_keys.dart
   static String get stripePublishableKey {
-    const envKey = String.fromEnvironment('STRIPE_PUBLISHABLE_KEY', defaultValue: '');
+    const envKey =
+        String.fromEnvironment('STRIPE_PUBLISHABLE_KEY', defaultValue: '');
     if (envKey.isNotEmpty) return envKey;
-    return isProduction ? ApiKeys.stripePublishableKeyLive : ApiKeys.stripePublishableKeyTest;
+    return isProduction
+        ? ApiKeys.stripePublishableKeyLive
+        : ApiKeys.stripePublishableKeyTest;
   }
 
   // Google Maps - Configurez via --dart-define=GOOGLE_MAPS_API_KEY=xxx ou api_keys.dart
   static String get googleMapsApiKey {
-    const envKey = String.fromEnvironment('GOOGLE_MAPS_API_KEY', defaultValue: '');
+    const envKey =
+        String.fromEnvironment('GOOGLE_MAPS_API_KEY', defaultValue: '');
     return envKey.isNotEmpty ? envKey : ApiKeys.googleMapsApiKey;
   }
-
-
 
   // Features Flags
   static bool get enableWeatherAPI => true;
@@ -138,13 +143,13 @@ enum UserRole {
 
 // Enum pour les statuts de réservation
 enum ReservationStatus {
-  pending,      // En attente d'assignation
-  assigned,     // Assignée à un déneigeur
-  enRoute,      // Déneigeur en route
-  inProgress,   // En cours
-  completed,    // Terminée
-  cancelled,    // Annulée
-  late,         // En retard
+  pending, // En attente d'assignation
+  assigned, // Assignée à un déneigeur
+  enRoute, // Déneigeur en route
+  inProgress, // En cours
+  completed, // Terminée
+  cancelled, // Annulée
+  late, // En retard
 }
 
 // Enum pour les types d'abonnement
@@ -157,9 +162,9 @@ enum SubscriptionType {
 
 // Enum pour les options de service
 enum ServiceOption {
-  windowScraping,    // Grattage vitres
-  doorDeicing,       // Déglaçage portes
-  wheelClearance,    // Dégagement roues
+  windowScraping, // Grattage vitres
+  doorDeicing, // Déglaçage portes
+  wheelClearance, // Dégagement roues
 }
 
 class AppStrings {

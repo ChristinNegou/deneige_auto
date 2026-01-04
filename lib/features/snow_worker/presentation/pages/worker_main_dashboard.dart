@@ -127,7 +127,9 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
           vertical: 6,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         ),
         child: Column(

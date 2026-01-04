@@ -37,7 +37,8 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section Date
-              _buildSectionHeader('Date de départ', Icons.calendar_today_rounded),
+              _buildSectionHeader(
+                  'Date de départ', Icons.calendar_today_rounded),
               const SizedBox(height: 12),
               _buildDateSelector(context),
 
@@ -53,8 +54,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
               const SizedBox(height: 24),
 
               // Messages d'info
-              if (state.departureDateTime != null)
-                _buildConfirmation(state),
+              if (state.departureDateTime != null) _buildConfirmation(state),
 
               if (state.isUrgent) ...[
                 const SizedBox(height: 12),
@@ -94,7 +94,8 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: hasDate ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          color:
+              hasDate ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasDate ? AppTheme.primary : Colors.grey[200]!,
@@ -110,7 +111,8 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                 color: AppTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(Icons.calendar_month, color: AppTheme.primary, size: 22),
+              child:
+                  Icon(Icons.calendar_month, color: AppTheme.primary, size: 22),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -119,7 +121,8 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                 children: [
                   Text(
                     hasDate
-                        ? DateFormat('EEEE d MMMM', 'fr_CA').format(selectedDate!)
+                        ? DateFormat('EEEE d MMMM', 'fr_CA')
+                            .format(selectedDate!)
                         : 'Sélectionner une date',
                     style: TextStyle(
                       fontSize: 15,
@@ -150,7 +153,8 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: hasTime ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          color:
+              hasTime ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasTime ? AppTheme.primary : Colors.grey[200]!,
@@ -198,11 +202,13 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
         final parts = time.split(':');
         final hour = int.parse(parts[0]);
         final minute = int.parse(parts[1]);
-        final isSelected = selectedTime?.hour == hour && selectedTime?.minute == minute;
+        final isSelected =
+            selectedTime?.hour == hour && selectedTime?.minute == minute;
 
         return GestureDetector(
           onTap: () {
-            setState(() => selectedTime = TimeOfDay(hour: hour, minute: minute));
+            setState(
+                () => selectedTime = TimeOfDay(hour: hour, minute: minute));
             _updateDateTime();
           },
           child: Container(
@@ -238,7 +244,8 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              DateFormat('EEEE d MMMM à HH:mm', 'fr_CA').format(state.departureDateTime!),
+              DateFormat('EEEE d MMMM à HH:mm', 'fr_CA')
+                  .format(state.departureDateTime!),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -260,7 +267,8 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.orange[700], size: 20),
+          Icon(Icons.warning_amber_rounded,
+              color: Colors.orange[700], size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Column(

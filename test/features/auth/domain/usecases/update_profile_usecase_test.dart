@@ -23,18 +23,19 @@ void main() {
     const tPhoneNumber = '+1999999999';
     const tPhotoUrl = 'https://example.com/photo.jpg';
 
-    test('should return updated User when profile is updated successfully', () async {
+    test('should return updated User when profile is updated successfully',
+        () async {
       // Arrange
       final updatedUser = UserFixtures.createClient(
         name: '$tFirstName $tLastName',
         phoneNumber: tPhoneNumber,
       );
       when(() => mockRepository.updateProfile(
-        firstName: tFirstName,
-        lastName: tLastName,
-        phoneNumber: tPhoneNumber,
-        photoUrl: tPhotoUrl,
-      )).thenAnswer((_) async => Right(updatedUser));
+            firstName: tFirstName,
+            lastName: tLastName,
+            phoneNumber: tPhoneNumber,
+            photoUrl: tPhotoUrl,
+          )).thenAnswer((_) async => Right(updatedUser));
 
       // Act
       final params = UpdateProfileParams(
@@ -48,21 +49,21 @@ void main() {
       // Assert
       expect(result, Right(updatedUser));
       verify(() => mockRepository.updateProfile(
-        firstName: tFirstName,
-        lastName: tLastName,
-        phoneNumber: tPhoneNumber,
-        photoUrl: tPhotoUrl,
-      )).called(1);
+            firstName: tFirstName,
+            lastName: tLastName,
+            phoneNumber: tPhoneNumber,
+            photoUrl: tPhotoUrl,
+          )).called(1);
     });
 
     test('should update only firstName when other fields are null', () async {
       // Arrange
       when(() => mockRepository.updateProfile(
-        firstName: tFirstName,
-        lastName: null,
-        phoneNumber: null,
-        photoUrl: null,
-      )).thenAnswer((_) async => Right(tUser));
+            firstName: tFirstName,
+            lastName: null,
+            phoneNumber: null,
+            photoUrl: null,
+          )).thenAnswer((_) async => Right(tUser));
 
       // Act
       final params = UpdateProfileParams(firstName: tFirstName);
@@ -71,21 +72,21 @@ void main() {
       // Assert
       expect(result, Right(tUser));
       verify(() => mockRepository.updateProfile(
-        firstName: tFirstName,
-        lastName: null,
-        phoneNumber: null,
-        photoUrl: null,
-      )).called(1);
+            firstName: tFirstName,
+            lastName: null,
+            phoneNumber: null,
+            photoUrl: null,
+          )).called(1);
     });
 
     test('should update only phoneNumber', () async {
       // Arrange
       when(() => mockRepository.updateProfile(
-        firstName: null,
-        lastName: null,
-        phoneNumber: tPhoneNumber,
-        photoUrl: null,
-      )).thenAnswer((_) async => Right(tUser));
+            firstName: null,
+            lastName: null,
+            phoneNumber: tPhoneNumber,
+            photoUrl: null,
+          )).thenAnswer((_) async => Right(tUser));
 
       // Act
       final params = UpdateProfileParams(phoneNumber: tPhoneNumber);
@@ -98,11 +99,11 @@ void main() {
     test('should return AuthFailure when not authenticated', () async {
       // Arrange
       when(() => mockRepository.updateProfile(
-        firstName: tFirstName,
-        lastName: null,
-        phoneNumber: null,
-        photoUrl: null,
-      )).thenAnswer((_) async => const Left(authFailure));
+            firstName: tFirstName,
+            lastName: null,
+            phoneNumber: null,
+            photoUrl: null,
+          )).thenAnswer((_) async => const Left(authFailure));
 
       // Act
       final params = UpdateProfileParams(firstName: tFirstName);
@@ -115,11 +116,11 @@ void main() {
     test('should return ServerFailure on server error', () async {
       // Arrange
       when(() => mockRepository.updateProfile(
-        firstName: tFirstName,
-        lastName: null,
-        phoneNumber: null,
-        photoUrl: null,
-      )).thenAnswer((_) async => const Left(serverFailure));
+            firstName: tFirstName,
+            lastName: null,
+            phoneNumber: null,
+            photoUrl: null,
+          )).thenAnswer((_) async => const Left(serverFailure));
 
       // Act
       final params = UpdateProfileParams(firstName: tFirstName);

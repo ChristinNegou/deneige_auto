@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -37,11 +36,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   void _handleResetPassword() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-        ResetPasswordEvent(
-          token: widget.token,
-          newPassword: _passwordController.text,
-        ),
-      );
+            ResetPasswordEvent(
+              token: widget.token,
+              newPassword: _passwordController.text,
+            ),
+          );
     }
   }
 
@@ -71,7 +70,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   if (mounted) {
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       AppRoutes.login,
-                          (route) => false,
+                      (route) => false,
                     );
                   }
                 });
@@ -107,9 +106,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                       // Titre
                       Text(
-                        isSuccess
-                            ? 'Succès !'
-                            : 'Nouveau mot de passe',
+                        isSuccess ? 'Succès !' : 'Nouveau mot de passe',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 28,
@@ -190,7 +187,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                     onPressed: () {
                                       setState(() {
                                         _obscureConfirmPassword =
-                                        !_obscureConfirmPassword;
+                                            !_obscureConfirmPassword;
                                       });
                                     },
                                   ),
@@ -215,7 +212,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 // Bouton de réinitialisation
                                 AppButton(
                                   text: 'Réinitialiser le mot de passe',
-                                  onPressed: isLoading ? null : _handleResetPassword,
+                                  onPressed:
+                                      isLoading ? null : _handleResetPassword,
                                   isLoading: isLoading,
                                 ),
                               ],
@@ -256,9 +254,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 AppButton(
                                   text: 'Aller à la connexion',
                                   onPressed: () {
-                                    Navigator.of(context).pushNamedAndRemoveUntil(
+                                    Navigator.of(context)
+                                        .pushNamedAndRemoveUntil(
                                       AppRoutes.login,
-                                          (route) => false,
+                                      (route) => false,
                                     );
                                   },
                                 ),
@@ -283,7 +282,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               onPressed: () {
                                 Navigator.of(context).pushNamedAndRemoveUntil(
                                   AppRoutes.login,
-                                      (route) => false,
+                                  (route) => false,
                                 );
                               },
                               child: const Text(

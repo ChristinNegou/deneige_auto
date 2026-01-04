@@ -114,9 +114,9 @@ void main() {
     test('should complete job successfully', () async {
       // Arrange
       when(() => mockRepository.completeJob(
-        jobId: tJobId,
-        workerNotes: any(named: 'workerNotes'),
-      )).thenAnswer((_) async => Right(tCompletedJob));
+            jobId: tJobId,
+            workerNotes: any(named: 'workerNotes'),
+          )).thenAnswer((_) async => Right(tCompletedJob));
 
       // Act
       final result = await completeJobUsecase(jobId: tJobId);
@@ -135,9 +135,9 @@ void main() {
     test('should complete job with notes', () async {
       // Arrange
       when(() => mockRepository.completeJob(
-        jobId: tJobId,
-        workerNotes: 'Travail bien fait',
-      )).thenAnswer((_) async => Right(tCompletedJob));
+            jobId: tJobId,
+            workerNotes: 'Travail bien fait',
+          )).thenAnswer((_) async => Right(tCompletedJob));
 
       // Act
       final result = await completeJobUsecase(
@@ -148,17 +148,17 @@ void main() {
       // Assert
       expect(result.isRight(), true);
       verify(() => mockRepository.completeJob(
-        jobId: tJobId,
-        workerNotes: 'Travail bien fait',
-      )).called(1);
+            jobId: tJobId,
+            workerNotes: 'Travail bien fait',
+          )).called(1);
     });
 
     test('should return ServerFailure when job cannot be completed', () async {
       // Arrange
       when(() => mockRepository.completeJob(
-        jobId: tJobId,
-        workerNotes: any(named: 'workerNotes'),
-      )).thenAnswer((_) async => const Left(serverFailure));
+            jobId: tJobId,
+            workerNotes: any(named: 'workerNotes'),
+          )).thenAnswer((_) async => const Left(serverFailure));
 
       // Act
       final result = await completeJobUsecase(jobId: tJobId);

@@ -21,7 +21,9 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = context.read<NewReservationBloc>().state;
-      if (!state.hasValidLocation && !state.isGettingLocation && !_hasTriedAutoLocation) {
+      if (!state.hasValidLocation &&
+          !state.isGettingLocation &&
+          !_hasTriedAutoLocation) {
         _hasTriedAutoLocation = true;
         context.read<NewReservationBloc>().add(GetCurrentLocation());
       }
@@ -42,7 +44,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
     return BlocConsumer<NewReservationBloc, NewReservationState>(
       listener: (context, state) {
         if (state.hasValidLocation && state.locationAddress != null) {
-          if (_addressController.text.isEmpty || _addressController.text != state.locationAddress) {
+          if (_addressController.text.isEmpty ||
+              _addressController.text != state.locationAddress) {
             _addressController.text = state.locationAddress!;
           }
         }
@@ -132,7 +135,9 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                     ),
                   )
                 : Icon(
-                    hasLocation ? Icons.check_circle_rounded : Icons.location_searching,
+                    hasLocation
+                        ? Icons.check_circle_rounded
+                        : Icons.location_searching,
                     size: 24,
                     color: hasLocation ? Colors.green : Colors.grey[400],
                   ),
@@ -153,7 +158,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: hasLocation ? Colors.green[700] : AppTheme.textPrimary,
+                    color:
+                        hasLocation ? Colors.green[700] : AppTheme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -172,14 +178,16 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
           // Bouton actualiser
           if (!isLoading)
             TextButton.icon(
-              onPressed: () => context.read<NewReservationBloc>().add(GetCurrentLocation()),
+              onPressed: () =>
+                  context.read<NewReservationBloc>().add(GetCurrentLocation()),
               icon: Icon(Icons.refresh, size: 18, color: AppTheme.primary),
               label: Text(
                 hasLocation ? 'Actualiser' : 'Réessayer',
                 style: TextStyle(fontSize: 13, color: AppTheme.primary),
               ),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
             ),
         ],
@@ -220,13 +228,16 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: AppTheme.primary, width: 1.5),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
           textInputAction: TextInputAction.search,
           onChanged: (_) => setState(() {}),
           onSubmitted: (value) {
             if (value.trim().isNotEmpty) {
-              context.read<NewReservationBloc>().add(SetLocationFromAddress(value));
+              context
+                  .read<NewReservationBloc>()
+                  .add(SetLocationFromAddress(value));
             }
           },
         ),
@@ -240,7 +251,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
         // Message de succès
         if (state.hasValidLocation && error == null) ...[
           const SizedBox(height: 10),
-          _buildMessage('Adresse validée', Colors.green, Icons.check_circle_outline),
+          _buildMessage(
+              'Adresse validée', Colors.green, Icons.check_circle_outline),
         ],
 
         const SizedBox(height: 14),
@@ -258,16 +270,19 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
               disabledBackgroundColor: Colors.grey[300],
             ),
             child: isLoading
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
                   )
-                : const Text('Valider l\'adresse', style: TextStyle(fontWeight: FontWeight.w600)),
+                : const Text('Valider l\'adresse',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
           ),
         ),
 
@@ -303,7 +318,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 13, color: color.withValues(alpha: 0.8)),
+              style:
+                  TextStyle(fontSize: 13, color: color.withValues(alpha: 0.8)),
             ),
           ),
         ],

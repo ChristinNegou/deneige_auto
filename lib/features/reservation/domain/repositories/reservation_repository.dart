@@ -39,12 +39,9 @@ abstract class ReservationRepository {
     bool isDefault = false,
   });
 
-
-
   Future<Either<Failure, List<Reservation>>> getReservations({
     bool upcoming,
     String? userId,
-
   });
 
   Future<Either<Failure, Reservation>> getReservationById(String id);
@@ -78,7 +75,8 @@ abstract class ReservationRepository {
   });
 
   /// Récupérer la note d'une réservation
-  Future<Either<Failure, Map<String, dynamic>>> getReservationRating(String reservationId);
+  Future<Either<Failure, Map<String, dynamic>>> getReservationRating(
+      String reservationId);
 
   /// Ajouter un pourboire à une réservation complétée
   Future<Either<Failure, Map<String, dynamic>>> addTip({

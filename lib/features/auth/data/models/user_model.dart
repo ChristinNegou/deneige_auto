@@ -1,4 +1,3 @@
-
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -16,7 +15,8 @@ class UserModel extends User {
     return UserModel(
       id: json['id'] as String,
       email: json['email'] as String,
-      name: json['name'] as String? ?? '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim(),
+      name: json['name'] as String? ??
+          '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim(),
       phoneNumber: json['phoneNumber'] as String?,
       photoUrl: json['photoUrl'] as String?,
       createdAt: json['createdAt'] != null

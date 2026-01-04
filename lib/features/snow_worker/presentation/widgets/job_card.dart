@@ -205,7 +205,8 @@ class JobCard extends StatelessWidget {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.check_circle),
-                    label: Text(isLoading ? 'Acceptation...' : 'Accepter ce job'),
+                    label:
+                        Text(isLoading ? 'Acceptation...' : 'Accepter ce job'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,

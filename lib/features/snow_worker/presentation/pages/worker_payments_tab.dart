@@ -111,7 +111,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
 
     return SafeArea(
       child: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.primary))
           : RefreshIndicator(
               onRefresh: _loadAccountStatus,
               color: AppTheme.primary,
@@ -248,7 +249,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         boxShadow: [
           BoxShadow(
-            color: (isConfigured ? Colors.green : AppTheme.primary).withValues(alpha: 0.3),
+            color: (isConfigured ? Colors.green : AppTheme.primary)
+                .withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -267,7 +269,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
                 child: Icon(
-                  isConfigured ? Icons.account_balance : Icons.account_balance_wallet,
+                  isConfigured
+                      ? Icons.account_balance
+                      : Icons.account_balance_wallet,
                   color: Colors.white,
                   size: 26,
                 ),
@@ -278,7 +282,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isConfigured ? 'Compte configure' : 'Configurez vos paiements',
+                      isConfigured
+                          ? 'Compte configure'
+                          : 'Configurez vos paiements',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -331,8 +337,11 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 onPressed: _createOrContinueSetup,
                 icon: const Icon(Icons.add_card_rounded, size: 20),
                 label: Text(
-                  _hasAccount ? 'Continuer la configuration' : 'Configurer maintenant',
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                  _hasAccount
+                      ? 'Continuer la configuration'
+                      : 'Configurer maintenant',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -358,7 +367,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
           width: 22,
           height: 22,
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.3),
+            color:
+                isActive ? Colors.white : Colors.white.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -402,7 +412,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: Icon(Icons.account_balance_wallet, color: Colors.green[600], size: 20),
+                child: Icon(Icons.account_balance_wallet,
+                    color: Colors.green[600], size: 20),
               ),
               const SizedBox(width: 12),
               Text('Solde', style: AppTheme.headlineSmall),
@@ -417,7 +428,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   children: [
                     Text(
                       'Disponible',
-                      style: AppTheme.labelSmall.copyWith(color: AppTheme.textTertiary),
+                      style: AppTheme.labelSmall
+                          .copyWith(color: AppTheme.textTertiary),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -444,7 +456,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                     children: [
                       Text(
                         'En attente',
-                        style: AppTheme.labelSmall.copyWith(color: AppTheme.textTertiary),
+                        style: AppTheme.labelSmall
+                            .copyWith(color: AppTheme.textTertiary),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -483,7 +496,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               color: Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radiusSM),
             ),
-            child: Icon(Icons.schedule_rounded, color: Colors.blue[700], size: 22),
+            child:
+                Icon(Icons.schedule_rounded, color: Colors.blue[700], size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -511,7 +525,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
   }
 
   Widget _buildCommissionInfo() {
-    final platformPercent = ((_feeConfig?['platformFeePercent'] ?? 0.25) * 100).toInt();
+    final platformPercent =
+        ((_feeConfig?['platformFeePercent'] ?? 0.25) * 100).toInt();
     final workerPercent = 100 - platformPercent;
 
     return Container(
@@ -533,7 +548,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   color: AppTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.pie_chart_outline, color: AppTheme.primary, size: 20),
+                child: const Icon(Icons.pie_chart_outline,
+                    color: AppTheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Repartition des paiements', style: AppTheme.headlineSmall),
@@ -579,7 +595,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
     );
   }
 
-  Widget _buildCommissionRow(String label, String percent, Color color, double progress) {
+  Widget _buildCommissionRow(
+      String label, String percent, Color color, double progress) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -589,7 +606,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             Text(label, style: AppTheme.bodyMedium),
             Text(
               percent,
-              style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600, color: color),
+              style: AppTheme.labelLarge
+                  .copyWith(fontWeight: FontWeight.w600, color: color),
             ),
           ],
         ),
@@ -627,7 +645,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   color: AppTheme.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                 ),
-                child: const Icon(Icons.lightbulb_outline_rounded, color: AppTheme.secondary, size: 20),
+                child: const Icon(Icons.lightbulb_outline_rounded,
+                    color: AppTheme.secondary, size: 20),
               ),
               const SizedBox(width: 12),
               Text('Comment ca fonctionne', style: AppTheme.headlineSmall),
@@ -635,7 +654,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
           ),
           const SizedBox(height: 20),
           _buildStep(1, 'Le client paie', 'Le paiement est traite par Stripe'),
-          _buildStep(2, 'Repartition automatique', 'Votre part est calculee instantanement'),
+          _buildStep(2, 'Repartition automatique',
+              'Votre part est calculee instantanement'),
           _buildStep(3, 'Depot sur votre compte', 'Sous 2-3 jours ouvrables'),
         ],
       ),
@@ -674,7 +694,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               children: [
                 Text(
                   title,
-                  style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                  style:
+                      AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
                 ),
                 Text(subtitle, style: AppTheme.bodySmall),
               ],
@@ -702,7 +723,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               color: Colors.green.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radiusSM),
             ),
-            child: Icon(Icons.verified_user_outlined, color: Colors.green[700], size: 22),
+            child: Icon(Icons.verified_user_outlined,
+                color: Colors.green[700], size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(

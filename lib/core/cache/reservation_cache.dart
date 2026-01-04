@@ -31,7 +31,8 @@ class ReservationCache {
   // ============ RESERVATIONS ============
 
   /// Sauvegarde les reservations en cache (format JSON)
-  Future<void> cacheReservationsJson(List<Map<String, dynamic>> reservations) async {
+  Future<void> cacheReservationsJson(
+      List<Map<String, dynamic>> reservations) async {
     _ensureInitialized();
     await _box.put(_reservationsKey, jsonEncode(reservations));
     await _updateLastSync();
@@ -52,7 +53,8 @@ class ReservationCache {
   }
 
   /// Sauvegarde une reservation individuelle
-  Future<void> cacheReservationJson(String id, Map<String, dynamic> reservation) async {
+  Future<void> cacheReservationJson(
+      String id, Map<String, dynamic> reservation) async {
     _ensureInitialized();
     await _box.put('reservation_$id', jsonEncode(reservation));
   }
@@ -139,7 +141,8 @@ class ReservationCache {
   }
 
   /// Verifie si le cache est perime
-  Future<bool> isCacheStale({Duration staleDuration = const Duration(minutes: 15)}) async {
+  Future<bool> isCacheStale(
+      {Duration staleDuration = const Duration(minutes: 15)}) async {
     final lastSync = await getLastSync();
     if (lastSync == null) return true;
     return DateTime.now().difference(lastSync) > staleDuration;
@@ -213,7 +216,8 @@ class ReservationCache {
     _ensureInitialized();
     await _box.delete(_reservationsKey);
     // Supprimer aussi les reservations individuelles
-    final keys = _box.keys.where((k) => k.toString().startsWith('reservation_'));
+    final keys =
+        _box.keys.where((k) => k.toString().startsWith('reservation_'));
     for (final key in keys) {
       await _box.delete(key);
     }

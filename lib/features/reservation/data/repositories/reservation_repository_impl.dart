@@ -1,4 +1,3 @@
-
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
@@ -153,7 +152,6 @@ class ReservationRepositoryImpl implements ReservationRepository {
     }
   }
 
-
   @override
   Future<Either<Failure, CancellationResult>> cancelReservation(
     String reservationId, {
@@ -230,7 +228,8 @@ class ReservationRepositoryImpl implements ReservationRepository {
         if (address != null) 'address': address,
       };
 
-      final updatedReservation = await remoteDataSource.updateReservation(reservationId, data);
+      final updatedReservation =
+          await remoteDataSource.updateReservation(reservationId, data);
       return Right(updatedReservation);
     } on NetworkException catch (e) {
       return Left(NetworkFailure(message: e.message));
@@ -264,7 +263,8 @@ class ReservationRepositoryImpl implements ReservationRepository {
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> getReservationRating(String reservationId) async {
+  Future<Either<Failure, Map<String, dynamic>>> getReservationRating(
+      String reservationId) async {
     try {
       final result = await remoteDataSource.getReservationRating(reservationId);
       return Right(result);

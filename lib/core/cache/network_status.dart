@@ -21,7 +21,8 @@ class NetworkStatus extends ChangeNotifier {
     await checkConnection();
 
     // Ecouter les changements
-    _subscription = _connectivity.onConnectivityChanged.listen(_onConnectivityChanged);
+    _subscription =
+        _connectivity.onConnectivityChanged.listen(_onConnectivityChanged);
   }
 
   /// Verifie la connexion actuelle
