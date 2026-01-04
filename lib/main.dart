@@ -11,6 +11,9 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'core/config/app_config.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/services/push_notification_service.dart';
+import 'core/cache/reservation_cache.dart';
+import 'core/cache/sync_queue.dart';
+import 'core/cache/network_status.dart';
 import 'deneigeauto_app.dart';
 
 // Import de l'injection de dépendances
@@ -44,6 +47,22 @@ void main() async {
 
   // Initialiser les dépendances
   await di.initializeDependencies();
+
+  // Initialiser les services de cache et offline
+  try {
+    final reservationCache = sl<ReservationCache>();
+    await reservationCache.init();
+
+    final syncQueue = sl<SyncQueue>();
+    await syncQueue.init();
+
+    final networkStatus = sl<NetworkStatus>();
+    await networkStatus.init();
+
+    debugPrint('Cache et services offline initialisés');
+  } catch (e) {
+    debugPrint('Erreur initialisation cache: $e');
+  }
 
   // Initialiser les notifications push
   try {
