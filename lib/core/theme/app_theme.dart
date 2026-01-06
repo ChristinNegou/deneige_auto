@@ -9,16 +9,16 @@ class AppTheme {
   // ============ COULEURS PRINCIPALES ============
 
   /// Fond principal - Gris très clair
-  static const Color background = Color(0xFFF3F4F6);
+  static const Color background = Color(0xFF212121);
 
   /// Fond des cartes - Blanc pur
-  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surface = Color(0xFF303030);
 
   /// Fond des cartes avec transparence (glassmorphism)
   static const Color surfaceGlass = Color(0xF2FFFFFF); // 95% opacity
 
   /// Texte principal - Gris charbon
-  static const Color textPrimary = Color(0xFF111827);
+  static const Color textPrimary = Color(0xFFFFFFFF);
 
   /// Texte secondaire - Gris moyen
   static const Color textSecondary = Color(0xFF6B7280);
@@ -27,13 +27,15 @@ class AppTheme {
   static const Color textTertiary = Color(0xFF9CA3AF);
 
   /// Accent principal - Bleu électrique
-  static const Color primary = Color(0xFF2563EB);
+  static const Color primary = Color(0xFF000000);
+  static const Color primary2 = Color(0xFF7E57C2);
+  static const Color primary3 = Color(0xFFCE93D8);
 
   /// Accent principal clair
   static const Color primaryLight = Color(0xFFDBEAFE);
 
   /// Accent secondaire - Indigo doux
-  static const Color secondary = Color(0xFF4F46E5);
+  static const Color secondary = Color(0xFF000000);
 
   /// Couleur succès - Émeraude
   static const Color success = Color(0xFF10B981);

@@ -88,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       : Icons.local_shipping_rounded;
 
   Color get _roleColor =>
-      widget.role == UserRole.client ? AppTheme.primary : AppTheme.success;
+      widget.role == UserRole.client ? AppTheme.statusAssigned : AppTheme.success;
 
   @override
   Widget build(BuildContext context) {
@@ -551,7 +551,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Text(
             'Se connecter',
             style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.primary,
+              color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),

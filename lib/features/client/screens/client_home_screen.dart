@@ -266,7 +266,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                 height: 44,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [AppTheme.primary, AppTheme.secondary],
+                    colors: [AppTheme.statusAssigned, AppTheme.statusAssigned],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -334,7 +334,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                 Icon(
                   _getWeatherIcon(state.weather!.condition),
                   size: 18,
-                  color: AppTheme.primary,
+                  color: AppTheme.statusAssigned,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -584,7 +584,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               child: _buildActionCard(
                 icon: Icons.add_circle_outline,
                 label: 'Réserver',
-                color: AppTheme.primary,
+                color: AppTheme.primary2,
                 onTap: () =>
                     Navigator.pushNamed(context, AppRoutes.newReservation),
               ),
@@ -604,7 +604,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               child: _buildActionCard(
                 icon: Icons.credit_card_outlined,
                 label: 'Paiements',
-                color: AppTheme.secondary,
+                color: AppTheme.primary3,
                 onTap: () => Navigator.pushNamed(context, AppRoutes.payments),
               ),
             ),
