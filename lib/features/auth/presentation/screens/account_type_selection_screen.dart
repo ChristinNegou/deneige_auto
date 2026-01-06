@@ -13,7 +13,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+            colors: [Color(0xFF212121), Color(0xFF212121)],
           ),
         ),
         child: SafeArea(

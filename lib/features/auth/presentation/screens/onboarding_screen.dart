@@ -18,29 +18,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     OnboardingContent(
       title: 'Bienvenue sur Déneige Auto',
       description:
-          'La solution moderne pour gérer le déneigement de votre propriété en toute simplicité',
+          'La solution moderne pour gérer le déneigement de votre véhicule en toute simplicité',
       illustrationType: IllustrationType.welcome,
-      accentColor: const Color(0xFF00D4FF),
+      accentColor: const Color(0xFFFAFAFA),
     ),
     OnboardingContent(
       title: 'Réservez en quelques clics',
       description:
           'Planifiez vos services de déneigement selon vos besoins et votre horaire',
       illustrationType: IllustrationType.calendar,
-      accentColor: const Color(0xFF3B82F6),
+      accentColor: const Color(0xFFFAFAFA),
     ),
     OnboardingContent(
       title: 'Suivi en temps réel',
       description:
           'Suivez l\'avancement du déneigement et recevez des notifications instantanées',
       illustrationType: IllustrationType.location,
-      accentColor: const Color(0xFF10B981),
+      accentColor: const Color(0xFFFAFAFA),
     ),
     OnboardingContent(
       title: 'Paiement sécurisé',
       description: 'Payez en toute sécurité et gérez vos factures facilement',
       illustrationType: IllustrationType.payment,
-      accentColor: const Color(0xFF8B5CF6),
+      accentColor: const Color(0xFFFAFAFA),
     ),
   ];
 
@@ -148,7 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     onPressed: _nextPage,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _pages[_currentPage].accentColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: Colors.black54,
                       elevation: 8,
                       shadowColor: _pages[_currentPage]
                           .accentColor
@@ -209,7 +209,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
-              color: AppTheme.textSecondary,
+              color: AppTheme.textTertiary,
               height: 1.5,
             ),
           ),

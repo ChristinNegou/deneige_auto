@@ -128,7 +128,7 @@ class SuspensionDialog extends StatelessWidget {
           ],
           const SizedBox(height: 16),
           Text(
-            'Contactez le support si vous pensez qu\'il s\'agit d\'une erreur.',
+            'Contactez le support au "deneigeauto@yahoo.com" si vous pensez qu\'il s\'agit d\'une erreur.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.grey.shade500,

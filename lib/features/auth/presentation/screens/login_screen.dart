@@ -381,7 +381,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Text(
             'S\'inscrire',
             style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.primary,
+              color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
