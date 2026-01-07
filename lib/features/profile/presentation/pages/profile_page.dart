@@ -144,14 +144,14 @@ class ProfilePage extends StatelessWidget {
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const Icon(
                         Icons.person_rounded,
-                        color: Colors.white,
+                        color: AppTheme.background,
                         size: 40,
                       ),
                     ),
                   )
                 : const Icon(
                     Icons.person_rounded,
-                    color: Colors.white,
+                    color: AppTheme.background,
                     size: 40,
                   ),
           ),
@@ -410,7 +410,7 @@ class ProfilePage extends StatelessWidget {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppTheme.background,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),

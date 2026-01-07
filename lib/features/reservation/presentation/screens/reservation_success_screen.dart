@@ -200,11 +200,11 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
               shouldLoop: false,
-              colors: const [
+              colors: [
                 AppTheme.success,
                 AppTheme.primary,
                 AppTheme.secondary,
-                Colors.white,
+                AppTheme.textPrimary,
               ],
               numberOfParticles: 30,
               gravity: 0.2,
