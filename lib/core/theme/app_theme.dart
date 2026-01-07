@@ -68,6 +68,9 @@ class AppTheme {
   static const Color border = Color(0xFF2A2A2A);
   static const Color divider = Color(0xFF1F1F1F);
 
+  /// Couleur d'ombre
+  static const Color shadowColor = Color(0xFF000000);
+
   // ============ COULEURS DE STATUT ============
   // Couleurs optimisées pour le mode sombre avec bonne lisibilité
 

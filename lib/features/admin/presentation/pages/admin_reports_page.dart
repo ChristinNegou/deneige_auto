@@ -64,7 +64,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline,
-                      size: 64, color: Colors.red.shade300),
+                      size: 64, color: AppTheme.error),
                   const SizedBox(height: 16),
                   Text(state.errorMessage ?? 'Une erreur est survenue'),
                   const SizedBox(height: 16),
@@ -120,18 +120,18 @@ class _AdminReportsPageState extends State<AdminReportsPage>
             ),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'Revenu Total',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: AppTheme.background.withValues(alpha: 0.7),
                     fontSize: 16,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   currencyFormat.format(stats.revenue.total),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppTheme.background,
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
                   ),
@@ -148,7 +148,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                     Container(
                       width: 1,
                       height: 40,
-                      color: Colors.white30,
+                      color: AppTheme.background.withValues(alpha: 0.3),
                     ),
                     _buildRevenueSubItem(
                       'Commission',
@@ -204,20 +204,20 @@ class _AdminReportsPageState extends State<AdminReportsPage>
   Widget _buildRevenueSubItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white70, size: 20),
+        Icon(icon, color: AppTheme.background.withValues(alpha: 0.7), size: 20),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: AppTheme.background,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white70,
+          style: TextStyle(
+            color: AppTheme.background.withValues(alpha: 0.7),
             fontSize: 12,
           ),
         ),
@@ -229,11 +229,11 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -244,7 +244,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
           _buildBreakdownRow(
             'Revenus bruts',
             revenue.total,
-            Colors.green,
+            AppTheme.success,
             Icons.trending_up,
           ),
           const Divider(height: 24),
@@ -258,14 +258,14 @@ class _AdminReportsPageState extends State<AdminReportsPage>
           _buildBreakdownRow(
             'Paiement déneigeurs',
             revenue.workerPayouts,
-            Colors.blue,
+            AppTheme.info,
             Icons.people,
           ),
           const Divider(height: 24),
           _buildBreakdownRow(
             'Pourboires',
             revenue.tips,
-            Colors.amber.shade700,
+            AppTheme.warning,
             Icons.volunteer_activism,
           ),
         ],
@@ -313,7 +313,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Center(
@@ -329,11 +329,11 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -358,7 +358,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                 flex: workerPercent.round(),
                 child: Container(
                   height: 24,
-                  color: Colors.blue,
+                  color: AppTheme.info,
                 ),
               ),
               Expanded(
@@ -366,7 +366,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                 child: Container(
                   height: 24,
                   decoration: BoxDecoration(
-                    color: Colors.amber.shade700,
+                    color: AppTheme.warning,
                     borderRadius: const BorderRadius.horizontal(
                         right: Radius.circular(12)),
                   ),
@@ -386,12 +386,12 @@ class _AdminReportsPageState extends State<AdminReportsPage>
               _buildLegendItem(
                 'Déneigeurs',
                 '${workerPercent.toStringAsFixed(1)}%',
-                Colors.blue,
+                AppTheme.info,
               ),
               _buildLegendItem(
                 'Pourboires',
                 '${tipsPercent.toStringAsFixed(1)}%',
-                Colors.amber.shade700,
+                AppTheme.warning,
               ),
             ],
           ),
@@ -418,7 +418,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
             Text(
               label,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppTheme.textSecondary,
                 fontSize: 12,
               ),
             ),
@@ -441,11 +441,11 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -460,7 +460,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   'Revenu ce mois',
                   monthlyTotal,
                   Icons.trending_up,
-                  Colors.green,
+                  AppTheme.success,
                 ),
               ),
               const SizedBox(width: 16),
@@ -503,7 +503,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade600,
+              color: AppTheme.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -526,7 +526,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   'Total Réservations',
                   stats.reservations.total.toString(),
                   Icons.calendar_today,
-                  Colors.purple,
+                  AppTheme.primary2,
                 ),
               ),
               const SizedBox(width: 12),
@@ -535,7 +535,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   'Aujourd\'hui',
                   stats.reservations.today.toString(),
                   Icons.today,
-                  Colors.orange,
+                  AppTheme.warning,
                 ),
               ),
             ],
@@ -548,7 +548,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   'Ce mois',
                   stats.reservations.thisMonth.toString(),
                   Icons.date_range,
-                  Colors.blue,
+                  AppTheme.info,
                 ),
               ),
               const SizedBox(width: 12),
@@ -557,7 +557,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   'En attente',
                   stats.reservations.pending.toString(),
                   Icons.pending,
-                  Colors.amber.shade700,
+                  AppTheme.warning,
                 ),
               ),
             ],
@@ -616,7 +616,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
           Text(
             label,
             style: TextStyle(
-              color: Colors.grey.shade700,
+              color: AppTheme.textSecondary,
               fontSize: 13,
             ),
             textAlign: TextAlign.center,
@@ -632,7 +632,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Center(
@@ -644,11 +644,11 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -660,21 +660,21 @@ class _AdminReportsPageState extends State<AdminReportsPage>
             'Terminées',
             reservations.completed,
             total,
-            Colors.green,
+            AppTheme.success,
           ),
           const SizedBox(height: 16),
           _buildStatusRow(
             'En attente',
             reservations.pending,
             total,
-            Colors.orange,
+            AppTheme.warning,
           ),
           const SizedBox(height: 16),
           _buildStatusRow(
             'Annulées',
             reservations.cancelled,
             total,
-            Colors.red,
+            AppTheme.error,
           ),
         ],
       ),
@@ -708,7 +708,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: percent / 100,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: AppTheme.surfaceContainer,
             valueColor: AlwaysStoppedAnimation(color),
             minHeight: 8,
           ),
@@ -721,11 +721,11 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -740,25 +740,25 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                 'Total',
                 users.total.toString(),
                 Icons.people,
-                Colors.purple,
+                AppTheme.primary2,
               ),
               _buildUserStatItem(
                 'Clients',
                 users.clients.toString(),
                 Icons.person,
-                Colors.teal,
+                AppTheme.info,
               ),
               _buildUserStatItem(
                 'Déneigeurs',
                 users.workers.toString(),
                 Icons.ac_unit,
-                Colors.blue,
+                AppTheme.info,
               ),
               _buildUserStatItem(
                 'Actifs',
                 users.activeWorkers.toString(),
                 Icons.check_circle,
-                Colors.green,
+                AppTheme.success,
               ),
             ],
           ),
@@ -791,7 +791,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey.shade600,
+            color: AppTheme.textSecondary,
             fontSize: 12,
           ),
         ),
@@ -838,10 +838,10 @@ class _AdminReportsPageState extends State<AdminReportsPage>
 
   Widget _buildCompletionRateCard(double rate) {
     final color = rate >= 80
-        ? Colors.green
+        ? AppTheme.success
         : rate >= 60
-            ? Colors.orange
-            : Colors.red;
+            ? AppTheme.warning
+            : AppTheme.error;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -876,7 +876,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                 child: CircularProgressIndicator(
                   value: rate / 100,
                   strokeWidth: 12,
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: AppTheme.surfaceContainer,
                   valueColor: AlwaysStoppedAnimation(color),
                 ),
               ),
@@ -897,7 +897,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                             ? 'Bon'
                             : 'À améliorer',
                     style: TextStyle(
-                      color: Colors.grey.shade600,
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                 ],
@@ -914,7 +914,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Center(
@@ -926,11 +926,11 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -940,12 +940,12 @@ class _AdminReportsPageState extends State<AdminReportsPage>
         children: List.generate(workers.length, (index) {
           final worker = workers[index];
           final medalColor = index == 0
-              ? Colors.amber
+              ? AppTheme.warning
               : index == 1
-                  ? Colors.grey.shade400
+                  ? AppTheme.textSecondary
                   : index == 2
-                      ? Colors.brown.shade300
-                      : Colors.grey.shade300;
+                      ? AppTheme.warning.withValues(alpha: 0.6)
+                      : AppTheme.textTertiary;
 
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -961,8 +961,8 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   child: Center(
                     child: Text(
                       '${index + 1}',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppTheme.background,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -984,7 +984,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                       Text(
                         '${worker.jobsCompleted} jobs - ${worker.totalEarnings.toStringAsFixed(0)}\$',
                         style: TextStyle(
-                          color: Colors.grey.shade600,
+                          color: AppTheme.textSecondary,
                           fontSize: 13,
                         ),
                       ),
@@ -995,13 +995,13 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 0.15),
+                    color: AppTheme.warningLight,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 18),
+                      Icon(Icons.star, color: AppTheme.warning, size: 18),
                       const SizedBox(width: 4),
                       Text(
                         worker.rating.toStringAsFixed(1),
@@ -1031,11 +1031,11 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1047,28 +1047,28 @@ class _AdminReportsPageState extends State<AdminReportsPage>
             'Revenu moyen par réservation',
             '${avgRevenuePerReservation.toStringAsFixed(2)} \$',
             Icons.receipt_long,
-            Colors.green,
+            AppTheme.success,
           ),
           const Divider(height: 24),
           _buildMetricRow(
             'Ratio clients/déneigeurs',
             '${clientToWorkerRatio.toStringAsFixed(1)}:1',
             Icons.people,
-            Colors.blue,
+            AppTheme.info,
           ),
           const Divider(height: 24),
           _buildMetricRow(
             'Déneigeurs actifs',
             '${stats.users.activeWorkers}/${stats.users.workers}',
             Icons.work,
-            Colors.orange,
+            AppTheme.warning,
           ),
           const Divider(height: 24),
           _buildMetricRow(
             'Réservations annulées',
             '${stats.reservations.cancelled}',
             Icons.cancel,
-            Colors.red,
+            AppTheme.error,
           ),
         ],
       ),

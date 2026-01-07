@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 /// Dialog affiché lorsqu'un utilisateur est suspendu
 class SuspensionDialog extends StatelessWidget {
@@ -44,12 +45,12 @@ class SuspensionDialog extends StatelessWidget {
       icon: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.red.shade50,
+          color: AppTheme.errorLight,
           shape: BoxShape.circle,
         ),
         child: Icon(
           Icons.block,
-          color: Colors.red.shade700,
+          color: AppTheme.error,
           size: 48,
         ),
       ),
@@ -68,7 +69,7 @@ class SuspensionDialog extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey.shade700,
+              color: AppTheme.textSecondary,
               fontSize: 16,
             ),
           ),
@@ -78,9 +79,9 @@ class SuspensionDialog extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red.shade50,
+                color: AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
+                border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +90,7 @@ class SuspensionDialog extends StatelessWidget {
                     'Raison:',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.red.shade700,
+                      color: AppTheme.error,
                       fontSize: 14,
                     ),
                   ),
@@ -97,7 +98,7 @@ class SuspensionDialog extends StatelessWidget {
                   Text(
                     reason!,
                     style: TextStyle(
-                      color: Colors.red.shade900,
+                      color: AppTheme.error,
                       fontSize: 14,
                     ),
                   ),
@@ -113,13 +114,13 @@ class SuspensionDialog extends StatelessWidget {
                 Icon(
                   Icons.access_time,
                   size: 16,
-                  color: Colors.grey.shade600,
+                  color: AppTheme.textTertiary,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   'Jusqu\'au: $suspendedUntilDisplay',
                   style: TextStyle(
-                    color: Colors.grey.shade600,
+                    color: AppTheme.textTertiary,
                     fontSize: 14,
                   ),
                 ),
@@ -131,7 +132,7 @@ class SuspensionDialog extends StatelessWidget {
             'Contactez le support au "deneigeauto@yahoo.com" si vous pensez qu\'il s\'agit d\'une erreur.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey.shade500,
+              color: AppTheme.textTertiary,
               fontSize: 12,
               fontStyle: FontStyle.italic,
             ),
@@ -143,8 +144,8 @@ class SuspensionDialog extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade700,
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.error,
+              foregroundColor: AppTheme.background,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

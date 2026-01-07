@@ -38,14 +38,14 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   bool _isDefault = false;
 
   final List<Map<String, dynamic>> _colors = [
-    {'name': 'Blanc', 'color': Colors.white},
-    {'name': 'Noir', 'color': Colors.black},
-    {'name': 'Gris', 'color': Colors.grey},
+    {'name': 'Blanc', 'color': AppTheme.textPrimary},
+    {'name': 'Noir', 'color': AppTheme.shadowColor},
+    {'name': 'Gris', 'color': AppTheme.textTertiary},
     {'name': 'Argent', 'color': const Color(0xFFC0C0C0)},
-    {'name': 'Rouge', 'color': Colors.red},
-    {'name': 'Bleu', 'color': Colors.blue},
-    {'name': 'Vert', 'color': Colors.green},
-    {'name': 'Brun', 'color': Colors.brown},
+    {'name': 'Rouge', 'color': AppTheme.error},
+    {'name': 'Bleu', 'color': AppTheme.info},
+    {'name': 'Vert', 'color': AppTheme.success},
+    {'name': 'Brun', 'color': const Color(0xFF795548)},
     {'name': 'Beige', 'color': const Color(0xFFF5F5DC)},
   ];
 
@@ -62,7 +62,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
     ));
 
     return Scaffold(
@@ -351,7 +351,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: isSelected
-                                  ? Colors.white
+                                  ? AppTheme.background
                                   : AppTheme.textSecondary,
                             ),
                           ),
@@ -409,7 +409,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                           color: colorData['name'] == 'Blanc' ||
                                   colorData['name'] == 'Beige'
                               ? AppTheme.primary
-                              : Colors.white,
+                              : AppTheme.background,
                         )
                       : null,
                 ),
@@ -544,27 +544,27 @@ class _AddVehicleViewState extends State<AddVehicleView> {
         ),
         child: Center(
           child: state.isSubmitting
-              ? const SizedBox(
+              ? SizedBox(
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
-                    color: Colors.white,
+                    color: AppTheme.background,
                     strokeWidth: 2.5,
                   ),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.add_rounded,
-                      color: Colors.white,
+                      color: AppTheme.background,
                       size: 22,
                     ),
                     const SizedBox(width: 8),
-                    const Text(
+                    Text(
                       'Ajouter le véhicule',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppTheme.background,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

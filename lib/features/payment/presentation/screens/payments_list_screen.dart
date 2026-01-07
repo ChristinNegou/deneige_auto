@@ -118,16 +118,16 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                       'Total dépensé',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: AppTheme.background.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${state.totalSpent.toStringAsFixed(2)} \$',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppTheme.background,
                       ),
                     ),
                   ],
@@ -136,24 +136,24 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
               Container(
                 height: 40,
                 width: 1,
-                color: Colors.white.withValues(alpha: 0.2),
+                color: AppTheme.background.withValues(alpha: 0.2),
               ),
               Expanded(
                 child: Column(
                   children: [
                     Text(
                       '${state.transactionCount}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppTheme.background,
                       ),
                     ),
                     Text(
                       'transactions',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: AppTheme.background.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -212,9 +212,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Row(
         children: [
@@ -253,13 +253,13 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                   children: [
                     Text(
                       DateFormat('dd MMM, HH:mm').format(payment.createdAt),
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                      style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                     ),
                     if (payment.last4 != null) ...[
-                      Text(' · ', style: TextStyle(color: Colors.grey[400])),
+                      Text(' · ', style: TextStyle(color: AppTheme.textTertiary)),
                       Text(
                         '•••• ${payment.last4}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                       ),
                     ],
                   ],
@@ -305,17 +305,17 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   Color _getStatusColor(PaymentStatus status) {
     switch (status) {
       case PaymentStatus.succeeded:
-        return Colors.green;
+        return AppTheme.success;
       case PaymentStatus.pending:
       case PaymentStatus.processing:
-        return Colors.orange;
+        return AppTheme.warning;
       case PaymentStatus.failed:
-        return Colors.red;
+        return AppTheme.error;
       case PaymentStatus.refunded:
       case PaymentStatus.partiallyRefunded:
-        return Colors.blue;
+        return AppTheme.info;
       case PaymentStatus.canceled:
-        return Colors.grey;
+        return AppTheme.textTertiary;
     }
   }
 
@@ -373,13 +373,13 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       padding: const EdgeInsets.all(24),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: AppTheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Icon(Icons.credit_card_off_outlined,
-              size: 48, color: Colors.grey[400]),
+              size: 48, color: AppTheme.textTertiary),
           const SizedBox(height: 12),
           const Text(
             'Aucune carte enregistrée',
@@ -388,7 +388,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
           const SizedBox(height: 4),
           Text(
             'Ajoutez une carte pour faciliter vos paiements',
-            style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
             textAlign: TextAlign.center,
           ),
         ],
@@ -400,12 +400,12 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: method.isDefault
-              ? Colors.green.withValues(alpha: 0.5)
-              : Colors.grey[200]!,
+              ? AppTheme.success.withValues(alpha: 0.5)
+              : AppTheme.border,
           width: method.isDefault ? 1.5 : 1,
         ),
       ),
@@ -416,7 +416,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             width: 44,
             height: 30,
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: AppTheme.surfaceContainer,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Center(
@@ -429,7 +429,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: Colors.grey[700],
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ),
@@ -456,15 +456,15 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.1),
+                          color: AppTheme.successLight,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Par défaut',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: Colors.green,
+                            color: AppTheme.success,
                           ),
                         ),
                       ),
@@ -476,7 +476,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                   'Expire ${method.expiryDisplay}',
                   style: TextStyle(
                     fontSize: 12,
-                    color: method.isExpired ? Colors.red : Colors.grey[500],
+                    color: method.isExpired ? AppTheme.error : AppTheme.textTertiary,
                   ),
                 ),
               ],
@@ -485,7 +485,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
 
           // Menu actions
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: Colors.grey[400], size: 20),
+            icon: Icon(Icons.more_vert, color: AppTheme.textTertiary, size: 20),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             onSelected: (value) {
@@ -503,9 +503,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                   value: 'default',
                   child: Text('Définir par défaut'),
                 ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'delete',
-                child: Text('Supprimer', style: TextStyle(color: Colors.red)),
+                child: Text('Supprimer', style: TextStyle(color: AppTheme.error)),
               ),
             ],
           ),
@@ -534,7 +534,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                     DeletePaymentMethod(method.stripePaymentMethodId!),
                   );
             },
-            child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+            child: Text('Supprimer', style: TextStyle(color: AppTheme.error)),
           ),
         ],
       ),
@@ -581,7 +581,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 56, color: Colors.grey[300]),
+          Icon(icon, size: 56, color: AppTheme.textTertiary),
           const SizedBox(height: 16),
           Text(
             title,
@@ -590,7 +590,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+            style: TextStyle(fontSize: 13, color: AppTheme.textTertiary),
           ),
         ],
       ),
@@ -602,9 +602,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+          Icon(Icons.error_outline, size: 48, color: AppTheme.error),
           const SizedBox(height: 12),
-          Text(message, style: TextStyle(color: Colors.grey[600])),
+          Text(message, style: TextStyle(color: AppTheme.textSecondary)),
           const SizedBox(height: 16),
           TextButton(
             onPressed: onRetry,

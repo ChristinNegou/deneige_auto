@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../../../core/theme/app_theme.dart';
 
 class NewReservationScreen extends StatefulWidget {
   const NewReservationScreen({super.key});
@@ -33,7 +34,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
       'description': 'Service de déneigement régulier',
       'price': 50.0,
       'icon': Icons.ac_unit,
-      'color': const Color(0xFF3B82F6),
+      'color': AppTheme.info,
     },
     {
       'id': 'urgent',
@@ -41,7 +42,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
       'description': 'Intervention rapide sous 2h',
       'price': 75.0,
       'icon': Icons.flash_on,
-      'color': const Color(0xFFFFA000),
+      'color': AppTheme.warning,
     },
     {
       'id': 'subscription',
@@ -49,7 +50,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
       'description': 'Service illimité pour l\'hiver',
       'price': 400.0,
       'icon': Icons.star,
-      'color': const Color(0xFF10B981),
+      'color': AppTheme.success,
     },
   ];
 
@@ -71,21 +72,21 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Nouvelle Réservation'),
-        backgroundColor: const Color(0xFF1E3A8A),
+        backgroundColor: AppTheme.primary2,
         elevation: 0,
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+            colors: [AppTheme.primary2, AppTheme.info],
           ),
         ),
         child: Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.white,
+            colorScheme: ColorScheme.light(
+              primary: AppTheme.textPrimary,
             ),
           ),
           child: Stepper(
@@ -109,8 +110,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                         child: OutlinedButton(
                           onPressed: details.onStepCancel,
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            side: const BorderSide(color: Colors.white),
+                            foregroundColor: AppTheme.textPrimary,
+                            side: BorderSide(color: AppTheme.textPrimary),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -126,9 +127,9 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             },
             steps: [
               Step(
-                title: const Text(
+                title: Text(
                   'Type de service',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 content: _buildServiceTypeStep(),
                 isActive: _currentStep >= 0,
@@ -136,9 +137,9 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                     _currentStep > 0 ? StepState.complete : StepState.indexed,
               ),
               Step(
-                title: const Text(
+                title: Text(
                   'Adresse',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 content: _buildAddressStep(),
                 isActive: _currentStep >= 1,
@@ -146,9 +147,9 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                     _currentStep > 1 ? StepState.complete : StepState.indexed,
               ),
               Step(
-                title: const Text(
+                title: Text(
                   'Date et heure',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 content: _buildDateTimeStep(),
                 isActive: _currentStep >= 2,
@@ -156,9 +157,9 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                     _currentStep > 2 ? StepState.complete : StepState.indexed,
               ),
               Step(
-                title: const Text(
+                title: Text(
                   'Confirmation',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 content: _buildConfirmationStep(),
                 isActive: _currentStep >= 3,
@@ -175,12 +176,12 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Choisissez le type de service',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.textPrimary,
           ),
         ),
         const SizedBox(height: 16),
@@ -203,11 +204,11 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.white.withOpacity(0.1),
+          color: isSelected ? AppTheme.textPrimary : AppTheme.textPrimary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color:
-                isSelected ? service['color'] : Colors.white.withOpacity(0.3),
+                isSelected ? service['color'] : AppTheme.textPrimary.withValues(alpha: 0.3),
             width: 2,
           ),
         ),
@@ -221,7 +222,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
               ),
               child: Icon(
                 service['icon'],
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 size: 28,
               ),
             ),
@@ -235,7 +236,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? Colors.black : Colors.white,
+                      color: isSelected ? AppTheme.shadowColor : AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -243,7 +244,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                     service['description'],
                     style: TextStyle(
                       fontSize: 14,
-                      color: isSelected ? Colors.grey[600] : Colors.white70,
+                      color: isSelected ? AppTheme.textSecondary : AppTheme.textSecondary,
                     ),
                   ),
                 ],
@@ -254,7 +255,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? service['color'] : Colors.white,
+                color: isSelected ? service['color'] : AppTheme.textPrimary,
               ),
             ),
           ],
@@ -267,20 +268,20 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Entrez votre adresse',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Commencez à taper pour voir les suggestions',
           style: TextStyle(
             fontSize: 14,
-            color: Colors.white70,
+            color: AppTheme.textSecondary,
           ),
         ),
         const SizedBox(height: 16),
@@ -288,12 +289,12 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
         // Champ d'adresse avec autocomplétion Google Places
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.textPrimary,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: _selectedAddress.isEmpty
-                  ? Colors.grey.withOpacity(0.3)
-                  : const Color(0xFF3B82F6),
+                  ? AppTheme.textTertiary.withValues(alpha: 0.3)
+                  : AppTheme.info,
               width: 2,
             ),
           ),
@@ -302,14 +303,14 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             googleAPIKey: kGoogleApiKey,
             inputDecoration: InputDecoration(
               hintText: 'Ex: 123 Rue Principale, Montréal',
-              hintStyle: TextStyle(color: Colors.grey[400]),
+              hintStyle: TextStyle(color: AppTheme.textTertiary),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(16),
               prefixIcon: Icon(
                 Icons.location_on,
                 color: _selectedAddress.isEmpty
-                    ? Colors.grey
-                    : const Color(0xFF3B82F6),
+                    ? AppTheme.textTertiary
+                    : AppTheme.info,
               ),
             ),
             debounceTime: 800,
@@ -336,17 +337,17 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                 padding: const EdgeInsets.all(10),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.location_on,
-                      color: Color(0xFF3B82F6),
+                      color: AppTheme.info,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         prediction.description ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: Colors.black87,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
                     ),
@@ -363,25 +364,25 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withOpacity(0.2),
+              color: AppTheme.successLight,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: const Color(0xFF10B981),
+                color: AppTheme.success,
               ),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.check_circle,
-                  color: Color(0xFF10B981),
+                  color: AppTheme.success,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Adresse confirmée',
                     style: TextStyle(
-                      color: Color(0xFF10B981),
+                      color: AppTheme.success,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -393,9 +394,9 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                       _addressController.clear();
                     });
                   },
-                  child: const Text(
+                  child: Text(
                     'Modifier',
-                    style: TextStyle(color: Color(0xFF10B981)),
+                    style: TextStyle(color: AppTheme.success),
                   ),
                 ),
               ],
@@ -410,12 +411,12 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Choisissez la date et l\'heure',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.textPrimary,
           ),
         ),
         const SizedBox(height: 16),
@@ -429,12 +430,12 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _selectedDate != null
-                      ? const Color(0xFF3B82F6)
-                      : Colors.grey.withOpacity(0.3),
+                      ? AppTheme.info
+                      : AppTheme.textTertiary.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
@@ -443,8 +444,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                   Icon(
                     Icons.calendar_today,
                     color: _selectedDate != null
-                        ? const Color(0xFF3B82F6)
-                        : Colors.grey,
+                        ? AppTheme.info
+                        : AppTheme.textTertiary,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -456,13 +457,13 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         color: _selectedDate != null
-                            ? Colors.black87
-                            : Colors.grey,
+                            ? AppTheme.textPrimary
+                            : AppTheme.textTertiary,
                       ),
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios,
-                      color: Colors.grey, size: 16),
+                  Icon(Icons.arrow_forward_ios,
+                      color: AppTheme.textTertiary, size: 16),
                 ],
               ),
             ),
@@ -480,12 +481,12 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.textPrimary,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _selectedTime != null
-                      ? const Color(0xFF3B82F6)
-                      : Colors.grey.withOpacity(0.3),
+                      ? AppTheme.info
+                      : AppTheme.textTertiary.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
@@ -494,8 +495,8 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                   Icon(
                     Icons.access_time,
                     color: _selectedTime != null
-                        ? const Color(0xFF3B82F6)
-                        : Colors.grey,
+                        ? AppTheme.info
+                        : AppTheme.textTertiary,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -506,13 +507,13 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         color: _selectedTime != null
-                            ? Colors.black87
-                            : Colors.grey,
+                            ? AppTheme.textPrimary
+                            : AppTheme.textTertiary,
                       ),
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios,
-                      color: Colors.grey, size: 16),
+                  Icon(Icons.arrow_forward_ios,
+                      color: AppTheme.textTertiary, size: 16),
                 ],
               ),
             ),
@@ -522,35 +523,35 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
         const SizedBox(height: 24),
 
         // Notes supplémentaires
-        const Text(
+        Text(
           'Notes supplémentaires (optionnel)',
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: _notesController,
           maxLines: 4,
-          style: const TextStyle(color: Colors.black87),
+          style: TextStyle(color: AppTheme.textPrimary),
           decoration: InputDecoration(
             hintText: 'Ex: Accès par l\'arrière, gros banc de neige...',
-            hintStyle: TextStyle(color: Colors.grey[400]),
+            hintStyle: TextStyle(color: AppTheme.textTertiary),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: AppTheme.textPrimary,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+              borderSide: BorderSide(color: AppTheme.textTertiary.withValues(alpha: 0.3)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+              borderSide: BorderSide(color: AppTheme.textTertiary.withValues(alpha: 0.3)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2),
+              borderSide: BorderSide(color: AppTheme.info, width: 2),
             ),
           ),
           onChanged: (value) {
@@ -569,18 +570,18 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.textPrimary,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Résumé de votre réservation',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E3A8A),
+              color: AppTheme.primary2,
             ),
           ),
           const SizedBox(height: 20),
@@ -595,7 +596,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             icon: Icons.location_on,
             label: 'Adresse',
             value: _selectedAddress,
-            color: const Color(0xFF3B82F6),
+            color: AppTheme.info,
           ),
           const Divider(height: 24),
           _buildSummaryRow(
@@ -604,7 +605,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             value: _selectedDate != null
                 ? DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(_selectedDate!)
                 : 'Non sélectionnée',
-            color: const Color(0xFF10B981),
+            color: AppTheme.success,
           ),
           const Divider(height: 24),
           _buildSummaryRow(
@@ -613,7 +614,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             value: _selectedTime != null
                 ? _selectedTime!.format(context)
                 : 'Non sélectionnée',
-            color: const Color(0xFFFFA000),
+            color: AppTheme.warning,
           ),
           if (_notes.isNotEmpty) ...[
             const Divider(height: 24),
@@ -621,33 +622,33 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
               icon: Icons.note,
               label: 'Notes',
               value: _notes,
-              color: const Color(0xFF8B5CF6),
+              color: AppTheme.primary2,
             ),
           ],
           const Divider(height: 24),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E3A8A).withOpacity(0.1),
+              color: AppTheme.primary2.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Prix estimé',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E3A8A),
+                    color: AppTheme.primary2,
                   ),
                 ),
                 Text(
                   '${_estimatedPrice.toStringAsFixed(2)}\$',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E3A8A),
+                    color: AppTheme.primary2,
                   ),
                 ),
               ],
@@ -670,7 +671,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: color, size: 20),
@@ -684,16 +685,16 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
@@ -715,14 +716,14 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF3B82F6),
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
+            colorScheme: ColorScheme.light(
+              primary: AppTheme.info,
+              onPrimary: AppTheme.textPrimary,
+              onSurface: AppTheme.shadowColor,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF3B82F6),
+                foregroundColor: AppTheme.info,
               ),
             ),
           ),
@@ -745,13 +746,13 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF3B82F6),
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
+            colorScheme: ColorScheme.light(
+              primary: AppTheme.info,
+              onPrimary: AppTheme.textPrimary,
+              surface: AppTheme.textPrimary,
+              onSurface: AppTheme.shadowColor,
             ),
-            dialogBackgroundColor: Colors.white,
+            dialogBackgroundColor: AppTheme.textPrimary,
           ),
           child: child!,
         );
@@ -808,7 +809,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.error,
       ),
     );
   }
@@ -818,11 +819,11 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle, color: Color(0xFF10B981), size: 32),
-            SizedBox(width: 12),
-            Text('Réservation confirmée !'),
+            Icon(Icons.check_circle, color: AppTheme.success, size: 32),
+            const SizedBox(width: 12),
+            const Text('Réservation confirmée !'),
           ],
         ),
         content: const Text(
@@ -836,7 +837,7 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
               Navigator.pop(context); // Retour à l'accueil
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF3B82F6),
+              backgroundColor: AppTheme.info,
             ),
             child: const Text('OK'),
           ),
