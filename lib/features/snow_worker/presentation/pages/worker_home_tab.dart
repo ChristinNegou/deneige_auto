@@ -300,7 +300,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             ),
             child: const Icon(
               Icons.local_shipping_rounded,
-              color: Colors.white,
+              color: AppTheme.background,
               size: 26,
             ),
           ),
@@ -425,7 +425,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 BoxShadow(
                   color: isAvailable
                       ? AppTheme.success.withValues(alpha: 0.3)
-                      : Colors.black.withValues(alpha: 0.05),
+                      : AppTheme.shadowColor.withValues(alpha: 0.05),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
@@ -438,7 +438,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                   height: 56,
                   decoration: BoxDecoration(
                     color: isAvailable
-                        ? Colors.white.withValues(alpha: 0.2)
+                        ? AppTheme.background.withValues(alpha: 0.2)
                         : AppTheme.background,
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
@@ -458,7 +458,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                               ? Icons.work_rounded
                               : Icons.work_off_rounded,
                           color: isAvailable
-                              ? Colors.white
+                              ? AppTheme.background
                               : AppTheme.textTertiary,
                           size: 28,
                         ),
@@ -474,7 +474,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                             : 'Vous etes hors ligne',
                         style: TextStyle(
                           color:
-                              isAvailable ? Colors.white : AppTheme.textPrimary,
+                              isAvailable ? AppTheme.background : AppTheme.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                         ),
@@ -486,7 +486,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                             : 'Activez pour recevoir des jobs',
                         style: TextStyle(
                           color: isAvailable
-                              ? Colors.white.withValues(alpha: 0.85)
+                              ? AppTheme.background.withValues(alpha: 0.85)
                               : AppTheme.textTertiary,
                           fontSize: 13,
                         ),
@@ -498,7 +498,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: isAvailable
-                        ? Colors.white.withValues(alpha: 0.2)
+                        ? AppTheme.background.withValues(alpha: 0.2)
                         : AppTheme.background,
                     borderRadius: BorderRadius.circular(AppTheme.radiusFull),
                   ),
@@ -512,8 +512,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                                 .read<WorkerAvailabilityBloc>()
                                 .add(const ToggleAvailability());
                           },
-                    activeColor: Colors.white,
-                    activeTrackColor: Colors.white.withValues(alpha: 0.3),
+                    activeColor: AppTheme.background,
+                    activeTrackColor: AppTheme.background.withValues(alpha: 0.3),
                     inactiveThumbColor: AppTheme.textTertiary,
                     inactiveTrackColor: AppTheme.border,
                   ),
@@ -572,7 +572,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             Expanded(
               child: _buildMiniStatCard(
                 icon: Icons.star_rounded,
-                iconColor: const Color(0xFFFFB800),
+                iconColor: AppTheme.warning,
                 value: rating > 0 ? rating.toStringAsFixed(1) : '-',
                 label: 'Note',
               ),
@@ -596,7 +596,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
         borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: AppTheme.shadowColor.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -694,7 +694,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                   child: Text(
                     '${myJobs.length} actif${myJobs.length > 1 ? 's' : ''}',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.background,
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
                     ),
@@ -825,14 +825,14 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                               children: [
                                 const Icon(
                                   Icons.bolt,
-                                  color: Colors.white,
+                                  color: AppTheme.background,
                                   size: 14,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   '${availableJobs.where((j) => j.isPriority).length} urgent',
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: AppTheme.background,
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -1030,12 +1030,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
+                  Icon(Icons.refresh_rounded, color: AppTheme.background, size: 18),
                   SizedBox(width: 8),
                   Text(
                     'Reessayer',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.background,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

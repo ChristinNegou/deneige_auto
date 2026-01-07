@@ -162,7 +162,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
             ),
             child: const Icon(
               Icons.trending_up_rounded,
-              color: Colors.white,
+              color: AppTheme.background,
               size: 24,
             ),
           ),
@@ -212,7 +212,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
           color: AppTheme.success,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         ),
-        labelColor: Colors.white,
+        labelColor: AppTheme.background,
         unselectedLabelColor: AppTheme.textSecondary,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         indicatorSize: TabBarIndicatorSize.tab,
@@ -241,7 +241,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
             label: const Text('Reessayer'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.success,
-              foregroundColor: Colors.white,
+              foregroundColor: AppTheme.background,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
@@ -334,8 +334,8 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppTheme.success, Color(0xFF059669)],
+            gradient: LinearGradient(
+              colors: [AppTheme.success, AppTheme.success.withValues(alpha: 0.8)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -357,7 +357,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: AppTheme.background.withValues(alpha: 0.9),
                   fontSize: 14,
                   letterSpacing: 0.5,
                 ),
@@ -370,18 +370,18 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                   Text(
                     animatedAmount.toStringAsFixed(2),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.background,
                       fontSize: 44,
                       fontWeight: FontWeight.bold,
                       fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
                     child: Text(
                       ' \$',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: AppTheme.background.withValues(alpha: 0.7),
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
                       ),
@@ -394,7 +394,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
+                  color: AppTheme.background.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
                 child: Row(
@@ -408,7 +408,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                     Container(
                       height: 36,
                       width: 1,
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: AppTheme.background.withValues(alpha: 0.3),
                     ),
                     _buildSummaryItem(
                       icon: Icons.volunteer_activism_rounded,
@@ -418,7 +418,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                     Container(
                       height: 36,
                       width: 1,
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: AppTheme.background.withValues(alpha: 0.3),
                     ),
                     _buildSummaryItem(
                       icon: Icons.trending_up_rounded,
@@ -449,14 +449,14 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
             Text(
               'Objectif: ${dailyGoal.toInt()}\$',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: AppTheme.background.withValues(alpha: 0.8),
                 fontSize: 12,
               ),
             ),
             Text(
               '${(progress * 100).toInt()}%',
               style: const TextStyle(
-                color: Colors.white,
+                color: AppTheme.background,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
@@ -468,9 +468,9 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            backgroundColor: AppTheme.background.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(
-              progress >= 1.0 ? AppTheme.warning : Colors.white,
+              progress >= 1.0 ? AppTheme.warning : AppTheme.background,
             ),
             minHeight: 6,
           ),
@@ -506,12 +506,12 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 18),
+        Icon(icon, color: AppTheme.background, size: 18),
         const SizedBox(height: 4),
         Text(
           value,
           style: const TextStyle(
-            color: Colors.white,
+            color: AppTheme.background,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -519,7 +519,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
+            color: AppTheme.background.withValues(alpha: 0.8),
             fontSize: 11,
           ),
         ),
