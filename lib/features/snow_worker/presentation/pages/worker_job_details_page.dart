@@ -348,12 +348,12 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 18),
+            Icon(icon, color: AppTheme.background, size: 18),
             const SizedBox(width: 6),
             Text(
               label,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppTheme.background,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -387,12 +387,12 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 18),
+            Icon(Icons.chat_bubble_rounded, color: AppTheme.background, size: 18),
             SizedBox(width: 6),
             Text(
               'Chat',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.background,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -736,7 +736,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: const [
-                  Icon(Icons.check_circle, color: Colors.white),
+                  Icon(Icons.check_circle, color: AppTheme.background),
                   SizedBox(width: 12),
                   Text('Job accepté avec succès!'),
                 ],
@@ -754,7 +754,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error, color: Colors.white),
+                  const Icon(Icons.error, color: AppTheme.background),
                   const SizedBox(width: 12),
                   Expanded(child: Text(state.message)),
                 ],
@@ -776,7 +776,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             color: AppTheme.surface,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: AppTheme.shadowColor.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, -4),
               ),
@@ -814,19 +814,19 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            color: Colors.white,
+                            color: AppTheme.background,
                           ),
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
                             Icon(Icons.check_circle_rounded,
-                                color: Colors.white, size: 24),
+                                color: AppTheme.background, size: 24),
                             SizedBox(width: 8),
                             Text(
                               'Accepter ce job',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppTheme.background,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1002,7 +1002,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           HapticFeedback.heavyImpact();
 
           String message = state.result.message;
-          Color bgColor = Colors.orange;
+          Color bgColor = AppTheme.warning;
 
           // Afficher l'avertissement ou la suspension si applicable
           if (state.result.consequence != null) {
@@ -1011,7 +1011,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               bgColor = AppTheme.error;
             } else if (state.result.consequence!.type == 'warning') {
               message = state.result.consequence!.message;
-              bgColor = Colors.orange;
+              bgColor = AppTheme.warning;
             }
           }
 
@@ -1023,7 +1023,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     state.result.consequence?.type == 'suspension'
                         ? Icons.block
                         : Icons.warning_amber_rounded,
-                    color: Colors.white,
+                    color: AppTheme.background,
                   ),
                   const SizedBox(width: 12),
                   Expanded(child: Text(message)),
@@ -1043,7 +1043,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error, color: Colors.white),
+                  const Icon(Icons.error, color: AppTheme.background),
                   const SizedBox(width: 12),
                   Expanded(child: Text(state.message)),
                 ],
@@ -1065,7 +1065,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             color: AppTheme.surface,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: AppTheme.shadowColor.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, -4),
               ),
@@ -1167,10 +1167,10 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.red[50],
+                  color: AppTheme.errorLight,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.warning, color: Colors.red),
+                child: const Icon(Icons.warning, color: AppTheme.error),
               ),
               const SizedBox(width: 12),
               const Expanded(
@@ -1189,20 +1189,20 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.orange[50],
+                    color: AppTheme.warningLight,
                     borderRadius: BorderRadius.circular(8),
                     border:
-                        Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                        Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: const [
-                      Icon(Icons.info, color: Colors.orange, size: 20),
+                      Icon(Icons.info, color: AppTheme.warning, size: 20),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Vous ne serez pas payé pour ce job.\nLes annulations fréquentes peuvent entraîner une suspension.',
                           style: TextStyle(
-                            color: Colors.orange,
+                            color: AppTheme.warning,
                             fontSize: 12,
                           ),
                         ),
@@ -1274,8 +1274,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                           );
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                backgroundColor: AppTheme.error,
+                foregroundColor: AppTheme.background,
               ),
               child: const Text('Confirmer l\'annulation'),
             ),
