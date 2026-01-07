@@ -175,14 +175,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const Icon(
                         Icons.person_rounded,
-                        color: Colors.white,
+                        color: AppTheme.background,
                         size: 50,
                       ),
                     ),
                   )
                 : const Icon(
                     Icons.person_rounded,
-                    color: Colors.white,
+                    color: AppTheme.background,
                     size: 50,
                   ),
           ),
@@ -202,7 +202,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 child: const Icon(
                   Icons.camera_alt_rounded,
-                  color: Colors.white,
+                  color: AppTheme.background,
                   size: 18,
                 ),
               ),
@@ -346,7 +346,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         onPressed: _isLoading ? null : _saveProfile,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppTheme.background,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMD),
@@ -354,12 +354,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
           elevation: 0,
         ),
         child: _isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 height: 20,
                 width: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.background),
                 ),
               )
             : const Text(

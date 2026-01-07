@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_illustration.dart';
 import '../../../reservation/presentation/bloc/reservation_list_bloc.dart';
 
@@ -54,7 +55,8 @@ class ReservationsView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
+                backgroundColor: AppTheme.error,
+                behavior: SnackBarBehavior.floating,
               ),
             );
           }
@@ -62,7 +64,8 @@ class ReservationsView extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.successMessage!),
-                backgroundColor: Colors.green,
+                backgroundColor: AppTheme.success,
+                behavior: SnackBarBehavior.floating,
               ),
             );
           }
@@ -113,7 +116,7 @@ class ReservationsView extends StatelessWidget {
                               .format(reservation.departureTime),
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[600],
+                            color: AppTheme.textSecondary,
                           ),
                         ),
                       ],
@@ -175,19 +178,19 @@ class ReservationsView extends StatelessWidget {
   Color _getStatusColor(ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
-        return Colors.orange;
+        return AppTheme.warning;
       case ReservationStatus.assigned:
-        return Colors.blue;
+        return AppTheme.info;
       case ReservationStatus.enRoute:
-        return Colors.indigo;
+        return AppTheme.primary2;
       case ReservationStatus.inProgress:
-        return Colors.purple;
+        return AppTheme.primary2;
       case ReservationStatus.completed:
-        return Colors.green;
+        return AppTheme.success;
       case ReservationStatus.cancelled:
-        return Colors.grey;
+        return AppTheme.textTertiary;
       case ReservationStatus.late:
-        return Colors.red;
+        return AppTheme.error;
     }
   }
 }

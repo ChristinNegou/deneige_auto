@@ -276,7 +276,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppTheme.background,
                     ),
                   ),
                 ),
@@ -487,10 +487,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: AppTheme.background.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(statusIcon, color: Colors.white, size: 22),
+                  child: Icon(statusIcon, color: AppTheme.background, size: 22),
                 ),
                 const SizedBox(width: 12),
                 // Infos
@@ -504,11 +504,11 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppTheme.background,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.white.withValues(alpha: 0.5),
+                                  color: AppTheme.background.withValues(alpha: 0.5),
                                   blurRadius: 4,
                                 ),
                               ],
@@ -518,7 +518,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                           Text(
                             statusText,
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppTheme.background,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
@@ -529,7 +529,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                       Text(
                         reservation.workerName ?? 'Déneigeur en approche',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: AppTheme.background.withValues(alpha: 0.9),
                           fontSize: 13,
                         ),
                       ),
@@ -543,12 +543,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.25),
+                        color: AppTheme.background.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
                         Icons.chat_bubble_rounded,
-                        color: Colors.white,
+                        color: AppTheme.background,
                         size: 20,
                       ),
                     ),
@@ -558,7 +558,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                 // Flèche
                 Icon(
                   Icons.arrow_forward_ios,
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: AppTheme.background.withValues(alpha: 0.7),
                   size: 16,
                 ),
               ],
@@ -907,7 +907,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         color: AppTheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -944,7 +944,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.add, color: Colors.white, size: 28),
+                  child: const Icon(Icons.add, color: AppTheme.background, size: 28),
                 ),
               ),
               _buildNavItem(

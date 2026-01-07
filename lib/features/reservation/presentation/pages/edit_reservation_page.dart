@@ -4,6 +4,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/parking_spot.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/entities/vehicle.dart';
@@ -47,9 +48,10 @@ class _EditReservationViewState extends State<EditReservationView> {
       listener: (context, state) {
         if (state.isUpdateSuccessful) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Réservation modifiée avec succès'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Réservation modifiée avec succès'),
+              backgroundColor: AppTheme.success,
+              behavior: SnackBarBehavior.floating,
             ),
           );
           Navigator.pop(context, true); // Retour avec succès
@@ -59,7 +61,8 @@ class _EditReservationViewState extends State<EditReservationView> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
+              backgroundColor: AppTheme.error,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -90,17 +93,18 @@ class _EditReservationViewState extends State<EditReservationView> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.block,
                       size: 64,
-                      color: Colors.red,
+                      color: AppTheme.error,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'Modification impossible',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -109,7 +113,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey[600],
+                        color: AppTheme.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -136,17 +140,17 @@ class _EditReservationViewState extends State<EditReservationView> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: AppTheme.infoLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.blue.shade700),
+                      Icon(Icons.info_outline, color: AppTheme.info),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Modifiez les informations ci-dessous',
-                          style: TextStyle(color: Colors.blue.shade700),
+                          style: TextStyle(color: AppTheme.info),
                         ),
                       ),
                     ],
@@ -314,21 +318,21 @@ class _EditReservationViewState extends State<EditReservationView> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade50,
+                  color: AppTheme.successLight,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.shade200),
+                  border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
                     Icon(Icons.check_circle,
-                        color: Colors.green.shade700, size: 16),
+                        color: AppTheme.success, size: 16),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Position GPS enregistrée',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.green.shade900,
+                          color: AppTheme.success,
                         ),
                       ),
                     ),
@@ -361,19 +365,21 @@ class _EditReservationViewState extends State<EditReservationView> {
                 ),
               );
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Adresse validée avec succès'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
+            SnackBar(
+              content: const Text('Adresse validée avec succès'),
+              backgroundColor: AppTheme.success,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
             ),
           );
         }
       } else {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Adresse non trouvée. Veuillez réessayer.'),
-              backgroundColor: Colors.orange,
+            SnackBar(
+              content: const Text('Adresse non trouvée. Veuillez réessayer.'),
+              backgroundColor: AppTheme.warning,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -381,9 +387,10 @@ class _EditReservationViewState extends State<EditReservationView> {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Erreur lors de la recherche de l\'adresse'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: const Text('Erreur lors de la recherche de l\'adresse'),
+            backgroundColor: AppTheme.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -438,7 +445,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                 'Deadline: ${dateFormat.format(state.deadlineTime!)}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ],
@@ -556,7 +563,7 @@ class _EditReservationViewState extends State<EditReservationView> {
 
   Widget _buildPriceCard(BuildContext context, EditReservationState state) {
     return Card(
-      color: Colors.blue.shade50,
+      color: AppTheme.primaryLight,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -569,7 +576,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                   'Prix total',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[700],
+                    color: AppTheme.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -577,10 +584,10 @@ class _EditReservationViewState extends State<EditReservationView> {
                   state.calculatedPrice != null
                       ? '${state.calculatedPrice!.toStringAsFixed(2)} \$'
                       : '0.00 \$',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                    color: AppTheme.primary,
                   ),
                 ),
               ],
@@ -593,7 +600,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                     'Prix original',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -601,7 +608,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                     '${state.originalReservation!.totalPrice.toStringAsFixed(2)} \$',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey[600],
+                      color: AppTheme.textTertiary,
                       decoration: TextDecoration.lineThrough,
                     ),
                   ),
@@ -627,12 +634,12 @@ class _EditReservationViewState extends State<EditReservationView> {
               }
             : null,
         icon: state.isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.background),
                 ),
               )
             : const Icon(Icons.check),
@@ -645,7 +652,8 @@ class _EditReservationViewState extends State<EditReservationView> {
         ),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.all(16),
-          backgroundColor: canSubmit ? Colors.blue : Colors.grey,
+          backgroundColor: canSubmit ? AppTheme.primary : AppTheme.textTertiary,
+          foregroundColor: AppTheme.background,
         ),
       ),
     );
