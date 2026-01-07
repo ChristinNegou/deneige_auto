@@ -43,7 +43,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.successMessage!),
-                backgroundColor: Colors.green,
+                backgroundColor: AppTheme.success,
               ),
             );
             context.read<AdminBloc>().add(ClearError());
@@ -53,7 +53,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
+                backgroundColor: AppTheme.error,
               ),
             );
             context.read<AdminBloc>().add(ClearError());
@@ -75,10 +75,10 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -90,15 +90,15 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
           children: [
             _buildStatusChip(context, 'Toutes', null),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'En attente', 'pending', Colors.orange),
+            _buildStatusChip(context, 'En attente', 'pending', AppTheme.warning),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'Assignées', 'assigned', Colors.blue),
+            _buildStatusChip(context, 'Assignées', 'assigned', AppTheme.info),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'En cours', 'inProgress', Colors.indigo),
+            _buildStatusChip(context, 'En cours', 'inProgress', AppTheme.primary2),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'Terminées', 'completed', Colors.green),
+            _buildStatusChip(context, 'Terminées', 'completed', AppTheme.success),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'Annulées', 'cancelled', Colors.red),
+            _buildStatusChip(context, 'Annulées', 'cancelled', AppTheme.error),
           ],
         ),
       ),
@@ -142,7 +142,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+            Icon(Icons.error_outline, size: 64, color: AppTheme.error),
             const SizedBox(height: 16),
             Text(state.errorMessage ?? 'Une erreur est survenue'),
             const SizedBox(height: 16),
@@ -161,7 +161,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.calendar_today, size: 64, color: Colors.grey),
+            Icon(Icons.calendar_today, size: 64, color: AppTheme.textTertiary),
             SizedBox(height: 16),
             Text('Aucune réservation trouvée'),
           ],
@@ -242,12 +242,12 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
               Row(
                 children: [
                   Icon(Icons.calendar_today,
-                      size: 16, color: Colors.grey.shade600),
+                      size: 16, color: AppTheme.textSecondary),
                   const SizedBox(width: 8),
                   Text(
                     dateFormat.format(reservation.departureTime),
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: AppTheme.textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -257,12 +257,12 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
               if (reservation.client != null)
                 Row(
                   children: [
-                    Icon(Icons.person, size: 16, color: Colors.grey.shade600),
+                    Icon(Icons.person, size: 16, color: AppTheme.textSecondary),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         reservation.client!.fullName,
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(color: AppTheme.textSecondary),
                       ),
                     ),
                   ],
@@ -271,12 +271,12 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.ac_unit, size: 16, color: Colors.blue.shade400),
+                    Icon(Icons.ac_unit, size: 16, color: AppTheme.info),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         reservation.worker!.fullName,
-                        style: TextStyle(color: Colors.blue.shade700),
+                        style: TextStyle(color: AppTheme.info),
                       ),
                     ),
                   ],
@@ -287,12 +287,12 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                 Row(
                   children: [
                     Icon(Icons.directions_car,
-                        size: 16, color: Colors.grey.shade600),
+                        size: 16, color: AppTheme.textSecondary),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         reservation.vehicle!.displayName,
-                        style: TextStyle(color: Colors.grey.shade700),
+                        style: TextStyle(color: AppTheme.textSecondary),
                       ),
                     ),
                   ],
@@ -309,7 +309,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                         onPressed: () =>
                             _showRefundDialog(context, reservation),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.orange,
+                          foregroundColor: AppTheme.warning,
                         ),
                       ),
                     ),
@@ -334,19 +334,19 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'pending':
-        return Colors.orange;
+        return AppTheme.warning;
       case 'assigned':
-        return Colors.blue;
+        return AppTheme.info;
       case 'enRoute':
-        return Colors.purple;
+        return AppTheme.primary2;
       case 'inProgress':
-        return Colors.indigo;
+        return AppTheme.primary2;
       case 'completed':
-        return Colors.green;
+        return AppTheme.success;
       case 'cancelled':
-        return Colors.red;
+        return AppTheme.error;
       default:
-        return Colors.grey;
+        return AppTheme.textTertiary;
     }
   }
 
@@ -402,8 +402,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
         maxChildSize: 0.95,
         minChildSize: 0.5,
         builder: (scrollContext, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: SingleChildScrollView(
@@ -417,7 +417,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: AppTheme.textTertiary,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -537,21 +537,21 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
+                      color: AppTheme.errorLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.red.shade200),
+                      border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.cancel, color: Colors.red.shade700),
+                            Icon(Icons.cancel, color: AppTheme.error),
                             const SizedBox(width: 8),
                             Text(
                               'Raison d\'annulation',
                               style: TextStyle(
-                                color: Colors.red.shade700,
+                                color: AppTheme.error,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -575,7 +575,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                         _showRefundDialog(pageContext, reservation);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
+                        backgroundColor: AppTheme.warning,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                     ),
@@ -605,7 +605,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: AppTheme.surfaceContainer,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -627,7 +627,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
             child: Text(
               label,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppTheme.textSecondary,
                 fontSize: 14,
               ),
             ),
@@ -662,7 +662,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
           children: [
             Text(
               'Montant maximum: ${reservation.totalPrice.toStringAsFixed(2)} \$',
-              style: TextStyle(color: Colors.grey.shade600),
+              style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -697,9 +697,9 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                   amount <= 0 ||
                   amount > reservation.totalPrice) {
                 ScaffoldMessenger.of(dialogContext).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Montant invalide'),
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppTheme.error,
                   ),
                 );
                 return;
@@ -713,7 +713,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                     : null,
               ));
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.warning),
             child: const Text('Rembourser'),
           ),
         ],

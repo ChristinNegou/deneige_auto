@@ -27,7 +27,7 @@ class VehiclesListView extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
     ));
 
     return Scaffold(
@@ -136,9 +136,9 @@ class VehiclesListView extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.add_rounded,
-                color: Colors.white,
+                color: AppTheme.background,
                 size: 22,
               ),
             ),
@@ -365,18 +365,18 @@ class VehiclesListView extends StatelessWidget {
 
   Color _getVehicleColor(String colorName) {
     final colors = {
-      'Blanc': Colors.white,
-      'Noir': Colors.black,
-      'Gris': Colors.grey,
-      'Rouge': Colors.red,
-      'Bleu': Colors.blue,
-      'Vert': Colors.green,
-      'Jaune': Colors.yellow,
-      'Orange': Colors.orange,
-      'Argent': Colors.grey[300]!,
-      'Brun': Colors.brown,
+      'Blanc': AppTheme.textPrimary,
+      'Noir': AppTheme.shadowColor,
+      'Gris': AppTheme.textTertiary,
+      'Rouge': AppTheme.error,
+      'Bleu': AppTheme.info,
+      'Vert': AppTheme.success,
+      'Jaune': AppTheme.warning,
+      'Orange': AppTheme.warning,
+      'Argent': AppTheme.textSecondary,
+      'Brun': const Color(0xFF795548),
       'Beige': const Color(0xFFF5F5DC),
     };
-    return colors[colorName] ?? Colors.grey;
+    return colors[colorName] ?? AppTheme.textTertiary;
   }
 }

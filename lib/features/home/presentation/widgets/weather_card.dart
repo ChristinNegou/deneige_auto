@@ -1,6 +1,7 @@
 // lib/features/home/presentation/widgets/weather_card.dart
 
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/weather.dart';
 
 class WeatherCard extends StatelessWidget {
@@ -24,7 +25,7 @@ class WeatherCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: AppTheme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -40,17 +41,17 @@ class WeatherCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Météo',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: AppTheme.textPrimary.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
                   Text(
                     weather.location,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppTheme.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -72,8 +73,8 @@ class WeatherCard extends StatelessWidget {
             children: [
               Text(
                 '${weather.temperature.round()}°',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
                   fontSize: 56,
                   fontWeight: FontWeight.bold,
                   height: 1,
@@ -87,8 +88,8 @@ class WeatherCard extends StatelessWidget {
                   children: [
                     Text(
                       weather.condition,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
@@ -96,9 +97,9 @@ class WeatherCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     if (weather.snowDepth != null)
                       Text(
-                        '❄️ ${weather.snowDepth} cm au sol',
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        '${weather.snowDepth} cm au sol',
+                        style: TextStyle(
+                          color: AppTheme.textPrimary.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -136,26 +137,26 @@ class WeatherCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.2),
+                color: AppTheme.warning.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Colors.orange.shade300,
+                  color: AppTheme.warning,
                   width: 1,
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.warning_amber_rounded,
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       weather.alertDescription ?? 'Alerte neige',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -174,19 +175,19 @@ class WeatherCard extends StatelessWidget {
     switch (conditionCode.toLowerCase()) {
       case 'sunny':
       case 'clear':
-        return [Colors.orange.shade400, Colors.orange.shade600];
+        return [AppTheme.warning, AppTheme.warning.withValues(alpha: 0.8)];
       case 'cloudy':
       case 'overcast':
-        return [Colors.grey.shade600, Colors.grey.shade800];
+        return [AppTheme.textSecondary, AppTheme.textTertiary];
       case 'rain':
-        return [Colors.blue.shade600, Colors.blue.shade800];
+        return [AppTheme.info, AppTheme.info.withValues(alpha: 0.8)];
       case 'snow':
       case 'snowy':
-        return [Colors.blue.shade300, Colors.blue.shade500];
+        return [AppTheme.info.withValues(alpha: 0.7), AppTheme.info];
       case 'fog':
-        return [Colors.blueGrey.shade400, Colors.blueGrey.shade600];
+        return [AppTheme.textSecondary.withValues(alpha: 0.7), AppTheme.textSecondary];
       default:
-        return [Colors.blue.shade400, Colors.blue.shade600];
+        return [AppTheme.info.withValues(alpha: 0.8), AppTheme.info];
     }
   }
 }
@@ -211,14 +212,14 @@ class _WeatherInfo extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Colors.white70,
+              color: AppTheme.textPrimary.withValues(alpha: 0.7),
               size: 16,
             ),
             const SizedBox(width: 6),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white70,
+              style: TextStyle(
+                color: AppTheme.textPrimary.withValues(alpha: 0.7),
                 fontSize: 12,
               ),
             ),
@@ -227,8 +228,8 @@ class _WeatherInfo extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: AppTheme.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

@@ -100,26 +100,26 @@ class _RatingDialogState extends State<RatingDialog>
   Color _getRatingColor() {
     switch (_selectedRating) {
       case 1:
-        return Colors.red;
+        return AppTheme.error;
       case 2:
-        return Colors.orange;
+        return AppTheme.warning;
       case 3:
-        return Colors.amber;
+        return AppTheme.warning;
       case 4:
-        return Colors.lightGreen;
+        return AppTheme.success;
       case 5:
-        return Colors.green;
+        return AppTheme.success;
       default:
-        return Colors.grey;
+        return AppTheme.textTertiary;
     }
   }
 
   void _handleSubmit() {
     if (_selectedRating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez sélectionner une note'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: const Text('Veuillez sélectionner une note'),
+          backgroundColor: AppTheme.warning,
         ),
       );
       return;
@@ -234,16 +234,16 @@ class _RatingDialogState extends State<RatingDialog>
                   child: Image.network(
                     widget.workerPhotoUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(
+                    errorBuilder: (_, __, ___) => Icon(
                       Icons.person,
-                      color: Colors.white,
+                      color: AppTheme.background,
                       size: 40,
                     ),
                   ),
                 )
-              : const Icon(
+              : Icon(
                   Icons.person,
-                  color: Colors.white,
+                  color: AppTheme.background,
                   size: 40,
                 ),
         ),
@@ -280,7 +280,7 @@ class _RatingDialogState extends State<RatingDialog>
             child: Icon(
               isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
               size: 48,
-              color: isSelected ? Colors.amber : Colors.grey.shade300,
+              color: isSelected ? AppTheme.warning : AppTheme.border,
             ),
           ),
         );
@@ -295,22 +295,22 @@ class _RatingDialogState extends State<RatingDialog>
       maxLength: 500,
       decoration: InputDecoration(
         hintText: 'Ajouter un commentaire (optionnel)',
-        hintStyle: TextStyle(color: Colors.grey.shade400),
+        hintStyle: TextStyle(color: AppTheme.textTertiary),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: AppTheme.surfaceContainer,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: AppTheme.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppTheme.primary),
         ),
-        counterStyle: TextStyle(color: Colors.grey.shade500),
+        counterStyle: TextStyle(color: AppTheme.textTertiary),
       ),
     );
   }
@@ -325,7 +325,7 @@ class _RatingDialogState extends State<RatingDialog>
             onPressed: _isSubmitting ? null : _handleSubmit,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: AppTheme.background,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -333,11 +333,11 @@ class _RatingDialogState extends State<RatingDialog>
               elevation: 0,
             ),
             child: _isSubmitting
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                      color: Colors.white,
+                      color: AppTheme.background,
                       strokeWidth: 2,
                     ),
                   )
@@ -359,7 +359,7 @@ class _RatingDialogState extends State<RatingDialog>
             child: Text(
               'Peut-être plus tard',
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: AppTheme.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -407,7 +407,7 @@ class RatingStars extends StatelessWidget {
           return Icon(
             icon,
             size: size,
-            color: color ?? Colors.amber,
+            color: color ?? AppTheme.warning,
           );
         }),
         if (showCount) ...[
@@ -417,7 +417,7 @@ class RatingStars extends StatelessWidget {
             style: TextStyle(
               fontSize: size * 0.8,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
+              color: AppTheme.textSecondary,
             ),
           ),
           if (totalRatings > 0) ...[
@@ -425,7 +425,7 @@ class RatingStars extends StatelessWidget {
               ' ($totalRatings)',
               style: TextStyle(
                 fontSize: size * 0.7,
-                color: Colors.grey.shade500,
+                color: AppTheme.textTertiary,
               ),
             ),
           ],

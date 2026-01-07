@@ -493,18 +493,18 @@ class _VehicleCard extends StatelessWidget {
 
   Color _getColor(String colorName) {
     final colors = {
-      'Blanc': Colors.white,
-      'Noir': Colors.black87,
-      'Gris': Colors.grey,
-      'Rouge': Colors.red,
-      'Bleu': Colors.blue,
-      'Vert': Colors.green,
-      'Jaune': Colors.yellow,
-      'Orange': Colors.orange,
-      'Argent': Colors.grey[300]!,
-      'Brun': Colors.brown,
+      'Blanc': AppTheme.background,
+      'Noir': AppTheme.shadowColor,
+      'Gris': AppTheme.textTertiary,
+      'Rouge': AppTheme.error,
+      'Bleu': AppTheme.info,
+      'Vert': AppTheme.success,
+      'Jaune': AppTheme.warning,
+      'Orange': AppTheme.warning,
+      'Argent': AppTheme.textSecondary,
+      'Brun': const Color(0xFF795548),
       'Beige': const Color(0xFFF5F5DC),
     };
-    return colors[colorName] ?? Colors.grey;
+    return colors[colorName] ?? AppTheme.textTertiary;
   }
 }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../reservation/domain/entities/reservation.dart';
 
 class UpcomingReservationsList extends StatelessWidget {
@@ -96,7 +97,7 @@ class _ReservationCard extends StatelessWidget {
                         .format(reservation.departureTime),
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: AppTheme.textSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -111,7 +112,7 @@ class _ReservationCard extends StatelessWidget {
                   Icon(
                     Icons.directions_car,
                     size: 18,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -133,14 +134,14 @@ class _ReservationCard extends StatelessWidget {
                   Icon(
                     Icons.local_parking,
                     size: 18,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Place ${reservation.parkingSpot.displayName}',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[700],
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                 ],
@@ -155,17 +156,17 @@ class _ReservationCard extends StatelessWidget {
   Color _getStatusColor(status) {
     switch (status.toString().split('.').last) {
       case 'pending':
-        return Colors.orange;
+        return AppTheme.warning;
       case 'assigned':
-        return Colors.blue;
+        return AppTheme.info;
       case 'inProgress':
-        return Colors.purple;
+        return AppTheme.primary2;
       case 'completed':
-        return Colors.green;
+        return AppTheme.success;
       case 'cancelled':
-        return Colors.grey;
+        return AppTheme.textTertiary;
       default:
-        return Colors.grey;
+        return AppTheme.textTertiary;
     }
   }
 }

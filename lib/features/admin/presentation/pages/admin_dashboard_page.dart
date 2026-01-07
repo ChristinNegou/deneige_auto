@@ -32,7 +32,7 @@ class AdminDashboardPage extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.successMessage!),
-                backgroundColor: Colors.green,
+                backgroundColor: AppTheme.success,
               ),
             );
             context.read<AdminBloc>().add(ClearError());
@@ -42,7 +42,7 @@ class AdminDashboardPage extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
+                backgroundColor: AppTheme.error,
               ),
             );
             context.read<AdminBloc>().add(ClearError());
@@ -59,7 +59,7 @@ class AdminDashboardPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline,
-                      size: 64, color: Colors.red.shade300),
+                      size: 64, color: AppTheme.error),
                   const SizedBox(height: 16),
                   Text(state.errorMessage ?? 'Erreur de chargement'),
                   const SizedBox(height: 16),
@@ -126,17 +126,17 @@ class AdminDashboardPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: AppTheme.background.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(Icons.admin_panel_settings,
-                      size: 35, color: Colors.white),
+                  child: Icon(Icons.admin_panel_settings,
+                      size: 35, color: AppTheme.background),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Administration',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.background,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -144,7 +144,7 @@ class AdminDashboardPage extends StatelessWidget {
                 Text(
                   'Deneige Auto',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: AppTheme.background.withValues(alpha: 0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -231,12 +231,12 @@ class AdminDashboardPage extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: isLogout ? Colors.red : (isSelected ? AppTheme.primary : null),
+        color: isLogout ? AppTheme.error : (isSelected ? AppTheme.primary : null),
       ),
       title: Text(
         title,
         style: TextStyle(
-          color: isLogout ? Colors.red : (isSelected ? AppTheme.primary : null),
+          color: isLogout ? AppTheme.error : (isSelected ? AppTheme.primary : null),
           fontWeight: isSelected ? FontWeight.bold : null,
         ),
       ),
@@ -249,11 +249,11 @@ class AdminDashboardPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -277,14 +277,14 @@ class AdminDashboardPage extends StatelessWidget {
                 context,
                 icon: Icons.person_add,
                 label: 'Utilisateurs',
-                color: Colors.teal,
+                color: AppTheme.info,
                 onTap: () => Navigator.pushNamed(context, AppRoutes.adminUsers),
               ),
               _buildQuickActionButton(
                 context,
                 icon: Icons.event_note,
                 label: 'Réservations',
-                color: Colors.purple,
+                color: AppTheme.primary2,
                 onTap: () =>
                     Navigator.pushNamed(context, AppRoutes.adminReservations),
               ),
@@ -292,14 +292,14 @@ class AdminDashboardPage extends StatelessWidget {
                 context,
                 icon: Icons.notifications_active,
                 label: 'Notifier',
-                color: Colors.orange,
+                color: AppTheme.warning,
                 onTap: () => _showBroadcastDialog(context),
               ),
               _buildQuickActionButton(
                 context,
                 icon: Icons.analytics,
                 label: 'Rapports',
-                color: Colors.indigo,
+                color: AppTheme.primary2,
                 onTap: () =>
                     Navigator.pushNamed(context, AppRoutes.adminReports),
               ),
@@ -335,7 +335,7 @@ class AdminDashboardPage extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade700,
+              color: AppTheme.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -358,7 +358,7 @@ class AdminDashboardPage extends StatelessWidget {
           'Utilisateurs',
           stats.users.total.toString(),
           Icons.people,
-          Colors.blue,
+          AppTheme.info,
           subtitle:
               '${stats.users.clients} clients, ${stats.users.workers} déneigeurs',
           onTap: () => Navigator.pushNamed(context, AppRoutes.adminUsers),
@@ -368,7 +368,7 @@ class AdminDashboardPage extends StatelessWidget {
           'Réservations',
           stats.reservations.total.toString(),
           Icons.calendar_today,
-          Colors.purple,
+          AppTheme.primary2,
           subtitle: '${stats.reservations.today} aujourd\'hui',
           onTap: () =>
               Navigator.pushNamed(context, AppRoutes.adminReservations),
@@ -378,7 +378,7 @@ class AdminDashboardPage extends StatelessWidget {
           'En attente',
           stats.reservations.pending.toString(),
           Icons.pending_actions,
-          Colors.orange,
+          AppTheme.warning,
           subtitle: 'À traiter',
           onTap: () =>
               Navigator.pushNamed(context, AppRoutes.adminReservations),
@@ -388,7 +388,7 @@ class AdminDashboardPage extends StatelessWidget {
           'Taux de complétion',
           '${stats.reservations.completionRate.toStringAsFixed(0)}%',
           Icons.check_circle,
-          Colors.green,
+          AppTheme.success,
           subtitle: '${stats.reservations.completed} terminées',
           onTap: () => Navigator.pushNamed(context, AppRoutes.adminReports),
         ),
@@ -448,7 +448,7 @@ class AdminDashboardPage extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 11,
-                      color: Colors.grey.shade600,
+                      color: AppTheme.textSecondary,
                     ),
                   ),
               ],
@@ -463,8 +463,8 @@ class AdminDashboardPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1A237E), Color(0xFF3949AB)],
+        gradient: LinearGradient(
+          colors: [AppTheme.primary2, AppTheme.primary2.withValues(alpha: 0.7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -473,14 +473,14 @@ class AdminDashboardPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.attach_money, color: Colors.white),
+              Icon(Icons.attach_money, color: AppTheme.background),
               SizedBox(width: 8),
               Text(
                 'Revenus',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppTheme.background,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -495,7 +495,7 @@ class AdminDashboardPage extends StatelessWidget {
               _buildRevenueItem('Ce mois', stats.revenue.thisMonth, false),
             ],
           ),
-          const Divider(color: Colors.white24, height: 32),
+          Divider(color: AppTheme.background.withValues(alpha: 0.24), height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -516,7 +516,7 @@ class AdminDashboardPage extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.7),
+            color: AppTheme.background.withValues(alpha: 0.7),
             fontSize: 12,
           ),
         ),
@@ -524,7 +524,7 @@ class AdminDashboardPage extends StatelessWidget {
         Text(
           '${amount.toStringAsFixed(2)} \$',
           style: TextStyle(
-            color: Colors.white,
+            color: AppTheme.background,
             fontSize: isMain ? 28 : 18,
             fontWeight: FontWeight.bold,
           ),
@@ -537,11 +537,11 @@ class AdminDashboardPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -553,9 +553,9 @@ class AdminDashboardPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.star, color: Colors.amber),
+                  Icon(Icons.star, color: AppTheme.warning),
                   SizedBox(width: 8),
                   Text(
                     'Top Déneigeurs',
@@ -591,8 +591,8 @@ class AdminDashboardPage extends StatelessWidget {
                       backgroundColor: _getMedalColor(index),
                       child: Text(
                         '${index + 1}',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppTheme.background,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -610,7 +610,7 @@ class AdminDashboardPage extends StatelessWidget {
                             '${worker.jobsCompleted} jobs - ${worker.totalEarnings.toStringAsFixed(0)}\$',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade600,
+                              color: AppTheme.textSecondary,
                             ),
                           ),
                         ],
@@ -620,12 +620,12 @@ class AdminDashboardPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withValues(alpha: 0.15),
+                        color: AppTheme.warningLight,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.star, size: 16, color: Colors.amber),
+                          Icon(Icons.star, size: 16, color: AppTheme.warning),
                           const SizedBox(width: 4),
                           Text(
                             worker.rating.toStringAsFixed(1),
@@ -646,13 +646,13 @@ class AdminDashboardPage extends StatelessWidget {
   Color _getMedalColor(int index) {
     switch (index) {
       case 0:
-        return Colors.amber;
+        return AppTheme.warning;
       case 1:
-        return Colors.grey.shade400;
+        return AppTheme.textSecondary;
       case 2:
-        return Colors.brown.shade300;
+        return AppTheme.warning.withValues(alpha: 0.6);
       default:
-        return Colors.grey.shade300;
+        return AppTheme.textTertiary;
     }
   }
 
@@ -666,9 +666,9 @@ class AdminDashboardPage extends StatelessWidget {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setState) => AlertDialog(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.notifications_active, color: Colors.orange),
+              Icon(Icons.notifications_active, color: AppTheme.warning),
               SizedBox(width: 12),
               Text('Envoyer une notification'),
             ],
@@ -736,9 +736,9 @@ class AdminDashboardPage extends StatelessWidget {
                 if (titleController.text.isEmpty ||
                     messageController.text.isEmpty) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('Veuillez remplir tous les champs'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppTheme.error,
                     ),
                   );
                   return;
@@ -770,11 +770,11 @@ class AdminDashboardPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
+                color: AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(8),
               ),
               child:
-                  const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
+                  Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('Déconnexion Admin'),
@@ -788,7 +788,7 @@ class AdminDashboardPage extends StatelessWidget {
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'Annuler',
-              style: TextStyle(color: Colors.grey.shade600),
+              style: TextStyle(color: AppTheme.textSecondary),
             ),
           ),
           ElevatedButton(
@@ -804,8 +804,8 @@ class AdminDashboardPage extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.error,
+              foregroundColor: AppTheme.background,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),

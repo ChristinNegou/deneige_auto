@@ -124,7 +124,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.successMessage!),
-                backgroundColor: Colors.green,
+                backgroundColor: AppTheme.success,
               ),
             );
             context.read<AdminBloc>().add(ClearError());
@@ -134,7 +134,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
+                backgroundColor: AppTheme.error,
               ),
             );
             context.read<AdminBloc>().add(ClearError());
@@ -227,12 +227,12 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 24),
+        Icon(icon, color: AppTheme.background, size: 24),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: AppTheme.background,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -240,7 +240,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
+            color: AppTheme.background.withValues(alpha: 0.8),
             fontSize: 12,
           ),
         ),
@@ -258,7 +258,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+            Icon(Icons.error_outline, size: 64, color: AppTheme.error),
             const SizedBox(height: 16),
             Text(state.errorMessage ?? 'Une erreur est survenue'),
             const SizedBox(height: 16),
@@ -280,7 +280,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.ac_unit, size: 64, color: Colors.grey),
+            Icon(Icons.ac_unit, size: 64, color: AppTheme.textTertiary),
             SizedBox(height: 16),
             Text('Aucun déneigeur trouvé'),
           ],
@@ -353,8 +353,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             ),
                             child: Text(
                               '${index + 1}',
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: AppTheme.background,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -381,7 +381,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             ),
                             if (profile?.isVerified == true)
                               Icon(Icons.verified,
-                                  color: Colors.blue.shade600, size: 20),
+                                  color: AppTheme.info, size: 20),
                           ],
                         ),
                         const SizedBox(height: 4),
@@ -391,7 +391,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: isActive ? Colors.green : Colors.grey,
+                                color: isActive ? AppTheme.success : AppTheme.textTertiary,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -399,7 +399,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             Text(
                               isActive ? 'Disponible' : 'Indisponible',
                               style: TextStyle(
-                                color: isActive ? Colors.green : Colors.grey,
+                                color: isActive ? AppTheme.success : AppTheme.textTertiary,
                                 fontSize: 12,
                               ),
                             ),
@@ -409,13 +409,13 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.shade100,
+                                  color: AppTheme.errorLight,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
                                   'Suspendu',
                                   style: TextStyle(
-                                    color: Colors.red.shade700,
+                                    color: AppTheme.error,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -435,25 +435,25 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                 children: [
                   _buildWorkerStat(
                     Icons.star,
-                    Colors.amber,
+                    AppTheme.warning,
                     profile?.averageRating.toStringAsFixed(1) ?? '0.0',
                     'Note',
                   ),
                   _buildWorkerStat(
                     Icons.work,
-                    Colors.blue,
+                    AppTheme.info,
                     profile?.totalJobsCompleted.toString() ?? '0',
                     'Jobs',
                   ),
                   _buildWorkerStat(
                     Icons.attach_money,
-                    Colors.green,
+                    AppTheme.success,
                     '${(profile?.totalEarnings ?? 0).toStringAsFixed(0)}\$',
                     'Gains',
                   ),
                   _buildWorkerStat(
                     Icons.warning,
-                    Colors.orange,
+                    AppTheme.warning,
                     profile?.warningCount.toString() ?? '0',
                     'Avert.',
                   ),
@@ -488,7 +488,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey.shade600,
+            color: AppTheme.textSecondary,
             fontSize: 12,
           ),
         ),
@@ -499,11 +499,11 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
   Color _getRankColor(int index) {
     switch (index) {
       case 0:
-        return Colors.amber.shade700;
+        return AppTheme.warning;
       case 1:
-        return Colors.grey.shade500;
+        return AppTheme.textSecondary;
       case 2:
-        return Colors.brown.shade400;
+        return AppTheme.warning.withValues(alpha: 0.6);
       default:
         return AppTheme.primary;
     }
@@ -522,8 +522,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
         maxChildSize: 0.95,
         minChildSize: 0.5,
         builder: (context, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: SingleChildScrollView(
@@ -537,7 +537,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: AppTheme.textTertiary,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -574,7 +574,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                           ),
                           if (profile?.isVerified == true) ...[
                             const SizedBox(width: 8),
-                            Icon(Icons.verified, color: Colors.blue.shade600),
+                            Icon(Icons.verified, color: AppTheme.info),
                           ],
                         ],
                       ),
@@ -582,7 +582,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.star, color: Colors.amber, size: 24),
+                          Icon(Icons.star, color: AppTheme.warning, size: 24),
                           const SizedBox(width: 4),
                           Text(
                             profile?.averageRating.toStringAsFixed(1) ?? '0.0',
@@ -594,7 +594,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                           Text(
                             ' (${profile?.totalRatingsCount ?? 0} avis)',
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: AppTheme.textSecondary,
                             ),
                           ),
                         ],
@@ -610,7 +610,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                         'Jobs terminés',
                         profile?.totalJobsCompleted.toString() ?? '0',
                         Icons.check_circle,
-                        Colors.green,
+                        AppTheme.success,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -619,7 +619,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                         'Gains totaux',
                         '${profile?.totalEarnings.toStringAsFixed(0) ?? 0}\$',
                         Icons.attach_money,
-                        Colors.blue,
+                        AppTheme.info,
                       ),
                     ),
                   ],
@@ -632,7 +632,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                         'Avertissements',
                         profile?.warningCount.toString() ?? '0',
                         Icons.warning,
-                        Colors.orange,
+                        AppTheme.warning,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -646,8 +646,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             ? Icons.check_circle
                             : Icons.cancel,
                         profile?.isAvailable == true
-                            ? Colors.green
-                            : Colors.grey,
+                            ? AppTheme.success
+                            : AppTheme.textTertiary,
                       ),
                     ),
                   ],
@@ -673,21 +673,21 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
+                      color: AppTheme.errorLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.red.shade200),
+                      border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.block, color: Colors.red.shade700),
+                            Icon(Icons.block, color: AppTheme.error),
                             const SizedBox(width: 8),
                             Text(
                               'Compte suspendu',
                               style: TextStyle(
-                                color: Colors.red.shade700,
+                                color: AppTheme.error,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -718,7 +718,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             adminBloc.add(UnsuspendUser(worker.id));
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
+                            backgroundColor: AppTheme.success,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
                         )
@@ -730,7 +730,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             _showSuspendDialog(context, worker);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
+                            backgroundColor: AppTheme.error,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
                         ),
@@ -769,7 +769,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade600,
+              color: AppTheme.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -783,7 +783,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.grey.shade600),
+          Icon(icon, size: 20, color: AppTheme.textSecondary),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -854,7 +854,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                   days: selectedDays,
                 ));
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
               child: const Text('Suspendre'),
             ),
           ],

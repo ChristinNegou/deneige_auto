@@ -52,7 +52,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.successMessage!),
-                backgroundColor: Colors.green,
+                backgroundColor: AppTheme.success,
               ),
             );
             context.read<AdminBloc>().add(ClearError());
@@ -62,7 +62,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorMessage!),
-                backgroundColor: Colors.red,
+                backgroundColor: AppTheme.error,
               ),
             );
             context.read<AdminBloc>().add(ClearError());
@@ -84,10 +84,10 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -172,7 +172,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+            Icon(Icons.error_outline, size: 64, color: AppTheme.error),
             const SizedBox(height: 16),
             Text(state.errorMessage ?? 'Une erreur est survenue'),
             const SizedBox(height: 16),
@@ -190,7 +190,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.people_outline, size: 64, color: Colors.grey),
+            Icon(Icons.people_outline, size: 64, color: AppTheme.textTertiary),
             SizedBox(height: 16),
             Text('Aucun utilisateur trouvé'),
           ],
@@ -274,7 +274,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                     Text(
                       user.email,
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: AppTheme.textSecondary,
                         fontSize: 14,
                       ),
                     ),
@@ -286,19 +286,19 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.red.shade100,
+                              color: AppTheme.errorLight,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.block,
-                                    size: 14, color: Colors.red.shade700),
+                                    size: 14, color: AppTheme.error),
                                 const SizedBox(width: 4),
                                 Text(
                                   'Suspendu',
                                   style: TextStyle(
-                                    color: Colors.red.shade700,
+                                    color: AppTheme.error,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -311,13 +311,13 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         if (user.role == 'snowWorker' &&
                             user.workerProfile != null) ...[
                           Icon(Icons.star,
-                              size: 14, color: Colors.amber.shade600),
+                              size: 14, color: AppTheme.warning),
                           const SizedBox(width: 2),
                           Text(
                             user.workerProfile!.averageRating
                                 .toStringAsFixed(1),
                             style: TextStyle(
-                              color: Colors.grey.shade700,
+                              color: AppTheme.textSecondary,
                               fontSize: 12,
                             ),
                           ),
@@ -325,7 +325,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           Text(
                             '${user.workerProfile!.totalJobsCompleted} jobs',
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: AppTheme.textSecondary,
                               fontSize: 12,
                             ),
                           ),
@@ -379,11 +379,11 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   Color _getRoleColor(String role) {
     switch (role) {
       case 'admin':
-        return Colors.purple;
+        return AppTheme.primary2;
       case 'snowWorker':
-        return Colors.blue;
+        return AppTheme.info;
       default:
-        return Colors.teal;
+        return AppTheme.info;
     }
   }
 
@@ -440,8 +440,8 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
         maxChildSize: 0.95,
         minChildSize: 0.5,
         builder: (context, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: SingleChildScrollView(
@@ -455,7 +455,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: AppTheme.textTertiary,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -511,21 +511,21 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
+                      color: AppTheme.errorLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.red.shade200),
+                      border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.block, color: Colors.red.shade700),
+                            Icon(Icons.block, color: AppTheme.error),
                             const SizedBox(width: 8),
                             Text(
                               'Compte suspendu',
                               style: TextStyle(
-                                color: Colors.red.shade700,
+                                color: AppTheme.error,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -562,7 +562,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           'Jobs terminés',
                           user.workerProfile!.totalJobsCompleted.toString(),
                           Icons.check_circle,
-                          Colors.green,
+                          AppTheme.success,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -571,7 +571,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           'Note moyenne',
                           user.workerProfile!.averageRating.toStringAsFixed(1),
                           Icons.star,
-                          Colors.amber,
+                          AppTheme.warning,
                         ),
                       ),
                     ],
@@ -584,7 +584,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           'Gains totaux',
                           '${user.workerProfile!.totalEarnings.toStringAsFixed(0)} \$',
                           Icons.attach_money,
-                          Colors.blue,
+                          AppTheme.info,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -593,7 +593,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           'Avertissements',
                           user.workerProfile!.warningCount.toString(),
                           Icons.warning,
-                          Colors.orange,
+                          AppTheme.warning,
                         ),
                       ),
                     ],
@@ -616,7 +616,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           'Réservations',
                           user.reservationsCount.toString(),
                           Icons.calendar_today,
-                          Colors.purple,
+                          AppTheme.primary2,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -625,7 +625,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                           'Total dépensé',
                           '${user.totalSpent.toStringAsFixed(0)} \$',
                           Icons.attach_money,
-                          Colors.teal,
+                          AppTheme.info,
                         ),
                       ),
                     ],
@@ -645,7 +645,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.grey.shade600),
+          Icon(icon, size: 20, color: AppTheme.textSecondary),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -653,7 +653,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.grey.shade500,
+                  color: AppTheme.textTertiary,
                   fontSize: 12,
                 ),
               ),
@@ -694,7 +694,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade600,
+              color: AppTheme.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -720,7 +720,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AppTheme.textTertiary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -735,7 +735,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             const SizedBox(height: 16),
             if (!user.isSuspended)
               ListTile(
-                leading: const Icon(Icons.block, color: Colors.red),
+                leading: Icon(Icons.block, color: AppTheme.error),
                 title: const Text('Suspendre l\'utilisateur'),
                 onTap: () {
                   Navigator.pop(sheetContext);
@@ -744,7 +744,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
               )
             else
               ListTile(
-                leading: const Icon(Icons.check_circle, color: Colors.green),
+                leading: Icon(Icons.check_circle, color: AppTheme.success),
                 title: const Text('Lever la suspension'),
                 onTap: () {
                   Navigator.pop(sheetContext);
@@ -824,7 +824,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                   days: selectedDays,
                 ));
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
               child: const Text('Suspendre'),
             ),
           ],
