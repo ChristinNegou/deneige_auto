@@ -1,6 +1,6 @@
 // ============= error_widget.dart =============
 import 'package:flutter/material.dart';
-
+import '../../core/theme/app_theme.dart';
 import 'app_button.dart';
 
 class AppErrorWidget extends StatelessWidget {
@@ -26,7 +26,7 @@ class AppErrorWidget extends StatelessWidget {
             Icon(
               icon,
               size: 80,
-              color: Colors.red[300],
+              color: AppTheme.error.withValues(alpha: 0.7),
             ),
             const SizedBox(height: 16),
             Text(
@@ -34,7 +34,7 @@ class AppErrorWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+                color: AppTheme.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -43,7 +43,7 @@ class AppErrorWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: AppTheme.textSecondary,
               ),
             ),
             if (onRetry != null) ...[

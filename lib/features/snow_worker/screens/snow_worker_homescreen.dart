@@ -82,12 +82,12 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: AppTheme.background.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     hasUrgent ? Icons.bolt : Icons.work_rounded,
-                    color: Colors.white,
+                    color: AppTheme.background,
                     size: 20,
                   ),
                 ),
@@ -111,7 +111,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                           newJobs.first.displayAddress,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: AppTheme.background.withValues(alpha: 0.9),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -222,9 +222,9 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
     ));
 
     return Scaffold(
@@ -330,9 +330,9 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                   ),
                 ],
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.local_shipping_rounded,
-                color: Colors.white,
+                color: AppTheme.background,
                 size: 26,
               ),
             ),
@@ -471,7 +471,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                 BoxShadow(
                   color: isAvailable
                       ? AppTheme.success.withValues(alpha: 0.3)
-                      : Colors.black.withValues(alpha: 0.05),
+                      : AppTheme.shadowColor.withValues(alpha: 0.05),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
@@ -484,7 +484,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                   height: 56,
                   decoration: BoxDecoration(
                     color: isAvailable
-                        ? Colors.white.withValues(alpha: 0.2)
+                        ? AppTheme.background.withValues(alpha: 0.2)
                         : AppTheme.background,
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
@@ -504,7 +504,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                               ? Icons.work_rounded
                               : Icons.work_off_rounded,
                           color: isAvailable
-                              ? Colors.white
+                              ? AppTheme.background
                               : AppTheme.textTertiary,
                           size: 28,
                         ),
@@ -520,7 +520,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                             : 'Vous etes hors ligne',
                         style: TextStyle(
                           color:
-                              isAvailable ? Colors.white : AppTheme.textPrimary,
+                              isAvailable ? AppTheme.background : AppTheme.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                         ),
@@ -532,7 +532,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                             : 'Activez pour recevoir des jobs',
                         style: TextStyle(
                           color: isAvailable
-                              ? Colors.white.withValues(alpha: 0.85)
+                              ? AppTheme.background.withValues(alpha: 0.85)
                               : AppTheme.textTertiary,
                           fontSize: 13,
                         ),
@@ -544,7 +544,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: isAvailable
-                        ? Colors.white.withValues(alpha: 0.2)
+                        ? AppTheme.background.withValues(alpha: 0.2)
                         : AppTheme.background,
                     borderRadius: BorderRadius.circular(AppTheme.radiusFull),
                   ),
@@ -558,8 +558,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                                 .read<WorkerAvailabilityBloc>()
                                 .add(const ToggleAvailability());
                           },
-                    activeColor: Colors.white,
-                    activeTrackColor: Colors.white.withValues(alpha: 0.3),
+                    activeColor: AppTheme.background,
+                    activeTrackColor: AppTheme.background.withValues(alpha: 0.3),
                     inactiveThumbColor: AppTheme.textTertiary,
                     inactiveTrackColor: AppTheme.border,
                   ),
@@ -815,8 +815,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                   ),
                   child: Text(
                     '${myJobs.length} actif${myJobs.length > 1 ? 's' : ''}',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppTheme.background,
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
                     ),
@@ -945,16 +945,16 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.bolt,
-                                  color: Colors.white,
+                                  color: AppTheme.background,
                                   size: 14,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   '${availableJobs.where((j) => j.isPriority).length} urgent',
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: AppTheme.background,
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -1163,13 +1163,13 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
+                children: [
+                  Icon(Icons.refresh_rounded, color: AppTheme.background, size: 18),
                   SizedBox(width: 8),
                   Text(
                     'Reessayer',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.background,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1210,14 +1210,14 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Icon(Icons.account_balance_wallet_rounded,
-                color: Colors.white, size: 20),
+                color: AppTheme.background, size: 20),
             SizedBox(width: 10),
             Text(
               'Mes revenus',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.background,
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
               ),

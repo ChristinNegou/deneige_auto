@@ -56,9 +56,9 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
     ));
 
     return Scaffold(
@@ -71,8 +71,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 SnackBar(
                   content: Row(
                     children: [
-                      const Icon(Icons.check_circle,
-                          color: Colors.white, size: 20),
+                      Icon(Icons.check_circle,
+                          color: AppTheme.background, size: 20),
                       const SizedBox(width: 12),
                       const Text('Paramètres sauvegardés'),
                     ],
@@ -89,8 +89,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 SnackBar(
                   content: Row(
                     children: [
-                      const Icon(Icons.error_outline,
-                          color: Colors.white, size: 20),
+                      Icon(Icons.error_outline,
+                          color: AppTheme.background, size: 20),
                       const SizedBox(width: 12),
                       Expanded(child: Text(state.message)),
                     ],
@@ -212,14 +212,14 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.green[600]!, Colors.green[400]!],
+            colors: [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(AppTheme.radiusLG),
           boxShadow: [
             BoxShadow(
-              color: Colors.green.withValues(alpha: 0.3),
+              color: AppTheme.success.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -231,12 +231,12 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: AppTheme.background.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.account_balance_wallet,
-                color: Colors.white,
+                color: AppTheme.background,
                 size: 24,
               ),
             ),
@@ -245,10 +245,10 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Mes paiements',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.background,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -257,16 +257,16 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   Text(
                     'Configurer mon compte bancaire',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: AppTheme.background.withValues(alpha: 0.8),
                       fontSize: 13,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
-              color: Colors.white,
+              color: AppTheme.background,
               size: 24,
             ),
           ],
@@ -375,7 +375,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                         : Border.all(color: AppTheme.border, width: 2),
                   ),
                   child: value
-                      ? const Icon(Icons.check, color: Colors.white, size: 16)
+                      ? Icon(Icons.check, color: AppTheme.background, size: 16)
                       : null,
                 ),
               ],
@@ -468,13 +468,13 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               height: 22,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected ? AppTheme.primary : Colors.transparent,
+                color: isSelected ? AppTheme.primary : AppTheme.background,
                 border: isSelected
                     ? null
                     : Border.all(color: AppTheme.textTertiary, width: 2),
               ),
               child: isSelected
-                  ? const Icon(Icons.check, color: Colors.white, size: 14)
+                  ? Icon(Icons.check, color: AppTheme.background, size: 14)
                   : null,
             ),
           ],
@@ -834,11 +834,11 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   height: 22,
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: AppTheme.shadowColor.withValues(alpha: 0.1),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -877,12 +877,12 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.save_rounded, color: Colors.white, size: 22),
+            Icon(Icons.save_rounded, color: AppTheme.background, size: 22),
             const SizedBox(width: 10),
-            const Text(
+            Text(
               'Sauvegarder',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.background,
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
               ),
@@ -1117,7 +1117,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppTheme.background,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/config/app_config.dart';
+import '../../core/theme/app_theme.dart';
 import '../../features/reservation/domain/entities/reservation.dart';
 
 class ReservationCard extends StatelessWidget {
@@ -18,6 +19,7 @@ class ReservationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
+      color: AppTheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -66,10 +68,10 @@ class ReservationCard extends StatelessWidget {
                   // Price
                   Text(
                     '${reservation.totalPrice.toStringAsFixed(2)} \$',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                 ],
@@ -85,7 +87,7 @@ class ReservationCard extends StatelessWidget {
                   Icon(
                     Icons.directions_car,
                     size: 20,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -108,7 +110,7 @@ class ReservationCard extends StatelessWidget {
                   Icon(
                     Icons.local_parking,
                     size: 20,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -126,7 +128,7 @@ class ReservationCard extends StatelessWidget {
                   Icon(
                     Icons.access_time,
                     size: 20,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -145,19 +147,19 @@ class ReservationCard extends StatelessWidget {
   Color _getStatusColor(ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
-        return Colors.orange;
+        return AppTheme.warning;
       case ReservationStatus.assigned:
-        return Colors.blue;
+        return AppTheme.statusAssigned;
       case ReservationStatus.inProgress:
-        return Colors.purple;
+        return AppTheme.primary2;
       case ReservationStatus.completed:
-        return Colors.green;
+        return AppTheme.success;
       case ReservationStatus.cancelled:
-        return Colors.grey;
+        return AppTheme.textTertiary;
       case ReservationStatus.late:
-        return Colors.red;
+        return AppTheme.error;
       default:
-        return Colors.grey;
+        return AppTheme.textTertiary;
     }
   }
 }

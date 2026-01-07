@@ -1,5 +1,6 @@
 // ============= app_snackbar.dart =============
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
 
 class AppSnackBar {
   static void show(
@@ -17,12 +18,12 @@ class AppSnackBar {
       SnackBar(
         content: Row(
           children: [
-            Icon(icon, color: Colors.white),
+            Icon(icon, color: AppTheme.background),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: AppTheme.background),
               ),
             ),
           ],
@@ -36,7 +37,7 @@ class AppSnackBar {
         action: onAction != null && actionLabel != null
             ? SnackBarAction(
                 label: actionLabel,
-                textColor: Colors.white,
+                textColor: AppTheme.background,
                 onPressed: onAction,
               )
             : null,
@@ -47,13 +48,13 @@ class AppSnackBar {
   static Color _getColorForType(SnackBarType type) {
     switch (type) {
       case SnackBarType.success:
-        return Colors.green;
+        return AppTheme.success;
       case SnackBarType.error:
-        return Colors.red;
+        return AppTheme.error;
       case SnackBarType.warning:
-        return Colors.orange;
+        return AppTheme.warning;
       case SnackBarType.info:
-        return Colors.blue;
+        return AppTheme.info;
     }
   }
 

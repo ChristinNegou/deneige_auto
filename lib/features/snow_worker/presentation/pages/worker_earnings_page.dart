@@ -76,9 +76,9 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
     ));
 
     return Scaffold(
@@ -213,11 +213,11 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           color: AppTheme.success,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         ),
-        labelColor: Colors.white,
+        labelColor: AppTheme.background,
         unselectedLabelColor: AppTheme.textSecondary,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         indicatorSize: TabBarIndicatorSize.tab,
-        dividerColor: Colors.transparent,
+        dividerColor: AppTheme.background.withValues(alpha: 0),
         tabs: const [
           Tab(text: 'Jour'),
           Tab(text: 'Semaine'),
@@ -245,7 +245,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
             label: const Text('Réessayer'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.success,
-              foregroundColor: Colors.white,
+              foregroundColor: AppTheme.background,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
@@ -357,7 +357,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: AppTheme.background.withValues(alpha: 0.9),
                   fontSize: 14,
                   letterSpacing: 0.5,
                 ),
@@ -369,19 +369,19 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                 children: [
                   Text(
                     animatedAmount.toStringAsFixed(2),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppTheme.background,
                       fontSize: 44,
                       fontWeight: FontWeight.bold,
                       fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 8),
                     child: Text(
                       ' \$',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: AppTheme.background.withValues(alpha: 0.7),
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
                       ),
@@ -394,7 +394,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
+                  color: AppTheme.background.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
                 child: Row(
@@ -408,7 +408,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                     Container(
                       height: 36,
                       width: 1,
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: AppTheme.background.withValues(alpha: 0.3),
                     ),
                     _buildSummaryItem(
                       icon: Icons.volunteer_activism_rounded,
@@ -418,7 +418,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                     Container(
                       height: 36,
                       width: 1,
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: AppTheme.background.withValues(alpha: 0.3),
                     ),
                     _buildSummaryItem(
                       icon: Icons.trending_up_rounded,
@@ -468,9 +468,9 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            backgroundColor: AppTheme.background.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(
-              progress >= 1.0 ? AppTheme.warning : Colors.white,
+              progress >= 1.0 ? AppTheme.warning : AppTheme.background,
             ),
             minHeight: 6,
           ),
@@ -506,12 +506,12 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
   }) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 18),
+        Icon(icon, color: AppTheme.background, size: 18),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: AppTheme.background,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -519,7 +519,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
+            color: AppTheme.background.withValues(alpha: 0.8),
             fontSize: 11,
           ),
         ),
