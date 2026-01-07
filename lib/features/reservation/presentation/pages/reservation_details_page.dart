@@ -9,6 +9,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../bloc/reservation_list_bloc.dart';
@@ -99,16 +100,32 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         // (quand on n'a pas encore de réservation)
         if (state.isLoading && reservation == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Détails de la réservation')),
-            body: const Center(child: CircularProgressIndicator()),
+            backgroundColor: AppTheme.background,
+            appBar: AppBar(
+              title: Text(
+                'Détails de la réservation',
+                style: TextStyle(color: AppTheme.textPrimary),
+              ),
+              backgroundColor: AppTheme.surface,
+              foregroundColor: AppTheme.textPrimary,
+            ),
+            body: Center(
+              child: CircularProgressIndicator(color: AppTheme.primary),
+            ),
           );
         }
 
         // Réservation introuvable après chargement
         if (reservation == null) {
           return Scaffold(
+            backgroundColor: AppTheme.background,
             appBar: AppBar(
-              title: const Text('Détails de la réservation'),
+              title: Text(
+                'Détails de la réservation',
+                style: TextStyle(color: AppTheme.textPrimary),
+              ),
+              backgroundColor: AppTheme.surface,
+              foregroundColor: AppTheme.textPrimary,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.pop(context),
@@ -118,16 +135,20 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                  Icon(Icons.search_off, size: 64, color: AppTheme.textTertiary),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Réservation introuvable',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Cette réservation n\'existe plus ou a été supprimée',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: AppTheme.textSecondary),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
@@ -140,14 +161,17 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     icon: const Icon(Icons.refresh),
                     label: const Text('Actualiser'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B82F6),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.info,
+                      foregroundColor: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Retour'),
+                    child: Text(
+                      'Retour',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
                   ),
                 ],
               ),
@@ -166,8 +190,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 end: Alignment.bottomCenter,
                 colors: [
                   _getStatusColor(reservation.status),
-                  _getStatusColor(reservation.status).withOpacity(0.7),
-                  Colors.grey[100]!,
+                  _getStatusColor(reservation.status).withValues(alpha: 0.7),
+                  AppTheme.background,
                 ],
                 stops: const [0.0, 0.15, 0.3],
               ),
@@ -184,11 +208,10 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                       icon: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: AppTheme.textPrimary.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child:
-                            const Icon(Icons.arrow_back, color: Colors.white),
+                        child: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -201,7 +224,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: AppTheme.textPrimary.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
@@ -211,17 +234,17 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                                 child: Container(
                                   width: 8,
                                   height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.textPrimary,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 'EN DIRECT',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppTheme.textPrimary,
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -242,7 +265,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                         // Main Content
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.grey[100],
+                            color: AppTheme.background,
                             borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(32),
                               topRight: Radius.circular(32),
@@ -329,11 +352,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.surface,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: AppTheme.border.withValues(alpha: 0.5),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -349,10 +372,10 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           const SizedBox(height: 16),
           Text(
             reservation.status.displayName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppTheme.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -360,7 +383,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             _getStatusDescription(reservation),
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.9),
+              color: AppTheme.textPrimary.withValues(alpha: 0.9),
             ),
             textAlign: TextAlign.center,
           ),
@@ -402,28 +425,24 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: AppTheme.border),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.timeline, color: Color(0xFF3B82F6)),
-              SizedBox(width: 8),
+              Icon(Icons.timeline, color: AppTheme.info),
+              const SizedBox(width: 8),
               Text(
                 'Progression',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
@@ -439,9 +458,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   child: Container(
                     height: 3,
                     decoration: BoxDecoration(
-                      color: isCompleted
-                          ? const Color(0xFF10B981)
-                          : Colors.grey[300],
+                      color: isCompleted ? AppTheme.success : AppTheme.border,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -458,21 +475,21 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   height: 40,
                   decoration: BoxDecoration(
                     color: isCompleted
-                        ? const Color(0xFF10B981)
+                        ? AppTheme.success
                         : isCurrent
                             ? _getStatusColor(status)
-                            : Colors.grey[200],
+                            : AppTheme.surfaceContainer,
                     shape: BoxShape.circle,
                     border: isCurrent
                         ? Border.all(
-                            color: _getStatusColor(status).withOpacity(0.3),
+                            color: _getStatusColor(status).withValues(alpha: 0.3),
                             width: 4,
                           )
                         : null,
                   ),
                   child: Center(
                     child: isCompleted
-                        ? const Icon(Icons.check, color: Colors.white, size: 20)
+                        ? Icon(Icons.check, color: AppTheme.background, size: 20)
                         : Text(
                             status.icon,
                             style: TextStyle(
@@ -496,8 +513,9 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                    color:
-                        isCurrent ? _getStatusColor(status) : Colors.grey[600],
+                    color: isCurrent
+                        ? _getStatusColor(status)
+                        : AppTheme.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
@@ -535,13 +553,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF3B82F6).withOpacity(0.1),
-            const Color(0xFF8B5CF6).withOpacity(0.1),
+            AppTheme.info.withValues(alpha: 0.1),
+            AppTheme.primary2.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF3B82F6).withOpacity(0.2),
+          color: AppTheme.info.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -550,11 +568,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFF3B82F6),
+              color: AppTheme.info,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF3B82F6).withOpacity(0.3),
+                  color: AppTheme.info.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
@@ -565,10 +583,10 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 reservation.workerName?.isNotEmpty == true
                     ? reservation.workerName![0].toUpperCase()
                     : '?',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ),
@@ -578,19 +596,20 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Votre déneigeur',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: AppTheme.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   reservation.workerName ?? 'Déneigeur assigné',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 if (reservation.rating != null) ...[
@@ -602,7 +621,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                           index < (reservation.rating ?? 0).round()
                               ? Icons.star
                               : Icons.star_border,
-                          color: Colors.amber,
+                          color: AppTheme.warning,
                           size: 16,
                         );
                       }),
@@ -618,13 +637,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             icon: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                gradient: LinearGradient(
+                  colors: [AppTheme.info, AppTheme.primary2],
                 ),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.chat_bubble_rounded,
-                  color: Colors.white, size: 20),
+              child: Icon(Icons.chat_bubble_rounded,
+                  color: AppTheme.textPrimary, size: 20),
             ),
           ),
           if (reservation.workerPhone != null) ...[
@@ -632,11 +651,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               onPressed: () => _callWorker(reservation),
               icon: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF10B981),
+                decoration: BoxDecoration(
+                  color: AppTheme.success,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.phone, color: Colors.white, size: 20),
+                child: Icon(Icons.phone, color: AppTheme.textPrimary, size: 20),
               ),
             ),
           ],
@@ -652,7 +671,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           child: _buildQuickActionButton(
             icon: Icons.phone,
             label: 'Appeler',
-            color: const Color(0xFF10B981),
+            color: AppTheme.success,
             onTap: () => _callWorker(reservation),
           ),
         ),
@@ -666,7 +685,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           child: _buildQuickActionButton(
             icon: Icons.map,
             label: 'Carte',
-            color: const Color(0xFF8B5CF6),
+            color: AppTheme.primary2,
             onTap: () => _openMap(reservation),
           ),
         ),
@@ -685,15 +704,15 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+            gradient: LinearGradient(
+              colors: [AppTheme.info, AppTheme.primary2],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF3B82F6).withOpacity(0.3),
+                color: AppTheme.info.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -701,14 +720,14 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           ),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 16),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 24),
-                SizedBox(height: 6),
+                Icon(Icons.chat_bubble_rounded, color: AppTheme.textPrimary, size: 24),
+                const SizedBox(height: 6),
                 Text(
                   'Chat',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -726,8 +745,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     if (authState is! AuthAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Erreur: utilisateur non authentifié'),
-          backgroundColor: Colors.red,
+          content: Text(
+            'Erreur: utilisateur non authentifié',
+            style: TextStyle(color: AppTheme.textPrimary),
+          ),
+          backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -741,14 +763,17 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     if (reservation.workerId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.white),
-              SizedBox(width: 12),
-              Text('Aucun déneigeur assigné pour le moment'),
+              Icon(Icons.info_outline, color: AppTheme.textPrimary),
+              const SizedBox(width: 12),
+              Text(
+                'Aucun déneigeur assigné pour le moment',
+                style: TextStyle(color: AppTheme.textPrimary),
+              ),
             ],
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppTheme.warning,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -793,12 +818,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             children: [
-              Icon(icon, color: Colors.white, size: 24),
+              Icon(icon, color: AppTheme.textPrimary, size: 24),
               const SizedBox(height: 6),
               Text(
                 label,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -816,33 +841,29 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: AppTheme.border),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.info_outline, color: Color(0xFF3B82F6)),
-              SizedBox(width: 8),
+              Icon(Icons.info_outline, color: AppTheme.info),
+              const SizedBox(width: 8),
               Text(
                 'Informations',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
           ),
-          const Divider(height: 24),
+          Divider(height: 24, color: AppTheme.border),
           _buildDetailRow(
             Icons.directions_car,
             'Véhicule',
@@ -903,33 +924,29 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: AppTheme.border),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.ac_unit, color: Color(0xFF3B82F6)),
-              SizedBox(width: 8),
+              Icon(Icons.ac_unit, color: AppTheme.info),
+              const SizedBox(width: 8),
               Text(
                 'Services demandés',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
           ),
-          const Divider(height: 24),
+          Divider(height: 24, color: AppTheme.border),
           // Base service
           _buildServiceItem(
             icon: Icons.cleaning_services,
@@ -952,22 +969,22 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             }),
           ],
           if (reservation.snowDepthCm != null) ...[
-            const Divider(height: 24),
+            Divider(height: 24, color: AppTheme.border),
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.blue[50],
+                    color: AppTheme.infoLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.height, color: Colors.blue[600], size: 20),
+                  child: Icon(Icons.height, color: AppTheme.info, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   'Profondeur de neige: ${reservation.snowDepthCm} cm',
                   style: TextStyle(
-                    color: Colors.grey[700],
+                    color: AppTheme.textSecondary,
                   ),
                 ),
               ],
@@ -989,12 +1006,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: isIncluded ? Colors.green[50] : Colors.grey[100],
+            color: isIncluded ? AppTheme.successLight : AppTheme.surfaceContainer,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
             icon,
-            color: isIncluded ? Colors.green[600] : Colors.grey,
+            color: isIncluded ? AppTheme.success : AppTheme.textTertiary,
             size: 20,
           ),
         ),
@@ -1002,14 +1019,14 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(fontSize: 14),
+            style: TextStyle(fontSize: 14, color: AppTheme.textPrimary),
           ),
         ),
         Text(
           '${price.toStringAsFixed(2)} \$',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
+            color: AppTheme.textSecondary,
           ),
         ),
       ],
@@ -1053,15 +1070,10 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: AppTheme.border),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1071,32 +1083,32 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.green[50],
+                  color: AppTheme.successLight,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.photo_camera,
-                    color: Colors.green[600], size: 20),
+                child: Icon(Icons.photo_camera, color: AppTheme.success, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Photos du service',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
           ),
-          const Divider(height: 24),
+          Divider(height: 24, color: AppTheme.border),
 
           // After Photo (primary - result)
           if (reservation.afterPhotoUrl != null) ...[
-            const Text(
+            Text(
               'Résultat final',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF10B981),
+                color: AppTheme.success,
               ),
             ),
             const SizedBox(height: 8),
@@ -1112,23 +1124,23 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   height: 200,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: AppTheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: CachedNetworkImage(
                     imageUrl: reservation.afterPhotoUrl!,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
+                    placeholder: (context, url) => Center(
+                      child: CircularProgressIndicator(color: AppTheme.primary),
                     ),
                     errorWidget: (context, url, error) => Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error, color: Colors.grey[400], size: 40),
+                        Icon(Icons.error, color: AppTheme.textTertiary, size: 40),
                         const SizedBox(height: 8),
                         Text(
                           'Photo non disponible',
-                          style: TextStyle(color: Colors.grey[500]),
+                          style: TextStyle(color: AppTheme.textSecondary),
                         ),
                       ],
                     ),
@@ -1141,13 +1153,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.touch_app, size: 14, color: Colors.grey[500]),
+                  Icon(Icons.touch_app, size: 14, color: AppTheme.textTertiary),
                   const SizedBox(width: 4),
                   Text(
                     'Appuyez pour agrandir',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[500],
+                      color: AppTheme.textTertiary,
                     ),
                   ),
                 ],
@@ -1158,12 +1170,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           // Before Photo (if exists)
           if (reservation.beforePhotoUrl != null) ...[
             if (reservation.afterPhotoUrl != null) const SizedBox(height: 20),
-            const Text(
+            Text(
               'Avant le service',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF6B7280),
+                color: AppTheme.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
@@ -1179,24 +1191,24 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   height: 150,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: AppTheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: CachedNetworkImage(
                     imageUrl: reservation.beforePhotoUrl!,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
+                    placeholder: (context, url) => Center(
+                      child: CircularProgressIndicator(color: AppTheme.primary),
                     ),
                     errorWidget: (context, url, error) => Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error, color: Colors.grey[400], size: 32),
+                        Icon(Icons.error, color: AppTheme.textTertiary, size: 32),
                         const SizedBox(height: 4),
                         Text(
                           'Photo non disponible',
                           style: TextStyle(
-                            color: Colors.grey[500],
+                            color: AppTheme.textSecondary,
                             fontSize: 12,
                           ),
                         ),
@@ -1218,13 +1230,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: AppTheme.background,
           appBar: AppBar(
-            backgroundColor: Colors.black,
-            iconTheme: const IconThemeData(color: Colors.white),
+            backgroundColor: AppTheme.surface,
+            iconTheme: IconThemeData(color: AppTheme.textPrimary),
             title: Text(
               title,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: AppTheme.textPrimary),
             ),
           ),
           body: Center(
@@ -1232,12 +1244,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
                 fit: BoxFit.contain,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+                placeholder: (context, url) => Center(
+                  child: CircularProgressIndicator(color: AppTheme.primary),
                 ),
-                errorWidget: (context, url, error) => const Icon(
+                errorWidget: (context, url, error) => Icon(
                   Icons.error,
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                   size: 48,
                 ),
               ),
@@ -1254,14 +1266,14 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF3B82F6),
-            const Color(0xFF1E3A8A),
+            AppTheme.info,
+            AppTheme.info.withValues(alpha: 0.7),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3B82F6).withOpacity(0.4),
+            color: AppTheme.info.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -1277,7 +1289,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 'Prix total',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.8),
+                  color: AppTheme.textPrimary.withValues(alpha: 0.8),
                 ),
               ),
               const SizedBox(height: 4),
@@ -1286,20 +1298,20 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 children: [
                   Text(
                     '${reservation.totalPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 6, left: 4),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6, left: 4),
                     child: Text(
                       '\$',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white70,
+                        color: AppTheme.textPrimary.withValues(alpha: 0.7),
                       ),
                     ),
                   ),
@@ -1313,17 +1325,17 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
+                    color: AppTheme.warning.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.favorite, color: Colors.amber, size: 16),
+                      Icon(Icons.favorite, color: AppTheme.warning, size: 16),
                       const SizedBox(width: 6),
                       Text(
                         '+${reservation.tip!.toStringAsFixed(2)}\$ pourboire',
-                        style: const TextStyle(
-                          color: Colors.amber,
+                        style: TextStyle(
+                          color: AppTheme.warning,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
@@ -1338,17 +1350,17 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.orange,
+                color: AppTheme.warning,
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.bolt, color: Colors.white, size: 18),
-                  SizedBox(width: 6),
+                  Icon(Icons.bolt, color: AppTheme.background, size: 18),
+                  const SizedBox(width: 6),
                   Text(
                     'URGENT',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.background,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -1368,30 +1380,31 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         margin: const EdgeInsets.only(bottom: 20),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.green[50],
+          color: AppTheme.successLight,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.green[200]!),
+          border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green[100],
+                color: AppTheme.success.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.star, color: Colors.green[700], size: 28),
+              child: Icon(Icons.star, color: AppTheme.success, size: 28),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Votre évaluation',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -1401,7 +1414,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                         index < reservation.rating!.round()
                             ? Icons.star
                             : Icons.star_border,
-                        color: Colors.amber,
+                        color: AppTheme.warning,
                         size: 24,
                       );
                     }),
@@ -1412,7 +1425,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     Text(
                       '"${reservation.review}"',
                       style: TextStyle(
-                        color: Colors.grey[700],
+                        color: AppTheme.textSecondary,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -1429,7 +1442,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: Material(
-        color: Colors.amber,
+        color: AppTheme.warning,
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: () {
@@ -1455,12 +1468,15 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                       SnackBar(
                         content: Row(
                           children: [
-                            const Icon(Icons.error, color: Colors.white),
+                            Icon(Icons.error, color: AppTheme.textPrimary),
                             const SizedBox(width: 12),
-                            Text('Erreur: ${failure.message}'),
+                            Text(
+                              'Erreur: ${failure.message}',
+                              style: TextStyle(color: AppTheme.textPrimary),
+                            ),
                           ],
                         ),
-                        backgroundColor: Colors.red,
+                        backgroundColor: AppTheme.error,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -1482,14 +1498,15 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             SnackBar(
                               content: Row(
                                 children: [
-                                  const Icon(Icons.warning,
-                                      color: Colors.white),
+                                  Icon(Icons.warning, color: AppTheme.textPrimary),
                                   const SizedBox(width: 12),
                                   Text(
-                                      'Évaluation envoyée, mais erreur pourboire: ${failure.message}'),
+                                    'Évaluation envoyée, mais erreur pourboire: ${failure.message}',
+                                    style: TextStyle(color: AppTheme.textPrimary),
+                                  ),
                                 ],
                               ),
-                              backgroundColor: Colors.orange,
+                              backgroundColor: AppTheme.warning,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -1502,14 +1519,15 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             SnackBar(
                               content: Row(
                                 children: [
-                                  const Icon(Icons.check_circle,
-                                      color: Colors.white),
+                                  Icon(Icons.check_circle, color: AppTheme.textPrimary),
                                   const SizedBox(width: 12),
                                   Text(
-                                      'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé'),
+                                    'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé',
+                                    style: TextStyle(color: AppTheme.textPrimary),
+                                  ),
                                 ],
                               ),
-                              backgroundColor: Colors.green,
+                              backgroundColor: AppTheme.success,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -1521,14 +1539,17 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Row(
+                          content: Row(
                             children: [
-                              Icon(Icons.check_circle, color: Colors.white),
-                              SizedBox(width: 12),
-                              Text('Merci pour votre évaluation!'),
+                              Icon(Icons.check_circle, color: AppTheme.textPrimary),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Merci pour votre évaluation!',
+                                style: TextStyle(color: AppTheme.textPrimary),
+                              ),
                             ],
                           ),
-                          backgroundColor: Colors.green,
+                          backgroundColor: AppTheme.success,
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -1555,37 +1576,36 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
+                    color: AppTheme.background.withValues(alpha: 0.3),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.star, color: Colors.white, size: 28),
+                  child: Icon(Icons.star, color: AppTheme.background, size: 28),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Évaluer le service',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppTheme.background,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'Partagez votre expérience et ajoutez un pourboire',
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: AppTheme.background.withValues(alpha: 0.8),
                           fontSize: 13,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios,
-                    color: Colors.white, size: 18),
+                Icon(Icons.arrow_forward_ios, color: AppTheme.background, size: 18),
               ],
             ),
           ),
@@ -1606,10 +1626,10 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: AppTheme.surfaceContainer,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, size: 20, color: Colors.grey[600]),
+          child: Icon(icon, size: 20, color: AppTheme.textSecondary),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -1620,15 +1640,16 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
+                  color: AppTheme.textPrimary,
                 ),
               ),
               if (subtitle != null) ...[
@@ -1637,7 +1658,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   subtitle,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.grey[500],
+                    color: AppTheme.textTertiary,
                   ),
                 ),
               ],
@@ -1663,8 +1684,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         icon: const Icon(Icons.edit),
         label: const Text('Modifier la réservation'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF3B82F6),
-          foregroundColor: Colors.white,
+          backgroundColor: AppTheme.info,
+          foregroundColor: AppTheme.textPrimary,
           padding: const EdgeInsets.all(16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -1682,8 +1703,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         icon: const Icon(Icons.cancel),
         label: const Text('Annuler la réservation'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.red,
-          side: const BorderSide(color: Colors.red),
+          foregroundColor: AppTheme.error,
+          side: BorderSide(color: AppTheme.error),
           padding: const EdgeInsets.all(16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -1706,58 +1727,63 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       case ReservationStatus.assigned:
         feePercent = 0;
         feeMessage = 'Remboursement complet - Aucun frais';
-        feeColor = Colors.green;
+        feeColor = AppTheme.success;
         break;
       case ReservationStatus.enRoute:
         feePercent = 50;
         feeMessage =
             'Le déneigeur est en route.\nFrais d\'annulation: 50% (${(reservation.totalPrice * 0.5).toStringAsFixed(2)}\$)';
-        feeColor = Colors.orange;
+        feeColor = AppTheme.warning;
         break;
       case ReservationStatus.inProgress:
         feePercent = 100;
         feeMessage =
             'Le travail a commencé.\nAucun remboursement (100% facturé)';
-        feeColor = Colors.red;
+        feeColor = AppTheme.error;
         break;
       default:
         feePercent = 0;
         feeMessage = '';
-        feeColor = Colors.grey;
+        feeColor = AppTheme.textTertiary;
     }
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppTheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red[50],
+                color: AppTheme.errorLight,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.warning, color: Colors.red),
+              child: Icon(Icons.warning, color: AppTheme.error),
             ),
             const SizedBox(width: 12),
-            const Text('Annuler?'),
+            Text(
+              'Annuler?',
+              style: TextStyle(color: AppTheme.textPrimary),
+            ),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Êtes-vous sûr de vouloir annuler cette réservation?',
+              style: TextStyle(color: AppTheme.textPrimary),
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: feeColor.withOpacity(0.1),
+                color: feeColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: feeColor.withOpacity(0.3)),
+                border: Border.all(color: feeColor.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -1785,7 +1811,10 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Non, garder'),
+            child: Text(
+              'Non, garder',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1796,8 +1825,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.error,
+              foregroundColor: AppTheme.textPrimary,
             ),
             child: const Text('Oui, annuler'),
           ),
@@ -1815,9 +1844,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Numéro de téléphone non disponible'),
-            backgroundColor: Colors.orange,
+          SnackBar(
+            content: Text(
+              'Numéro de téléphone non disponible',
+              style: TextStyle(color: AppTheme.textPrimary),
+            ),
+            backgroundColor: AppTheme.warning,
           ),
         );
       }
@@ -1839,19 +1871,19 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   Color _getStatusColor(ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
-        return Colors.orange;
+        return AppTheme.warning;
       case ReservationStatus.assigned:
-        return const Color(0xFF3B82F6);
+        return AppTheme.info;
       case ReservationStatus.enRoute:
-        return const Color(0xFF6366F1);
+        return AppTheme.primary2;
       case ReservationStatus.inProgress:
-        return const Color(0xFF8B5CF6);
+        return AppTheme.primary2;
       case ReservationStatus.completed:
-        return const Color(0xFF10B981);
+        return AppTheme.success;
       case ReservationStatus.cancelled:
-        return Colors.grey;
+        return AppTheme.textTertiary;
       case ReservationStatus.late:
-        return Colors.red;
+        return AppTheme.error;
     }
   }
 }
