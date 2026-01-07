@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/theme/app_theme.dart';
 
 class RatingTipDialog extends StatefulWidget {
   final String workerName;
@@ -54,9 +55,9 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -72,7 +73,7 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: AppTheme.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -82,22 +83,21 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.green[400]!, Colors.green[600]!],
-                  ),
+                  color: AppTheme.successLight,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: AppTheme.success.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.check_circle,
-                        color: Colors.white,
+                        color: AppTheme.success,
                         size: 32,
                       ),
                     ),
@@ -106,10 +106,10 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Service terminé!',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppTheme.success,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -117,7 +117,7 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                           Text(
                             'par ${widget.workerName}',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
+                              color: AppTheme.textSecondary,
                               fontSize: 14,
                             ),
                           ),
@@ -131,11 +131,12 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
               const SizedBox(height: 32),
 
               // Rating section
-              const Text(
+              Text(
                 'Comment était le service?',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -156,7 +157,7 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                       padding: const EdgeInsets.all(8),
                       child: Icon(
                         isSelected ? Icons.star : Icons.star_border,
-                        color: isSelected ? Colors.amber : Colors.grey[400],
+                        color: isSelected ? AppTheme.warning : AppTheme.textTertiary,
                         size: 44,
                       ),
                     ),
@@ -172,7 +173,7 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                     child: Text(
                       _getRatingText(_rating),
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: AppTheme.textSecondary,
                         fontSize: 14,
                       ),
                     ),
@@ -182,18 +183,19 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
               const SizedBox(height: 32),
 
               // Tip section
-              const Text(
+              Text(
                 'Ajouter un pourboire?',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 '100% va au déneigeur',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                   fontSize: 13,
                 ),
               ),
@@ -213,11 +215,21 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                     controller: _customTipController,
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
+                    style: TextStyle(color: AppTheme.textPrimary),
                     decoration: InputDecoration(
                       hintText: 'Montant',
+                      hintStyle: TextStyle(color: AppTheme.textTertiary),
                       suffixText: '\$',
+                      suffixStyle: TextStyle(color: AppTheme.textSecondary),
+                      filled: true,
+                      fillColor: AppTheme.surfaceContainer,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: AppTheme.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: AppTheme.border),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -242,10 +254,19 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
               TextField(
                 controller: _commentController,
                 maxLines: 3,
+                style: TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'Commentaire (optionnel)',
+                  hintStyle: TextStyle(color: AppTheme.textTertiary),
+                  filled: true,
+                  fillColor: AppTheme.surfaceContainer,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.border),
                   ),
                   contentPadding: const EdgeInsets.all(16),
                 ),
@@ -258,17 +279,19 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.blue[50],
+                    color: AppTheme.successLight,
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Pourboire',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
                       Text(
@@ -276,7 +299,7 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.green[700],
+                          color: AppTheme.success,
                         ),
                       ),
                     ],
@@ -303,13 +326,14 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: AppTheme.background,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    disabledBackgroundColor: Colors.grey[300],
+                    disabledBackgroundColor: AppTheme.surfaceContainer,
+                    disabledForegroundColor: AppTheme.textTertiary,
                   ),
                   child: Text(
                     _selectedTip != null && _selectedTip! > 0
@@ -331,7 +355,7 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                 child: Text(
                   'Plus tard',
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                     fontSize: 14,
                   ),
                 ),
@@ -358,17 +382,17 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3B82F6) : Colors.grey[100],
+          color: isSelected ? AppTheme.textPrimary : AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF3B82F6) : Colors.grey[300]!,
+            color: isSelected ? AppTheme.textPrimary : AppTheme.border,
             width: 2,
           ),
         ),
         child: Text(
           amount == 0 ? 'Non' : '${amount.toInt()}\$',
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[800],
+            color: isSelected ? AppTheme.background : AppTheme.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -391,16 +415,16 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: _showCustomTip ? const Color(0xFF3B82F6) : Colors.grey[100],
+          color: _showCustomTip ? AppTheme.textPrimary : AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _showCustomTip ? const Color(0xFF3B82F6) : Colors.grey[300]!,
+            color: _showCustomTip ? AppTheme.textPrimary : AppTheme.border,
             width: 2,
           ),
         ),
         child: Icon(
           Icons.edit,
-          color: _showCustomTip ? Colors.white : Colors.grey[600],
+          color: _showCustomTip ? AppTheme.background : AppTheme.textSecondary,
           size: 20,
         ),
       ),

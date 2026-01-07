@@ -60,7 +60,7 @@ class Step5SummaryScreen extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: AppTheme.textPrimary,
@@ -74,18 +74,22 @@ class Step5SummaryScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.green.withValues(alpha: 0.05),
+        color: AppTheme.successLight,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+        border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.check_circle, color: Colors.green[600], size: 20),
+          Icon(Icons.check_circle, color: AppTheme.success, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               state.locationAddress ?? 'Position GPS enregistrée',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.textPrimary,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -122,8 +126,9 @@ class Step5SummaryScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         children: guarantees.asMap().entries.map((entry) {
@@ -137,13 +142,13 @@ class Step5SummaryScreen extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
+                      color: AppTheme.successLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       item['icon'] as IconData,
                       size: 18,
-                      color: Colors.green[700],
+                      color: AppTheme.success,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -153,7 +158,7 @@ class Step5SummaryScreen extends StatelessWidget {
                       children: [
                         Text(
                           item['title'] as String,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: AppTheme.textPrimary,
@@ -161,18 +166,20 @@ class Step5SummaryScreen extends StatelessWidget {
                         ),
                         Text(
                           item['subtitle'] as String,
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.textSecondary,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.check, size: 16, color: Colors.green[600]),
+                  Icon(Icons.check, size: 16, color: AppTheme.success),
                 ],
               ),
               if (index < guarantees.length - 1) ...[
                 const SizedBox(height: 10),
-                Divider(color: Colors.grey[200], height: 1),
+                Divider(color: AppTheme.border, height: 1),
                 const SizedBox(height: 10),
               ],
             ],

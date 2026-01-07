@@ -2,69 +2,92 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Thème "Soft Glass" - Design moderne inspiré de Uber, Airbnb, Apple Maps
+/// Thème Dark Premium - Design moderne inspiré de Uber
 class AppTheme {
   AppTheme._();
 
   // ============ COULEURS PRINCIPALES ============
 
-  /// Fond principal - Gris très clair
-  static const Color background = Color(0xFF212121);
+  /// Fond principal - Noir profond chaleureux (pas noir pur)
+  static const Color background = Color(0xFF0A0A0A);
 
-  /// Fond des cartes - Blanc pur
-  static const Color surface = Color(0xFF303030);
+  /// Fond des cartes - Gris anthracite doux
+  static const Color surface = Color(0xFF161616);
+
+  /// Surface élevée - Pour les cartes au-dessus
+  static const Color surfaceElevated = Color(0xFF1E1E1E);
+
+  /// Surface container - Pour les inputs et éléments interactifs
+  static const Color surfaceContainer = Color(0xFF252525);
 
   /// Fond des cartes avec transparence (glassmorphism)
-  static const Color surfaceGlass = Color(0xF2FFFFFF); // 95% opacity
+  static const Color surfaceGlass = Color(0xE6161616); // 90% opacity
 
-  /// Texte principal - Gris charbon
-  static const Color textPrimary = Color(0xFFFFFFFF);
+  /// Texte principal - Blanc cassé (plus doux pour les yeux)
+  static const Color textPrimary = Color(0xFFF5F5F5);
 
-  /// Texte secondaire - Gris moyen
-  static const Color textSecondary = Color(0xFF6B7280);
+  /// Texte secondaire - Gris clair
+  static const Color textSecondary = Color(0xFFB3B3B3);
 
-  /// Texte tertiaire - Gris clair
-  static const Color textTertiary = Color(0xFF9CA3AF);
+  /// Texte tertiaire - Gris moyen
+  static const Color textTertiary = Color(0xFF787878);
 
-  /// Accent principal - Bleu électrique
-  static const Color primary = Color(0xFF000000);
+  /// Texte désactivé
+  static const Color textDisabled = Color(0xFF505050);
+
+  /// Accent principal - Blanc pur (style Uber)
+  static const Color primary = Color(0xFFFFFFFF);
+
+  /// Accent principal variantes
   static const Color primary2 = Color(0xFF7E57C2);
   static const Color primary3 = Color(0xFFCE93D8);
 
-  /// Accent principal clair
-  static const Color primaryLight = Color(0xFFDBEAFE);
+  /// Accent principal atténué
+  static const Color primaryLight = Color(0xFF2A2A2A);
 
-  /// Accent secondaire - Indigo doux
-  static const Color secondary = Color(0xFF000000);
+  /// Accent secondaire - Gris clair
+  static const Color secondary = Color(0xFFE0E0E0);
 
-  /// Couleur succès - Émeraude
-  static const Color success = Color(0xFF10B981);
-  static const Color successLight = Color(0xFFD1FAE5);
+  /// Couleur succès - Vert Uber
+  static const Color success = Color(0xFF34D399);
+  static const Color successLight = Color(0xFF162D22);
 
-  /// Couleur warning - Ambre doux
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color warningLight = Color(0xFFFEF3C7);
+  /// Couleur warning - Jaune doux
+  static const Color warning = Color(0xFFFBBF24);
+  static const Color warningLight = Color(0xFF2D2612);
 
   /// Couleur erreur - Rouge doux
-  static const Color error = Color(0xFFEF4444);
-  static const Color errorLight = Color(0xFFFEE2E2);
+  static const Color error = Color(0xFFF87171);
+  static const Color errorLight = Color(0xFF2D1616);
 
-  /// Couleur info - Cyan
-  static const Color info = Color(0xFF06B6D4);
-  static const Color infoLight = Color(0xFFCFFAFE);
+  /// Couleur info - Bleu ciel
+  static const Color info = Color(0xFF60A5FA);
+  static const Color infoLight = Color(0xFF162339);
 
   /// Bordures et séparateurs
-  static const Color border = Color(0xFFE5E7EB);
-  static const Color divider = Color(0xFFF3F4F6);
+  static const Color border = Color(0xFF2A2A2A);
+  static const Color divider = Color(0xFF1F1F1F);
 
   // ============ COULEURS DE STATUT ============
+  // Couleurs optimisées pour le mode sombre avec bonne lisibilité
 
-  static const Color statusPending = Color(0xFFF59E0B);
-  static const Color statusAssigned = Color(0xFF3B82F6);
-  static const Color statusEnRoute = Color(0xFF8B5CF6);
-  static const Color statusInProgress = Color(0xFF10B981);
-  static const Color statusCompleted = Color(0xFF059669);
-  static const Color statusCancelled = Color(0xFF6B7280);
+  static const Color statusPending = Color(0xFFFBBF24);
+  static const Color statusPendingBg = Color(0xFF2D2612);
+
+  static const Color statusAssigned = Color(0xFF60A5FA);
+  static const Color statusAssignedBg = Color(0xFF162339);
+
+  static const Color statusEnRoute = Color(0xFFA78BFA);
+  static const Color statusEnRouteBg = Color(0xFF221B33);
+
+  static const Color statusInProgress = Color(0xFF34D399);
+  static const Color statusInProgressBg = Color(0xFF162D22);
+
+  static const Color statusCompleted = Color(0xFF10B981);
+  static const Color statusCompletedBg = Color(0xFF122D23);
+
+  static const Color statusCancelled = Color(0xFF9CA3AF);
+  static const Color statusCancelledBg = Color(0xFF1F2125);
 
   // ============ DIMENSIONS ============
 
@@ -89,10 +112,11 @@ class AppTheme {
   static const double headerHeight = 100.0;
   static const double bottomNavHeight = 64.0;
 
-  /// Ombres
+  /// Ombres optimisées pour le mode sombre
+  /// En dark mode, on utilise des ombres plus subtiles avec luminosité réduite
   static List<BoxShadow> get shadowSM => [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.04),
+          color: Colors.black.withValues(alpha: 0.3),
           blurRadius: 4,
           offset: const Offset(0, 2),
         ),
@@ -100,7 +124,7 @@ class AppTheme {
 
   static List<BoxShadow> get shadowMD => [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.06),
+          color: Colors.black.withValues(alpha: 0.4),
           blurRadius: 8,
           offset: const Offset(0, 4),
         ),
@@ -108,9 +132,27 @@ class AppTheme {
 
   static List<BoxShadow> get shadowLG => [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.08),
-          blurRadius: 16,
+          color: Colors.black.withValues(alpha: 0.5),
+          blurRadius: 20,
           offset: const Offset(0, 8),
+        ),
+      ];
+
+  /// Effet de glow subtil pour les éléments importants
+  static List<BoxShadow> get glowPrimary => [
+        BoxShadow(
+          color: primary.withValues(alpha: 0.15),
+          blurRadius: 12,
+          spreadRadius: 0,
+        ),
+      ];
+
+  /// Effet de surélévation pour les cartes actives
+  static List<BoxShadow> get shadowElevated => [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.6),
+          blurRadius: 24,
+          offset: const Offset(0, 12),
         ),
       ];
 
@@ -120,8 +162,8 @@ class AppTheme {
   static BoxDecoration get glassCard => BoxDecoration(
         color: surfaceGlass,
         borderRadius: BorderRadius.circular(radiusLG),
-        border: Border.all(color: border.withValues(alpha: 0.5)),
-        boxShadow: shadowSM,
+        border: Border.all(color: border.withValues(alpha: 0.3)),
+        boxShadow: shadowMD,
       );
 
   /// Décoration carte standard
@@ -131,11 +173,33 @@ class AppTheme {
         boxShadow: shadowSM,
       );
 
-  /// Décoration carte avec bordure
+  /// Décoration carte élevée
+  static BoxDecoration get cardElevated => BoxDecoration(
+        color: surfaceElevated,
+        borderRadius: BorderRadius.circular(radiusLG),
+        boxShadow: shadowMD,
+      );
+
+  /// Décoration carte avec bordure subtile
   static BoxDecoration get cardBordered => BoxDecoration(
         color: surface,
         borderRadius: BorderRadius.circular(radiusLG),
         border: Border.all(color: border),
+      );
+
+  /// Décoration pour les inputs
+  static BoxDecoration get inputDecoration => BoxDecoration(
+        color: surfaceContainer,
+        borderRadius: BorderRadius.circular(radiusMD),
+        border: Border.all(color: border),
+      );
+
+  /// Décoration pour les éléments interactifs au survol/focus
+  static BoxDecoration get cardActive => BoxDecoration(
+        color: surfaceElevated,
+        borderRadius: BorderRadius.circular(radiusLG),
+        border: Border.all(color: textTertiary.withValues(alpha: 0.3)),
+        boxShadow: shadowMD,
       );
 
   // ============ TEXT STYLES ============
@@ -203,20 +267,20 @@ class AppTheme {
 
   // ============ THEME DATA ============
 
-  static ThemeData get lightTheme => ThemeData(
+  static ThemeData get darkTheme => ThemeData(
         useMaterial3: true,
-        brightness: Brightness.light,
+        brightness: Brightness.dark,
         primaryColor: primary,
         scaffoldBackgroundColor: background,
-        colorScheme: const ColorScheme.light(
+        colorScheme: const ColorScheme.dark(
           primary: primary,
           secondary: secondary,
           surface: surface,
           error: error,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
+          onPrimary: background,
+          onSecondary: background,
           onSurface: textPrimary,
-          onError: Colors.white,
+          onError: background,
         ),
         appBarTheme: const AppBarTheme(
           elevation: 0,
@@ -225,8 +289,8 @@ class AppTheme {
           foregroundColor: textPrimary,
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.dark,
-            statusBarBrightness: Brightness.light,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
           ),
           titleTextStyle: TextStyle(
             fontSize: 18,
@@ -245,7 +309,7 @@ class AppTheme {
           style: ElevatedButton.styleFrom(
             elevation: 0,
             backgroundColor: primary,
-            foregroundColor: Colors.white,
+            foregroundColor: background,
             minimumSize: const Size(double.infinity, buttonHeight),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(radiusMD),
@@ -258,9 +322,9 @@ class AppTheme {
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: primary,
+            foregroundColor: textPrimary,
             minimumSize: const Size(double.infinity, buttonHeight),
-            side: const BorderSide(color: primary, width: 1.5),
+            side: const BorderSide(color: border, width: 1.5),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(radiusMD),
             ),
@@ -272,7 +336,7 @@ class AppTheme {
         ),
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            foregroundColor: primary,
+            foregroundColor: textPrimary,
             textStyle: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -281,7 +345,7 @@ class AppTheme {
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: surface,
+          fillColor: surfaceContainer,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           border: OutlineInputBorder(
@@ -294,20 +358,21 @@ class AppTheme {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(radiusMD),
-            borderSide: const BorderSide(color: primary, width: 2),
+            borderSide: const BorderSide(color: textSecondary, width: 1.5),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(radiusMD),
             borderSide: const BorderSide(color: error),
           ),
           hintStyle: const TextStyle(color: textTertiary),
+          labelStyle: const TextStyle(color: textSecondary),
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: surface,
-          selectedItemColor: primary,
+          selectedItemColor: textPrimary,
           unselectedItemColor: textTertiary,
           type: BottomNavigationBarType.fixed,
-          elevation: 8,
+          elevation: 0,
         ),
         dividerTheme: const DividerThemeData(
           color: divider,
@@ -315,18 +380,60 @@ class AppTheme {
           space: 1,
         ),
         chipTheme: ChipThemeData(
-          backgroundColor: background,
-          selectedColor: primaryLight,
+          backgroundColor: surfaceContainer,
+          selectedColor: surfaceElevated,
           labelStyle: labelMedium,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusFull),
+            side: const BorderSide(color: border),
           ),
         ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: surfaceElevated,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusLG),
+          ),
+        ),
+        bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: surface,
+          modalBackgroundColor: surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: surfaceElevated,
+          contentTextStyle: const TextStyle(color: textPrimary),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusMD),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+          color: textPrimary,
+        ),
+        switchTheme: SwitchThemeData(
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return textPrimary;
+            }
+            return textTertiary;
+          }),
+          trackColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return success;
+            }
+            return surfaceContainer;
+          }),
+        ),
       );
+
+  /// Alias pour la compatibilité (pointe vers darkTheme)
+  static ThemeData get lightTheme => darkTheme;
 }
 
-/// Widget de carte glassmorphism
+/// Widget de carte glassmorphism optimisé pour le dark mode
 class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -336,6 +443,7 @@ class GlassCard extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? backgroundColor;
   final double borderRadius;
+  final bool elevated;
 
   const GlassCard({
     super.key,
@@ -347,26 +455,30 @@ class GlassCard extends StatelessWidget {
     this.onTap,
     this.backgroundColor,
     this.borderRadius = AppTheme.radiusLG,
+    this.elevated = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = backgroundColor ??
+        (elevated ? AppTheme.surfaceElevated : AppTheme.surface);
+
     final card = Container(
       width: width,
       height: height,
       margin: margin,
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppTheme.surfaceGlass,
+        color: bgColor,
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
-          color: AppTheme.border.withValues(alpha: 0.5),
+          color: AppTheme.border.withValues(alpha: 0.4),
         ),
-        boxShadow: AppTheme.shadowSM,
+        boxShadow: elevated ? AppTheme.shadowMD : AppTheme.shadowSM,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
           child: Padding(
             padding: padding ?? const EdgeInsets.all(AppTheme.paddingLG),
             child: child,
@@ -386,10 +498,11 @@ class GlassCard extends StatelessWidget {
   }
 }
 
-/// Badge de statut compact
+/// Badge de statut compact optimisé pour le dark mode
 class StatusBadge extends StatelessWidget {
   final String label;
   final Color color;
+  final Color? backgroundColor;
   final IconData? icon;
   final bool small;
 
@@ -397,20 +510,28 @@ class StatusBadge extends StatelessWidget {
     super.key,
     required this.label,
     required this.color,
+    this.backgroundColor,
     this.icon,
     this.small = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Utiliser le fond personnalisé ou générer un fond subtil
+    final bgColor = backgroundColor ?? color.withValues(alpha: 0.15);
+
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: small ? 8 : 10,
+        horizontal: small ? 8 : 12,
         vertical: small ? 4 : 6,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: bgColor,
         borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+        border: Border.all(
+          color: color.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -433,13 +554,14 @@ class StatusBadge extends StatelessWidget {
   }
 }
 
-/// Bouton d'action compact
+/// Bouton d'action compact optimisé pour le dark mode
 class ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final Color? color;
   final bool outlined;
+  final bool small;
 
   const ActionButton({
     super.key,
@@ -448,11 +570,13 @@ class ActionButton extends StatelessWidget {
     required this.onTap,
     this.color,
     this.outlined = false,
+    this.small = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final buttonColor = color ?? AppTheme.primary;
+    final textColor = outlined ? buttonColor : AppTheme.background;
 
     return Material(
       color: outlined ? Colors.transparent : buttonColor,
@@ -460,12 +584,17 @@ class ActionButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        splashColor: buttonColor.withValues(alpha: 0.1),
+        highlightColor: buttonColor.withValues(alpha: 0.05),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: EdgeInsets.symmetric(
+            horizontal: small ? 12 : 16,
+            vertical: small ? 8 : 10,
+          ),
           decoration: outlined
               ? BoxDecoration(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  border: Border.all(color: buttonColor, width: 1.5),
+                  border: Border.all(color: AppTheme.border, width: 1.5),
                 )
               : null,
           child: Row(
@@ -473,16 +602,16 @@ class ActionButton extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                size: 18,
-                color: outlined ? buttonColor : Colors.white,
+                size: small ? 16 : 18,
+                color: textColor,
               ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: small ? 13 : 14,
                   fontWeight: FontWeight.w600,
-                  color: outlined ? buttonColor : Colors.white,
+                  color: textColor,
                 ),
               ),
             ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class SnowDepthInput extends StatefulWidget {
   final int? initialValue;
@@ -36,9 +37,9 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
+        color: AppTheme.infoLight,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue[200]!),
+        border: Border.all(color: AppTheme.info.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,7 +48,7 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
             children: [
               Icon(
                 Icons.ac_unit,
-                color: Colors.blue[700],
+                color: AppTheme.info,
                 size: 24,
               ),
               const SizedBox(width: 8),
@@ -56,7 +57,7 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.blue[900],
+                  color: AppTheme.info,
                 ),
               ),
             ],
@@ -66,7 +67,7 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
             'Optionnel - Aide à estimer le temps requis',
             style: TextStyle(
               fontSize: 13,
-              color: Colors.blue[700],
+              color: AppTheme.info.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 16),
@@ -82,24 +83,26 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
                   }
                 },
                 icon: const Icon(Icons.remove_circle_outline),
-                color: Theme.of(context).primaryColor,
+                color: AppTheme.primary,
               ),
               Expanded(
                 child: TextField(
                   controller: _controller,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
                   ),
                   decoration: InputDecoration(
                     hintText: '0',
+                    hintStyle: TextStyle(color: AppTheme.textTertiary),
                     suffix: Text(
                       'cm',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey[600],
+                        color: AppTheme.textSecondary,
                       ),
                     ),
                     border: InputBorder.none,
@@ -121,21 +124,33 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
                   }
                 },
                 icon: const Icon(Icons.add_circle_outline),
-                color: Theme.of(context).primaryColor,
+                color: AppTheme.primary,
               ),
             ],
           ),
-          Slider(
-            value: (int.tryParse(_controller.text) ?? 0).toDouble(),
-            min: 0,
-            max: 100,
-            divisions: 20,
-            label: '${_controller.text} cm',
-            onChanged: (value) {
-              final intValue = value.round();
-              _controller.text = intValue.toString();
-              widget.onChanged(intValue);
-            },
+          SliderTheme(
+            data: SliderThemeData(
+              activeTrackColor: AppTheme.primary,
+              inactiveTrackColor: AppTheme.surfaceContainer,
+              thumbColor: AppTheme.primary,
+              overlayColor: AppTheme.primary.withValues(alpha: 0.2),
+              valueIndicatorColor: AppTheme.primary,
+              valueIndicatorTextStyle: TextStyle(
+                color: AppTheme.background,
+              ),
+            ),
+            child: Slider(
+              value: (int.tryParse(_controller.text) ?? 0).toDouble(),
+              min: 0,
+              max: 100,
+              divisions: 20,
+              label: '${_controller.text} cm',
+              onChanged: (value) {
+                final intValue = value.round();
+                _controller.text = intValue.toString();
+                widget.onChanged(intValue);
+              },
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -144,14 +159,14 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
                 '0 cm',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                 ),
               ),
               Text(
                 '100 cm',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ],

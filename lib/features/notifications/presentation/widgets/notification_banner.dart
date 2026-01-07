@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/notification.dart';
 import '../../services/notification_navigation_service.dart';
 
@@ -106,18 +107,18 @@ class _NotificationBannerState extends State<NotificationBanner>
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
+                        color: AppTheme.border.withValues(alpha: 0.5),
                         blurRadius: 20,
                         offset: const Offset(0, 4),
                       ),
                     ],
                     border: widget.notification.isUrgent
-                        ? Border.all(color: Colors.red, width: 2)
-                        : null,
+                        ? Border.all(color: AppTheme.error, width: 2)
+                        : Border.all(color: AppTheme.border),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -143,9 +144,10 @@ class _NotificationBannerState extends State<NotificationBanner>
                                       Expanded(
                                         child: Text(
                                           widget.notification.title,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
+                                            color: AppTheme.textPrimary,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -154,7 +156,7 @@ class _NotificationBannerState extends State<NotificationBanner>
                                       Text(
                                         'maintenant',
                                         style: TextStyle(
-                                          color: Colors.grey[500],
+                                          color: AppTheme.textTertiary,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -164,7 +166,7 @@ class _NotificationBannerState extends State<NotificationBanner>
                                   Text(
                                     widget.notification.message,
                                     style: TextStyle(
-                                      color: Colors.grey[700],
+                                      color: AppTheme.textSecondary,
                                       fontSize: 14,
                                     ),
                                     maxLines: 2,
@@ -182,7 +184,7 @@ class _NotificationBannerState extends State<NotificationBanner>
                                 child: Icon(
                                   Icons.close,
                                   size: 20,
-                                  color: Colors.grey[400],
+                                  color: AppTheme.textTertiary,
                                 ),
                               ),
                             ),
@@ -192,7 +194,7 @@ class _NotificationBannerState extends State<NotificationBanner>
 
                       // Action button (if available)
                       if (action != null) ...[
-                        const Divider(height: 1, indent: 16, endIndent: 16),
+                        Divider(height: 1, indent: 16, endIndent: 16, color: AppTheme.border),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -204,16 +206,16 @@ class _NotificationBannerState extends State<NotificationBanner>
                                 action.icon,
                                 size: 18,
                                 color: action.isUrgent
-                                    ? Colors.red
-                                    : const Color(0xFF8B5CF6),
+                                    ? AppTheme.error
+                                    : AppTheme.primary2,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 action.label,
                                 style: TextStyle(
                                   color: action.isUrgent
-                                      ? Colors.red
-                                      : const Color(0xFF8B5CF6),
+                                      ? AppTheme.error
+                                      : AppTheme.primary2,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),
@@ -223,8 +225,8 @@ class _NotificationBannerState extends State<NotificationBanner>
                                 Icons.arrow_forward,
                                 size: 18,
                                 color: action.isUrgent
-                                    ? Colors.red
-                                    : const Color(0xFF8B5CF6),
+                                    ? AppTheme.error
+                                    : AppTheme.primary2,
                               ),
                             ],
                           ),
@@ -272,9 +274,9 @@ class _NotificationBannerState extends State<NotificationBanner>
               width: 12,
               height: 12,
               decoration: BoxDecoration(
-                color: Colors.red,
+                color: AppTheme.error,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: AppTheme.surface, width: 2),
               ),
             ),
           ),
@@ -322,27 +324,26 @@ class _NotificationBannerState extends State<NotificationBanner>
       case NotificationType.reservationAssigned:
       case NotificationType.workCompleted:
       case NotificationType.paymentSuccess:
-        return Colors.green;
+      case NotificationType.tipReceived:
+        return AppTheme.success;
       case NotificationType.workerEnRoute:
       case NotificationType.workStarted:
-        return Colors.blue;
+        return AppTheme.info;
       case NotificationType.reservationCancelled:
       case NotificationType.paymentFailed:
       case NotificationType.urgentRequest:
-        return Colors.red;
+        return AppTheme.error;
       case NotificationType.refundProcessed:
-        return Colors.orange;
+        return AppTheme.warning;
       case NotificationType.weatherAlert:
-        return Colors.lightBlue;
+        return AppTheme.info;
       case NotificationType.workerMessage:
       case NotificationType.newMessage:
-        return const Color(0xFF8B5CF6);
-      case NotificationType.tipReceived:
-        return Colors.green;
+        return AppTheme.primary2;
       case NotificationType.rating:
-        return Colors.amber;
+        return AppTheme.warning;
       case NotificationType.systemNotification:
-        return Colors.grey;
+        return AppTheme.textSecondary;
     }
   }
 }
@@ -392,8 +393,8 @@ class _AutoDismissProgressState extends State<_AutoDismissProgress>
           clipBehavior: Clip.hardEdge,
           child: LinearProgressIndicator(
             value: 1 - _controller.value,
-            backgroundColor: Colors.grey[200],
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B5CF6)),
+            backgroundColor: AppTheme.surfaceContainer,
+            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary2),
           ),
         );
       },

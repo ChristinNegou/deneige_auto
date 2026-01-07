@@ -1,3 +1,4 @@
+import 'package:deneige_auto/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
@@ -38,7 +39,7 @@ class NewReservationView extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
+              backgroundColor: AppTheme.error,
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -121,7 +122,6 @@ class NewReservationView extends StatelessWidget {
     required int currentStep,
     required bool isCompleted,
   }) {
-    final theme = Theme.of(context);
     final isActive = index == currentStep;
 
     final stepIcons = [
@@ -133,9 +133,9 @@ class NewReservationView extends StatelessWidget {
     ];
 
     Color getColor() {
-      if (isCompleted) return theme.primaryColor;
-      if (isActive) return theme.primaryColor;
-      return Colors.grey[300]!;
+      if (isCompleted) return AppTheme.textPrimary;
+      if (isActive) return AppTheme.textPrimary;
+      return AppTheme.border;
     }
 
     return Row(
@@ -145,7 +145,7 @@ class NewReservationView extends StatelessWidget {
           height: 36,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isActive ? theme.primaryColor : Colors.transparent,
+            color: isActive ? AppTheme.textPrimary : Colors.transparent,
             border: Border.all(
               color: getColor(),
               width: 2,
@@ -153,11 +153,11 @@ class NewReservationView extends StatelessWidget {
           ),
           child: Center(
             child: isCompleted
-                ? Icon(Icons.check, size: 18, color: theme.primaryColor)
+                ? Icon(Icons.check, size: 18, color: AppTheme.textPrimary)
                 : Icon(
                     stepIcons[index],
                     size: 18,
-                    color: isActive ? Colors.white : Colors.grey[400],
+                    color: isActive ? AppTheme.background : AppTheme.textTertiary,
                   ),
           ),
         ),
@@ -166,7 +166,7 @@ class NewReservationView extends StatelessWidget {
             child: Container(
               height: 2,
               margin: const EdgeInsets.symmetric(horizontal: 2),
-              color: isCompleted ? theme.primaryColor : Colors.grey[300],
+              color: isCompleted ? AppTheme.textPrimary : AppTheme.border,
             ),
           ),
       ],
@@ -212,14 +212,8 @@ class NewReservationView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
+        color: AppTheme.surface,
+        boxShadow: AppTheme.shadowMD,
       ),
       child: SafeArea(
         child: Row(
@@ -246,20 +240,20 @@ class NewReservationView extends StatelessWidget {
                 onPressed: _getNextButtonOnPressed(context, state),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: AppTheme.background,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: state.isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                              AlwaysStoppedAnimation<Color>(AppTheme.background),
                         ),
                       )
                     : Row(
@@ -331,9 +325,14 @@ class NewReservationView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Annuler la réservation?'),
-        content: const Text(
+        backgroundColor: AppTheme.surfaceElevated,
+        title: Text(
+          'Annuler la réservation?',
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
+        content: Text(
           'Êtes-vous sûr de vouloir quitter? Les informations saisies seront perdues.',
+          style: TextStyle(color: AppTheme.textSecondary),
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -341,7 +340,10 @@ class NewReservationView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Non, continuer'),
+            child: Text(
+              'Non, continuer',
+              style: TextStyle(color: AppTheme.textPrimary),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -349,7 +351,7 @@ class NewReservationView extends StatelessWidget {
               Navigator.of(context).pop();
             },
             style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
+              foregroundColor: AppTheme.error,
             ),
             child: const Text('Oui, annuler'),
           ),
@@ -367,6 +369,7 @@ class NewReservationView extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: AppTheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -380,15 +383,16 @@ class NewReservationView extends StatelessWidget {
               children: [
                 Icon(
                   Icons.payment,
-                  color: Theme.of(context).primaryColor,
+                  color: AppTheme.textPrimary,
                   size: 28,
                 ),
                 const SizedBox(width: 12),
-                const Text(
+                Text(
                   'Méthode de paiement',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
               ],
@@ -401,7 +405,7 @@ class NewReservationView extends StatelessWidget {
               onTap: () async {
                 Navigator.of(sheetContext).pop();
 
-                // ✅ Ouvrir la page de paiement
+                // Ouvrir la page de paiement
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -412,9 +416,8 @@ class NewReservationView extends StatelessWidget {
                   ),
                 );
 
-                // ✅ Si le paiement réussit
+                // Si le paiement réussit
                 if (result != null && result['success'] == true) {
-                  print('✅ Paiement validé, soumission de la réservation...');
                   bloc.add(SubmitReservation(
                     'card',
                     paymentIntentId: result['paymentIntentId'],
@@ -423,13 +426,14 @@ class NewReservationView extends StatelessWidget {
               },
             ),
             const SizedBox(height: 24),
-            Text(
-              'Paiement sécurisé par Stripe',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+            Center(
+              child: Text(
+                'Paiement sécurisé par Stripe',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.textTertiary,
+                ),
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -459,7 +463,8 @@ class _PaymentMethodTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
+          color: AppTheme.surfaceContainer,
+          border: Border.all(color: AppTheme.border),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -467,12 +472,12 @@ class _PaymentMethodTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                color: AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
-                color: Theme.of(context).primaryColor,
+                color: AppTheme.textPrimary,
               ),
             ),
             const SizedBox(width: 16),
@@ -482,9 +487,10 @@ class _PaymentMethodTile extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -492,7 +498,7 @@ class _PaymentMethodTile extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                 ],
@@ -501,7 +507,7 @@ class _PaymentMethodTile extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: Colors.grey[400],
+              color: AppTheme.textTertiary,
             ),
           ],
         ),

@@ -22,8 +22,12 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Ajouter une carte'),
+        title: Text(
+          'Ajouter une carte',
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
         backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.textPrimary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -77,13 +81,13 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.blue.withValues(alpha: 0.05),
+        color: AppTheme.infoLight,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+        border: Border.all(color: AppTheme.info.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.lock_outline, size: 20, color: Colors.blue[700]),
+          Icon(Icons.lock_outline, size: 20, color: AppTheme.info),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -94,13 +98,13 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.blue[900],
+                    color: AppTheme.info,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Vos informations sont protégées par Stripe',
-                  style: TextStyle(fontSize: 11, color: Colors.blue[700]),
+                  style: TextStyle(fontSize: 11, color: AppTheme.info.withValues(alpha: 0.8)),
                 ),
               ],
             ),
@@ -114,7 +118,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Informations de la carte',
           style: TextStyle(
             fontSize: 16,
@@ -126,9 +130,9 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey[200]!),
+            border: Border.all(color: AppTheme.border),
           ),
           child: CardField(
             onCardChanged: (card) {
@@ -136,11 +140,12 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                 _cardComplete = card?.complete ?? false;
               });
             },
-            style: const TextStyle(fontSize: 15),
+            style: TextStyle(fontSize: 15, color: AppTheme.textPrimary),
             enablePostalCode: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
               hintText: 'Numéro de carte',
+              hintStyle: TextStyle(color: AppTheme.textTertiary),
             ),
           ),
         ),
@@ -154,9 +159,9 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey[200]!),
+          border: Border.all(color: AppTheme.border),
         ),
         child: Row(
           children: [
@@ -167,12 +172,12 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                 color: _setAsDefault ? AppTheme.primary : Colors.transparent,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: _setAsDefault ? AppTheme.primary : Colors.grey[300]!,
+                  color: _setAsDefault ? AppTheme.primary : AppTheme.textTertiary,
                   width: 1.5,
                 ),
               ),
               child: _setAsDefault
-                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  ? Icon(Icons.check, size: 14, color: AppTheme.background)
                   : null,
             ),
             const SizedBox(width: 12),
@@ -180,17 +185,18 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Définir comme méthode par défaut',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     'Utilisée pour vos futurs paiements',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                   ),
                 ],
               ),
@@ -204,12 +210,12 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
   Widget _buildSecurityInfo() {
     return Row(
       children: [
-        Icon(Icons.verified_user_outlined, size: 16, color: Colors.green[600]),
+        Icon(Icons.verified_user_outlined, size: 16, color: AppTheme.success),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             'Données cryptées et sécurisées. Numéro de carte jamais stocké.',
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
           ),
         ),
       ],
@@ -225,19 +231,20 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
         onPressed: canSubmit ? _handleAddCard : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primary,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.grey[300],
+          foregroundColor: AppTheme.background,
+          disabledBackgroundColor: AppTheme.surfaceContainer,
+          disabledForegroundColor: AppTheme.textTertiary,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 0,
         ),
         child: _isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 height: 20,
                 width: 20,
                 child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.white),
+                    strokeWidth: 2, color: AppTheme.background),
               )
             : const Text(
                 'Ajouter la carte',
@@ -264,13 +271,13 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: AppTheme.surfaceContainer,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         text,
         style: TextStyle(
-            fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+            fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
       ),
     );
   }
@@ -278,8 +285,11 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
   void _showSnackBar(String message, {required bool isError}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
+        content: Text(
+          message,
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
+        backgroundColor: isError ? AppTheme.error : AppTheme.success,
       ),
     );
   }

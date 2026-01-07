@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../reservation/domain/entities/reservation.dart';
 
 class ServiceCompletedDialog extends StatefulWidget {
@@ -85,9 +86,9 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.92,
       ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -98,7 +99,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: AppTheme.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -119,13 +120,14 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
                       child: Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.green[400]!, Colors.green[600]!],
-                          ),
+                          color: AppTheme.successLight,
                           borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppTheme.success.withValues(alpha: 0.3),
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.green.withOpacity(0.3),
+                              color: AppTheme.success.withValues(alpha: 0.2),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -136,20 +138,20 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: AppTheme.success.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.check_circle,
-                                color: Colors.white,
+                                color: AppTheme.success,
                                 size: 48,
                               ),
                             ),
                             const SizedBox(height: 16),
-                            const Text(
+                            Text(
                               'Service terminé!',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppTheme.success,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -158,7 +160,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
                             Text(
                               'par ${widget.reservation.workerName ?? "votre déneigeur"}',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
+                                color: AppTheme.textSecondary,
                                 fontSize: 16,
                               ),
                             ),
@@ -194,10 +196,19 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
                     TextField(
                       controller: _commentController,
                       maxLines: 3,
+                      style: TextStyle(color: AppTheme.textPrimary),
                       decoration: InputDecoration(
                         hintText: 'Commentaire (optionnel)',
+                        hintStyle: TextStyle(color: AppTheme.textTertiary),
+                        filled: true,
+                        fillColor: AppTheme.surfaceContainer,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppTheme.border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppTheme.border),
                         ),
                         contentPadding: const EdgeInsets.all(16),
                       ),
@@ -229,13 +240,14 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
       children: [
         Row(
           children: [
-            Icon(Icons.photo_camera, color: Colors.grey[600], size: 20),
+            Icon(Icons.photo_camera, color: AppTheme.textSecondary, size: 20),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               'Photo du résultat',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimary,
               ),
             ),
             const Spacer(),
@@ -248,8 +260,12 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
               icon: Icon(
                 _showFullPhoto ? Icons.fullscreen_exit : Icons.fullscreen,
                 size: 18,
+                color: AppTheme.textSecondary,
               ),
-              label: Text(_showFullPhoto ? 'Réduire' : 'Agrandir'),
+              label: Text(
+                _showFullPhoto ? 'Réduire' : 'Agrandir',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
             ),
           ],
         ),
@@ -266,21 +282,23 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
                 imageUrl: widget.reservation.afterPhotoUrl!,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(
-                  color: Colors.grey[200],
-                  child: const Center(
-                    child: CircularProgressIndicator(),
+                  color: AppTheme.surfaceContainer,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                 ),
                 errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[200],
+                  color: AppTheme.surfaceContainer,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error, color: Colors.grey[400], size: 40),
+                      Icon(Icons.error, color: AppTheme.textTertiary, size: 40),
                       const SizedBox(height: 8),
                       Text(
                         'Photo non disponible',
-                        style: TextStyle(color: Colors.grey[500]),
+                        style: TextStyle(color: AppTheme.textTertiary),
                       ),
                     ],
                   ),
@@ -295,7 +313,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
             'Appuyez pour voir en plein écran',
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey[500],
+              color: AppTheme.textTertiary,
             ),
           ),
         ),
@@ -310,13 +328,13 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: AppTheme.background,
           appBar: AppBar(
-            backgroundColor: Colors.black,
-            iconTheme: const IconThemeData(color: Colors.white),
-            title: const Text(
+            backgroundColor: AppTheme.background,
+            iconTheme: IconThemeData(color: AppTheme.textPrimary),
+            title: Text(
               'Photo du résultat',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppTheme.textPrimary),
             ),
           ),
           body: Center(
@@ -324,12 +342,12 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
               child: CachedNetworkImage(
                 imageUrl: widget.reservation.afterPhotoUrl!,
                 fit: BoxFit.contain,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+                placeholder: (context, url) => Center(
+                  child: CircularProgressIndicator(color: AppTheme.textPrimary),
                 ),
-                errorWidget: (context, url, error) => const Icon(
+                errorWidget: (context, url, error) => Icon(
                   Icons.error,
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                   size: 48,
                 ),
               ),
@@ -344,20 +362,23 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: AppTheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Icon(Icons.directions_car, color: Colors.grey[600], size: 20),
+              Icon(Icons.directions_car, color: AppTheme.textSecondary, size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   '${widget.reservation.vehicle.make} ${widget.reservation.vehicle.model}',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.textPrimary,
+                  ),
                 ),
               ),
             ],
@@ -365,27 +386,30 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(Icons.location_on, color: Colors.grey[600], size: 20),
+              Icon(Icons.location_on, color: AppTheme.textSecondary, size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   widget.reservation.parkingSpot.displayName,
-                  style: TextStyle(color: Colors.grey[700]),
+                  style: TextStyle(color: AppTheme.textSecondary),
                 ),
               ),
             ],
           ),
-          const Divider(height: 24),
+          Divider(height: 24, color: AppTheme.border),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Prix du service'),
+              Text(
+                'Prix du service',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
               Text(
                 '${widget.reservation.totalPrice.toStringAsFixed(2)} \$',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF3B82F6),
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
@@ -398,11 +422,12 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
   Widget _buildRatingSection() {
     return Column(
       children: [
-        const Text(
+        Text(
           'Comment était le service?',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
           ),
         ),
         const SizedBox(height: 16),
@@ -423,7 +448,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
                 padding: const EdgeInsets.all(8),
                 child: Icon(
                   isSelected ? Icons.star : Icons.star_border,
-                  color: isSelected ? Colors.amber : Colors.grey[400],
+                  color: isSelected ? AppTheme.warning : AppTheme.textTertiary,
                   size: 44,
                 ),
               ),
@@ -439,7 +464,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
               child: Text(
                 _getRatingText(_rating),
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                   fontSize: 14,
                 ),
               ),
@@ -452,18 +477,19 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
   Widget _buildTipSection() {
     return Column(
       children: [
-        const Text(
+        Text(
           'Ajouter un pourboire?',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           '100% va au déneigeur',
           style: TextStyle(
-            color: Colors.grey[600],
+            color: AppTheme.textSecondary,
             fontSize: 13,
           ),
         ),
@@ -483,11 +509,21 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
               controller: _customTipController,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
+              style: TextStyle(color: AppTheme.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Montant',
+                hintStyle: TextStyle(color: AppTheme.textTertiary),
                 suffixText: '\$',
+                suffixStyle: TextStyle(color: AppTheme.textSecondary),
+                filled: true,
+                fillColor: AppTheme.surfaceContainer,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppTheme.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppTheme.border),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -524,17 +560,17 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3B82F6) : Colors.grey[100],
+          color: isSelected ? AppTheme.textPrimary : AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF3B82F6) : Colors.grey[300]!,
+            color: isSelected ? AppTheme.textPrimary : AppTheme.border,
             width: 2,
           ),
         ),
         child: Text(
           amount == 0 ? 'Non' : '${amount.toInt()}\$',
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[800],
+            color: isSelected ? AppTheme.background : AppTheme.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -557,16 +593,16 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: _showCustomTip ? const Color(0xFF3B82F6) : Colors.grey[100],
+          color: _showCustomTip ? AppTheme.textPrimary : AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _showCustomTip ? const Color(0xFF3B82F6) : Colors.grey[300]!,
+            color: _showCustomTip ? AppTheme.textPrimary : AppTheme.border,
             width: 2,
           ),
         ),
         child: Icon(
           Icons.edit,
-          color: _showCustomTip ? Colors.white : Colors.grey[600],
+          color: _showCustomTip ? AppTheme.background : AppTheme.textSecondary,
           size: 20,
         ),
       ),
@@ -577,22 +613,23 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green[50],
+        color: AppTheme.successLight,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green[200]!),
+        border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              Icon(Icons.favorite, color: Colors.green[600], size: 20),
+              Icon(Icons.favorite, color: AppTheme.success, size: 20),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Pourboire',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
@@ -602,7 +639,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.green[700],
+              color: AppTheme.success,
             ),
           ),
         ],
@@ -631,13 +668,14 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
                   }
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF3B82F6),
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.background,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              disabledBackgroundColor: Colors.grey[300],
+              disabledBackgroundColor: AppTheme.surfaceContainer,
+              disabledForegroundColor: AppTheme.textTertiary,
             ),
             child: Text(
               _selectedTip != null && _selectedTip! > 0
@@ -660,8 +698,11 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
               Navigator.pop(context);
               widget.onViewDetails!();
             },
-            icon: const Icon(Icons.visibility),
-            label: const Text('Voir les détails'),
+            icon: Icon(Icons.visibility, color: AppTheme.textSecondary),
+            label: Text(
+              'Voir les détails',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
 
         // Skip button
@@ -670,7 +711,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
           child: Text(
             'Plus tard',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: AppTheme.textSecondary,
               fontSize: 14,
             ),
           ),

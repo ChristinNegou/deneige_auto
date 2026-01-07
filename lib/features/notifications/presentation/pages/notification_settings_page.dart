@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/notification.dart';
 import '../../services/notification_preferences_service.dart';
 
@@ -33,14 +34,20 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Notifications'),
-        backgroundColor: const Color(0xFF8B5CF6),
-        foregroundColor: Colors.white,
+        title: Text(
+          'Notifications',
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
+        backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.textPrimary,
+        elevation: 0,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(color: AppTheme.primary2),
+            )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -75,15 +82,15 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+        gradient: LinearGradient(
+          colors: [AppTheme.primary2, AppTheme.primary2.withValues(alpha: 0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+            color: AppTheme.primary2.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -94,12 +101,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: AppTheme.textPrimary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.notifications_active,
-              color: Colors.white,
+              color: AppTheme.textPrimary,
               size: 28,
             ),
           ),
@@ -108,10 +115,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Notifications',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -121,7 +128,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       ? 'Les notifications sont activées'
                       : 'Les notifications sont désactivées',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: AppTheme.textPrimary.withValues(alpha: 0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -134,8 +141,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               await _prefsService!.setEnabled(value);
               setState(() {});
             },
-            activeColor: Colors.white,
-            activeTrackColor: Colors.white.withValues(alpha: 0.4),
+            activeColor: AppTheme.textPrimary,
+            activeTrackColor: AppTheme.textPrimary.withValues(alpha: 0.4),
           ),
         ],
       ),
@@ -145,15 +152,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   Widget _buildQuickSettings() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         children: [
@@ -167,7 +168,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               setState(() {});
             },
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: AppTheme.border),
           _buildSettingTile(
             icon: Icons.vibration,
             title: 'Vibration',
@@ -178,7 +179,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               setState(() {});
             },
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: AppTheme.border),
           _buildSettingTile(
             icon: Icons.circle_notifications,
             title: 'Badge',
@@ -189,7 +190,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               setState(() {});
             },
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: AppTheme.border),
           _buildSettingTile(
             icon: Icons.preview,
             title: 'Aperçu',
@@ -213,14 +214,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Row(
             children: [
-              Icon(Icons.nights_stay, color: Colors.grey[700], size: 20),
+              Icon(Icons.nights_stay, color: AppTheme.textSecondary, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Mode silencieux',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
@@ -228,15 +229,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            boxShadow: AppTheme.shadowSM,
           ),
           child: Column(
             children: [
@@ -251,35 +246,40 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 },
               ),
               if (_prefsService!.isQuietHoursEnabled) ...[
-                const Divider(height: 1),
+                Divider(height: 1, color: AppTheme.border),
                 ListTile(
-                  leading: const Icon(Icons.schedule, color: Color(0xFF8B5CF6)),
-                  title: const Text('Heures'),
+                  leading: Icon(Icons.schedule, color: AppTheme.primary2),
+                  title: Text(
+                    'Heures',
+                    style: TextStyle(color: AppTheme.textPrimary),
+                  ),
                   subtitle: Text(
                     'De ${_prefsService!.quietHoursStart} à ${_prefsService!.quietHoursEnd}',
-                    style: const TextStyle(color: Color(0xFF8B5CF6)),
+                    style: TextStyle(color: AppTheme.primary2),
                   ),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: Icon(Icons.chevron_right, color: AppTheme.textTertiary),
                   onTap: () => _showQuietHoursDialog(),
                 ),
                 if (_prefsService!.isCurrentlyQuietHours) ...[
-                  const Divider(height: 1),
+                  Divider(height: 1, color: AppTheme.border),
                   Container(
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.1),
+                      color: AppTheme.warningLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.info, color: Colors.orange, size: 20),
-                        SizedBox(width: 8),
+                        Icon(Icons.info, color: AppTheme.warning, size: 20),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Mode silencieux actuellement actif',
-                            style:
-                                TextStyle(color: Colors.orange, fontSize: 13),
+                            style: TextStyle(
+                              color: AppTheme.warning,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ],
@@ -297,7 +297,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             'Les notifications urgentes seront toujours envoyées',
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey[600],
+              color: AppTheme.textTertiary,
             ),
           ),
         ),
@@ -316,7 +316,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: AppTheme.textPrimary,
             ),
           ),
         ),
@@ -335,15 +335,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -353,14 +347,15 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             children: [
               Icon(
                 _getCategoryIcon(categoryName),
-                color: const Color(0xFF8B5CF6),
+                color: AppTheme.primary2,
               ),
               const SizedBox(width: 12),
               Text(
                 categoryName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
+                  color: AppTheme.textPrimary,
                 ),
               ),
             ],
@@ -374,30 +369,30 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isFullyEnabled
-                      ? Colors.green
-                      : (isPartiallyEnabled ? Colors.orange : Colors.grey),
+                      ? AppTheme.success
+                      : (isPartiallyEnabled ? AppTheme.warning : AppTheme.textTertiary),
                 ),
                 child: Icon(
                   isFullyEnabled
                       ? Icons.check
                       : (isPartiallyEnabled ? Icons.remove : Icons.close),
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                   size: 16,
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.expand_more),
+              Icon(Icons.expand_more, color: AppTheme.textTertiary),
             ],
           ),
           children: [
-            const Divider(height: 1),
+            Divider(height: 1, color: AppTheme.border),
             // Category toggle
             ListTile(
               dense: true,
               title: Text(
                 isFullyEnabled ? 'Tout désactiver' : 'Tout activer',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                   fontSize: 13,
                 ),
               ),
@@ -407,10 +402,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   await _prefsService!.setCategoryEnabled(categoryName, value);
                   setState(() {});
                 },
-                activeColor: const Color(0xFF8B5CF6),
+                activeColor: AppTheme.primary2,
               ),
             ),
-            const Divider(height: 1),
+            Divider(height: 1, color: AppTheme.border),
             // Individual types
             ...types.map((type) => _buildNotificationTypeTile(type)),
           ],
@@ -427,34 +422,34 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       leading: Icon(
         _getNotificationTypeIcon(type),
         size: 20,
-        color: isEnabled ? Colors.grey[700] : Colors.grey[400],
+        color: isEnabled ? AppTheme.textSecondary : AppTheme.textTertiary,
       ),
       title: Text(
         type.displayName,
         style: TextStyle(
           fontSize: 14,
-          color: isEnabled ? Colors.grey[800] : Colors.grey[500],
+          color: isEnabled ? AppTheme.textPrimary : AppTheme.textSecondary,
         ),
       ),
       subtitle: Text(
         type.settingsDescription,
         style: TextStyle(
           fontSize: 12,
-          color: Colors.grey[500],
+          color: AppTheme.textTertiary,
         ),
       ),
       trailing: type.isCritical
           ? Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
+                color: AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Text(
+              child: Text(
                 'Critique',
                 style: TextStyle(
                   fontSize: 10,
-                  color: Colors.red,
+                  color: AppTheme.error,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -465,7 +460,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 await _prefsService!.setTypeEnabled(type, value);
                 setState(() {});
               },
-              activeColor: const Color(0xFF8B5CF6),
+              activeColor: AppTheme.primary2,
             ),
     );
   }
@@ -478,16 +473,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     required ValueChanged<bool> onChanged,
   }) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF8B5CF6)),
-      title: Text(title),
+      leading: Icon(icon, color: AppTheme.primary2),
+      title: Text(
+        title,
+        style: TextStyle(color: AppTheme.textPrimary),
+      ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
       ),
       trailing: Switch(
         value: value,
         onChanged: _prefsService!.isEnabled ? onChanged : null,
-        activeColor: const Color(0xFF8B5CF6),
+        activeColor: AppTheme.primary2,
       ),
     );
   }
@@ -496,10 +494,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     return Center(
       child: TextButton.icon(
         onPressed: () => _showResetConfirmation(),
-        icon: const Icon(Icons.restore, size: 20),
-        label: const Text('Réinitialiser les paramètres'),
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.grey[600],
+        icon: Icon(Icons.restore, size: 20, color: AppTheme.textSecondary),
+        label: Text(
+          'Réinitialiser les paramètres',
+          style: TextStyle(color: AppTheme.textSecondary),
         ),
       ),
     );
@@ -509,14 +507,24 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Heures du mode silencieux'),
+        backgroundColor: AppTheme.surface,
+        title: Text(
+          'Heures du mode silencieux',
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: const Text('Début'),
-              subtitle: Text(_prefsService!.quietHoursStart),
-              trailing: const Icon(Icons.access_time),
+              title: Text(
+                'Début',
+                style: TextStyle(color: AppTheme.textPrimary),
+              ),
+              subtitle: Text(
+                _prefsService!.quietHoursStart,
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+              trailing: Icon(Icons.access_time, color: AppTheme.primary2),
               onTap: () async {
                 final time = await showTimePicker(
                   context: context,
@@ -531,9 +539,15 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               },
             ),
             ListTile(
-              title: const Text('Fin'),
-              subtitle: Text(_prefsService!.quietHoursEnd),
-              trailing: const Icon(Icons.access_time),
+              title: Text(
+                'Fin',
+                style: TextStyle(color: AppTheme.textPrimary),
+              ),
+              subtitle: Text(
+                _prefsService!.quietHoursEnd,
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+              trailing: Icon(Icons.access_time, color: AppTheme.primary2),
               onTap: () async {
                 final time = await showTimePicker(
                   context: context,
@@ -552,7 +566,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
+            child: Text(
+              'Fermer',
+              style: TextStyle(color: AppTheme.primary2),
+            ),
           ),
         ],
       ),
@@ -563,14 +580,22 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Réinitialiser?'),
-        content: const Text(
+        backgroundColor: AppTheme.surface,
+        title: Text(
+          'Réinitialiser?',
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
+        content: Text(
           'Tous les paramètres de notification seront remis à leurs valeurs par défaut.',
+          style: TextStyle(color: AppTheme.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child: Text(
+              'Annuler',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -579,15 +604,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               if (mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Paramètres réinitialisés'),
-                    backgroundColor: Colors.green,
+                  SnackBar(
+                    content: Text(
+                      'Paramètres réinitialisés',
+                      style: TextStyle(color: AppTheme.textPrimary),
+                    ),
+                    backgroundColor: AppTheme.success,
                   ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8B5CF6),
+              backgroundColor: AppTheme.primary2,
+              foregroundColor: AppTheme.textPrimary,
             ),
             child: const Text('Réinitialiser'),
           ),

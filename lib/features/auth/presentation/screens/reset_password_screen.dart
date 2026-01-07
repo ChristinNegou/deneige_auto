@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../bloc/auth_bloc.dart';
@@ -47,22 +48,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
-          ),
-        ),
+        color: AppTheme.background,
         child: SafeArea(
           child: BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is ResetPasswordSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Mot de passe réinitialisé avec succès !'),
-                    backgroundColor: Colors.green,
+                  SnackBar(
+                    content: const Text('Mot de passe réinitialisé avec succès !'),
+                    backgroundColor: AppTheme.success,
                   ),
                 );
                 // Rediriger vers la page de connexion après 2 secondes
@@ -78,7 +74,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.message),
-                    backgroundColor: Colors.red,
+                    backgroundColor: AppTheme.error,
                   ),
                 );
               }
@@ -100,7 +96,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       Icon(
                         isSuccess ? Icons.check_circle : Icons.lock_reset,
                         size: 80,
-                        color: isSuccess ? Colors.green : Colors.white,
+                        color: isSuccess ? AppTheme.success : AppTheme.textPrimary,
                       ),
                       const SizedBox(height: 16),
 
@@ -108,10 +104,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       Text(
                         isSuccess ? 'Succès !' : 'Nouveau mot de passe',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -122,147 +118,139 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             ? 'Votre mot de passe a été réinitialisé avec succès. Vous allez être redirigé vers la page de connexion.'
                             : 'Entrez votre nouveau mot de passe',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white70,
+                          color: AppTheme.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 40),
 
                       // Formulaire
                       if (!isSuccess) ...[
-                        Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Column(
-                              children: [
-                                // Champ mot de passe
-                                AppTextField(
-                                  controller: _passwordController,
-                                  label: 'Nouveau mot de passe',
-                                  hint: '••••••••',
-                                  prefixIcon: Icons.lock,
-                                  obscureText: _obscurePassword,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _obscurePassword = !_obscurePassword;
-                                      });
-                                    },
+                        Container(
+                          decoration: AppTheme.cardElevated,
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            children: [
+                              // Champ mot de passe
+                              AppTextField(
+                                controller: _passwordController,
+                                label: 'Nouveau mot de passe',
+                                hint: '••••••••',
+                                prefixIcon: Icons.lock,
+                                obscureText: _obscurePassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: AppTheme.textTertiary,
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Veuillez entrer un mot de passe';
-                                    }
-                                    if (value.length < 6) {
-                                      return 'Le mot de passe doit contenir au moins 6 caractères';
-                                    }
-                                    return null;
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
                                   },
                                 ),
-                                const SizedBox(height: 16),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Veuillez entrer un mot de passe';
+                                  }
+                                  if (value.length < 6) {
+                                    return 'Le mot de passe doit contenir au moins 6 caractères';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
 
-                                // Champ confirmation mot de passe
-                                AppTextField(
-                                  controller: _confirmPasswordController,
-                                  label: 'Confirmer le mot de passe',
-                                  hint: '••••••••',
-                                  prefixIcon: Icons.lock_outline,
-                                  obscureText: _obscureConfirmPassword,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscureConfirmPassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _obscureConfirmPassword =
-                                            !_obscureConfirmPassword;
-                                      });
-                                    },
+                              // Champ confirmation mot de passe
+                              AppTextField(
+                                controller: _confirmPasswordController,
+                                label: 'Confirmer le mot de passe',
+                                hint: '••••••••',
+                                prefixIcon: Icons.lock_outline,
+                                obscureText: _obscureConfirmPassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirmPassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: AppTheme.textTertiary,
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Veuillez confirmer le mot de passe';
-                                    }
-                                    if (value != _passwordController.text) {
-                                      return 'Les mots de passe ne correspondent pas';
-                                    }
-                                    return null;
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureConfirmPassword =
+                                          !_obscureConfirmPassword;
+                                    });
                                   },
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Veuillez confirmer le mot de passe';
+                                  }
+                                  if (value != _passwordController.text) {
+                                    return 'Les mots de passe ne correspondent pas';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 24),
+
+                              // Indicateur de force du mot de passe
+                              if (_passwordController.text.isNotEmpty) ...[
+                                _buildPasswordStrengthIndicator(),
                                 const SizedBox(height: 24),
-
-                                // Indicateur de force du mot de passe
-                                if (_passwordController.text.isNotEmpty) ...[
-                                  _buildPasswordStrengthIndicator(),
-                                  const SizedBox(height: 24),
-                                ],
-
-                                // Bouton de réinitialisation
-                                AppButton(
-                                  text: 'Réinitialiser le mot de passe',
-                                  onPressed:
-                                      isLoading ? null : _handleResetPassword,
-                                  isLoading: isLoading,
-                                ),
                               ],
-                            ),
+
+                              // Bouton de réinitialisation
+                              AppButton(
+                                text: 'Réinitialiser le mot de passe',
+                                onPressed:
+                                    isLoading ? null : _handleResetPassword,
+                                isLoading: isLoading,
+                              ),
+                            ],
                           ),
                         ),
                       ] else ...[
                         // Message de succès
-                        Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Column(
-                              children: [
-                                const Icon(
-                                  Icons.check_circle,
-                                  size: 64,
-                                  color: Colors.green,
+                        Container(
+                          decoration: AppTheme.cardElevated,
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                size: 64,
+                                color: AppTheme.success,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Mot de passe réinitialisé !',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.textPrimary,
                                 ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Mot de passe réinitialisé !',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                const SizedBox(height: 24),
-                                AppButton(
-                                  text: 'Aller à la connexion',
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pushNamedAndRemoveUntil(
-                                      AppRoutes.login,
-                                      (route) => false,
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: AppTheme.textSecondary),
+                              ),
+                              const SizedBox(height: 24),
+                              AppButton(
+                                text: 'Aller à la connexion',
+                                onPressed: () {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                    AppRoutes.login,
+                                    (route) => false,
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -274,9 +262,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'Vous vous souvenez de votre mot de passe ? ',
-                              style: TextStyle(color: Colors.white70),
+                              style: TextStyle(color: AppTheme.textSecondary),
                             ),
                             TextButton(
                               onPressed: () {
@@ -285,10 +273,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   (route) => false,
                                 );
                               },
-                              child: const Text(
+                              child: Text(
                                 'Se connecter',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -310,7 +298,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final password = _passwordController.text;
     int strength = 0;
     String strengthText = '';
-    Color strengthColor = Colors.red;
+    Color strengthColor = AppTheme.error;
 
     if (password.length >= 6) strength++;
     if (password.length >= 8) strength++;
@@ -322,17 +310,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       case 0:
       case 1:
         strengthText = 'Faible';
-        strengthColor = Colors.red;
+        strengthColor = AppTheme.error;
         break;
       case 2:
       case 3:
         strengthText = 'Moyen';
-        strengthColor = Colors.orange;
+        strengthColor = AppTheme.warning;
         break;
       case 4:
       case 5:
         strengthText = 'Fort';
-        strengthColor = Colors.green;
+        strengthColor = AppTheme.success;
         break;
     }
 
@@ -344,7 +332,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             Expanded(
               child: LinearProgressIndicator(
                 value: strength / 5,
-                backgroundColor: Colors.grey[300],
+                backgroundColor: AppTheme.surfaceContainer,
                 valueColor: AlwaysStoppedAnimation<Color>(strengthColor),
                 minHeight: 8,
               ),
@@ -364,7 +352,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           'Le mot de passe doit contenir au moins 6 caractères',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: AppTheme.textTertiary,
           ),
         ),
       ],

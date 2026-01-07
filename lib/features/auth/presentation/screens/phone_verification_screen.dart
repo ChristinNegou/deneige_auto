@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -176,9 +177,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
             });
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Code de vérification envoyé'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Code de vérification envoyé'),
+              backgroundColor: AppTheme.success,
             ),
           );
         } else if (state is PhoneVerificationSuccess) {
@@ -201,11 +202,14 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: AppTheme.background,
         appBar: AppBar(
-          title: const Text('Vérification'),
-          backgroundColor: const Color(0xFF8B5CF6),
-          foregroundColor: Colors.white,
+          title: Text(
+            'Vérification',
+            style: TextStyle(color: AppTheme.textPrimary),
+          ),
+          backgroundColor: AppTheme.surface,
+          foregroundColor: AppTheme.textPrimary,
           elevation: 0,
         ),
         body: SafeArea(
@@ -221,24 +225,25 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+                    color: AppTheme.primary2.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.phone_android,
                     size: 50,
-                    color: Color(0xFF8B5CF6),
+                    color: AppTheme.primary2,
                   ),
                 ),
 
                 const SizedBox(height: 32),
 
                 // Titre
-                const Text(
+                Text(
                   'Vérification du téléphone',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -250,7 +255,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   'Entrez le code à 6 chiffres envoyé au',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -260,10 +265,10 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                 // Numéro de téléphone
                 Text(
                   widget.phoneNumber,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF8B5CF6),
+                    color: AppTheme.primary2,
                   ),
                 ),
 
@@ -274,20 +279,20 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.amber.withValues(alpha: 0.2),
+                      color: AppTheme.warningLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.amber),
+                      border: Border.all(color: AppTheme.warning.withValues(alpha: 0.5)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.bug_report, color: Colors.amber),
+                        Icon(Icons.bug_report, color: AppTheme.warning),
                         const SizedBox(width: 12),
                         Text(
                           'Mode dev - Code: $_devCode',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.amber,
+                            color: AppTheme.warning,
                           ),
                         ),
                       ],
@@ -312,28 +317,33 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           maxLength: 1,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
+                            color: AppTheme.textPrimary,
                           ),
                           decoration: InputDecoration(
                             counterText: '',
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: AppTheme.surfaceContainer,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
+                              borderSide: BorderSide(color: AppTheme.border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: AppTheme.border),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: Color(0xFF8B5CF6),
+                              borderSide: BorderSide(
+                                color: AppTheme.primary2,
                                 width: 2,
                               ),
                             ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.red),
+                              borderSide: BorderSide(color: AppTheme.error),
                             ),
                           ),
                           inputFormatters: [
@@ -353,17 +363,18 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
+                      color: AppTheme.errorLight,
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline, color: Colors.red),
+                        Icon(Icons.error_outline, color: AppTheme.error),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _errorMessage!,
-                            style: const TextStyle(color: Colors.red),
+                            style: TextStyle(color: AppTheme.error),
                           ),
                         ),
                       ],
@@ -379,18 +390,20 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   child: ElevatedButton(
                     onPressed: _isVerifying ? null : _verifyCode,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B5CF6),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: AppTheme.background,
+                      disabledBackgroundColor: AppTheme.surfaceContainer,
+                      disabledForegroundColor: AppTheme.textTertiary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: _isVerifying
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
-                              color: Colors.white,
+                              color: AppTheme.background,
                               strokeWidth: 2,
                             ),
                           )
@@ -412,15 +425,15 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   children: [
                     Text(
                       'Vous n\'avez pas reçu le code? ',
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(color: AppTheme.textSecondary),
                     ),
                     if (_canResend)
                       TextButton(
                         onPressed: _resendCode,
-                        child: const Text(
+                        child: Text(
                           'Renvoyer',
                           style: TextStyle(
-                            color: Color(0xFF8B5CF6),
+                            color: AppTheme.primary2,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -429,7 +442,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       Text(
                         'Renvoyer dans ${_resendCountdown}s',
                         style: TextStyle(
-                          color: Colors.grey[500],
+                          color: AppTheme.textTertiary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -441,10 +454,10 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                 // Modifier le numéro
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.edit, size: 18),
-                  label: const Text('Modifier le numéro'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.grey[600],
+                  icon: Icon(Icons.edit, size: 18, color: AppTheme.textSecondary),
+                  label: Text(
+                    'Modifier le numéro',
+                    style: TextStyle(color: AppTheme.textSecondary),
                   ),
                 ),
               ],

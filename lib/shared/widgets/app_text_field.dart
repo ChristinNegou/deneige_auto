@@ -1,5 +1,6 @@
 // ============= app_text_field.dart =============
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
 
 class AppTextField extends StatelessWidget {
   final String label;
@@ -36,10 +37,10 @@ class AppTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: AppTheme.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -52,31 +53,40 @@ class AppTextField extends StatelessWidget {
           enabled: enabled,
           onTap: onTap,
           readOnly: onTap != null,
+          style: TextStyle(color: AppTheme.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+            hintStyle: TextStyle(color: AppTheme.textTertiary),
+            prefixIcon: prefixIcon != null
+                ? Icon(prefixIcon, color: AppTheme.textTertiary)
+                : null,
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: enabled ? Colors.grey[100] : Colors.grey[200],
+            fillColor: enabled ? AppTheme.surfaceContainer : AppTheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(color: AppTheme.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(color: AppTheme.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Theme.of(context).primaryColor,
-                width: 2,
+                color: AppTheme.textSecondary,
+                width: 1.5,
               ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.red, width: 2),
+              borderSide: BorderSide(color: AppTheme.error, width: 1.5),
             ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppTheme.error, width: 1.5),
+            ),
+            errorStyle: TextStyle(color: AppTheme.error),
           ),
         ),
       ],
