@@ -63,8 +63,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
-                  children: const [
-                    Icon(Icons.check_circle, color: Colors.white, size: 20),
+                  children: [
+                    Icon(Icons.check_circle, color: AppTheme.background, size: 20),
                     SizedBox(width: 12),
                     Text('Parametres sauvegardes'),
                   ],
@@ -81,8 +81,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               SnackBar(
                 content: Row(
                   children: [
-                    const Icon(Icons.error_outline,
-                        color: Colors.white, size: 20),
+                    Icon(Icons.error_outline,
+                        color: AppTheme.background, size: 20),
                     const SizedBox(width: 12),
                     Expanded(child: Text(state.message)),
                   ],
@@ -162,9 +162,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.person_rounded,
-              color: Colors.white,
+              color: AppTheme.background,
               size: 24,
             ),
           ),
@@ -238,16 +238,16 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 width: 70,
                 height: 70,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: AppTheme.background.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
                 child: Center(
                   child: Text(
                     userName.isNotEmpty ? userName[0].toUpperCase() : 'D',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppTheme.background,
                     ),
                   ),
                 ),
@@ -259,8 +259,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   children: [
                     Text(
                       userName,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppTheme.background,
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
@@ -272,14 +272,14 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                           Icon(
                             Icons.email_outlined,
                             size: 14,
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: AppTheme.background.withValues(alpha: 0.8),
                           ),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
                               userEmail,
                               style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
+                                color: AppTheme.background.withValues(alpha: 0.9),
                                 fontSize: 13,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -294,13 +294,13 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                           Icon(
                             Icons.phone_outlined,
                             size: 14,
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: AppTheme.background.withValues(alpha: 0.8),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             userPhone,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
+                              color: AppTheme.background.withValues(alpha: 0.9),
                               fontSize: 13,
                             ),
                           ),
@@ -417,7 +417,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                         : Border.all(color: AppTheme.border, width: 2),
                   ),
                   child: value
-                      ? const Icon(Icons.check, color: Colors.white, size: 16)
+                      ? Icon(Icons.check, color: AppTheme.background, size: 16)
                       : null,
                 ),
               ],
@@ -510,13 +510,13 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               height: 22,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected ? AppTheme.primary : Colors.transparent,
+                color: isSelected ? AppTheme.primary : AppTheme.background,
                 border: isSelected
                     ? null
                     : Border.all(color: AppTheme.textTertiary, width: 2),
               ),
               child: isSelected
-                  ? const Icon(Icons.check, color: Colors.white, size: 14)
+                  ? Icon(Icons.check, color: AppTheme.background, size: 14)
                   : null,
             ),
           ],
@@ -876,11 +876,11 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   height: 22,
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.textPrimary,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: AppTheme.shadowColor.withValues(alpha: 0.1),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -918,13 +918,13 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.save_rounded, color: Colors.white, size: 22),
+          children: [
+            Icon(Icons.save_rounded, color: AppTheme.background, size: 22),
             SizedBox(width: 10),
             Text(
               'Sauvegarder',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.background,
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
               ),
@@ -1156,7 +1156,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppTheme.background,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),

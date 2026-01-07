@@ -84,12 +84,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: AppTheme.background.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     hasUrgent ? Icons.bolt : Icons.work_rounded,
-                    color: Colors.white,
+                    color: AppTheme.background,
                     size: 20,
                   ),
                 ),
@@ -113,7 +113,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                           newJobs.first.displayAddress,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: AppTheme.background.withValues(alpha: 0.9),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

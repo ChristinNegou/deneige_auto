@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/worker_job.dart';
 
 class JobCard extends StatelessWidget {
@@ -28,10 +29,11 @@ class JobCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 2,
+      color: AppTheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: job.isPriority
-            ? const BorderSide(color: Colors.orange, width: 2)
+            ? BorderSide(color: AppTheme.warning, width: 2)
             : BorderSide.none,
       ),
       child: InkWell(
@@ -55,22 +57,22 @@ class JobCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.orange,
+                            color: AppTheme.warning,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.bolt,
-                                color: Colors.white,
+                                color: AppTheme.background,
                                 size: 14,
                               ),
                               SizedBox(width: 4),
                               Text(
                                 'URGENT',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppTheme.background,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -87,7 +89,7 @@ class JobCard extends StatelessWidget {
                     '${job.totalPrice.toStringAsFixed(2)} \$',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.green[700],
+                      color: AppTheme.success,
                     ),
                   ),
                 ],
@@ -98,13 +100,14 @@ class JobCard extends StatelessWidget {
               // Address
               Row(
                 children: [
-                  Icon(Icons.location_on, color: Colors.grey[600], size: 20),
+                  Icon(Icons.location_on, color: AppTheme.textSecondary, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       job.displayAddress,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w500,
+                        color: AppTheme.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -119,22 +122,22 @@ class JobCard extends StatelessWidget {
               Row(
                 children: [
                   if (job.distanceKm != null) ...[
-                    Icon(Icons.near_me, color: Colors.grey[600], size: 18),
+                    Icon(Icons.near_me, color: AppTheme.textSecondary, size: 18),
                     const SizedBox(width: 4),
                     Text(
                       '${job.distanceKm!.toStringAsFixed(1)} km',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
+                        color: AppTheme.textSecondary,
                       ),
                     ),
                     const SizedBox(width: 16),
                   ],
-                  Icon(Icons.schedule, color: Colors.grey[600], size: 18),
+                  Icon(Icons.schedule, color: AppTheme.textSecondary, size: 18),
                   const SizedBox(width: 4),
                   Text(
                     '${dateFormatter.format(job.departureTime)} à ${timeFormatter.format(job.departureTime)}',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                 ],
@@ -145,11 +148,11 @@ class JobCard extends StatelessWidget {
               // Vehicle info
               Row(
                 children: [
-                  Icon(Icons.directions_car, color: Colors.grey[600], size: 18),
+                  Icon(Icons.directions_car, color: AppTheme.textSecondary, size: 18),
                   const SizedBox(width: 8),
                   Text(
                     job.vehicle.displayName,
-                    style: theme.textTheme.bodyMedium,
+                    style: theme.textTheme.bodyMedium?.copyWith(color: AppTheme.textPrimary),
                   ),
                   if (job.vehicle.color != null) ...[
                     const SizedBox(width: 8),
@@ -159,12 +162,12 @@ class JobCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        color: AppTheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         job.vehicle.color!,
-                        style: theme.textTheme.bodySmall,
+                        style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
                       ),
                     ),
                   ],
@@ -199,17 +202,17 @@ class JobCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: isLoading ? null : onAccept,
                     icon: isLoading
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.background),
                           )
-                        : const Icon(Icons.check_circle),
+                        : Icon(Icons.check_circle, color: AppTheme.background),
                     label:
                         Text(isLoading ? 'Acceptation...' : 'Accepter ce job'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.success,
+                      foregroundColor: AppTheme.background,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -232,32 +235,32 @@ class JobCard extends StatelessWidget {
 
     switch (status) {
       case JobStatus.pending:
-        color = Colors.blue;
+        color = AppTheme.info;
         label = 'Disponible';
         icon = Icons.pending;
         break;
       case JobStatus.assigned:
-        color = Colors.orange;
+        color = AppTheme.warning;
         label = 'Assigné';
         icon = Icons.assignment_ind;
         break;
       case JobStatus.enRoute:
-        color = Colors.amber;
+        color = AppTheme.statusEnRoute;
         label = 'En route';
         icon = Icons.directions_car;
         break;
       case JobStatus.inProgress:
-        color = Colors.purple;
+        color = AppTheme.primary2;
         label = 'En cours';
         icon = Icons.engineering;
         break;
       case JobStatus.completed:
-        color = Colors.green;
+        color = AppTheme.success;
         label = 'Terminé';
         icon = Icons.check_circle;
         break;
       case JobStatus.cancelled:
-        color = Colors.red;
+        color = AppTheme.error;
         label = 'Annulé';
         icon = Icons.cancel;
         break;
@@ -266,9 +269,9 @@ class JobCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

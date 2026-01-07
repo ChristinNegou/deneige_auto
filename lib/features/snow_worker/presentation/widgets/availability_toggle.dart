@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class AvailabilityToggle extends StatelessWidget {
   final bool isAvailable;
@@ -20,15 +21,15 @@ class AvailabilityToggle extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isAvailable
-              ? [Colors.green[400]!, Colors.green[600]!]
-              : [Colors.grey[400]!, Colors.grey[600]!],
+              ? [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)]
+              : [AppTheme.textTertiary, AppTheme.textTertiary.withValues(alpha: 0.7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: (isAvailable ? Colors.green : Colors.grey).withOpacity(0.3),
+            color: (isAvailable ? AppTheme.success : AppTheme.textTertiary).withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -39,12 +40,12 @@ class AvailabilityToggle extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: AppTheme.background.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               isAvailable ? Icons.wifi_tethering : Icons.wifi_off,
-              color: Colors.white,
+              color: AppTheme.background,
               size: 28,
             ),
           ),
@@ -55,8 +56,8 @@ class AvailabilityToggle extends StatelessWidget {
               children: [
                 Text(
                   isAvailable ? 'Vous êtes en ligne' : 'Vous êtes hors ligne',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppTheme.background,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -67,7 +68,7 @@ class AvailabilityToggle extends StatelessWidget {
                       ? 'Vous recevez les demandes de déneigement'
                       : 'Activez pour recevoir des demandes',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: AppTheme.background.withValues(alpha: 0.8),
                     fontSize: 13,
                   ),
                 ),
@@ -75,12 +76,12 @@ class AvailabilityToggle extends StatelessWidget {
             ),
           ),
           if (isLoading)
-            const SizedBox(
+            SizedBox(
               width: 24,
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor: AlwaysStoppedAnimation<Color>(AppTheme.background),
               ),
             )
           else
@@ -89,10 +90,10 @@ class AvailabilityToggle extends StatelessWidget {
               child: Switch(
                 value: isAvailable,
                 onChanged: (_) => onToggle(),
-                activeColor: Colors.white,
-                activeTrackColor: Colors.white.withOpacity(0.5),
-                inactiveThumbColor: Colors.white,
-                inactiveTrackColor: Colors.white.withOpacity(0.3),
+                activeColor: AppTheme.background,
+                activeTrackColor: AppTheme.background.withValues(alpha: 0.5),
+                inactiveThumbColor: AppTheme.background,
+                inactiveTrackColor: AppTheme.background.withValues(alpha: 0.3),
               ),
             ),
         ],

@@ -505,13 +505,13 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
+                  children: [
+                    Icon(Icons.refresh_rounded, color: AppTheme.background, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Reessayer',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppTheme.background,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

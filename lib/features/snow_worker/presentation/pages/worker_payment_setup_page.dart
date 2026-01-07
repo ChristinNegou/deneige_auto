@@ -93,7 +93,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+        SnackBar(content: Text('Erreur: $e'), backgroundColor: AppTheme.error),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -143,18 +143,18 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.red.withValues(alpha: 0.1),
+        color: AppTheme.errorLight,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+        border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+          Icon(Icons.error_outline, color: AppTheme.error, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               _errorMessage!,
-              style: const TextStyle(fontSize: 13, color: Colors.red),
+              style: TextStyle(fontSize: 13, color: AppTheme.error),
             ),
           ),
         ],
@@ -170,7 +170,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isConfigured
-              ? [Colors.green[600]!, Colors.green[400]!]
+              ? [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)]
               : [AppTheme.primary, AppTheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -186,14 +186,14 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: AppTheme.background.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   isConfigured
                       ? Icons.account_balance
                       : Icons.account_balance_wallet,
-                  color: Colors.white,
+                  color: AppTheme.background,
                   size: 24,
                 ),
               ),
@@ -206,8 +206,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                       isConfigured
                           ? 'Compte configure'
                           : 'Configurez vos paiements',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppTheme.background,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
@@ -218,7 +218,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                           ? 'Pret a recevoir des paiements'
                           : 'Recevez vos gains directement',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: AppTheme.background.withValues(alpha: 0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -240,8 +240,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
               child: OutlinedButton(
                 onPressed: _openDashboard,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.white),
+                  foregroundColor: AppTheme.background,
+                  side: BorderSide(color: AppTheme.background),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -259,7 +259,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
               child: ElevatedButton(
                 onPressed: _createOrContinueSetup,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppTheme.background,
                   foregroundColor: AppTheme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -290,20 +290,20 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
           height: 20,
           decoration: BoxDecoration(
             color:
-                isActive ? Colors.white : Colors.white.withValues(alpha: 0.3),
+                isActive ? AppTheme.background : AppTheme.background.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: Icon(
             isActive ? Icons.check : Icons.close,
             size: 14,
-            color: isActive ? Colors.green : Colors.white,
+            color: isActive ? AppTheme.success : AppTheme.background,
           ),
         ),
         const SizedBox(width: 10),
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.9),
+            color: AppTheme.background.withValues(alpha: 0.9),
             fontSize: 14,
           ),
         ),
@@ -318,9 +318,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,11 +328,11 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
           Row(
             children: [
               Icon(Icons.account_balance_wallet,
-                  color: Colors.green[600], size: 20),
+                  color: AppTheme.success, size: 20),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 'Solde',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
               ),
             ],
           ),
@@ -345,7 +345,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                   children: [
                     Text(
                       'Disponible',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -353,7 +353,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        color: Colors.green[600],
+                        color: AppTheme.success,
                       ),
                     ),
                   ],
@@ -362,7 +362,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
               Container(
                 height: 40,
                 width: 1,
-                color: Colors.grey[200],
+                color: AppTheme.border,
               ),
               Expanded(
                 child: Padding(
@@ -372,7 +372,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                     children: [
                       Text(
                         'En attente',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -380,7 +380,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: Colors.orange[600],
+                          color: AppTheme.warning,
                         ),
                       ),
                     ],
@@ -392,7 +392,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
           const SizedBox(height: 12),
           Text(
             'Les fonds sont deposes sur votre compte bancaire sous 2-3 jours ouvrables.',
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+            style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
           ),
         ],
       ),
@@ -407,9 +407,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,9 +418,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
             children: [
               Icon(Icons.pie_chart_outline, color: AppTheme.primary, size: 20),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 'Repartition des paiements',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
               ),
             ],
           ),
@@ -428,31 +428,31 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
           _buildCommissionRow(
             'Vous recevez',
             '$workerPercent%',
-            Colors.green[600]!,
+            AppTheme.success,
             workerPercent / 100,
           ),
           const SizedBox(height: 12),
           _buildCommissionRow(
             'Commission plateforme',
             '$platformPercent%',
-            Colors.grey[400]!,
+            AppTheme.textTertiary,
             platformPercent / 100,
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.05),
+              color: AppTheme.infoLight,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.blue[700], size: 18),
+                Icon(Icons.info_outline, color: AppTheme.info, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Exemple: Pour un job a 50\$, vous recevez ${(50 * workerPercent / 100).toStringAsFixed(2)}\$',
-                    style: TextStyle(fontSize: 13, color: Colors.blue[700]),
+                    style: TextStyle(fontSize: 13, color: AppTheme.info),
                   ),
                 ),
               ],
@@ -471,7 +471,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontSize: 14)),
+            Text(label, style: TextStyle(fontSize: 14, color: AppTheme.textPrimary)),
             Text(
               percent,
               style: TextStyle(
@@ -484,7 +484,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: AppTheme.surfaceContainer,
             valueColor: AlwaysStoppedAnimation(color),
             minHeight: 8,
           ),
@@ -497,16 +497,16 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Comment ca fonctionne',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
           ),
           const SizedBox(height: 16),
           _buildStep(1, 'Le client paie', 'Le paiement est traite par Stripe'),
@@ -548,12 +548,12 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w500, color: AppTheme.textPrimary),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                 ),
               ],
             ),
@@ -567,14 +567,14 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.green.withValues(alpha: 0.05),
+        color: AppTheme.successLight,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+        border: Border.all(color: AppTheme.success.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
           Icon(Icons.verified_user_outlined,
-              color: Colors.green[700], size: 20),
+              color: AppTheme.success, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -585,13 +585,13 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.green[900],
+                    color: AppTheme.success,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Propulse par Stripe, leader mondial des paiements',
-                  style: TextStyle(fontSize: 11, color: Colors.green[700]),
+                  style: TextStyle(fontSize: 11, color: AppTheme.success.withValues(alpha: 0.8)),
                 ),
               ],
             ),

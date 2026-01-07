@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class StatsCard extends StatelessWidget {
   final String title;
@@ -21,11 +22,11 @@ class StatsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppTheme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -39,7 +40,7 @@ class StatsCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -49,7 +50,7 @@ class StatsCard extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -65,7 +66,7 @@ class StatsCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: AppTheme.textPrimary,
             ),
           ),
           if (subtitle != null) ...[
@@ -74,7 +75,7 @@ class StatsCard extends StatelessWidget {
               subtitle!,
               style: TextStyle(
                 fontSize: 11,
-                color: Colors.grey[500],
+                color: AppTheme.textTertiary,
               ),
             ),
           ],
@@ -109,7 +110,7 @@ class StatsRow extends StatelessWidget {
               title: 'Terminés',
               value: completed.toString(),
               icon: Icons.check_circle,
-              color: Colors.green,
+              color: AppTheme.success,
               subtitle: "aujourd'hui",
             ),
           ),
@@ -119,7 +120,7 @@ class StatsRow extends StatelessWidget {
               title: 'En cours',
               value: inProgress.toString(),
               icon: Icons.engineering,
-              color: Colors.orange,
+              color: AppTheme.warning,
             ),
           ),
           const SizedBox(width: 12),
@@ -128,7 +129,7 @@ class StatsRow extends StatelessWidget {
               title: 'Revenus',
               value: '${earnings.toStringAsFixed(0)}\$',
               icon: Icons.attach_money,
-              color: Colors.blue,
+              color: AppTheme.info,
               subtitle: "aujourd'hui",
             ),
           ),
@@ -138,7 +139,7 @@ class StatsRow extends StatelessWidget {
               title: 'Note',
               value: rating > 0 ? rating.toStringAsFixed(1) : '-',
               icon: Icons.star,
-              color: Colors.amber,
+              color: AppTheme.statusEnRoute,
             ),
           ),
         ],
