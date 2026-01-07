@@ -135,10 +135,10 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-          child: const Icon(
+          child: Icon(
             Icons.ac_unit_rounded,
             size: 45,
-            color: Colors.white,
+            color: AppTheme.background,
           ),
         ),
         const SizedBox(height: 24),
@@ -345,18 +345,18 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: Center(
           child: isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
-                    color: Colors.white,
+                    color: AppTheme.background,
                     strokeWidth: 2.5,
                   ),
                 )
-              : const Text(
+              : Text(
                   'Se connecter',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.background,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),

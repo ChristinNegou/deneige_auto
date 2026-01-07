@@ -1,5 +1,6 @@
 // ============= app_button.dart =============
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
 
 enum AppButtonType { primary, secondary, outlined, text }
 
@@ -25,23 +26,23 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return SizedBox(
       width: width,
       height: height,
-      child: _buildButton(context, theme),
+      child: _buildButton(context),
     );
   }
 
-  Widget _buildButton(BuildContext context, ThemeData theme) {
+  Widget _buildButton(BuildContext context) {
     switch (type) {
       case AppButtonType.primary:
         return ElevatedButton(
           onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: theme.primaryColor,
-            foregroundColor: Colors.white,
+            backgroundColor: AppTheme.primary,
+            foregroundColor: AppTheme.background,
+            disabledBackgroundColor: AppTheme.surfaceContainer,
+            disabledForegroundColor: AppTheme.textTertiary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -53,8 +54,10 @@ class AppButton extends StatelessWidget {
         return ElevatedButton(
           onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[200],
-            foregroundColor: Colors.black87,
+            backgroundColor: AppTheme.surfaceContainer,
+            foregroundColor: AppTheme.textPrimary,
+            disabledBackgroundColor: AppTheme.surface,
+            disabledForegroundColor: AppTheme.textTertiary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -66,8 +69,8 @@ class AppButton extends StatelessWidget {
         return OutlinedButton(
           onPressed: isLoading ? null : onPressed,
           style: OutlinedButton.styleFrom(
-            foregroundColor: theme.primaryColor,
-            side: BorderSide(color: theme.primaryColor),
+            foregroundColor: AppTheme.textPrimary,
+            side: BorderSide(color: AppTheme.border),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -79,7 +82,7 @@ class AppButton extends StatelessWidget {
         return TextButton(
           onPressed: isLoading ? null : onPressed,
           style: TextButton.styleFrom(
-            foregroundColor: theme.primaryColor,
+            foregroundColor: AppTheme.textPrimary,
           ),
           child: _buildContent(),
         );
@@ -88,10 +91,15 @@ class AppButton extends StatelessWidget {
 
   Widget _buildContent() {
     if (isLoading) {
-      return const SizedBox(
+      return SizedBox(
         height: 20,
         width: 20,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: type == AppButtonType.primary
+              ? AppTheme.background
+              : AppTheme.textPrimary,
+        ),
       );
     }
 

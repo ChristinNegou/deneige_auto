@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class ServiceOptionTile extends StatelessWidget {
   final ServiceOption option;
@@ -24,12 +25,11 @@ class ServiceOptionTile extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? Theme.of(context).primaryColor.withOpacity(0.1)
-              : Colors.white,
+              ? AppTheme.primary.withValues(alpha: 0.1)
+              : AppTheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color:
-                isSelected ? Theme.of(context).primaryColor : Colors.grey[300]!,
+            color: isSelected ? AppTheme.primary : AppTheme.border,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -39,14 +39,12 @@ class ServiceOptionTile extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey[200],
+                color: isSelected ? AppTheme.primary : AppTheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 _getOptionIcon(option),
-                color: isSelected ? Colors.white : Colors.grey[600],
+                color: isSelected ? AppTheme.background : AppTheme.textSecondary,
               ),
             ),
             const SizedBox(width: 16),
@@ -56,9 +54,10 @@ class ServiceOptionTile extends StatelessWidget {
                 children: [
                   Text(
                     _getOptionTitle(option),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -66,7 +65,7 @@ class ServiceOptionTile extends StatelessWidget {
                     _getOptionDescription(option),
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[600],
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                 ],
@@ -80,9 +79,7 @@ class ServiceOptionTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isSelected
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey[800],
+                    color: isSelected ? AppTheme.primary : AppTheme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -90,22 +87,18 @@ class ServiceOptionTile extends StatelessWidget {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? Theme.of(context).primaryColor
-                        : Colors.transparent,
+                    color: isSelected ? AppTheme.primary : Colors.transparent,
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(
-                      color: isSelected
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey[400]!,
+                      color: isSelected ? AppTheme.primary : AppTheme.textTertiary,
                       width: 2,
                     ),
                   ),
                   child: isSelected
-                      ? const Icon(
+                      ? Icon(
                           Icons.check,
                           size: 16,
-                          color: Colors.white,
+                          color: AppTheme.background,
                         )
                       : null,
                 ),

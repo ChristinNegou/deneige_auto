@@ -76,7 +76,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: AppTheme.textPrimary,
@@ -94,11 +94,12 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color:
-              hasDate ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          color: hasDate
+              ? AppTheme.primary.withValues(alpha: 0.05)
+              : AppTheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: hasDate ? AppTheme.primary : Colors.grey[200]!,
+            color: hasDate ? AppTheme.primary : AppTheme.border,
             width: hasDate ? 1.5 : 1,
           ),
         ),
@@ -127,18 +128,18 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: hasDate ? AppTheme.textPrimary : Colors.grey[400],
+                      color: hasDate ? AppTheme.textPrimary : AppTheme.textTertiary,
                     ),
                   ),
                   if (hasDate)
                     Text(
                       DateFormat('yyyy').format(selectedDate!),
-                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                      style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
                     ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.grey[400]),
+            Icon(Icons.chevron_right, color: AppTheme.textTertiary),
           ],
         ),
       ),
@@ -153,11 +154,12 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color:
-              hasTime ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,
+          color: hasTime
+              ? AppTheme.primary.withValues(alpha: 0.05)
+              : AppTheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: hasTime ? AppTheme.primary : Colors.grey[200]!,
+            color: hasTime ? AppTheme.primary : AppTheme.border,
             width: hasTime ? 1.5 : 1,
           ),
         ),
@@ -181,11 +183,11 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: hasTime ? AppTheme.textPrimary : Colors.grey[400],
+                  color: hasTime ? AppTheme.textPrimary : AppTheme.textTertiary,
                 ),
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.grey[400]),
+            Icon(Icons.chevron_right, color: AppTheme.textTertiary),
           ],
         ),
       ),
@@ -214,7 +216,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? AppTheme.primary : Colors.grey[100],
+              color: isSelected ? AppTheme.primary : AppTheme.surfaceContainer,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -222,7 +224,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : Colors.grey[700],
+                color: isSelected ? AppTheme.background : AppTheme.textSecondary,
               ),
             ),
           ),
@@ -235,12 +237,12 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.green.withValues(alpha: 0.08),
+        color: AppTheme.successLight,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Icon(Icons.check_circle, color: Colors.green[600], size: 20),
+          Icon(Icons.check_circle, color: AppTheme.success, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -249,7 +251,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.green[800],
+                color: AppTheme.success,
               ),
             ),
           ),
@@ -262,13 +264,12 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.orange.withValues(alpha: 0.1),
+        color: AppTheme.warningLight,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded,
-              color: Colors.orange[700], size: 20),
+          Icon(Icons.warning_amber_rounded, color: AppTheme.warning, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -279,12 +280,15 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.orange[900],
+                    color: AppTheme.warning,
                   ),
                 ),
                 Text(
                   'Frais d\'urgence de 40% appliqués',
-                  style: TextStyle(fontSize: 12, color: Colors.orange[700]),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.warning.withValues(alpha: 0.8),
+                  ),
                 ),
               ],
             ),
@@ -304,8 +308,19 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       locale: const Locale('fr', 'CA'),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(primary: AppTheme.primary),
+          data: ThemeData.dark().copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: AppTheme.primary,
+              onPrimary: AppTheme.background,
+              surface: AppTheme.surface,
+              onSurface: AppTheme.textPrimary,
+            ),
+            dialogBackgroundColor: AppTheme.surface,
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppTheme.primary,
+              ),
+            ),
           ),
           child: child!,
         );
@@ -326,8 +341,19 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
           child: Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(primary: AppTheme.primary),
+            data: ThemeData.dark().copyWith(
+              colorScheme: ColorScheme.dark(
+                primary: AppTheme.primary,
+                onPrimary: AppTheme.background,
+                surface: AppTheme.surface,
+                onSurface: AppTheme.textPrimary,
+              ),
+              dialogBackgroundColor: AppTheme.surface,
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primary,
+                ),
+              ),
             ),
             child: child!,
           ),

@@ -24,9 +24,9 @@ class PriceSummaryCard extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[200]!),
+            border: Border.all(color: AppTheme.border),
           ),
           child: Column(
             children: [
@@ -67,7 +67,7 @@ class PriceSummaryCard extends StatelessWidget {
                           'Frais d\'urgence (40%)',
                           breakdown.urgencyFee,
                           highlight: true,
-                          highlightColor: Colors.orange,
+                          highlightColor: AppTheme.warning,
                         ),
 
                       const SizedBox(height: 8),
@@ -128,13 +128,13 @@ class PriceSummaryCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(Icons.location_on_outlined,
-                              size: 14, color: Colors.grey[400]),
+                              size: 14, color: AppTheme.textTertiary),
                           const SizedBox(width: 4),
                           Text(
                             'Taxes calculées pour: ${breakdown.provinceName}',
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.grey[400],
+                              color: AppTheme.textTertiary,
                               fontStyle: FontStyle.italic,
                             ),
                           ),
@@ -164,7 +164,7 @@ class PriceSummaryCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Total à payer',
                           style: TextStyle(
                             fontSize: 14,
@@ -176,7 +176,7 @@ class PriceSummaryCard extends StatelessWidget {
                           'Taxes incluses',
                           style: TextStyle(
                             fontSize: 11,
-                            color: Colors.grey[500],
+                            color: AppTheme.textTertiary,
                           ),
                         ),
                       ],
@@ -199,7 +199,7 @@ class PriceSummaryCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey[600],
+                            color: AppTheme.textSecondary,
                           ),
                         ),
                       ],
@@ -214,7 +214,7 @@ class PriceSummaryCard extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.1),
+                    color: AppTheme.warningLight,
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(12),
                       bottomRight: Radius.circular(12),
@@ -223,14 +223,14 @@ class PriceSummaryCard extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.bolt, size: 16, color: Colors.orange[700]),
+                      Icon(Icons.bolt, size: 16, color: AppTheme.warning),
                       const SizedBox(width: 6),
                       Text(
                         'Réservation urgente - Frais majorés',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Colors.orange[800],
+                          color: AppTheme.warning,
                         ),
                       ),
                     ],
@@ -257,10 +257,10 @@ class PriceSummaryCard extends StatelessWidget {
     final textColor = highlight
         ? highlightColor ?? AppTheme.primary
         : isNegative
-            ? Colors.green[600]
+            ? AppTheme.success
             : isTax
-                ? Colors.grey[500]
-                : Colors.grey[700];
+                ? AppTheme.textTertiary
+                : AppTheme.textSecondary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -272,7 +272,7 @@ class PriceSummaryCard extends StatelessWidget {
             style: TextStyle(
               fontSize: isSmall ? 12 : 13,
               fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
-              color: isTax ? Colors.grey[500] : Colors.grey[700],
+              color: isTax ? AppTheme.textTertiary : AppTheme.textSecondary,
             ),
           ),
           Text(
@@ -290,6 +290,6 @@ class PriceSummaryCard extends StatelessWidget {
   }
 
   Widget _buildDivider() {
-    return Divider(color: Colors.grey[200], height: 1);
+    return Divider(color: AppTheme.border, height: 1);
   }
 }

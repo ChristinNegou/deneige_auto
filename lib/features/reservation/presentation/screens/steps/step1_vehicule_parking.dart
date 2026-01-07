@@ -106,7 +106,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
       icon: const Icon(Icons.add, size: 18),
       label: const Text('Ajouter un véhicule'),
       style: TextButton.styleFrom(
-        foregroundColor: AppTheme.primary,
+        foregroundColor: AppTheme.textPrimary,
         padding: const EdgeInsets.symmetric(vertical: 12),
       ),
     );
@@ -129,9 +129,9 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                     controller: _parkingSpotController,
                     decoration: InputDecoration(
                       hintText: 'Ex: P32, A-15, 205...',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      hintStyle: TextStyle(color: AppTheme.textTertiary),
                       filled: true,
-                      fillColor: Colors.grey[50],
+                      fillColor: AppTheme.surfaceContainer,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -140,8 +140,10 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                           horizontal: 14, vertical: 12),
                     ),
                     textCapitalization: TextCapitalization.characters,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500, letterSpacing: 1),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 1,
+                        color: AppTheme.textPrimary),
                     onChanged: (value) {
                       if (value.trim().isNotEmpty) {
                         _customLocationController.clear();
@@ -174,9 +176,9 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                         controller: _customLocationController,
                         decoration: InputDecoration(
                           hintText: 'Ex: Devant le bâtiment A...',
-                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          hintStyle: TextStyle(color: AppTheme.textTertiary),
                           filled: true,
-                          fillColor: Colors.grey[50],
+                          fillColor: AppTheme.surfaceContainer,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,
@@ -185,6 +187,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                               horizontal: 14, vertical: 12),
                         ),
                         maxLines: 2,
+                        style: TextStyle(color: AppTheme.textPrimary),
                         onChanged: (value) {
                           if (value.trim().isNotEmpty) {
                             _parkingSpotController.clear();
@@ -230,10 +233,10 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
         decoration: BoxDecoration(
           color: isSelected
               ? AppTheme.primary.withValues(alpha: 0.05)
-              : Colors.white,
+              : AppTheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppTheme.primary : Colors.grey[200]!,
+            color: isSelected ? AppTheme.textPrimary : AppTheme.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -244,7 +247,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
               children: [
                 Icon(icon,
                     size: 20,
-                    color: isSelected ? AppTheme.primary : Colors.grey[600]),
+                    color: isSelected ? AppTheme.textPrimary : AppTheme.textTertiary),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -256,13 +259,13 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: isSelected
-                              ? AppTheme.primary
+                              ? AppTheme.textPrimary
                               : AppTheme.textPrimary,
                         ),
                       ),
                       Text(
                         subtitle,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                       ),
                     ],
                   ),
@@ -272,14 +275,14 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                   height: 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isSelected ? AppTheme.primary : Colors.transparent,
+                    color: isSelected ? AppTheme.textPrimary : Colors.transparent,
                     border: Border.all(
-                      color: isSelected ? AppTheme.primary : Colors.grey[300]!,
+                      color: isSelected ? AppTheme.textPrimary : AppTheme.border,
                       width: 1.5,
                     ),
                   ),
                   child: isSelected
-                      ? const Icon(Icons.check, size: 12, color: Colors.white)
+                      ? Icon(Icons.check, size: 12, color: AppTheme.background)
                       : null,
                 ),
               ],
@@ -302,12 +305,13 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
+          color: AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.border),
         ),
         child: Text(
           label,
-          style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+          style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
         ),
       ),
     );
@@ -317,22 +321,26 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         children: [
           Icon(Icons.directions_car_outlined,
-              size: 48, color: Colors.grey[400]),
+              size: 48, color: AppTheme.textTertiary),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Aucun véhicule',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary),
           ),
           const SizedBox(height: 4),
           Text(
             'Ajoutez votre premier véhicule',
-            style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
@@ -341,7 +349,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
             label: const Text('Ajouter'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: AppTheme.background,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -382,10 +390,10 @@ class _VehicleCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppTheme.primary.withValues(alpha: 0.05)
-              : Colors.white,
+              : AppTheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppTheme.primary : Colors.grey[200]!,
+            color: isSelected ? AppTheme.textPrimary : AppTheme.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -396,7 +404,7 @@ class _VehicleCard extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: AppTheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: vehicle.photoUrl != null
@@ -419,9 +427,10 @@ class _VehicleCard extends StatelessWidget {
                 children: [
                   Text(
                     vehicle.displayName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -433,21 +442,19 @@ class _VehicleCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: _getColor(vehicle.color),
                           shape: BoxShape.circle,
-                          border:
-                              Border.all(color: Colors.grey[300]!, width: 0.5),
+                          border: Border.all(color: AppTheme.border, width: 0.5),
                         ),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         vehicle.color,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                       ),
                       if (vehicle.licensePlate != null) ...[
-                        Text(' · ', style: TextStyle(color: Colors.grey[400])),
+                        Text(' · ', style: TextStyle(color: AppTheme.textTertiary)),
                         Text(
                           vehicle.licensePlate!,
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                         ),
                       ],
                     ],
@@ -462,14 +469,14 @@ class _VehicleCard extends StatelessWidget {
               height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected ? AppTheme.primary : Colors.transparent,
+                color: isSelected ? AppTheme.textPrimary : Colors.transparent,
                 border: Border.all(
-                  color: isSelected ? AppTheme.primary : Colors.grey[300]!,
+                  color: isSelected ? AppTheme.textPrimary : AppTheme.border,
                   width: 1.5,
                 ),
               ),
               child: isSelected
-                  ? const Icon(Icons.check, size: 12, color: Colors.white)
+                  ? Icon(Icons.check, size: 12, color: AppTheme.background)
                   : null,
             ),
           ],

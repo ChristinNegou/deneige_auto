@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../bloc/new_reservation_bloc.dart';
 import '../bloc/new_reservation_state.dart';
 import 'package:intl/intl.dart';
@@ -15,15 +16,10 @@ class ReservationSummaryCard extends StatelessWidget {
       builder: (context, state) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.surface,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(color: AppTheme.border),
+            boxShadow: AppTheme.shadowSM,
           ),
           child: Column(
             children: [
@@ -31,7 +27,7 @@ class ReservationSummaryCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  color: AppTheme.primary.withValues(alpha: 0.1),
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(16),
                   ),
@@ -40,14 +36,15 @@ class ReservationSummaryCard extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.receipt_long,
-                      color: Theme.of(context).primaryColor,
+                      color: AppTheme.primary,
                     ),
                     const SizedBox(width: 12),
-                    const Text(
+                    Text(
                       'Résumé de la réservation',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
                       ),
                     ),
                   ],
@@ -65,7 +62,7 @@ class ReservationSummaryCard extends StatelessWidget {
                       value: state.selectedVehicle?.displayName ?? '-',
                     ),
 
-                    const Divider(height: 24),
+                    Divider(height: 24, color: AppTheme.border),
 
                     // ✅ Logique corrigée pour afficher la place de parking
                     _SummaryRow(
@@ -74,7 +71,7 @@ class ReservationSummaryCard extends StatelessWidget {
                       value: _getParkingSpotDisplay(state),
                     ),
 
-                    const Divider(height: 24),
+                    Divider(height: 24, color: AppTheme.border),
 
                     _SummaryRow(
                       icon: Icons.access_time,
@@ -86,7 +83,7 @@ class ReservationSummaryCard extends StatelessWidget {
                     ),
 
                     if (state.selectedOptions.isNotEmpty) ...[
-                      const Divider(height: 24),
+                      Divider(height: 24, color: AppTheme.border),
                       _SummaryRow(
                         icon: Icons.tune,
                         label: 'Options',
@@ -97,7 +94,7 @@ class ReservationSummaryCard extends StatelessWidget {
                     ],
 
                     if (state.snowDepthCm != null) ...[
-                      const Divider(height: 24),
+                      Divider(height: 24, color: AppTheme.border),
                       _SummaryRow(
                         icon: Icons.ac_unit,
                         label: 'Neige',
@@ -166,23 +163,24 @@ class _SummaryRow extends StatelessWidget {
         Icon(
           icon,
           size: 20,
-          color: Colors.grey[600],
+          color: AppTheme.textSecondary,
         ),
         const SizedBox(width: 12),
         Text(
           label,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: AppTheme.textSecondary,
           ),
         ),
         const Spacer(),
         Flexible(
           child: Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimary,
             ),
             textAlign: TextAlign.right,
             maxLines: 2,
