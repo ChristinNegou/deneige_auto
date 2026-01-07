@@ -233,7 +233,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                  const Icon(Icons.check_circle, color: AppTheme.background, size: 20),
                   const SizedBox(width: 12),
                   Text(_getSuccessMessage(state.action)),
                 ],
@@ -262,7 +262,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               content: Row(
                 children: [
                   const Icon(Icons.error_outline,
-                      color: Colors.white, size: 20),
+                      color: AppTheme.background, size: 20),
                   const SizedBox(width: 12),
                   Expanded(child: Text(state.message)),
                 ],
@@ -436,13 +436,13 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.timer_outlined, color: Colors.white70, size: 18),
+              Icon(Icons.timer_outlined, color: AppTheme.background.withValues(alpha: 0.7), size: 18),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Temps écoulé',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white70,
+                  color: AppTheme.background.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -458,7 +458,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 style: TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppTheme.background,
                 ),
               ),
               _buildTimeBlock(minutes.toString().padLeft(2, '0'), 'm'),
@@ -467,7 +467,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 style: TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppTheme.background,
                 ),
               ),
               _buildTimeBlock(seconds.toString().padLeft(2, '0'), 's'),
@@ -484,7 +484,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
+            color: AppTheme.background.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(AppTheme.radiusSM),
           ),
           child: Text(
@@ -492,7 +492,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             style: const TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppTheme.background,
               fontFamily: 'monospace',
             ),
           ),
@@ -500,9 +500,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         const SizedBox(height: 4),
         Text(
           unit,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.white70,
+            color: AppTheme.background.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -539,7 +539,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   child: Text(
                     _currentJob.client.firstName[0].toUpperCase(),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.background,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
@@ -646,12 +646,12 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.chat_bubble_rounded,
-                            size: 20, color: Colors.white),
+                            size: 20, color: AppTheme.background),
                         const SizedBox(width: 6),
                         const Text(
                           'Chat',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppTheme.background,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -907,7 +907,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                             content: Row(
                               children: [
                                 const Icon(Icons.warning,
-                                    color: Colors.white, size: 20),
+                                    color: AppTheme.background, size: 20),
                                 const SizedBox(width: 12),
                                 const Expanded(
                                     child: Text(
@@ -1032,16 +1032,16 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: AppTheme.background,
                 ),
               )
             else
-              Icon(icon, color: Colors.white, size: 22),
+              Icon(icon, color: AppTheme.background, size: 22),
             const SizedBox(width: 10),
             Text(
               label,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppTheme.background,
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
               ),
@@ -1190,17 +1190,17 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: AppTheme.background,
                               ),
                             )
                           else
                             const Icon(Icons.cloud_upload_rounded,
-                                color: Colors.white, size: 18),
+                                color: AppTheme.background, size: 18),
                           const SizedBox(width: 6),
                           Text(
                             _isUploadingPhoto ? 'Envoi...' : 'Envoyer',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppTheme.background,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -1233,7 +1233,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                       ),
                       child: const Icon(
                         Icons.check,
-                        color: Colors.white,
+                        color: AppTheme.background,
                         size: 20,
                       ),
                     ),
@@ -1262,12 +1262,12 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.camera_alt_rounded,
-                        color: Colors.white, size: 22),
+                        color: AppTheme.background, size: 22),
                     const SizedBox(width: 10),
                     const Text(
                       'Prendre une photo',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppTheme.background,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1354,7 +1354,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 content: Row(
                   children: [
                     const Icon(Icons.check_circle,
-                        color: Colors.white, size: 20),
+                        color: AppTheme.background, size: 20),
                     const SizedBox(width: 12),
                     const Text('Photo envoyée avec succès!'),
                   ],

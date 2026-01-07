@@ -342,7 +342,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
             Icon(
               icon,
               size: 16,
-              color: isSelected ? Colors.white : AppTheme.textSecondary,
+              color: isSelected ? AppTheme.background : AppTheme.textSecondary,
             ),
             const SizedBox(width: 6),
             Text(
@@ -350,7 +350,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : AppTheme.textSecondary,
+                color: isSelected ? AppTheme.background : AppTheme.textSecondary,
               ),
             ),
           ],
@@ -541,7 +541,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
           borderRadius: BorderRadius.circular(AppTheme.radiusLG),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: AppTheme.shadowColor.withValues(alpha: 0.04),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -603,14 +603,14 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                       children: [
                         const Icon(
                           Icons.check_circle_rounded,
-                          color: Colors.white,
+                          color: AppTheme.background,
                           size: 12,
                         ),
                         const SizedBox(width: 4),
                         const Text(
                           'Termine',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppTheme.background,
                             fontWeight: FontWeight.w600,
                             fontSize: 11,
                           ),
@@ -808,14 +808,14 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                                 children: [
                                   const Icon(
                                     Icons.favorite_rounded,
-                                    color: Colors.white,
+                                    color: AppTheme.background,
                                     size: 12,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     '+${job.tipAmount!.toStringAsFixed(2)} \$',
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: AppTheme.background,
                                       fontWeight: FontWeight.w700,
                                       fontSize: 12,
                                     ),
