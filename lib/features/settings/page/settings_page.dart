@@ -52,12 +52,6 @@ class _SettingsPageState extends State<SettingsPage> {
           }
 
           if (state.successMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.successMessage!),
-                backgroundColor: AppTheme.success,
-              ),
-            );
             context.read<SettingsBloc>().add(ClearSettingsMessages());
           }
 

@@ -85,25 +85,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       body: SafeArea(
         child: BlocConsumer<WorkerAvailabilityBloc, WorkerAvailabilityState>(
           listener: (context, state) {
-            if (state is WorkerProfileUpdated) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(Icons.check_circle,
-                          color: AppTheme.background, size: 20),
-                      const SizedBox(width: 12),
-                      const Text('Paramètres sauvegardés'),
-                    ],
-                  ),
-                  backgroundColor: AppTheme.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  ),
-                ),
-              );
-            } else if (state is WorkerAvailabilityError) {
+            if (state is WorkerAvailabilityError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Row(

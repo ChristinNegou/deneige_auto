@@ -52,15 +52,6 @@ class VehiclesListView extends StatelessWidget {
                       ),
                     );
                   }
-                  if (state.successMessage != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.successMessage!),
-                        backgroundColor: AppTheme.success,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
                 },
                 builder: (context, state) {
                   if (state.isLoading && state.vehicles.isEmpty) {
