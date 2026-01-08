@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/config/app_config.dart' hide ServiceOption;
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/worker_job.dart';
 
@@ -145,32 +147,61 @@ class JobCard extends StatelessWidget {
 
               const SizedBox(height: 8),
 
-              // Vehicle info
+              // Vehicle info with photo
               Row(
                 children: [
-                  Icon(Icons.directions_car, color: AppTheme.textSecondary, size: 18),
-                  const SizedBox(width: 8),
-                  Text(
-                    job.vehicle.displayName,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: AppTheme.textPrimary),
-                  ),
-                  if (job.vehicle.color != null) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceContainer,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        job.vehicle.color!,
-                        style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
-                      ),
+                  // Vehicle photo or icon
+                  _buildVehiclePhoto(job.vehicle.photoUrl),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          job.vehicle.displayName,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        if (job.vehicle.color != null || job.vehicle.licensePlate != null)
+                          Row(
+                            children: [
+                              if (job.vehicle.color != null) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.surfaceContainer,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    job.vehicle.color!,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: AppTheme.textSecondary,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              if (job.vehicle.licensePlate != null) ...[
+                                const SizedBox(width: 6),
+                                Text(
+                                  job.vehicle.licensePlate!,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: AppTheme.textSecondary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                      ],
                     ),
-                  ],
+                  ),
                 ],
               ),
 
@@ -300,5 +331,45 @@ class JobCard extends StatelessWidget {
       case ServiceOption.wheelClearance:
         return 'Dégagement roues';
     }
+  }
+
+  Widget _buildVehiclePhoto(String? photoUrl) {
+    final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
+    final fullPhotoUrl = hasPhoto ? '${AppConfig.apiBaseUrl}$photoUrl' : null;
+
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: AppTheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: hasPhoto
+          ? CachedNetworkImage(
+              imageUrl: fullPhotoUrl!,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppTheme.primary.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => const Icon(
+                Icons.directions_car,
+                color: AppTheme.primary,
+                size: 20,
+              ),
+            )
+          : const Icon(
+              Icons.directions_car,
+              color: AppTheme.primary,
+              size: 20,
+            ),
+    );
   }
 }

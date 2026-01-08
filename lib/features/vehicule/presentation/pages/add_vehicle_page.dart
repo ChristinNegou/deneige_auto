@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../reservation/domain/entities/vehicle.dart';
@@ -36,6 +38,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   VehicleType _selectedType = VehicleType.car;
   String _selectedColor = 'Blanc';
   bool _isDefault = false;
+  File? _selectedPhoto;
 
   final List<Map<String, dynamic>> _colors = [
     {'name': 'Blanc', 'color': AppTheme.textPrimary},
@@ -84,6 +87,18 @@ class _AddVehicleViewState extends State<AddVehicleView> {
             }
 
             if (state.successMessage != null) {
+              // Check if we have a photo to upload after vehicle creation
+              if (state.successMessage == 'Véhicule ajouté avec succès' &&
+                  _selectedPhoto != null &&
+                  state.vehicles.isNotEmpty) {
+                // Get the newly created vehicle ID
+                final newVehicle = state.vehicles.last;
+                context.read<VehicleBloc>().add(
+                  UploadVehiclePhoto(vehicleId: newVehicle.id, photo: _selectedPhoto!),
+                );
+                return; // Wait for photo upload to complete
+              }
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.successMessage!),
@@ -168,21 +183,65 @@ class _AddVehicleViewState extends State<AddVehicleView> {
       ),
       child: Column(
         children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-            ),
-            child: Center(
-              child: Text(
-                _selectedType.icon,
-                style: const TextStyle(fontSize: 40),
-              ),
+          // Clickable photo/icon area
+          GestureDetector(
+            onTap: _showPhotoOptions,
+            child: Stack(
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: _selectedPhoto != null
+                      ? Image.file(
+                          _selectedPhoto!,
+                          fit: BoxFit.cover,
+                          width: 100,
+                          height: 100,
+                        )
+                      : Center(
+                          child: Text(
+                            _selectedType.icon,
+                            style: const TextStyle(fontSize: 48),
+                          ),
+                        ),
+                ),
+                // Camera icon overlay
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppTheme.surface, width: 2),
+                      boxShadow: AppTheme.shadowSM,
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          Text(
+            'Touchez pour ajouter une photo',
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 12),
           Text(
             _makeController.text.isNotEmpty || _modelController.text.isNotEmpty
                 ? '${_makeController.text} ${_modelController.text}'.trim()
@@ -231,6 +290,124 @@ class _AddVehicleViewState extends State<AddVehicleView> {
         ],
       ),
     );
+  }
+
+  void _showPhotoOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (bottomSheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: AppTheme.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(
+                  'Photo du véhicule',
+                  style: AppTheme.headlineSmall,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Cette photo sera visible par le déneigeur',
+                  style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                ),
+                const SizedBox(height: 20),
+                ListTile(
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
+                  ),
+                  title: const Text('Prendre une photo'),
+                  subtitle: Text(
+                    'Utiliser l\'appareil photo',
+                    style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                  ),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _pickPhoto(ImageSource.camera);
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppTheme.info.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.photo_library_rounded, color: AppTheme.info),
+                  ),
+                  title: const Text('Choisir une photo'),
+                  subtitle: Text(
+                    'Depuis la galerie',
+                    style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                  ),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _pickPhoto(ImageSource.gallery);
+                  },
+                ),
+                if (_selectedPhoto != null)
+                  ListTile(
+                    leading: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppTheme.error.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.delete_rounded, color: AppTheme.error),
+                    ),
+                    title: const Text('Supprimer la photo'),
+                    subtitle: Text(
+                      'Retirer la photo sélectionnée',
+                      style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                    ),
+                    onTap: () {
+                      Navigator.pop(bottomSheetContext);
+                      setState(() => _selectedPhoto = null);
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickPhoto(ImageSource source) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: source,
+      maxWidth: 1200,
+      maxHeight: 1200,
+      imageQuality: 85,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedPhoto = File(pickedFile.path);
+      });
+    }
   }
 
   Widget _buildFormCard(VehicleState state) {

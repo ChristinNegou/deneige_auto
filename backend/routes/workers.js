@@ -246,7 +246,7 @@ router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res)
                 departureTime: { $gte: now, $lte: next24Hours },
             })
                 .populate('userId', 'firstName lastName phoneNumber')
-                .populate('vehicle', 'make model color licensePlate')
+                .populate('vehicle', 'make model color licensePlate photoUrl')
                 .lean();
 
             console.log(`📋 Fallback: ${fallbackReservations.length} réservations pending trouvées`);
@@ -303,6 +303,7 @@ router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res)
                 model: r.vehicleInfo.model,
                 color: r.vehicleInfo.color,
                 licensePlate: r.vehicleInfo.licensePlate,
+                photoUrl: r.vehicleInfo.photoUrl,
             } : null,
         }));
 
@@ -333,7 +334,7 @@ router.get('/my-jobs', protect, authorize('snowWorker'), async (req, res) => {
             status: { $in: ['assigned', 'enRoute', 'inProgress'] },
         })
             .populate('userId', 'firstName lastName phoneNumber')
-            .populate('vehicle', 'make model color licensePlate')
+            .populate('vehicle', 'make model color licensePlate photoUrl')
             .sort({ departureTime: 1 });
 
         res.json({
@@ -374,7 +375,7 @@ router.get('/history', protect, authorize('snowWorker'), async (req, res) => {
 
         const reservations = await Reservation.find(query)
             .populate('userId', 'firstName lastName phoneNumber')
-            .populate('vehicle', 'make model color')
+            .populate('vehicle', 'make model color licensePlate photoUrl')
             .sort({ completedAt: -1 })
             .skip((page - 1) * limit)
             .limit(parseInt(limit));
@@ -789,7 +790,7 @@ router.post('/jobs/:id/accept', protect, authorize('snowWorker'), async (req, re
 
         // Populate for response
         await reservation.populate('userId', 'firstName lastName phoneNumber');
-        await reservation.populate('vehicle', 'make model color licensePlate');
+        await reservation.populate('vehicle', 'make model color licensePlate photoUrl');
 
         // Send notification to client
         await Notification.createNotification({
@@ -858,7 +859,7 @@ router.patch('/jobs/:id/en-route', protect, authorize('snowWorker'), async (req,
 
         // Populate for response
         await reservation.populate('userId', 'firstName lastName phoneNumber');
-        await reservation.populate('vehicle', 'make model color plateNumber type');
+        await reservation.populate('vehicle', 'make model color licensePlate photoUrl');
 
         // Send notification to client
         const worker = await User.findById(req.user.id);
@@ -916,7 +917,7 @@ router.patch('/jobs/:id/start', protect, authorize('snowWorker'), async (req, re
 
         // Populate for response
         await reservation.populate('userId', 'firstName lastName phoneNumber');
-        await reservation.populate('vehicle', 'make model color plateNumber type');
+        await reservation.populate('vehicle', 'make model color licensePlate photoUrl');
 
         // Send notification to client
         const worker = await User.findById(req.user.id);
@@ -984,7 +985,7 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
 
         // Populate for response
         await reservation.populate('userId', 'firstName lastName phoneNumber');
-        await reservation.populate('vehicle', 'make model color plateNumber type');
+        await reservation.populate('vehicle', 'make model color licensePlate photoUrl');
 
         // Update worker stats
         await User.findByIdAndUpdate(req.user.id, {

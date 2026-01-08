@@ -29,7 +29,7 @@ router.get('/', protect, async (req, res) => {
         const reservations = await Reservation.find(query)
             .populate('vehicle')
             .populate('parkingSpot')
-            .populate('workerId', 'firstName lastName phoneNumber')
+            .populate('workerId', 'firstName lastName phoneNumber photoUrl')
             .sort({ departureTime: -1 });
 
         res.status(200).json({
@@ -57,7 +57,7 @@ router.get('/:id', protect, async (req, res) => {
         })
             .populate('vehicle')
             .populate('parkingSpot')
-            .populate('workerId', 'firstName lastName phoneNumber');
+            .populate('workerId', 'firstName lastName phoneNumber photoUrl');
 
         if (!reservation) {
             return res.status(404).json({
@@ -875,7 +875,7 @@ router.patch('/:id/cancel-by-client', protect, async (req, res) => {
             _id: req.params.id,
             userId: req.user.id,
             status: { $nin: ['completed', 'cancelled'] },
-        }).populate('workerId', 'firstName lastName');
+        }).populate('workerId', 'firstName lastName photoUrl');
 
         if (!reservation) {
             return res.status(404).json({

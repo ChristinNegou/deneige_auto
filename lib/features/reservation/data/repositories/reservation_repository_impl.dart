@@ -309,4 +309,24 @@ class ReservationRepositoryImpl implements ReservationRepository {
       return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
     }
   }
+
+  @override
+  Future<Either<Failure, String>> uploadVehiclePhoto({
+    required String vehicleId,
+    required String photoPath,
+  }) async {
+    try {
+      final photoUrl = await remoteDataSource.uploadVehiclePhoto(
+        vehicleId: vehicleId,
+        photoPath: photoPath,
+      );
+      return Right(photoUrl);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
 }

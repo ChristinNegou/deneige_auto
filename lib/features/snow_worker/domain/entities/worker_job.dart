@@ -40,6 +40,7 @@ class VehicleInfo extends Equatable {
   final String model;
   final String? color;
   final String? licensePlate;
+  final String? photoUrl;
 
   const VehicleInfo({
     required this.id,
@@ -47,12 +48,13 @@ class VehicleInfo extends Equatable {
     required this.model,
     this.color,
     this.licensePlate,
+    this.photoUrl,
   });
 
   String get displayName => '$make $model';
 
   @override
-  List<Object?> get props => [id, make, model, color, licensePlate];
+  List<Object?> get props => [id, make, model, color, licensePlate, photoUrl];
 }
 
 class JobLocation extends Equatable {

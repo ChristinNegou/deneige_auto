@@ -1,3 +1,4 @@
+import '../../../../core/config/app_config.dart' show AppConfig;
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -18,7 +19,7 @@ class UserModel extends User {
       name: json['name'] as String? ??
           '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim(),
       phoneNumber: json['phoneNumber'] as String?,
-      photoUrl: json['photoUrl'] as String?,
+      photoUrl: _parsePhotoUrl(json['photoUrl']),
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
@@ -36,6 +37,17 @@ class UserModel extends User {
       'createdAt': createdAt.toIso8601String(),
       'role': role.toString().split('.').last,
     };
+  }
+
+  /// Parse photoUrl - prepend API base URL if relative
+  static String? _parsePhotoUrl(dynamic url) {
+    if (url == null) return null;
+    final urlStr = url.toString();
+    if (urlStr.isEmpty) return null;
+    if (urlStr.startsWith('/')) {
+      return '${AppConfig.apiBaseUrl}$urlStr';
+    }
+    return urlStr;
   }
 
   static UserRole _parseRole(String? role) {

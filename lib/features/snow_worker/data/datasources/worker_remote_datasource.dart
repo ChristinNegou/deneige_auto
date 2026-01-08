@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
+import '../../../../core/config/app_config.dart';
 import '../models/worker_job_model.dart';
 import '../models/worker_profile_model.dart';
 import '../models/worker_stats_model.dart';
@@ -473,6 +474,7 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
   @override
   Future<String> uploadProfilePhoto(File photoFile) async {
     final fileName = photoFile.path.split('/').last;
+
     final formData = FormData.fromMap({
       'photo': await MultipartFile.fromFile(
         photoFile.path,
@@ -488,7 +490,13 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
       ),
     );
 
-    return response.data['data']['photoUrl'] as String;
+    final photoUrl = response.data['data']['photoUrl'] as String;
+
+    // Convert relative URL to absolute URL
+    if (photoUrl.startsWith('/')) {
+      return '${AppConfig.apiBaseUrl}$photoUrl';
+    }
+    return photoUrl;
   }
 
   @override

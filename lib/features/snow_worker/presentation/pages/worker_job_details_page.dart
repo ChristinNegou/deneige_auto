@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/config/app_config.dart' hide ServiceOption;
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -522,6 +524,9 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
   }
 
   Widget _buildVehicleCard() {
+    final hasPhoto = job.vehicle.photoUrl != null && job.vehicle.photoUrl!.isNotEmpty;
+    final photoUrl = hasPhoto ? '${AppConfig.apiBaseUrl}${job.vehicle.photoUrl}' : null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -549,12 +554,141 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             ],
           ),
           const SizedBox(height: 16),
+          // Vehicle photo if available
+          if (hasPhoto && photoUrl != null) ...[
+            GestureDetector(
+              onTap: () => _showFullScreenPhoto(photoUrl),
+              child: Container(
+                width: double.infinity,
+                height: 160,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  color: AppTheme.surfaceContainer,
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: CachedNetworkImage(
+                  imageUrl: photoUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(color: AppTheme.primary),
+                  ),
+                  errorWidget: (context, url, error) => Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.directions_car_rounded,
+                          color: AppTheme.textTertiary, size: 48),
+                      const SizedBox(height: 8),
+                      Text('Photo non disponible',
+                          style: AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           _buildInfoRow('Véhicule', job.vehicle.displayName),
           if (job.vehicle.color != null)
             _buildInfoRow('Couleur', job.vehicle.color!),
           if (job.vehicle.licensePlate != null)
             _buildInfoRow('Plaque', job.vehicle.licensePlate!),
         ],
+      ),
+    );
+  }
+
+  void _showFullScreenPhoto(String photoUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Semi-transparent background
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(color: Colors.black87),
+            ),
+            // Photo
+            Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: CachedNetworkImage(
+                  imageUrl: photoUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+                ),
+              ),
+            ),
+            // Close button
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 16,
+              right: 16,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+            // Vehicle info
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 16,
+              left: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      job.vehicle.displayName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (job.vehicle.color != null || job.vehicle.licensePlate != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        [
+                          if (job.vehicle.color != null) job.vehicle.color,
+                          if (job.vehicle.licensePlate != null) job.vehicle.licensePlate,
+                        ].join(' • '),
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

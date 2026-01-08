@@ -1,7 +1,11 @@
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deneige_auto/features/reservation/domain/entities/vehicle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -44,6 +48,15 @@ class VehiclesListView extends StatelessWidget {
                       SnackBar(
                         content: Text(state.errorMessage!),
                         backgroundColor: AppTheme.error,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
+                  if (state.successMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.successMessage!),
+                        backgroundColor: AppTheme.success,
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -174,21 +187,8 @@ class VehiclesListView extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Vehicle icon
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-            ),
-            child: Center(
-              child: Text(
-                vehicle.type.icon,
-                style: const TextStyle(fontSize: 28),
-              ),
-            ),
-          ),
+          // Vehicle photo or icon
+          _buildVehiclePhoto(context, vehicle),
           const SizedBox(width: 14),
           // Info
           Expanded(
@@ -285,6 +285,178 @@ class VehiclesListView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildVehiclePhoto(BuildContext context, Vehicle vehicle) {
+    final hasPhoto = vehicle.photoUrl != null && vehicle.photoUrl!.isNotEmpty;
+    final photoUrl = hasPhoto
+        ? '${AppConfig.apiBaseUrl}${vehicle.photoUrl}'
+        : null;
+
+    return GestureDetector(
+      onTap: () => _showPhotoOptions(context, vehicle),
+      child: Stack(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: hasPhoto
+                ? CachedNetworkImage(
+                    imageUrl: photoUrl!,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppTheme.primary.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Center(
+                      child: Text(
+                        vehicle.type.icon,
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      vehicle.type.icon,
+                      style: const TextStyle(fontSize: 28),
+                    ),
+                  ),
+          ),
+          // Camera icon overlay
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: AppTheme.primary,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppTheme.surface, width: 1.5),
+              ),
+              child: const Icon(
+                Icons.camera_alt_rounded,
+                size: 10,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPhotoOptions(BuildContext context, Vehicle vehicle) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (bottomSheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: AppTheme.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(
+                  'Photo du véhicule',
+                  style: AppTheme.headlineSmall,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Cette photo sera visible par le déneigeur',
+                  style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                ),
+                const SizedBox(height: 20),
+                ListTile(
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
+                  ),
+                  title: const Text('Prendre une photo'),
+                  subtitle: Text(
+                    'Utiliser l\'appareil photo',
+                    style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                  ),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _pickAndUploadPhoto(context, vehicle, ImageSource.camera);
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppTheme.info.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.photo_library_rounded, color: AppTheme.info),
+                  ),
+                  title: const Text('Choisir une photo'),
+                  subtitle: Text(
+                    'Depuis la galerie',
+                    style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                  ),
+                  onTap: () {
+                    Navigator.pop(bottomSheetContext);
+                    _pickAndUploadPhoto(context, vehicle, ImageSource.gallery);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickAndUploadPhoto(
+    BuildContext context,
+    Vehicle vehicle,
+    ImageSource source,
+  ) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: source,
+      maxWidth: 1200,
+      maxHeight: 1200,
+      imageQuality: 85,
+    );
+
+    if (pickedFile != null && context.mounted) {
+      final file = File(pickedFile.path);
+      context.read<VehicleBloc>().add(
+        UploadVehiclePhoto(vehicleId: vehicle.id, photo: file),
+      );
+    }
   }
 
   Widget _buildAddButton(BuildContext context) {
