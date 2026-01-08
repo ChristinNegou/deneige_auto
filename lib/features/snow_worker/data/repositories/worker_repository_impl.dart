@@ -123,6 +123,7 @@ class WorkerRepositoryImpl implements WorkerRepository {
     List<String>? equipmentList,
     VehicleType? vehicleType,
     int? maxActiveJobs,
+    WorkerNotificationPreferences? notificationPreferences,
   }) async {
     try {
       final zonesModels = preferredZones
@@ -134,11 +135,21 @@ class WorkerRepositoryImpl implements WorkerRepository {
               ))
           .toList();
 
+      Map<String, bool>? notifPrefsMap;
+      if (notificationPreferences != null) {
+        notifPrefsMap = {
+          'newJobs': notificationPreferences.newJobs,
+          'urgentJobs': notificationPreferences.urgentJobs,
+          'tips': notificationPreferences.tips,
+        };
+      }
+
       final profile = await remoteDataSource.updateProfile(
         preferredZones: zonesModels,
         equipmentList: equipmentList,
         vehicleType: vehicleType?.name,
         maxActiveJobs: maxActiveJobs,
+        notificationPreferences: notifPrefsMap,
       );
       return Right(profile);
     } on DioException catch (e) {

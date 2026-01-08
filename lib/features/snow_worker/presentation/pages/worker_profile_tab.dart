@@ -85,6 +85,11 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
     // Load other settings
     _maxActiveJobs = profile.maxActiveJobs;
+
+    // Load notification preferences
+    _notifyNewJobs = profile.notificationPreferences.newJobs;
+    _notifyUrgentJobs = profile.notificationPreferences.urgentJobs;
+    _notifyTips = profile.notificationPreferences.tips;
   }
 
   @override
@@ -1080,10 +1085,17 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     if (_hasSaltSpreader) equipment.add('salt_spreader');
     if (_hasSnowBlower) equipment.add('snow_blower');
 
+    final notificationPrefs = WorkerNotificationPreferences(
+      newJobs: _notifyNewJobs,
+      urgentJobs: _notifyUrgentJobs,
+      tips: _notifyTips,
+    );
+
     context.read<WorkerAvailabilityBloc>().add(
           UpdateProfile(
             equipmentList: equipment,
             maxActiveJobs: _maxActiveJobs,
+            notificationPreferences: notificationPrefs,
           ),
         );
   }

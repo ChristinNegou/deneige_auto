@@ -45,6 +45,7 @@ abstract class WorkerRepository {
     List<String>? equipmentList,
     VehicleType? vehicleType,
     int? maxActiveJobs,
+    WorkerNotificationPreferences? notificationPreferences,
   });
 
   /// Upload profile photo

@@ -45,17 +45,19 @@ class UpdateProfile extends WorkerAvailabilityEvent {
   final List<String>? equipmentList;
   final VehicleType? vehicleType;
   final int? maxActiveJobs;
+  final WorkerNotificationPreferences? notificationPreferences;
 
   const UpdateProfile({
     this.preferredZones,
     this.equipmentList,
     this.vehicleType,
     this.maxActiveJobs,
+    this.notificationPreferences,
   });
 
   @override
   List<Object?> get props =>
-      [preferredZones, equipmentList, vehicleType, maxActiveJobs];
+      [preferredZones, equipmentList, vehicleType, maxActiveJobs, notificationPreferences];
 }
 
 class UploadProfilePhoto extends WorkerAvailabilityEvent {
@@ -261,6 +263,7 @@ class WorkerAvailabilityBloc
       equipmentList: event.equipmentList,
       vehicleType: event.vehicleType,
       maxActiveJobs: event.maxActiveJobs,
+      notificationPreferences: event.notificationPreferences,
     );
 
     result.fold(

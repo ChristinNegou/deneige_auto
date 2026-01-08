@@ -47,6 +47,33 @@ class WorkerLocationModel extends WorkerLocation {
   }
 }
 
+class WorkerNotificationPreferencesModel extends WorkerNotificationPreferences {
+  const WorkerNotificationPreferencesModel({
+    super.newJobs = true,
+    super.urgentJobs = true,
+    super.tips = true,
+  });
+
+  factory WorkerNotificationPreferencesModel.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return const WorkerNotificationPreferencesModel();
+    }
+    return WorkerNotificationPreferencesModel(
+      newJobs: json['newJobs'] as bool? ?? true,
+      urgentJobs: json['urgentJobs'] as bool? ?? true,
+      tips: json['tips'] as bool? ?? true,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'newJobs': newJobs,
+      'urgentJobs': urgentJobs,
+      'tips': tips,
+    };
+  }
+}
+
 class WorkerProfileModel extends WorkerProfile {
   const WorkerProfileModel({
     required super.id,
@@ -61,6 +88,7 @@ class WorkerProfileModel extends WorkerProfile {
     super.maxActiveJobs = 3,
     super.vehicleType = VehicleType.car,
     super.equipmentList = const [],
+    super.notificationPreferences = const WorkerNotificationPreferences(),
     super.totalJobsCompleted = 0,
     super.totalEarnings = 0,
     super.totalTipsReceived = 0,
@@ -105,6 +133,11 @@ class WorkerProfileModel extends WorkerProfile {
           workerProfile['currentLocation'] as Map<String, dynamic>);
     }
 
+    // Parse notification preferences
+    final notificationPreferences = WorkerNotificationPreferencesModel.fromJson(
+      workerProfile['notificationPreferences'] as Map<String, dynamic>?,
+    );
+
     return WorkerProfileModel(
       id: json['_id'] ?? json['id'] ?? '',
       email: json['email'] ?? '',
@@ -118,6 +151,7 @@ class WorkerProfileModel extends WorkerProfile {
       maxActiveJobs: workerProfile['maxActiveJobs'] as int? ?? 3,
       vehicleType: vehicleType,
       equipmentList: equipmentList,
+      notificationPreferences: notificationPreferences,
       totalJobsCompleted: workerProfile['totalJobsCompleted'] as int? ?? 0,
       totalEarnings: (workerProfile['totalEarnings'] as num?)?.toDouble() ?? 0,
       totalTipsReceived:
@@ -154,6 +188,11 @@ class WorkerProfileModel extends WorkerProfile {
         'maxActiveJobs': maxActiveJobs,
         'vehicleType': vehicleType.name,
         'equipmentList': equipmentList,
+        'notificationPreferences': {
+          'newJobs': notificationPreferences.newJobs,
+          'urgentJobs': notificationPreferences.urgentJobs,
+          'tips': notificationPreferences.tips,
+        },
         'totalJobsCompleted': totalJobsCompleted,
         'totalEarnings': totalEarnings,
         'totalTipsReceived': totalTipsReceived,
