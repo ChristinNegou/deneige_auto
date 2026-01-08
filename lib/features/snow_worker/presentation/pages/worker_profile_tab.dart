@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -22,10 +23,11 @@ class WorkerProfileTab extends StatefulWidget {
 
 class _WorkerProfileTabState extends State<WorkerProfileTab>
     with AutomaticKeepAliveClientMixin {
-  final _formKey = GlobalKey<FormState>();
   final _imagePicker = ImagePicker();
   bool _isUploadingPhoto = false;
   bool _initialized = false;
+  Timer? _debounceTimer;
+  bool _isSaving = false;
 
   // Equipment checkboxes
   bool _hasShovel = false;
@@ -56,6 +58,22 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     });
   }
 
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Auto-save avec debounce de 500ms
+  void _autoSave() {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (mounted && !_isSaving) {
+        _saveSettings();
+      }
+    });
+  }
+
   void _initializeFromProfile(WorkerProfile profile) {
     if (_initialized) return;
     _initialized = true;
@@ -81,17 +99,20 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
       child: BlocConsumer<WorkerAvailabilityBloc, WorkerAvailabilityState>(
         listener: (context, state) {
           if (state is WorkerProfileUpdated) {
+            setState(() => _isSaving = false);
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
                   children: [
                     Icon(Icons.check_circle, color: AppTheme.background, size: 20),
                     SizedBox(width: 12),
-                    Text('Parametres sauvegardes'),
+                    Text('Sauvegarde automatique'),
                   ],
                 ),
                 backgroundColor: AppTheme.success,
                 behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
@@ -118,7 +139,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               ),
             );
           } else if (state is WorkerAvailabilityError) {
-            setState(() => _isUploadingPhoto = false);
+            setState(() {
+              _isUploadingPhoto = false;
+              _isSaving = false;
+            });
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
@@ -176,8 +200,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     _buildNotificationsSection(),
                     const SizedBox(height: 16),
                     _buildHelpSupportSection(),
-                    const SizedBox(height: 24),
-                    _buildSaveButton(),
                     const SizedBox(height: 24),
                     _buildLogoutSection(),
                     const SizedBox(height: 32),
@@ -576,31 +598,46 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             icon: '🪣',
             label: 'Pelle a neige',
             value: _hasShovel,
-            onChanged: (val) => setState(() => _hasShovel = val!),
+            onChanged: (val) {
+              setState(() => _hasShovel = val!);
+              _autoSave();
+            },
           ),
           _buildEquipmentItem(
             icon: '🧹',
             label: 'Balai a neige',
             value: _hasBrush,
-            onChanged: (val) => setState(() => _hasBrush = val!),
+            onChanged: (val) {
+              setState(() => _hasBrush = val!);
+              _autoSave();
+            },
           ),
           _buildEquipmentItem(
             icon: '🪟',
             label: 'Grattoir a glace',
             value: _hasIceScraper,
-            onChanged: (val) => setState(() => _hasIceScraper = val!),
+            onChanged: (val) {
+              setState(() => _hasIceScraper = val!);
+              _autoSave();
+            },
           ),
           _buildEquipmentItem(
             icon: '🧂',
             label: 'Epandeur de sel',
             value: _hasSaltSpreader,
-            onChanged: (val) => setState(() => _hasSaltSpreader = val!),
+            onChanged: (val) {
+              setState(() => _hasSaltSpreader = val!);
+              _autoSave();
+            },
           ),
           _buildEquipmentItem(
             icon: '❄️',
             label: 'Souffleuse',
             value: _hasSnowBlower,
-            onChanged: (val) => setState(() => _hasSnowBlower = val!),
+            onChanged: (val) {
+              setState(() => _hasSnowBlower = val!);
+              _autoSave();
+            },
             isLast: true,
           ),
         ],
@@ -699,7 +736,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             children: [
               GestureDetector(
                 onTap: _maxActiveJobs > 1
-                    ? () => setState(() => _maxActiveJobs--)
+                    ? () {
+                        setState(() => _maxActiveJobs--);
+                        _autoSave();
+                      }
                     : null,
                 child: Container(
                   width: 44,
@@ -733,7 +773,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               ),
               GestureDetector(
                 onTap: _maxActiveJobs < 5
-                    ? () => setState(() => _maxActiveJobs++)
+                    ? () {
+                        setState(() => _maxActiveJobs++);
+                        _autoSave();
+                      }
                     : null,
                 child: Container(
                   width: 44,
@@ -882,6 +925,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               setState(() {
                 _zones.remove(zoneName);
               });
+              _autoSave();
             },
             child: Container(
               width: 22,
@@ -935,7 +979,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             title: 'Nouveaux jobs',
             subtitle: 'Alerte pour les nouveaux jobs disponibles',
             value: _notifyNewJobs,
-            onChanged: (val) => setState(() => _notifyNewJobs = val),
+            onChanged: (val) {
+              setState(() => _notifyNewJobs = val);
+              _autoSave();
+            },
           ),
           const Divider(height: 1, color: AppTheme.divider),
           _buildNotificationToggle(
@@ -943,7 +990,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             title: 'Jobs urgents',
             subtitle: 'Alertes prioritaires',
             value: _notifyUrgentJobs,
-            onChanged: (val) => setState(() => _notifyUrgentJobs = val),
+            onChanged: (val) {
+              setState(() => _notifyUrgentJobs = val);
+              _autoSave();
+            },
             iconColor: AppTheme.error,
           ),
           const Divider(height: 1, color: AppTheme.divider),
@@ -952,7 +1002,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             title: 'Pourboires',
             subtitle: 'Notification de reception',
             value: _notifyTips,
-            onChanged: (val) => setState(() => _notifyTips = val),
+            onChanged: (val) {
+              setState(() => _notifyTips = val);
+              _autoSave();
+            },
             iconColor: AppTheme.success,
           ),
         ],
@@ -1086,46 +1139,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     );
   }
 
-  Widget _buildSaveButton() {
-    return GestureDetector(
-      onTap: _saveSettings,
-      child: Container(
-        width: double.infinity,
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppTheme.primary, AppTheme.secondary],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primary.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.save_rounded, color: AppTheme.background, size: 22),
-            SizedBox(width: 10),
-            Text(
-              'Sauvegarder',
-              style: TextStyle(
-                color: AppTheme.background,
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildLogoutSection() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1228,6 +1241,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 setState(() {
                   _zones.add(controller.text);
                 });
+                _autoSave();
               }
               Navigator.pop(context);
             },
@@ -1245,21 +1259,22 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   void _saveSettings() {
-    if (_formKey.currentState?.validate() ?? true) {
-      final equipment = <String>[];
-      if (_hasShovel) equipment.add('shovel');
-      if (_hasBrush) equipment.add('brush');
-      if (_hasIceScraper) equipment.add('ice_scraper');
-      if (_hasSaltSpreader) equipment.add('salt_spreader');
-      if (_hasSnowBlower) equipment.add('snow_blower');
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
 
-      context.read<WorkerAvailabilityBloc>().add(
-            UpdateProfile(
-              equipmentList: equipment,
-              maxActiveJobs: _maxActiveJobs,
-            ),
-          );
-    }
+    final equipment = <String>[];
+    if (_hasShovel) equipment.add('shovel');
+    if (_hasBrush) equipment.add('brush');
+    if (_hasIceScraper) equipment.add('ice_scraper');
+    if (_hasSaltSpreader) equipment.add('salt_spreader');
+    if (_hasSnowBlower) equipment.add('snow_blower');
+
+    context.read<WorkerAvailabilityBloc>().add(
+          UpdateProfile(
+            equipmentList: equipment,
+            maxActiveJobs: _maxActiveJobs,
+          ),
+        );
   }
 
   void _showLogoutDialog(BuildContext context) {
