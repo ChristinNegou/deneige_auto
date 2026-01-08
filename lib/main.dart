@@ -21,72 +21,79 @@ import 'core/di/injection_container.dart';
 
 /// Point d'entrée principal de l'application Deneige Auto
 /// Cette fonction est appelée au démarrage de l'application
-void main() async {
-  // Garantir l'initialisation des bindings Flutter
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialiser Firebase
-  try {
-    await Firebase.initializeApp();
-    debugPrint('Firebase initialisé');
-
-    // Initialiser Crashlytics
-    await _initializeCrashlytics();
-
-    // Initialiser Analytics
-    await _initializeAnalytics();
-  } catch (e, stack) {
-    debugPrint('Erreur initialisation Firebase: $e');
-    debugPrint('Stack: $stack');
-  }
-
-  // Initialiser Stripe
-  Stripe.publishableKey = AppConfig.stripePublishableKey;
-  await Stripe.instance.applySettings();
-  debugPrint('Stripe initialisé');
-
-  // Initialiser les dépendances
-  await di.initializeDependencies();
-
-  // Initialiser les services de cache et offline
-  try {
-    final reservationCache = sl<ReservationCache>();
-    await reservationCache.init();
-
-    final syncQueue = sl<SyncQueue>();
-    await syncQueue.init();
-
-    final networkStatus = sl<NetworkStatus>();
-    await networkStatus.init();
-
-    debugPrint('Cache et services offline initialisés');
-  } catch (e) {
-    debugPrint('Erreur initialisation cache: $e');
-  }
-
-  // Initialiser les notifications push
-  try {
-    final pushService = sl<PushNotificationService>();
-    await pushService.initialize();
-    debugPrint('Push notifications initialisées');
-  } catch (e) {
-    debugPrint('Erreur initialisation push notifications: $e');
-  }
-
-  // Capturer les erreurs Flutter avec Crashlytics
-  FlutterError.onError = (errorDetails) {
-    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-  };
-
-  // Capturer les erreurs asynchrones
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
-
-  // Lancer l'app avec zone d'erreur
+void main() {
   runZonedGuarded(
-    () => runApp(const DeneigeAutoApp()),
+    () async {
+      // Garantir l'initialisation des bindings Flutter
+      WidgetsFlutterBinding.ensureInitialized();
+
+      // Initialiser Firebase
+      try {
+        await Firebase.initializeApp();
+        debugPrint('Firebase initialisé');
+
+        // Initialiser Crashlytics
+        await _initializeCrashlytics();
+
+        // Initialiser Analytics
+        await _initializeAnalytics();
+      } catch (e, stack) {
+        debugPrint('Erreur initialisation Firebase: $e');
+        debugPrint('Stack: $stack');
+      }
+
+      // Initialiser Stripe
+      try {
+        Stripe.publishableKey = AppConfig.stripePublishableKey;
+        await Stripe.instance.applySettings();
+        debugPrint('Stripe initialisé');
+      } catch (e, stack) {
+        debugPrint('Erreur initialisation Stripe: $e');
+        debugPrint('Stack: $stack');
+      }
+
+      // Initialiser les dépendances
+      await di.initializeDependencies();
+
+      // Initialiser les services de cache et offline
+      try {
+        final reservationCache = sl<ReservationCache>();
+        await reservationCache.init();
+
+        final syncQueue = sl<SyncQueue>();
+        await syncQueue.init();
+
+        final networkStatus = sl<NetworkStatus>();
+        await networkStatus.init();
+
+        debugPrint('Cache et services offline initialisés');
+      } catch (e) {
+        debugPrint('Erreur initialisation cache: $e');
+      }
+
+      // Initialiser les notifications push
+      try {
+        final pushService = sl<PushNotificationService>();
+        await pushService.initialize();
+        debugPrint('Push notifications initialisées');
+      } catch (e) {
+        debugPrint('Erreur initialisation push notifications: $e');
+      }
+
+      // Capturer les erreurs Flutter avec Crashlytics
+      FlutterError.onError = (errorDetails) {
+        FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+      };
+
+      // Capturer les erreurs asynchrones
+      PlatformDispatcher.instance.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
+
+      // Lancer l'app
+      runApp(const DeneigeAutoApp());
+    },
     (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack);
     },
