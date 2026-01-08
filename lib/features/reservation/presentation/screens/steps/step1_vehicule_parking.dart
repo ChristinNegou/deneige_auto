@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../core/config/app_config.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
@@ -382,6 +384,11 @@ class _VehicleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPhoto = vehicle.photoUrl != null && vehicle.photoUrl!.isNotEmpty;
+    final photoUrl = hasPhoto
+        ? '${AppConfig.apiBaseUrl}${vehicle.photoUrl}'
+        : null;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -399,7 +406,7 @@ class _VehicleCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Icône véhicule
+            // Photo ou icône véhicule
             Container(
               width: 44,
               height: 44,
@@ -407,14 +414,22 @@ class _VehicleCard extends StatelessWidget {
                 color: AppTheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: vehicle.photoUrl != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        vehicle.photoUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildIcon(),
+              clipBehavior: Clip.antiAlias,
+              child: hasPhoto && photoUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: photoUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppTheme.primary,
+                          ),
+                        ),
                       ),
+                      errorWidget: (context, url, error) => _buildIcon(),
                     )
                   : _buildIcon(),
             ),
