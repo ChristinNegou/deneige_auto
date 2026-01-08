@@ -8,7 +8,7 @@ const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 
-// Configure multer for photo uploads
+// Configure multer for job photo uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const uploadDir = path.join(__dirname, '../uploads/jobs');
@@ -29,6 +29,38 @@ const upload = multer({
     storage: storage,
     limits: {
         fileSize: 10 * 1024 * 1024, // 10MB max
+    },
+    fileFilter: function (req, file, cb) {
+        // Accept only images
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Seules les images sont acceptées'), false);
+        }
+    }
+});
+
+// Configure multer for profile photo uploads
+const profileStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = path.join(__dirname, '../uploads/profiles');
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname) || '.jpg';
+        cb(null, `profile-${req.user.id}-${uniqueSuffix}${ext}`);
+    }
+});
+
+const profileUpload = multer({
+    storage: profileStorage,
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB max for profile photos
     },
     fileFilter: function (req, file, cb) {
         // Accept only images
@@ -659,6 +691,47 @@ router.put('/profile', protect, authorize('snowWorker'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la mise à jour du profil',
+            error: error.message,
+        });
+    }
+});
+
+// @route   POST /api/workers/profile/photo
+// @desc    Upload worker profile photo
+// @access  Private (Worker only)
+router.post('/profile/photo', protect, authorize('snowWorker'), profileUpload.single('photo'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Photo requise',
+            });
+        }
+
+        // Build the URL for the photo
+        const photoUrl = `/uploads/profiles/${req.file.filename}`;
+
+        // Update user's photoUrl
+        const worker = await User.findByIdAndUpdate(
+            req.user.id,
+            { photoUrl: photoUrl },
+            { new: true }
+        );
+
+        console.log(`📷 Profile photo uploaded for worker ${worker.firstName}: ${photoUrl}`);
+
+        res.json({
+            success: true,
+            message: 'Photo de profil mise à jour',
+            data: {
+                photoUrl: photoUrl,
+            },
+        });
+    } catch (error) {
+        console.error('Error uploading profile photo:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'upload de la photo de profil',
             error: error.message,
         });
     }
