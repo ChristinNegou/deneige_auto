@@ -44,9 +44,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   bool _notifyUrgentJobs = true;
   bool _notifyTips = true;
 
-  // Zones
-  List<String> _zones = [];
-
   @override
   bool get wantKeepAlive => true;
 
@@ -88,7 +85,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
     // Load other settings
     _maxActiveJobs = profile.maxActiveJobs;
-    _zones = profile.preferredZones.map((z) => z.name).toList();
   }
 
   @override
@@ -194,8 +190,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     _buildEquipmentSection(),
                     const SizedBox(height: 16),
                     _buildWorkPreferencesSection(),
-                    const SizedBox(height: 16),
-                    _buildZonesSection(),
                     const SizedBox(height: 16),
                     _buildNotificationsSection(),
                     const SizedBox(height: 16),
@@ -821,131 +815,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     );
   }
 
-  Widget _buildZonesSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.warning.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.location_on_rounded,
-                    color: AppTheme.warning, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Zones preferees', style: AppTheme.headlineSmall),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Notifications prioritaires',
-                      style: AppTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              ..._zones.map((zone) => _buildZoneChip(zone)),
-              GestureDetector(
-                onTap: () => _showAddZoneDialog(context),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                    border: Border.all(
-                        color: AppTheme.primary.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add, size: 16, color: AppTheme.primary),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Ajouter',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildZoneChip(String zoneName) {
-    return Container(
-      padding: const EdgeInsets.only(left: 14, right: 6, top: 6, bottom: 6),
-      decoration: BoxDecoration(
-        color: AppTheme.warningLight,
-        borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            zoneName,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppTheme.warning,
-            ),
-          ),
-          const SizedBox(width: 4),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _zones.remove(zoneName);
-              });
-              _autoSave();
-            },
-            child: Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                color: AppTheme.warning.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.close,
-                size: 14,
-                color: AppTheme.warning,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildNotificationsSection() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1194,64 +1063,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAddZoneDialog(BuildContext context) {
-    final controller = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        title: Row(
-          children: [
-            Icon(Icons.add_location_alt_rounded, color: AppTheme.primary),
-            const SizedBox(width: 10),
-            const Text('Ajouter une zone'),
-          ],
-        ),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: 'Nom de la zone',
-            hintText: 'Ex: Trois-Rivieres Ouest',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-            ),
-            prefixIcon: const Icon(Icons.location_on_outlined),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Annuler',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (controller.text.isNotEmpty) {
-                setState(() {
-                  _zones.add(controller.text);
-                });
-                _autoSave();
-              }
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-            ),
-            child: const Text('Ajouter'),
           ),
         ],
       ),
