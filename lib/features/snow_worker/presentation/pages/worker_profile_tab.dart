@@ -1,8 +1,11 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../bloc/worker_availability_bloc.dart';
-import '../../domain/entities/worker_profile.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -19,6 +22,8 @@ class WorkerProfileTab extends StatefulWidget {
 class _WorkerProfileTabState extends State<WorkerProfileTab>
     with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
+  final _imagePicker = ImagePicker();
+  bool _isUploadingPhoto = false;
 
   // Equipment checkboxes
   bool _hasShovel = true;
@@ -26,9 +31,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   bool _hasIceScraper = true;
   bool _hasSaltSpreader = false;
   bool _hasSnowBlower = false;
-
-  // Vehicle selection
-  VehicleType _selectedVehicle = VehicleType.car;
 
   // Max active jobs
   int _maxActiveJobs = 3;
@@ -76,7 +78,28 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 ),
               ),
             );
+          } else if (state is WorkerPhotoUploading) {
+            setState(() => _isUploadingPhoto = true);
+          } else if (state is WorkerPhotoUploaded) {
+            setState(() => _isUploadingPhoto = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: AppTheme.background, size: 20),
+                    SizedBox(width: 12),
+                    Text('Photo de profil mise à jour'),
+                  ],
+                ),
+                backgroundColor: AppTheme.success,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+              ),
+            );
           } else if (state is WorkerAvailabilityError) {
+            setState(() => _isUploadingPhoto = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Row(
@@ -116,8 +139,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     _buildProfileCard(),
                     const SizedBox(height: 20),
                     _buildEquipmentSection(),
-                    const SizedBox(height: 16),
-                    _buildVehicleSection(),
                     const SizedBox(height: 16),
                     _buildWorkPreferencesSection(),
                     const SizedBox(height: 16),
@@ -203,118 +224,293 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildProfileCard() {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, authState) {
-        String userName = 'Deneigeur';
-        String userEmail = '';
-        String userPhone = '';
-
-        if (authState is AuthAuthenticated) {
-          userName = authState.user.name;
-          userEmail = authState.user.email;
-          userPhone = authState.user.phoneNumber ?? '';
+    return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
+      builder: (context, workerState) {
+        String? photoUrl;
+        if (workerState is WorkerAvailabilityLoaded) {
+          photoUrl = workerState.profile?.photoUrl;
         }
 
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppTheme.primary, AppTheme.secondary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.primary.withValues(alpha: 0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: AppTheme.background.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        return BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, authState) {
+            String userName = 'Deneigeur';
+            String userEmail = '';
+            String userPhone = '';
+
+            if (authState is AuthAuthenticated) {
+              userName = authState.user.name;
+              userEmail = authState.user.email;
+              userPhone = authState.user.phoneNumber ?? '';
+            }
+
+            return Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.primary, AppTheme.secondary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                child: Center(
-                  child: Text(
-                    userName.isNotEmpty ? userName[0].toUpperCase() : 'D',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.background,
+                borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Photo de profil avec bouton d'édition
+                  GestureDetector(
+                    onTap: _isUploadingPhoto ? null : _showPhotoOptions,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 70,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            color: AppTheme.background.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                            child: _isUploadingPhoto
+                                ? Center(
+                                    child: SizedBox(
+                                      width: 30,
+                                      height: 30,
+                                      child: CircularProgressIndicator(
+                                        color: AppTheme.background,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  )
+                                : photoUrl != null && photoUrl.isNotEmpty
+                                    ? CachedNetworkImage(
+                                        imageUrl: photoUrl,
+                                        fit: BoxFit.cover,
+                                        width: 70,
+                                        height: 70,
+                                        placeholder: (context, url) => Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppTheme.background,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            _buildInitialsAvatar(userName),
+                                      )
+                                    : _buildInitialsAvatar(userName),
+                          ),
+                        ),
+                        // Badge d'édition
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: AppTheme.background,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppTheme.shadowColor.withValues(alpha: 0.2),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.camera_alt_rounded,
+                              size: 14,
+                              color: AppTheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      userName,
-                      style: TextStyle(
-                        color: AppTheme.background,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    if (userEmail.isNotEmpty)
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.email_outlined,
-                            size: 14,
-                            color: AppTheme.background.withValues(alpha: 0.8),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userName,
+                          style: TextStyle(
+                            color: AppTheme.background,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
                           ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              userEmail,
-                              style: TextStyle(
-                                color: AppTheme.background.withValues(alpha: 0.9),
-                                fontSize: 13,
+                        ),
+                        const SizedBox(height: 4),
+                        if (userEmail.isNotEmpty)
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.email_outlined,
+                                size: 14,
+                                color: AppTheme.background.withValues(alpha: 0.8),
                               ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  userEmail,
+                                  style: TextStyle(
+                                    color: AppTheme.background.withValues(alpha: 0.9),
+                                    fontSize: 13,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        if (userPhone.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.phone_outlined,
+                                size: 14,
+                                color: AppTheme.background.withValues(alpha: 0.8),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                userPhone,
+                                style: TextStyle(
+                                  color: AppTheme.background.withValues(alpha: 0.9),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
-                    if (userPhone.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.phone_outlined,
-                            size: 14,
-                            color: AppTheme.background.withValues(alpha: 0.8),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            userPhone,
-                            style: TextStyle(
-                              color: AppTheme.background.withValues(alpha: 0.9),
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
+  }
+
+  Widget _buildInitialsAvatar(String userName) {
+    return Center(
+      child: Text(
+        userName.isNotEmpty ? userName[0].toUpperCase() : 'D',
+        style: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: AppTheme.background,
+        ),
+      ),
+    );
+  }
+
+  void _showPhotoOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppTheme.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Photo de profil',
+                style: AppTheme.headlineSmall,
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                  child: Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
+                ),
+                title: const Text('Prendre une photo'),
+                subtitle: Text(
+                  'Utiliser la camera',
+                  style: AppTheme.bodySmall,
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickPhoto(ImageSource.camera);
+                },
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppTheme.secondary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                  child: Icon(Icons.photo_library_rounded, color: AppTheme.secondary),
+                ),
+                title: const Text('Choisir une photo'),
+                subtitle: Text(
+                  'Depuis la galerie',
+                  style: AppTheme.bodySmall,
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickPhoto(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickPhoto(ImageSource source) async {
+    try {
+      final XFile? photo = await _imagePicker.pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 800,
+        maxHeight: 800,
+      );
+
+      if (photo != null && mounted) {
+        final file = File(photo.path);
+        context.read<WorkerAvailabilityBloc>().add(UploadProfilePhoto(file));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur lors de la selection de la photo'),
+            backgroundColor: AppTheme.error,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildEquipmentSection() {
@@ -426,102 +622,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         ),
         if (!isLast) const Divider(height: 1, color: AppTheme.divider),
       ],
-    );
-  }
-
-  Widget _buildVehicleSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.secondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.directions_car_rounded,
-                    color: AppTheme.secondary, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text('Mon vehicule', style: AppTheme.headlineSmall),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ...VehicleType.values.map((type) => _buildVehicleOption(type)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVehicleOption(VehicleType type) {
-    final isSelected = _selectedVehicle == type;
-    final emoji = _getVehicleEmoji(type);
-
-    return GestureDetector(
-      onTap: () => setState(() => _selectedVehicle = type),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.primary.withValues(alpha: 0.08)
-              : AppTheme.background,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          border: isSelected
-              ? Border.all(color: AppTheme.primary, width: 2)
-              : Border.all(color: AppTheme.border),
-        ),
-        child: Row(
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _getVehicleLabel(type),
-                    style: AppTheme.labelLarge.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color:
-                          isSelected ? AppTheme.primary : AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _getVehicleDescription(type),
-                    style: AppTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSelected ? AppTheme.primary : AppTheme.background,
-                border: isSelected
-                    ? null
-                    : Border.all(color: AppTheme.textTertiary, width: 2),
-              ),
-              child: isSelected
-                  ? Icon(Icons.check, color: AppTheme.background, size: 14)
-                  : null,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -996,45 +1096,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     );
   }
 
-  String _getVehicleEmoji(VehicleType type) {
-    switch (type) {
-      case VehicleType.car:
-        return '🚗';
-      case VehicleType.truck:
-        return '🛻';
-      case VehicleType.atv:
-        return '🏍️';
-      case VehicleType.other:
-        return '🚙';
-    }
-  }
-
-  String _getVehicleLabel(VehicleType type) {
-    switch (type) {
-      case VehicleType.car:
-        return 'Voiture';
-      case VehicleType.truck:
-        return 'Camionnette';
-      case VehicleType.atv:
-        return 'VTT / Quad';
-      case VehicleType.other:
-        return 'Autre';
-    }
-  }
-
-  String _getVehicleDescription(VehicleType type) {
-    switch (type) {
-      case VehicleType.car:
-        return 'Petites entrees, stationnements';
-      case VehicleType.truck:
-        return 'Grandes entrees, equipement lourd';
-      case VehicleType.atv:
-        return 'Acces difficile, terrains varies';
-      case VehicleType.other:
-        return 'Autre type de vehicule';
-    }
-  }
-
   void _showAddZoneDialog(BuildContext context) {
     final controller = TextEditingController();
 
@@ -1103,7 +1164,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
       context.read<WorkerAvailabilityBloc>().add(
             UpdateProfile(
-              vehicleType: _selectedVehicle,
               equipmentList: equipment,
               maxActiveJobs: _maxActiveJobs,
             ),

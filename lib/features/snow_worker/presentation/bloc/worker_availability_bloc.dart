@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -54,6 +56,15 @@ class UpdateProfile extends WorkerAvailabilityEvent {
   @override
   List<Object?> get props =>
       [preferredZones, equipmentList, vehicleType, maxActiveJobs];
+}
+
+class UploadProfilePhoto extends WorkerAvailabilityEvent {
+  final File photo;
+
+  const UploadProfilePhoto(this.photo);
+
+  @override
+  List<Object?> get props => [photo];
 }
 
 // States
@@ -117,6 +128,19 @@ class WorkerProfileUpdated extends WorkerAvailabilityState {
   List<Object?> get props => [profile];
 }
 
+class WorkerPhotoUploading extends WorkerAvailabilityState {
+  const WorkerPhotoUploading();
+}
+
+class WorkerPhotoUploaded extends WorkerAvailabilityState {
+  final String photoUrl;
+
+  const WorkerPhotoUploaded(this.photoUrl);
+
+  @override
+  List<Object?> get props => [photoUrl];
+}
+
 // BLoC
 class WorkerAvailabilityBloc
     extends Bloc<WorkerAvailabilityEvent, WorkerAvailabilityState> {
@@ -134,6 +158,7 @@ class WorkerAvailabilityBloc
     on<UpdateLocation>(_onUpdateLocation);
     on<LoadProfile>(_onLoadProfile);
     on<UpdateProfile>(_onUpdateProfile);
+    on<UploadProfilePhoto>(_onUploadProfilePhoto);
   }
 
   Future<void> _onLoadAvailability(
@@ -249,6 +274,31 @@ class WorkerAvailabilityBloc
           profile: profile,
           isUpdating: false,
         ));
+      },
+    );
+  }
+
+  Future<void> _onUploadProfilePhoto(
+    UploadProfilePhoto event,
+    Emitter<WorkerAvailabilityState> emit,
+  ) async {
+    final currentState = state;
+
+    emit(const WorkerPhotoUploading());
+
+    final result = await repository.uploadProfilePhoto(event.photo);
+
+    result.fold(
+      (failure) {
+        emit(WorkerAvailabilityError(failure.message));
+        if (currentState is WorkerAvailabilityLoaded) {
+          emit(currentState);
+        }
+      },
+      (photoUrl) {
+        emit(WorkerPhotoUploaded(photoUrl));
+        // Reload profile to get updated photo URL
+        add(const LoadProfile());
       },
     );
   }

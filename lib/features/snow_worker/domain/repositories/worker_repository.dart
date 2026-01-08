@@ -47,6 +47,9 @@ abstract class WorkerRepository {
     int? maxActiveJobs,
   });
 
+  /// Upload profile photo
+  Future<Either<Failure, String>> uploadProfilePhoto(File photo);
+
   /// Toggle worker availability
   Future<Either<Failure, bool>> toggleAvailability(bool isAvailable);
 

@@ -283,6 +283,18 @@ class WorkerRepositoryImpl implements WorkerRepository {
   }
 
   @override
+  Future<Either<Failure, String>> uploadProfilePhoto(File photo) async {
+    try {
+      final photoUrl = await remoteDataSource.uploadProfilePhoto(photo);
+      return Right(photoUrl);
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, WorkerCancellationResult>> cancelJob({
     required String jobId,
     required String reasonCode,

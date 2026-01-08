@@ -9,6 +9,7 @@ class Reservation extends Equatable {
   final String? workerId;
   final String? workerName;
   final String? workerPhone;
+  final String? workerPhotoUrl;
   final ParkingSpot parkingSpot;
   final Vehicle vehicle;
   final DateTime departureTime;
@@ -42,6 +43,7 @@ class Reservation extends Equatable {
     this.workerId,
     this.workerName,
     this.workerPhone,
+    this.workerPhotoUrl,
     required this.parkingSpot,
     required this.vehicle,
     required this.departureTime,
@@ -129,6 +131,7 @@ class Reservation extends Equatable {
     String? workerId,
     String? workerName,
     String? workerPhone,
+    String? workerPhotoUrl,
     ParkingSpot? parkingSpot,
     Vehicle? vehicle,
     DateTime? departureTime,
@@ -160,6 +163,7 @@ class Reservation extends Equatable {
       workerId: workerId ?? this.workerId,
       workerName: workerName ?? this.workerName,
       workerPhone: workerPhone ?? this.workerPhone,
+      workerPhotoUrl: workerPhotoUrl ?? this.workerPhotoUrl,
       parkingSpot: parkingSpot ?? this.parkingSpot,
       vehicle: vehicle ?? this.vehicle,
       departureTime: departureTime ?? this.departureTime,
@@ -195,6 +199,7 @@ class Reservation extends Equatable {
         workerId,
         workerName,
         workerPhone,
+        workerPhotoUrl,
         parkingSpot,
         vehicle,
         departureTime,

@@ -70,6 +70,9 @@ abstract class WorkerRemoteDataSource {
     required File photoFile,
   });
 
+  /// Upload profile photo
+  Future<String> uploadProfilePhoto(File photoFile);
+
   /// Annuler un job avec une raison valable
   Future<WorkerCancellationResult> cancelJob({
     required String jobId,
@@ -465,6 +468,27 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     );
 
     return response.data['data']['url'] as String;
+  }
+
+  @override
+  Future<String> uploadProfilePhoto(File photoFile) async {
+    final fileName = photoFile.path.split('/').last;
+    final formData = FormData.fromMap({
+      'photo': await MultipartFile.fromFile(
+        photoFile.path,
+        filename: fileName,
+      ),
+    });
+
+    final response = await dio.post(
+      '/workers/profile/photo',
+      data: formData,
+      options: Options(
+        contentType: 'multipart/form-data',
+      ),
+    );
+
+    return response.data['data']['photoUrl'] as String;
   }
 
   @override
