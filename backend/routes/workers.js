@@ -708,7 +708,7 @@ router.get('/profile', protect, authorize('snowWorker'), async (req, res) => {
 // @access  Private (Worker only)
 router.put('/profile', protect, authorize('snowWorker'), async (req, res) => {
     try {
-        const { preferredZones, equipmentList, vehicleType, maxActiveJobs } = req.body;
+        const { preferredZones, equipmentList, vehicleType, maxActiveJobs, notificationPreferences } = req.body;
 
         const updateData = {};
 
@@ -723,6 +723,17 @@ router.put('/profile', protect, authorize('snowWorker'), async (req, res) => {
         }
         if (maxActiveJobs !== undefined) {
             updateData['workerProfile.maxActiveJobs'] = maxActiveJobs;
+        }
+        if (notificationPreferences !== undefined) {
+            if (notificationPreferences.newJobs !== undefined) {
+                updateData['workerProfile.notificationPreferences.newJobs'] = notificationPreferences.newJobs;
+            }
+            if (notificationPreferences.urgentJobs !== undefined) {
+                updateData['workerProfile.notificationPreferences.urgentJobs'] = notificationPreferences.urgentJobs;
+            }
+            if (notificationPreferences.tips !== undefined) {
+                updateData['workerProfile.notificationPreferences.tips'] = notificationPreferences.tips;
+            }
         }
 
         const worker = await User.findByIdAndUpdate(

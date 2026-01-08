@@ -51,6 +51,33 @@ enum VehicleType {
   other,
 }
 
+class WorkerNotificationPreferences extends Equatable {
+  final bool newJobs;
+  final bool urgentJobs;
+  final bool tips;
+
+  const WorkerNotificationPreferences({
+    this.newJobs = true,
+    this.urgentJobs = true,
+    this.tips = true,
+  });
+
+  WorkerNotificationPreferences copyWith({
+    bool? newJobs,
+    bool? urgentJobs,
+    bool? tips,
+  }) {
+    return WorkerNotificationPreferences(
+      newJobs: newJobs ?? this.newJobs,
+      urgentJobs: urgentJobs ?? this.urgentJobs,
+      tips: tips ?? this.tips,
+    );
+  }
+
+  @override
+  List<Object?> get props => [newJobs, urgentJobs, tips];
+}
+
 class WorkerProfile extends Equatable {
   final String id;
   final String email;
@@ -64,6 +91,7 @@ class WorkerProfile extends Equatable {
   final int maxActiveJobs;
   final VehicleType vehicleType;
   final List<String> equipmentList;
+  final WorkerNotificationPreferences notificationPreferences;
   final int totalJobsCompleted;
   final double totalEarnings;
   final double totalTipsReceived;
@@ -83,6 +111,7 @@ class WorkerProfile extends Equatable {
     this.maxActiveJobs = 3,
     this.vehicleType = VehicleType.car,
     this.equipmentList = const [],
+    this.notificationPreferences = const WorkerNotificationPreferences(),
     this.totalJobsCompleted = 0,
     this.totalEarnings = 0,
     this.totalTipsReceived = 0,
@@ -105,6 +134,7 @@ class WorkerProfile extends Equatable {
     int? maxActiveJobs,
     VehicleType? vehicleType,
     List<String>? equipmentList,
+    WorkerNotificationPreferences? notificationPreferences,
     int? totalJobsCompleted,
     double? totalEarnings,
     double? totalTipsReceived,
@@ -124,6 +154,7 @@ class WorkerProfile extends Equatable {
       maxActiveJobs: maxActiveJobs ?? this.maxActiveJobs,
       vehicleType: vehicleType ?? this.vehicleType,
       equipmentList: equipmentList ?? this.equipmentList,
+      notificationPreferences: notificationPreferences ?? this.notificationPreferences,
       totalJobsCompleted: totalJobsCompleted ?? this.totalJobsCompleted,
       totalEarnings: totalEarnings ?? this.totalEarnings,
       totalTipsReceived: totalTipsReceived ?? this.totalTipsReceived,
@@ -146,6 +177,7 @@ class WorkerProfile extends Equatable {
         maxActiveJobs,
         vehicleType,
         equipmentList,
+        notificationPreferences,
         totalJobsCompleted,
         totalEarnings,
         totalTipsReceived,

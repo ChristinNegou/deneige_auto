@@ -34,6 +34,7 @@ abstract class WorkerRemoteDataSource {
     List<String>? equipmentList,
     String? vehicleType,
     int? maxActiveJobs,
+    Map<String, bool>? notificationPreferences,
   });
 
   Future<bool> toggleAvailability(bool isAvailable);
@@ -335,6 +336,7 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     List<String>? equipmentList,
     String? vehicleType,
     int? maxActiveJobs,
+    Map<String, bool>? notificationPreferences,
   }) async {
     final body = <String, dynamic>{};
 
@@ -349,6 +351,9 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     }
     if (maxActiveJobs != null) {
       body['maxActiveJobs'] = maxActiveJobs;
+    }
+    if (notificationPreferences != null) {
+      body['notificationPreferences'] = notificationPreferences;
     }
 
     final response = await dio.put('/workers/profile', data: body);

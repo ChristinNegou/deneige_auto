@@ -145,6 +145,21 @@ const userSchema = new mongoose.Schema({
         equipmentList: [{
             type: String,
         }],
+        // Worker notification preferences
+        notificationPreferences: {
+            newJobs: {
+                type: Boolean,
+                default: true,
+            },
+            urgentJobs: {
+                type: Boolean,
+                default: true,
+            },
+            tips: {
+                type: Boolean,
+                default: true,
+            },
+        },
 
         // Worker statistics
         totalJobsCompleted: {
