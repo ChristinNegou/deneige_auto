@@ -150,14 +150,45 @@ router.put('/location', protect, authorize('snowWorker'), async (req, res) => {
 // JOBS DISCOVERY & MANAGEMENT
 // ============================================
 
+// Helper function to compute required equipment for a reservation
+const computeRequiredEquipment = (reservation) => {
+    const required = ['shovel', 'brush']; // Base equipment always required
+
+    if (reservation.serviceOptions && reservation.serviceOptions.length > 0) {
+        if (reservation.serviceOptions.includes('windowScraping')) {
+            required.push('ice_scraper');
+        }
+        if (reservation.serviceOptions.includes('doorDeicing')) {
+            required.push('salt_spreader');
+        }
+    }
+
+    // Heavy snow requires snow blower
+    if (reservation.snowDepthCm && reservation.snowDepthCm > 15) {
+        required.push('snow_blower');
+    }
+
+    return [...new Set(required)];
+};
+
+// Helper function to check if worker has required equipment
+const workerHasRequiredEquipment = (workerEquipment, requiredEquipment) => {
+    if (!requiredEquipment || requiredEquipment.length === 0) return true;
+    if (!workerEquipment || workerEquipment.length === 0) return false;
+    return requiredEquipment.every(eq => workerEquipment.includes(eq));
+};
+
 // @route   GET /api/workers/available-jobs
-// @desc    Get available jobs near worker location
+// @desc    Get available jobs near worker location (filtered by worker's equipment)
 // @access  Private (Worker only)
 router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res) => {
     try {
-        const { lat, lng, radiusKm = 50 } = req.query; // Default radius: 50km
+        const { lat, lng, radiusKm = 50, filterByEquipment = 'true' } = req.query; // Default radius: 50km
 
         console.log(`🔍 Available jobs request from worker ${req.user.firstName}: lat=${lat}, lng=${lng}, radius=${radiusKm}km`);
+
+        // Get worker's equipment list
+        const workerEquipment = req.user.workerProfile?.equipmentList || [];
 
         if (!lat || !lng) {
             return res.status(400).json({
@@ -274,8 +305,24 @@ router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res)
             return (a.distanceKm || 0) - (b.distanceKm || 0);
         });
 
+        // Compute required equipment for each reservation
+        const reservationsWithEquipment = allReservations.map(r => ({
+            ...r,
+            requiredEquipment: r.requiredEquipment || computeRequiredEquipment(r),
+        }));
+
+        // Filter by equipment if enabled
+        const shouldFilter = filterByEquipment === 'true';
+        const filteredReservations = shouldFilter
+            ? reservationsWithEquipment.filter(r =>
+                workerHasRequiredEquipment(workerEquipment, r.requiredEquipment))
+            : reservationsWithEquipment;
+
+        console.log(`🔧 Worker equipment: [${workerEquipment.join(', ')}]`);
+        console.log(`📋 ${reservationsWithEquipment.length} total jobs, ${filteredReservations.length} compatible with worker equipment`);
+
         // Format output
-        const formattedReservations = allReservations.map(r => ({
+        const formattedReservations = filteredReservations.map(r => ({
             _id: r._id,
             departureTime: r.departureTime,
             deadlineTime: r.deadlineTime,
@@ -291,6 +338,8 @@ router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res)
             distanceKm: r.distanceKm,
             hoursUntilDeparture: r.hoursUntilDeparture,
             createdAt: r.createdAt,
+            requiredEquipment: r.requiredEquipment,
+            workerHasEquipment: workerHasRequiredEquipment(workerEquipment, r.requiredEquipment),
             client: r.client ? {
                 _id: r.client._id,
                 firstName: r.client.firstName,

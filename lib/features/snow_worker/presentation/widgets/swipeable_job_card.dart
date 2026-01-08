@@ -370,6 +370,12 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                       _buildServiceOptions(),
                     ],
 
+                    // Required equipment
+                    if (widget.job.requiredEquipment.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      _buildRequiredEquipment(),
+                    ],
+
                     // Accept button (non-swipe mode)
                     if (widget.showAcceptButton &&
                         widget.job.status == JobStatus.pending &&
@@ -570,6 +576,70 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildRequiredEquipment() {
+    final hasEquipment = widget.job.workerHasEquipment;
+    final statusColor = hasEquipment ? AppTheme.success : AppTheme.warning;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header with compatibility status
+        Row(
+          children: [
+            Icon(
+              hasEquipment ? Icons.check_circle : Icons.warning_amber_rounded,
+              size: 14,
+              color: statusColor,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              hasEquipment ? 'Équipement compatible' : 'Équipement requis',
+              style: TextStyle(
+                fontSize: 11,
+                color: statusColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        // Equipment chips
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: widget.job.requiredEquipment.map((equipment) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: AppTheme.border),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    equipment.icon,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    equipment.label,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 

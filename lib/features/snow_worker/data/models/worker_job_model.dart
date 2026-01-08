@@ -142,6 +142,8 @@ class WorkerJobModel extends WorkerJob {
     super.tipAmount,
     super.rating,
     super.review,
+    super.requiredEquipment = const [],
+    super.workerHasEquipment = true,
   });
 
   factory WorkerJobModel.fromJson(Map<String, dynamic> json) {
@@ -223,6 +225,17 @@ class WorkerJobModel extends WorkerJob {
       tipAmount = (json['tip']['amount'] as num?)?.toDouble();
     }
 
+    // Parse required equipment
+    final requiredEquipmentJson =
+        json['requiredEquipment'] as List<dynamic>? ?? [];
+    final requiredEquipment = requiredEquipmentJson
+        .map((e) => EquipmentTypeExtension.fromString(e.toString()))
+        .whereType<EquipmentType>()
+        .toList();
+
+    // Parse worker has equipment flag
+    final workerHasEquipment = json['workerHasEquipment'] as bool? ?? true;
+
     return WorkerJobModel(
       id: json['_id'] ?? json['id'] ?? '',
       client: client,
@@ -262,6 +275,8 @@ class WorkerJobModel extends WorkerJob {
       tipAmount: tipAmount,
       rating: (json['rating'] as num?)?.toDouble(),
       review: json['review'],
+      requiredEquipment: requiredEquipment,
+      workerHasEquipment: workerHasEquipment,
     );
   }
 

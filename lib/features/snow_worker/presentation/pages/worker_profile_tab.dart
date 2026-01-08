@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../bloc/worker_availability_bloc.dart';
+import '../../domain/entities/worker_profile.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -24,11 +25,12 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   final _formKey = GlobalKey<FormState>();
   final _imagePicker = ImagePicker();
   bool _isUploadingPhoto = false;
+  bool _initialized = false;
 
   // Equipment checkboxes
-  bool _hasShovel = true;
-  bool _hasBrush = true;
-  bool _hasIceScraper = true;
+  bool _hasShovel = false;
+  bool _hasBrush = false;
+  bool _hasIceScraper = false;
   bool _hasSaltSpreader = false;
   bool _hasSnowBlower = false;
 
@@ -41,7 +43,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   bool _notifyTips = true;
 
   // Zones
-  final List<String> _zones = ['Trois-Rivieres Centre', 'Cap-de-la-Madeleine'];
+  List<String> _zones = [];
 
   @override
   bool get wantKeepAlive => true;
@@ -52,6 +54,23 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<WorkerAvailabilityBloc>().add(const LoadAvailability());
     });
+  }
+
+  void _initializeFromProfile(WorkerProfile profile) {
+    if (_initialized) return;
+    _initialized = true;
+
+    // Load equipment from profile
+    final equipment = profile.equipmentList;
+    _hasShovel = equipment.contains('shovel');
+    _hasBrush = equipment.contains('brush');
+    _hasIceScraper = equipment.contains('ice_scraper');
+    _hasSaltSpreader = equipment.contains('salt_spreader');
+    _hasSnowBlower = equipment.contains('snow_blower');
+
+    // Load other settings
+    _maxActiveJobs = profile.maxActiveJobs;
+    _zones = profile.preferredZones.map((z) => z.name).toList();
   }
 
   @override
@@ -124,6 +143,16 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             return const Center(
               child: CircularProgressIndicator(color: AppTheme.primary),
             );
+          }
+
+          // Initialize from profile when loaded (use addPostFrameCallback to avoid setState during build)
+          if (state is WorkerAvailabilityLoaded && state.profile != null && !_initialized) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                _initializeFromProfile(state.profile!);
+                setState(() {});
+              }
+            });
           }
 
           return CustomScrollView(
