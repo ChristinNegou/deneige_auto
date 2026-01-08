@@ -382,4 +382,134 @@ router.put('/update-profile', protect, async (req, res) => {
     }
 });
 
+// @route   GET /api/auth/preferences
+// @desc    Obtenir les préférences utilisateur
+// @access  Private
+router.get('/preferences', protect, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        res.status(200).json({
+            success: true,
+            preferences: {
+                notificationSettings: user.notificationSettings || {
+                    pushEnabled: true,
+                    emailEnabled: true,
+                    smsEnabled: false,
+                },
+                userPreferences: user.userPreferences || {
+                    soundEnabled: true,
+                    darkThemeEnabled: true,
+                },
+            },
+        });
+    } catch (error) {
+        console.error('Erreur lors de la récupération des préférences:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération des préférences',
+        });
+    }
+});
+
+// @route   PUT /api/auth/preferences
+// @desc    Mettre à jour les préférences utilisateur
+// @access  Private
+router.put('/preferences', protect, async (req, res) => {
+    try {
+        const { pushEnabled, soundEnabled, darkThemeEnabled } = req.body;
+
+        const updateData = {
+            updatedAt: Date.now(),
+        };
+
+        // Mettre à jour notificationSettings si pushEnabled est fourni
+        if (typeof pushEnabled === 'boolean') {
+            updateData['notificationSettings.pushEnabled'] = pushEnabled;
+        }
+
+        // Mettre à jour userPreferences
+        if (typeof soundEnabled === 'boolean') {
+            updateData['userPreferences.soundEnabled'] = soundEnabled;
+        }
+        if (typeof darkThemeEnabled === 'boolean') {
+            updateData['userPreferences.darkThemeEnabled'] = darkThemeEnabled;
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { $set: updateData },
+            { new: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            preferences: {
+                notificationSettings: user.notificationSettings,
+                userPreferences: user.userPreferences,
+            },
+        });
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour des préférences:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la mise à jour des préférences',
+        });
+    }
+});
+
+// @route   DELETE /api/auth/account
+// @desc    Supprimer le compte utilisateur
+// @access  Private
+router.delete('/account', protect, async (req, res) => {
+    try {
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le mot de passe est requis pour confirmer la suppression',
+            });
+        }
+
+        // Récupérer l'utilisateur avec le mot de passe
+        const user = await User.findById(req.user.id).select('+password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Utilisateur non trouvé',
+            });
+        }
+
+        // Vérifier le mot de passe
+        const isPasswordValid = await user.comparePassword(password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: 'Mot de passe incorrect',
+            });
+        }
+
+        // Supprimer l'utilisateur
+        await User.findByIdAndDelete(req.user.id);
+
+        // TODO: Optionnel - Supprimer les données associées (véhicules, réservations, etc.)
+        // await Vehicle.deleteMany({ userId: req.user.id });
+        // await Reservation.deleteMany({ client: req.user.id });
+
+        res.status(200).json({
+            success: true,
+            message: 'Compte supprimé avec succès',
+        });
+    } catch (error) {
+        console.error('Erreur lors de la suppression du compte:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la suppression du compte',
+        });
+    }
+});
+
 module.exports = router;

@@ -79,6 +79,7 @@ dependencies:
   audioplayers: ^6.1.0
   confetti: ^0.8.0
   lottie: ^3.3.1
+  package_info_plus: ^8.0.0
 
   # Authentication
   jwt_decoder: ^2.0.1
