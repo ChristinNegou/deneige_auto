@@ -101,24 +101,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         listener: (context, state) {
           if (state is WorkerProfileUpdated) {
             setState(() => _isSaving = false);
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: AppTheme.background, size: 20),
-                    SizedBox(width: 12),
-                    Text('Sauvegarde automatique'),
-                  ],
-                ),
-                backgroundColor: AppTheme.success,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-              ),
-            );
           } else if (state is WorkerPhotoUploading) {
             setState(() => _isUploadingPhoto = true);
           } else if (state is WorkerPhotoUploaded) {
