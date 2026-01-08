@@ -99,16 +99,6 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 return; // Wait for photo upload to complete
               }
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.successMessage!),
-                  backgroundColor: AppTheme.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                  ),
-                ),
-              );
               Navigator.pop(context, true);
             }
           },

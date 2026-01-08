@@ -105,22 +105,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             setState(() => _isUploadingPhoto = true);
           } else if (state is WorkerPhotoUploaded) {
             setState(() => _isUploadingPhoto = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: AppTheme.background, size: 20),
-                    SizedBox(width: 12),
-                    Text('Photo de profil mise à jour'),
-                  ],
-                ),
-                backgroundColor: AppTheme.success,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-              ),
-            );
           } else if (state is WorkerAvailabilityError) {
             setState(() {
               _isUploadingPhoto = false;

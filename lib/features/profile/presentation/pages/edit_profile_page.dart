@@ -70,13 +70,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           );
         }
         if (state is AuthAuthenticated) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Profil mis à jour avec succès'),
-              backgroundColor: AppTheme.success,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
           Navigator.pop(context);
         }
       },
@@ -426,13 +419,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
               title: 'Supprimer la photo',
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Photo supprimée'),
-                    backgroundColor: AppTheme.success,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
               },
             ),
           ],
