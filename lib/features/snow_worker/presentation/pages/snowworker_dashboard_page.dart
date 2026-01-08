@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../bloc/worker_jobs_bloc.dart';
+import '../bloc/worker_availability_bloc.dart';
 import '../../domain/entities/worker_job.dart';
 import '../../../../core/di/injection_container.dart';
 import '../widgets/shimmer_loading.dart';
@@ -130,33 +132,89 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Row(
         children: [
-          // Avatar avec animation
-          Hero(
-            tag: 'worker_avatar',
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.secondary, AppTheme.primary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.local_shipping_rounded,
-                color: AppTheme.background,
-                size: 24,
-              ),
-            ),
+          // Avatar avec photo de profil - utilise WorkerAvailabilityBloc
+          BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
+            builder: (context, workerState) {
+              return BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, authState) {
+                  // Priorité: photo du worker profile, sinon auth state
+                  String? photoUrl;
+                  if (workerState is WorkerAvailabilityLoaded) {
+                    photoUrl = workerState.profile?.photoUrl;
+                  }
+                  photoUrl ??= authState is AuthAuthenticated
+                      ? authState.user.photoUrl
+                      : null;
+
+                  final userName = authState is AuthAuthenticated
+                      ? authState.user.firstName ?? 'D'
+                      : 'D';
+
+                  return Hero(
+                    tag: 'worker_avatar',
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppTheme.secondary, AppTheme.primary],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primary.withValues(alpha: 0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                        child: photoUrl != null && photoUrl.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: photoUrl,
+                                fit: BoxFit.cover,
+                                width: 48,
+                                height: 48,
+                                placeholder: (context, url) => Center(
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: AppTheme.background,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Center(
+                                  child: Text(
+                                    userName[0].toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.background,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Center(
+                                child: Text(
+                                  userName[0].toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.background,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
           const SizedBox(width: 14),
           Expanded(

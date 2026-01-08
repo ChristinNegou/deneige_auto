@@ -255,6 +255,7 @@ Future<void> initializeDependencies() async {
       getVehicles: sl(),
       addVehicle: sl(),
       deleteVehicle: sl(),
+      repository: sl(),
     ),
   );
 

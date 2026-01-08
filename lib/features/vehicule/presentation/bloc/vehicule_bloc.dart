@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:deneige_auto/features/reservation/domain/usecases/add_vehicle_usecase.dart';
 import 'package:deneige_auto/features/reservation/domain/usecases/delete_vehicle_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../reservation/domain/entities/vehicle.dart';
+import '../../../reservation/domain/repositories/reservation_repository.dart';
 import '../../../reservation/domain/usecases/get_vehicules_usecase.dart';
 
 // ==================== EVENTS ====================
@@ -31,6 +34,16 @@ class DeleteVehicle extends VehicleEvent {
 
   @override
   List<Object?> get props => [vehicleId];
+}
+
+class UploadVehiclePhoto extends VehicleEvent {
+  final String vehicleId;
+  final File photo;
+
+  const UploadVehiclePhoto({required this.vehicleId, required this.photo});
+
+  @override
+  List<Object?> get props => [vehicleId, photo];
 }
 
 // ==================== STATES ====================
@@ -83,15 +96,18 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
   final GetVehiclesUseCase getVehicles;
   final AddVehicleUseCase addVehicle;
   final DeleteVehicleUseCase deleteVehicle;
+  final ReservationRepository repository;
 
   VehicleBloc({
     required this.getVehicles,
     required this.addVehicle,
     required this.deleteVehicle,
+    required this.repository,
   }) : super(const VehicleState()) {
     on<LoadVehicles>(_onLoadVehicles);
     on<AddVehicle>(_onAddVehicle);
     on<DeleteVehicle>(_onDeleteVehicle);
+    on<UploadVehiclePhoto>(_onUploadVehiclePhoto);
   }
 
   Future<void> _onLoadVehicles(
@@ -161,6 +177,41 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
           isSubmitting: false,
           vehicles: updatedVehicles,
           successMessage: 'Véhicule supprimé avec succès',
+          clearError: true,
+        ));
+      },
+    );
+  }
+
+  Future<void> _onUploadVehiclePhoto(
+    UploadVehiclePhoto event,
+    Emitter<VehicleState> emit,
+  ) async {
+    emit(state.copyWith(isSubmitting: true, clearError: true));
+
+    final result = await repository.uploadVehiclePhoto(
+      vehicleId: event.vehicleId,
+      photoPath: event.photo.path,
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        isSubmitting: false,
+        errorMessage: failure.message,
+      )),
+      (photoUrl) {
+        // Update the vehicle in the list with the new photo URL
+        final updatedVehicles = state.vehicles.map((v) {
+          if (v.id == event.vehicleId) {
+            return v.copyWith(photoUrl: photoUrl);
+          }
+          return v;
+        }).toList();
+
+        emit(state.copyWith(
+          isSubmitting: false,
+          vehicles: updatedVehicles,
+          successMessage: 'Photo du véhicule mise à jour',
           clearError: true,
         ));
       },

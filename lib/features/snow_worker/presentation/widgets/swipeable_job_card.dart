@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/config/app_config.dart' hide ServiceOption;
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/worker_job.dart';
 
@@ -319,10 +321,10 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                             ],
                           ),
                         ),
-                        // Vehicle
+                        // Vehicle with photo
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
+                            horizontal: 6,
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
@@ -332,18 +334,29 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
-                                Icons.directions_car,
-                                color: AppTheme.textSecondary,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                widget.job.vehicle.displayName,
-                                style: TextStyle(
-                                  color: AppTheme.textSecondary,
-                                  fontSize: 12,
-                                ),
+                              _buildVehiclePhoto(widget.job.vehicle.photoUrl),
+                              const SizedBox(width: 6),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    widget.job.vehicle.displayName,
+                                    style: TextStyle(
+                                      color: AppTheme.textSecondary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  if (widget.job.vehicle.color != null)
+                                    Text(
+                                      widget.job.vehicle.color!,
+                                      style: TextStyle(
+                                        color: AppTheme.textTertiary,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                ],
                               ),
                             ],
                           ),
@@ -695,6 +708,41 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
           color: AppTheme.primary2,
         );
     }
+  }
+
+  Widget _buildVehiclePhoto(String? photoUrl) {
+    final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
+    final fullPhotoUrl = hasPhoto ? '${AppConfig.apiBaseUrl}$photoUrl' : null;
+
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: AppTheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: hasPhoto
+          ? CachedNetworkImage(
+              imageUrl: fullPhotoUrl!,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => const Icon(
+                Icons.directions_car,
+                color: AppTheme.primary,
+                size: 14,
+              ),
+              errorWidget: (context, url, error) => const Icon(
+                Icons.directions_car,
+                color: AppTheme.primary,
+                size: 14,
+              ),
+            )
+          : const Icon(
+              Icons.directions_car,
+              color: AppTheme.primary,
+              size: 14,
+            ),
+    );
   }
 }
 

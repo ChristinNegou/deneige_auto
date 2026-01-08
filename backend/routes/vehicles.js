@@ -1,8 +1,42 @@
 
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const { protect } = require('../middleware/auth');
 const Vehicle = require('../models/Vehicle');
+
+// Configure multer for vehicle photo uploads
+const vehiclePhotoStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadDir = path.join(__dirname, '../uploads/vehicles');
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname) || '.jpg';
+        cb(null, `vehicle-${req.params.id}-${uniqueSuffix}${ext}`);
+    }
+});
+
+const vehiclePhotoUpload = multer({
+    storage: vehiclePhotoStorage,
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB max
+    },
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Seules les images sont acceptées'), false);
+        }
+    }
+});
 
 // @route   GET /api/vehicles
 // @desc    Obtenir tous les véhicules de l'utilisateur
@@ -159,6 +193,60 @@ router.delete('/:id', protect, async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la suppression du véhicule',
+        });
+    }
+});
+
+// @route   POST /api/vehicles/:id/photo
+// @desc    Upload vehicle photo
+// @access  Private
+router.post('/:id/photo', protect, vehiclePhotoUpload.single('photo'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Photo requise',
+            });
+        }
+
+        // Verify vehicle belongs to user
+        const vehicle = await Vehicle.findOne({
+            _id: req.params.id,
+            userId: req.user.id,
+        });
+
+        if (!vehicle) {
+            return res.status(404).json({
+                success: false,
+                message: 'Véhicule non trouvé',
+            });
+        }
+
+        const photoUrl = `/uploads/vehicles/${req.file.filename}`;
+
+        // Update vehicle with new photo URL
+        const updatedVehicle = await Vehicle.findByIdAndUpdate(
+            req.params.id,
+            { photoUrl: photoUrl },
+            { new: true }
+        );
+
+        console.log(`📸 Vehicle photo uploaded: ${photoUrl}`);
+
+        res.json({
+            success: true,
+            message: 'Photo du véhicule mise à jour',
+            data: {
+                photoUrl: photoUrl,
+                vehicle: updatedVehicle,
+            },
+        });
+    } catch (error) {
+        console.error('Error uploading vehicle photo:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'upload de la photo',
+            error: error.message,
         });
     }
 });

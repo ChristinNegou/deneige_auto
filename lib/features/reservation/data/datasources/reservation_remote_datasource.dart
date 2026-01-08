@@ -28,6 +28,10 @@ abstract class ReservationRemoteDataSource {
     required double amount,
   });
   Future<void> deleteVehicle(String vehicleId);
+  Future<String> uploadVehiclePhoto({
+    required String vehicleId,
+    required String photoPath,
+  });
 }
 
 /// Résultat d'une annulation de réservation
@@ -447,6 +451,42 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
           statusCode: 404,
         );
       }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<String> uploadVehiclePhoto({
+    required String vehicleId,
+    required String photoPath,
+  }) async {
+    try {
+      final fileName = photoPath.split('/').last;
+      final formData = FormData.fromMap({
+        'photo': await MultipartFile.fromFile(
+          photoPath,
+          filename: fileName,
+        ),
+      });
+
+      final response = await dio.post(
+        '/vehicles/$vehicleId/photo',
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data['data']['photoUrl'] as String;
+      } else {
+        throw ServerException(
+          message: response.data['message'] ??
+              'Erreur lors de l\'upload de la photo',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }

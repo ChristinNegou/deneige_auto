@@ -34,6 +34,7 @@ class VehicleInfoModel extends VehicleInfo {
     required super.model,
     super.color,
     super.licensePlate,
+    super.photoUrl,
   });
 
   factory VehicleInfoModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +44,7 @@ class VehicleInfoModel extends VehicleInfo {
       model: json['model'] ?? '',
       color: json['color'],
       licensePlate: json['licensePlate'],
+      photoUrl: json['photoUrl'],
     );
   }
 
@@ -53,6 +55,7 @@ class VehicleInfoModel extends VehicleInfo {
       'model': model,
       'color': color,
       'licensePlate': licensePlate,
+      'photoUrl': photoUrl,
     };
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -708,6 +710,12 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   }
 
   Widget _buildVehicleCard() {
+    final hasPhoto = _currentJob.vehicle.photoUrl != null &&
+                     _currentJob.vehicle.photoUrl!.isNotEmpty;
+    final photoUrl = hasPhoto
+        ? '${AppConfig.apiBaseUrl}${_currentJob.vehicle.photoUrl}'
+        : null;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -716,66 +724,247 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         boxShadow: AppTheme.shadowSM,
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: AppTheme.secondary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-            ),
-            child: const Center(
-              child: Text('🚗', style: TextStyle(fontSize: 26)),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _currentJob.vehicle.displayName,
-                  style:
-                      AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              // Vehicle photo or icon
+              GestureDetector(
+                onTap: hasPhoto ? () => _showVehiclePhoto(photoUrl!) : null,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppTheme.secondary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: hasPhoto
+                      ? CachedNetworkImage(
+                          imageUrl: photoUrl!,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppTheme.secondary,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => const Center(
+                            child: Text('🚗', style: TextStyle(fontSize: 28)),
+                          ),
+                        )
+                      : const Center(
+                          child: Text('🚗', style: TextStyle(fontSize: 28)),
+                        ),
                 ),
-                if (_currentJob.vehicle.licensePlate != null)
-                  Container(
-                    margin: const EdgeInsets.only(top: 6),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppTheme.background,
-                      borderRadius: BorderRadius.circular(6),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _currentJob.vehicle.displayName,
+                      style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    child: Text(
-                      _currentJob.vehicle.licensePlate!,
-                      style: AppTheme.labelSmall.copyWith(
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
+                    if (_currentJob.vehicle.licensePlate != null)
+                      Container(
+                        margin: const EdgeInsets.only(top: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.background,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          _currentJob.vehicle.licensePlate!,
+                          style: AppTheme.labelSmall.copyWith(
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
                       ),
+                  ],
+                ),
+              ),
+              if (_currentJob.vehicle.color != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.infoLight,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                  ),
+                  child: Text(
+                    _currentJob.vehicle.color!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.info,
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
-          if (_currentJob.vehicle.color != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppTheme.infoLight,
-                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-              ),
-              child: Text(
-                _currentJob.vehicle.color!,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.info,
+          // Show larger photo if available
+          if (hasPhoto && photoUrl != null) ...[
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () => _showVehiclePhoto(photoUrl),
+              child: Container(
+                width: double.infinity,
+                height: 140,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  color: AppTheme.surfaceContainer,
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: photoUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(color: AppTheme.secondary),
+                      ),
+                      errorWidget: (context, url, error) => Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.broken_image_rounded,
+                               color: AppTheme.textTertiary, size: 40),
+                          const SizedBox(height: 8),
+                          Text('Photo non disponible',
+                               style: AppTheme.bodySmall.copyWith(
+                                 color: AppTheme.textTertiary)),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.zoom_in, color: Colors.white, size: 14),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Agrandir',
+                              style: TextStyle(color: Colors.white, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
+          ],
         ],
+      ),
+    );
+  }
+
+  void _showVehiclePhoto(String photoUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(color: Colors.black87),
+            ),
+            Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: CachedNetworkImage(
+                  imageUrl: photoUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 16,
+              right: 16,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 16,
+              left: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _currentJob.vehicle.displayName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (_currentJob.vehicle.color != null ||
+                        _currentJob.vehicle.licensePlate != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        [
+                          if (_currentJob.vehicle.color != null) _currentJob.vehicle.color,
+                          if (_currentJob.vehicle.licensePlate != null)
+                            _currentJob.vehicle.licensePlate,
+                        ].join(' • '),
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

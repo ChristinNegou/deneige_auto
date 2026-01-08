@@ -6,6 +6,7 @@ import 'package:deneige_auto/features/vehicule/presentation/bloc/vehicule_bloc.d
 import 'package:deneige_auto/features/reservation/domain/entities/vehicle.dart';
 import 'package:deneige_auto/features/reservation/domain/usecases/add_vehicle_usecase.dart';
 
+import '../../../../mocks/mock_repositories.dart';
 import '../../../../mocks/mock_usecases.dart';
 import '../../../../fixtures/reservation_fixtures.dart';
 import '../../../../helpers/test_helpers.dart';
@@ -18,6 +19,7 @@ void main() {
   late MockGetVehiclesUseCase mockGetVehicles;
   late MockAddVehicleUseCase mockAddVehicle;
   late MockDeleteVehicleUseCase mockDeleteVehicle;
+  late MockReservationRepository mockRepository;
 
   setUpAll(() {
     registerFallbackValue(FakeAddVehicleParams());
@@ -28,10 +30,12 @@ void main() {
     mockGetVehicles = MockGetVehiclesUseCase();
     mockAddVehicle = MockAddVehicleUseCase();
     mockDeleteVehicle = MockDeleteVehicleUseCase();
+    mockRepository = MockReservationRepository();
     bloc = VehicleBloc(
       getVehicles: mockGetVehicles,
       addVehicle: mockAddVehicle,
       deleteVehicle: mockDeleteVehicle,
+      repository: mockRepository,
     );
   });
 

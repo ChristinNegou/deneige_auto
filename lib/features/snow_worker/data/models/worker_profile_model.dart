@@ -1,3 +1,4 @@
+import '../../../../core/config/app_config.dart';
 import '../../domain/entities/worker_profile.dart';
 
 class PreferredZoneModel extends PreferredZone {
@@ -110,7 +111,7 @@ class WorkerProfileModel extends WorkerProfile {
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
       phoneNumber: json['phoneNumber'],
-      photoUrl: json['photoUrl'],
+      photoUrl: _parsePhotoUrl(json['photoUrl']),
       isAvailable: workerProfile['isAvailable'] as bool? ?? false,
       currentLocation: currentLocation,
       preferredZones: preferredZones,
@@ -124,6 +125,17 @@ class WorkerProfileModel extends WorkerProfile {
       averageRating: (workerProfile['averageRating'] as num?)?.toDouble() ?? 0,
       totalRatingsCount: workerProfile['totalRatingsCount'] as int? ?? 0,
     );
+  }
+
+  /// Parse photoUrl - prepend API base URL if relative
+  static String? _parsePhotoUrl(dynamic url) {
+    if (url == null) return null;
+    final urlStr = url.toString();
+    if (urlStr.isEmpty) return null;
+    if (urlStr.startsWith('/')) {
+      return '${AppConfig.apiBaseUrl}$urlStr';
+    }
+    return urlStr;
   }
 
   Map<String, dynamic> toJson() {

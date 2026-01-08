@@ -86,4 +86,10 @@ abstract class ReservationRepository {
 
   /// Supprimer un véhicule
   Future<Either<Failure, void>> deleteVehicle(String vehicleId);
+
+  /// Upload vehicle photo
+  Future<Either<Failure, String>> uploadVehiclePhoto({
+    required String vehicleId,
+    required String photoPath,
+  });
 }
