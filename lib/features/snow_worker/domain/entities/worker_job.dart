@@ -87,6 +87,80 @@ class JobPhoto extends Equatable {
   List<Object?> get props => [url, type, uploadedAt];
 }
 
+/// Types d'équipement disponibles pour les déneigeurs
+enum EquipmentType {
+  shovel,       // Pelle à neige
+  brush,        // Balai à neige
+  iceScraper,   // Grattoir à glace
+  saltSpreader, // Épandeur de sel
+  snowBlower,   // Souffleuse
+}
+
+/// Extension pour obtenir les labels d'équipement
+extension EquipmentTypeExtension on EquipmentType {
+  String get label {
+    switch (this) {
+      case EquipmentType.shovel:
+        return 'Pelle';
+      case EquipmentType.brush:
+        return 'Balai';
+      case EquipmentType.iceScraper:
+        return 'Grattoir';
+      case EquipmentType.saltSpreader:
+        return 'Sel';
+      case EquipmentType.snowBlower:
+        return 'Souffleuse';
+    }
+  }
+
+  String get icon {
+    switch (this) {
+      case EquipmentType.shovel:
+        return '🪣';
+      case EquipmentType.brush:
+        return '🧹';
+      case EquipmentType.iceScraper:
+        return '🪟';
+      case EquipmentType.saltSpreader:
+        return '🧂';
+      case EquipmentType.snowBlower:
+        return '❄️';
+    }
+  }
+
+  static EquipmentType? fromString(String value) {
+    switch (value) {
+      case 'shovel':
+        return EquipmentType.shovel;
+      case 'brush':
+        return EquipmentType.brush;
+      case 'ice_scraper':
+        return EquipmentType.iceScraper;
+      case 'salt_spreader':
+        return EquipmentType.saltSpreader;
+      case 'snow_blower':
+        return EquipmentType.snowBlower;
+      default:
+        return null;
+    }
+  }
+
+  String toApiString() {
+    switch (this) {
+      case EquipmentType.shovel:
+        return 'shovel';
+      case EquipmentType.brush:
+        return 'brush';
+      case EquipmentType.iceScraper:
+        return 'ice_scraper';
+      case EquipmentType.saltSpreader:
+        return 'salt_spreader';
+      case EquipmentType.snowBlower:
+        return 'snow_blower';
+    }
+  }
+}
+
 class WorkerJob extends Equatable {
   final String id;
   final ClientInfo client;
@@ -113,6 +187,8 @@ class WorkerJob extends Equatable {
   final double? tipAmount;
   final double? rating;
   final String? review;
+  final List<EquipmentType> requiredEquipment;
+  final bool workerHasEquipment;
 
   const WorkerJob({
     required this.id,
@@ -140,6 +216,8 @@ class WorkerJob extends Equatable {
     this.tipAmount,
     this.rating,
     this.review,
+    this.requiredEquipment = const [],
+    this.workerHasEquipment = true,
   });
 
   /// Returns the display address (parking spot number, custom location, or location address)
@@ -221,6 +299,8 @@ class WorkerJob extends Equatable {
     double? tipAmount,
     double? rating,
     String? review,
+    List<EquipmentType>? requiredEquipment,
+    bool? workerHasEquipment,
   }) {
     return WorkerJob(
       id: id ?? this.id,
@@ -248,6 +328,8 @@ class WorkerJob extends Equatable {
       tipAmount: tipAmount ?? this.tipAmount,
       rating: rating ?? this.rating,
       review: review ?? this.review,
+      requiredEquipment: requiredEquipment ?? this.requiredEquipment,
+      workerHasEquipment: workerHasEquipment ?? this.workerHasEquipment,
     );
   }
 
@@ -278,5 +360,7 @@ class WorkerJob extends Equatable {
         tipAmount,
         rating,
         review,
+        requiredEquipment,
+        workerHasEquipment,
       ];
 }

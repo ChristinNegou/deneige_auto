@@ -286,6 +286,12 @@ const reservationSchema = new mongoose.Schema({
             type: [Number],
         },
     },
+
+    // Equipment required for this job (computed from service options and snow depth)
+    requiredEquipment: [{
+        type: String,
+        enum: ['shovel', 'brush', 'ice_scraper', 'salt_spreader', 'snow_blower'],
+    }],
 }, {
     timestamps: true,
 });
@@ -342,6 +348,30 @@ reservationSchema.pre('save', function(next) {
             this.totalPrice = this.basePrice * this.urgencyMultiplier;
         }
     }
+    next();
+});
+
+// Middleware pour calculer l'équipement requis
+reservationSchema.pre('save', function(next) {
+    // Base equipment always required
+    const required = ['shovel', 'brush'];
+
+    // Check service options
+    if (this.serviceOptions && this.serviceOptions.length > 0) {
+        if (this.serviceOptions.includes('windowScraping')) {
+            required.push('ice_scraper');
+        }
+        if (this.serviceOptions.includes('doorDeicing')) {
+            required.push('salt_spreader');
+        }
+    }
+
+    // Check snow depth - heavy snow requires snow blower
+    if (this.snowDepthCm && this.snowDepthCm > 15) {
+        required.push('snow_blower');
+    }
+
+    this.requiredEquipment = [...new Set(required)]; // Remove duplicates
     next();
 });
 

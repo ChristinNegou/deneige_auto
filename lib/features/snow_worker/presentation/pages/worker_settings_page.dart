@@ -32,11 +32,12 @@ class _WorkerSettingsView extends StatefulWidget {
 
 class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   final _formKey = GlobalKey<FormState>();
+  bool _initialized = false;
 
   // Equipment checkboxes
-  bool _hasShovel = true;
-  bool _hasBrush = true;
-  bool _hasIceScraper = true;
+  bool _hasShovel = false;
+  bool _hasBrush = false;
+  bool _hasIceScraper = false;
   bool _hasSaltSpreader = false;
   bool _hasSnowBlower = false;
 
@@ -52,7 +53,25 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   bool _notifyTips = true;
 
   // Zones
-  List<String> _zones = ['Trois-Rivières Centre', 'Cap-de-la-Madeleine'];
+  List<String> _zones = [];
+
+  void _initializeFromProfile(WorkerProfile profile) {
+    if (_initialized) return;
+    _initialized = true;
+
+    // Load equipment from profile
+    final equipment = profile.equipmentList;
+    _hasShovel = equipment.contains('shovel');
+    _hasBrush = equipment.contains('brush');
+    _hasIceScraper = equipment.contains('ice_scraper');
+    _hasSaltSpreader = equipment.contains('salt_spreader');
+    _hasSnowBlower = equipment.contains('snow_blower');
+
+    // Load other settings
+    _selectedVehicle = profile.vehicleType;
+    _maxActiveJobs = profile.maxActiveJobs;
+    _zones = profile.preferredZones.map((z) => z.name).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +128,16 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               return const Center(
                 child: CircularProgressIndicator(color: AppTheme.primary),
               );
+            }
+
+            // Initialize from profile when loaded (use addPostFrameCallback to avoid setState during build)
+            if (state is WorkerAvailabilityLoaded && state.profile != null && !_initialized) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _initializeFromProfile(state.profile!);
+                  setState(() {});
+                }
+              });
             }
 
             return Column(
