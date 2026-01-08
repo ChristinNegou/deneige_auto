@@ -12,6 +12,7 @@ class ReservationModel extends Reservation {
     super.workerId,
     super.workerName,
     super.workerPhone,
+    super.workerPhotoUrl,
     required super.parkingSpot,
     required super.vehicle,
     required super.departureTime,
@@ -45,6 +46,7 @@ class ReservationModel extends Reservation {
       workerId: _parseWorkerId(json['workerId']),
       workerName: _parseWorkerName(json['workerId']),
       workerPhone: _parseWorkerPhone(json['workerId']),
+      workerPhotoUrl: _parseWorkerPhotoUrl(json['workerId']),
       parkingSpot: _parseParkingSpot(json),
       vehicle: _parseVehicle(json),
       departureTime: DateTime.parse(json['departureTime'] as String),
@@ -315,6 +317,24 @@ class ReservationModel extends Reservation {
     }
     if (workerId is Map<String, dynamic>) {
       return workerId['phoneNumber'] as String?;
+    }
+    return null;
+  }
+
+  /// Parse workerPhotoUrl depuis l'objet worker (populated)
+  static String? _parseWorkerPhotoUrl(dynamic workerId) {
+    if (workerId == null) {
+      return null;
+    }
+    if (workerId is Map<String, dynamic>) {
+      final photoUrl = workerId['photoUrl'] as String?;
+      if (photoUrl != null && photoUrl.isNotEmpty) {
+        // If URL is relative, prepend the server base URL
+        if (photoUrl.startsWith('/')) {
+          return '${AppConfig.apiBaseUrl}$photoUrl';
+        }
+        return photoUrl;
+      }
     }
     return null;
   }

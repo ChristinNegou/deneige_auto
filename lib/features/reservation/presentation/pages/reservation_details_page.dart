@@ -578,17 +578,45 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 ),
               ],
             ),
-            child: Center(
-              child: Text(
-                reservation.workerName?.isNotEmpty == true
-                    ? reservation.workerName![0].toUpperCase()
-                    : '?',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
+            child: ClipOval(
+              child: reservation.workerPhotoUrl != null &&
+                      reservation.workerPhotoUrl!.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: reservation.workerPhotoUrl!,
+                      fit: BoxFit.cover,
+                      width: 60,
+                      height: 60,
+                      placeholder: (context, url) => Center(
+                        child: CircularProgressIndicator(
+                          color: AppTheme.textPrimary,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Text(
+                          reservation.workerName?.isNotEmpty == true
+                              ? reservation.workerName![0].toUpperCase()
+                              : '?',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textPrimary,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        reservation.workerName?.isNotEmpty == true
+                            ? reservation.workerName![0].toUpperCase()
+                            : '?',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: 16),
