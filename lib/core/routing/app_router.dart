@@ -19,6 +19,10 @@ import '../../features/reservation/presentation/pages/reservations_page.dart';
 import '../../features/reservation/presentation/screens/reservation_success_screen.dart';
 import '../../features/reservation/domain/entities/reservation.dart';
 import '../../features/settings/page/settings_page.dart';
+import '../../features/settings/presentation/pages/privacy_policy_page.dart';
+import '../../features/settings/presentation/pages/terms_of_service_page.dart';
+import '../../features/support/presentation/pages/help_support_page.dart';
+import '../../features/support/presentation/pages/worker_help_support_page.dart';
 import '../../features/snow_worker/presentation/pages/snowworker_dashboard_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_job_details_page.dart';
 import '../../features/snow_worker/presentation/pages/active_job_page.dart';
@@ -221,6 +225,24 @@ class AppRouter {
           settings: settings,
         );
 
+      case AppRoutes.privacyPolicy:
+        return MaterialPageRoute(
+          builder: (_) => const PrivacyPolicyPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.termsOfService:
+        return MaterialPageRoute(
+          builder: (_) => const TermsOfServicePage(),
+          settings: settings,
+        );
+
+      case AppRoutes.helpSupport:
+        return MaterialPageRoute(
+          builder: (_) => const HelpSupportPage(),
+          settings: settings,
+        );
+
       case AppRoutes.notifications:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -300,6 +322,12 @@ class AppRouter {
       case AppRoutes.workerPaymentSetup:
         return MaterialPageRoute(
           builder: (_) => const WorkerPaymentSetupPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.workerHelpSupport:
+        return MaterialPageRoute(
+          builder: (_) => const WorkerHelpSupportPage(),
           settings: settings,
         );
 

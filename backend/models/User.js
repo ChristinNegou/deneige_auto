@@ -86,6 +86,17 @@ const userSchema = new mongoose.Schema({
             default: false,
         },
     },
+    // User preferences (app settings)
+    userPreferences: {
+        soundEnabled: {
+            type: Boolean,
+            default: true,
+        },
+        darkThemeEnabled: {
+            type: Boolean,
+            default: true,
+        },
+    },
 
     // Worker-specific profile (only used when role === 'snowWorker')
     workerProfile: {

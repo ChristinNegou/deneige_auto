@@ -103,6 +103,22 @@ import '../../features/admin/data/repositories/admin_repository_impl.dart';
 import '../../features/admin/domain/repositories/admin_repository.dart';
 import '../../features/admin/presentation/bloc/admin_bloc.dart';
 
+// Settings
+import '../../features/settings/data/datasources/settings_remote_datasource.dart';
+import '../../features/settings/data/repositories/settings_repository_impl.dart';
+import '../../features/settings/domain/repositories/settings_repository.dart';
+import '../../features/settings/domain/usecases/get_preferences_usecase.dart';
+import '../../features/settings/domain/usecases/update_preferences_usecase.dart';
+import '../../features/settings/domain/usecases/delete_account_usecase.dart';
+import '../../features/settings/presentation/bloc/settings_bloc.dart';
+
+// Support
+import '../../features/support/data/datasources/support_remote_datasource.dart';
+import '../../features/support/data/repositories/support_repository_impl.dart';
+import '../../features/support/domain/repositories/support_repository.dart';
+import '../../features/support/domain/usecases/submit_support_request_usecase.dart';
+import '../../features/support/presentation/bloc/support_bloc.dart';
+
 // BLoCs
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
@@ -331,5 +347,33 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => ChatBloc(
         repository: sl(),
         socketService: sl(),
+      ));
+
+  //! Settings Feature
+  sl.registerLazySingleton<SettingsRemoteDataSource>(
+    () => SettingsRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetPreferencesUseCase(sl()));
+  sl.registerLazySingleton(() => UpdatePreferencesUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteAccountUseCase(sl()));
+  sl.registerFactory(() => SettingsBloc(
+        getPreferences: sl(),
+        updatePreferences: sl(),
+        deleteAccount: sl(),
+      ));
+
+  //! Support Feature
+  sl.registerLazySingleton<SupportRemoteDataSource>(
+    () => SupportRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<SupportRepository>(
+    () => SupportRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => SubmitSupportRequestUseCase(sl()));
+  sl.registerFactory(() => SupportBloc(
+        submitSupportRequest: sl(),
       ));
 }

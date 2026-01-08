@@ -145,6 +145,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     _buildZonesSection(),
                     const SizedBox(height: 16),
                     _buildNotificationsSection(),
+                    const SizedBox(height: 16),
+                    _buildHelpSupportSection(),
                     const SizedBox(height: 24),
                     _buildSaveButton(),
                     const SizedBox(height: 24),
@@ -991,6 +993,66 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHelpSupportSection() {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.workerHelpSupport),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+          boxShadow: AppTheme.shadowSM,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppTheme.info.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.help_outline_rounded,
+                color: AppTheme.info,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Aide et support',
+                    style: TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'FAQ et contact',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: AppTheme.textTertiary,
+              size: 24,
+            ),
+          ],
+        ),
       ),
     );
   }

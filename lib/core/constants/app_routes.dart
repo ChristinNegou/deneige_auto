@@ -48,6 +48,11 @@ class AppRoutes {
 
   // Routes de paramètres
   static const String settings = '/settings';
+  static const String privacyPolicy = '/settings/privacy';
+  static const String termsOfService = '/settings/terms';
+
+  // Routes d'aide et support
+  static const String helpSupport = '/help-support';
 
   // Routes de notifications
   static const String notifications = '/notifications';
@@ -65,6 +70,7 @@ class AppRoutes {
   static const String workerEarnings = '/snow-worker/earnings';
   static const String workerSettings = '/snow-worker/settings';
   static const String workerPaymentSetup = '/snow-worker/payment-setup';
+  static const String workerHelpSupport = '/snow-worker/help-support';
 
   //Routes pour le dashboard client
   static const String clientHome = '/client-home';

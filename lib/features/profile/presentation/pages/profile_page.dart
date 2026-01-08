@@ -261,18 +261,7 @@ class ProfilePage extends StatelessWidget {
             iconColor: AppTheme.info,
             title: 'Aide et support',
             subtitle: 'FAQ et contact',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Page d\'aide à venir'),
-                  backgroundColor: AppTheme.textSecondary,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                  ),
-                ),
-              );
-            },
+            onTap: () => Navigator.pushNamed(context, AppRoutes.helpSupport),
           ),
         ],
       ),
