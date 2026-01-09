@@ -6,7 +6,7 @@ import '../config/app_config.dart';
 /// Client Dio configuré pour l'application
 class DioClient {
   // URL de base dynamique depuis AppConfig
-  static String get _baseUrl => '${AppConfig.apiBaseUrl}/api';
+  static String get _baseUrl => AppConfig.apiBaseUrl;
 
   late final Dio _dio;
 

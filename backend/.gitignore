@@ -15,3 +15,10 @@ npm-debug.log*
 # Fichiers OS
 .DS_Store
 Thumbs.db
+
+# Uploads locaux
+uploads/
+
+# IDE
+.vscode/
+.idea/

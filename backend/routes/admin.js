@@ -890,4 +890,175 @@ router.get('/database/retention-config', protect, adminOnly, async (req, res) =>
     });
 });
 
+// ============================================================================
+// GESTION DES JOBS EXPIRES
+// ============================================================================
+
+const { processExpiredJobs, getExpiredJobsStats, findExpiredJobs, CONFIG: EXPIRED_JOBS_CONFIG } = require('../services/expiredJobsService');
+
+/**
+ * @route   GET /api/admin/expired-jobs/stats
+ * @desc    Obtenir les statistiques des jobs expires
+ * @access  Private (Admin)
+ */
+router.get('/expired-jobs/stats', protect, adminOnly, async (req, res) => {
+    try {
+        const stats = await getExpiredJobsStats();
+        res.json({
+            success: true,
+            stats,
+            config: EXPIRED_JOBS_CONFIG,
+        });
+    } catch (error) {
+        console.error('Erreur stats jobs expires:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la recuperation des stats',
+        });
+    }
+});
+
+/**
+ * @route   GET /api/admin/expired-jobs/list
+ * @desc    Lister les jobs actuellement expires
+ * @access  Private (Admin)
+ */
+router.get('/expired-jobs/list', protect, adminOnly, async (req, res) => {
+    try {
+        const expiredJobs = await findExpiredJobs();
+        res.json({
+            success: true,
+            count: expiredJobs.length,
+            jobs: expiredJobs.map(job => ({
+                id: job._id,
+                status: job.status,
+                deadlineTime: job.deadlineTime,
+                departureTime: job.departureTime,
+                minutesOverdue: Math.floor((new Date() - job.deadlineTime) / (1000 * 60)),
+                client: job.userId ? {
+                    id: job.userId._id,
+                    name: `${job.userId.firstName} ${job.userId.lastName}`,
+                    email: job.userId.email,
+                } : null,
+                worker: job.workerId ? {
+                    id: job.workerId._id,
+                    name: `${job.workerId.firstName} ${job.workerId.lastName}`,
+                    email: job.workerId.email,
+                } : null,
+                vehicle: job.vehicle ? {
+                    brand: job.vehicle.brand,
+                    model: job.vehicle.model,
+                    licensePlate: job.vehicle.licensePlate,
+                } : null,
+            })),
+        });
+    } catch (error) {
+        console.error('Erreur liste jobs expires:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la recuperation des jobs expires',
+        });
+    }
+});
+
+/**
+ * @route   POST /api/admin/expired-jobs/process
+ * @desc    Declencher manuellement le traitement des jobs expires
+ * @access  Private (Admin)
+ */
+router.post('/expired-jobs/process', protect, adminOnly, async (req, res) => {
+    try {
+        console.log(`\n🔧 Traitement manuel des jobs expires declenche par admin ${req.user.email}`);
+        const results = await processExpiredJobs();
+        res.json({
+            success: true,
+            message: 'Traitement des jobs expires termine',
+            results,
+        });
+    } catch (error) {
+        console.error('Erreur traitement manuel:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors du traitement',
+            error: error.message,
+        });
+    }
+});
+
+/**
+ * @route   GET /api/admin/workers/warnings
+ * @desc    Lister les workers avec des avertissements
+ * @access  Private (Admin)
+ */
+router.get('/workers/warnings', protect, adminOnly, async (req, res) => {
+    try {
+        const workers = await User.find({
+            role: 'snowWorker',
+            'workerProfile.warningCount': { $gt: 0 },
+        }).select('firstName lastName email workerProfile.warningCount workerProfile.isSuspended workerProfile.cancellationHistory');
+
+        res.json({
+            success: true,
+            count: workers.length,
+            workers: workers.map(w => ({
+                id: w._id,
+                name: `${w.firstName} ${w.lastName}`,
+                email: w.email,
+                warningCount: w.workerProfile?.warningCount || 0,
+                isSuspended: w.workerProfile?.isSuspended || false,
+                cancellationHistory: w.workerProfile?.cancellationHistory || [],
+            })),
+        });
+    } catch (error) {
+        console.error('Erreur liste workers warnings:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la recuperation',
+        });
+    }
+});
+
+/**
+ * @route   POST /api/admin/workers/:id/reset-warnings
+ * @desc    Reinitialiser les avertissements d'un worker
+ * @access  Private (Admin)
+ */
+router.post('/workers/:id/reset-warnings', protect, adminOnly, async (req, res) => {
+    try {
+        const worker = await User.findById(req.params.id);
+
+        if (!worker || worker.role !== 'snowWorker') {
+            return res.status(404).json({
+                success: false,
+                message: 'Worker non trouve',
+            });
+        }
+
+        worker.workerProfile.warningCount = 0;
+        worker.workerProfile.isSuspended = false;
+        worker.workerProfile.suspendedAt = null;
+        worker.workerProfile.suspensionReason = null;
+        await worker.save();
+
+        // Notifier le worker
+        await Notification.create({
+            userId: worker._id,
+            type: 'systemNotification',
+            title: 'Avertissements reinitialises',
+            message: 'Vos avertissements ont ete reinitialises par un administrateur. Votre compte est de nouveau actif.',
+        });
+
+        res.json({
+            success: true,
+            message: `Avertissements de ${worker.firstName} ${worker.lastName} reinitialises`,
+        });
+    } catch (error) {
+        console.error('Erreur reset warnings:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la reinitialisation',
+        });
+    }
+});
+
 module.exports = router;
