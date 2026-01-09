@@ -140,6 +140,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                     if (_hasAccount && _isComplete) ...[
                       _buildBalanceCard(),
                       const SizedBox(height: 20),
+                    ] else ...[
+                      _buildIdentityRequirements(),
+                      const SizedBox(height: 20),
                     ],
                     _buildCommissionInfo(),
                     const SizedBox(height: 20),
@@ -609,6 +612,169 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                   style: TextStyle(fontSize: 11, color: AppTheme.success.withValues(alpha: 0.8)),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIdentityRequirements() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.warning.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(Icons.badge_outlined, color: AppTheme.warning, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Documents requis',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Pour recevoir vos paiements, Stripe doit verifier votre identite. Preparez les documents suivants:',
+            style: TextStyle(
+              fontSize: 13,
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildRequirementItem(
+            Icons.credit_card,
+            'Piece d\'identite avec photo',
+            'Permis de conduire, passeport ou carte d\'identite',
+          ),
+          const SizedBox(height: 12),
+          _buildRequirementItem(
+            Icons.home_outlined,
+            'Preuve d\'adresse',
+            'Facture de services publics ou releve bancaire recent',
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.infoLight,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.info_outline, color: AppTheme.info, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Exigences pour les photos',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.info,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                _buildRequirementBullet('Photo en couleur (format JPG ou PNG)'),
+                _buildRequirementBullet('Document original, pas une photocopie'),
+                _buildRequirementBullet('Nom et date de naissance lisibles'),
+                _buildRequirementBullet('Document non expire'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequirementItem(IconData icon, String title, String subtitle) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppTheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: AppTheme.primary, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRequirementBullet(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, top: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 6),
+            width: 4,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppTheme.info,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.info.withValues(alpha: 0.9),
+              ),
             ),
           ),
         ],
