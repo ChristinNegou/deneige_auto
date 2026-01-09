@@ -52,9 +52,14 @@ nul
 .env
 .env.local
 .env.*.local
+env.local
 backend/.env
 backend/.env.local
 *.env
+
+# Scripts de lancement locaux (peuvent contenir des chemins)
+run_dev.local.ps1
+run_dev.local.sh
 
 # Firebase
 google-services.json

@@ -12,6 +12,11 @@ const { runFullCleanup, getDatabaseStats } = require('./services/databaseCleanup
 // Charger les variables d'environnement
 dotenv.config();
 
+// Valider les variables d'environnement AVANT de continuer
+const { validateEnv, checkProductionKeys } = require('./config/validateEnv');
+validateEnv(true); // true = exit si erreur
+checkProductionKeys();
+
 // Connecter à la base de données
 connectDB();
 
@@ -24,11 +29,46 @@ const app = express();
 // Créer le serveur HTTP pour Socket.IO
 const httpServer = http.createServer(app);
 
-// Middleware
-app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
-    credentials: true
-}));
+// Configuration CORS sécurisée
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Permettre les requêtes sans origin (apps mobiles, Postman)
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+
+        // En développement, permettre localhost
+        if (process.env.NODE_ENV !== 'production') {
+            if (origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('192.168.')) {
+                return callback(null, true);
+            }
+        }
+
+        // Vérifier si l'origin est dans la liste autorisée
+        const isAllowed = allowedOrigins.some(allowed => {
+            // Support des wildcards simples
+            if (allowed.includes('*')) {
+                const pattern = allowed.replace(/\*/g, '.*');
+                return new RegExp(`^${pattern}$`).test(origin);
+            }
+            return allowed === origin;
+        });
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            console.warn(`⚠️ CORS bloqué pour origin: ${origin}`);
+            callback(new Error('Non autorisé par CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
