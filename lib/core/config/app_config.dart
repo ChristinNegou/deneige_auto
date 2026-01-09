@@ -25,12 +25,8 @@ class AppConfig {
     }
   }
 
-  // OpenWeatherMap API - Use --dart-define=OPENWEATHER_API_KEY=xxx or api_keys.dart
-  static String get openWeatherMapApiKey {
-    const envKey =
-        String.fromEnvironment('OPENWEATHER_API_KEY', defaultValue: '');
-    return envKey.isNotEmpty ? envKey : ApiKeys.openWeatherMapApiKey;
-  }
+  // OpenWeatherMap API - Use --dart-define=OPENWEATHER_API_KEY=xxx
+  static String get openWeatherMapApiKey => ApiKeys.openWeatherMapApiKey;
 
   // Debug
   static bool get enableLogging => kDebugMode || !isProduction;
@@ -106,21 +102,24 @@ class AppConfig {
 
   static const String firebaseProjectId = 'deneigeauto';
 
-  // Stripe - Configurez via --dart-define=STRIPE_PUBLISHABLE_KEY=xxx ou api_keys.dart
+  // Stripe - Configurez via --dart-define=STRIPE_PUBLISHABLE_KEY=xxx
   static String get stripePublishableKey {
-    const envKey =
-        String.fromEnvironment('STRIPE_PUBLISHABLE_KEY', defaultValue: '');
-    if (envKey.isNotEmpty) return envKey;
     return isProduction
         ? ApiKeys.stripePublishableKeyLive
         : ApiKeys.stripePublishableKeyTest;
   }
 
-  // Google Maps - Configurez via --dart-define=GOOGLE_MAPS_API_KEY=xxx ou api_keys.dart
-  static String get googleMapsApiKey {
-    const envKey =
-        String.fromEnvironment('GOOGLE_MAPS_API_KEY', defaultValue: '');
-    return envKey.isNotEmpty ? envKey : ApiKeys.googleMapsApiKey;
+  // Google Maps - Configurez via --dart-define=GOOGLE_MAPS_API_KEY=xxx
+  static String get googleMapsApiKey => ApiKeys.googleMapsApiKey;
+
+  /// Vérifie que les clés API critiques sont configurées
+  static void validateConfiguration() {
+    if (!ApiKeys.isConfigured && isProduction) {
+      throw Exception(
+        'Configuration incomplète! Clés manquantes: ${ApiKeys.missingKeys.join(", ")}\n'
+        'Utilisez --dart-define pour configurer les clés API.',
+      );
+    }
   }
 
   // Features Flags
