@@ -81,4 +81,5 @@ class AppRoutes {
   static const String adminReservations = '/admin/reservations';
   static const String adminWorkers = '/admin/workers';
   static const String adminReports = '/admin/reports';
+  static const String adminSupport = '/admin/support';
 }

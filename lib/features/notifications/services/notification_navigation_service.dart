@@ -30,6 +30,12 @@ class NotificationNavigationService {
       return;
     }
 
+    // Traitement spécial pour les notifications système (support, etc.)
+    if (notification.type == NotificationType.systemNotification) {
+      _showNotificationDetails(context, notification);
+      return;
+    }
+
     final route = _getRouteForNotification(notification);
     final arguments = _getArgumentsForNotification(notification);
 
@@ -45,6 +51,88 @@ class NotificationNavigationService {
     }
 
     Navigator.of(context).pushNamed(route, arguments: arguments);
+  }
+
+  /// Affiche les détails complets d'une notification système
+  void _showNotificationDetails(BuildContext context, AppNotification notification) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.support_agent,
+                color: Colors.blue,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                notification.title,
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  notification.message,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Icon(
+                    Icons.access_time,
+                    size: 14,
+                    color: Colors.grey[600],
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    notification.timeAgo,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Navigation vers le chat pour les notifications de message
@@ -270,7 +358,11 @@ class NotificationNavigationService {
         );
 
       case NotificationType.systemNotification:
-        return null;
+        return NotificationAction(
+          label: 'Voir le message',
+          icon: Icons.visibility,
+          route: '',
+        );
     }
   }
 }

@@ -1,6 +1,7 @@
 import '../entities/admin_stats.dart';
 import '../entities/admin_user.dart';
 import '../entities/admin_reservation.dart';
+import '../entities/admin_support_request.dart';
 
 abstract class AdminRepository {
   Future<AdminStats> getDashboardStats();
@@ -32,6 +33,22 @@ abstract class AdminRepository {
     required String message,
     String? targetRole,
   });
+
+  // Support
+  Future<AdminSupportResponse> getSupportRequests({
+    int page = 1,
+    int limit = 20,
+    String? status,
+  });
+  Future<void> updateSupportRequest(String requestId,
+      {String? status, String? adminNotes});
+  Future<void> respondToSupportRequest(
+    String requestId, {
+    required String responseMessage,
+    bool sendEmail = true,
+    bool sendNotification = true,
+  });
+  Future<void> deleteSupportRequest(String requestId);
 }
 
 class AdminUsersResponse {
@@ -115,4 +132,30 @@ double _toDouble(dynamic value) {
   if (value is int) return value.toDouble();
   if (value is String) return double.tryParse(value) ?? 0.0;
   return 0.0;
+}
+
+class AdminSupportResponse {
+  final List<AdminSupportRequest> requests;
+  final int total;
+  final int page;
+  final int totalPages;
+
+  AdminSupportResponse({
+    required this.requests,
+    required this.total,
+    required this.page,
+    required this.totalPages,
+  });
+
+  factory AdminSupportResponse.fromJson(Map<String, dynamic> json) {
+    return AdminSupportResponse(
+      requests: (json['requests'] as List<dynamic>?)
+              ?.map((r) => AdminSupportRequest.fromJson(r))
+              .toList() ??
+          [],
+      total: json['total'] ?? 0,
+      page: json['page'] ?? 1,
+      totalPages: json['totalPages'] ?? 1,
+    );
+  }
 }

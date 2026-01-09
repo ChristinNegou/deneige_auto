@@ -4,6 +4,7 @@ const { protect, authorize } = require('../middleware/auth');
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
 const Notification = require('../models/Notification');
+const SupportRequest = require('../models/SupportRequest');
 const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../services/databaseCleanupService');
 
 // Middleware pour vérifier le rôle admin
@@ -38,6 +39,13 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
             todayReservations,
             monthlyReservations,
             pendingReservations,
+            // Support stats
+            totalSupportRequests,
+            pendingSupportRequests,
+            inProgressSupportRequests,
+            resolvedSupportRequests,
+            closedSupportRequests,
+            todaySupportRequests,
         ] = await Promise.all([
             User.countDocuments(),
             User.countDocuments({ role: 'client' }),
@@ -49,6 +57,13 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
             Reservation.countDocuments({ createdAt: { $gte: today } }),
             Reservation.countDocuments({ createdAt: { $gte: thisMonth } }),
             Reservation.countDocuments({ status: 'pending' }),
+            // Support stats
+            SupportRequest.countDocuments(),
+            SupportRequest.countDocuments({ status: 'pending' }),
+            SupportRequest.countDocuments({ status: 'in_progress' }),
+            SupportRequest.countDocuments({ status: 'resolved' }),
+            SupportRequest.countDocuments({ status: 'closed' }),
+            SupportRequest.countDocuments({ createdAt: { $gte: today } }),
         ]);
 
         // Revenus
@@ -146,6 +161,15 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
                     totalEarnings: w.workerProfile?.totalEarnings || 0,
                     rating: w.workerProfile?.averageRating || 0,
                 })),
+                support: {
+                    total: totalSupportRequests,
+                    pending: pendingSupportRequests,
+                    inProgress: inProgressSupportRequests,
+                    resolved: resolvedSupportRequests,
+                    closed: closedSupportRequests,
+                    todayNew: todaySupportRequests,
+                    avgResponseTimeHours: 0, // TODO: calculer si besoin
+                },
             },
         });
     } catch (error) {

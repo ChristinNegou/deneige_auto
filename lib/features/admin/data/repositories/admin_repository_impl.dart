@@ -91,4 +91,48 @@ class AdminRepositoryImpl implements AdminRepository {
       targetRole: targetRole,
     );
   }
+
+  @override
+  Future<AdminSupportResponse> getSupportRequests({
+    int page = 1,
+    int limit = 20,
+    String? status,
+  }) async {
+    final response = await remoteDataSource.getSupportRequests(
+      page: page,
+      limit: limit,
+      status: status,
+    );
+    return AdminSupportResponse.fromJson(response);
+  }
+
+  @override
+  Future<void> updateSupportRequest(String requestId,
+      {String? status, String? adminNotes}) async {
+    await remoteDataSource.updateSupportRequest(
+      requestId,
+      status: status,
+      adminNotes: adminNotes,
+    );
+  }
+
+  @override
+  Future<void> respondToSupportRequest(
+    String requestId, {
+    required String responseMessage,
+    bool sendEmail = true,
+    bool sendNotification = true,
+  }) async {
+    await remoteDataSource.respondToSupportRequest(
+      requestId,
+      responseMessage: responseMessage,
+      sendEmail: sendEmail,
+      sendNotification: sendNotification,
+    );
+  }
+
+  @override
+  Future<void> deleteSupportRequest(String requestId) async {
+    await remoteDataSource.deleteSupportRequest(requestId);
+  }
 }

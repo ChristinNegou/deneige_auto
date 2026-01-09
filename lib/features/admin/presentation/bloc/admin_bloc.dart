@@ -16,6 +16,10 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<LoadReservationDetails>(_onLoadReservationDetails);
     on<RefundReservation>(_onRefundReservation);
     on<BroadcastNotification>(_onBroadcastNotification);
+    on<LoadSupportRequests>(_onLoadSupportRequests);
+    on<UpdateSupportRequest>(_onUpdateSupportRequest);
+    on<RespondToSupportRequest>(_onRespondToSupportRequest);
+    on<DeleteSupportRequest>(_onDeleteSupportRequest);
     on<ClearUserDetails>(_onClearUserDetails);
     on<ClearReservationDetails>(_onClearReservationDetails);
     on<ClearError>(_onClearError);
@@ -249,6 +253,116 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       emit(state.copyWith(
         actionStatus: AdminStatus.error,
         errorMessage: 'Erreur d\'envoi de la notification: $e',
+      ));
+    }
+  }
+
+  Future<void> _onLoadSupportRequests(
+    LoadSupportRequests event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(state.copyWith(
+      supportStatus: AdminStatus.loading,
+      supportStatusFilter: event.status,
+      clearSupportStatusFilter: event.status == null,
+    ));
+    try {
+      final response = await repository.getSupportRequests(
+        page: event.page,
+        status: event.status,
+      );
+      emit(state.copyWith(
+        supportRequests: response.requests,
+        supportTotal: response.total,
+        supportPage: response.page,
+        supportTotalPages: response.totalPages,
+        supportStatus: AdminStatus.success,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        supportStatus: AdminStatus.error,
+        errorMessage: 'Erreur de chargement des demandes de support: $e',
+      ));
+    }
+  }
+
+  Future<void> _onUpdateSupportRequest(
+    UpdateSupportRequest event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(state.copyWith(actionStatus: AdminStatus.loading));
+    try {
+      await repository.updateSupportRequest(
+        event.requestId,
+        status: event.status,
+        adminNotes: event.adminNotes,
+      );
+      emit(state.copyWith(
+        actionStatus: AdminStatus.success,
+        successMessage: 'Demande mise à jour avec succès',
+      ));
+      // Reload support requests
+      add(LoadSupportRequests(
+        page: state.supportPage,
+        status: state.supportStatusFilter,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        actionStatus: AdminStatus.error,
+        errorMessage: 'Erreur de mise à jour: $e',
+      ));
+    }
+  }
+
+  Future<void> _onRespondToSupportRequest(
+    RespondToSupportRequest event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(state.copyWith(actionStatus: AdminStatus.loading));
+    try {
+      await repository.respondToSupportRequest(
+        event.requestId,
+        responseMessage: event.responseMessage,
+        sendEmail: event.sendEmail,
+        sendNotification: event.sendNotification,
+      );
+      emit(state.copyWith(
+        actionStatus: AdminStatus.success,
+        successMessage: 'Réponse envoyée avec succès',
+      ));
+      // Reload support requests
+      add(LoadSupportRequests(
+        page: state.supportPage,
+        status: state.supportStatusFilter,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        actionStatus: AdminStatus.error,
+        errorMessage: 'Erreur lors de l\'envoi de la réponse: $e',
+      ));
+    }
+  }
+
+  Future<void> _onDeleteSupportRequest(
+    DeleteSupportRequest event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(state.copyWith(actionStatus: AdminStatus.loading));
+    try {
+      await repository.deleteSupportRequest(event.requestId);
+      emit(state.copyWith(
+        actionStatus: AdminStatus.success,
+        successMessage: 'Demande supprimée avec succès',
+      ));
+      // Reload support requests
+      add(LoadSupportRequests(
+        page: state.supportPage,
+        status: state.supportStatusFilter,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        actionStatus: AdminStatus.error,
+        errorMessage: 'Erreur lors de la suppression: $e',
       ));
     }
   }

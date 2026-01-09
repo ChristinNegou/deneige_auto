@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const SupportRequest = require('../models/SupportRequest');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { protect, authorize } = require('../middleware/auth');
+const { sendEmail } = require('../config/email');
 
 // @route   POST /api/support/request
 // @desc    Créer une nouvelle demande de support
@@ -114,13 +116,29 @@ router.get('/requests', protect, authorize('admin'), async (req, res) => {
 
         const total = await SupportRequest.countDocuments(query);
 
+        // Formater les données pour le frontend
+        const formattedRequests = requests.map(request => ({
+            _id: request._id,
+            userId: request.userId?._id || request.userId,
+            userEmail: request.userId?.email || request.userEmail,
+            userName: request.userId
+                ? `${request.userId.firstName} ${request.userId.lastName}`
+                : request.userName,
+            subject: request.subject,
+            message: request.message,
+            status: request.status,
+            adminNotes: request.adminNotes,
+            resolvedAt: request.resolvedAt,
+            createdAt: request.createdAt,
+            updatedAt: request.updatedAt,
+        }));
+
         res.status(200).json({
             success: true,
-            count: requests.length,
+            requests: formattedRequests,
             total,
+            page: parseInt(page),
             totalPages: Math.ceil(total / limit),
-            currentPage: parseInt(page),
-            data: requests,
         });
     } catch (error) {
         console.error('Erreur lors de la récupération des demandes:', error);
@@ -175,6 +193,164 @@ router.put('/requests/:id', protect, authorize('admin'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la mise à jour de la demande',
+        });
+    }
+});
+
+// @route   POST /api/support/requests/:id/respond
+// @desc    Répondre à une demande de support (Admin)
+// @access  Private/Admin
+router.post('/requests/:id/respond', protect, authorize('admin'), async (req, res) => {
+    try {
+        const { message, sendEmail: shouldSendEmail, sendNotification } = req.body;
+
+        if (!message || message.trim().length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le message de réponse est requis',
+            });
+        }
+
+        const request = await SupportRequest.findById(req.params.id);
+
+        if (!request) {
+            return res.status(404).json({
+                success: false,
+                message: 'Demande non trouvée',
+            });
+        }
+
+        // Mettre à jour le statut si en attente
+        if (request.status === 'pending') {
+            request.status = 'in_progress';
+        }
+        request.adminNotes = request.adminNotes
+            ? `${request.adminNotes}\n\n[Réponse ${new Date().toLocaleDateString('fr-CA')}]: ${message}`
+            : `[Réponse ${new Date().toLocaleDateString('fr-CA')}]: ${message}`;
+        request.updatedAt = Date.now();
+        await request.save();
+
+        // Envoyer un email si demandé
+        if (shouldSendEmail) {
+            try {
+                const html = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                            .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
+                            .email-content { background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                            .header { text-align: center; color: #1E3A8A; margin-bottom: 30px; }
+                            .message-box { background-color: #E8F4FD; border-left: 4px solid #3B82F6; padding: 15px; margin: 20px 0; }
+                            .original-request { background-color: #F3F4F6; padding: 15px; border-radius: 8px; margin-top: 20px; }
+                            .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <div class="email-content">
+                                <div class="header">
+                                    <h1>❄️ Déneige Auto</h1>
+                                    <h2>Réponse à votre demande de support</h2>
+                                </div>
+
+                                <p>Bonjour <strong>${request.userName}</strong>,</p>
+
+                                <p>Notre équipe de support a répondu à votre demande :</p>
+
+                                <div class="message-box">
+                                    <p>${message.replace(/\n/g, '<br>')}</p>
+                                </div>
+
+                                <div class="original-request">
+                                    <p><strong>Votre demande originale :</strong></p>
+                                    <p><em>Sujet : ${request.getSubjectLabel()}</em></p>
+                                    <p>${request.message}</p>
+                                </div>
+
+                                <p>Si vous avez d'autres questions, n'hésitez pas à nous contacter.</p>
+
+                                <div class="footer">
+                                    <p>L'équipe Déneige Auto</p>
+                                    <p>support@deneigeauto.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                await sendEmail({
+                    email: request.userEmail,
+                    subject: `📩 Réponse à votre demande de support - ${request.getSubjectLabel()}`,
+                    html,
+                });
+            } catch (emailError) {
+                console.error('Erreur lors de l\'envoi de l\'email:', emailError);
+                // Continue même si l'email échoue
+            }
+        }
+
+        // Créer une notification si demandé
+        if (sendNotification) {
+            try {
+                await Notification.create({
+                    userId: request.userId,
+                    type: 'systemNotification',
+                    title: 'Réponse du support',
+                    message: message,
+                    priority: 'normal',
+                    metadata: {
+                        supportRequestId: request._id,
+                        subject: request.getSubjectLabel(),
+                        originalMessage: request.message,
+                    },
+                });
+            } catch (notifError) {
+                console.error('Erreur lors de la création de la notification:', notifError);
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Réponse envoyée avec succès',
+            data: request,
+        });
+    } catch (error) {
+        console.error('Erreur lors de la réponse à la demande:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'envoi de la réponse',
+        });
+    }
+});
+
+// @route   DELETE /api/support/requests/:id
+// @desc    Supprimer une demande de support (Admin)
+// @access  Private/Admin
+router.delete('/requests/:id', protect, authorize('admin'), async (req, res) => {
+    try {
+        const request = await SupportRequest.findById(req.params.id);
+
+        if (!request) {
+            return res.status(404).json({
+                success: false,
+                message: 'Demande non trouvée',
+            });
+        }
+
+        await SupportRequest.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            message: 'Demande supprimée avec succès',
+        });
+    } catch (error) {
+        console.error('Erreur lors de la suppression de la demande:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la suppression de la demande',
         });
     }
 });
