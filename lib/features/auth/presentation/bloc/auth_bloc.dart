@@ -271,7 +271,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
-      (user) => emit(PhoneVerificationSuccess(user: user)),
+      (user) {
+        // Configurer les notifications pour le nouvel utilisateur
+        _setupNotificationsForUser(user);
+        // Émettre PhoneVerificationSuccess pour que l'UI puisse réagir
+        emit(PhoneVerificationSuccess(user: user));
+        // Puis émettre AuthAuthenticated pour que RoleBasedHomeWrapper affiche le bon dashboard
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
