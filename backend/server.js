@@ -8,6 +8,7 @@ const connectDB = require('./config/database');
 const path = require('path');
 const { initializeFirebase } = require('./services/firebaseService');
 const { runFullCleanup, getDatabaseStats } = require('./services/databaseCleanupService');
+const { processExpiredJobs } = require('./services/expiredJobsService');
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -282,6 +283,19 @@ cron.schedule('0 3 * * *', async () => {
 });
 
 console.log('📅 Tâche cron de nettoyage programmée (3h00 tous les jours)');
+
+// Vérification des jobs expirés toutes les 5 minutes
+cron.schedule('*/5 * * * *', async () => {
+    try {
+        await processExpiredJobs();
+    } catch (error) {
+        console.error('❌ Erreur lors de la vérification des jobs expirés:', error);
+    }
+}, {
+    timezone: 'America/Montreal'
+});
+
+console.log('📅 Tâche cron de vérification des jobs expirés programmée (toutes les 5 minutes)');
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3000;

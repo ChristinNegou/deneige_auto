@@ -16,12 +16,12 @@ class AppConfig {
   static String get apiBaseUrl {
     switch (environment) {
       case 'production':
-        return 'https://api.deneige-auto.com/v1';
+        return 'https://deneigeauto-production.up.railway.app/api';
       case 'staging':
         return 'https://staging-api.deneige-auto.com/v1';
       default:
         // Pour téléphone physique, utilisez l'adresse IP locale du PC
-        return 'http://192.168.40.228:3000';
+        return 'http://192.168.40.228:3000/api';
     }
   }
 
