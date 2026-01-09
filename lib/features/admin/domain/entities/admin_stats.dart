@@ -21,12 +21,14 @@ class AdminStats {
   final ReservationStats reservations;
   final RevenueStats revenue;
   final List<TopWorker> topWorkers;
+  final SupportStats support;
 
   AdminStats({
     required this.users,
     required this.reservations,
     required this.revenue,
     required this.topWorkers,
+    required this.support,
   });
 
   factory AdminStats.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,7 @@ class AdminStats {
               ?.map((w) => TopWorker.fromJson(w))
               .toList() ??
           [],
+      support: SupportStats.fromJson(json['support'] ?? {}),
     );
   }
 }
@@ -148,6 +151,38 @@ class TopWorker {
       jobsCompleted: _toInt(json['jobsCompleted']),
       totalEarnings: _toDouble(json['totalEarnings']),
       rating: _toDouble(json['rating']),
+    );
+  }
+}
+
+class SupportStats {
+  final int total;
+  final int pending;
+  final int inProgress;
+  final int resolved;
+  final int closed;
+  final int todayNew;
+  final double avgResponseTimeHours;
+
+  SupportStats({
+    required this.total,
+    required this.pending,
+    required this.inProgress,
+    required this.resolved,
+    required this.closed,
+    required this.todayNew,
+    required this.avgResponseTimeHours,
+  });
+
+  factory SupportStats.fromJson(Map<String, dynamic> json) {
+    return SupportStats(
+      total: _toInt(json['total']),
+      pending: _toInt(json['pending']),
+      inProgress: _toInt(json['inProgress']),
+      resolved: _toInt(json['resolved']),
+      closed: _toInt(json['closed']),
+      todayNew: _toInt(json['todayNew']),
+      avgResponseTimeHours: _toDouble(json['avgResponseTimeHours']),
     );
   }
 }

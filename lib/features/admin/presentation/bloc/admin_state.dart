@@ -1,6 +1,7 @@
 import '../../domain/entities/admin_stats.dart';
 import '../../domain/entities/admin_user.dart';
 import '../../domain/entities/admin_reservation.dart';
+import '../../domain/entities/admin_support_request.dart';
 
 enum AdminStatus { initial, loading, success, error }
 
@@ -26,6 +27,14 @@ class AdminState {
   final AdminStatus reservationsStatus;
   final AdminReservation? selectedReservation;
   final AdminStatus reservationDetailsStatus;
+
+  // Support Requests
+  final List<AdminSupportRequest> supportRequests;
+  final int supportTotal;
+  final int supportPage;
+  final int supportTotalPages;
+  final AdminStatus supportStatus;
+  final String? supportStatusFilter;
 
   // Filters
   final String? usersRoleFilter;
@@ -59,6 +68,14 @@ class AdminState {
     this.reservationsStatus = AdminStatus.initial,
     this.selectedReservation,
     this.reservationDetailsStatus = AdminStatus.initial,
+
+    // Support Requests
+    this.supportRequests = const [],
+    this.supportTotal = 0,
+    this.supportPage = 1,
+    this.supportTotalPages = 1,
+    this.supportStatus = AdminStatus.initial,
+    this.supportStatusFilter,
 
     // Filters
     this.usersRoleFilter,
@@ -95,6 +112,15 @@ class AdminState {
     AdminReservation? selectedReservation,
     bool clearSelectedReservation = false,
     AdminStatus? reservationDetailsStatus,
+
+    // Support Requests
+    List<AdminSupportRequest>? supportRequests,
+    int? supportTotal,
+    int? supportPage,
+    int? supportTotalPages,
+    AdminStatus? supportStatus,
+    String? supportStatusFilter,
+    bool clearSupportStatusFilter = false,
 
     // Filters
     String? usersRoleFilter,
@@ -138,6 +164,16 @@ class AdminState {
           : (selectedReservation ?? this.selectedReservation),
       reservationDetailsStatus:
           reservationDetailsStatus ?? this.reservationDetailsStatus,
+
+      // Support Requests
+      supportRequests: supportRequests ?? this.supportRequests,
+      supportTotal: supportTotal ?? this.supportTotal,
+      supportPage: supportPage ?? this.supportPage,
+      supportTotalPages: supportTotalPages ?? this.supportTotalPages,
+      supportStatus: supportStatus ?? this.supportStatus,
+      supportStatusFilter: clearSupportStatusFilter
+          ? null
+          : (supportStatusFilter ?? this.supportStatusFilter),
 
       // Filters
       usersRoleFilter: clearUsersRoleFilter

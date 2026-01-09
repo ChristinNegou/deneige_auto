@@ -67,6 +67,46 @@ class BroadcastNotification extends AdminEvent {
   });
 }
 
+// Support Events
+class LoadSupportRequests extends AdminEvent {
+  final int page;
+  final String? status;
+
+  LoadSupportRequests({this.page = 1, this.status});
+}
+
+class UpdateSupportRequest extends AdminEvent {
+  final String requestId;
+  final String? status;
+  final String? adminNotes;
+
+  UpdateSupportRequest({
+    required this.requestId,
+    this.status,
+    this.adminNotes,
+  });
+}
+
+class RespondToSupportRequest extends AdminEvent {
+  final String requestId;
+  final String responseMessage;
+  final bool sendEmail;
+  final bool sendNotification;
+
+  RespondToSupportRequest({
+    required this.requestId,
+    required this.responseMessage,
+    this.sendEmail = true,
+    this.sendNotification = true,
+  });
+}
+
+class DeleteSupportRequest extends AdminEvent {
+  final String requestId;
+
+  DeleteSupportRequest(this.requestId);
+}
+
 // Clear Events
 class ClearUserDetails extends AdminEvent {}
 

@@ -91,6 +91,8 @@ class AdminDashboardPage extends StatelessWidget {
                   const SizedBox(height: 24),
                   _buildStatsGrid(context, state.stats!),
                   const SizedBox(height: 24),
+                  _buildSupportStatsCard(context, state.stats!),
+                  const SizedBox(height: 24),
                   _buildRevenueCard(state.stats!),
                   const SizedBox(height: 24),
                   _buildTopWorkersCard(context, state.stats!),
@@ -204,6 +206,15 @@ class AdminDashboardPage extends StatelessWidget {
               Navigator.pushNamed(context, AppRoutes.adminReports);
             },
           ),
+          _buildDrawerItem(
+            context,
+            icon: Icons.support_agent,
+            title: 'Support',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, AppRoutes.adminSupport);
+            },
+          ),
           const Divider(),
           _buildDrawerItem(
             context,
@@ -297,11 +308,11 @@ class AdminDashboardPage extends StatelessWidget {
               ),
               _buildQuickActionButton(
                 context,
-                icon: Icons.analytics,
-                label: 'Rapports',
-                color: AppTheme.primary2,
+                icon: Icons.support_agent,
+                label: 'Support',
+                color: AppTheme.success,
                 onTap: () =>
-                    Navigator.pushNamed(context, AppRoutes.adminReports),
+                    Navigator.pushNamed(context, AppRoutes.adminSupport),
               ),
             ],
           ),
@@ -456,6 +467,173 @@ class AdminDashboardPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSupportStatsCard(BuildContext context, AdminStats stats) {
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, AppRoutes.adminSupport),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.shadowColor.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.info.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.support_agent,
+                          color: AppTheme.info, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Support',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                if (stats.support.pending > 0)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.warning,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.priority_high,
+                            color: AppTheme.background, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${stats.support.pending} en attente',
+                          style: TextStyle(
+                            color: AppTheme.background,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildSupportStatItem(
+                    'Total',
+                    stats.support.total.toString(),
+                    Icons.inbox,
+                    AppTheme.textSecondary,
+                  ),
+                ),
+                Expanded(
+                  child: _buildSupportStatItem(
+                    'En attente',
+                    stats.support.pending.toString(),
+                    Icons.pending_actions,
+                    AppTheme.warning,
+                  ),
+                ),
+                Expanded(
+                  child: _buildSupportStatItem(
+                    'En cours',
+                    stats.support.inProgress.toString(),
+                    Icons.hourglass_top,
+                    AppTheme.info,
+                  ),
+                ),
+                Expanded(
+                  child: _buildSupportStatItem(
+                    'Résolues',
+                    stats.support.resolved.toString(),
+                    Icons.check_circle,
+                    AppTheme.success,
+                  ),
+                ),
+              ],
+            ),
+            if (stats.support.todayNew > 0) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.new_releases,
+                        color: AppTheme.info, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${stats.support.todayNew} nouvelle(s) demande(s) aujourd\'hui',
+                      style: TextStyle(
+                        color: AppTheme.info,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSupportStatItem(
+      String label, String value, IconData icon, Color color) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 20),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: AppTheme.textSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 

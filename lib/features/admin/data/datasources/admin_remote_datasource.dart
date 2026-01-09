@@ -15,6 +15,17 @@ abstract class AdminRemoteDataSource {
       {double? amount, String? reason});
   Future<void> broadcastNotification(
       {required String title, required String message, String? targetRole});
+  Future<Map<String, dynamic>> getSupportRequests(
+      {int page, int limit, String? status});
+  Future<void> updateSupportRequest(String requestId,
+      {String? status, String? adminNotes});
+  Future<void> respondToSupportRequest(
+    String requestId, {
+    required String responseMessage,
+    bool sendEmail = true,
+    bool sendNotification = true,
+  });
+  Future<void> deleteSupportRequest(String requestId);
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
@@ -113,5 +124,50 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       'message': message,
       if (targetRole != null) 'targetRole': targetRole,
     });
+  }
+
+  @override
+  Future<Map<String, dynamic>> getSupportRequests({
+    int page = 1,
+    int limit = 20,
+    String? status,
+  }) async {
+    final queryParams = <String, dynamic>{
+      'page': page,
+      'limit': limit,
+    };
+    if (status != null) queryParams['status'] = status;
+
+    final response =
+        await dio.get('/support/requests', queryParameters: queryParams);
+    return response.data;
+  }
+
+  @override
+  Future<void> updateSupportRequest(String requestId,
+      {String? status, String? adminNotes}) async {
+    await dio.put('/support/requests/$requestId', data: {
+      if (status != null) 'status': status,
+      if (adminNotes != null) 'adminNotes': adminNotes,
+    });
+  }
+
+  @override
+  Future<void> respondToSupportRequest(
+    String requestId, {
+    required String responseMessage,
+    bool sendEmail = true,
+    bool sendNotification = true,
+  }) async {
+    await dio.post('/support/requests/$requestId/respond', data: {
+      'message': responseMessage,
+      'sendEmail': sendEmail,
+      'sendNotification': sendNotification,
+    });
+  }
+
+  @override
+  Future<void> deleteSupportRequest(String requestId) async {
+    await dio.delete('/support/requests/$requestId');
   }
 }
