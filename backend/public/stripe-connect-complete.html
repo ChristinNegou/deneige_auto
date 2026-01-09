@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration terminée - Deneige Auto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+        .icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+        h1 {
+            color: #1F2937;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+        p {
+            color: #6B7280;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .success-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #D1FAE5;
+            color: #059669;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .success-badge svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            fill: currentColor;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        .note {
+            margin-top: 20px;
+            padding: 16px;
+            background: #F3F4F6;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #6B7280;
+        }
+        .logo {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">❄️</div>
+        <div class="icon">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        </div>
+
+        <div class="success-badge">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+            Configuration réussie
+        </div>
+
+        <h1>Compte bancaire configuré!</h1>
+        <p>Votre compte Stripe est maintenant prêt. Vous pouvez recevoir des paiements pour vos services de déneigement.</p>
+
+        <button class="btn" onclick="closeWindow()">Fermer et retourner à l'application</button>
+
+        <div class="note">
+            <strong>Prochaine étape:</strong> Retournez dans l'application Deneige Auto pour commencer à accepter des jobs.
+        </div>
+    </div>
+
+    <script>
+        function closeWindow() {
+            // Essayer de fermer la fenêtre/onglet
+            window.close();
+
+            // Si ça ne fonctionne pas après 500ms, afficher un message
+            setTimeout(function() {
+                alert('Vous pouvez maintenant fermer cette page et retourner à l\'application Deneige Auto.');
+            }, 500);
+        }
+    </script>
+</body>
+</html>
