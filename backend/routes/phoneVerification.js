@@ -165,8 +165,8 @@ router.post('/verify-code', async (req, res) => {
                 });
             }
 
-            // Créer l'utilisateur
-            const user = await User.create({
+            // Préparer les données utilisateur
+            const userData = {
                 email,
                 password,
                 firstName,
@@ -174,7 +174,30 @@ router.post('/verify-code', async (req, res) => {
                 phoneNumber: formattedPhone,
                 phoneVerified: true,
                 role
-            });
+            };
+
+            // Initialiser workerProfile pour les déneigeurs
+            if (role === 'snowWorker') {
+                userData.workerProfile = {
+                    isAvailable: false,
+                    currentLocation: {
+                        type: 'Point',
+                        coordinates: [0, 0],
+                    },
+                    preferredZones: [],
+                    maxActiveJobs: 3,
+                    vehicleType: 'car',
+                    equipmentList: [],
+                    totalJobsCompleted: 0,
+                    totalEarnings: 0,
+                    totalTipsReceived: 0,
+                    averageRating: 0,
+                    totalRatingsCount: 0,
+                };
+            }
+
+            // Créer l'utilisateur
+            const user = await User.create(userData);
 
             // Générer le token JWT
             const token = jwt.sign(
@@ -194,10 +217,13 @@ router.post('/verify-code', async (req, res) => {
                 user: {
                     id: user._id,
                     email: user.email,
+                    name: `${user.firstName} ${user.lastName}`,
                     firstName: user.firstName,
                     lastName: user.lastName,
                     phoneNumber: user.phoneNumber,
-                    role: user.role
+                    role: user.role,
+                    photoUrl: user.photoUrl || null,
+                    createdAt: user.createdAt
                 }
             });
         }
