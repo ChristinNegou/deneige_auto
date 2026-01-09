@@ -12,7 +12,7 @@ class WorkerPaymentSetupPage extends StatefulWidget {
   State<WorkerPaymentSetupPage> createState() => _WorkerPaymentSetupPageState();
 }
 
-class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
+class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with WidgetsBindingObserver {
   late WorkerStripeService _stripeService;
   bool _isLoading = true;
   bool _hasAccount = false;
@@ -22,12 +22,29 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
   Map<String, dynamic>? _balance;
   Map<String, dynamic>? _feeConfig;
   String? _errorMessage;
+  bool _waitingForStripeReturn = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _stripeService = WorkerStripeService(dioClient: sl<DioClient>());
     _loadAccountStatus();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Quand l'utilisateur revient dans l'app après Stripe, rafraîchir le statut
+    if (state == AppLifecycleState.resumed && _waitingForStripeReturn) {
+      _waitingForStripeReturn = false;
+      _loadAccountStatus();
+    }
   }
 
   Future<void> _loadAccountStatus() async {
@@ -68,13 +85,11 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> {
       if (result['onboardingUrl'] != null) {
         final url = Uri.parse(result['onboardingUrl']);
         if (await canLaunchUrl(url)) {
+          // Marquer qu'on attend le retour de Stripe
+          _waitingForStripeReturn = true;
           await launchUrl(url, mode: LaunchMode.externalApplication);
         }
       }
-
-      // Recharger le statut apres retour
-      await Future.delayed(const Duration(seconds: 2));
-      await _loadAccountStatus();
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
