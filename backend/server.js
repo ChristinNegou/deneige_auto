@@ -109,6 +109,15 @@ app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
 });
 
+// ✅ Routes pour les redirections Stripe Connect
+app.get('/worker/stripe-connect/complete', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'stripe-connect-complete.html'));
+});
+
+app.get('/worker/stripe-connect/refresh', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'stripe-connect-refresh.html'));
+});
+
 
 // Route de test
 app.get('/', (req, res) => {
