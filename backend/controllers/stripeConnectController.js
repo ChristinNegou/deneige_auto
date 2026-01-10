@@ -753,6 +753,7 @@ exports.deleteConnectAccount = async (req, res) => {
 
 /**
  * [ADMIN] Lister tous les comptes Connect de la plateforme
+ * Récupère directement depuis Stripe pour avoir tous les comptes, même orphelins
  */
 exports.listAllConnectAccounts = async (req, res) => {
     try {
@@ -764,51 +765,130 @@ exports.listAllConnectAccounts = async (req, res) => {
             });
         }
 
-        // Récupérer tous les workers avec un compte Stripe Connect
+        // Récupérer TOUS les comptes Connect directement depuis Stripe
+        const stripeAccounts = await stripe.accounts.list({
+            limit: 100, // Maximum par requête
+        });
+
+        // Récupérer tous les workers avec un compte Stripe Connect pour le mapping
         const workers = await User.find({
             role: 'snowWorker',
             'workerProfile.stripeConnectId': { $exists: true, $ne: null }
         }).select('firstName lastName email workerProfile.stripeConnectId');
 
-        // Récupérer les détails Stripe pour chaque compte
-        const accountsWithDetails = await Promise.all(
-            workers.map(async (worker) => {
-                try {
-                    const account = await stripe.accounts.retrieve(
-                        worker.workerProfile.stripeConnectId
-                    );
-                    return {
-                        workerId: worker._id,
-                        workerName: `${worker.firstName} ${worker.lastName}`,
-                        workerEmail: worker.email,
-                        stripeAccountId: account.id,
-                        chargesEnabled: account.charges_enabled,
-                        payoutsEnabled: account.payouts_enabled,
-                        detailsSubmitted: account.details_submitted,
-                        created: new Date(account.created * 1000),
-                    };
-                } catch (error) {
-                    return {
-                        workerId: worker._id,
-                        workerName: `${worker.firstName} ${worker.lastName}`,
-                        workerEmail: worker.email,
-                        stripeAccountId: worker.workerProfile.stripeConnectId,
-                        error: 'Compte introuvable sur Stripe',
-                    };
-                }
-            })
-        );
+        // Créer un map pour recherche rapide par stripeConnectId
+        const workerMap = new Map();
+        workers.forEach(worker => {
+            workerMap.set(worker.workerProfile.stripeConnectId, worker);
+        });
+
+        // Formater les comptes avec les infos du worker si disponible
+        const accountsWithDetails = stripeAccounts.data.map(account => {
+            const worker = workerMap.get(account.id);
+
+            return {
+                stripeAccountId: account.id,
+                email: account.email,
+                chargesEnabled: account.charges_enabled,
+                payoutsEnabled: account.payouts_enabled,
+                detailsSubmitted: account.details_submitted,
+                created: new Date(account.created * 1000),
+                businessType: account.business_type,
+                country: account.country,
+                // Infos du worker si lié dans notre DB
+                workerId: worker?._id || null,
+                workerName: worker ? `${worker.firstName} ${worker.lastName}` : null,
+                workerEmail: worker?.email || null,
+                isOrphan: !worker, // True si le compte existe sur Stripe mais pas lié dans notre DB
+            };
+        });
+
+        // Aussi vérifier s'il y a des workers dans notre DB avec des stripeConnectId invalides
+        const stripeAccountIds = new Set(stripeAccounts.data.map(a => a.id));
+        const orphanedInDb = workers
+            .filter(w => !stripeAccountIds.has(w.workerProfile.stripeConnectId))
+            .map(worker => ({
+                stripeAccountId: worker.workerProfile.stripeConnectId,
+                email: null,
+                chargesEnabled: false,
+                payoutsEnabled: false,
+                detailsSubmitted: false,
+                created: null,
+                businessType: null,
+                country: null,
+                workerId: worker._id,
+                workerName: `${worker.firstName} ${worker.lastName}`,
+                workerEmail: worker.email,
+                isOrphan: false,
+                isInvalidOnStripe: true, // Le compte n'existe plus sur Stripe
+            }));
+
+        const allAccounts = [...accountsWithDetails, ...orphanedInDb];
 
         res.json({
             success: true,
-            accounts: accountsWithDetails,
-            count: accountsWithDetails.length,
+            accounts: allAccounts,
+            count: allAccounts.length,
+            stripeTotal: stripeAccounts.data.length,
+            linkedToWorkers: accountsWithDetails.filter(a => !a.isOrphan).length,
+            orphanOnStripe: accountsWithDetails.filter(a => a.isOrphan).length,
+            invalidInDb: orphanedInDb.length,
         });
     } catch (error) {
         console.error('❌ Erreur listing comptes Connect:', error);
         res.status(500).json({
             success: false,
             message: error.message,
+        });
+    }
+};
+
+/**
+ * [ADMIN] Supprimer un compte Stripe Connect orphelin (par son ID Stripe directement)
+ * Pour les comptes qui existent sur Stripe mais ne sont pas liés à un worker
+ */
+exports.deleteOrphanConnectAccount = async (req, res) => {
+    try {
+        const { stripeAccountId } = req.params;
+
+        // Vérifier que l'utilisateur est admin
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Accès réservé aux administrateurs',
+            });
+        }
+
+        if (!stripeAccountId) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID du compte Stripe requis',
+            });
+        }
+
+        // Supprimer le compte via l'API Stripe
+        const deletedAccount = await stripe.accounts.del(stripeAccountId);
+
+        console.log('✅ Compte Stripe Connect orphelin supprimé:', stripeAccountId);
+
+        res.json({
+            success: true,
+            message: 'Compte Stripe Connect supprimé avec succès',
+            deletedAccountId: stripeAccountId,
+            deleted: deletedAccount.deleted,
+        });
+    } catch (error) {
+        console.error('❌ Erreur suppression compte orphelin:', error);
+
+        let userMessage = error.message;
+        if (error.code === 'resource_missing' || error.code === 'account_invalid') {
+            userMessage = 'Compte déjà supprimé ou inexistant sur Stripe';
+        }
+
+        res.status(400).json({
+            success: false,
+            message: userMessage,
+            stripeCode: error.code || null,
         });
     }
 };

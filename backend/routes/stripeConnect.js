@@ -15,6 +15,7 @@ const {
     getCanadianBanks,
     deleteConnectAccount,
     listAllConnectAccounts,
+    deleteOrphanConnectAccount,
 } = require('../controllers/stripeConnectController');
 
 // @route   POST /api/stripe-connect/create-account
@@ -85,5 +86,10 @@ router.get('/admin/accounts', protect, authorize('admin'), listAllConnectAccount
 // @desc    Supprimer le compte Connect d'un déneigeur
 // @access  Private (admin only)
 router.delete('/admin/accounts/:workerId', protect, authorize('admin'), deleteConnectAccount);
+
+// @route   DELETE /api/stripe-connect/admin/orphan-accounts/:stripeAccountId
+// @desc    Supprimer un compte Connect orphelin (non lié à un worker)
+// @access  Private (admin only)
+router.delete('/admin/orphan-accounts/:stripeAccountId', protect, authorize('admin'), deleteOrphanConnectAccount);
 
 module.exports = router;
