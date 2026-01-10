@@ -187,6 +187,15 @@ class AdminDashboardPage extends StatelessWidget {
               Navigator.pushNamed(context, AppRoutes.adminWorkers);
             },
           ),
+          _buildDrawerItem(
+            context,
+            icon: Icons.account_balance_wallet,
+            title: 'Comptes Stripe',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, AppRoutes.adminStripeAccounts);
+            },
+          ),
           const Divider(),
           _buildDrawerItem(
             context,
