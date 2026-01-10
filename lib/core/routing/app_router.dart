@@ -53,6 +53,7 @@ import '../../features/admin/presentation/pages/admin_reservations_page.dart';
 import '../../features/admin/presentation/pages/admin_workers_page.dart';
 import '../../features/admin/presentation/pages/admin_reports_page.dart';
 import '../../features/admin/presentation/pages/admin_support_page.dart';
+import '../../features/admin/presentation/pages/admin_stripe_accounts_page.dart';
 import '../../features/admin/presentation/bloc/admin_bloc.dart';
 import '../../features/admin/presentation/bloc/admin_event.dart';
 
@@ -391,6 +392,12 @@ class AppRouter {
             create: (_) => sl<AdminBloc>(),
             child: const AdminSupportPage(),
           ),
+          settings: settings,
+        );
+
+      case AppRoutes.adminStripeAccounts:
+        return MaterialPageRoute(
+          builder: (_) => const AdminStripeAccountsPage(),
           settings: settings,
         );
 

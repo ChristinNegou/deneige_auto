@@ -83,4 +83,5 @@ class AppRoutes {
   static const String adminWorkers = '/admin/workers';
   static const String adminReports = '/admin/reports';
   static const String adminSupport = '/admin/support';
+  static const String adminStripeAccounts = '/admin/stripe-accounts';
 }
