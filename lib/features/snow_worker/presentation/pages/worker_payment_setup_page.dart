@@ -56,6 +56,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
 
     try {
       final status = await _stripeService.getAccountStatus();
+      print('=== PAYMENT PAGE: Account Status: $status ===');
       final feeConfig = await _stripeService.getFeeConfig();
 
       setState(() {
@@ -65,6 +66,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         _payoutsEnabled = status['payoutsEnabled'] ?? false;
         _feeConfig = feeConfig;
       });
+
+      print('=== PAYMENT PAGE: hasAccount: $_hasAccount, isComplete: $_isComplete, chargesEnabled: $_chargesEnabled, payoutsEnabled: $_payoutsEnabled ===');
 
       if (_hasAccount && _isComplete) {
         final balance = await _stripeService.getBalance();
@@ -85,10 +88,24 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
     setState(() => _isLoading = true);
 
     try {
+      debugPrint('=== Calling createConnectAccount ===');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Connexion a Stripe...'),
+            backgroundColor: AppTheme.info,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+
       final result = await _stripeService.createConnectAccount();
+      debugPrint('=== Result: $result ===');
 
       if (result['onboardingUrl'] != null) {
         final url = Uri.parse(result['onboardingUrl']);
+        debugPrint('=== Opening URL: $url ===');
         if (await canLaunchUrl(url)) {
           // Marquer qu'on attend le retour de Stripe
           _waitingForStripeReturn = true;
@@ -115,18 +132,29 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         }
         await _loadAccountStatus();
       } else {
-        // Pas d'URL mais pas complet non plus - situation anormale
+        // Pas d'URL mais pas complet non plus - afficher le resultat
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Erreur: impossible de continuer la configuration. Reessayez.'),
+              content: Text('Reponse Stripe: ${result.toString().substring(0, result.toString().length.clamp(0, 100))}'),
               backgroundColor: AppTheme.warning,
+              duration: const Duration(seconds: 5),
             ),
           );
         }
       }
     } catch (e) {
+      debugPrint('=== Error: $e ===');
       setState(() => _errorMessage = e.toString());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur: ${e.toString()}'),
+            backgroundColor: AppTheme.error,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
     } finally {
       setState(() => _isLoading = false);
     }
@@ -158,6 +186,18 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         title: const Text('Paiements'),
         backgroundColor: AppTheme.surface,
         elevation: 0,
+        actions: [
+          // Debug: afficher le statut actuel
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Text(
+                'v4 | C:${_chargesEnabled ? "1" : "0"} P:${_payoutsEnabled ? "1" : "0"}',
+                style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+              ),
+            ),
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -172,14 +212,14 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                     if (_errorMessage != null) _buildErrorBanner(),
                     _buildStatusCard(),
                     const SizedBox(height: 20),
-                    if (_hasAccount && _isComplete && _payoutsEnabled) ...[
+                    if (_hasAccount && _chargesEnabled && _payoutsEnabled) ...[
                       _buildBalanceCard(),
                       const SizedBox(height: 20),
                       _buildBankAccountsCard(),
                       const SizedBox(height: 20),
                     ],
-                    // Montrer les exigences si les paiements ne sont pas encore activés
-                    if (!_payoutsEnabled) ...[
+                    // Montrer les exigences si les virements ne sont pas encore activés
+                    if (!_payoutsEnabled && !_chargesEnabled) ...[
                       _buildIdentityRequirements(),
                       const SizedBox(height: 20),
                     ],
@@ -220,8 +260,10 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
   }
 
   Widget _buildStatusCard() {
-    final bool isConfigured = _hasAccount && _isComplete && _payoutsEnabled;
-    final bool isPendingVerification = _hasAccount && _isComplete && !_payoutsEnabled;
+    // Compte entièrement configuré: paiements et virements actifs
+    final bool isConfigured = _hasAccount && _payoutsEnabled && _chargesEnabled;
+    // En attente de vérification: compte créé avec charges OU details soumis, mais virements pas encore actifs
+    final bool isPendingVerification = _hasAccount && (_isComplete || _chargesEnabled) && !_payoutsEnabled;
 
     return Container(
       padding: const EdgeInsets.all(20),
