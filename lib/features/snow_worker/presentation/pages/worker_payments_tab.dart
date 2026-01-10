@@ -234,7 +234,10 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
   }
 
   Widget _buildStatusCard() {
-    final bool isConfigured = _hasAccount && _isComplete && _payoutsEnabled;
+    // Compte entièrement configuré: paiements et virements actifs
+    final bool isConfigured = _hasAccount && _payoutsEnabled && _chargesEnabled;
+    // En attente de vérification: compte créé avec charges OU details soumis, mais virements pas encore actifs
+    final bool isPendingVerification = _hasAccount && (_isComplete || _chargesEnabled) && !_payoutsEnabled;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -242,14 +245,16 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
         gradient: LinearGradient(
           colors: isConfigured
               ? [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)]
-              : [AppTheme.primary, AppTheme.secondary],
+              : isPendingVerification
+                  ? [AppTheme.warning, AppTheme.warning.withValues(alpha: 0.7)]
+                  : [AppTheme.primary, AppTheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         boxShadow: [
           BoxShadow(
-            color: (isConfigured ? AppTheme.success : AppTheme.primary)
+            color: (isConfigured ? AppTheme.success : isPendingVerification ? AppTheme.warning : AppTheme.primary)
                 .withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 6),
@@ -271,7 +276,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 child: Icon(
                   isConfigured
                       ? Icons.account_balance
-                      : Icons.account_balance_wallet,
+                      : isPendingVerification
+                          ? Icons.hourglass_top_rounded
+                          : Icons.account_balance_wallet,
                   color: AppTheme.background,
                   size: 26,
                 ),
@@ -284,7 +291,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                     Text(
                       isConfigured
                           ? 'Compte configure'
-                          : 'Configurez vos paiements',
+                          : isPendingVerification
+                              ? 'Verification en cours'
+                              : 'Configurez vos paiements',
                       style: const TextStyle(
                         color: AppTheme.background,
                         fontSize: 18,
@@ -295,7 +304,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                     Text(
                       isConfigured
                           ? 'Pret a recevoir des paiements'
-                          : 'Recevez vos gains directement',
+                          : isPendingVerification
+                              ? 'Stripe verifie vos informations'
+                              : 'Recevez vos gains directement',
                       style: TextStyle(
                         color: AppTheme.background.withValues(alpha: 0.85),
                         fontSize: 14,
@@ -320,6 +331,84 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 onPressed: _openDashboard,
                 icon: const Icon(Icons.open_in_new_rounded, size: 18),
                 label: const Text('Voir mon dashboard Stripe'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.background,
+                  side: const BorderSide(color: AppTheme.background, width: 1.5),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                ),
+              ),
+            ),
+          ] else if (isPendingVerification) ...[
+            _buildStatusRow('Informations de base', _isComplete),
+            const SizedBox(height: 8),
+            _buildStatusRow('Paiements actifs', _chargesEnabled),
+            const SizedBox(height: 8),
+            _buildStatusRow('Documents verifies', _payoutsEnabled),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.background.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: AppTheme.background, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Documents requis',
+                          style: TextStyle(
+                            color: AppTheme.background,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Pour encaisser vos gains, envoyez vos documents d\'identite via le bouton ci-dessous. Stripe verifiera votre compte sous 24-48h.',
+                          style: TextStyle(
+                            color: AppTheme.background.withValues(alpha: 0.9),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _openDashboard,
+                icon: const Icon(Icons.upload_file_rounded, size: 18),
+                label: const Text('Envoyer mes documents'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.background,
+                  foregroundColor: AppTheme.warning,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _loadAccountStatus,
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Actualiser le statut'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.background,
                   side: const BorderSide(color: AppTheme.background, width: 1.5),
