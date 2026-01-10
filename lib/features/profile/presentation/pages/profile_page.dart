@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../disputes/presentation/pages/my_disputes_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -235,6 +236,18 @@ class ProfilePage extends StatelessWidget {
             title: 'Paiements',
             subtitle: 'Historique et méthodes',
             onTap: () => Navigator.pushNamed(context, AppRoutes.payments),
+          ),
+          const Divider(height: 1, indent: 56, color: AppTheme.divider),
+          _buildMenuItem(
+            context,
+            icon: Icons.gavel_outlined,
+            iconColor: AppTheme.error,
+            title: 'Mes litiges',
+            subtitle: 'Signalements et réclamations',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MyDisputesPage()),
+            ),
           ),
           const Divider(height: 1, indent: 56, color: AppTheme.divider),
           _buildMenuItem(

@@ -98,6 +98,104 @@ const userSchema = new mongoose.Schema({
         },
     },
 
+    // Client-specific tracking (anti-abus et historique)
+    clientProfile: {
+        // Historique des annulations
+        totalCancellations: {
+            type: Number,
+            default: 0,
+        },
+        lateCancellations: {
+            type: Number,
+            default: 0, // Annulations après que le worker soit en route
+        },
+        cancellationHistory: [{
+            reservationId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Reservation',
+            },
+            status: String, // Status de la réservation au moment de l'annulation
+            fee: Number,
+            cancelledAt: {
+                type: Date,
+                default: Date.now,
+            },
+        }],
+
+        // Historique des litiges
+        totalDisputes: {
+            type: Number,
+            default: 0,
+        },
+        disputesWon: {
+            type: Number,
+            default: 0,
+        },
+        disputesLost: {
+            type: Number,
+            default: 0,
+        },
+
+        // No-shows signalés
+        noShowReports: {
+            type: Number,
+            default: 0,
+        },
+
+        // Avertissements
+        warningCount: {
+            type: Number,
+            default: 0,
+        },
+        warnings: [{
+            reason: String,
+            issuedAt: {
+                type: Date,
+                default: Date.now,
+            },
+            issuedBy: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            },
+        }],
+
+        // Score de fiabilité (0-100)
+        reliabilityScore: {
+            type: Number,
+            default: 100,
+            min: 0,
+            max: 100,
+        },
+
+        // Statistiques
+        totalReservations: {
+            type: Number,
+            default: 0,
+        },
+        completedReservations: {
+            type: Number,
+            default: 0,
+        },
+        totalSpent: {
+            type: Number,
+            default: 0,
+        },
+
+        // Chargebacks Stripe
+        chargebackCount: {
+            type: Number,
+            default: 0,
+        },
+        chargebackHistory: [{
+            stripeDisputeId: String,
+            amount: Number,
+            status: String,
+            reason: String,
+            createdAt: Date,
+            resolvedAt: Date,
+        }],
+    },
+
     // Worker-specific profile (only used when role === 'snowWorker')
     workerProfile: {
         isAvailable: {
@@ -227,6 +325,81 @@ const userSchema = new mongoose.Schema({
         suspensionReason: {
             type: String,
             default: null,
+        },
+
+        // Tracking des no-shows
+        noShowCount: {
+            type: Number,
+            default: 0,
+        },
+        noShowHistory: [{
+            reservationId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Reservation',
+            },
+            reportedAt: {
+                type: Date,
+                default: Date.now,
+            },
+            disputeId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Dispute',
+            },
+            resolved: {
+                type: Boolean,
+                default: false,
+            },
+            resolution: String, // 'confirmed', 'dismissed', 'pending'
+        }],
+
+        // Tracking des litiges
+        totalDisputes: {
+            type: Number,
+            default: 0,
+        },
+        disputesAgainst: {
+            type: Number,
+            default: 0, // Litiges ouverts contre ce worker
+        },
+        disputesWon: {
+            type: Number,
+            default: 0,
+        },
+        disputesLost: {
+            type: Number,
+            default: 0,
+        },
+
+        // Retards
+        lateArrivals: {
+            type: Number,
+            default: 0,
+        },
+        onTimePercentage: {
+            type: Number,
+            default: 100,
+            min: 0,
+            max: 100,
+        },
+
+        // Score de fiabilité (0-100)
+        reliabilityScore: {
+            type: Number,
+            default: 100,
+            min: 0,
+            max: 100,
+        },
+
+        // Qualité du travail
+        qualityScore: {
+            type: Number,
+            default: 100,
+            min: 0,
+            max: 100,
+        },
+        qualityComplaints: {
+            type: Number,
+            default: 0,
         },
     },
 

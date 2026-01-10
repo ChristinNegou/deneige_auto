@@ -87,6 +87,50 @@ class WorkerFaqData {
       category: FaqCategory.payments,
     ),
 
+    // Litiges et réclamations
+    FaqItem(
+      question: 'Que se passe-t-il si un client me signale un no-show?',
+      answer:
+          'Si un client signale que vous n\'êtes pas venu, vous recevrez une notification et aurez l\'opportunité de répondre. Si vous avez marqué "En route" dans l\'application, cela sera pris en compte. Les faux signalements de clients sont aussi sanctionnés.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment répondre à une réclamation client?',
+      answer:
+          'Vous recevrez une notification dès qu\'un litige est ouvert contre vous. Allez dans l\'application pour voir les détails et répondre. Expliquez votre version des faits et ajoutez des photos comme preuve si disponible. Vous avez généralement 48 heures pour répondre.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Quelles sont les conséquences d\'un litige contre moi?',
+      answer:
+          'Les conséquences dépendent de la décision et de votre historique:\n• Premier avertissement: notification\n• Récidive: suspension temporaire (3-7 jours)\n• Problèmes répétés: suspension prolongée (30 jours)\n• Cas graves: exclusion permanente\n\nMaintenez un bon service pour éviter les litiges.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment contester une décision défavorable?',
+      answer:
+          'Si vous n\'êtes pas d\'accord avec la décision prise sur un litige, vous pouvez faire appel dans les 7 jours. Fournissez des preuves supplémentaires (photos, messages, etc.) pour appuyer votre contestation.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment signaler un client problématique?',
+      answer:
+          'Si un client est abusif, introuvable malgré vos efforts, ou fait de fausses réclamations, vous pouvez le signaler dans les détails du job. Notre équipe examinera la situation et pourra sanctionner le client si nécessaire.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Mon paiement est-il affecté pendant un litige?',
+      answer:
+          'Pendant l\'examen d\'un litige, le paiement correspondant peut être temporairement retenu. Une fois la décision prise:\n• Litige en votre faveur: paiement complet versé\n• Litige contre vous: remboursement au client (partiel ou total selon la décision)',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment protéger mon score de fiabilité?',
+      answer:
+          'Pour maintenir un bon score:\n• Arrivez à l\'heure (marquez "En route" dans l\'app)\n• Prenez des photos avant/après chaque job\n• Communiquez avec le client en cas de problème\n• Complétez le travail selon les standards demandés\n• Évitez les annulations de dernière minute',
+      category: FaqCategory.disputes,
+    ),
+
     // Compte
     FaqItem(
       question: 'Comment modifier mon équipement disponible?',

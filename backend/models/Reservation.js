@@ -292,6 +292,146 @@ const reservationSchema = new mongoose.Schema({
         type: String,
         enum: ['shovel', 'brush', 'ice_scraper', 'salt_spreader', 'snow_blower'],
     }],
+
+    // ============== DISPUTE & VERIFICATION TRACKING ==============
+
+    // Litige associé
+    dispute: {
+        hasDispute: {
+            type: Boolean,
+            default: false,
+        },
+        disputeId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Dispute',
+        },
+        disputeType: String,
+        disputeStatus: String,
+        disputeOpenedAt: Date,
+        disputeResolvedAt: Date,
+    },
+
+    // No-show tracking
+    noShow: {
+        reported: {
+            type: Boolean,
+            default: false,
+        },
+        reportedAt: Date,
+        reportedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        confirmed: {
+            type: Boolean,
+            default: false,
+        },
+        confirmedAt: Date,
+    },
+
+    // Vérification de qualité du travail
+    qualityVerification: {
+        // Vérification GPS - worker était-il vraiment sur place?
+        gpsVerified: {
+            type: Boolean,
+            default: false,
+        },
+        gpsData: [{
+            coordinates: [Number], // [longitude, latitude]
+            timestamp: Date,
+            accuracy: Number, // en mètres
+            event: {
+                type: String,
+                enum: ['enRoute', 'arrived', 'workStarted', 'workCompleted'],
+            },
+        }],
+        distanceFromJobSite: Number, // distance en mètres au moment de la completion
+
+        // Vérification du temps
+        timeVerification: {
+            expectedDuration: Number, // en minutes
+            actualDuration: Number,   // en minutes
+            isSuspicious: {
+                type: Boolean,
+                default: false,
+            },
+            suspiciousReason: String,
+        },
+
+        // Vérification des photos
+        photoVerification: {
+            beforePhotoCount: {
+                type: Number,
+                default: 0,
+            },
+            afterPhotoCount: {
+                type: Number,
+                default: 0,
+            },
+            photosValidated: {
+                type: Boolean,
+                default: false,
+            },
+            validationNotes: String,
+        },
+
+        // Score de qualité pour cette réservation (0-100)
+        qualityScore: {
+            type: Number,
+            min: 0,
+            max: 100,
+        },
+
+        // Client confirmation
+        clientConfirmed: {
+            type: Boolean,
+            default: false,
+        },
+        clientConfirmedAt: Date,
+        clientSatisfied: {
+            type: Boolean,
+            default: null,
+        },
+    },
+
+    // Tracking de ponctualité
+    punctuality: {
+        scheduledArrival: Date,      // Heure d'arrivée prévue
+        actualArrival: Date,         // Heure d'arrivée réelle
+        delayMinutes: {
+            type: Number,
+            default: 0,
+        },
+        isLate: {
+            type: Boolean,
+            default: false,
+        },
+        lateNotified: {              // Worker a-t-il notifié son retard?
+            type: Boolean,
+            default: false,
+        },
+        lateReason: String,
+    },
+
+    // Flags d'alerte
+    flags: {
+        suspiciousActivity: {
+            type: Boolean,
+            default: false,
+        },
+        requiresReview: {
+            type: Boolean,
+            default: false,
+        },
+        flagReasons: [String],
+        flaggedAt: Date,
+        reviewedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        reviewedAt: Date,
+        reviewNotes: String,
+    },
 }, {
     timestamps: true,
 });
