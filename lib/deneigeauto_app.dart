@@ -29,6 +29,10 @@ class DeneigeAutoApp extends StatelessWidget {
           if (state is UserSuspended) {
             _showSuspensionDialog(state);
           }
+          // Rediriger vers le dashboard si l'utilisateur est authentifié
+          else if (state is AuthAuthenticated) {
+            _navigateToHome(state.user.role);
+          }
         },
         child: MaterialApp(
           navigatorKey: navigatorKey,
@@ -57,6 +61,20 @@ class DeneigeAutoApp extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Redirige vers le home selon le rôle de l'utilisateur
+  void _navigateToHome(UserRole role) {
+    // Attendre que le navigator soit prêt
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final navigator = navigatorKey.currentState;
+      if (navigator != null) {
+        navigator.pushNamedAndRemoveUntil(
+          AppRoutes.home,
+          (route) => false,
+        );
+      }
+    });
   }
 
   /// Affiche le dialog de suspension et redirige vers la page de connexion
