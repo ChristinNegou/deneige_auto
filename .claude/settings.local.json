@@ -24,7 +24,12 @@
       "Bash(where:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(dir \"C:\\\\Deneige-auto\\\\backend\")",
+      "Bash(dir /s \"C:\\\\Deneige-auto\")",
+      "Bash(dir \"C:\\\\Deneige-auto\" /B)",
+      "WebFetch(domain:deneigeauto-production.up.railway.app)",
+      "Bash(flutter build:*)"
     ],
     "deny": [],
     "ask": []

@@ -21,6 +21,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
   bool _payoutsEnabled = false;
   Map<String, dynamic>? _balance;
   Map<String, dynamic>? _feeConfig;
+  List<Map<String, dynamic>> _bankAccounts = [];
   String? _errorMessage;
   bool _waitingForStripeReturn = false;
 
@@ -67,7 +68,11 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
 
       if (_hasAccount && _isComplete) {
         final balance = await _stripeService.getBalance();
-        setState(() => _balance = balance);
+        final bankAccounts = await _stripeService.listBankAccounts();
+        setState(() {
+          _balance = balance;
+          _bankAccounts = bankAccounts;
+        });
       }
     } catch (e) {
       setState(() => _errorMessage = e.toString());
@@ -137,10 +142,14 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                     if (_errorMessage != null) _buildErrorBanner(),
                     _buildStatusCard(),
                     const SizedBox(height: 20),
-                    if (_hasAccount && _isComplete) ...[
+                    if (_hasAccount && _isComplete && _payoutsEnabled) ...[
                       _buildBalanceCard(),
                       const SizedBox(height: 20),
-                    ] else ...[
+                      _buildBankAccountsCard(),
+                      const SizedBox(height: 20),
+                    ],
+                    // Montrer les exigences si les paiements ne sont pas encore activés
+                    if (!_payoutsEnabled) ...[
                       _buildIdentityRequirements(),
                       const SizedBox(height: 20),
                     ],
@@ -411,6 +420,225 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
           Text(
             'Les fonds sont deposes sur votre compte bancaire sous 2-3 jours ouvrables.',
             style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToBankAccounts() {
+    Navigator.pushNamed(context, '/snow-worker/bank-accounts').then((_) {
+      _loadAccountStatus();
+    });
+  }
+
+  Widget _buildBankAccountsCard() {
+    // Trouver le compte par défaut
+    final defaultAccount = _bankAccounts.firstWhere(
+      (a) => a['isDefault'] == true,
+      orElse: () => _bankAccounts.isNotEmpty ? _bankAccounts.first : {},
+    );
+
+    final hasAccounts = _bankAccounts.isNotEmpty;
+    final bankName = defaultAccount['bankName'] ?? 'Banque';
+    final last4 = defaultAccount['last4'] ?? '****';
+    final status = defaultAccount['status'] ?? 'new';
+    final currency = (defaultAccount['currency'] ?? 'cad').toString().toUpperCase();
+    final bool isVerified = status == 'verified' || status == 'new';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.account_balance,
+                  color: AppTheme.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Comptes bancaires',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${_bankAccounts.length} compte${_bankAccounts.length > 1 ? 's' : ''} configure${_bankAccounts.length > 1 ? 's' : ''}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: _navigateToBankAccounts,
+                icon: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 18,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          if (hasAccounts) ...[
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: _navigateToBankAccounts,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                bankName,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primary,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'Principal',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                '•••• $last4',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: AppTheme.textSecondary,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceContainer,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: AppTheme.border),
+                                ),
+                                child: Text(
+                                  currency,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppTheme.textSecondary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(
+                                isVerified ? Icons.verified : Icons.pending,
+                                size: 14,
+                                color: isVerified ? AppTheme.success : AppTheme.warning,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppTheme.textTertiary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: _navigateToBankAccounts,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.warningLight,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: AppTheme.warning, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Aucun compte bancaire configure. Ajoutez-en un pour recevoir vos gains.',
+                        style: TextStyle(fontSize: 13, color: AppTheme.warning),
+                      ),
+                    ),
+                    Icon(Icons.add_circle_outline, color: AppTheme.warning),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Center(
+            child: TextButton.icon(
+              onPressed: _navigateToBankAccounts,
+              icon: Icon(Icons.settings, size: 18, color: AppTheme.primary),
+              label: Text(
+                'Gerer mes comptes bancaires',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.primary,
+                ),
+              ),
+            ),
           ),
         ],
       ),

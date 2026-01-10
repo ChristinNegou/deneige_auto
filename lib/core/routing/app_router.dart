@@ -30,6 +30,7 @@ import '../../features/snow_worker/presentation/pages/worker_history_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_earnings_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_settings_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_payment_setup_page.dart';
+import '../../features/snow_worker/presentation/pages/worker_bank_accounts_page.dart';
 import '../../features/snow_worker/domain/entities/worker_job.dart';
 import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../../features/subscription/presentation/page/subscription_page.dart';
@@ -323,6 +324,12 @@ class AppRouter {
       case AppRoutes.workerPaymentSetup:
         return MaterialPageRoute(
           builder: (_) => const WorkerPaymentSetupPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.workerBankAccounts:
+        return MaterialPageRoute(
+          builder: (_) => const WorkerBankAccountsPage(),
           settings: settings,
         );
 
