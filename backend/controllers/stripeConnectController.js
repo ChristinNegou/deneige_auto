@@ -666,4 +666,147 @@ exports.getCanadianBanks = async (req, res) => {
     });
 };
 
+// ============== ADMIN: GESTION DES COMPTES CONNECT ==============
+
+/**
+ * [ADMIN] Supprimer un compte Stripe Connect d'un déneigeur
+ * Utilise l'API Delete de Stripe pour supprimer le compte
+ */
+exports.deleteConnectAccount = async (req, res) => {
+    try {
+        const { workerId } = req.params;
+
+        // Vérifier que l'utilisateur est admin
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Accès réservé aux administrateurs',
+            });
+        }
+
+        // Trouver le worker
+        const worker = await User.findById(workerId);
+
+        if (!worker) {
+            return res.status(404).json({
+                success: false,
+                message: 'Déneigeur introuvable',
+            });
+        }
+
+        if (!worker.workerProfile?.stripeConnectId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Ce déneigeur n\'a pas de compte Stripe Connect',
+            });
+        }
+
+        const stripeConnectId = worker.workerProfile.stripeConnectId;
+
+        // Supprimer le compte via l'API Stripe
+        const deletedAccount = await stripe.accounts.del(stripeConnectId);
+
+        // Mettre à jour le profil du worker
+        worker.workerProfile.stripeConnectId = null;
+        await worker.save();
+
+        console.log('✅ Compte Stripe Connect supprimé:', stripeConnectId, 'pour worker:', workerId);
+
+        res.json({
+            success: true,
+            message: 'Compte Stripe Connect supprimé avec succès',
+            deletedAccountId: stripeConnectId,
+            deleted: deletedAccount.deleted,
+        });
+    } catch (error) {
+        console.error('❌ Erreur suppression compte Connect:', error);
+
+        let userMessage = error.message;
+        if (error.code === 'resource_missing') {
+            // Le compte n'existe plus sur Stripe, on nettoie quand même
+            try {
+                const worker = await User.findById(req.params.workerId);
+                if (worker?.workerProfile?.stripeConnectId) {
+                    worker.workerProfile.stripeConnectId = null;
+                    await worker.save();
+                }
+                return res.json({
+                    success: true,
+                    message: 'Compte Stripe Connect déjà supprimé ou inexistant, profil nettoyé',
+                });
+            } catch (cleanupError) {
+                console.error('Erreur nettoyage:', cleanupError);
+            }
+        }
+
+        res.status(400).json({
+            success: false,
+            message: userMessage,
+            stripeCode: error.code || null,
+        });
+    }
+};
+
+/**
+ * [ADMIN] Lister tous les comptes Connect de la plateforme
+ */
+exports.listAllConnectAccounts = async (req, res) => {
+    try {
+        // Vérifier que l'utilisateur est admin
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Accès réservé aux administrateurs',
+            });
+        }
+
+        // Récupérer tous les workers avec un compte Stripe Connect
+        const workers = await User.find({
+            role: 'snowWorker',
+            'workerProfile.stripeConnectId': { $exists: true, $ne: null }
+        }).select('firstName lastName email workerProfile.stripeConnectId');
+
+        // Récupérer les détails Stripe pour chaque compte
+        const accountsWithDetails = await Promise.all(
+            workers.map(async (worker) => {
+                try {
+                    const account = await stripe.accounts.retrieve(
+                        worker.workerProfile.stripeConnectId
+                    );
+                    return {
+                        workerId: worker._id,
+                        workerName: `${worker.firstName} ${worker.lastName}`,
+                        workerEmail: worker.email,
+                        stripeAccountId: account.id,
+                        chargesEnabled: account.charges_enabled,
+                        payoutsEnabled: account.payouts_enabled,
+                        detailsSubmitted: account.details_submitted,
+                        created: new Date(account.created * 1000),
+                    };
+                } catch (error) {
+                    return {
+                        workerId: worker._id,
+                        workerName: `${worker.firstName} ${worker.lastName}`,
+                        workerEmail: worker.email,
+                        stripeAccountId: worker.workerProfile.stripeConnectId,
+                        error: 'Compte introuvable sur Stripe',
+                    };
+                }
+            })
+        );
+
+        res.json({
+            success: true,
+            accounts: accountsWithDetails,
+            count: accountsWithDetails.length,
+        });
+    } catch (error) {
+        console.error('❌ Erreur listing comptes Connect:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = exports;

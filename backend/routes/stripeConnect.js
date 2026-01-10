@@ -13,6 +13,8 @@ const {
     deleteBankAccount,
     setDefaultBankAccount,
     getCanadianBanks,
+    deleteConnectAccount,
+    listAllConnectAccounts,
 } = require('../controllers/stripeConnectController');
 
 // @route   POST /api/stripe-connect/create-account
@@ -71,5 +73,17 @@ router.put('/bank-accounts/:bankAccountId/set-default', protect, authorize('snow
 // @desc    Obtenir la liste des institutions bancaires canadiennes
 // @access  Private (snowWorker only)
 router.get('/canadian-banks', protect, authorize('snowWorker'), getCanadianBanks);
+
+// ============== ADMIN: GESTION DES COMPTES CONNECT ==============
+
+// @route   GET /api/stripe-connect/admin/accounts
+// @desc    Lister tous les comptes Connect de la plateforme
+// @access  Private (admin only)
+router.get('/admin/accounts', protect, authorize('admin'), listAllConnectAccounts);
+
+// @route   DELETE /api/stripe-connect/admin/accounts/:workerId
+// @desc    Supprimer le compte Connect d'un déneigeur
+// @access  Private (admin only)
+router.delete('/admin/accounts/:workerId', protect, authorize('admin'), deleteConnectAccount);
 
 module.exports = router;
