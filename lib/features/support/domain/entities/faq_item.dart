@@ -4,6 +4,7 @@ enum FaqCategory {
   general,
   reservations,
   payments,
+  disputes,
   account;
 
   String get label {
@@ -14,6 +15,8 @@ enum FaqCategory {
         return 'Réservations';
       case FaqCategory.payments:
         return 'Paiements';
+      case FaqCategory.disputes:
+        return 'Litiges';
       case FaqCategory.account:
         return 'Compte';
     }

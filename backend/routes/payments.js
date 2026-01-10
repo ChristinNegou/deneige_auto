@@ -311,4 +311,116 @@ router.get('/payouts/history', protect, getWorkerPayoutHistory);
 // @access  Private (snowWorker)
 router.get('/payouts/summary', protect, getWorkerEarningsSummary);
 
+// ============================================
+// Stripe Webhook pour les chargebacks/disputes
+// ============================================
+
+// @route   POST /api/payments/webhook
+// @desc    Gérer les webhooks Stripe (chargebacks, disputes)
+// @access  Public (vérifié par signature Stripe)
+// Note: Ce endpoint doit recevoir le raw body, configuré dans server.js
+router.post('/webhook', async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    let event;
+
+    try {
+        // Vérifier la signature Stripe
+        event = stripe.webhooks.constructEvent(req.rawBody || req.body, sig, webhookSecret);
+    } catch (err) {
+        console.error('⚠️ Webhook signature verification failed:', err.message);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    console.log(`📩 Webhook Stripe reçu: ${event.type}`);
+
+    // Gérer les différents types d'événements
+    try {
+        switch (event.type) {
+            case 'charge.dispute.created': {
+                // Un client a ouvert un chargeback
+                const dispute = event.data.object;
+                console.log('⚠️ CHARGEBACK CRÉÉ:', dispute.id);
+
+                const { handleStripeDispute } = require('../controllers/disputeController');
+                await handleStripeDispute(dispute);
+                break;
+            }
+
+            case 'charge.dispute.updated': {
+                // Mise à jour du statut du chargeback
+                const dispute = event.data.object;
+                console.log('📝 Chargeback mis à jour:', dispute.id, dispute.status);
+
+                const { handleStripeDispute } = require('../controllers/disputeController');
+                await handleStripeDispute(dispute);
+                break;
+            }
+
+            case 'charge.dispute.closed': {
+                // Chargeback résolu (gagné ou perdu)
+                const dispute = event.data.object;
+                console.log(`✅ Chargeback fermé: ${dispute.id} - Statut: ${dispute.status}`);
+
+                const { handleStripeDispute } = require('../controllers/disputeController');
+                await handleStripeDispute(dispute);
+                break;
+            }
+
+            case 'charge.refunded': {
+                // Remboursement effectué
+                const charge = event.data.object;
+                console.log('💸 Remboursement effectué:', charge.id);
+
+                // Mettre à jour la réservation si applicable
+                if (charge.payment_intent) {
+                    const reservation = await Reservation.findOne({
+                        paymentIntentId: charge.payment_intent,
+                    });
+
+                    if (reservation) {
+                        const refundedAmount = charge.amount_refunded / 100;
+                        reservation.refundAmount = refundedAmount;
+                        reservation.refundedAt = new Date();
+
+                        if (refundedAmount >= reservation.totalPrice) {
+                            reservation.paymentStatus = 'refunded';
+                        } else {
+                            reservation.paymentStatus = 'partially_refunded';
+                        }
+
+                        await reservation.save();
+                        console.log('✅ Réservation mise à jour après remboursement');
+                    }
+                }
+                break;
+            }
+
+            case 'payment_intent.payment_failed': {
+                // Paiement échoué
+                const paymentIntent = event.data.object;
+                console.log('❌ Paiement échoué:', paymentIntent.id);
+
+                // Mettre à jour la réservation
+                if (paymentIntent.metadata?.reservationId) {
+                    await Reservation.findByIdAndUpdate(
+                        paymentIntent.metadata.reservationId,
+                        { paymentStatus: 'failed' }
+                    );
+                }
+                break;
+            }
+
+            default:
+                console.log(`Webhook non géré: ${event.type}`);
+        }
+
+        res.json({ received: true });
+    } catch (error) {
+        console.error('❌ Erreur traitement webhook:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

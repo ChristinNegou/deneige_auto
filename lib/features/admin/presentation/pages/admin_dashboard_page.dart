@@ -8,6 +8,7 @@ import '../bloc/admin_event.dart';
 import '../bloc/admin_state.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
+import 'admin_disputes_page.dart';
 
 class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({super.key});
@@ -222,6 +223,18 @@ class AdminDashboardPage extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminSupport);
+            },
+          ),
+          _buildDrawerItem(
+            context,
+            icon: Icons.gavel,
+            title: 'Litiges',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminDisputesPage()),
+              );
             },
           ),
           const Divider(),

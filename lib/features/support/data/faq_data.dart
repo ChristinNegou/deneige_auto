@@ -74,6 +74,44 @@ class FaqData {
       category: FaqCategory.payments,
     ),
 
+    // Litiges et réclamations
+    FaqItem(
+      question: 'Que faire si le déneigeur n\'est pas venu?',
+      answer:
+          'Si le déneigeur assigné n\'est pas venu à l\'heure prévue, vous pouvez signaler un "no-show" directement depuis les détails de la réservation. Le bouton "Signaler un no-show" apparaît 30 minutes après l\'heure de départ prévue. Si le no-show est confirmé, vous serez remboursé intégralement.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment signaler un problème avec le service?',
+      answer:
+          'Allez dans Profil > Mes litiges pour créer une réclamation. Vous pouvez signaler différents problèmes: travail incomplet, qualité insuffisante, retard important, dommage causé, surfacturation, etc. Décrivez la situation et ajoutez des photos si possible.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Combien de temps ai-je pour signaler un problème?',
+      answer:
+          'Vous avez 24 heures après la fin du service pour signaler un problème ou un no-show. Passé ce délai, vous pouvez toujours contacter le support, mais le traitement pourrait être plus long.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment suivre l\'état de mon litige?',
+      answer:
+          'Rendez-vous dans Profil > Mes litiges pour voir tous vos litiges et leur statut: Ouvert, En examen, En attente de réponse, Résolu. Vous recevrez une notification dès qu\'une décision sera prise.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Puis-je faire appel d\'une décision?',
+      answer:
+          'Oui, si vous n\'êtes pas satisfait de la décision prise, vous pouvez faire appel dans les 7 jours suivant la résolution. Allez dans les détails du litige et appuyez sur "Faire appel". Expliquez pourquoi vous contestez la décision.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment sont traités les remboursements suite à un litige?',
+      answer:
+          'Si le litige est résolu en votre faveur, le remboursement est automatiquement traité sur votre méthode de paiement originale. Le délai est généralement de 3-5 jours ouvrables selon votre banque.',
+      category: FaqCategory.disputes,
+    ),
+
     // Compte
     FaqItem(
       question: 'Comment modifier mes informations personnelles?',

@@ -70,6 +70,14 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Middleware spécial pour le webhook Stripe (doit recevoir le raw body)
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
+    req.rawBody = req.body;
+    next();
+});
+
+// Middleware JSON pour les autres routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -104,6 +112,7 @@ app.use('/api/stripe-connect', require('./routes/stripeConnect'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/support', require('./routes/support'));
+app.use('/api/disputes', require('./routes/disputes'));
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));

@@ -18,6 +18,7 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../chat/presentation/bloc/chat_bloc.dart';
 import '../../../chat/presentation/pages/chat_screen.dart';
+import '../../../disputes/presentation/pages/report_no_show_page.dart';
 
 class ReservationDetailsPage extends StatelessWidget {
   final String reservationId;
@@ -324,6 +325,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                                   const SizedBox(height: 12),
                                 if (reservation.canBeCancelled)
                                   _buildCancelButton(context, reservation),
+
+                                // Report No-Show button
+                                if (_canReportNoShow(reservation)) ...[
+                                  const SizedBox(height: 12),
+                                  _buildReportNoShowButton(context, reservation),
+                                ],
 
                                 const SizedBox(height: 40),
                               ],
@@ -1913,5 +1920,108 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       case ReservationStatus.late:
         return AppTheme.error;
     }
+  }
+
+  /// Check if the user can report a no-show for this reservation
+  bool _canReportNoShow(Reservation reservation) {
+    // Cannot report if cancelled
+    if (reservation.status == ReservationStatus.cancelled) {
+      return false;
+    }
+
+    // Must have a worker assigned
+    if (reservation.workerId == null) {
+      return false;
+    }
+
+    // Check if departure time has passed
+    final now = DateTime.now();
+    final departureTime = reservation.departureTime;
+
+    // Allow reporting if:
+    // 1. The departure time has passed (with 30 min grace period)
+    // 2. Status is assigned, enRoute, or late (worker was supposed to come but maybe didn't)
+    // 3. Or completed within the last 24 hours (in case user realizes later)
+
+    if (reservation.status == ReservationStatus.completed) {
+      // Can report within 24 hours of completion
+      final completedAt = reservation.completedAt;
+      if (completedAt != null) {
+        final hoursSinceCompletion = now.difference(completedAt).inHours;
+        return hoursSinceCompletion < 24;
+      }
+      return false;
+    }
+
+    if (reservation.status == ReservationStatus.assigned ||
+        reservation.status == ReservationStatus.enRoute ||
+        reservation.status == ReservationStatus.late) {
+      // Can report if 30 minutes past departure time
+      return now.isAfter(departureTime.add(const Duration(minutes: 30)));
+    }
+
+    return false;
+  }
+
+  Widget _buildReportNoShowButton(BuildContext context, Reservation reservation) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          HapticFeedback.mediumImpact();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ReportNoShowPage(
+                reservationId: reservation.id,
+                workerName: reservation.workerName,
+                totalPrice: reservation.totalPrice,
+                departureTime: reservation.departureTime,
+              ),
+            ),
+          ).then((reported) {
+            if (reported == true && mounted) {
+              // Refresh the reservation details
+              context
+                  .read<ReservationListBloc>()
+                  .add(LoadReservationById(widget.reservationId));
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: AppTheme.textPrimary),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Signalement envoyé',
+                        style: TextStyle(color: AppTheme.textPrimary),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: AppTheme.success,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }
+          });
+        },
+        icon: Icon(Icons.person_off, color: AppTheme.error),
+        label: Text(
+          'Signaler un no-show',
+          style: TextStyle(color: AppTheme.error),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppTheme.error,
+          side: BorderSide(color: AppTheme.error),
+          padding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
   }
 }
