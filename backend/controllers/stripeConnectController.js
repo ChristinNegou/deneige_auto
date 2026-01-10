@@ -722,17 +722,21 @@ exports.deleteConnectAccount = async (req, res) => {
         console.error('❌ Erreur suppression compte Connect:', error);
 
         let userMessage = error.message;
-        if (error.code === 'resource_missing') {
-            // Le compte n'existe plus sur Stripe, on nettoie quand même
+
+        // Si le compte n'existe plus sur Stripe (supprimé ou accès révoqué), on nettoie la DB
+        if (error.code === 'resource_missing' || error.code === 'account_invalid') {
             try {
                 const worker = await User.findById(req.params.workerId);
                 if (worker?.workerProfile?.stripeConnectId) {
+                    const oldStripeId = worker.workerProfile.stripeConnectId;
                     worker.workerProfile.stripeConnectId = null;
                     await worker.save();
+                    console.log('✅ Profil nettoyé pour worker:', req.params.workerId, '- ancien Stripe ID:', oldStripeId);
                 }
                 return res.json({
                     success: true,
-                    message: 'Compte Stripe Connect déjà supprimé ou inexistant, profil nettoyé',
+                    message: 'Compte Stripe Connect déjà supprimé ou inexistant. Le profil a été nettoyé.',
+                    cleaned: true,
                 });
             } catch (cleanupError) {
                 console.error('Erreur nettoyage:', cleanupError);
