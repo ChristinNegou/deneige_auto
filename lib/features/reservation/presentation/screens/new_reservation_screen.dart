@@ -35,17 +35,28 @@ class NewReservationView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<NewReservationBloc, NewReservationState>(
       listener: (context, state) {
+        print('🔄 [NewReservationView] State changed: isLoading=${state.isLoading}, isSubmitted=${state.isSubmitted}, error=${state.errorMessage}');
+
         if (state.errorMessage != null) {
+          // Fermer le SnackBar de chargement
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+          print('❌ [NewReservationView] Erreur: ${state.errorMessage}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
               backgroundColor: AppTheme.error,
               behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 5),
             ),
           );
         }
 
         if (state.isSubmitted && state.reservationId != null) {
+          // Fermer le SnackBar de chargement
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+          print('✅ [NewReservationView] Réservation créée: ${state.reservationId}');
           Navigator.of(context).pushReplacementNamed(
             '/reservation/success',
             arguments: state.reservationId,
@@ -418,10 +429,39 @@ class NewReservationView extends StatelessWidget {
 
                 // Si le paiement réussit
                 if (result != null && result['success'] == true) {
+                  print('✅ [NewReservationScreen] Paiement réussi, création réservation...');
+                  print('✅ [NewReservationScreen] paymentIntentId: ${result['paymentIntentId']}');
+
+                  // Montrer un indicateur de chargement
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppTheme.background,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text('Création de la réservation...'),
+                          ],
+                        ),
+                        backgroundColor: AppTheme.primary,
+                        duration: const Duration(seconds: 10),
+                      ),
+                    );
+                  }
+
                   bloc.add(SubmitReservation(
                     'card',
                     paymentIntentId: result['paymentIntentId'],
                   ));
+                } else {
+                  print('❌ [NewReservationScreen] Paiement annulé ou échoué');
                 }
               },
             ),

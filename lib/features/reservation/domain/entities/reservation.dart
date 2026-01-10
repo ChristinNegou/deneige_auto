@@ -102,8 +102,32 @@ class Reservation extends Equatable {
     return departureTime.isBefore(DateTime.now());
   }
 
-  /// Vérifie si la réservation est à venir et active (non passée et statut pending/assigned)
+  /// Vérifie si la réservation a été créée récemment (moins de 2 heures)
+  bool get isRecentlyCreated {
+    final twoHoursAgo = DateTime.now().subtract(const Duration(hours: 2));
+    return createdAt.isAfter(twoHoursAgo);
+  }
+
+  /// Vérifie si la réservation est à venir et active
+  /// Inclut:
+  /// - Réservations futures avec statut pending/assigned
+  /// - Réservations créées récemment (même si departureTime est passé)
+  /// - Réservations en cours (enRoute, inProgress)
   bool get isUpcoming {
+    // Toujours afficher les réservations actives
+    if (status == ReservationStatus.enRoute ||
+        status == ReservationStatus.inProgress) {
+      return true;
+    }
+
+    // Afficher les réservations récentes même si departureTime est passé
+    if (isRecentlyCreated &&
+        (status == ReservationStatus.pending ||
+            status == ReservationStatus.assigned)) {
+      return true;
+    }
+
+    // Réservations futures avec statut pending/assigned
     return !isPast &&
         (status == ReservationStatus.pending ||
             status == ReservationStatus.assigned);

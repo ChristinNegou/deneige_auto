@@ -435,12 +435,40 @@ class NewReservationBloc
 
     print('📝 [NewReservationBloc] Création réservation - paymentIntentId: ${event.paymentIntentId}');
 
+    // Vérifier que le véhicule est sélectionné
+    if (state.selectedVehicle == null) {
+      print('❌ [NewReservationBloc] Pas de véhicule sélectionné');
+      emit(state.copyWith(
+        errorMessage: 'Aucun véhicule sélectionné. Veuillez recommencer.',
+      ));
+      return;
+    }
+
     // Vérifier que la localisation est disponible
     if (!state.hasValidLocation) {
+      print('❌ [NewReservationBloc] Pas de localisation valide');
       emit(state.copyWith(
         errorMessage:
             'La localisation est requise. Veuillez activer le GPS ou entrer une adresse.',
         needsManualAddress: true,
+      ));
+      return;
+    }
+
+    // Vérifier que les dates sont définies
+    if (state.departureDateTime == null || state.deadlineTime == null) {
+      print('❌ [NewReservationBloc] Dates manquantes');
+      emit(state.copyWith(
+        errorMessage: 'Les dates de départ et limite sont requises.',
+      ));
+      return;
+    }
+
+    // Vérifier que le prix est calculé
+    if (state.calculatedPrice == null) {
+      print('❌ [NewReservationBloc] Prix non calculé');
+      emit(state.copyWith(
+        errorMessage: 'Le prix n\'a pas été calculé. Veuillez recommencer.',
       ));
       return;
     }
@@ -469,6 +497,14 @@ class NewReservationBloc
         return;
       }
 
+      print('📝 [NewReservationBloc] Données envoyées:');
+      print('  - vehicleId: ${state.selectedVehicle!.id}');
+      print('  - parkingSpotId: $parkingSpotId');
+      print('  - departureTime: ${state.departureDateTime}');
+      print('  - latitude: ${state.locationLatitude}');
+      print('  - longitude: ${state.locationLongitude}');
+      print('  - totalPrice: ${state.calculatedPrice}');
+
       // Utiliser la localisation stockée dans le state
       final result = await createReservation(CreateReservationParams(
         vehicleId: state.selectedVehicle!.id,
@@ -489,12 +525,14 @@ class NewReservationBloc
 
       result.fold(
         (failure) {
+          print('❌ [NewReservationBloc] Erreur création: ${failure.message}');
           emit(state.copyWith(
             isLoading: false,
             errorMessage: failure.message,
           ));
         },
         (reservation) {
+          print('✅ [NewReservationBloc] Réservation créée: ${reservation.id}');
           emit(state.copyWith(
             isLoading: false,
             isSubmitted: true,
@@ -503,9 +541,10 @@ class NewReservationBloc
         },
       );
     } catch (e) {
+      print('❌ [NewReservationBloc] Exception: $e');
       emit(state.copyWith(
         isLoading: false,
-        errorMessage: 'Une erreur est survenue lors de la création',
+        errorMessage: 'Une erreur est survenue lors de la création: $e',
       ));
     }
   }
