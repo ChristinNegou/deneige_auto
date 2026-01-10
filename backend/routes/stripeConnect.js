@@ -8,6 +8,11 @@ const {
     getConnectBalance,
     getPayoutHistory,
     getPlatformFeeConfig,
+    listBankAccounts,
+    addBankAccount,
+    deleteBankAccount,
+    setDefaultBankAccount,
+    getCanadianBanks,
 } = require('../controllers/stripeConnectController');
 
 // @route   POST /api/stripe-connect/create-account
@@ -39,5 +44,32 @@ router.get('/payout-history', protect, authorize('snowWorker'), getPayoutHistory
 // @desc    Obtenir la configuration des commissions
 // @access  Private
 router.get('/fee-config', protect, getPlatformFeeConfig);
+
+// ============== GESTION DES COMPTES BANCAIRES ==============
+
+// @route   GET /api/stripe-connect/bank-accounts
+// @desc    Récupérer la liste de tous les comptes bancaires
+// @access  Private (snowWorker only)
+router.get('/bank-accounts', protect, authorize('snowWorker'), listBankAccounts);
+
+// @route   POST /api/stripe-connect/bank-accounts
+// @desc    Ajouter un nouveau compte bancaire
+// @access  Private (snowWorker only)
+router.post('/bank-accounts', protect, authorize('snowWorker'), addBankAccount);
+
+// @route   DELETE /api/stripe-connect/bank-accounts/:bankAccountId
+// @desc    Supprimer un compte bancaire
+// @access  Private (snowWorker only)
+router.delete('/bank-accounts/:bankAccountId', protect, authorize('snowWorker'), deleteBankAccount);
+
+// @route   PUT /api/stripe-connect/bank-accounts/:bankAccountId/set-default
+// @desc    Définir un compte bancaire comme compte par défaut
+// @access  Private (snowWorker only)
+router.put('/bank-accounts/:bankAccountId/set-default', protect, authorize('snowWorker'), setDefaultBankAccount);
+
+// @route   GET /api/stripe-connect/canadian-banks
+// @desc    Obtenir la liste des institutions bancaires canadiennes
+// @access  Private (snowWorker only)
+router.get('/canadian-banks', protect, authorize('snowWorker'), getCanadianBanks);
 
 module.exports = router;

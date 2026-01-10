@@ -326,4 +326,344 @@ exports.getPlatformFeeConfig = async (req, res) => {
     });
 };
 
+/**
+ * Récupérer TOUS les comptes bancaires configurés
+ * Retourne la liste complète avec infos partielles pour chaque compte
+ */
+exports.listBankAccounts = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user.workerProfile?.stripeConnectId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucun compte de paiement configuré',
+            });
+        }
+
+        // Récupérer le compte Connect avec les external_accounts
+        const account = await stripe.accounts.retrieve(
+            user.workerProfile.stripeConnectId,
+            { expand: ['external_accounts'] }
+        );
+
+        // Filtrer uniquement les comptes bancaires (pas les cartes)
+        const bankAccounts = account.external_accounts?.data?.filter(
+            (acc) => acc.object === 'bank_account'
+        ) || [];
+
+        // Formater les données pour chaque compte
+        const formattedAccounts = bankAccounts.map((bank) => ({
+            id: bank.id,
+            bankName: bank.bank_name,
+            last4: bank.last4,
+            routingNumber: bank.routing_number,
+            currency: bank.currency,
+            country: bank.country,
+            status: bank.status,
+            accountHolderName: bank.account_holder_name,
+            accountHolderType: bank.account_holder_type,
+            isDefault: bank.default_for_currency || false,
+        }));
+
+        res.json({
+            success: true,
+            bankAccounts: formattedAccounts,
+            count: formattedAccounts.length,
+        });
+    } catch (error) {
+        console.error('❌ Erreur récupération comptes bancaires:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+/**
+ * Ajouter un nouveau compte bancaire
+ * Crée un token et l'attache au compte Connect
+ */
+exports.addBankAccount = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const {
+            accountNumber,
+            transitNumber,
+            institutionNumber,
+            accountHolderName,
+            accountHolderType = 'individual',
+            setAsDefault = false
+        } = req.body;
+
+        if (!user.workerProfile?.stripeConnectId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucun compte de paiement configuré',
+            });
+        }
+
+        // Validation des champs requis
+        if (!accountNumber || !transitNumber || !institutionNumber || !accountHolderName) {
+            return res.status(400).json({
+                success: false,
+                message: 'Tous les champs sont requis: numéro de compte, numéro de transit, numéro d\'institution et nom du titulaire',
+            });
+        }
+
+        // Validation du format canadien
+        if (transitNumber.length !== 5) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le numéro de transit doit contenir 5 chiffres',
+            });
+        }
+
+        if (institutionNumber.length !== 3) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le numéro d\'institution doit contenir 3 chiffres',
+            });
+        }
+
+        // Créer le routing number canadien (transit + institution)
+        const routingNumber = `${transitNumber}${institutionNumber}`;
+
+        // Créer le compte bancaire externe
+        const bankAccount = await stripe.accounts.createExternalAccount(
+            user.workerProfile.stripeConnectId,
+            {
+                external_account: {
+                    object: 'bank_account',
+                    country: 'CA',
+                    currency: 'cad',
+                    account_holder_name: accountHolderName,
+                    account_holder_type: accountHolderType,
+                    routing_number: routingNumber,
+                    account_number: accountNumber,
+                },
+            }
+        );
+
+        // Si demandé, définir comme compte par défaut
+        if (setAsDefault) {
+            await stripe.accounts.updateExternalAccount(
+                user.workerProfile.stripeConnectId,
+                bankAccount.id,
+                { default_for_currency: true }
+            );
+        }
+
+        console.log('✅ Compte bancaire ajouté:', bankAccount.id);
+
+        res.json({
+            success: true,
+            message: 'Compte bancaire ajouté avec succès',
+            bankAccount: {
+                id: bankAccount.id,
+                bankName: bankAccount.bank_name,
+                last4: bankAccount.last4,
+                routingNumber: bankAccount.routing_number,
+                currency: bankAccount.currency,
+                country: bankAccount.country,
+                status: bankAccount.status,
+                accountHolderName: bankAccount.account_holder_name,
+                accountHolderType: bankAccount.account_holder_type,
+                isDefault: setAsDefault,
+            },
+        });
+    } catch (error) {
+        console.error('❌ Erreur ajout compte bancaire:', error);
+
+        // Messages d'erreur plus clairs pour l'utilisateur
+        let userMessage = error.message;
+        if (error.code === 'routing_number_invalid') {
+            userMessage = 'Le numéro de transit ou d\'institution est invalide';
+        } else if (error.code === 'account_number_invalid') {
+            userMessage = 'Le numéro de compte est invalide';
+        } else if (error.code === 'bank_account_exists') {
+            userMessage = 'Ce compte bancaire est déjà enregistré';
+        }
+
+        res.status(400).json({
+            success: false,
+            message: userMessage,
+            stripeCode: error.code || null,
+        });
+    }
+};
+
+/**
+ * Supprimer un compte bancaire
+ */
+exports.deleteBankAccount = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const { bankAccountId } = req.params;
+
+        if (!user.workerProfile?.stripeConnectId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucun compte de paiement configuré',
+            });
+        }
+
+        if (!bankAccountId) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID du compte bancaire requis',
+            });
+        }
+
+        // Vérifier d'abord combien de comptes bancaires existent
+        const account = await stripe.accounts.retrieve(
+            user.workerProfile.stripeConnectId,
+            { expand: ['external_accounts'] }
+        );
+
+        const bankAccounts = account.external_accounts?.data?.filter(
+            (acc) => acc.object === 'bank_account'
+        ) || [];
+
+        // Vérifier qu'il reste au moins un compte après suppression
+        if (bankAccounts.length <= 1) {
+            return res.status(400).json({
+                success: false,
+                message: 'Impossible de supprimer le dernier compte bancaire. Ajoutez un autre compte avant de supprimer celui-ci.',
+            });
+        }
+
+        // Vérifier si c'est le compte par défaut
+        const accountToDelete = bankAccounts.find((b) => b.id === bankAccountId);
+        if (accountToDelete?.default_for_currency) {
+            return res.status(400).json({
+                success: false,
+                message: 'Impossible de supprimer le compte par défaut. Définissez un autre compte comme principal avant de supprimer celui-ci.',
+            });
+        }
+
+        // Supprimer le compte bancaire
+        await stripe.accounts.deleteExternalAccount(
+            user.workerProfile.stripeConnectId,
+            bankAccountId
+        );
+
+        console.log('✅ Compte bancaire supprimé:', bankAccountId);
+
+        res.json({
+            success: true,
+            message: 'Compte bancaire supprimé avec succès',
+            deletedAccountId: bankAccountId,
+        });
+    } catch (error) {
+        console.error('❌ Erreur suppression compte bancaire:', error);
+
+        let userMessage = error.message;
+        if (error.code === 'resource_missing') {
+            userMessage = 'Compte bancaire introuvable';
+        }
+
+        res.status(400).json({
+            success: false,
+            message: userMessage,
+            stripeCode: error.code || null,
+        });
+    }
+};
+
+/**
+ * Définir un compte bancaire comme compte par défaut pour les versements
+ */
+exports.setDefaultBankAccount = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const { bankAccountId } = req.params;
+
+        if (!user.workerProfile?.stripeConnectId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucun compte de paiement configuré',
+            });
+        }
+
+        if (!bankAccountId) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID du compte bancaire requis',
+            });
+        }
+
+        // Mettre à jour le compte pour le définir comme défaut
+        const bankAccount = await stripe.accounts.updateExternalAccount(
+            user.workerProfile.stripeConnectId,
+            bankAccountId,
+            { default_for_currency: true }
+        );
+
+        console.log('✅ Compte bancaire défini par défaut:', bankAccountId);
+
+        res.json({
+            success: true,
+            message: 'Compte bancaire défini comme principal',
+            bankAccount: {
+                id: bankAccount.id,
+                bankName: bankAccount.bank_name,
+                last4: bankAccount.last4,
+                isDefault: true,
+            },
+        });
+    } catch (error) {
+        console.error('❌ Erreur définition compte par défaut:', error);
+
+        let userMessage = error.message;
+        if (error.code === 'resource_missing') {
+            userMessage = 'Compte bancaire introuvable';
+        }
+
+        res.status(400).json({
+            success: false,
+            message: userMessage,
+            stripeCode: error.code || null,
+        });
+    }
+};
+
+/**
+ * Obtenir la liste des institutions bancaires canadiennes (pour aide à la saisie)
+ */
+exports.getCanadianBanks = async (req, res) => {
+    // Liste des principales banques canadiennes avec leurs numéros d'institution
+    const canadianBanks = [
+        { code: '001', name: 'Banque de Montréal (BMO)' },
+        { code: '002', name: 'Banque Scotia' },
+        { code: '003', name: 'Banque Royale du Canada (RBC)' },
+        { code: '004', name: 'Banque Toronto-Dominion (TD)' },
+        { code: '006', name: 'Banque Nationale du Canada' },
+        { code: '010', name: 'Banque CIBC' },
+        { code: '016', name: 'Banque HSBC Canada' },
+        { code: '030', name: 'Banque Canadienne de l\'Ouest' },
+        { code: '039', name: 'Banque Laurentienne' },
+        { code: '219', name: 'ATB Financial' },
+        { code: '241', name: 'Banque Équitable' },
+        { code: '260', name: 'Citibank Canada' },
+        { code: '309', name: 'Banque Bridgewater' },
+        { code: '315', name: 'Banque Continentale du Canada' },
+        { code: '320', name: 'Banque Manuvie' },
+        { code: '540', name: 'Banque Manulife Trust' },
+        { code: '614', name: 'Tangerine' },
+        { code: '815', name: 'Desjardins' },
+        { code: '828', name: 'Caisse Centrale Desjardins' },
+        { code: '829', name: 'Caisses Populaires Desjardins' },
+        { code: '837', name: 'Caisse Populaire Groupe Financier' },
+        { code: '865', name: 'Caisses Populaires' },
+        { code: '879', name: 'Credit Union Atlantic' },
+        { code: '899', name: 'Meridian Credit Union' },
+    ];
+
+    res.json({
+        success: true,
+        banks: canadianBanks,
+    });
+};
+
 module.exports = exports;

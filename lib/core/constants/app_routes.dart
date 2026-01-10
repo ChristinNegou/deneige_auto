@@ -70,6 +70,7 @@ class AppRoutes {
   static const String workerEarnings = '/snow-worker/earnings';
   static const String workerSettings = '/snow-worker/settings';
   static const String workerPaymentSetup = '/snow-worker/payment-setup';
+  static const String workerBankAccounts = '/snow-worker/bank-accounts';
   static const String workerHelpSupport = '/snow-worker/help-support';
 
   //Routes pour le dashboard client

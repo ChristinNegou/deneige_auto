@@ -62,4 +62,52 @@ class WorkerStripeService {
     );
     return response.data['summary'];
   }
+
+  // ============== GESTION DES COMPTES BANCAIRES ==============
+
+  /// Obtenir la liste de tous les comptes bancaires
+  Future<List<Map<String, dynamic>>> listBankAccounts() async {
+    final response = await _dio.get('/stripe-connect/bank-accounts');
+    final List<dynamic> accounts = response.data['bankAccounts'] ?? [];
+    return accounts.cast<Map<String, dynamic>>();
+  }
+
+  /// Ajouter un nouveau compte bancaire
+  Future<Map<String, dynamic>> addBankAccount({
+    required String accountNumber,
+    required String transitNumber,
+    required String institutionNumber,
+    required String accountHolderName,
+    String accountHolderType = 'individual',
+    bool setAsDefault = false,
+  }) async {
+    final response = await _dio.post('/stripe-connect/bank-accounts', data: {
+      'accountNumber': accountNumber,
+      'transitNumber': transitNumber,
+      'institutionNumber': institutionNumber,
+      'accountHolderName': accountHolderName,
+      'accountHolderType': accountHolderType,
+      'setAsDefault': setAsDefault,
+    });
+    return response.data;
+  }
+
+  /// Supprimer un compte bancaire
+  Future<Map<String, dynamic>> deleteBankAccount(String bankAccountId) async {
+    final response = await _dio.delete('/stripe-connect/bank-accounts/$bankAccountId');
+    return response.data;
+  }
+
+  /// Definir un compte bancaire comme compte par defaut
+  Future<Map<String, dynamic>> setDefaultBankAccount(String bankAccountId) async {
+    final response = await _dio.put('/stripe-connect/bank-accounts/$bankAccountId/set-default');
+    return response.data;
+  }
+
+  /// Obtenir la liste des banques canadiennes
+  Future<List<Map<String, dynamic>>> getCanadianBanks() async {
+    final response = await _dio.get('/stripe-connect/canadian-banks');
+    final List<dynamic> banks = response.data['banks'] ?? [];
+    return banks.cast<Map<String, dynamic>>();
+  }
 }
