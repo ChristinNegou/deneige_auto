@@ -93,6 +93,36 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
           // Marquer qu'on attend le retour de Stripe
           _waitingForStripeReturn = true;
           await launchUrl(url, mode: LaunchMode.externalApplication);
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Impossible d\'ouvrir le lien Stripe'),
+                backgroundColor: AppTheme.error,
+              ),
+            );
+          }
+        }
+      } else if (result['isComplete'] == true) {
+        // Le compte est deja configure, rafraichir le statut
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Votre compte est deja configure! Actualisation...'),
+              backgroundColor: AppTheme.success,
+            ),
+          );
+        }
+        await _loadAccountStatus();
+      } else {
+        // Pas d'URL mais pas complet non plus - situation anormale
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Erreur: impossible de continuer la configuration. Reessayez.'),
+              backgroundColor: AppTheme.warning,
+            ),
+          );
         }
       }
     } catch (e) {
@@ -191,6 +221,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
 
   Widget _buildStatusCard() {
     final bool isConfigured = _hasAccount && _isComplete && _payoutsEnabled;
+    final bool isPendingVerification = _hasAccount && _isComplete && !_payoutsEnabled;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -198,7 +229,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         gradient: LinearGradient(
           colors: isConfigured
               ? [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)]
-              : [AppTheme.primary, AppTheme.secondary],
+              : isPendingVerification
+                  ? [AppTheme.warning, AppTheme.warning.withValues(alpha: 0.7)]
+                  : [AppTheme.primary, AppTheme.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -219,7 +252,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                 child: Icon(
                   isConfigured
                       ? Icons.account_balance
-                      : Icons.account_balance_wallet,
+                      : isPendingVerification
+                          ? Icons.hourglass_top
+                          : Icons.account_balance_wallet,
                   color: AppTheme.background,
                   size: 24,
                 ),
@@ -232,7 +267,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                     Text(
                       isConfigured
                           ? 'Compte configure'
-                          : 'Configurez vos paiements',
+                          : isPendingVerification
+                              ? 'Verification en cours'
+                              : 'Configurez vos paiements',
                       style: TextStyle(
                         color: AppTheme.background,
                         fontSize: 18,
@@ -243,7 +280,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                     Text(
                       isConfigured
                           ? 'Pret a recevoir des paiements'
-                          : 'Recevez vos gains directement',
+                          : isPendingVerification
+                              ? 'Stripe verifie vos informations'
+                              : 'Recevez vos gains directement',
                       style: TextStyle(
                         color: AppTheme.background.withValues(alpha: 0.8),
                         fontSize: 14,
@@ -276,6 +315,54 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                 ),
                 child: const Text(
                   'Voir mon dashboard Stripe',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ] else if (isPendingVerification) ...[
+            _buildStatusRow('Documents soumis', _isComplete),
+            const SizedBox(height: 8),
+            _buildStatusRow('Paiements actifs', _chargesEnabled),
+            const SizedBox(height: 8),
+            _buildStatusRow('Virements actifs', _payoutsEnabled),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.background.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: AppTheme.background, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'La verification peut prendre quelques minutes a 24 heures. Tirez vers le bas pour actualiser.',
+                      style: TextStyle(
+                        color: AppTheme.background,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _openDashboard,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.background,
+                  side: BorderSide(color: AppTheme.background),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text(
+                  'Voir le statut sur Stripe',
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
