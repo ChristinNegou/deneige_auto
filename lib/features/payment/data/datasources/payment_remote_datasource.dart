@@ -57,19 +57,38 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
           reservations = [];
         }
 
+        print('📊 [PaymentHistory] Total réservations: ${reservations.length}');
+
         // Convert reservations to payments (only paid ones)
         final payments = <PaymentModel>[];
         for (final reservation in reservations) {
           if (reservation is Map<String, dynamic>) {
             final status = reservation['paymentStatus'];
-            if (status == 'paid' ||
+            final paymentIntentId = reservation['paymentIntentId'];
+            final totalPrice = reservation['totalPrice'];
+
+            print('📊 [PaymentHistory] Réservation ${reservation['_id']}: paymentStatus=$status, paymentIntentId=$paymentIntentId, totalPrice=$totalPrice');
+
+            // Inclure si:
+            // 1. paymentStatus est 'paid', 'refunded', ou 'partially_refunded'
+            // 2. OU paymentIntentId existe (paiement effectué même si status mal enregistré)
+            final isPaid = status == 'paid' ||
                 status == 'refunded' ||
-                status == 'partially_refunded') {
+                status == 'partially_refunded';
+            final hasPaymentIntent = paymentIntentId != null &&
+                paymentIntentId.toString().isNotEmpty &&
+                paymentIntentId.toString() != 'null';
+
+            if (isPaid || hasPaymentIntent) {
               payments.add(PaymentModel.fromReservation(reservation));
+              print('   ✅ Ajouté à l\'historique des paiements');
+            } else {
+              print('   ❌ Non inclus (pas de paiement détecté)');
             }
           }
         }
 
+        print('📊 [PaymentHistory] Paiements trouvés: ${payments.length}');
         return payments;
       } else {
         throw ServerException(

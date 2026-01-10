@@ -141,14 +141,10 @@ class ReservationListBloc
         errorMessage: failure.message,
       )),
       (reservations) {
-        // Filtrer pour afficher uniquement les réservations actives et non passées
+        // Filtrer pour afficher uniquement les réservations actives
+        // Utilise isUpcoming qui inclut les réservations récentes même si departureTime passé
         final activeReservations = reservations
-            .where((r) =>
-                !r.isPast &&
-                (r.status == ReservationStatus.pending ||
-                    r.status == ReservationStatus.assigned ||
-                    r.status == ReservationStatus.enRoute ||
-                    r.status == ReservationStatus.inProgress))
+            .where((r) => r.isUpcoming)
             .toList();
 
         emit(state.copyWith(
@@ -169,14 +165,10 @@ class ReservationListBloc
     result.fold(
       (failure) => emit(state.copyWith(errorMessage: failure.message)),
       (reservations) {
-        // Filtrer pour afficher uniquement les réservations actives et non passées
+        // Filtrer pour afficher uniquement les réservations actives
+        // Utilise isUpcoming qui inclut les réservations récentes même si departureTime passé
         final activeReservations = reservations
-            .where((r) =>
-                !r.isPast &&
-                (r.status == ReservationStatus.pending ||
-                    r.status == ReservationStatus.assigned ||
-                    r.status == ReservationStatus.enRoute ||
-                    r.status == ReservationStatus.inProgress))
+            .where((r) => r.isUpcoming)
             .toList();
 
         emit(state.copyWith(

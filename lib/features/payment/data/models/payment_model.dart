@@ -24,6 +24,22 @@ class PaymentModel extends Payment {
 
   /// Create from Reservation data (for payment history)
   factory PaymentModel.fromReservation(Map<String, dynamic> json) {
+    // Déterminer le statut de paiement
+    // Si paymentIntentId existe mais paymentStatus n'est pas 'paid',
+    // on considère que le paiement a réussi
+    final paymentIntentId = json['paymentIntentId'];
+    final hasPaymentIntent = paymentIntentId != null &&
+        paymentIntentId.toString().isNotEmpty &&
+        paymentIntentId.toString() != 'null';
+
+    PaymentStatus status;
+    if (hasPaymentIntent && json['paymentStatus'] == 'pending') {
+      // Paiement effectué mais status mal enregistré
+      status = PaymentStatus.succeeded;
+    } else {
+      status = _parsePaymentStatus(json['paymentStatus']);
+    }
+
     return PaymentModel(
       id: json['_id'] ?? json['id'],
       userId: json['userId'] ?? '',
@@ -32,9 +48,9 @@ class PaymentModel extends Payment {
       refundedAmount: json['refundedAmount'] != null
           ? (json['refundedAmount'] as num).toDouble()
           : null,
-      status: _parsePaymentStatus(json['paymentStatus']),
+      status: status,
       methodType: _parsePaymentMethodType(json['paymentMethod']),
-      paymentIntentId: json['paymentIntentId'],
+      paymentIntentId: paymentIntentId?.toString(),
       createdAt: DateTime.parse(json['createdAt']),
       paidAt: json['completedAt'] != null
           ? DateTime.parse(json['completedAt'])
