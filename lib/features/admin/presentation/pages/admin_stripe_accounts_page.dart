@@ -43,7 +43,11 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
 
   Future<void> _deleteAccount(Map<String, dynamic> account) async {
     final workerId = account['workerId'];
-    final workerName = account['workerName'];
+    final stripeAccountId = account['stripeAccountId'];
+    final workerName = account['workerName'] ?? 'Compte orphelin';
+    final email = account['workerEmail'] ?? account['email'] ?? '';
+    final isOrphan = account['isOrphan'] == true;
+    final isInvalidOnStripe = account['isInvalidOnStripe'] == true;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -69,7 +73,11 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Vous etes sur le point de supprimer le compte Stripe Connect de:',
+              isOrphan
+                  ? 'Vous etes sur le point de supprimer un compte Stripe Connect orphelin:'
+                  : isInvalidOnStripe
+                      ? 'Vous etes sur le point de nettoyer la reference invalide pour:'
+                      : 'Vous etes sur le point de supprimer le compte Stripe Connect de:',
               style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 12),
@@ -82,10 +90,12 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
-                    child: Text(
-                      workerName.toString().substring(0, 1).toUpperCase(),
-                      style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold),
+                    backgroundColor: isOrphan
+                        ? AppTheme.warning.withValues(alpha: 0.1)
+                        : AppTheme.primary.withValues(alpha: 0.1),
+                    child: Icon(
+                      isOrphan ? Icons.link_off : Icons.person,
+                      color: isOrphan ? AppTheme.warning : AppTheme.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -94,11 +104,11 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          workerName,
+                          isOrphan ? 'Compte orphelin' : workerName,
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         Text(
-                          account['workerEmail'] ?? '',
+                          email.isNotEmpty ? email : stripeAccountId,
                           style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                         ),
                       ],
@@ -111,18 +121,31 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.errorLight,
+                color: isInvalidOnStripe ? AppTheme.infoLight : AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: isInvalidOnStripe
+                      ? AppTheme.info.withValues(alpha: 0.3)
+                      : AppTheme.error.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: AppTheme.error, size: 20),
+                  Icon(
+                    Icons.info_outline,
+                    color: isInvalidOnStripe ? AppTheme.info : AppTheme.error,
+                    size: 20,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Cette action est irreversible. Le deneigeur devra recreer un compte pour recevoir des paiements.',
-                      style: TextStyle(fontSize: 12, color: AppTheme.error),
+                      isInvalidOnStripe
+                          ? 'Cette action nettoiera la reference dans la base de donnees. Le compte n\'existe deja plus sur Stripe.'
+                          : 'Cette action est irreversible. Le deneigeur devra recreer un compte pour recevoir des paiements.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isInvalidOnStripe ? AppTheme.info : AppTheme.error,
+                      ),
                     ),
                   ),
                 ],
@@ -141,7 +164,7 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
               backgroundColor: AppTheme.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Supprimer'),
+            child: Text(isInvalidOnStripe ? 'Nettoyer' : 'Supprimer'),
           ),
         ],
       ),
@@ -153,12 +176,25 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
 
     try {
       final dio = sl<DioClient>().dio;
-      await dio.delete('/stripe-connect/admin/accounts/$workerId');
+
+      if (isOrphan) {
+        // Supprimer un compte orphelin par son ID Stripe
+        await dio.delete('/stripe-connect/admin/orphan-accounts/$stripeAccountId');
+      } else {
+        // Supprimer un compte lie a un worker
+        await dio.delete('/stripe-connect/admin/accounts/$workerId');
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Compte de $workerName supprime'),
+            content: Text(
+              isOrphan
+                  ? 'Compte orphelin supprime'
+                  : isInvalidOnStripe
+                      ? 'Reference nettoyee pour $workerName'
+                      : 'Compte de $workerName supprime',
+            ),
             backgroundColor: AppTheme.success,
           ),
         );
@@ -296,9 +332,17 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
 
   Widget _buildSummaryCard() {
     final totalAccounts = _accounts.length;
-    final activeAccounts = _accounts.where((a) => a['chargesEnabled'] == true && a['payoutsEnabled'] == true).length;
-    final pendingAccounts = _accounts.where((a) => a['chargesEnabled'] != true || a['payoutsEnabled'] != true).length;
-    final errorAccounts = _accounts.where((a) => a['error'] != null).length;
+    final activeAccounts = _accounts.where((a) =>
+        a['chargesEnabled'] == true &&
+        a['payoutsEnabled'] == true &&
+        a['isOrphan'] != true &&
+        a['isInvalidOnStripe'] != true).length;
+    final orphanAccounts = _accounts.where((a) => a['isOrphan'] == true).length;
+    final invalidInDb = _accounts.where((a) => a['isInvalidOnStripe'] == true).length;
+    final pendingAccounts = _accounts.where((a) =>
+        (a['chargesEnabled'] != true || a['payoutsEnabled'] != true) &&
+        a['isOrphan'] != true &&
+        a['isInvalidOnStripe'] != true).length;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -330,9 +374,21 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
               Expanded(child: _buildSummaryItem('Total', totalAccounts, AppTheme.primary)),
               Expanded(child: _buildSummaryItem('Actifs', activeAccounts, AppTheme.success)),
               Expanded(child: _buildSummaryItem('En attente', pendingAccounts, AppTheme.warning)),
-              Expanded(child: _buildSummaryItem('Erreurs', errorAccounts, AppTheme.error)),
             ],
           ),
+          if (orphanAccounts > 0 || invalidInDb > 0) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                if (orphanAccounts > 0)
+                  Expanded(child: _buildSummaryItem('Orphelins', orphanAccounts, Colors.orange)),
+                if (invalidInDb > 0)
+                  Expanded(child: _buildSummaryItem('Invalides', invalidInDb, AppTheme.error)),
+                if (orphanAccounts == 0 || invalidInDb == 0)
+                  const Expanded(child: SizedBox()),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -404,23 +460,33 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
   }
 
   Widget _buildAccountCard(Map<String, dynamic> account) {
-    final workerName = account['workerName'] ?? 'Inconnu';
+    final workerName = account['workerName'] ?? 'Compte orphelin';
     final workerEmail = account['workerEmail'] ?? '';
+    final stripeEmail = account['email'] ?? '';
     final stripeAccountId = account['stripeAccountId'] ?? '';
     final chargesEnabled = account['chargesEnabled'] == true;
     final payoutsEnabled = account['payoutsEnabled'] == true;
     final detailsSubmitted = account['detailsSubmitted'] == true;
     final hasError = account['error'] != null;
     final created = account['created'];
+    final isOrphan = account['isOrphan'] == true;
+    final isInvalidOnStripe = account['isInvalidOnStripe'] == true;
 
     final isActive = chargesEnabled && payoutsEnabled;
-    final isPending = !isActive && !hasError;
 
     Color statusColor;
     String statusText;
     IconData statusIcon;
 
-    if (hasError) {
+    if (isInvalidOnStripe) {
+      statusColor = AppTheme.error;
+      statusText = 'Invalide';
+      statusIcon = Icons.link_off;
+    } else if (isOrphan) {
+      statusColor = Colors.orange;
+      statusText = 'Orphelin';
+      statusIcon = Icons.warning_amber;
+    } else if (hasError) {
       statusColor = AppTheme.error;
       statusText = 'Erreur';
       statusIcon = Icons.error_outline;
@@ -448,15 +514,25 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
-                child: Text(
-                  workerName.toString().substring(0, 1).toUpperCase(),
-                  style: TextStyle(
-                    color: AppTheme.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
+                backgroundColor: isOrphan
+                    ? Colors.orange.withValues(alpha: 0.1)
+                    : isInvalidOnStripe
+                        ? AppTheme.error.withValues(alpha: 0.1)
+                        : AppTheme.primary.withValues(alpha: 0.1),
+                child: isOrphan || isInvalidOnStripe
+                    ? Icon(
+                        isOrphan ? Icons.link_off : Icons.error_outline,
+                        color: isOrphan ? Colors.orange : AppTheme.error,
+                        size: 24,
+                      )
+                    : Text(
+                        workerName.toString().substring(0, 1).toUpperCase(),
+                        style: TextStyle(
+                          color: AppTheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -464,14 +540,17 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      workerName,
-                      style: const TextStyle(
+                      isOrphan ? 'Compte orphelin' : workerName,
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
+                        color: isOrphan ? Colors.orange : null,
                       ),
                     ),
                     Text(
-                      workerEmail,
+                      isOrphan
+                          ? (stripeEmail.isNotEmpty ? stripeEmail : 'Email non disponible')
+                          : workerEmail,
                       style: TextStyle(
                         fontSize: 13,
                         color: AppTheme.textSecondary,
@@ -560,7 +639,51 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
               ],
             ),
           ],
-          if (hasError) ...[
+          if (isOrphan) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber, size: 16, color: Colors.orange),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Ce compte existe sur Stripe mais n\'est lie a aucun deneigeur dans l\'application.',
+                      style: TextStyle(fontSize: 12, color: Colors.orange.shade800),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (isInvalidOnStripe) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.errorLight,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.link_off, size: 16, color: AppTheme.error),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Ce compte n\'existe plus sur Stripe. Nettoyez la reference pour permettre au deneigeur de recreer un compte.',
+                      style: TextStyle(fontSize: 12, color: AppTheme.error),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (hasError && !isInvalidOnStripe) ...[
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(10),
