@@ -29,7 +29,8 @@
       "Bash(dir /s \"C:\\\\Deneige-auto\")",
       "Bash(dir \"C:\\\\Deneige-auto\" /B)",
       "WebFetch(domain:deneigeauto-production.up.railway.app)",
-      "Bash(flutter build:*)"
+      "Bash(flutter build:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

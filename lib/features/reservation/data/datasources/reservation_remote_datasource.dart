@@ -221,18 +221,27 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
   @override
   Future<ReservationModel> createReservation(Map<String, dynamic> data) async {
     try {
+      print('📝 [DataSource] Envoi requête POST /reservations');
+      print('📝 [DataSource] Data: $data');
+
       final response = await dio.post('/reservations', data: data);
 
+      print('📝 [DataSource] Réponse: ${response.statusCode}');
+
       if (response.statusCode == 201 || response.statusCode == 200) {
+        print('✅ [DataSource] Réservation créée avec succès');
         return ReservationModel.fromJson(
             response.data['reservation'] ?? response.data);
       } else {
+        print('❌ [DataSource] Erreur: ${response.statusCode}');
         throw ServerException(
           message: 'Erreur de création de réservation',
           statusCode: response.statusCode,
         );
       }
     } on DioException catch (e) {
+      print('❌ [DataSource] DioException: ${e.message}');
+      print('❌ [DataSource] Response: ${e.response?.data}');
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
     }
   }

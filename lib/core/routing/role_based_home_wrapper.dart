@@ -10,7 +10,8 @@ import '../../features/admin/presentation/bloc/admin_bloc.dart';
 import '../../features/admin/presentation/bloc/admin_event.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/notifications/presentation/bloc/notification_bloc.dart';
-import '../../features/reservation/presentation/bloc/reservation_list_bloc.dart';
+import '../../features/reservation/presentation/bloc/reservation_list_bloc.dart'
+    as reservation_bloc;
 import '../di/injection_container.dart';
 
 /// Widget qui affiche le bon dashboard selon le rôle de l'utilisateur
@@ -35,7 +36,11 @@ class RoleBasedHomeWrapper extends StatelessWidget {
                 key: uniqueKey,
                 providers: [
                   BlocProvider(create: (context) => sl<HomeBloc>()),
-                  BlocProvider(create: (context) => sl<ReservationListBloc>()),
+                  BlocProvider(
+                    create: (context) =>
+                        sl<reservation_bloc.ReservationListBloc>()
+                          ..add(const reservation_bloc.LoadReservations()),
+                  ),
                   BlocProvider(create: (context) => sl<NotificationBloc>()),
                 ],
                 child: const ClientHomeScreen(),

@@ -83,6 +83,7 @@ class ReservationRepositoryImpl implements ReservationRepository {
     int? snowDepthCm,
     required double totalPrice,
     required String paymentMethod,
+    String? paymentIntentId,
     // Localisation GPS pour le système déneigeur
     double? latitude,
     double? longitude,
@@ -100,6 +101,7 @@ class ReservationRepositoryImpl implements ReservationRepository {
         'snowDepthCm': snowDepthCm,
         'totalPrice': totalPrice,
         'paymentMethod': paymentMethod,
+        if (paymentIntentId != null) 'paymentIntentId': paymentIntentId,
         // Ajouter les coordonnées GPS si disponibles
         if (latitude != null) 'latitude': latitude,
         if (longitude != null) 'longitude': longitude,

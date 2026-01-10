@@ -22,6 +22,7 @@ abstract class ReservationRepository {
     int? snowDepthCm,
     required double totalPrice,
     required String paymentMethod,
+    String? paymentIntentId,
     // Localisation GPS pour le système déneigeur
     double? latitude,
     double? longitude,
