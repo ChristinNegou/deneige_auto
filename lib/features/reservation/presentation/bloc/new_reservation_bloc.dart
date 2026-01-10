@@ -424,7 +424,16 @@ class NewReservationBloc
     SubmitReservation event,
     Emitter<NewReservationState> emit,
   ) async {
-    if (!state.canSubmit) return;
+    // Si paymentIntentId est fourni, le paiement a déjà été fait
+    // On doit créer la réservation même si canSubmit retourne false
+    final hasPayment = event.paymentIntentId != null;
+
+    if (!hasPayment && !state.canSubmit) {
+      print('❌ [NewReservationBloc] canSubmit=false, pas de paiement');
+      return;
+    }
+
+    print('📝 [NewReservationBloc] Création réservation - paymentIntentId: ${event.paymentIntentId}');
 
     // Vérifier que la localisation est disponible
     if (!state.hasValidLocation) {
@@ -470,6 +479,7 @@ class NewReservationBloc
         snowDepthCm: state.snowDepthCm,
         totalPrice: state.calculatedPrice!,
         paymentMethod: event.paymentMethod,
+        paymentIntentId: event.paymentIntentId,
         latitude: state.locationLatitude,
         longitude: state.locationLongitude,
         address: state.locationAddress ??

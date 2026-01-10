@@ -95,6 +95,7 @@ router.post('/', protect, async (req, res) => {
             snowDepthCm,
             totalPrice,
             paymentMethod,
+            paymentIntentId, // ✅ ID du paiement Stripe
             // Localisation GPS pour le système déneigeur
             latitude,
             longitude,
@@ -109,6 +110,7 @@ router.post('/', protect, async (req, res) => {
             customLocation,
             departureTime,
             totalPrice,
+            paymentIntentId,
         });
 
         // ✅ Gérer les différents cas de place de parking
@@ -167,6 +169,8 @@ router.post('/', protect, async (req, res) => {
             basePrice: totalPrice,
             totalPrice,
             paymentMethod,
+            paymentIntentId: paymentIntentId || null,
+            paymentStatus: paymentIntentId ? 'paid' : 'pending',
             // Localisation GPS (obligatoire)
             location: locationData,
         });
