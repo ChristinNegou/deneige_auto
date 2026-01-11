@@ -216,29 +216,87 @@ class AuthInterceptor extends Interceptor {
 }
 
 /// Intercepteur pour logger les requêtes et réponses
+/// Note: Ne log que en mode debug et filtre les données sensibles
 class LoggingInterceptor extends Interceptor {
+  // Clés sensibles à masquer dans les logs
+  static const _sensitiveKeys = [
+    'password',
+    'token',
+    'refreshToken',
+    'accessToken',
+    'authorization',
+    'Authorization',
+    'secret',
+    'apiKey',
+    'api_key',
+    'creditCard',
+    'cardNumber',
+  ];
+
+  /// Filtre les données sensibles d'un objet
+  dynamic _filterSensitiveData(dynamic data) {
+    if (data == null) return null;
+    if (data is! Map) return '[DATA]';
+
+    final filtered = <String, dynamic>{};
+    for (final entry in data.entries) {
+      final key = entry.key.toString();
+      if (_sensitiveKeys
+          .any((k) => key.toLowerCase().contains(k.toLowerCase()))) {
+        filtered[key] = '***FILTERED***';
+      } else if (entry.value is Map) {
+        filtered[key] = _filterSensitiveData(entry.value);
+      } else {
+        filtered[key] = entry.value;
+      }
+    }
+    return filtered;
+  }
+
+  /// Filtre les headers sensibles
+  Map<String, dynamic> _filterHeaders(Map<String, dynamic> headers) {
+    final filtered = <String, dynamic>{};
+    for (final entry in headers.entries) {
+      if (_sensitiveKeys
+          .any((k) => entry.key.toLowerCase().contains(k.toLowerCase()))) {
+        filtered[entry.key] = '***FILTERED***';
+      } else {
+        filtered[entry.key] = entry.value;
+      }
+    }
+    return filtered;
+  }
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    debugPrint('🌐 REQUEST[${options.method}] => PATH: ${options.path}');
-    debugPrint('📤 Headers: ${options.headers}');
-    debugPrint('📦 Data: ${options.data}');
+    if (kDebugMode) {
+      debugPrint('🌐 REQUEST[${options.method}] => PATH: ${options.path}');
+      debugPrint('📤 Headers: ${_filterHeaders(options.headers)}');
+      debugPrint('📦 Data: ${_filterSensitiveData(options.data)}');
+    }
     return super.onRequest(options, handler);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    debugPrint(
-        '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
-    debugPrint('📥 Data: ${response.data}');
+    if (kDebugMode) {
+      debugPrint(
+          '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
+      // Ne pas logger les données de réponse (peuvent contenir des tokens)
+      debugPrint('📥 Data: [Response received]');
+    }
     return super.onResponse(response, handler);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    debugPrint(
-        '❌ ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}');
-    debugPrint('🔥 Message: ${err.message}');
-    debugPrint('📛 Response: ${err.response?.data}');
+    if (kDebugMode) {
+      debugPrint(
+          '❌ ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}');
+      debugPrint('🔥 Message: ${err.message}');
+      // Ne pas logger les détails de la réponse d'erreur
+      debugPrint('📛 Response: [Error response]');
+    }
     return super.onError(err, handler);
   }
 }

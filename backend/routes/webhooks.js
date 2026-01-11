@@ -21,17 +21,22 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
     let event;
 
     try {
-        // Vérifier la signature du webhook
-        if (WEBHOOK_SECRET) {
-            event = stripe.webhooks.constructEvent(req.body, sig, WEBHOOK_SECRET);
-        } else {
-            // Mode développement sans vérification (à ne pas utiliser en production)
-            console.warn('⚠️ STRIPE_WEBHOOK_SECRET non configuré - webhook non vérifié');
+        // Vérifier la signature du webhook - OBLIGATOIRE en production
+        if (!WEBHOOK_SECRET) {
+            if (process.env.NODE_ENV === 'production') {
+                console.error('❌ STRIPE_WEBHOOK_SECRET non configuré en production - webhook rejeté');
+                return res.status(500).json({ error: 'Webhook configuration error' });
+            }
+            // Mode développement uniquement - afficher un avertissement
+            console.warn('⚠️ STRIPE_WEBHOOK_SECRET non configuré - webhook non vérifié (dev mode only)');
             event = JSON.parse(req.body);
+        } else {
+            // Vérification cryptographique de la signature Stripe
+            event = stripe.webhooks.constructEvent(req.body, sig, WEBHOOK_SECRET);
         }
     } catch (err) {
         console.error('❌ Webhook signature verification failed:', err.message);
-        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+        return res.status(400).json({ error: 'Webhook signature verification failed' });
     }
 
     console.log(`📥 Stripe webhook received: ${event.type}`);

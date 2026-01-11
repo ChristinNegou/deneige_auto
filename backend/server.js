@@ -76,10 +76,26 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// HTTPS enforcement en production
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        // Vérifier le header x-forwarded-proto (utilisé par les load balancers/proxies)
+        if (req.headers['x-forwarded-proto'] !== 'https') {
+            return res.redirect(301, `https://${req.headers.host}${req.url}`);
+        }
+        next();
+    });
+}
+
 // Security middleware
 app.use(helmet({
     contentSecurityPolicy: false, // Désactivé pour les apps mobiles
     crossOriginEmbedderPolicy: false,
+    hsts: {
+        maxAge: 31536000, // 1 an
+        includeSubDomains: true,
+        preload: true,
+    },
 }));
 app.use(mongoSanitize()); // Protection contre les injections NoSQL
 app.use(generalLimiter); // Rate limiting général
@@ -104,24 +120,44 @@ app.use('/api/payments/webhook', express.raw({ type: 'application/json' }), (req
     next();
 });
 
-// Middleware JSON pour les autres routes
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware JSON pour les autres routes avec limite de taille
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 //  Servir les fichiers statiques
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-// Logging middleware amélioré
+// Logging middleware amélioré avec filtrage des données sensibles
+const sensitiveFields = ['password', 'token', 'refreshToken', 'secret', 'apiKey', 'cardNumber', 'cvv'];
+const filterSensitiveData = (obj) => {
+    if (!obj || typeof obj !== 'object') return obj;
+    const filtered = { ...obj };
+    for (const key of Object.keys(filtered)) {
+        if (sensitiveFields.some(f => key.toLowerCase().includes(f.toLowerCase()))) {
+            filtered[key] = '***FILTERED***';
+        } else if (typeof filtered[key] === 'object') {
+            filtered[key] = filterSensitiveData(filtered[key]);
+        }
+    }
+    return filtered;
+};
+
 app.use((req, res, next) => {
+    // Ne pas logger en production pour éviter les fuites de données
+    if (process.env.NODE_ENV === 'production') {
+        return next();
+    }
+
     const timestamp = new Date().toISOString();
     console.log(`\n📝 [${timestamp}]`);
     console.log(`   Method: ${req.method}`);
     console.log(`   Path: ${req.path}`);
     console.log(`   IP: ${req.ip}`);
     if (Object.keys(req.body).length > 0) {
-        console.log(`   Body:`, JSON.stringify(req.body, null, 2));
+        // Filtrer les données sensibles avant de logger
+        console.log(`   Body:`, JSON.stringify(filterSensitiveData(req.body), null, 2));
     }
     next();
 });

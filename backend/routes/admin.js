@@ -11,6 +11,35 @@ const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../servi
 const adminOnly = authorize('admin');
 
 // ============================================================================
+// SECURITY UTILITIES
+// ============================================================================
+
+// Whitelist des champs de tri autorisés pour éviter NoSQL injection
+const ALLOWED_USER_SORT_FIELDS = ['createdAt', 'firstName', 'lastName', 'email', 'role', 'isActive'];
+const ALLOWED_RESERVATION_SORT_FIELDS = ['createdAt', 'departureTime', 'status', 'totalPrice', 'paymentStatus'];
+
+// Whitelist des champs modifiables pour les utilisateurs (évite Object.assign non contrôlé)
+const ALLOWED_USER_UPDATE_FIELDS = ['firstName', 'lastName', 'email', 'phoneNumber', 'photoUrl'];
+
+// Fonction pour échapper les caractères spéciaux regex (évite ReDoS)
+const escapeRegex = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+// Fonction pour valider et sécuriser le champ de tri
+const validateSortField = (sortBy, allowedFields) => {
+    return allowedFields.includes(sortBy) ? sortBy : 'createdAt';
+};
+
+// Message d'erreur générique pour la production
+const getErrorMessage = (error) => {
+    if (process.env.NODE_ENV === 'production') {
+        return 'Une erreur est survenue';
+    }
+    return error.message;
+};
+
+// ============================================================================
 // DASHBOARD STATS
 // ============================================================================
 
@@ -176,7 +205,7 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
         console.error('Erreur dashboard admin:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -195,23 +224,29 @@ router.get('/users', protect, adminOnly, async (req, res) => {
         const { page = 1, limit = 20, role, search, sortBy = 'createdAt', order = 'desc' } = req.query;
 
         const query = {};
-        if (role) query.role = role;
+        if (role && ['client', 'snowWorker', 'admin'].includes(role)) {
+            query.role = role;
+        }
         if (search) {
+            // Échapper les caractères spéciaux pour éviter ReDoS
+            const safeSearch = escapeRegex(search);
             query.$or = [
-                { firstName: { $regex: search, $options: 'i' } },
-                { lastName: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { phoneNumber: { $regex: search, $options: 'i' } },
+                { firstName: { $regex: safeSearch, $options: 'i' } },
+                { lastName: { $regex: safeSearch, $options: 'i' } },
+                { email: { $regex: safeSearch, $options: 'i' } },
+                { phoneNumber: { $regex: safeSearch, $options: 'i' } },
             ];
         }
 
         const sortOrder = order === 'desc' ? -1 : 1;
         const skip = (parseInt(page) - 1) * parseInt(limit);
+        // Valider le champ de tri contre la whitelist
+        const safeSortBy = validateSortField(sortBy, ALLOWED_USER_SORT_FIELDS);
 
         const [users, total] = await Promise.all([
             User.find(query)
                 .select('-password -resetPasswordToken -resetPasswordExpire')
-                .sort({ [sortBy]: sortOrder })
+                .sort({ [safeSortBy]: sortOrder })
                 .skip(skip)
                 .limit(parseInt(limit)),
             User.countDocuments(query),
@@ -231,7 +266,7 @@ router.get('/users', protect, adminOnly, async (req, res) => {
         console.error('Erreur liste utilisateurs:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -290,7 +325,7 @@ router.get('/users/:id', protect, adminOnly, async (req, res) => {
         console.error('Erreur détails utilisateur:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -316,7 +351,12 @@ router.patch('/users/:id', protect, adminOnly, async (req, res) => {
         if (typeof isActive === 'boolean') user.isActive = isActive;
         if (role && ['client', 'snowWorker', 'admin'].includes(role)) user.role = role;
 
-        Object.assign(user, updateData);
+        // Seulement mettre à jour les champs dans la whitelist (évite injection de champs sensibles)
+        for (const field of ALLOWED_USER_UPDATE_FIELDS) {
+            if (updateData[field] !== undefined) {
+                user[field] = updateData[field];
+            }
+        }
         await user.save();
 
         res.json({
@@ -328,7 +368,7 @@ router.patch('/users/:id', protect, adminOnly, async (req, res) => {
         console.error('Erreur modification utilisateur:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -386,7 +426,7 @@ router.post('/users/:id/suspend', protect, adminOnly, async (req, res) => {
         console.error('Erreur suspension utilisateur:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -438,7 +478,7 @@ router.post('/users/:id/unsuspend', protect, adminOnly, async (req, res) => {
         console.error('Erreur lever suspension:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -465,7 +505,11 @@ router.get('/reservations', protect, adminOnly, async (req, res) => {
         } = req.query;
 
         const query = {};
-        if (status) query.status = status;
+        // Valider le status contre les valeurs autorisées
+        const validStatuses = ['pending', 'assigned', 'inProgress', 'completed', 'cancelled'];
+        if (status && validStatuses.includes(status)) {
+            query.status = status;
+        }
         if (startDate || endDate) {
             query.departureTime = {};
             if (startDate) query.departureTime.$gte = new Date(startDate);
@@ -474,13 +518,15 @@ router.get('/reservations', protect, adminOnly, async (req, res) => {
 
         const sortOrder = order === 'desc' ? -1 : 1;
         const skip = (parseInt(page) - 1) * parseInt(limit);
+        // Valider le champ de tri contre la whitelist
+        const safeSortBy = validateSortField(sortBy, ALLOWED_RESERVATION_SORT_FIELDS);
 
         const [reservations, total] = await Promise.all([
             Reservation.find(query)
                 .populate('userId', 'firstName lastName email phoneNumber')
                 .populate('workerId', 'firstName lastName phoneNumber')
                 .populate('vehicle')
-                .sort({ [sortBy]: sortOrder })
+                .sort({ [safeSortBy]: sortOrder })
                 .skip(skip)
                 .limit(parseInt(limit)),
             Reservation.countDocuments(query),
@@ -500,7 +546,7 @@ router.get('/reservations', protect, adminOnly, async (req, res) => {
         console.error('Erreur liste réservations:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -533,7 +579,7 @@ router.get('/reservations/:id', protect, adminOnly, async (req, res) => {
         console.error('Erreur détails réservation:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -545,9 +591,19 @@ router.get('/reservations/:id', protect, adminOnly, async (req, res) => {
  */
 router.patch('/reservations/:id', protect, adminOnly, async (req, res) => {
     try {
+        // Whitelist des champs modifiables pour les réservations
+        const allowedFields = ['status', 'workerNotes', 'adminNotes', 'priority'];
+        const updateData = {};
+
+        for (const field of allowedFields) {
+            if (req.body[field] !== undefined) {
+                updateData[field] = req.body[field];
+            }
+        }
+
         const reservation = await Reservation.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updateData,
             { new: true, runValidators: true }
         )
             .populate('userId', 'firstName lastName email')
@@ -569,7 +625,7 @@ router.patch('/reservations/:id', protect, adminOnly, async (req, res) => {
         console.error('Erreur modification réservation:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -629,7 +685,7 @@ router.post('/reservations/:id/refund', protect, adminOnly, async (req, res) => 
         console.error('Erreur remboursement:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -666,7 +722,7 @@ router.get('/workers', protect, adminOnly, async (req, res) => {
         console.error('Erreur liste workers:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -705,7 +761,7 @@ router.get('/workers/:id/jobs', protect, adminOnly, async (req, res) => {
         console.error('Erreur historique jobs:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -752,7 +808,7 @@ router.post('/notifications/broadcast', protect, adminOnly, async (req, res) => 
         console.error('Erreur broadcast notification:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -814,7 +870,7 @@ router.get('/reports/revenue', protect, adminOnly, async (req, res) => {
         console.error('Erreur rapport revenus:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -841,7 +897,7 @@ router.get('/database/stats', protect, adminOnly, async (req, res) => {
         console.error('Erreur stats database:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });
@@ -866,7 +922,7 @@ router.post('/database/cleanup', protect, adminOnly, async (req, res) => {
         console.error('Erreur nettoyage database:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: getErrorMessage(error),
         });
     }
 });

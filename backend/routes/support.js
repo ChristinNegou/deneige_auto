@@ -6,6 +6,19 @@ const Notification = require('../models/Notification');
 const { protect, authorize } = require('../middleware/auth');
 const { sendEmail } = require('../config/email');
 
+// Fonction pour échapper les caractères HTML (évite XSS)
+const escapeHtml = (text) => {
+    if (!text) return '';
+    const htmlEntities = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+    };
+    return text.replace(/[&<>"']/g, (char) => htmlEntities[char]);
+};
+
 // @route   POST /api/support/request
 // @desc    Créer une nouvelle demande de support
 // @access  Private
@@ -255,18 +268,18 @@ router.post('/requests/:id/respond', protect, authorize('admin'), async (req, re
                                     <h2>Réponse à votre demande de support</h2>
                                 </div>
 
-                                <p>Bonjour <strong>${request.userName}</strong>,</p>
+                                <p>Bonjour <strong>${escapeHtml(request.userName)}</strong>,</p>
 
                                 <p>Notre équipe de support a répondu à votre demande :</p>
 
                                 <div class="message-box">
-                                    <p>${message.replace(/\n/g, '<br>')}</p>
+                                    <p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>
                                 </div>
 
                                 <div class="original-request">
                                     <p><strong>Votre demande originale :</strong></p>
-                                    <p><em>Sujet : ${request.getSubjectLabel()}</em></p>
-                                    <p>${request.message}</p>
+                                    <p><em>Sujet : ${escapeHtml(request.getSubjectLabel())}</em></p>
+                                    <p>${escapeHtml(request.message)}</p>
                                 </div>
 
                                 <p>Si vous avez d'autres questions, n'hésitez pas à nous contacter.</p>
