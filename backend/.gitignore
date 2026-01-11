@@ -1,6 +1,6 @@
 # Dépendances
 node_modules/
-package-lock.json
+# Note: package-lock.json est commité pour assurer des builds reproductibles en CI
 
 # Variables d'environnement
 .env
