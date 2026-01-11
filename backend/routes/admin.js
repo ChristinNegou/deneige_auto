@@ -1440,4 +1440,93 @@ router.post('/finance/cleanup-test-reservations', protect, adminOnly, async (req
     }
 });
 
+/**
+ * @route   POST /api/admin/finance/fix-payouts
+ * @desc    Calculer et remplir les champs payout manquants pour les réservations payées
+ * @access  Private (Admin)
+ */
+router.post('/finance/fix-payouts', protect, adminOnly, async (req, res) => {
+    try {
+        const { dryRun = true } = req.body;
+
+        // Trouver les réservations payées avec payout.platformFee manquant ou à 0
+        const reservationsToFix = await Reservation.find({
+            status: 'completed',
+            paymentStatus: 'paid',
+            $or: [
+                { 'payout.platformFee': { $exists: false } },
+                { 'payout.platformFee': null },
+                { 'payout.platformFee': 0 }
+            ]
+        }).select('_id totalPrice tipAmount payout paymentIntentId');
+
+        const summary = {
+            found: reservationsToFix.length,
+            fixed: 0,
+            totalRevenue: 0,
+            totalPlatformFees: 0,
+            totalStripeFees: 0,
+            totalWorkerPayouts: 0,
+            details: []
+        };
+
+        const PLATFORM_FEE_PERCENT = 0.25; // 25%
+        const STRIPE_FEE_PERCENT = 0.029; // 2.9%
+        const STRIPE_FEE_FIXED = 0.30; // $0.30
+
+        for (const reservation of reservationsToFix) {
+            const totalPrice = reservation.totalPrice || 0;
+            const tipAmount = reservation.tipAmount || 0;
+
+            // Calcul des frais
+            const platformFee = totalPrice * PLATFORM_FEE_PERCENT;
+            const workerAmount = totalPrice * (1 - PLATFORM_FEE_PERCENT) + tipAmount;
+            const stripeFee = (totalPrice + tipAmount) * STRIPE_FEE_PERCENT + STRIPE_FEE_FIXED;
+
+            summary.totalRevenue += totalPrice;
+            summary.totalPlatformFees += platformFee;
+            summary.totalStripeFees += stripeFee;
+            summary.totalWorkerPayouts += workerAmount;
+
+            summary.details.push({
+                id: reservation._id,
+                totalPrice,
+                platformFee: Math.round(platformFee * 100) / 100,
+                stripeFee: Math.round(stripeFee * 100) / 100,
+                workerAmount: Math.round(workerAmount * 100) / 100
+            });
+
+            if (!dryRun) {
+                await Reservation.findByIdAndUpdate(reservation._id, {
+                    'payout.platformFee': Math.round(platformFee * 100) / 100,
+                    'payout.workerAmount': Math.round(workerAmount * 100) / 100,
+                    'payout.stripeFee': Math.round(stripeFee * 100) / 100,
+                    'payout.currency': 'cad'
+                });
+                summary.fixed++;
+            }
+        }
+
+        // Arrondir les totaux
+        summary.totalRevenue = Math.round(summary.totalRevenue * 100) / 100;
+        summary.totalPlatformFees = Math.round(summary.totalPlatformFees * 100) / 100;
+        summary.totalStripeFees = Math.round(summary.totalStripeFees * 100) / 100;
+        summary.totalWorkerPayouts = Math.round(summary.totalWorkerPayouts * 100) / 100;
+
+        res.json({
+            success: true,
+            message: dryRun
+                ? `${summary.found} reservation(s) a corriger. Utilisez dryRun: false pour appliquer.`
+                : `${summary.fixed} reservation(s) corrigee(s)`,
+            summary: dryRun ? summary : { found: summary.found, fixed: summary.fixed }
+        });
+    } catch (error) {
+        console.error('Erreur fix-payouts:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la correction des payouts',
+        });
+    }
+});
+
 module.exports = router;
