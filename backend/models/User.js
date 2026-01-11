@@ -405,6 +405,10 @@ const userSchema = new mongoose.Schema({
 
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    resetTokenUsed: {
+        type: Boolean,
+        default: false,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -420,7 +424,15 @@ userSchema.index({ 'workerProfile.currentLocation': '2dsphere' });
 
 // Hash le mot de passe avant de sauvegarder
 userSchema.pre('save', async function (next) {
+    // Ne pas hasher si le mot de passe n'a pas été modifié
     if (!this.isModified('password')) {
+        return next();
+    }
+
+    // Ne pas re-hasher si le flag skipPasswordHash est défini
+    // (cas où le mot de passe vient de phoneVerification déjà hashé)
+    if (this.skipPasswordHash) {
+        this.skipPasswordHash = undefined; // Supprimer le flag temporaire
         return next();
     }
 
@@ -451,6 +463,9 @@ userSchema.methods.getResetPasswordToken = function () {
 
     // Définir l'expiration du token (10 minutes)
     this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+    // Réinitialiser le flag "utilisé" pour ce nouveau token
+    this.resetTokenUsed = false;
 
     return resetToken;
 };

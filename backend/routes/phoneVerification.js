@@ -5,6 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const PhoneVerification = require('../models/PhoneVerification');
 const User = require('../models/User');
 const {
@@ -76,12 +77,15 @@ router.post('/send-code', async (req, res) => {
         const code = generateVerificationCode();
 
         // Préparer les données d'inscription en attente
-        // Note: Ne pas hasher le mot de passe ici, le hook pre('save') du modèle User le fera
+        // Hasher le mot de passe pour ne pas le stocker en clair dans PhoneVerification
         let pendingRegistration = null;
         if (email && password && firstName && lastName) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
             pendingRegistration = {
                 email: email.toLowerCase(),
-                password: password, // Mot de passe en clair, sera haché par User.create()
+                password: hashedPassword, // Mot de passe hashé pour sécurité
+                passwordHashed: true, // Flag pour indiquer que le mdp est déjà hashé
                 firstName,
                 lastName,
                 role: role || 'client'
@@ -154,7 +158,7 @@ router.post('/verify-code', async (req, res) => {
 
         // Si des données d'inscription sont en attente, créer le compte
         if (verificationResult.pendingRegistration) {
-            const { email, password, firstName, lastName, role } = verificationResult.pendingRegistration;
+            const { email, password, firstName, lastName, role, passwordHashed } = verificationResult.pendingRegistration;
 
             // Vérifier une dernière fois que l'email n'existe pas
             const existingUser = await User.findOne({ email });
@@ -173,7 +177,8 @@ router.post('/verify-code', async (req, res) => {
                 lastName,
                 phoneNumber: formattedPhone,
                 phoneVerified: true,
-                role
+                role,
+                skipPasswordHash: passwordHashed === true, // Flag pour ne pas re-hasher le mdp
             };
 
             // Initialiser workerProfile pour les déneigeurs

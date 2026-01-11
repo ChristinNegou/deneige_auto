@@ -264,17 +264,22 @@ exports.createWorkerPayout = async (req, res) => {
     const workerAmount = grossAmount - platformFee;
 
     // Créer le transfert vers le compte Connect du déneigeur
-    const transfer = await stripe.transfers.create({
-      amount: Math.round(workerAmount * 100), // En cents
-      currency: 'cad',
-      destination: workerConnectId,
-      description: `Versement pour réservation #${reservation._id}`,
-      metadata: {
-        reservationId: reservation._id.toString(),
-        workerId: worker._id.toString(),
-        clientId: reservation.userId.toString(),
+    const transfer = await stripe.transfers.create(
+      {
+        amount: Math.round(workerAmount * 100), // En cents
+        currency: 'cad',
+        destination: workerConnectId,
+        description: `Versement pour réservation #${reservation._id}`,
+        metadata: {
+          reservationId: reservation._id.toString(),
+          workerId: worker._id.toString(),
+          clientId: reservation.userId.toString(),
+        },
       },
-    });
+      {
+        idempotencyKey: `admin_payout_${reservation._id}`, // Empêche les doubles paiements
+      }
+    );
 
     // Mettre à jour la réservation
     reservation.payout = {

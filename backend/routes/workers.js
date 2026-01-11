@@ -1074,17 +1074,22 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
                 const workerAmount = grossAmount - platformFee;
 
                 // Créer le transfert vers le compte Connect du déneigeur
-                const transfer = await stripe.transfers.create({
-                    amount: Math.round(workerAmount * 100), // En cents
-                    currency: 'cad',
-                    destination: workerConnectId,
-                    description: `Paiement pour réservation #${reservation._id}`,
-                    metadata: {
-                        reservationId: reservation._id.toString(),
-                        workerId: worker._id.toString(),
-                        clientId: reservation.userId._id.toString(),
+                const transfer = await stripe.transfers.create(
+                    {
+                        amount: Math.round(workerAmount * 100), // En cents
+                        currency: 'cad',
+                        destination: workerConnectId,
+                        description: `Paiement pour réservation #${reservation._id}`,
+                        metadata: {
+                            reservationId: reservation._id.toString(),
+                            workerId: worker._id.toString(),
+                            clientId: reservation.userId._id.toString(),
+                        },
                     },
-                });
+                    {
+                        idempotencyKey: `payout_job_${reservation._id}`, // Empêche les doubles paiements
+                    }
+                );
 
                 // Mettre à jour la réservation avec les infos de payout
                 reservation.payout = {

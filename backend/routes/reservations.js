@@ -391,19 +391,49 @@ router.delete('/:id', protect, async (req, res) => {
 // @access  Private (Worker)
 router.patch('/:id/assign', protect, async (req, res) => {
     try {
-        const reservation = await Reservation.findByIdAndUpdate(
-            req.params.id,
+        // Vérifier que le worker n'a pas trop de jobs actifs
+        const activeJobsCount = await Reservation.countDocuments({
+            workerId: req.user.id,
+            status: { $in: ['assigned', 'enRoute', 'inProgress'] },
+        });
+
+        const worker = await User.findById(req.user.id);
+        const maxActiveJobs = worker?.workerProfile?.maxActiveJobs || 3;
+
+        if (activeJobsCount >= maxActiveJobs) {
+            return res.status(400).json({
+                success: false,
+                message: `Vous avez déjà ${maxActiveJobs} jobs actifs. Complétez-en un avant d'en accepter un nouveau.`,
+            });
+        }
+
+        // Atomic update: seulement si le job est pending et non assigné
+        const reservation = await Reservation.findOneAndUpdate(
+            {
+                _id: req.params.id,
+                status: 'pending',
+                workerId: null, // Empêche la double assignation
+            },
             {
                 workerId: req.user.id,
                 status: 'assigned',
+                assignedAt: new Date(),
             },
             { new: true }
         ).populate('userId', 'firstName lastName');
 
         if (!reservation) {
+            // Vérifier si le job existe mais est déjà pris
+            const existingJob = await Reservation.findById(req.params.id);
+            if (existingJob && existingJob.workerId) {
+                return res.status(409).json({
+                    success: false,
+                    message: 'Ce job a déjà été accepté par un autre déneigeur',
+                });
+            }
             return res.status(404).json({
                 success: false,
-                message: 'Réservation non trouvée',
+                message: 'Réservation non trouvée ou non disponible',
             });
         }
 
@@ -542,19 +572,24 @@ router.patch('/:id/complete', protect, async (req, res) => {
         let transferResult = null;
         if (worker.workerProfile?.stripeConnectId && reservation.paymentStatus === 'paid') {
             try {
-                const transfer = await stripe.transfers.create({
-                    amount: Math.round(workerAmount * 100), // En cents
-                    currency: 'cad',
-                    destination: worker.workerProfile.stripeConnectId,
-                    description: `Paiement job #${reservation._id}`,
-                    metadata: {
-                        reservationId: reservation._id.toString(),
-                        workerId: worker._id.toString(),
-                        originalAmount: totalAmount,
-                        platformFee: platformFee,
-                        tipAmount: tipAmount,
+                const transfer = await stripe.transfers.create(
+                    {
+                        amount: Math.round(workerAmount * 100), // En cents
+                        currency: 'cad',
+                        destination: worker.workerProfile.stripeConnectId,
+                        description: `Paiement job #${reservation._id}`,
+                        metadata: {
+                            reservationId: reservation._id.toString(),
+                            workerId: worker._id.toString(),
+                            originalAmount: totalAmount,
+                            platformFee: platformFee,
+                            tipAmount: tipAmount,
+                        },
                     },
-                });
+                    {
+                        idempotencyKey: `transfer_job_${reservation._id}`, // Empêche les doubles paiements
+                    }
+                );
 
                 reservation.payout.status = 'completed';
                 reservation.payout.stripeTransferId = transfer.id;
@@ -1472,18 +1507,23 @@ router.post('/:id/tip', protect, async (req, res) => {
         // Si le worker a un compte Stripe Connect, transférer le pourboire
         if (worker.workerProfile?.stripeConnectId && reservation.paymentStatus === 'paid') {
             try {
-                const transfer = await stripe.transfers.create({
-                    amount: Math.round(amount * 100), // En cents
-                    currency: 'cad',
-                    destination: worker.workerProfile.stripeConnectId,
-                    transfer_group: `reservation_${reservation._id}`,
-                    metadata: {
-                        reservationId: reservation._id.toString(),
-                        type: 'tip',
-                        clientId: req.user.id,
-                        workerId: worker._id.toString(),
+                const transfer = await stripe.transfers.create(
+                    {
+                        amount: Math.round(amount * 100), // En cents
+                        currency: 'cad',
+                        destination: worker.workerProfile.stripeConnectId,
+                        transfer_group: `reservation_${reservation._id}`,
+                        metadata: {
+                            reservationId: reservation._id.toString(),
+                            type: 'tip',
+                            clientId: req.user.id,
+                            workerId: worker._id.toString(),
+                        },
                     },
-                });
+                    {
+                        idempotencyKey: `tip_${reservation._id}_${Date.now()}`, // Unique par tip
+                    }
+                );
 
                 transferResult = {
                     success: true,

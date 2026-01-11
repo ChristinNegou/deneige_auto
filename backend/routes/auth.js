@@ -262,19 +262,21 @@ router.put('/reset-password/:resetToken', async (req, res) => {
         const user = await User.findOne({
             resetPasswordToken,
             resetPasswordExpire: { $gt: Date.now() },
+            resetTokenUsed: { $ne: true }, // Vérifier que le token n'a pas déjà été utilisé
         });
 
         if (!user) {
             return res.status(400).json({
                 success: false,
-                message: 'Token invalide ou expiré',
+                message: 'Token invalide, expiré ou déjà utilisé',
             });
         }
 
-        // Définir le nouveau mot de passe
+        // Définir le nouveau mot de passe et marquer le token comme utilisé
         user.password = password;
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
+        user.resetTokenUsed = true; // Marquer comme utilisé pour empêcher la réutilisation
         await user.save();
 
         // Générer un nouveau token JWT
