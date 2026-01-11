@@ -30,7 +30,8 @@
       "Bash(dir \"C:\\\\Deneige-auto\" /B)",
       "WebFetch(domain:deneigeauto-production.up.railway.app)",
       "Bash(flutter build:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(MONGODB_URI=\"mongodb+srv://deneigeauto_db:root@deneigeautocluster.o6fxvd.mongodb.net/deneige_auto?appName=deneigeAutoCluster\" node:*)"
     ],
     "deny": [],
     "ask": []

@@ -773,54 +773,63 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildAvailableJobsSection() {
-    return BlocConsumer<WorkerJobsBloc, WorkerJobsState>(
-      listener: (context, state) {
-        if (state is WorkerJobsLoaded) {
-          _checkForNewJobs(state.availableJobs);
+    return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
+      builder: (context, availabilityState) {
+        // Vérifier si l'équipement est configuré
+        List<String> equipmentList = [];
+        if (availabilityState is WorkerAvailabilityLoaded) {
+          equipmentList = availabilityState.profile?.equipmentList ?? [];
         }
-        if (state is JobActionSuccess && state.action == 'accept') {
-          _notificationService.notifyJobAccepted(state.job);
-          HapticFeedback.heavyImpact();
-        }
-      },
-      builder: (context, state) {
-        if (state is WorkerJobsLoading) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Jobs disponibles',
-                style: AppTheme.headlineSmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 14),
-              const JobCardSkeleton(),
-              const SizedBox(height: 12),
-              const JobCardSkeleton(),
-            ],
-          );
-        }
+        final hasEquipment = equipmentList.isNotEmpty;
 
-        if (state is WorkerJobsError) {
-          return _buildErrorState(state.message);
-        }
+        return BlocConsumer<WorkerJobsBloc, WorkerJobsState>(
+          listener: (context, state) {
+            if (state is WorkerJobsLoaded) {
+              _checkForNewJobs(state.availableJobs);
+            }
+            if (state is JobActionSuccess && state.action == 'accept') {
+              _notificationService.notifyJobAccepted(state.job);
+              HapticFeedback.heavyImpact();
+            }
+          },
+          builder: (context, state) {
+            if (state is WorkerJobsLoading) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Jobs disponibles',
+                    style: AppTheme.headlineSmall.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const JobCardSkeleton(),
+                  const SizedBox(height: 12),
+                  const JobCardSkeleton(),
+                ],
+              );
+            }
 
-        List<WorkerJob> availableJobs = [];
-        String? loadingJobId;
+            if (state is WorkerJobsError) {
+              return _buildErrorState(state.message);
+            }
 
-        if (state is WorkerJobsLoaded) {
-          availableJobs = state.availableJobs;
-        } else if (state is JobActionLoading) {
-          availableJobs = state.previousState.availableJobs;
-          loadingJobId = state.jobId;
-        }
+            List<WorkerJob> availableJobs = [];
+            String? loadingJobId;
 
-        availableJobs.sort((a, b) {
-          if (a.isPriority && !b.isPriority) return -1;
-          if (!a.isPriority && b.isPriority) return 1;
-          return a.departureTime.compareTo(b.departureTime);
-        });
+            if (state is WorkerJobsLoaded) {
+              availableJobs = state.availableJobs;
+            } else if (state is JobActionLoading) {
+              availableJobs = state.previousState.availableJobs;
+              loadingJobId = state.jobId;
+            }
+
+            availableJobs.sort((a, b) {
+              if (a.isPriority && !b.isPriority) return -1;
+              if (!a.isPriority && b.isPriority) return 1;
+              return a.departureTime.compareTo(b.departureTime);
+            });
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -911,7 +920,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               ],
             ),
             const SizedBox(height: 14),
-            if (availableJobs.isEmpty)
+            // Afficher un message si aucun équipement n'est configuré
+            if (!hasEquipment)
+              _buildNoEquipmentWarning()
+            else if (availableJobs.isEmpty)
               _buildEmptyState()
             else
               ...availableJobs.map((job) => Padding(
@@ -936,9 +948,108 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                       },
                     ),
                   )),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+  Widget _buildNoEquipmentWarning() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppTheme.warning.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppTheme.warning.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+            ),
+            child: const Icon(
+              Icons.build_rounded,
+              size: 36,
+              color: AppTheme.warning,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Configurez votre équipement',
+            style: AppTheme.headlineSmall.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Pour voir les jobs disponibles, vous devez d\'abord indiquer les équipements que vous possédez dans "Mon équipement".',
+            textAlign: TextAlign.center,
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Les jobs sont filtrés selon votre équipement.',
+            textAlign: TextAlign.center,
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textTertiary,
+              fontStyle: FontStyle.italic,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              Navigator.pushNamed(context, AppRoutes.workerSettings);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppTheme.warning, Color(0xFFFF9800)],
+                ),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.warning.withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.settings_rounded,
+                    color: AppTheme.background,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Configurer mon équipement',
+                    style: TextStyle(
+                      color: AppTheme.background,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
