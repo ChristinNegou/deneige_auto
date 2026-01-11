@@ -29,12 +29,14 @@ const formatLog = (level, message, metadata = {}) => {
 
     // Ajouter le stack trace pour les erreurs
     if (metadata.error instanceof Error) {
-        log.error = {
+        log.errorDetails = {
             name: metadata.error.name,
             message: metadata.error.message,
-            stack: metadata.error.stack,
+            stack: process.env.NODE_ENV === 'production'
+                ? metadata.error.stack?.split('\n').slice(0, 5).join('\n')
+                : metadata.error.stack,
         };
-        delete log.error; // Retirer l'objet Error brut
+        delete metadata.error;
     }
 
     return log;

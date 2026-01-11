@@ -80,6 +80,38 @@ const requiredEnvVars = {
     required: false,
     description: 'Mot de passe SMTP',
   },
+
+  // Cloudinary (pour les photos)
+  CLOUDINARY_CLOUD_NAME: {
+    required: false,
+    description: 'Nom du cloud Cloudinary',
+  },
+  CLOUDINARY_API_KEY: {
+    required: false,
+    description: 'Clé API Cloudinary',
+  },
+  CLOUDINARY_API_SECRET: {
+    required: false,
+    description: 'Secret API Cloudinary',
+  },
+
+  // Firebase (pour les notifications push)
+  FIREBASE_PROJECT_ID: {
+    required: false,
+    description: 'ID du projet Firebase',
+  },
+
+  // Stripe Webhook
+  STRIPE_WEBHOOK_SECRET: {
+    required: false,
+    description: 'Secret du webhook Stripe',
+    validate: (value) => {
+      if (value && !value.startsWith('whsec_')) {
+        return 'STRIPE_WEBHOOK_SECRET doit commencer par whsec_';
+      }
+      return null;
+    },
+  },
 };
 
 const optionalEnvVars = [
@@ -88,7 +120,8 @@ const optionalEnvVars = [
   'ALLOWED_ORIGINS',
   'FRONTEND_URL',
   'APP_URL',
-  'FIREBASE_PROJECT_ID',
+  'LOG_LEVEL',
+  'GOOGLE_MAPS_API_KEY',
 ];
 
 /**
