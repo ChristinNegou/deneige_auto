@@ -5,7 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 /// Service de cache local pour les données API
 /// Permet de stocker et récupérer des données de manière persistante
-class CacheService {
+class ApiCacheService {
   static const String _cacheBoxName = 'api_cache';
   static const String _metadataBoxName = 'cache_metadata';
 
@@ -14,9 +14,9 @@ class CacheService {
   bool _isInitialized = false;
 
   /// Instance singleton
-  static final CacheService _instance = CacheService._internal();
-  factory CacheService() => _instance;
-  CacheService._internal();
+  static final ApiCacheService _instance = ApiCacheService._internal();
+  factory ApiCacheService() => _instance;
+  ApiCacheService._internal();
 
   /// Initialise le service de cache
   Future<void> initialize() async {
@@ -209,8 +209,11 @@ class CacheService {
     if (!_isInitialized) await initialize();
 
     int size = 0;
-    for (final value in _cacheBox?.values ?? []) {
-      size += value.length * 2; // Approximation UTF-16
+    final values = _cacheBox?.values;
+    if (values != null) {
+      for (final value in values) {
+        size += value.length * 2; // Approximation UTF-16
+      }
     }
     return size;
   }

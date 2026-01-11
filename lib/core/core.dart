@@ -10,8 +10,9 @@
 /// - `import 'package:deneige_auto/core/constants/constants.dart';`
 /// - `import 'package:deneige_auto/core/errors/errors.dart';`
 /// - `import 'package:deneige_auto/core/widgets/widgets.dart';`
+library;
 
-// Cache
+// Cache (Hive-based generic cache)
 export 'cache/cache.dart';
 
 // Config
