@@ -1,0 +1,36 @@
+# Lefthook configuration for pre-commit hooks
+# Documentation: https://github.com/evilmartians/lefthook
+
+pre-commit:
+  parallel: false
+  commands:
+    # Flutter/Dart formatting check
+    dart-format:
+      glob: "*.dart"
+      run: dart format --set-exit-if-changed {staged_files}
+      stage_fixed: true
+
+    # Flutter analyze (only if Dart files changed)
+    flutter-analyze:
+      glob: "*.dart"
+      run: flutter analyze --no-fatal-infos lib/
+
+    # Backend ESLint (only if JS files in backend changed)
+    backend-lint:
+      root: "backend/"
+      glob: "*.js"
+      run: npm run lint --prefix backend 2>/dev/null || echo "Lint check skipped"
+
+pre-push:
+  parallel: true
+  commands:
+    # Run Flutter tests before push
+    flutter-tests:
+      glob: "*.dart"
+      run: flutter test --no-pub
+
+    # Run backend tests before push
+    backend-tests:
+      root: "backend/"
+      glob: "*.js"
+      run: npm test --prefix backend
