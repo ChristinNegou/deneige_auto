@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { protect, authorize } = require('../middleware/auth');
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
 const Notification = require('../models/Notification');
 const SupportRequest = require('../models/SupportRequest');
+const Transaction = require('../models/Transaction');
 const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../services/databaseCleanupService');
 
 // Middleware pour vérifier le rôle admin
@@ -105,6 +107,8 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
                     totalPlatformFees: { $sum: '$payout.platformFee' },
                     totalWorkerPayouts: { $sum: '$payout.workerAmount' },
                     totalTips: { $sum: '$tipAmount' },
+                    totalStripeFees: { $sum: { $ifNull: ['$payout.stripeFee', 0] } },
+                    reservationCount: { $sum: 1 },
                 },
             },
         ]);
@@ -122,6 +126,8 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
                     _id: null,
                     revenue: { $sum: '$totalPrice' },
                     platformFees: { $sum: '$payout.platformFee' },
+                    stripeFees: { $sum: { $ifNull: ['$payout.stripeFee', 0] } },
+                    tips: { $sum: '$tipAmount' },
                 },
             },
         ]);
@@ -174,11 +180,17 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
                 },
                 revenue: {
                     total: revenueStats[0]?.totalRevenue || 0,
-                    platformFees: revenueStats[0]?.totalPlatformFees || 0,
+                    platformFeesGross: revenueStats[0]?.totalPlatformFees || 0,
+                    stripeFees: revenueStats[0]?.totalStripeFees || 0,
+                    platformFeesNet: (revenueStats[0]?.totalPlatformFees || 0) - (revenueStats[0]?.totalStripeFees || 0),
                     workerPayouts: revenueStats[0]?.totalWorkerPayouts || 0,
                     tips: revenueStats[0]?.totalTips || 0,
+                    reservationCount: revenueStats[0]?.reservationCount || 0,
                     thisMonth: monthlyRevenueStats[0]?.revenue || 0,
-                    monthlyPlatformFees: monthlyRevenueStats[0]?.platformFees || 0,
+                    monthlyPlatformFeesGross: monthlyRevenueStats[0]?.platformFees || 0,
+                    monthlyStripeFees: monthlyRevenueStats[0]?.stripeFees || 0,
+                    monthlyPlatformFeesNet: (monthlyRevenueStats[0]?.platformFees || 0) - (monthlyRevenueStats[0]?.stripeFees || 0),
+                    monthlyTips: monthlyRevenueStats[0]?.tips || 0,
                 },
                 charts: {
                     dailyReservations,
@@ -1116,5 +1128,257 @@ router.post('/workers/:id/reset-warnings', protect, adminOnly, async (req, res) 
         });
     }
 });
+
+// ============================================================================
+// RECONCILIATION STRIPE
+// ============================================================================
+
+/**
+ * @route   GET /api/admin/finance/reconciliation
+ * @desc    Comparer les donnees locales avec Stripe pour detecter les ecarts
+ * @access  Private (Admin)
+ */
+router.get('/finance/reconciliation', protect, adminOnly, async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+
+        // Dates par defaut: 30 derniers jours
+        const end = endDate ? new Date(endDate) : new Date();
+        const start = startDate ? new Date(startDate) : new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        // 1. Donnees locales depuis la base de donnees
+        const localStats = await Reservation.aggregate([
+            {
+                $match: {
+                    status: 'completed',
+                    paymentStatus: 'paid',
+                    completedAt: { $gte: start, $lte: end },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalRevenue: { $sum: '$totalPrice' },
+                    platformFees: { $sum: '$payout.platformFee' },
+                    workerPayouts: { $sum: '$payout.workerAmount' },
+                    stripeFees: { $sum: { $ifNull: ['$payout.stripeFee', 0] } },
+                    tips: { $sum: '$tipAmount' },
+                    count: { $sum: 1 },
+                },
+            },
+        ]);
+
+        // 2. Donnees Stripe - Balance et transactions
+        let stripeData = {
+            balance: null,
+            charges: { total: 0, count: 0 },
+            transfers: { total: 0, count: 0 },
+            refunds: { total: 0, count: 0 },
+            fees: 0,
+        };
+
+        try {
+            // Solde Stripe actuel
+            const balance = await stripe.balance.retrieve();
+            stripeData.balance = {
+                available: balance.available.reduce((sum, b) => sum + b.amount, 0) / 100,
+                pending: balance.pending.reduce((sum, b) => sum + b.amount, 0) / 100,
+                currency: 'CAD',
+            };
+
+            // Charges (paiements recus) dans la periode
+            const charges = await stripe.charges.list({
+                created: {
+                    gte: Math.floor(start.getTime() / 1000),
+                    lte: Math.floor(end.getTime() / 1000),
+                },
+                limit: 100,
+            });
+
+            for (const charge of charges.data) {
+                if (charge.status === 'succeeded') {
+                    stripeData.charges.total += charge.amount / 100;
+                    stripeData.charges.count++;
+                    // Frais Stripe
+                    if (charge.balance_transaction) {
+                        try {
+                            const txn = await stripe.balanceTransactions.retrieve(charge.balance_transaction);
+                            stripeData.fees += txn.fee / 100;
+                        } catch (e) {
+                            // Ignorer si impossible de recuperer
+                        }
+                    }
+                }
+            }
+
+            // Transferts vers les workers
+            const transfers = await stripe.transfers.list({
+                created: {
+                    gte: Math.floor(start.getTime() / 1000),
+                    lte: Math.floor(end.getTime() / 1000),
+                },
+                limit: 100,
+            });
+
+            for (const transfer of transfers.data) {
+                stripeData.transfers.total += transfer.amount / 100;
+                stripeData.transfers.count++;
+            }
+
+            // Remboursements
+            const refunds = await stripe.refunds.list({
+                created: {
+                    gte: Math.floor(start.getTime() / 1000),
+                    lte: Math.floor(end.getTime() / 1000),
+                },
+                limit: 100,
+            });
+
+            for (const refund of refunds.data) {
+                if (refund.status === 'succeeded') {
+                    stripeData.refunds.total += refund.amount / 100;
+                    stripeData.refunds.count++;
+                }
+            }
+
+        } catch (stripeError) {
+            console.error('Erreur Stripe API:', stripeError.message);
+            stripeData.error = 'Impossible de recuperer les donnees Stripe';
+        }
+
+        // 3. Calculer les ecarts
+        const local = localStats[0] || { totalRevenue: 0, platformFees: 0, workerPayouts: 0, stripeFees: 0, tips: 0, count: 0 };
+
+        const discrepancies = {
+            revenue: {
+                local: local.totalRevenue,
+                stripe: stripeData.charges.total,
+                difference: stripeData.charges.total - local.totalRevenue,
+                percentDiff: local.totalRevenue > 0
+                    ? (((stripeData.charges.total - local.totalRevenue) / local.totalRevenue) * 100).toFixed(2)
+                    : 0,
+            },
+            workerPayouts: {
+                local: local.workerPayouts,
+                stripe: stripeData.transfers.total,
+                difference: stripeData.transfers.total - local.workerPayouts,
+            },
+            stripeFees: {
+                local: local.stripeFees,
+                stripe: stripeData.fees,
+                difference: stripeData.fees - local.stripeFees,
+            },
+            transactionCount: {
+                local: local.count,
+                stripe: stripeData.charges.count,
+                difference: stripeData.charges.count - local.count,
+            },
+        };
+
+        // 4. Trouver les reservations potentiellement desynchronisees
+        const problematicReservations = await Reservation.find({
+            completedAt: { $gte: start, $lte: end },
+            $or: [
+                { status: 'completed', paymentStatus: { $ne: 'paid' } },
+                { paymentIntentId: { $exists: true }, 'payout.status': 'pending' },
+            ],
+        }).select('_id totalPrice status paymentStatus paymentIntentId payout.status createdAt')
+          .limit(20);
+
+        res.json({
+            success: true,
+            period: {
+                start: start.toISOString(),
+                end: end.toISOString(),
+            },
+            localDatabase: {
+                totalRevenue: local.totalRevenue,
+                platformFeesGross: local.platformFees,
+                platformFeesNet: local.platformFees - local.stripeFees,
+                workerPayouts: local.workerPayouts,
+                stripeFees: local.stripeFees,
+                tips: local.tips,
+                reservationCount: local.count,
+            },
+            stripe: {
+                balance: stripeData.balance,
+                chargesTotal: stripeData.charges.total,
+                chargesCount: stripeData.charges.count,
+                transfersTotal: stripeData.transfers.total,
+                transfersCount: stripeData.transfers.count,
+                refundsTotal: stripeData.refunds.total,
+                refundsCount: stripeData.refunds.count,
+                feesTotal: stripeData.fees,
+                error: stripeData.error || null,
+            },
+            discrepancies,
+            problematicReservations: problematicReservations.map(r => ({
+                id: r._id,
+                totalPrice: r.totalPrice,
+                status: r.status,
+                paymentStatus: r.paymentStatus,
+                payoutStatus: r.payout?.status,
+                paymentIntentId: r.paymentIntentId,
+                createdAt: r.createdAt,
+            })),
+            recommendations: generateReconciliationRecommendations(discrepancies, problematicReservations.length),
+        });
+    } catch (error) {
+        console.error('Erreur reconciliation:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la reconciliation',
+        });
+    }
+});
+
+/**
+ * Genere des recommandations basees sur les ecarts detectes
+ */
+function generateReconciliationRecommendations(discrepancies, problematicCount) {
+    const recommendations = [];
+
+    if (Math.abs(discrepancies.revenue.difference) > 10) {
+        recommendations.push({
+            type: 'warning',
+            message: `Ecart de revenus de ${discrepancies.revenue.difference.toFixed(2)}$ detecte`,
+            action: 'Verifier les webhooks Stripe et les reservations non synchronisees',
+        });
+    }
+
+    if (Math.abs(discrepancies.transactionCount.difference) > 0) {
+        recommendations.push({
+            type: 'warning',
+            message: `${Math.abs(discrepancies.transactionCount.difference)} transaction(s) non synchronisee(s)`,
+            action: 'Executer une synchronisation manuelle des paiements',
+        });
+    }
+
+    if (problematicCount > 0) {
+        recommendations.push({
+            type: 'action',
+            message: `${problematicCount} reservation(s) avec statut de paiement suspect`,
+            action: 'Examiner les reservations listees et corriger manuellement si necessaire',
+        });
+    }
+
+    if (discrepancies.stripeFees.difference > 5) {
+        recommendations.push({
+            type: 'info',
+            message: 'Les frais Stripe locaux different des frais reels',
+            action: 'Mettre a jour le calcul des frais Stripe (actuellement estime a 2.9% + 0.30$)',
+        });
+    }
+
+    if (recommendations.length === 0) {
+        recommendations.push({
+            type: 'success',
+            message: 'Aucun ecart significatif detecte',
+            action: 'Les donnees sont synchronisees',
+        });
+    }
+
+    return recommendations;
+}
 
 module.exports = router;
