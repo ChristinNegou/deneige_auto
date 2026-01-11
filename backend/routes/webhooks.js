@@ -125,8 +125,8 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
         res.json({ received: true });
     } catch (error) {
         console.error(`❌ Webhook handler error for ${event.type}:`, error);
-        // Retourner 200 pour éviter les retries Stripe sur erreurs de logique
-        res.status(200).json({ received: true, error: error.message });
+        // Retourner 200 pour éviter les retries Stripe - ne jamais exposer les erreurs
+        res.json({ received: true });
     }
 });
 

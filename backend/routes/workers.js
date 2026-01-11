@@ -11,6 +11,7 @@ const Notification = require('../models/Notification');
 const Transaction = require('../models/Transaction');
 const { uploadFromBuffer } = require('../config/cloudinary');
 const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, FILE_UPLOAD, GEOLOCATION } = require('../config/constants');
+const { logError, safeNotify } = require('../utils/errorHandler');
 
 // Configure multer with memory storage for Cloudinary uploads
 const upload = multer({
@@ -72,7 +73,6 @@ router.patch('/availability', protect, authorize('snowWorker'), async (req, res)
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la mise à jour de la disponibilité',
-            error: error.message,
         });
     }
 });
@@ -112,7 +112,6 @@ router.put('/location', protect, authorize('snowWorker'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la mise à jour de la position',
-            error: error.message,
         });
     }
 });
@@ -350,7 +349,6 @@ router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res)
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération des jobs disponibles',
-            error: error.message,
         });
     }
 });
@@ -378,7 +376,6 @@ router.get('/my-jobs', protect, authorize('snowWorker'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération de vos jobs',
-            error: error.message,
         });
     }
 });
@@ -424,7 +421,6 @@ router.get('/history', protect, authorize('snowWorker'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération de l\'historique',
-            error: error.message,
         });
     }
 });
@@ -552,7 +548,6 @@ router.get('/stats', protect, authorize('snowWorker'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération des statistiques',
-            error: error.message,
         });
     }
 });
@@ -647,7 +642,6 @@ router.get('/earnings', protect, authorize('snowWorker'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération des revenus',
-            error: error.message,
         });
     }
 });
@@ -680,7 +674,6 @@ router.get('/profile', protect, authorize('snowWorker'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération du profil',
-            error: error.message,
         });
     }
 });
@@ -734,7 +727,6 @@ router.put('/profile', protect, authorize('snowWorker'), async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la mise à jour du profil',
-            error: error.message,
         });
     }
 });
@@ -780,7 +772,6 @@ router.post('/profile/photo', protect, authorize('snowWorker'), profileUpload.si
         res.status(500).json({
             success: false,
             message: 'Erreur lors de l\'upload de la photo de profil',
-            error: error.message,
         });
     }
 });
@@ -865,7 +856,6 @@ router.post('/jobs/:id/accept', protect, authorize('snowWorker'), async (req, re
         res.status(500).json({
             success: false,
             message: 'Erreur lors de l\'acceptation du job',
-            error: error.message,
         });
     }
 });
@@ -932,7 +922,6 @@ router.patch('/jobs/:id/en-route', protect, authorize('snowWorker'), async (req,
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la mise à jour du statut',
-            error: error.message,
         });
     }
 });
@@ -987,7 +976,6 @@ router.patch('/jobs/:id/start', protect, authorize('snowWorker'), async (req, re
         res.status(500).json({
             success: false,
             message: 'Erreur lors du démarrage du travail',
-            error: error.message,
         });
     }
 });
@@ -1154,7 +1142,6 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la complétion du travail',
-            error: error.message,
         });
     }
 });
@@ -1226,7 +1213,6 @@ router.post('/jobs/:id/photos/upload', protect, authorize('snowWorker'), upload.
         res.status(500).json({
             success: false,
             message: 'Erreur lors de l\'ajout de la photo',
-            error: error.message,
         });
     }
 });
@@ -1283,7 +1269,6 @@ router.post('/jobs/:id/photos', protect, authorize('snowWorker'), async (req, re
         res.status(500).json({
             success: false,
             message: 'Erreur lors de l\'ajout de la photo',
-            error: error.message,
         });
     }
 });

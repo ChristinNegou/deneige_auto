@@ -467,6 +467,12 @@ reservationSchema.index({ status: 1, deadlineTime: 1 });
 // Geospatial index for location-based job discovery
 reservationSchema.index({ 'location': '2dsphere' });
 
+// Additional compound indexes for worker stats and filtering
+reservationSchema.index({ workerId: 1, status: 1, completedAt: -1 }); // Worker history with dates
+reservationSchema.index({ workerId: 1, rating: 1, ratedAt: -1 });     // Worker reviews/ratings
+reservationSchema.index({ status: 1, createdAt: 1 });                  // Admin stats and fallback queries
+reservationSchema.index({ cancelledBy: 1, cancelledAt: -1 });          // Cancellation tracking
+
 // Méthode virtuelle pour savoir si c'est urgent
 reservationSchema.virtual('isUrgent').get(function() {
     const now = new Date();

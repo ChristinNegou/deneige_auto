@@ -96,7 +96,7 @@ router.post('/register', registrationLimiter, validateRegister, async (req, res)
         console.error('Erreur lors de l\'inscription:', error);
         res.status(400).json({
             success: false,
-            message: error.message || 'Erreur lors de l\'inscription',
+            message: 'Erreur lors de l\'inscription',
         });
     }
 });
@@ -470,7 +470,7 @@ router.put('/update-profile', protect, validateUpdateProfile, async (req, res) =
         console.error('Erreur lors de la mise à jour du profil:', error);
         res.status(400).json({
             success: false,
-            message: error.message || 'Erreur lors de la mise à jour du profil',
+            message: 'Erreur lors de la mise à jour du profil',
         });
     }
 });

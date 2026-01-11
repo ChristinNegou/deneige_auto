@@ -112,7 +112,7 @@ router.post('/', protect, async (req, res) => {
         console.error('Erreur lors de l\'ajout du véhicule:', error);
         res.status(500).json({
             success: false,
-            message: error.message || 'Erreur lors de l\'ajout du véhicule',
+            message: 'Erreur lors de l\'ajout du véhicule',
         });
     }
 });

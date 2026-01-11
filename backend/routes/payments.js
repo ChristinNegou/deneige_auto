@@ -21,6 +21,7 @@ const {
 const { paymentLimiter } = require('../middleware/rateLimiter');
 const { validatePaymentMethodId, validateTip, validateRefund, validateReservationId } = require('../middleware/validators');
 const { PLATFORM_FEE_PERCENT } = require('../config/constants');
+const { handleError, safeNotify } = require('../utils/errorHandler');
 
 // @route   POST /api/payments/create-intent
 // @desc    Créer un Payment Intent Stripe avec transfert automatique au déneigeur
@@ -110,11 +111,7 @@ router.post('/create-intent', protect, paymentLimiter, async (req, res) => {
             },
         });
     } catch (error) {
-        console.error('❌ Erreur Stripe:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'payments:create-intent', 'Erreur lors de la création du paiement');
     }
 });
 
@@ -215,7 +212,10 @@ router.post('/confirm', protect, paymentLimiter, async (req, res) => {
                 }
 
                 // Envoyer notification de paiement réussi
-                await Notification.notifyPaymentSuccess(reservation);
+                await safeNotify(
+                    () => Notification.notifyPaymentSuccess(reservation),
+                    'PaymentSuccess'
+                );
             }
 
             res.status(200).json({
@@ -233,9 +233,9 @@ router.post('/confirm', protect, paymentLimiter, async (req, res) => {
             if (reservationId) {
                 const reservation = await Reservation.findById(reservationId);
                 if (reservation) {
-                    await Notification.notifyPaymentFailed(
-                        reservation,
-                        paymentIntent.last_payment_error?.message || 'Paiement refusé'
+                    await safeNotify(
+                        () => Notification.notifyPaymentFailed(reservation, 'Paiement refusé'),
+                        'PaymentFailed'
                     );
                 }
             }
@@ -247,11 +247,7 @@ router.post('/confirm', protect, paymentLimiter, async (req, res) => {
             });
         }
     } catch (error) {
-        console.error('❌ Erreur confirmation paiement:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'payments:confirm', 'Erreur lors de la confirmation du paiement');
     }
 });
 
@@ -330,7 +326,7 @@ router.post('/webhook', async (req, res) => {
         event = stripe.webhooks.constructEvent(req.rawBody || req.body, sig, webhookSecret);
     } catch (err) {
         console.error('⚠️ Webhook signature verification failed:', err.message);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
+        return res.status(400).json({ success: false, message: 'Webhook validation failed' });
     }
 
     console.log(`📩 Webhook Stripe reçu: ${event.type}`);
@@ -419,7 +415,8 @@ router.post('/webhook', async (req, res) => {
         res.json({ received: true });
     } catch (error) {
         console.error('❌ Erreur traitement webhook:', error);
-        res.status(500).json({ error: error.message });
+        // Ne jamais exposer les erreurs dans les webhooks - retourner toujours 200
+        res.json({ received: true });
     }
 });
 

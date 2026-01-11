@@ -7,6 +7,7 @@ const Notification = require('../models/Notification');
 const User = require('../models/User');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, CANCELLATION_POLICY } = require('../config/constants');
+const { safeNotify } = require('../utils/errorHandler');
 
 
 // @route   GET /api/reservations
@@ -239,7 +240,7 @@ router.post('/', protect, async (req, res) => {
         console.error('❌ Erreur lors de la création de la réservation:', error);
         res.status(500).json({
             success: false,
-            message: error.message || 'Erreur lors de la création de la réservation',
+            message: 'Erreur lors de la création de la réservation',
         });
     }
 });
@@ -712,7 +713,7 @@ router.post('/create-intent', protect, async (req, res) => {
         console.error('Erreur Stripe:', error);
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: 'Erreur lors du traitement du paiement',
         });
     }
 });

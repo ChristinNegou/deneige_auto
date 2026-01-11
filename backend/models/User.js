@@ -431,6 +431,13 @@ const userSchema = new mongoose.Schema({
 // Geospatial index for worker location queries
 userSchema.index({ 'workerProfile.currentLocation': '2dsphere' });
 
+// Performance indexes for common queries
+// Note: email index is auto-created by unique: true in schema
+userSchema.index({ role: 1 });                                         // Role-based queries
+userSchema.index({ role: 1, 'workerProfile.isAvailable': 1 });         // Admin: available workers
+userSchema.index({ role: 1, 'workerProfile.totalJobsCompleted': -1 }); // Admin: top workers ranking
+userSchema.index({ role: 1, isActive: 1 });                            // Active users by role
+
 // Hash le mot de passe avant de sauvegarder
 userSchema.pre('save', async function (next) {
     // Ne pas hasher si le mot de passe n'a pas été modifié

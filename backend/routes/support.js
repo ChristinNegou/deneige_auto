@@ -69,7 +69,7 @@ router.post('/request', protect, async (req, res) => {
         console.error('Erreur lors de la création de la demande de support:', error);
         res.status(500).json({
             success: false,
-            message: error.message || 'Erreur lors de l\'envoi de la demande',
+            message: 'Erreur lors de l\'envoi de la demande',
         });
     }
 });
