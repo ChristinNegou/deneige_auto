@@ -3,30 +3,17 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { protect, authorize } = require('../middleware/auth');
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const Transaction = require('../models/Transaction');
+const { uploadFromBuffer } = require('../config/cloudinary');
 
-// Configure multer for job photo uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = path.join(__dirname, '../uploads/jobs');
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname) || '.jpg';
-        cb(null, `job-${req.params.id}-${uniqueSuffix}${ext}`);
-    }
-});
-
+// Configure multer with memory storage for Cloudinary uploads
 const upload = multer({
-    storage: storage,
+    storage: multer.memoryStorage(),
     limits: {
         fileSize: 10 * 1024 * 1024, // 10MB max
     },
@@ -40,30 +27,13 @@ const upload = multer({
     }
 });
 
-// Configure multer for profile photo uploads
-const profileStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = path.join(__dirname, '../uploads/profiles');
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname) || '.jpg';
-        cb(null, `profile-${req.user.id}-${uniqueSuffix}${ext}`);
-    }
-});
-
+// Configure multer for profile photo uploads (also using Cloudinary)
 const profileUpload = multer({
-    storage: profileStorage,
+    storage: multer.memoryStorage(),
     limits: {
         fileSize: 5 * 1024 * 1024, // 5MB max for profile photos
     },
     fileFilter: function (req, file, cb) {
-        // Accept only images
         if (file.mimetype.startsWith('image/')) {
             cb(null, true);
         } else {
@@ -780,8 +750,13 @@ router.post('/profile/photo', protect, authorize('snowWorker'), profileUpload.si
             });
         }
 
-        // Build the URL for the photo
-        const photoUrl = `/uploads/profiles/${req.file.filename}`;
+        // Upload vers Cloudinary
+        const cloudinaryResult = await uploadFromBuffer(req.file.buffer, {
+            folder: 'deneige-auto/profiles',
+            public_id: `worker-${req.user.id}-${Date.now()}`,
+        });
+
+        const photoUrl = cloudinaryResult.url;
 
         // Update user's photoUrl
         const worker = await User.findByIdAndUpdate(
@@ -790,7 +765,7 @@ router.post('/profile/photo', protect, authorize('snowWorker'), profileUpload.si
             { new: true }
         );
 
-        console.log(`📷 Profile photo uploaded for worker ${worker.firstName}: ${photoUrl}`);
+        console.log(`📷 Profile photo uploaded to Cloudinary for worker ${worker.firstName}: ${photoUrl}`);
 
         res.json({
             success: true,
@@ -1083,6 +1058,88 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
 
         console.log(`✅ Job ${reservation._id} completed by worker ${worker.firstName}`);
 
+        // ============================================
+        // PAYOUT AUTOMATIQUE AU DÉNEIGEUR
+        // ============================================
+        const workerConnectId = worker?.workerProfile?.stripeConnectId;
+        const isPaid = reservation.paymentStatus === 'paid' || reservation.paymentIntentId;
+        const payoutNotDone = reservation.payout?.status !== 'paid';
+
+        if (workerConnectId && isPaid && payoutNotDone) {
+            try {
+                const PLATFORM_FEE_PERCENT = 0.25; // 25% commission plateforme
+                const grossAmount = reservation.totalPrice;
+                const platformFee = grossAmount * PLATFORM_FEE_PERCENT;
+                const stripeFee = (grossAmount * 0.029) + 0.30;
+                const workerAmount = grossAmount - platformFee;
+
+                // Créer le transfert vers le compte Connect du déneigeur
+                const transfer = await stripe.transfers.create({
+                    amount: Math.round(workerAmount * 100), // En cents
+                    currency: 'cad',
+                    destination: workerConnectId,
+                    description: `Paiement pour réservation #${reservation._id}`,
+                    metadata: {
+                        reservationId: reservation._id.toString(),
+                        workerId: worker._id.toString(),
+                        clientId: reservation.userId._id.toString(),
+                    },
+                });
+
+                // Mettre à jour la réservation avec les infos de payout
+                reservation.payout = {
+                    status: 'paid',
+                    workerAmount: workerAmount,
+                    platformFee: platformFee,
+                    stripeFee: stripeFee,
+                    stripeTransferId: transfer.id,
+                    paidAt: new Date(),
+                };
+                await reservation.save();
+
+                // Créer la transaction
+                await Transaction.create({
+                    type: 'payout',
+                    status: 'succeeded',
+                    amount: workerAmount,
+                    reservationId: reservation._id,
+                    toUserId: worker._id,
+                    stripeTransferId: transfer.id,
+                    breakdown: {
+                        grossAmount,
+                        stripeFee,
+                        platformFee,
+                        workerAmount,
+                    },
+                    description: `Paiement automatique pour réservation #${reservation._id}`,
+                    processedAt: new Date(),
+                });
+
+                console.log(`💰 Payout automatique effectué: ${workerAmount}$ vers ${worker.firstName} (Transfer: ${transfer.id})`);
+
+                // Notification au déneigeur
+                await Notification.createNotification({
+                    userId: worker._id,
+                    type: 'paymentReceived',
+                    title: 'Paiement reçu',
+                    message: `Vous avez reçu ${workerAmount.toFixed(2)} $ pour le job complété.`,
+                    reservationId: reservation._id,
+                    metadata: {
+                        amount: workerAmount,
+                        transferId: transfer.id,
+                    },
+                });
+            } catch (payoutError) {
+                console.error('⚠️ Erreur payout automatique (job complété quand même):', payoutError.message);
+                // Le job est marqué complété même si le payout échoue
+                // On peut réessayer le payout manuellement plus tard
+            }
+        } else if (!workerConnectId) {
+            console.log('⚠️ Pas de compte Stripe Connect configuré pour le déneigeur - payout reporté');
+        } else if (!isPaid) {
+            console.log('⚠️ Paiement non effectué - payout reporté');
+        }
+
         res.json({
             success: true,
             message: 'Travail terminé avec succès',
@@ -1099,7 +1156,7 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
 });
 
 // @route   POST /api/workers/jobs/:id/photos/upload
-// @desc    Upload before/after photo (actual file upload)
+// @desc    Upload before/after photo to Cloudinary
 // @access  Private (Worker only)
 router.post('/jobs/:id/photos/upload', protect, authorize('snowWorker'), upload.single('photo'), async (req, res) => {
     try {
@@ -1133,17 +1190,23 @@ router.post('/jobs/:id/photos/upload', protect, authorize('snowWorker'), upload.
             });
         }
 
-        // Build the URL for the photo
-        const photoUrl = `/uploads/jobs/${req.file.filename}`;
+        // Upload vers Cloudinary
+        const cloudinaryResult = await uploadFromBuffer(req.file.buffer, {
+            folder: `deneige-auto/jobs/${id}`,
+            public_id: `${type}-${Date.now()}`,
+        });
+
+        const photoUrl = cloudinaryResult.url;
 
         reservation.photos.push({
             url: photoUrl,
             type,
             uploadedAt: new Date(),
+            cloudinaryPublicId: cloudinaryResult.publicId,
         });
         await reservation.save();
 
-        console.log(`📷 Photo ${type} uploaded for job ${id}: ${photoUrl}`);
+        console.log(`📷 Photo ${type} uploaded to Cloudinary for job ${id}: ${photoUrl}`);
 
         res.json({
             success: true,

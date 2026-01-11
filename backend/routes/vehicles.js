@@ -2,30 +2,13 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const { protect } = require('../middleware/auth');
 const Vehicle = require('../models/Vehicle');
+const { uploadFromBuffer } = require('../config/cloudinary');
 
-// Configure multer for vehicle photo uploads
-const vehiclePhotoStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = path.join(__dirname, '../uploads/vehicles');
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname) || '.jpg';
-        cb(null, `vehicle-${req.params.id}-${uniqueSuffix}${ext}`);
-    }
-});
-
+// Configure multer with memory storage for Cloudinary uploads
 const vehiclePhotoUpload = multer({
-    storage: vehiclePhotoStorage,
+    storage: multer.memoryStorage(),
     limits: {
         fileSize: 5 * 1024 * 1024, // 5MB max
     },
@@ -222,7 +205,13 @@ router.post('/:id/photo', protect, vehiclePhotoUpload.single('photo'), async (re
             });
         }
 
-        const photoUrl = `/uploads/vehicles/${req.file.filename}`;
+        // Upload vers Cloudinary
+        const cloudinaryResult = await uploadFromBuffer(req.file.buffer, {
+            folder: 'deneige-auto/vehicles',
+            public_id: `vehicle-${req.params.id}-${Date.now()}`,
+        });
+
+        const photoUrl = cloudinaryResult.url;
 
         // Update vehicle with new photo URL
         const updatedVehicle = await Vehicle.findByIdAndUpdate(
@@ -231,7 +220,7 @@ router.post('/:id/photo', protect, vehiclePhotoUpload.single('photo'), async (re
             { new: true }
         );
 
-        console.log(`📸 Vehicle photo uploaded: ${photoUrl}`);
+        console.log(`📸 Vehicle photo uploaded to Cloudinary: ${photoUrl}`);
 
         res.json({
             success: true,
