@@ -7,7 +7,8 @@ class AdminStripeAccountsPage extends StatefulWidget {
   const AdminStripeAccountsPage({super.key});
 
   @override
-  State<AdminStripeAccountsPage> createState() => _AdminStripeAccountsPageState();
+  State<AdminStripeAccountsPage> createState() =>
+      _AdminStripeAccountsPageState();
 }
 
 class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
@@ -32,7 +33,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
       final response = await dio.get('/stripe-connect/admin/accounts');
 
       setState(() {
-        _accounts = List<Map<String, dynamic>>.from(response.data['accounts'] ?? []);
+        _accounts =
+            List<Map<String, dynamic>>.from(response.data['accounts'] ?? []);
       });
     } catch (e) {
       setState(() => _errorMessage = e.toString());
@@ -62,7 +64,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                 color: AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.warning_amber_rounded, color: AppTheme.error, size: 24),
+              child: Icon(Icons.warning_amber_rounded,
+                  color: AppTheme.error, size: 24),
             ),
             const SizedBox(width: 12),
             const Expanded(child: Text('Supprimer ce compte?')),
@@ -109,7 +112,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                         ),
                         Text(
                           email.isNotEmpty ? email : stripeAccountId,
-                          style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                          style: TextStyle(
+                              fontSize: 12, color: AppTheme.textSecondary),
                         ),
                       ],
                     ),
@@ -121,7 +125,9 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isInvalidOnStripe ? AppTheme.infoLight : AppTheme.errorLight,
+                color: isInvalidOnStripe
+                    ? AppTheme.infoLight
+                    : AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: isInvalidOnStripe
@@ -144,7 +150,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                           : 'Cette action est irreversible. Le deneigeur devra recreer un compte pour recevoir des paiements.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isInvalidOnStripe ? AppTheme.info : AppTheme.error,
+                        color:
+                            isInvalidOnStripe ? AppTheme.info : AppTheme.error,
                       ),
                     ),
                   ),
@@ -156,7 +163,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Annuler', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text('Annuler',
+                style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -179,7 +187,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
 
       if (isOrphan) {
         // Supprimer un compte orphelin par son ID Stripe
-        await dio.delete('/stripe-connect/admin/orphan-accounts/$stripeAccountId');
+        await dio
+            .delete('/stripe-connect/admin/orphan-accounts/$stripeAccountId');
       } else {
         // Supprimer un compte lie a un worker
         await dio.delete('/stripe-connect/admin/accounts/$workerId');
@@ -332,17 +341,22 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
 
   Widget _buildSummaryCard() {
     final totalAccounts = _accounts.length;
-    final activeAccounts = _accounts.where((a) =>
-        a['chargesEnabled'] == true &&
-        a['payoutsEnabled'] == true &&
-        a['isOrphan'] != true &&
-        a['isInvalidOnStripe'] != true).length;
+    final activeAccounts = _accounts
+        .where((a) =>
+            a['chargesEnabled'] == true &&
+            a['payoutsEnabled'] == true &&
+            a['isOrphan'] != true &&
+            a['isInvalidOnStripe'] != true)
+        .length;
     final orphanAccounts = _accounts.where((a) => a['isOrphan'] == true).length;
-    final invalidInDb = _accounts.where((a) => a['isInvalidOnStripe'] == true).length;
-    final pendingAccounts = _accounts.where((a) =>
-        (a['chargesEnabled'] != true || a['payoutsEnabled'] != true) &&
-        a['isOrphan'] != true &&
-        a['isInvalidOnStripe'] != true).length;
+    final invalidInDb =
+        _accounts.where((a) => a['isInvalidOnStripe'] == true).length;
+    final pendingAccounts = _accounts
+        .where((a) =>
+            (a['chargesEnabled'] != true || a['payoutsEnabled'] != true) &&
+            a['isOrphan'] != true &&
+            a['isInvalidOnStripe'] != true)
+        .length;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -371,9 +385,15 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _buildSummaryItem('Total', totalAccounts, AppTheme.primary)),
-              Expanded(child: _buildSummaryItem('Actifs', activeAccounts, AppTheme.success)),
-              Expanded(child: _buildSummaryItem('En attente', pendingAccounts, AppTheme.warning)),
+              Expanded(
+                  child: _buildSummaryItem(
+                      'Total', totalAccounts, AppTheme.primary)),
+              Expanded(
+                  child: _buildSummaryItem(
+                      'Actifs', activeAccounts, AppTheme.success)),
+              Expanded(
+                  child: _buildSummaryItem(
+                      'En attente', pendingAccounts, AppTheme.warning)),
             ],
           ),
           if (orphanAccounts > 0 || invalidInDb > 0) ...[
@@ -381,9 +401,13 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
             Row(
               children: [
                 if (orphanAccounts > 0)
-                  Expanded(child: _buildSummaryItem('Orphelins', orphanAccounts, Colors.orange)),
+                  Expanded(
+                      child: _buildSummaryItem(
+                          'Orphelins', orphanAccounts, Colors.orange)),
                 if (invalidInDb > 0)
-                  Expanded(child: _buildSummaryItem('Invalides', invalidInDb, AppTheme.error)),
+                  Expanded(
+                      child: _buildSummaryItem(
+                          'Invalides', invalidInDb, AppTheme.error)),
                 if (orphanAccounts == 0 || invalidInDb == 0)
                   const Expanded(child: SizedBox()),
               ],
@@ -549,7 +573,9 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                     ),
                     Text(
                       isOrphan
-                          ? (stripeEmail.isNotEmpty ? stripeEmail : 'Email non disponible')
+                          ? (stripeEmail.isNotEmpty
+                              ? stripeEmail
+                              : 'Email non disponible')
                           : workerEmail,
                       style: TextStyle(
                         fontSize: 13,
@@ -560,7 +586,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -594,7 +621,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.fingerprint, size: 16, color: AppTheme.textSecondary),
+                    Icon(Icons.fingerprint,
+                        size: 16, color: AppTheme.textSecondary),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -612,7 +640,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 16, color: AppTheme.textSecondary),
+                      Icon(Icons.calendar_today,
+                          size: 16, color: AppTheme.textSecondary),
                       const SizedBox(width: 8),
                       Text(
                         'Cree le ${_formatDate(created)}',
@@ -654,7 +683,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                   Expanded(
                     child: Text(
                       'Ce compte existe sur Stripe mais n\'est lie a aucun deneigeur dans l\'application.',
-                      style: TextStyle(fontSize: 12, color: Colors.orange.shade800),
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.orange.shade800),
                     ),
                   ),
                 ],
@@ -761,7 +791,8 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
 
   String _formatDate(dynamic date) {
     try {
-      final DateTime dateTime = date is String ? DateTime.parse(date) : date as DateTime;
+      final DateTime dateTime =
+          date is String ? DateTime.parse(date) : date as DateTime;
       return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
     } catch (e) {
       return 'Date inconnue';

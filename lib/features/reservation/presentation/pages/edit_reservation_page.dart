@@ -320,12 +320,12 @@ class _EditReservationViewState extends State<EditReservationView> {
                 decoration: BoxDecoration(
                   color: AppTheme.successLight,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: AppTheme.success.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle,
-                        color: AppTheme.success, size: 16),
+                    Icon(Icons.check_circle, color: AppTheme.success, size: 16),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -639,7 +639,8 @@ class _EditReservationViewState extends State<EditReservationView> {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.background),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppTheme.background),
                 ),
               )
             : const Icon(Icons.check),

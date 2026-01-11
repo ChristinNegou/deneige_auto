@@ -303,15 +303,18 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                             children: [
                               Icon(
                                 Icons.schedule,
-                                color: isUrgent ? AppTheme.error : AppTheme.textSecondary,
+                                color: isUrgent
+                                    ? AppTheme.error
+                                    : AppTheme.textSecondary,
                                 size: 18,
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 '${dateFormatter.format(widget.job.departureTime)} à ${timeFormatter.format(widget.job.departureTime)}',
                                 style: TextStyle(
-                                  color:
-                                      isUrgent ? AppTheme.error : AppTheme.textSecondary,
+                                  color: isUrgent
+                                      ? AppTheme.error
+                                      : AppTheme.textSecondary,
                                   fontWeight: isUrgent
                                       ? FontWeight.bold
                                       : FontWeight.normal,
@@ -495,7 +498,9 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         color: isUrgent ? AppTheme.errorLight : AppTheme.infoLight,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: isUrgent ? AppTheme.error.withOpacity(0.3) : AppTheme.info.withOpacity(0.3),
+          color: isUrgent
+              ? AppTheme.error.withOpacity(0.3)
+              : AppTheme.info.withOpacity(0.3),
         ),
       ),
       child: Row(

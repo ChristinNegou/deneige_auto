@@ -352,7 +352,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 width: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.background),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppTheme.background),
                 ),
               )
             : const Text(

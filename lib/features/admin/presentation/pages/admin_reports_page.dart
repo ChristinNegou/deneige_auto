@@ -63,8 +63,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline,
-                      size: 64, color: AppTheme.error),
+                  Icon(Icons.error_outline, size: 64, color: AppTheme.error),
                   const SizedBox(height: 16),
                   Text(state.errorMessage ?? 'Une erreur est survenue'),
                   const SizedBox(height: 16),

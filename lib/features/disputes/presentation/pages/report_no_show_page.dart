@@ -46,7 +46,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
     if (!_confirmed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Veuillez confirmer que le deneigeur n\'est pas venu'),
+          content:
+              const Text('Veuillez confirmer que le deneigeur n\'est pas venu'),
           backgroundColor: AppTheme.warning,
           behavior: SnackBarBehavior.floating,
         ),
@@ -137,7 +138,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context); // Close dialog
-                Navigator.pop(context, true); // Return to previous page with success
+                Navigator.pop(
+                    context, true); // Return to previous page with success
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
@@ -195,7 +197,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                   decoration: BoxDecoration(
                     color: AppTheme.errorLight,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppTheme.error.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,7 +327,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                   decoration: BoxDecoration(
                     color: AppTheme.successLight,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppTheme.success.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
@@ -429,7 +433,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      disabledBackgroundColor: AppTheme.error.withValues(alpha: 0.5),
+                      disabledBackgroundColor:
+                          AppTheme.error.withValues(alpha: 0.5),
                     ),
                     child: _isLoading
                         ? SizedBox(

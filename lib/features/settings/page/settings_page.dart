@@ -254,8 +254,7 @@ class _SettingsPageState extends State<SettingsPage> {
     VoidCallback? onTap,
   }) {
     return ListTile(
-      leading: Icon(icon,
-          color: titleColor ?? AppTheme.textSecondary),
+      leading: Icon(icon, color: titleColor ?? AppTheme.textSecondary),
       title: Text(
         title,
         style: TextStyle(
@@ -358,7 +357,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           if (passwordController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Veuillez entrer votre mot de passe'),
+                                content:
+                                    Text('Veuillez entrer votre mot de passe'),
                                 backgroundColor: AppTheme.error,
                               ),
                             );

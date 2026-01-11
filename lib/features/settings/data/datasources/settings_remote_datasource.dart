@@ -3,7 +3,8 @@ import '../models/user_preferences_model.dart';
 
 abstract class SettingsRemoteDataSource {
   Future<UserPreferencesModel> getPreferences();
-  Future<UserPreferencesModel> updatePreferences(UserPreferencesModel preferences);
+  Future<UserPreferencesModel> updatePreferences(
+      UserPreferencesModel preferences);
   Future<void> deleteAccount(String password);
 }
 
@@ -28,7 +29,8 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
   }
 
   @override
-  Future<UserPreferencesModel> updatePreferences(UserPreferencesModel preferences) async {
+  Future<UserPreferencesModel> updatePreferences(
+      UserPreferencesModel preferences) async {
     try {
       final response = await dio.put(
         '/auth/preferences',

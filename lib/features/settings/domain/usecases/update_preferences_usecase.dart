@@ -8,7 +8,8 @@ class UpdatePreferencesUseCase {
 
   UpdatePreferencesUseCase(this.repository);
 
-  Future<Either<Failure, UserPreferences>> call(UserPreferences preferences) async {
+  Future<Either<Failure, UserPreferences>> call(
+      UserPreferences preferences) async {
     return await repository.updatePreferences(preferences);
   }
 }

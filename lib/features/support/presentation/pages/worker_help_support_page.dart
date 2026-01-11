@@ -332,8 +332,7 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                           value: subject,
                           child: Text(
                             _getWorkerSubjectLabel(subject),
-                            style:
-                                const TextStyle(color: AppTheme.textPrimary),
+                            style: const TextStyle(color: AppTheme.textPrimary),
                           ),
                         );
                       }).toList(),
@@ -366,7 +365,8 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                   maxLength: 2000,
                   style: const TextStyle(color: AppTheme.textPrimary),
                   decoration: InputDecoration(
-                    hintText: 'Décrivez votre problème ou question en détail...',
+                    hintText:
+                        'Décrivez votre problème ou question en détail...',
                     hintStyle: const TextStyle(color: AppTheme.textTertiary),
                     filled: true,
                     fillColor: AppTheme.surfaceContainer,
@@ -382,8 +382,7 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppTheme.warning),
                     ),
-                    counterStyle:
-                        const TextStyle(color: AppTheme.textTertiary),
+                    counterStyle: const TextStyle(color: AppTheme.textTertiary),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {

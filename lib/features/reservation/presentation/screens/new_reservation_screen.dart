@@ -35,7 +35,8 @@ class NewReservationView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<NewReservationBloc, NewReservationState>(
       listener: (context, state) {
-        print('🔄 [NewReservationView] State changed: isLoading=${state.isLoading}, isSubmitted=${state.isSubmitted}, error=${state.errorMessage}');
+        print(
+            '🔄 [NewReservationView] State changed: isLoading=${state.isLoading}, isSubmitted=${state.isSubmitted}, error=${state.errorMessage}');
 
         if (state.errorMessage != null) {
           // Fermer le SnackBar de chargement
@@ -56,7 +57,8 @@ class NewReservationView extends StatelessWidget {
           // Fermer le SnackBar de chargement
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-          print('✅ [NewReservationView] Réservation créée: ${state.reservationId}');
+          print(
+              '✅ [NewReservationView] Réservation créée: ${state.reservationId}');
           Navigator.of(context).pushReplacementNamed(
             '/reservation/success',
             arguments: state.reservationId,
@@ -168,7 +170,8 @@ class NewReservationView extends StatelessWidget {
                 : Icon(
                     stepIcons[index],
                     size: 18,
-                    color: isActive ? AppTheme.background : AppTheme.textTertiary,
+                    color:
+                        isActive ? AppTheme.background : AppTheme.textTertiary,
                   ),
           ),
         ),
@@ -263,8 +266,8 @@ class NewReservationView extends StatelessWidget {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(AppTheme.background),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppTheme.background),
                         ),
                       )
                     : Row(
@@ -429,8 +432,10 @@ class NewReservationView extends StatelessWidget {
 
                 // Si le paiement réussit
                 if (result != null && result['success'] == true) {
-                  print('✅ [NewReservationScreen] Paiement réussi, création réservation...');
-                  print('✅ [NewReservationScreen] paymentIntentId: ${result['paymentIntentId']}');
+                  print(
+                      '✅ [NewReservationScreen] Paiement réussi, création réservation...');
+                  print(
+                      '✅ [NewReservationScreen] paymentIntentId: ${result['paymentIntentId']}');
 
                   // Montrer un indicateur de chargement
                   if (context.mounted) {

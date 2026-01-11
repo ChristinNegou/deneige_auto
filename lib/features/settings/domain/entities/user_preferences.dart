@@ -17,7 +17,8 @@ class UserPreferences extends Equatable {
     bool? darkThemeEnabled,
   }) {
     return UserPreferences(
-      pushNotificationsEnabled: pushNotificationsEnabled ?? this.pushNotificationsEnabled,
+      pushNotificationsEnabled:
+          pushNotificationsEnabled ?? this.pushNotificationsEnabled,
       soundEnabled: soundEnabled ?? this.soundEnabled,
       darkThemeEnabled: darkThemeEnabled ?? this.darkThemeEnabled,
     );

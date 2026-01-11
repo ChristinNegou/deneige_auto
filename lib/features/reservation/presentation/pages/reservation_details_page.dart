@@ -136,7 +136,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search_off, size: 64, color: AppTheme.textTertiary),
+                  Icon(Icons.search_off,
+                      size: 64, color: AppTheme.textTertiary),
                   const SizedBox(height: 16),
                   Text(
                     'Réservation introuvable',
@@ -212,7 +213,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                           color: AppTheme.textPrimary.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+                        child:
+                            Icon(Icons.arrow_back, color: AppTheme.textPrimary),
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -329,7 +331,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                                 // Report No-Show button
                                 if (_canReportNoShow(reservation)) ...[
                                   const SizedBox(height: 12),
-                                  _buildReportNoShowButton(context, reservation),
+                                  _buildReportNoShowButton(
+                                      context, reservation),
                                 ],
 
                                 const SizedBox(height: 40),
@@ -489,14 +492,16 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     shape: BoxShape.circle,
                     border: isCurrent
                         ? Border.all(
-                            color: _getStatusColor(status).withValues(alpha: 0.3),
+                            color:
+                                _getStatusColor(status).withValues(alpha: 0.3),
                             width: 4,
                           )
                         : null,
                   ),
                   child: Center(
                     child: isCompleted
-                        ? Icon(Icons.check, color: AppTheme.background, size: 20)
+                        ? Icon(Icons.check,
+                            color: AppTheme.background, size: 20)
                         : Text(
                             status.icon,
                             style: TextStyle(
@@ -757,7 +762,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
               children: [
-                Icon(Icons.chat_bubble_rounded, color: AppTheme.textPrimary, size: 24),
+                Icon(Icons.chat_bubble_rounded,
+                    color: AppTheme.textPrimary, size: 24),
                 const SizedBox(height: 6),
                 Text(
                   'Chat',
@@ -1041,7 +1047,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: isIncluded ? AppTheme.successLight : AppTheme.surfaceContainer,
+            color:
+                isIncluded ? AppTheme.successLight : AppTheme.surfaceContainer,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -1121,7 +1128,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   color: AppTheme.successLight,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.photo_camera, color: AppTheme.success, size: 20),
+                child:
+                    Icon(Icons.photo_camera, color: AppTheme.success, size: 20),
               ),
               const SizedBox(width: 12),
               Text(
@@ -1171,7 +1179,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     errorWidget: (context, url, error) => Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error, color: AppTheme.textTertiary, size: 40),
+                        Icon(Icons.error,
+                            color: AppTheme.textTertiary, size: 40),
                         const SizedBox(height: 8),
                         Text(
                           'Photo non disponible',
@@ -1238,7 +1247,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     errorWidget: (context, url, error) => Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error, color: AppTheme.textTertiary, size: 32),
+                        Icon(Icons.error,
+                            color: AppTheme.textTertiary, size: 32),
                         const SizedBox(height: 4),
                         Text(
                           'Photo non disponible',
@@ -1533,11 +1543,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             SnackBar(
                               content: Row(
                                 children: [
-                                  Icon(Icons.warning, color: AppTheme.textPrimary),
+                                  Icon(Icons.warning,
+                                      color: AppTheme.textPrimary),
                                   const SizedBox(width: 12),
                                   Text(
                                     'Évaluation envoyée, mais erreur pourboire: ${failure.message}',
-                                    style: TextStyle(color: AppTheme.textPrimary),
+                                    style:
+                                        TextStyle(color: AppTheme.textPrimary),
                                   ),
                                 ],
                               ),
@@ -1554,11 +1566,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             SnackBar(
                               content: Row(
                                 children: [
-                                  Icon(Icons.check_circle, color: AppTheme.textPrimary),
+                                  Icon(Icons.check_circle,
+                                      color: AppTheme.textPrimary),
                                   const SizedBox(width: 12),
                                   Text(
                                     'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé',
-                                    style: TextStyle(color: AppTheme.textPrimary),
+                                    style:
+                                        TextStyle(color: AppTheme.textPrimary),
                                   ),
                                 ],
                               ),
@@ -1576,7 +1590,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                         SnackBar(
                           content: Row(
                             children: [
-                              Icon(Icons.check_circle, color: AppTheme.textPrimary),
+                              Icon(Icons.check_circle,
+                                  color: AppTheme.textPrimary),
                               const SizedBox(width: 12),
                               Text(
                                 'Merci pour votre évaluation!',
@@ -1640,7 +1655,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios, color: AppTheme.background, size: 18),
+                Icon(Icons.arrow_forward_ios,
+                    color: AppTheme.background, size: 18),
               ],
             ),
           ),
@@ -1963,7 +1979,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     return false;
   }
 
-  Widget _buildReportNoShowButton(BuildContext context, Reservation reservation) {
+  Widget _buildReportNoShowButton(
+      BuildContext context, Reservation reservation) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(

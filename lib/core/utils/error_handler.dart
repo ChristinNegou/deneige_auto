@@ -69,13 +69,15 @@ class ErrorHandler {
 
     switch (response.statusCode) {
       case 400:
-        return serverMessage ?? 'Requête invalide. Vérifiez les informations saisies.';
+        return serverMessage ??
+            'Requête invalide. Vérifiez les informations saisies.';
 
       case 401:
         return 'Session expirée. Veuillez vous reconnecter.';
 
       case 403:
-        return serverMessage ?? 'Vous n\'avez pas les droits pour cette action.';
+        return serverMessage ??
+            'Vous n\'avez pas les droits pour cette action.';
 
       case 404:
         return serverMessage ?? 'Ressource non trouvée.';
@@ -85,8 +87,8 @@ class ErrorHandler {
 
       case 422:
         return _extractValidationErrors(response.data) ??
-               serverMessage ??
-               'Données invalides. Vérifiez les champs du formulaire.';
+            serverMessage ??
+            'Données invalides. Vérifiez les champs du formulaire.';
 
       case 429:
         final retryAfter = response.data['retryAfter'];
@@ -112,7 +114,8 @@ class ErrorHandler {
         if (response.statusCode != null && response.statusCode! >= 500) {
           return 'Erreur serveur (${response.statusCode}). Réessayez plus tard.';
         }
-        return serverMessage ?? 'Erreur ${response.statusCode}. Veuillez réessayer.';
+        return serverMessage ??
+            'Erreur ${response.statusCode}. Veuillez réessayer.';
     }
   }
 
@@ -154,10 +157,10 @@ class ErrorHandler {
   static bool isNetworkError(dynamic error) {
     if (error is DioException) {
       return error.type == DioExceptionType.connectionError ||
-             error.type == DioExceptionType.connectionTimeout ||
-             error.type == DioExceptionType.receiveTimeout ||
-             error.type == DioExceptionType.sendTimeout ||
-             (error.type == DioExceptionType.unknown &&
+          error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          (error.type == DioExceptionType.unknown &&
               error.error is SocketException);
     }
     return error is SocketException;

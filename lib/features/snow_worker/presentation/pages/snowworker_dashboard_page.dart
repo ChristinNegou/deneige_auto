@@ -314,7 +314,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                   width: 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: isWorking ? AppTheme.background : AppTheme.textTertiary,
+                    color:
+                        isWorking ? AppTheme.background : AppTheme.textTertiary,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -325,7 +326,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isWorking ? AppTheme.background : AppTheme.textTertiary,
+                  color:
+                      isWorking ? AppTheme.background : AppTheme.textTertiary,
                 ),
               ),
             ],
@@ -662,7 +664,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: AppTheme.textPrimary.withValues(alpha: 0.2),
+                                color:
+                                    AppTheme.textPrimary.withValues(alpha: 0.2),
                                 borderRadius:
                                     BorderRadius.circular(AppTheme.radiusFull),
                               ),
@@ -680,7 +683,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: AppTheme.textPrimary.withValues(alpha: 0.15),
+                                color: AppTheme.textPrimary
+                                    .withValues(alpha: 0.15),
                                 borderRadius:
                                     BorderRadius.circular(AppTheme.radiusSM),
                               ),
@@ -706,7 +710,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                           children: [
                             Icon(
                               Icons.location_on_outlined,
-                              color: AppTheme.textPrimary.withValues(alpha: 0.8),
+                              color:
+                                  AppTheme.textPrimary.withValues(alpha: 0.8),
                               size: 16,
                             ),
                             const SizedBox(width: 6),
@@ -714,7 +719,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                               child: Text(
                                 job.displayAddress,
                                 style: TextStyle(
-                                  color: AppTheme.textPrimary.withValues(alpha: 0.9),
+                                  color: AppTheme.textPrimary
+                                      .withValues(alpha: 0.9),
                                   fontSize: 14,
                                 ),
                               ),
@@ -834,7 +840,8 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.search_rounded, color: AppTheme.background, size: 20),
+                      Icon(Icons.search_rounded,
+                          color: AppTheme.background, size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'Voir les jobs disponibles',

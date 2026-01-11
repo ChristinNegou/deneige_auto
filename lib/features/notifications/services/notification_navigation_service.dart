@@ -54,7 +54,8 @@ class NotificationNavigationService {
   }
 
   /// Affiche les détails complets d'une notification système
-  void _showNotificationDetails(BuildContext context, AppNotification notification) {
+  void _showNotificationDetails(
+      BuildContext context, AppNotification notification) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(

@@ -104,7 +104,9 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                 const SizedBox(height: 2),
                 Text(
                   'Vos informations sont protégées par Stripe',
-                  style: TextStyle(fontSize: 11, color: AppTheme.info.withValues(alpha: 0.8)),
+                  style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.info.withValues(alpha: 0.8)),
                 ),
               ],
             ),
@@ -172,7 +174,8 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                 color: _setAsDefault ? AppTheme.primary : Colors.transparent,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: _setAsDefault ? AppTheme.primary : AppTheme.textTertiary,
+                  color:
+                      _setAsDefault ? AppTheme.primary : AppTheme.textTertiary,
                   width: 1.5,
                 ),
               ),
@@ -196,7 +199,8 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                   const SizedBox(height: 2),
                   Text(
                     'Utilisée pour vos futurs paiements',
-                    style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                    style:
+                        TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                   ),
                 ],
               ),
@@ -277,7 +281,9 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       child: Text(
         text,
         style: TextStyle(
-            fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textSecondary),
       ),
     );
   }

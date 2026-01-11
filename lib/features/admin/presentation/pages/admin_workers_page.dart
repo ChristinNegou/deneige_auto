@@ -391,7 +391,9 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: isActive ? AppTheme.success : AppTheme.textTertiary,
+                                color: isActive
+                                    ? AppTheme.success
+                                    : AppTheme.textTertiary,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -399,7 +401,9 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             Text(
                               isActive ? 'Disponible' : 'Indisponible',
                               style: TextStyle(
-                                color: isActive ? AppTheme.success : AppTheme.textTertiary,
+                                color: isActive
+                                    ? AppTheme.success
+                                    : AppTheme.textTertiary,
                                 fontSize: 12,
                               ),
                             ),
@@ -675,7 +679,8 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                     decoration: BoxDecoration(
                       color: AppTheme.errorLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AppTheme.error.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

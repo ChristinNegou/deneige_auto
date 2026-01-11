@@ -139,7 +139,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                         ? Icons.check_circle_rounded
                         : Icons.location_searching,
                     size: 24,
-                    color: hasLocation ? AppTheme.success : AppTheme.textTertiary,
+                    color:
+                        hasLocation ? AppTheme.success : AppTheme.textTertiary,
                   ),
           ),
           const SizedBox(width: 14),
@@ -158,7 +159,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: hasLocation ? AppTheme.success : AppTheme.textPrimary,
+                    color:
+                        hasLocation ? AppTheme.success : AppTheme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -211,7 +213,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
             prefixIcon: Icon(Icons.search, color: AppTheme.textTertiary),
             suffixIcon: _addressController.text.isNotEmpty
                 ? IconButton(
-                    icon: Icon(Icons.clear, color: AppTheme.textTertiary, size: 20),
+                    icon: Icon(Icons.clear,
+                        color: AppTheme.textTertiary, size: 20),
                     onPressed: () {
                       _addressController.clear();
                       setState(() {});
@@ -291,7 +294,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
         const SizedBox(height: 16),
         Row(
           children: [
-            Icon(Icons.lightbulb_outline, size: 16, color: AppTheme.textTertiary),
+            Icon(Icons.lightbulb_outline,
+                size: 16, color: AppTheme.textTertiary),
             const SizedBox(width: 6),
             Expanded(
               child: Text(

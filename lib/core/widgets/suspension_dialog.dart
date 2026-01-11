@@ -81,7 +81,8 @@ class SuspensionDialog extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                border:
+                    Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

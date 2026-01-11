@@ -54,7 +54,8 @@ class WorkerNotificationPreferencesModel extends WorkerNotificationPreferences {
     super.tips = true,
   });
 
-  factory WorkerNotificationPreferencesModel.fromJson(Map<String, dynamic>? json) {
+  factory WorkerNotificationPreferencesModel.fromJson(
+      Map<String, dynamic>? json) {
     if (json == null) {
       return const WorkerNotificationPreferencesModel();
     }

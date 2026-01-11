@@ -160,7 +160,10 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             height: 48,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)],
+                colors: [
+                  AppTheme.success,
+                  AppTheme.success.withValues(alpha: 0.7)
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -237,7 +240,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
     // Compte entièrement configuré: paiements et virements actifs
     final bool isConfigured = _hasAccount && _payoutsEnabled && _chargesEnabled;
     // En attente de vérification: compte créé avec charges OU details soumis, mais virements pas encore actifs
-    final bool isPendingVerification = _hasAccount && (_isComplete || _chargesEnabled) && !_payoutsEnabled;
+    final bool isPendingVerification =
+        _hasAccount && (_isComplete || _chargesEnabled) && !_payoutsEnabled;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -254,7 +258,11 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         boxShadow: [
           BoxShadow(
-            color: (isConfigured ? AppTheme.success : isPendingVerification ? AppTheme.warning : AppTheme.primary)
+            color: (isConfigured
+                    ? AppTheme.success
+                    : isPendingVerification
+                        ? AppTheme.warning
+                        : AppTheme.primary)
                 .withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 6),
@@ -333,7 +341,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 label: const Text('Voir mon dashboard Stripe'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.background,
-                  side: const BorderSide(color: AppTheme.background, width: 1.5),
+                  side:
+                      const BorderSide(color: AppTheme.background, width: 1.5),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
@@ -357,7 +366,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.warning_amber_rounded, color: AppTheme.background, size: 20),
+                  Icon(Icons.warning_amber_rounded,
+                      color: AppTheme.background, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -411,7 +421,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 label: const Text('Actualiser le statut'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.background,
-                  side: const BorderSide(color: AppTheme.background, width: 1.5),
+                  side:
+                      const BorderSide(color: AppTheme.background, width: 1.5),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
@@ -456,8 +467,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
           width: 22,
           height: 22,
           decoration: BoxDecoration(
-            color:
-                isActive ? AppTheme.background : AppTheme.background.withValues(alpha: 0.3),
+            color: isActive
+                ? AppTheme.background
+                : AppTheme.background.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -585,8 +597,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               color: AppTheme.info.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radiusSM),
             ),
-            child:
-                Icon(Icons.schedule_rounded, color: AppTheme.info, size: 22),
+            child: Icon(Icons.schedule_rounded, color: AppTheme.info, size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(

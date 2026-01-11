@@ -39,12 +39,14 @@ class ServiceOptionTile extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primary : AppTheme.surfaceContainer,
+                color:
+                    isSelected ? AppTheme.primary : AppTheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 _getOptionIcon(option),
-                color: isSelected ? AppTheme.background : AppTheme.textSecondary,
+                color:
+                    isSelected ? AppTheme.background : AppTheme.textSecondary,
               ),
             ),
             const SizedBox(width: 16),
@@ -90,7 +92,8 @@ class ServiceOptionTile extends StatelessWidget {
                     color: isSelected ? AppTheme.primary : Colors.transparent,
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(
-                      color: isSelected ? AppTheme.primary : AppTheme.textTertiary,
+                      color:
+                          isSelected ? AppTheme.primary : AppTheme.textTertiary,
                       width: 2,
                     ),
                   ),

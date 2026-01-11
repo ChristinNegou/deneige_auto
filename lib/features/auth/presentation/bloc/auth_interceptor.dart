@@ -128,14 +128,16 @@ class AuthInterceptor extends Interceptor {
         requestOptions: err.requestOptions,
         response: err.response,
         type: err.type,
-        error: 'Connexion au serveur trop lente. Vérifiez votre connexion internet.',
+        error:
+            'Connexion au serveur trop lente. Vérifiez votre connexion internet.',
       );
     } else if (err.type == DioExceptionType.connectionError) {
       err = DioException(
         requestOptions: err.requestOptions,
         response: err.response,
         type: err.type,
-        error: 'Impossible de se connecter au serveur. Vérifiez votre connexion internet.',
+        error:
+            'Impossible de se connecter au serveur. Vérifiez votre connexion internet.',
       );
     }
 

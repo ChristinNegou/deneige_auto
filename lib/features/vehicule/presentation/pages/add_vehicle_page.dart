@@ -94,8 +94,9 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 // Get the newly created vehicle ID
                 final newVehicle = state.vehicles.last;
                 context.read<VehicleBloc>().add(
-                  UploadVehiclePhoto(vehicleId: newVehicle.id, photo: _selectedPhoto!),
-                );
+                      UploadVehiclePhoto(
+                          vehicleId: newVehicle.id, photo: _selectedPhoto!),
+                    );
                 return; // Wait for photo upload to complete
               }
 
@@ -312,7 +313,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 const SizedBox(height: 4),
                 Text(
                   'Cette photo sera visible par le déneigeur',
-                  style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                  style: AppTheme.bodySmall
+                      .copyWith(color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 20),
                 ListTile(
@@ -323,12 +325,14 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                       color: AppTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
+                    child: const Icon(Icons.camera_alt_rounded,
+                        color: AppTheme.primary),
                   ),
                   title: const Text('Prendre une photo'),
                   subtitle: Text(
                     'Utiliser l\'appareil photo',
-                    style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                    style: AppTheme.bodySmall
+                        .copyWith(color: AppTheme.textSecondary),
                   ),
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
@@ -343,12 +347,14 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                       color: AppTheme.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.photo_library_rounded, color: AppTheme.info),
+                    child: const Icon(Icons.photo_library_rounded,
+                        color: AppTheme.info),
                   ),
                   title: const Text('Choisir une photo'),
                   subtitle: Text(
                     'Depuis la galerie',
-                    style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                    style: AppTheme.bodySmall
+                        .copyWith(color: AppTheme.textSecondary),
                   ),
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
@@ -364,12 +370,14 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                         color: AppTheme.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.delete_rounded, color: AppTheme.error),
+                      child: const Icon(Icons.delete_rounded,
+                          color: AppTheme.error),
                     ),
                     title: const Text('Supprimer la photo'),
                     subtitle: Text(
                       'Retirer la photo sélectionnée',
-                      style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                      style: AppTheme.bodySmall
+                          .copyWith(color: AppTheme.textSecondary),
                     ),
                     onTap: () {
                       Navigator.pop(bottomSheetContext);

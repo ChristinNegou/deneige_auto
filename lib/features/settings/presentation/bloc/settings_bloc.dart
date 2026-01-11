@@ -80,7 +80,8 @@ class SettingsState extends Equatable {
       isDeleting: isDeleting ?? this.isDeleting,
       isAccountDeleted: isAccountDeleted ?? this.isAccountDeleted,
       errorMessage: clearMessages ? null : (errorMessage ?? this.errorMessage),
-      successMessage: clearMessages ? null : (successMessage ?? this.successMessage),
+      successMessage:
+          clearMessages ? null : (successMessage ?? this.successMessage),
     );
   }
 
@@ -217,9 +218,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       },
       (updatedPreferences) => emit(state.copyWith(
         preferences: updatedPreferences,
-        successMessage: event.enabled
-            ? 'Thème sombre activé'
-            : 'Thème clair activé',
+        successMessage:
+            event.enabled ? 'Thème sombre activé' : 'Thème clair activé',
       )),
     );
   }

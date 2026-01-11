@@ -109,12 +109,13 @@ class Dispute {
     );
   }
 
-  bool get isOpen => status == DisputeStatus.open ||
-                     status == DisputeStatus.underReview ||
-                     status == DisputeStatus.pendingResponse;
+  bool get isOpen =>
+      status == DisputeStatus.open ||
+      status == DisputeStatus.underReview ||
+      status == DisputeStatus.pendingResponse;
 
-  bool get canRespond => status == DisputeStatus.open ||
-                         status == DisputeStatus.pendingResponse;
+  bool get canRespond =>
+      status == DisputeStatus.open || status == DisputeStatus.pendingResponse;
 
   bool get canAppeal => status == DisputeStatus.resolved;
 }

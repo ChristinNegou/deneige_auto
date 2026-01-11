@@ -94,13 +94,16 @@ class WorkerStripeService {
 
   /// Supprimer un compte bancaire
   Future<Map<String, dynamic>> deleteBankAccount(String bankAccountId) async {
-    final response = await _dio.delete('/stripe-connect/bank-accounts/$bankAccountId');
+    final response =
+        await _dio.delete('/stripe-connect/bank-accounts/$bankAccountId');
     return response.data;
   }
 
   /// Definir un compte bancaire comme compte par defaut
-  Future<Map<String, dynamic>> setDefaultBankAccount(String bankAccountId) async {
-    final response = await _dio.put('/stripe-connect/bank-accounts/$bankAccountId/set-default');
+  Future<Map<String, dynamic>> setDefaultBankAccount(
+      String bankAccountId) async {
+    final response = await _dio
+        .put('/stripe-connect/bank-accounts/$bankAccountId/set-default');
     return response.data;
   }
 

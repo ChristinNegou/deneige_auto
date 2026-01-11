@@ -67,7 +67,8 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
             final paymentIntentId = reservation['paymentIntentId'];
             final totalPrice = reservation['totalPrice'];
 
-            print('📊 [PaymentHistory] Réservation ${reservation['_id']}: paymentStatus=$status, paymentIntentId=$paymentIntentId, totalPrice=$totalPrice');
+            print(
+                '📊 [PaymentHistory] Réservation ${reservation['_id']}: paymentStatus=$status, paymentIntentId=$paymentIntentId, totalPrice=$totalPrice');
 
             // Inclure si:
             // 1. paymentStatus est 'paid', 'refunded', ou 'partially_refunded'

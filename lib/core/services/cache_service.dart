@@ -57,9 +57,8 @@ class ApiCacheService {
       await _cacheBox?.put(key, jsonString);
 
       // Stocker le timestamp d'expiration
-      final expirationTime = DateTime.now()
-          .add(_cacheDurations[policy]!)
-          .millisecondsSinceEpoch;
+      final expirationTime =
+          DateTime.now().add(_cacheDurations[policy]!).millisecondsSinceEpoch;
       await _metadataBox?.put('exp_$key', expirationTime);
 
       if (kDebugMode) {
@@ -164,7 +163,8 @@ class ApiCacheService {
     }
 
     if (kDebugMode) {
-      print('Removed ${keysToRemove.length} cache entries with prefix: $prefix');
+      print(
+          'Removed ${keysToRemove.length} cache entries with prefix: $prefix');
     }
   }
 

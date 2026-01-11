@@ -389,7 +389,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.chat_bubble_rounded, color: AppTheme.background, size: 18),
+            Icon(Icons.chat_bubble_rounded,
+                color: AppTheme.background, size: 18),
             SizedBox(width: 6),
             Text(
               'Chat',
@@ -524,8 +525,10 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
   }
 
   Widget _buildVehicleCard() {
-    final hasPhoto = job.vehicle.photoUrl != null && job.vehicle.photoUrl!.isNotEmpty;
-    final photoUrl = hasPhoto ? '${AppConfig.apiBaseUrl}${job.vehicle.photoUrl}' : null;
+    final hasPhoto =
+        job.vehicle.photoUrl != null && job.vehicle.photoUrl!.isNotEmpty;
+    final photoUrl =
+        hasPhoto ? '${AppConfig.apiBaseUrl}${job.vehicle.photoUrl}' : null;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -579,7 +582,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                           color: AppTheme.textTertiary, size: 48),
                       const SizedBox(height: 8),
                       Text('Photo non disponible',
-                          style: AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary)),
+                          style: AppTheme.bodySmall
+                              .copyWith(color: AppTheme.textTertiary)),
                     ],
                   ),
                 ),
@@ -670,12 +674,14 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if (job.vehicle.color != null || job.vehicle.licensePlate != null) ...[
+                    if (job.vehicle.color != null ||
+                        job.vehicle.licensePlate != null) ...[
                       const SizedBox(height: 4),
                       Text(
                         [
                           if (job.vehicle.color != null) job.vehicle.color,
-                          if (job.vehicle.licensePlate != null) job.vehicle.licensePlate,
+                          if (job.vehicle.licensePlate != null)
+                            job.vehicle.licensePlate,
                         ].join(' • '),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.8),
@@ -1325,8 +1331,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   decoration: BoxDecoration(
                     color: AppTheme.warningLight,
                     borderRadius: BorderRadius.circular(8),
-                    border:
-                        Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppTheme.warning.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: const [

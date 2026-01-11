@@ -8,11 +8,13 @@ class UserPreferencesModel extends UserPreferences {
   });
 
   factory UserPreferencesModel.fromJson(Map<String, dynamic> json) {
-    final notificationSettings = json['notificationSettings'] as Map<String, dynamic>?;
+    final notificationSettings =
+        json['notificationSettings'] as Map<String, dynamic>?;
     final userPreferences = json['userPreferences'] as Map<String, dynamic>?;
 
     return UserPreferencesModel(
-      pushNotificationsEnabled: notificationSettings?['pushEnabled'] as bool? ?? true,
+      pushNotificationsEnabled:
+          notificationSettings?['pushEnabled'] as bool? ?? true,
       soundEnabled: userPreferences?['soundEnabled'] as bool? ?? true,
       darkThemeEnabled: userPreferences?['darkThemeEnabled'] as bool? ?? true,
     );

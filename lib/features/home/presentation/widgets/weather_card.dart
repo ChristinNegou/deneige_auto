@@ -185,7 +185,10 @@ class WeatherCard extends StatelessWidget {
       case 'snowy':
         return [AppTheme.info.withValues(alpha: 0.7), AppTheme.info];
       case 'fog':
-        return [AppTheme.textSecondary.withValues(alpha: 0.7), AppTheme.textSecondary];
+        return [
+          AppTheme.textSecondary.withValues(alpha: 0.7),
+          AppTheme.textSecondary
+        ];
       default:
         return [AppTheme.info.withValues(alpha: 0.8), AppTheme.info];
     }

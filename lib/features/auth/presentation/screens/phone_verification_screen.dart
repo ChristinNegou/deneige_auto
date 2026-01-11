@@ -281,7 +281,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                     decoration: BoxDecoration(
                       color: AppTheme.warningLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.warning.withValues(alpha: 0.5)),
+                      border: Border.all(
+                          color: AppTheme.warning.withValues(alpha: 0.5)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -365,7 +366,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                     decoration: BoxDecoration(
                       color: AppTheme.errorLight,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AppTheme.error.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -454,7 +456,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                 // Modifier le numéro
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.edit, size: 18, color: AppTheme.textSecondary),
+                  icon:
+                      Icon(Icons.edit, size: 18, color: AppTheme.textSecondary),
                   label: Text(
                     'Modifier le numéro',
                     style: TextStyle(color: AppTheme.textSecondary),

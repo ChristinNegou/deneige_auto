@@ -370,7 +370,8 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
         children: [
           Row(
             children: [
-              Icon(Icons.directions_car, color: AppTheme.textSecondary, size: 20),
+              Icon(Icons.directions_car,
+                  color: AppTheme.textSecondary, size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -593,7 +594,8 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: _showCustomTip ? AppTheme.textPrimary : AppTheme.surfaceContainer,
+          color:
+              _showCustomTip ? AppTheme.textPrimary : AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: _showCustomTip ? AppTheme.textPrimary : AppTheme.border,

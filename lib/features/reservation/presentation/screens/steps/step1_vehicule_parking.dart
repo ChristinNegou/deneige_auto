@@ -249,7 +249,9 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
               children: [
                 Icon(icon,
                     size: 20,
-                    color: isSelected ? AppTheme.textPrimary : AppTheme.textTertiary),
+                    color: isSelected
+                        ? AppTheme.textPrimary
+                        : AppTheme.textTertiary),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -267,7 +269,8 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                       ),
                       Text(
                         subtitle,
-                        style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                        style: TextStyle(
+                            fontSize: 12, color: AppTheme.textTertiary),
                       ),
                     ],
                   ),
@@ -277,9 +280,11 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                   height: 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isSelected ? AppTheme.textPrimary : Colors.transparent,
+                    color:
+                        isSelected ? AppTheme.textPrimary : Colors.transparent,
                     border: Border.all(
-                      color: isSelected ? AppTheme.textPrimary : AppTheme.border,
+                      color:
+                          isSelected ? AppTheme.textPrimary : AppTheme.border,
                       width: 1.5,
                     ),
                   ),
@@ -385,9 +390,8 @@ class _VehicleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasPhoto = vehicle.photoUrl != null && vehicle.photoUrl!.isNotEmpty;
-    final photoUrl = hasPhoto
-        ? '${AppConfig.apiBaseUrl}${vehicle.photoUrl}'
-        : null;
+    final photoUrl =
+        hasPhoto ? '${AppConfig.apiBaseUrl}${vehicle.photoUrl}' : null;
 
     return GestureDetector(
       onTap: onTap,
@@ -457,19 +461,23 @@ class _VehicleCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: _getColor(vehicle.color),
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppTheme.border, width: 0.5),
+                          border:
+                              Border.all(color: AppTheme.border, width: 0.5),
                         ),
                       ),
                       const SizedBox(width: 6),
                       Text(
                         vehicle.color,
-                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                        style: TextStyle(
+                            fontSize: 12, color: AppTheme.textSecondary),
                       ),
                       if (vehicle.licensePlate != null) ...[
-                        Text(' · ', style: TextStyle(color: AppTheme.textTertiary)),
+                        Text(' · ',
+                            style: TextStyle(color: AppTheme.textTertiary)),
                         Text(
                           vehicle.licensePlate!,
-                          style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                          style: TextStyle(
+                              fontSize: 12, color: AppTheme.textSecondary),
                         ),
                       ],
                     ],

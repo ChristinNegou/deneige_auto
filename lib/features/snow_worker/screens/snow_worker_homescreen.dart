@@ -519,8 +519,9 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                             ? 'Vous etes disponible'
                             : 'Vous etes hors ligne',
                         style: TextStyle(
-                          color:
-                              isAvailable ? AppTheme.background : AppTheme.textPrimary,
+                          color: isAvailable
+                              ? AppTheme.background
+                              : AppTheme.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                         ),
@@ -559,7 +560,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                                 .add(const ToggleAvailability());
                           },
                     activeColor: AppTheme.background,
-                    activeTrackColor: AppTheme.background.withValues(alpha: 0.3),
+                    activeTrackColor:
+                        AppTheme.background.withValues(alpha: 0.3),
                     inactiveThumbColor: AppTheme.textTertiary,
                     inactiveTrackColor: AppTheme.border,
                   ),
@@ -1164,7 +1166,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.refresh_rounded, color: AppTheme.background, size: 18),
+                  Icon(Icons.refresh_rounded,
+                      color: AppTheme.background, size: 18),
                   SizedBox(width: 8),
                   Text(
                     'Reessayer',

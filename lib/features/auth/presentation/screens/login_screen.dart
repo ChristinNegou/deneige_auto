@@ -182,8 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (value == null || value.isEmpty) {
                 return 'Veuillez entrer votre email';
               }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$')
-                  .hasMatch(value)) {
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(value)) {
                 return 'Email invalide';
               }
               return null;

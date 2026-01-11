@@ -56,8 +56,13 @@ class UpdateProfile extends WorkerAvailabilityEvent {
   });
 
   @override
-  List<Object?> get props =>
-      [preferredZones, equipmentList, vehicleType, maxActiveJobs, notificationPreferences];
+  List<Object?> get props => [
+        preferredZones,
+        equipmentList,
+        vehicleType,
+        maxActiveJobs,
+        notificationPreferences
+      ];
 }
 
 class UploadProfilePhoto extends WorkerAvailabilityEvent {

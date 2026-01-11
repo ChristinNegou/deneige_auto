@@ -280,9 +280,8 @@ class VehiclesListView extends StatelessWidget {
 
   Widget _buildVehiclePhoto(BuildContext context, Vehicle vehicle) {
     final hasPhoto = vehicle.photoUrl != null && vehicle.photoUrl!.isNotEmpty;
-    final photoUrl = hasPhoto
-        ? '${AppConfig.apiBaseUrl}${vehicle.photoUrl}'
-        : null;
+    final photoUrl =
+        hasPhoto ? '${AppConfig.apiBaseUrl}${vehicle.photoUrl}' : null;
 
     return GestureDetector(
       onTap: () => _showPhotoOptions(context, vehicle),
@@ -378,7 +377,8 @@ class VehiclesListView extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Cette photo sera visible par le déneigeur',
-                  style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                  style: AppTheme.bodySmall
+                      .copyWith(color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 20),
                 ListTile(
@@ -389,12 +389,14 @@ class VehiclesListView extends StatelessWidget {
                       color: AppTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
+                    child: const Icon(Icons.camera_alt_rounded,
+                        color: AppTheme.primary),
                   ),
                   title: const Text('Prendre une photo'),
                   subtitle: Text(
                     'Utiliser l\'appareil photo',
-                    style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                    style: AppTheme.bodySmall
+                        .copyWith(color: AppTheme.textSecondary),
                   ),
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
@@ -409,12 +411,14 @@ class VehiclesListView extends StatelessWidget {
                       color: AppTheme.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.photo_library_rounded, color: AppTheme.info),
+                    child: const Icon(Icons.photo_library_rounded,
+                        color: AppTheme.info),
                   ),
                   title: const Text('Choisir une photo'),
                   subtitle: Text(
                     'Depuis la galerie',
-                    style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                    style: AppTheme.bodySmall
+                        .copyWith(color: AppTheme.textSecondary),
                   ),
                   onTap: () {
                     Navigator.pop(bottomSheetContext);
@@ -445,8 +449,8 @@ class VehiclesListView extends StatelessWidget {
     if (pickedFile != null && context.mounted) {
       final file = File(pickedFile.path);
       context.read<VehicleBloc>().add(
-        UploadVehiclePhoto(vehicleId: vehicle.id, photo: file),
-      );
+            UploadVehiclePhoto(vehicleId: vehicle.id, photo: file),
+          );
     }
   }
 

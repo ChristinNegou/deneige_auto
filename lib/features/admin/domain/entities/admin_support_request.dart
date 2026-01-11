@@ -112,7 +112,8 @@ class AdminSupportRequest {
       userId: json['userId']?.toString() ?? '',
       userEmail: json['userEmail']?.toString() ?? '',
       userName: json['userName']?.toString() ?? '',
-      subject: SupportSubject.fromString(json['subject']?.toString() ?? 'other'),
+      subject:
+          SupportSubject.fromString(json['subject']?.toString() ?? 'other'),
       message: json['message']?.toString() ?? '',
       status: SupportStatus.fromString(json['status']?.toString() ?? 'pending'),
       adminNotes: json['adminNotes']?.toString(),

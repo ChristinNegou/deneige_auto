@@ -85,7 +85,8 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                 decoration: BoxDecoration(
                   color: AppTheme.successLight,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: AppTheme.success.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -157,7 +158,9 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                       padding: const EdgeInsets.all(8),
                       child: Icon(
                         isSelected ? Icons.star : Icons.star_border,
-                        color: isSelected ? AppTheme.warning : AppTheme.textTertiary,
+                        color: isSelected
+                            ? AppTheme.warning
+                            : AppTheme.textTertiary,
                         size: 44,
                       ),
                     ),
@@ -281,7 +284,8 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
                   decoration: BoxDecoration(
                     color: AppTheme.successLight,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppTheme.success.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -415,7 +419,8 @@ class _RatingTipDialogState extends State<RatingTipDialog> {
         margin: const EdgeInsets.symmetric(horizontal: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: _showCustomTip ? AppTheme.textPrimary : AppTheme.surfaceContainer,
+          color:
+              _showCustomTip ? AppTheme.textPrimary : AppTheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: _showCustomTip ? AppTheme.textPrimary : AppTheme.border,

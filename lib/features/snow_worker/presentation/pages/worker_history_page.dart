@@ -350,7 +350,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? AppTheme.background : AppTheme.textSecondary,
+                color:
+                    isSelected ? AppTheme.background : AppTheme.textSecondary,
               ),
             ),
           ],
@@ -506,7 +507,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.refresh_rounded, color: AppTheme.background, size: 20),
+                    Icon(Icons.refresh_rounded,
+                        color: AppTheme.background, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Reessayer',

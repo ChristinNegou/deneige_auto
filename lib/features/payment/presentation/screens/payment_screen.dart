@@ -224,7 +224,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Center(
-                child: Icon(Icons.credit_card, size: 18, color: AppTheme.textSecondary),
+                child: Icon(Icons.credit_card,
+                    size: 18, color: AppTheme.textSecondary),
               ),
             ),
             const SizedBox(width: 12),
@@ -268,7 +269,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(height: 2),
                   Text(
                     'Expire ${method.expMonth.toString().padLeft(2, '0')}/${method.expYear}',
-                    style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                    style:
+                        TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                   ),
                 ],
               ),
@@ -375,7 +377,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 const SizedBox(height: 2),
                 Text(
                   'SSL 256-bit · PCI DSS · Propulsé par Stripe',
-                  style: TextStyle(fontSize: 11, color: AppTheme.info.withValues(alpha: 0.8)),
+                  style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.info.withValues(alpha: 0.8)),
                 ),
               ],
             ),
@@ -442,7 +446,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       child: Text(
         text,
         style: TextStyle(
-            fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textSecondary),
       ),
     );
   }

@@ -57,7 +57,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               if (state is ResetPasswordSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Mot de passe réinitialisé avec succès !'),
+                    content:
+                        const Text('Mot de passe réinitialisé avec succès !'),
                     backgroundColor: AppTheme.success,
                   ),
                 );
@@ -96,7 +97,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       Icon(
                         isSuccess ? Icons.check_circle : Icons.lock_reset,
                         size: 80,
-                        color: isSuccess ? AppTheme.success : AppTheme.textPrimary,
+                        color:
+                            isSuccess ? AppTheme.success : AppTheme.textPrimary,
                       ),
                       const SizedBox(height: 16),
 

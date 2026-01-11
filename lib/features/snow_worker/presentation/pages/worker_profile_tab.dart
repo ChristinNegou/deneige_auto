@@ -137,7 +137,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
           }
 
           // Initialize from profile when loaded (use addPostFrameCallback to avoid setState during build)
-          if (state is WorkerAvailabilityLoaded && state.profile != null && !_initialized) {
+          if (state is WorkerAvailabilityLoaded &&
+              state.profile != null &&
+              !_initialized) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
                 _initializeFromProfile(state.profile!);
@@ -290,10 +292,12 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                           height: 70,
                           decoration: BoxDecoration(
                             color: AppTheme.background.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMD),
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMD),
                             child: _isUploadingPhoto
                                 ? Center(
                                     child: SizedBox(
@@ -335,7 +339,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.shadowColor.withValues(alpha: 0.2),
+                                  color: AppTheme.shadowColor
+                                      .withValues(alpha: 0.2),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),
@@ -371,14 +376,16 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                               Icon(
                                 Icons.email_outlined,
                                 size: 14,
-                                color: AppTheme.background.withValues(alpha: 0.8),
+                                color:
+                                    AppTheme.background.withValues(alpha: 0.8),
                               ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   userEmail,
                                   style: TextStyle(
-                                    color: AppTheme.background.withValues(alpha: 0.9),
+                                    color: AppTheme.background
+                                        .withValues(alpha: 0.9),
                                     fontSize: 13,
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -393,13 +400,15 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                               Icon(
                                 Icons.phone_outlined,
                                 size: 14,
-                                color: AppTheme.background.withValues(alpha: 0.8),
+                                color:
+                                    AppTheme.background.withValues(alpha: 0.8),
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 userPhone,
                                 style: TextStyle(
-                                  color: AppTheme.background.withValues(alpha: 0.9),
+                                  color: AppTheme.background
+                                      .withValues(alpha: 0.9),
                                   fontSize: 13,
                                 ),
                               ),
@@ -466,7 +475,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     color: AppTheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
-                  child: Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
+                  child:
+                      Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
                 ),
                 title: const Text('Prendre une photo'),
                 subtitle: Text(
@@ -487,7 +497,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     color: AppTheme.secondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
-                  child: Icon(Icons.photo_library_rounded, color: AppTheme.secondary),
+                  child: Icon(Icons.photo_library_rounded,
+                      color: AppTheme.secondary),
                 ),
                 title: const Text('Choisir une photo'),
                 subtitle: Text(

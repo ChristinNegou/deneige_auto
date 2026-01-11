@@ -23,7 +23,8 @@ class ConnectivityService {
 
   /// File d'attente des opérations hors-ligne
   final List<PendingOperation> _pendingOperations = [];
-  List<PendingOperation> get pendingOperations => List.unmodifiable(_pendingOperations);
+  List<PendingOperation> get pendingOperations =>
+      List.unmodifiable(_pendingOperations);
 
   /// Initialise le service de connectivité
   Future<void> initialize() async {
@@ -32,12 +33,14 @@ class ConnectivityService {
     _updateConnectionStatus(result);
 
     // Écouter les changements
-    _subscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _subscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
 
   void _updateConnectionStatus(List<ConnectivityResult> results) {
     final wasConnected = _isConnected;
-    _isConnected = results.isNotEmpty && !results.contains(ConnectivityResult.none);
+    _isConnected =
+        results.isNotEmpty && !results.contains(ConnectivityResult.none);
 
     if (_isConnected != wasConnected) {
       _connectionStatusController.add(_isConnected);
@@ -64,7 +67,8 @@ class ConnectivityService {
   void addPendingOperation(PendingOperation operation) {
     _pendingOperations.add(operation);
     if (kDebugMode) {
-      print('Added pending operation: ${operation.type} - ${_pendingOperations.length} in queue');
+      print(
+          'Added pending operation: ${operation.type} - ${_pendingOperations.length} in queue');
     }
   }
 
@@ -91,11 +95,13 @@ class ConnectivityService {
           operation.retryCount++;
           _pendingOperations.add(operation);
           if (kDebugMode) {
-            print('Re-queued failed operation: ${operation.type} (attempt ${operation.retryCount})');
+            print(
+                'Re-queued failed operation: ${operation.type} (attempt ${operation.retryCount})');
           }
         } else {
           if (kDebugMode) {
-            print('Failed to execute operation after max retries: ${operation.type}');
+            print(
+                'Failed to execute operation after max retries: ${operation.type}');
           }
         }
       }
@@ -141,7 +147,8 @@ class PendingOperation {
   }) : createdAt = DateTime.now();
 
   @override
-  String toString() => 'PendingOperation($type, retries: $retryCount/$maxRetries)';
+  String toString() =>
+      'PendingOperation($type, retries: $retryCount/$maxRetries)';
 }
 
 /// Extension pour faciliter l'ajout d'opérations

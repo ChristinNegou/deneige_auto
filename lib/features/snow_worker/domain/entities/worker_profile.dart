@@ -154,7 +154,8 @@ class WorkerProfile extends Equatable {
       maxActiveJobs: maxActiveJobs ?? this.maxActiveJobs,
       vehicleType: vehicleType ?? this.vehicleType,
       equipmentList: equipmentList ?? this.equipmentList,
-      notificationPreferences: notificationPreferences ?? this.notificationPreferences,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
       totalJobsCompleted: totalJobsCompleted ?? this.totalJobsCompleted,
       totalEarnings: totalEarnings ?? this.totalEarnings,
       totalTipsReceived: totalTipsReceived ?? this.totalTipsReceived,

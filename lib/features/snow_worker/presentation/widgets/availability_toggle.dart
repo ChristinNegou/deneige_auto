@@ -22,14 +22,18 @@ class AvailabilityToggle extends StatelessWidget {
         gradient: LinearGradient(
           colors: isAvailable
               ? [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)]
-              : [AppTheme.textTertiary, AppTheme.textTertiary.withValues(alpha: 0.7)],
+              : [
+                  AppTheme.textTertiary,
+                  AppTheme.textTertiary.withValues(alpha: 0.7)
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: (isAvailable ? AppTheme.success : AppTheme.textTertiary).withValues(alpha: 0.3),
+            color: (isAvailable ? AppTheme.success : AppTheme.textTertiary)
+                .withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

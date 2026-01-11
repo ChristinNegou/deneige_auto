@@ -143,9 +143,8 @@ class ReservationListBloc
       (reservations) {
         // Filtrer pour afficher uniquement les réservations actives
         // Utilise isUpcoming qui inclut les réservations récentes même si departureTime passé
-        final activeReservations = reservations
-            .where((r) => r.isUpcoming)
-            .toList();
+        final activeReservations =
+            reservations.where((r) => r.isUpcoming).toList();
 
         emit(state.copyWith(
           isLoading: false,
@@ -167,9 +166,8 @@ class ReservationListBloc
       (reservations) {
         // Filtrer pour afficher uniquement les réservations actives
         // Utilise isUpcoming qui inclut les réservations récentes même si departureTime passé
-        final activeReservations = reservations
-            .where((r) => r.isUpcoming)
-            .toList();
+        final activeReservations =
+            reservations.where((r) => r.isUpcoming).toList();
 
         emit(state.copyWith(
           reservations: activeReservations,

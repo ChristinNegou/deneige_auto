@@ -253,13 +253,16 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                   children: [
                     Text(
                       DateFormat('dd MMM, HH:mm').format(payment.createdAt),
-                      style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                      style:
+                          TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                     ),
                     if (payment.last4 != null) ...[
-                      Text(' · ', style: TextStyle(color: AppTheme.textTertiary)),
+                      Text(' · ',
+                          style: TextStyle(color: AppTheme.textTertiary)),
                       Text(
                         '•••• ${payment.last4}',
-                        style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
+                        style: TextStyle(
+                            fontSize: 12, color: AppTheme.textTertiary),
                       ),
                     ],
                   ],
@@ -476,7 +479,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                   'Expire ${method.expiryDisplay}',
                   style: TextStyle(
                     fontSize: 12,
-                    color: method.isExpired ? AppTheme.error : AppTheme.textTertiary,
+                    color: method.isExpired
+                        ? AppTheme.error
+                        : AppTheme.textTertiary,
                   ),
                 ),
               ],
@@ -505,7 +510,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                 ),
               PopupMenuItem(
                 value: 'delete',
-                child: Text('Supprimer', style: TextStyle(color: AppTheme.error)),
+                child:
+                    Text('Supprimer', style: TextStyle(color: AppTheme.error)),
               ),
             ],
           ),

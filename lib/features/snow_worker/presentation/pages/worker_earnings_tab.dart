@@ -335,7 +335,10 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppTheme.success, AppTheme.success.withValues(alpha: 0.8)],
+              colors: [
+                AppTheme.success,
+                AppTheme.success.withValues(alpha: 0.8)
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

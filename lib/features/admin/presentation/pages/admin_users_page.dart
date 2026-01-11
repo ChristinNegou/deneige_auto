@@ -310,8 +310,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         ],
                         if (user.role == 'snowWorker' &&
                             user.workerProfile != null) ...[
-                          Icon(Icons.star,
-                              size: 14, color: AppTheme.warning),
+                          Icon(Icons.star, size: 14, color: AppTheme.warning),
                           const SizedBox(width: 2),
                           Text(
                             user.workerProfile!.averageRating
@@ -513,7 +512,8 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                     decoration: BoxDecoration(
                       color: AppTheme.errorLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AppTheme.error.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

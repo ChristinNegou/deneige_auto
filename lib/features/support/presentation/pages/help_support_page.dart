@@ -306,8 +306,7 @@ class _ContactTabState extends State<_ContactTab> {
                           value: subject,
                           child: Text(
                             subject.label,
-                            style:
-                                const TextStyle(color: AppTheme.textPrimary),
+                            style: const TextStyle(color: AppTheme.textPrimary),
                           ),
                         );
                       }).toList(),
@@ -340,7 +339,8 @@ class _ContactTabState extends State<_ContactTab> {
                   maxLength: 2000,
                   style: const TextStyle(color: AppTheme.textPrimary),
                   decoration: InputDecoration(
-                    hintText: 'Décrivez votre problème ou question en détail...',
+                    hintText:
+                        'Décrivez votre problème ou question en détail...',
                     hintStyle: const TextStyle(color: AppTheme.textTertiary),
                     filled: true,
                     fillColor: AppTheme.surfaceContainer,
@@ -356,8 +356,7 @@ class _ContactTabState extends State<_ContactTab> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppTheme.primary),
                     ),
-                    counterStyle:
-                        const TextStyle(color: AppTheme.textTertiary),
+                    counterStyle: const TextStyle(color: AppTheme.textTertiary),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {

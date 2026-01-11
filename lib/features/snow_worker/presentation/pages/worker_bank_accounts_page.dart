@@ -90,7 +90,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Annuler', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text('Annuler',
+                style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -335,7 +336,9 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDefault ? AppTheme.primary.withValues(alpha: 0.5) : AppTheme.border,
+          color: isDefault
+              ? AppTheme.primary.withValues(alpha: 0.5)
+              : AppTheme.border,
           width: isDefault ? 2 : 1,
         ),
       ),
@@ -378,7 +381,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                         ),
                         if (isDefault)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
                               color: AppTheme.primary,
                               borderRadius: BorderRadius.circular(20),
@@ -407,7 +411,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: AppTheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(4),
@@ -425,7 +430,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                         Icon(
                           isVerified ? Icons.verified : Icons.pending,
                           size: 14,
-                          color: isVerified ? AppTheme.success : AppTheme.warning,
+                          color:
+                              isVerified ? AppTheme.success : AppTheme.warning,
                         ),
                       ],
                     ),
@@ -461,7 +467,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                     ),
                     child: const Text(
                       'Definir comme principal',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -653,16 +660,19 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                         decoration: BoxDecoration(
                           color: AppTheme.errorLight,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                          border: Border.all(
+                              color: AppTheme.error.withValues(alpha: 0.3)),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.error_outline, color: AppTheme.error, size: 20),
+                            Icon(Icons.error_outline,
+                                color: AppTheme.error, size: 20),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 _errorMessage!,
-                                style: TextStyle(fontSize: 13, color: AppTheme.error),
+                                style: TextStyle(
+                                    fontSize: 13, color: AppTheme.error),
                               ),
                             ),
                           ],
@@ -702,7 +712,9 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                                       : AppTheme.surface,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: isSelected ? AppTheme.primary : AppTheme.border,
+                                    color: isSelected
+                                        ? AppTheme.primary
+                                        : AppTheme.border,
                                     width: isSelected ? 2 : 1,
                                   ),
                                 ),
@@ -711,7 +723,9 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                                   children: [
                                     Icon(
                                       Icons.account_balance,
-                                      color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
+                                      color: isSelected
+                                          ? AppTheme.primary
+                                          : AppTheme.textSecondary,
                                       size: 28,
                                     ),
                                     const SizedBox(height: 8),
@@ -719,8 +733,12 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                                       bank['name'].toString().split(' ').first,
                                       style: TextStyle(
                                         fontSize: 11,
-                                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                        color: isSelected ? AppTheme.primary : AppTheme.textPrimary,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w500,
+                                        color: isSelected
+                                            ? AppTheme.primary
+                                            : AppTheme.textPrimary,
                                       ),
                                       textAlign: TextAlign.center,
                                       maxLines: 2,
@@ -747,7 +765,8 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                       controller: _accountHolderNameController,
                       decoration: InputDecoration(
                         labelText: 'Nom du titulaire',
-                        hintText: 'Nom complet tel qu\'il apparait sur le compte',
+                        hintText:
+                            'Nom complet tel qu\'il apparait sur le compte',
                         filled: true,
                         fillColor: AppTheme.surface,
                         border: OutlineInputBorder(
@@ -760,7 +779,8 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: AppTheme.primary, width: 2),
+                          borderSide:
+                              BorderSide(color: AppTheme.primary, width: 2),
                         ),
                       ),
                       textCapitalization: TextCapitalization.words,
@@ -790,9 +810,11 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: AppTheme.primary, width: 2),
+                          borderSide:
+                              BorderSide(color: AppTheme.primary, width: 2),
                         ),
-                        prefixIcon: Icon(Icons.business, color: AppTheme.textSecondary),
+                        prefixIcon:
+                            Icon(Icons.business, color: AppTheme.textSecondary),
                       ),
                       keyboardType: TextInputType.number,
                       inputFormatters: [
@@ -825,9 +847,11 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: AppTheme.primary, width: 2),
+                          borderSide:
+                              BorderSide(color: AppTheme.primary, width: 2),
                         ),
-                        prefixIcon: Icon(Icons.pin, color: AppTheme.textSecondary),
+                        prefixIcon:
+                            Icon(Icons.pin, color: AppTheme.textSecondary),
                       ),
                       keyboardType: TextInputType.number,
                       inputFormatters: [
@@ -860,9 +884,11 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: AppTheme.primary, width: 2),
+                          borderSide:
+                              BorderSide(color: AppTheme.primary, width: 2),
                         ),
-                        prefixIcon: Icon(Icons.credit_card, color: AppTheme.textSecondary),
+                        prefixIcon: Icon(Icons.credit_card,
+                            color: AppTheme.textSecondary),
                       ),
                       keyboardType: TextInputType.number,
                       inputFormatters: [
@@ -931,16 +957,19 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                       decoration: BoxDecoration(
                         color: AppTheme.successLight,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppTheme.success.withValues(alpha: 0.2)),
+                        border: Border.all(
+                            color: AppTheme.success.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.lock_outline, color: AppTheme.success, size: 20),
+                          Icon(Icons.lock_outline,
+                              color: AppTheme.success, size: 20),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               'Vos informations bancaires sont securisees et encryptees par Stripe',
-                              style: TextStyle(fontSize: 12, color: AppTheme.success),
+                              style: TextStyle(
+                                  fontSize: 12, color: AppTheme.success),
                             ),
                           ),
                         ],
@@ -971,7 +1000,8 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    disabledBackgroundColor: AppTheme.primary.withValues(alpha: 0.5),
+                    disabledBackgroundColor:
+                        AppTheme.primary.withValues(alpha: 0.5),
                   ),
                   child: _isLoading
                       ? const SizedBox(
@@ -984,7 +1014,8 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
                         )
                       : const Text(
                           'Ajouter le compte',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                 ),
               ),

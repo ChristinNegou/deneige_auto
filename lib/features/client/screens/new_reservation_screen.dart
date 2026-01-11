@@ -204,11 +204,14 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.textPrimary : AppTheme.textPrimary.withValues(alpha: 0.1),
+          color: isSelected
+              ? AppTheme.textPrimary
+              : AppTheme.textPrimary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color:
-                isSelected ? service['color'] : AppTheme.textPrimary.withValues(alpha: 0.3),
+            color: isSelected
+                ? service['color']
+                : AppTheme.textPrimary.withValues(alpha: 0.3),
             width: 2,
           ),
         ),
@@ -236,7 +239,9 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? AppTheme.shadowColor : AppTheme.textPrimary,
+                      color: isSelected
+                          ? AppTheme.shadowColor
+                          : AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -244,7 +249,9 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
                     service['description'],
                     style: TextStyle(
                       fontSize: 14,
-                      color: isSelected ? AppTheme.textSecondary : AppTheme.textSecondary,
+                      color: isSelected
+                          ? AppTheme.textSecondary
+                          : AppTheme.textSecondary,
                     ),
                   ),
                 ],
@@ -543,11 +550,13 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
             fillColor: AppTheme.textPrimary,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppTheme.textTertiary.withValues(alpha: 0.3)),
+              borderSide: BorderSide(
+                  color: AppTheme.textTertiary.withValues(alpha: 0.3)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppTheme.textTertiary.withValues(alpha: 0.3)),
+              borderSide: BorderSide(
+                  color: AppTheme.textTertiary.withValues(alpha: 0.3)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

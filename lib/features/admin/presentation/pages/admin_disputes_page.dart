@@ -104,9 +104,8 @@ class _AdminDisputesPageState extends State<AdminDisputesPage>
                   children: [
                     _buildDisputesList(
                         _disputes.where((d) => _isOpen(d['status'])).toList()),
-                    _buildDisputesList(_disputes
-                        .where((d) => !_isOpen(d['status']))
-                        .toList()),
+                    _buildDisputesList(
+                        _disputes.where((d) => !_isOpen(d['status'])).toList()),
                     _buildStatsTab(),
                   ],
                 ),

@@ -89,11 +89,11 @@ class JobPhoto extends Equatable {
 
 /// Types d'équipement disponibles pour les déneigeurs
 enum EquipmentType {
-  shovel,       // Pelle à neige
-  brush,        // Balai à neige
-  iceScraper,   // Grattoir à glace
+  shovel, // Pelle à neige
+  brush, // Balai à neige
+  iceScraper, // Grattoir à glace
   saltSpreader, // Épandeur de sel
-  snowBlower,   // Souffleuse
+  snowBlower, // Souffleuse
 }
 
 /// Extension pour obtenir les labels d'équipement

@@ -128,13 +128,16 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: hasDate ? AppTheme.textPrimary : AppTheme.textTertiary,
+                      color: hasDate
+                          ? AppTheme.textPrimary
+                          : AppTheme.textTertiary,
                     ),
                   ),
                   if (hasDate)
                     Text(
                       DateFormat('yyyy').format(selectedDate!),
-                      style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                      style: TextStyle(
+                          fontSize: 13, color: AppTheme.textSecondary),
                     ),
                 ],
               ),
@@ -224,7 +227,8 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? AppTheme.background : AppTheme.textSecondary,
+                color:
+                    isSelected ? AppTheme.background : AppTheme.textSecondary,
               ),
             ),
           ),

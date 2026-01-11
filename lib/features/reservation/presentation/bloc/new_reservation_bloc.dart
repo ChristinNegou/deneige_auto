@@ -433,7 +433,8 @@ class NewReservationBloc
       return;
     }
 
-    print('📝 [NewReservationBloc] Création réservation - paymentIntentId: ${event.paymentIntentId}');
+    print(
+        '📝 [NewReservationBloc] Création réservation - paymentIntentId: ${event.paymentIntentId}');
 
     // Vérifier que le véhicule est sélectionné
     if (state.selectedVehicle == null) {

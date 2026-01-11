@@ -235,7 +235,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.check_circle, color: AppTheme.background, size: 20),
+                  const Icon(Icons.check_circle,
+                      color: AppTheme.background, size: 20),
                   const SizedBox(width: 12),
                   Text(_getSuccessMessage(state.action)),
                 ],
@@ -438,7 +439,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.timer_outlined, color: AppTheme.background.withValues(alpha: 0.7), size: 18),
+              Icon(Icons.timer_outlined,
+                  color: AppTheme.background.withValues(alpha: 0.7), size: 18),
               const SizedBox(width: 8),
               Text(
                 'Temps écoulé',
@@ -711,7 +713,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
 
   Widget _buildVehicleCard() {
     final hasPhoto = _currentJob.vehicle.photoUrl != null &&
-                     _currentJob.vehicle.photoUrl!.isNotEmpty;
+        _currentJob.vehicle.photoUrl!.isNotEmpty;
     final photoUrl = hasPhoto
         ? '${AppConfig.apiBaseUrl}${_currentJob.vehicle.photoUrl}'
         : null;
@@ -770,12 +772,14 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   children: [
                     Text(
                       _currentJob.vehicle.displayName,
-                      style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                      style: AppTheme.labelLarge
+                          .copyWith(fontWeight: FontWeight.w600),
                     ),
                     if (_currentJob.vehicle.licensePlate != null)
                       Container(
                         margin: const EdgeInsets.only(top: 6),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppTheme.background,
                           borderRadius: BorderRadius.circular(6),
@@ -793,7 +797,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               ),
               if (_currentJob.vehicle.color != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppTheme.infoLight,
                     borderRadius: BorderRadius.circular(AppTheme.radiusFull),
@@ -829,17 +834,18 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                       imageUrl: photoUrl,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(color: AppTheme.secondary),
+                        child: CircularProgressIndicator(
+                            color: AppTheme.secondary),
                       ),
                       errorWidget: (context, url, error) => Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.broken_image_rounded,
-                               color: AppTheme.textTertiary, size: 40),
+                              color: AppTheme.textTertiary, size: 40),
                           const SizedBox(height: 8),
                           Text('Photo non disponible',
-                               style: AppTheme.bodySmall.copyWith(
-                                 color: AppTheme.textTertiary)),
+                              style: AppTheme.bodySmall
+                                  .copyWith(color: AppTheme.textTertiary)),
                         ],
                       ),
                     ),
@@ -847,7 +853,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                       right: 8,
                       bottom: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.black54,
                           borderRadius: BorderRadius.circular(4),
@@ -859,7 +866,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                             const SizedBox(width: 4),
                             Text(
                               'Agrandir',
-                              style: TextStyle(color: Colors.white, fontSize: 11),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 11),
                             ),
                           ],
                         ),
@@ -949,7 +957,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                       const SizedBox(height: 4),
                       Text(
                         [
-                          if (_currentJob.vehicle.color != null) _currentJob.vehicle.color,
+                          if (_currentJob.vehicle.color != null)
+                            _currentJob.vehicle.color,
                           if (_currentJob.vehicle.licensePlate != null)
                             _currentJob.vehicle.licensePlate,
                         ].join(' • '),

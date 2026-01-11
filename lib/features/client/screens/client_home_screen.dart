@@ -508,7 +508,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.background.withValues(alpha: 0.5),
+                                  color: AppTheme.background
+                                      .withValues(alpha: 0.5),
                                   blurRadius: 4,
                                 ),
                               ],
@@ -944,7 +945,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.add, color: AppTheme.background, size: 28),
+                  child: const Icon(Icons.add,
+                      color: AppTheme.background, size: 28),
                 ),
               ),
               _buildNavItem(

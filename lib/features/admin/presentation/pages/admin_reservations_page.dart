@@ -90,13 +90,16 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
           children: [
             _buildStatusChip(context, 'Toutes', null),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'En attente', 'pending', AppTheme.warning),
+            _buildStatusChip(
+                context, 'En attente', 'pending', AppTheme.warning),
             const SizedBox(width: 8),
             _buildStatusChip(context, 'Assignées', 'assigned', AppTheme.info),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'En cours', 'inProgress', AppTheme.primary2),
+            _buildStatusChip(
+                context, 'En cours', 'inProgress', AppTheme.primary2),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'Terminées', 'completed', AppTheme.success),
+            _buildStatusChip(
+                context, 'Terminées', 'completed', AppTheme.success),
             const SizedBox(width: 8),
             _buildStatusChip(context, 'Annulées', 'cancelled', AppTheme.error),
           ],
@@ -539,7 +542,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                     decoration: BoxDecoration(
                       color: AppTheme.errorLight,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AppTheme.error.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -113,7 +113,9 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
             }
 
             // Initialize from profile when loaded (use addPostFrameCallback to avoid setState during build)
-            if (state is WorkerAvailabilityLoaded && state.profile != null && !_initialized) {
+            if (state is WorkerAvailabilityLoaded &&
+                state.profile != null &&
+                !_initialized) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted) {
                   _initializeFromProfile(state.profile!);

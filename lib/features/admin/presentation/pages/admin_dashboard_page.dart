@@ -59,8 +59,7 @@ class AdminDashboardPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline,
-                      size: 64, color: AppTheme.error),
+                  Icon(Icons.error_outline, size: 64, color: AppTheme.error),
                   const SizedBox(height: 16),
                   Text(state.errorMessage ?? 'Erreur de chargement'),
                   const SizedBox(height: 16),
@@ -264,12 +263,15 @@ class AdminDashboardPage extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: isLogout ? AppTheme.error : (isSelected ? AppTheme.primary : null),
+        color:
+            isLogout ? AppTheme.error : (isSelected ? AppTheme.primary : null),
       ),
       title: Text(
         title,
         style: TextStyle(
-          color: isLogout ? AppTheme.error : (isSelected ? AppTheme.primary : null),
+          color: isLogout
+              ? AppTheme.error
+              : (isSelected ? AppTheme.primary : null),
           fontWeight: isSelected ? FontWeight.bold : null,
         ),
       ),
@@ -611,8 +613,7 @@ class AdminDashboardPage extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.new_releases,
-                        color: AppTheme.info, size: 18),
+                    Icon(Icons.new_releases, color: AppTheme.info, size: 18),
                     const SizedBox(width: 8),
                     Text(
                       '${stats.support.todayNew} nouvelle(s) demande(s) aujourd\'hui',
@@ -695,7 +696,8 @@ class AdminDashboardPage extends StatelessWidget {
               _buildRevenueItem('Ce mois', stats.revenue.thisMonth, false),
             ],
           ),
-          Divider(color: AppTheme.background.withValues(alpha: 0.24), height: 32),
+          Divider(
+              color: AppTheme.background.withValues(alpha: 0.24), height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

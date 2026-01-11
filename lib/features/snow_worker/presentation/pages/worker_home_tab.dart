@@ -327,7 +327,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                           ),
                           errorWidget: (context, url, error) => Center(
                             child: Text(
-                              userName.isNotEmpty ? userName[0].toUpperCase() : 'D',
+                              userName.isNotEmpty
+                                  ? userName[0].toUpperCase()
+                                  : 'D',
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -338,7 +340,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                         )
                       : Center(
                           child: Text(
-                            userName.isNotEmpty ? userName[0].toUpperCase() : 'D',
+                            userName.isNotEmpty
+                                ? userName[0].toUpperCase()
+                                : 'D',
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -519,8 +523,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                             ? 'Vous etes disponible'
                             : 'Vous etes hors ligne',
                         style: TextStyle(
-                          color:
-                              isAvailable ? AppTheme.background : AppTheme.textPrimary,
+                          color: isAvailable
+                              ? AppTheme.background
+                              : AppTheme.textPrimary,
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                         ),
@@ -559,7 +564,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                                 .add(const ToggleAvailability());
                           },
                     activeColor: AppTheme.background,
-                    activeTrackColor: AppTheme.background.withValues(alpha: 0.3),
+                    activeTrackColor:
+                        AppTheme.background.withValues(alpha: 0.3),
                     inactiveThumbColor: AppTheme.textTertiary,
                     inactiveTrackColor: AppTheme.border,
                   ),
@@ -831,130 +837,134 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               return a.departureTime.compareTo(b.departureTime);
             });
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Jobs disponibles',
-                      style: AppTheme.headlineSmall.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          'Jobs disponibles',
+                          style: AppTheme.headlineSmall.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        if (availableJobs.any((j) => j.isPriority)) ...[
+                          const SizedBox(width: 10),
+                          AnimatedBuilder(
+                            animation: _pulseController,
+                            builder: (context, child) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      AppTheme.warning,
+                                      AppTheme.warning.withValues(
+                                        alpha: 0.7 +
+                                            (_pulseController.value * 0.3),
+                                      ),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                      AppTheme.radiusFull),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppTheme.warning
+                                          .withValues(alpha: 0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.bolt,
+                                      color: AppTheme.background,
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${availableJobs.where((j) => j.isPriority).length} urgent',
+                                      style: const TextStyle(
+                                        color: AppTheme.background,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ],
                     ),
-                    if (availableJobs.any((j) => j.isPriority)) ...[
-                      const SizedBox(width: 10),
-                      AnimatedBuilder(
-                        animation: _pulseController,
-                        builder: (context, child) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppTheme.warning,
-                                  AppTheme.warning.withValues(
-                                    alpha: 0.7 + (_pulseController.value * 0.3),
-                                  ),
-                                ],
-                              ),
-                              borderRadius:
-                                  BorderRadius.circular(AppTheme.radiusFull),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      AppTheme.warning.withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.bolt,
-                                  color: AppTheme.background,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${availableJobs.where((j) => j.isPriority).length} urgent',
-                                  style: const TextStyle(
-                                    color: AppTheme.background,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                    if (availableJobs.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppTheme.info.withValues(alpha: 0.1),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusFull),
+                        ),
+                        child: Text(
+                          '${availableJobs.length} job${availableJobs.length > 1 ? 's' : ''}',
+                          style: TextStyle(
+                            color: AppTheme.info,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
-                    ],
                   ],
                 ),
-                if (availableJobs.isNotEmpty)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppTheme.info.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                    ),
-                    child: Text(
-                      '${availableJobs.length} job${availableJobs.length > 1 ? 's' : ''}',
-                      style: TextStyle(
-                        color: AppTheme.info,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
+                const SizedBox(height: 14),
+                // Afficher un message si aucun équipement n'est configuré
+                if (!hasEquipment)
+                  _buildNoEquipmentWarning()
+                else if (availableJobs.isEmpty)
+                  _buildEmptyState()
+                else
+                  ...availableJobs.map((job) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: SwipeableJobCard(
+                          job: job,
+                          showAcceptButton: true,
+                          enableSwipe: true,
+                          isLoading: loadingJobId == job.id,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.workerJobDetails,
+                              arguments: job,
+                            );
+                          },
+                          onAccept: () {
+                            context
+                                .read<WorkerJobsBloc>()
+                                .add(AcceptJob(job.id));
+                          },
+                          onDecline: () {
+                            HapticFeedback.lightImpact();
+                          },
+                        ),
+                      )),
               ],
-            ),
-            const SizedBox(height: 14),
-            // Afficher un message si aucun équipement n'est configuré
-            if (!hasEquipment)
-              _buildNoEquipmentWarning()
-            else if (availableJobs.isEmpty)
-              _buildEmptyState()
-            else
-              ...availableJobs.map((job) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: SwipeableJobCard(
-                      job: job,
-                      showAcceptButton: true,
-                      enableSwipe: true,
-                      isLoading: loadingJobId == job.id,
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.workerJobDetails,
-                          arguments: job,
-                        );
-                      },
-                      onAccept: () {
-                        context.read<WorkerJobsBloc>().add(AcceptJob(job.id));
-                      },
-                      onDecline: () {
-                        HapticFeedback.lightImpact();
-                      },
-                    ),
-                  )),
-            ],
-          );
-        },
-      );
-    },
-  );
-}
+            );
+          },
+        );
+      },
+    );
+  }
 
   Widget _buildNoEquipmentWarning() {
     return Container(
@@ -1187,7 +1197,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.refresh_rounded, color: AppTheme.background, size: 18),
+                  Icon(Icons.refresh_rounded,
+                      color: AppTheme.background, size: 18),
                   SizedBox(width: 8),
                   Text(
                     'Reessayer',

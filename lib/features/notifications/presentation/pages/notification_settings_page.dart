@@ -257,7 +257,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     'De ${_prefsService!.quietHoursStart} à ${_prefsService!.quietHoursEnd}',
                     style: TextStyle(color: AppTheme.primary2),
                   ),
-                  trailing: Icon(Icons.chevron_right, color: AppTheme.textTertiary),
+                  trailing:
+                      Icon(Icons.chevron_right, color: AppTheme.textTertiary),
                   onTap: () => _showQuietHoursDialog(),
                 ),
                 if (_prefsService!.isCurrentlyQuietHours) ...[
@@ -370,7 +371,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   shape: BoxShape.circle,
                   color: isFullyEnabled
                       ? AppTheme.success
-                      : (isPartiallyEnabled ? AppTheme.warning : AppTheme.textTertiary),
+                      : (isPartiallyEnabled
+                          ? AppTheme.warning
+                          : AppTheme.textTertiary),
                 ),
                 child: Icon(
                   isFullyEnabled

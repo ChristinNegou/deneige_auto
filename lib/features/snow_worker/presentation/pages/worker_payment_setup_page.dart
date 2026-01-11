@@ -12,7 +12,8 @@ class WorkerPaymentSetupPage extends StatefulWidget {
   State<WorkerPaymentSetupPage> createState() => _WorkerPaymentSetupPageState();
 }
 
-class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with WidgetsBindingObserver {
+class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
+    with WidgetsBindingObserver {
   late WorkerStripeService _stripeService;
   bool _isLoading = true;
   bool _hasAccount = false;
@@ -67,7 +68,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         _feeConfig = feeConfig;
       });
 
-      print('=== PAYMENT PAGE: hasAccount: $_hasAccount, isComplete: $_isComplete, chargesEnabled: $_chargesEnabled, payoutsEnabled: $_payoutsEnabled ===');
+      print(
+          '=== PAYMENT PAGE: hasAccount: $_hasAccount, isComplete: $_isComplete, chargesEnabled: $_chargesEnabled, payoutsEnabled: $_payoutsEnabled ===');
 
       if (_hasAccount && _isComplete) {
         final balance = await _stripeService.getBalance();
@@ -125,7 +127,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Votre compte est deja configure! Actualisation...'),
+              content: const Text(
+                  'Votre compte est deja configure! Actualisation...'),
               backgroundColor: AppTheme.success,
             ),
           );
@@ -136,7 +139,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Reponse Stripe: ${result.toString().substring(0, result.toString().length.clamp(0, 100))}'),
+              content: Text(
+                  'Reponse Stripe: ${result.toString().substring(0, result.toString().length.clamp(0, 100))}'),
               backgroundColor: AppTheme.warning,
               duration: const Duration(seconds: 5),
             ),
@@ -263,7 +267,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
     // Compte entièrement configuré: paiements et virements actifs
     final bool isConfigured = _hasAccount && _payoutsEnabled && _chargesEnabled;
     // En attente de vérification: compte créé avec charges OU details soumis, mais virements pas encore actifs
-    final bool isPendingVerification = _hasAccount && (_isComplete || _chargesEnabled) && !_payoutsEnabled;
+    final bool isPendingVerification =
+        _hasAccount && (_isComplete || _chargesEnabled) && !_payoutsEnabled;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -376,7 +381,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: AppTheme.background, size: 20),
+                  Icon(Icons.info_outline,
+                      color: AppTheme.background, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -445,8 +451,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
           width: 20,
           height: 20,
           decoration: BoxDecoration(
-            color:
-                isActive ? AppTheme.background : AppTheme.background.withValues(alpha: 0.3),
+            color: isActive
+                ? AppTheme.background
+                : AppTheme.background.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -488,7 +495,10 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
               const SizedBox(width: 10),
               Text(
                 'Solde',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary),
               ),
             ],
           ),
@@ -501,7 +511,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                   children: [
                     Text(
                       'Disponible',
-                      style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                      style: TextStyle(
+                          fontSize: 12, color: AppTheme.textSecondary),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -528,7 +539,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                     children: [
                       Text(
                         'En attente',
-                        style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                        style: TextStyle(
+                            fontSize: 12, color: AppTheme.textSecondary),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -572,7 +584,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
     final bankName = defaultAccount['bankName'] ?? 'Banque';
     final last4 = defaultAccount['last4'] ?? '****';
     final status = defaultAccount['status'] ?? 'new';
-    final currency = (defaultAccount['currency'] ?? 'cad').toString().toUpperCase();
+    final currency =
+        (defaultAccount['currency'] ?? 'cad').toString().toUpperCase();
     final bool isVerified = status == 'verified' || status == 'new';
 
     return Container(
@@ -663,7 +676,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                               ),
                               const SizedBox(width: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: AppTheme.primary,
                                   borderRadius: BorderRadius.circular(4),
@@ -692,7 +706,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                               ),
                               const SizedBox(width: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 1),
                                 decoration: BoxDecoration(
                                   color: AppTheme.surfaceContainer,
                                   borderRadius: BorderRadius.circular(4),
@@ -711,7 +726,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                               Icon(
                                 isVerified ? Icons.verified : Icons.pending,
                                 size: 14,
-                                color: isVerified ? AppTheme.success : AppTheme.warning,
+                                color: isVerified
+                                    ? AppTheme.success
+                                    : AppTheme.warning,
                               ),
                             ],
                           ),
@@ -736,11 +753,13 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                 decoration: BoxDecoration(
                   color: AppTheme.warningLight,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: AppTheme.warning.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.warning_amber_rounded, color: AppTheme.warning, size: 20),
+                    Icon(Icons.warning_amber_rounded,
+                        color: AppTheme.warning, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -795,7 +814,10 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
               const SizedBox(width: 10),
               Text(
                 'Repartition des paiements',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary),
               ),
             ],
           ),
@@ -846,7 +868,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: TextStyle(fontSize: 14, color: AppTheme.textPrimary)),
+            Text(label,
+                style: TextStyle(fontSize: 14, color: AppTheme.textPrimary)),
             Text(
               percent,
               style: TextStyle(
@@ -881,7 +904,10 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
         children: [
           Text(
             'Comment ca fonctionne',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary),
           ),
           const SizedBox(height: 16),
           _buildStep(1, 'Le client paie', 'Le paiement est traite par Stripe'),
@@ -924,7 +950,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                 Text(
                   title,
                   style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500, color: AppTheme.textPrimary),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.textPrimary),
                 ),
                 Text(
                   subtitle,
@@ -948,8 +976,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
       ),
       child: Row(
         children: [
-          Icon(Icons.verified_user_outlined,
-              color: AppTheme.success, size: 20),
+          Icon(Icons.verified_user_outlined, color: AppTheme.success, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -966,7 +993,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                 const SizedBox(height: 2),
                 Text(
                   'Propulse par Stripe, leader mondial des paiements',
-                  style: TextStyle(fontSize: 11, color: AppTheme.success.withValues(alpha: 0.8)),
+                  style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.success.withValues(alpha: 0.8)),
                 ),
               ],
             ),
@@ -995,7 +1024,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                   color: AppTheme.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.badge_outlined, color: AppTheme.warning, size: 20),
+                child: Icon(Icons.badge_outlined,
+                    color: AppTheme.warning, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1057,7 +1087,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage> with Wi
                 ),
                 const SizedBox(height: 8),
                 _buildRequirementBullet('Photo en couleur (format JPG ou PNG)'),
-                _buildRequirementBullet('Document original, pas une photocopie'),
+                _buildRequirementBullet(
+                    'Document original, pas une photocopie'),
                 _buildRequirementBullet('Nom et date de naissance lisibles'),
                 _buildRequirementBullet('Document non expire'),
               ],

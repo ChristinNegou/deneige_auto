@@ -102,7 +102,8 @@ class JobCard extends StatelessWidget {
               // Address
               Row(
                 children: [
-                  Icon(Icons.location_on, color: AppTheme.textSecondary, size: 20),
+                  Icon(Icons.location_on,
+                      color: AppTheme.textSecondary, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -124,7 +125,8 @@ class JobCard extends StatelessWidget {
               Row(
                 children: [
                   if (job.distanceKm != null) ...[
-                    Icon(Icons.near_me, color: AppTheme.textSecondary, size: 18),
+                    Icon(Icons.near_me,
+                        color: AppTheme.textSecondary, size: 18),
                     const SizedBox(width: 4),
                     Text(
                       '${job.distanceKm!.toStringAsFixed(1)} km',
@@ -164,7 +166,8 @@ class JobCard extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        if (job.vehicle.color != null || job.vehicle.licensePlate != null)
+                        if (job.vehicle.color != null ||
+                            job.vehicle.licensePlate != null)
                           Row(
                             children: [
                               if (job.vehicle.color != null) ...[
@@ -236,7 +239,8 @@ class JobCard extends StatelessWidget {
                         ? SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.background),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppTheme.background),
                           )
                         : Icon(Icons.check_circle, color: AppTheme.background),
                     label:

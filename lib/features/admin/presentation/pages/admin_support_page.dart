@@ -195,8 +195,8 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor:
-                        _getSubjectColor(request.subject).withValues(alpha: 0.2),
+                    backgroundColor: _getSubjectColor(request.subject)
+                        .withValues(alpha: 0.2),
                     child: Icon(
                       _getSubjectIcon(request.subject),
                       size: 20,
@@ -232,7 +232,8 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getSubjectColor(request.subject).withValues(alpha: 0.1),
+                  color:
+                      _getSubjectColor(request.subject).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -401,8 +402,8 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                   children: [
                     CircleAvatar(
                       radius: 28,
-                      backgroundColor:
-                          _getSubjectColor(request.subject).withValues(alpha: 0.2),
+                      backgroundColor: _getSubjectColor(request.subject)
+                          .withValues(alpha: 0.2),
                       child: Icon(
                         _getSubjectIcon(request.subject),
                         size: 28,
@@ -727,7 +728,8 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                   title: const Text('Envoyer par email'),
                   subtitle: Text(
                     request.userEmail,
-                    style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                    style:
+                        TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
@@ -735,11 +737,13 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                 ),
                 CheckboxListTile(
                   value: sendNotification,
-                  onChanged: (value) => setState(() => sendNotification = value!),
+                  onChanged: (value) =>
+                      setState(() => sendNotification = value!),
                   title: const Text('Envoyer une notification'),
                   subtitle: Text(
                     'Notification push dans l\'app',
-                    style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                    style:
+                        TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
@@ -769,7 +773,8 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                 if (!sendEmail && !sendNotification) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
                     SnackBar(
-                      content: const Text('Sélectionnez au moins un mode d\'envoi'),
+                      content:
+                          const Text('Sélectionnez au moins un mode d\'envoi'),
                       backgroundColor: AppTheme.error,
                     ),
                   );
@@ -806,7 +811,8 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
                 color: AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.delete_outline, color: AppTheme.error, size: 20),
+              child:
+                  Icon(Icons.delete_outline, color: AppTheme.error, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('Supprimer la demande'),
