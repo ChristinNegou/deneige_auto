@@ -102,11 +102,10 @@ class AppConfig {
 
   static const String firebaseProjectId = 'deneigeauto';
 
-  // Stripe - Configurez via --dart-define=STRIPE_PUBLISHABLE_KEY=xxx
+  // Stripe - Toujours utiliser la clé live car le backend utilise sk_live
   static String get stripePublishableKey {
-    return isProduction
-        ? ApiKeys.stripePublishableKeyLive
-        : ApiKeys.stripePublishableKeyTest;
+    // Le backend utilise sk_live, donc on doit utiliser pk_live
+    return ApiKeys.stripePublishableKeyLive;
   }
 
   // Google Maps - Configurez via --dart-define=GOOGLE_MAPS_API_KEY=xxx
