@@ -206,8 +206,10 @@ router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res)
         // Find pending reservations within radius, sorted by urgency and distance
         const now = new Date();
         const next24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
 
         // 1. Get reservations WITH location using geoNear
+        // Inclure: departureTime futur OU créé récemment (moins de 2h)
         let geoReservations = [];
         try {
             geoReservations = await Reservation.aggregate([
@@ -221,7 +223,12 @@ router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res)
                         maxDistance: radius * 1000, // Convert km to meters
                         query: {
                             status: 'pending',
-                            departureTime: { $gte: now, $lte: next24Hours },
+                            $or: [
+                                // Réservations futures (dans les 24h)
+                                { departureTime: { $gte: now, $lte: next24Hours } },
+                                // OU réservations créées récemment (même si departureTime passé)
+                                { createdAt: { $gte: twoHoursAgo } },
+                            ],
                         },
                         spherical: true,
                     },
@@ -272,9 +279,13 @@ router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res)
             console.log('📍 Aucune réservation trouvée par géolocalisation, recherche de toutes les réservations pending...');
 
             // Fallback: chercher toutes les réservations pending sans filtre géospatial
+            // Inclure: departureTime futur OU créé récemment (moins de 2h)
             const fallbackReservations = await Reservation.find({
                 status: 'pending',
-                departureTime: { $gte: now, $lte: next24Hours },
+                $or: [
+                    { departureTime: { $gte: now, $lte: next24Hours } },
+                    { createdAt: { $gte: twoHoursAgo } },
+                ],
             })
                 .populate('userId', 'firstName lastName phoneNumber')
                 .populate('vehicle', 'make model color licensePlate photoUrl')
