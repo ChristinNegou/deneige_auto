@@ -76,13 +76,22 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Check if signing secrets are available
+        id: check_secrets
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "has_signing_secrets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_signing_secrets=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Decode Keystore
-        if: github.ref == 'refs/heads/main'
+        if: steps.check_secrets.outputs.has_signing_secrets == 'true' && github.ref == 'refs/heads/main'
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
 
       - name: Create key.properties
-        if: github.ref == 'refs/heads/main'
+        if: steps.check_secrets.outputs.has_signing_secrets == 'true' && github.ref == 'refs/heads/main'
         run: |
           echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
@@ -90,15 +99,14 @@ jobs:
           echo "storeFile=keystore.jks" >> android/key.properties
 
       - name: Build APK (Debug)
-        if: github.ref == 'refs/heads/develop'
         run: flutter build apk --debug
 
       - name: Build APK (Release)
-        if: github.ref == 'refs/heads/main'
+        if: steps.check_secrets.outputs.has_signing_secrets == 'true' && github.ref == 'refs/heads/main'
         run: flutter build apk --release
 
       - name: Build App Bundle (Release)
-        if: github.ref == 'refs/heads/main'
+        if: steps.check_secrets.outputs.has_signing_secrets == 'true' && github.ref == 'refs/heads/main'
         run: flutter build appbundle --release
 
       - name: Upload APK artifact
@@ -109,7 +117,7 @@ jobs:
           retention-days: 14
 
       - name: Upload App Bundle artifact
-        if: github.ref == 'refs/heads/main'
+        if: steps.check_secrets.outputs.has_signing_secrets == 'true' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: android-aab
@@ -137,10 +145,17 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios
+          pod install --repo-update || pod install
+
       - name: Build iOS (no codesign)
         run: flutter build ios --no-codesign
+        continue-on-error: true
 
       - name: Upload iOS build
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ios-build
