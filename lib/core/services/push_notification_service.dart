@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -29,6 +30,11 @@ class PushNotificationService {
 
   bool _isInitialized = false;
   String? _fcmToken;
+
+  // StreamSubscriptions pour éviter les fuites de mémoire
+  StreamSubscription<String>? _tokenRefreshSubscription;
+  StreamSubscription<RemoteMessage>? _foregroundMessageSubscription;
+  StreamSubscription<RemoteMessage>? _messageOpenedSubscription;
 
   /// Token FCM actuel
   String? get fcmToken => _fcmToken;
@@ -63,7 +69,8 @@ class PushNotificationService {
       await _getToken();
 
       // Écouter les mises à jour du token
-      _messaging.onTokenRefresh.listen(_handleTokenRefresh);
+      _tokenRefreshSubscription =
+          _messaging.onTokenRefresh.listen(_handleTokenRefresh);
 
       _isInitialized = true;
       debugPrint('Push notification service initialized');
@@ -133,10 +140,12 @@ class PushNotificationService {
   /// Configurer les handlers de messages Firebase
   void _setupMessageHandlers() {
     // Message reçu quand l'app est au premier plan
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+    _foregroundMessageSubscription =
+        FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
 
     // Message ouvert depuis la notification (app en arrière-plan)
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationOpen);
+    _messageOpenedSubscription =
+        FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationOpen);
 
     // Vérifier si l'app a été ouverte depuis une notification
     _checkInitialMessage();
@@ -288,5 +297,17 @@ class PushNotificationService {
   Future<AuthorizationStatus> getPermissionStatus() async {
     final settings = await _messaging.getNotificationSettings();
     return settings.authorizationStatus;
+  }
+
+  /// Libérer les ressources du service
+  void dispose() {
+    _tokenRefreshSubscription?.cancel();
+    _foregroundMessageSubscription?.cancel();
+    _messageOpenedSubscription?.cancel();
+    _tokenRefreshSubscription = null;
+    _foregroundMessageSubscription = null;
+    _messageOpenedSubscription = null;
+    _isInitialized = false;
+    debugPrint('Push notification service disposed');
   }
 }
