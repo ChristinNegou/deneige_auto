@@ -167,7 +167,9 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
       }
 
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       final isEmulatorLocation =
@@ -559,7 +561,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                                 .read<WorkerAvailabilityBloc>()
                                 .add(const ToggleAvailability());
                           },
-                    activeColor: AppTheme.background,
+                    activeThumbColor: AppTheme.background,
                     activeTrackColor:
                         AppTheme.background.withValues(alpha: 0.3),
                     inactiveThumbColor: AppTheme.textTertiary,

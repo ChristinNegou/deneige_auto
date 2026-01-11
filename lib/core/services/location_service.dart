@@ -1,5 +1,6 @@
 // lib/core/services/location_service.dart
 
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -25,13 +26,15 @@ class LocationService {
 
       // Obtenir la position
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-        timeLimit: const Duration(seconds: 5),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 5),
+        ),
       );
 
       return position;
     } catch (e) {
-      print('Erreur géolocalisation: $e');
+      debugPrint('Erreur géolocalisation: $e');
       return null;
     }
   }

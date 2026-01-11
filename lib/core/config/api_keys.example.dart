@@ -1,5 +1,5 @@
-/// FICHIER EXEMPLE - Copiez vers api_keys.dart et remplissez les valeurs
-/// NE JAMAIS COMMITTER api_keys.dart !
+// FICHIER EXEMPLE - Copiez vers api_keys.dart et remplissez les valeurs
+// NE JAMAIS COMMITTER api_keys.dart !
 
 class ApiKeys {
   // OpenWeatherMap

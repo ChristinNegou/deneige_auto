@@ -1,5 +1,6 @@
 import 'package:deneige_auto/features/reservation/domain/entities/parking_spot.dart';
 import 'package:deneige_auto/features/reservation/domain/entities/vehicle.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -429,16 +430,16 @@ class NewReservationBloc
     final hasPayment = event.paymentIntentId != null;
 
     if (!hasPayment && !state.canSubmit) {
-      print('❌ [NewReservationBloc] canSubmit=false, pas de paiement');
+      debugPrint('❌ [NewReservationBloc] canSubmit=false, pas de paiement');
       return;
     }
 
-    print(
+    debugPrint(
         '📝 [NewReservationBloc] Création réservation - paymentIntentId: ${event.paymentIntentId}');
 
     // Vérifier que le véhicule est sélectionné
     if (state.selectedVehicle == null) {
-      print('❌ [NewReservationBloc] Pas de véhicule sélectionné');
+      debugPrint('❌ [NewReservationBloc] Pas de véhicule sélectionné');
       emit(state.copyWith(
         errorMessage: 'Aucun véhicule sélectionné. Veuillez recommencer.',
       ));
@@ -447,7 +448,7 @@ class NewReservationBloc
 
     // Vérifier que la localisation est disponible
     if (!state.hasValidLocation) {
-      print('❌ [NewReservationBloc] Pas de localisation valide');
+      debugPrint('❌ [NewReservationBloc] Pas de localisation valide');
       emit(state.copyWith(
         errorMessage:
             'La localisation est requise. Veuillez activer le GPS ou entrer une adresse.',
@@ -458,7 +459,7 @@ class NewReservationBloc
 
     // Vérifier que les dates sont définies
     if (state.departureDateTime == null || state.deadlineTime == null) {
-      print('❌ [NewReservationBloc] Dates manquantes');
+      debugPrint('❌ [NewReservationBloc] Dates manquantes');
       emit(state.copyWith(
         errorMessage: 'Les dates de départ et limite sont requises.',
       ));
@@ -467,7 +468,7 @@ class NewReservationBloc
 
     // Vérifier que le prix est calculé
     if (state.calculatedPrice == null) {
-      print('❌ [NewReservationBloc] Prix non calculé');
+      debugPrint('❌ [NewReservationBloc] Prix non calculé');
       emit(state.copyWith(
         errorMessage: 'Le prix n\'a pas été calculé. Veuillez recommencer.',
       ));
@@ -498,13 +499,13 @@ class NewReservationBloc
         return;
       }
 
-      print('📝 [NewReservationBloc] Données envoyées:');
-      print('  - vehicleId: ${state.selectedVehicle!.id}');
-      print('  - parkingSpotId: $parkingSpotId');
-      print('  - departureTime: ${state.departureDateTime}');
-      print('  - latitude: ${state.locationLatitude}');
-      print('  - longitude: ${state.locationLongitude}');
-      print('  - totalPrice: ${state.calculatedPrice}');
+      debugPrint('📝 [NewReservationBloc] Données envoyées:');
+      debugPrint('  - vehicleId: ${state.selectedVehicle!.id}');
+      debugPrint('  - parkingSpotId: $parkingSpotId');
+      debugPrint('  - departureTime: ${state.departureDateTime}');
+      debugPrint('  - latitude: ${state.locationLatitude}');
+      debugPrint('  - longitude: ${state.locationLongitude}');
+      debugPrint('  - totalPrice: ${state.calculatedPrice}');
 
       // Utiliser la localisation stockée dans le state
       final result = await createReservation(CreateReservationParams(
@@ -526,14 +527,16 @@ class NewReservationBloc
 
       result.fold(
         (failure) {
-          print('❌ [NewReservationBloc] Erreur création: ${failure.message}');
+          debugPrint(
+              '❌ [NewReservationBloc] Erreur création: ${failure.message}');
           emit(state.copyWith(
             isLoading: false,
             errorMessage: failure.message,
           ));
         },
         (reservation) {
-          print('✅ [NewReservationBloc] Réservation créée: ${reservation.id}');
+          debugPrint(
+              '✅ [NewReservationBloc] Réservation créée: ${reservation.id}');
           emit(state.copyWith(
             isLoading: false,
             isSubmitted: true,
@@ -542,7 +545,7 @@ class NewReservationBloc
         },
       );
     } catch (e) {
-      print('❌ [NewReservationBloc] Exception: $e');
+      debugPrint('❌ [NewReservationBloc] Exception: $e');
       emit(state.copyWith(
         isLoading: false,
         errorMessage: 'Une erreur est survenue lors de la création: $e',

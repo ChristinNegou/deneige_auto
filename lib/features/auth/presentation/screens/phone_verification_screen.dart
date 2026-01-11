@@ -154,8 +154,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     }
   }
 
-  void _onKeyPressed(int index, RawKeyEvent event) {
-    if (event is RawKeyDownEvent) {
+  void _onKeyPressed(int index, KeyEvent event) {
+    if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.backspace) {
         if (_controllers[index].text.isEmpty && index > 0) {
           _focusNodes[index - 1].requestFocus();
@@ -309,9 +309,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                     return SizedBox(
                       width: 50,
                       height: 60,
-                      child: RawKeyboardListener(
+                      child: KeyboardListener(
                         focusNode: FocusNode(),
-                        onKey: (event) => _onKeyPressed(index, event),
+                        onKeyEvent: (event) => _onKeyPressed(index, event),
                         child: TextField(
                           controller: _controllers[index],
                           focusNode: _focusNodes[index],

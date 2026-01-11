@@ -908,7 +908,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           _buildDetailRow(
             Icons.directions_car,
             'Véhicule',
-            '${reservation.vehicle.displayName}',
+            reservation.vehicle.displayName,
             subtitle: reservation.vehicle.color,
           ),
           const SizedBox(height: 16),
@@ -1342,7 +1342,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${reservation.totalPrice.toStringAsFixed(2)}',
+                    reservation.totalPrice.toStringAsFixed(2),
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
@@ -1997,13 +1997,14 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               ),
             ),
           ).then((reported) {
-            if (reported == true && mounted) {
-              // Refresh the reservation details
-              context
+            if (reported == true) {
+              if (!mounted) return;
+              this
+                  .context
                   .read<ReservationListBloc>()
                   .add(LoadReservationById(widget.reservationId));
 
-              ScaffoldMessenger.of(context).showSnackBar(
+              ScaffoldMessenger.of(this.context).showSnackBar(
                 SnackBar(
                   content: Row(
                     children: [

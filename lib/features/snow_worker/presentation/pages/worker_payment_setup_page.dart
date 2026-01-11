@@ -57,7 +57,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
 
     try {
       final status = await _stripeService.getAccountStatus();
-      print('=== PAYMENT PAGE: Account Status: $status ===');
+      debugPrint('=== PAYMENT PAGE: Account Status: $status ===');
       final feeConfig = await _stripeService.getFeeConfig();
 
       setState(() {
@@ -68,7 +68,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
         _feeConfig = feeConfig;
       });
 
-      print(
+      debugPrint(
           '=== PAYMENT PAGE: hasAccount: $_hasAccount, isComplete: $_isComplete, chargesEnabled: $_chargesEnabled, payoutsEnabled: $_payoutsEnabled ===');
 
       if (_hasAccount && _isComplete) {
@@ -174,11 +174,14 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur: $e'), backgroundColor: AppTheme.error),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

@@ -598,7 +598,9 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
               return RadioListTile<SupportStatus>(
                 title: Text(status.label),
                 value: status,
+                // ignore: deprecated_member_use
                 groupValue: selectedStatus,
+                // ignore: deprecated_member_use
                 onChanged: (value) {
                   setState(() => selectedStatus = value!);
                 },

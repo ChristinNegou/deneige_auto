@@ -188,7 +188,7 @@ class ApiCacheService {
     }
 
     if (expiredKeys.isNotEmpty && kDebugMode) {
-      print('Cleaned ${expiredKeys.length} expired cache entries');
+      debugPrint('Cleaned ${expiredKeys.length} expired cache entries');
     }
   }
 

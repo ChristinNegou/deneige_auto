@@ -791,7 +791,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<int>(
-                value: selectedDays,
+                initialValue: selectedDays,
                 decoration: const InputDecoration(
                   labelText: 'Durée',
                   border: OutlineInputBorder(),

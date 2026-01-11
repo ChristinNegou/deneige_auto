@@ -13,7 +13,7 @@ import 'steps/step4_options.dart';
 import 'steps/step5_summary.dart';
 
 class NewReservationScreen extends StatelessWidget {
-  const NewReservationScreen({Key? key}) : super(key: key);
+  const NewReservationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,20 +29,20 @@ class NewReservationScreen extends StatelessWidget {
 }
 
 class NewReservationView extends StatelessWidget {
-  const NewReservationView({Key? key}) : super(key: key);
+  const NewReservationView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<NewReservationBloc, NewReservationState>(
       listener: (context, state) {
-        print(
+        debugPrint(
             '🔄 [NewReservationView] State changed: isLoading=${state.isLoading}, isSubmitted=${state.isSubmitted}, error=${state.errorMessage}');
 
         if (state.errorMessage != null) {
           // Fermer le SnackBar de chargement
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-          print('❌ [NewReservationView] Erreur: ${state.errorMessage}');
+          debugPrint('❌ [NewReservationView] Erreur: ${state.errorMessage}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
@@ -57,7 +57,7 @@ class NewReservationView extends StatelessWidget {
           // Fermer le SnackBar de chargement
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-          print(
+          debugPrint(
               '✅ [NewReservationView] Réservation créée: ${state.reservationId}');
           Navigator.of(context).pushReplacementNamed(
             '/reservation/success',
@@ -432,9 +432,9 @@ class NewReservationView extends StatelessWidget {
 
                 // Si le paiement réussit
                 if (result != null && result['success'] == true) {
-                  print(
+                  debugPrint(
                       '✅ [NewReservationScreen] Paiement réussi, création réservation...');
-                  print(
+                  debugPrint(
                       '✅ [NewReservationScreen] paymentIntentId: ${result['paymentIntentId']}');
 
                   // Montrer un indicateur de chargement
@@ -466,7 +466,8 @@ class NewReservationView extends StatelessWidget {
                     paymentIntentId: result['paymentIntentId'],
                   ));
                 } else {
-                  print('❌ [NewReservationScreen] Paiement annulé ou échoué');
+                  debugPrint(
+                      '❌ [NewReservationScreen] Paiement annulé ou échoué');
                 }
               },
             ),

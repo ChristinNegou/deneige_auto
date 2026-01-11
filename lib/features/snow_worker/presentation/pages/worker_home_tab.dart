@@ -170,7 +170,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
       }
 
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       final isEmulatorLocation =
@@ -563,7 +565,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                                 .read<WorkerAvailabilityBloc>()
                                 .add(const ToggleAvailability());
                           },
-                    activeColor: AppTheme.background,
+                    activeThumbColor: AppTheme.background,
                     activeTrackColor:
                         AppTheme.background.withValues(alpha: 0.3),
                     inactiveThumbColor: AppTheme.textTertiary,

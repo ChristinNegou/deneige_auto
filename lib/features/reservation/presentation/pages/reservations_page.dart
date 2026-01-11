@@ -99,8 +99,8 @@ class ReservationsView extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor:
-                          _getStatusColor(reservation.status).withOpacity(0.2),
+                      backgroundColor: _getStatusColor(reservation.status)
+                          .withValues(alpha: 0.2),
                       child: Text(
                         reservation.status.icon,
                         style: const TextStyle(fontSize: 20),
@@ -132,7 +132,7 @@ class ReservationsView extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: _getStatusColor(reservation.status)
-                                .withOpacity(0.2),
+                                .withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(

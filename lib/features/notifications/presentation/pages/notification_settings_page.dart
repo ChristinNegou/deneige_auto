@@ -141,7 +141,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               await _prefsService!.setEnabled(value);
               setState(() {});
             },
-            activeColor: AppTheme.textPrimary,
+            activeThumbColor: AppTheme.textPrimary,
             activeTrackColor: AppTheme.textPrimary.withValues(alpha: 0.4),
           ),
         ],
@@ -405,7 +405,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   await _prefsService!.setCategoryEnabled(categoryName, value);
                   setState(() {});
                 },
-                activeColor: AppTheme.primary2,
+                activeThumbColor: AppTheme.primary2,
               ),
             ),
             Divider(height: 1, color: AppTheme.border),
@@ -463,7 +463,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 await _prefsService!.setTypeEnabled(type, value);
                 setState(() {});
               },
-              activeColor: AppTheme.primary2,
+              activeThumbColor: AppTheme.primary2,
             ),
     );
   }
@@ -488,7 +488,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       trailing: Switch(
         value: value,
         onChanged: _prefsService!.isEnabled ? onChanged : null,
-        activeColor: AppTheme.primary2,
+        activeThumbColor: AppTheme.primary2,
       ),
     );
   }
@@ -509,7 +509,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   void _showQuietHoursDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.surface,
         title: Text(
           'Heures du mode silencieux',
@@ -529,14 +529,16 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ),
               trailing: Icon(Icons.access_time, color: AppTheme.primary2),
               onTap: () async {
+                final navigator = Navigator.of(dialogContext);
                 final time = await showTimePicker(
-                  context: context,
+                  context: dialogContext,
                   initialTime: _parseTime(_prefsService!.quietHoursStart),
                 );
                 if (time != null) {
                   await _prefsService!.setQuietHoursStart(_formatTime(time));
+                  if (!mounted) return;
                   setState(() {});
-                  if (mounted) Navigator.pop(context);
+                  navigator.pop();
                   _showQuietHoursDialog();
                 }
               },
@@ -552,14 +554,16 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ),
               trailing: Icon(Icons.access_time, color: AppTheme.primary2),
               onTap: () async {
+                final navigator = Navigator.of(dialogContext);
                 final time = await showTimePicker(
-                  context: context,
+                  context: dialogContext,
                   initialTime: _parseTime(_prefsService!.quietHoursEnd),
                 );
                 if (time != null) {
                   await _prefsService!.setQuietHoursEnd(_formatTime(time));
+                  if (!mounted) return;
                   setState(() {});
-                  if (mounted) Navigator.pop(context);
+                  navigator.pop();
                   _showQuietHoursDialog();
                 }
               },
@@ -568,7 +572,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'Fermer',
               style: TextStyle(color: AppTheme.primary2),
@@ -582,7 +586,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   void _showResetConfirmation() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.surface,
         title: Text(
           'Réinitialiser?',
@@ -594,7 +598,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'Annuler',
               style: TextStyle(color: AppTheme.textSecondary),
@@ -602,20 +606,20 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
           ElevatedButton(
             onPressed: () async {
+              final navigator = Navigator.of(dialogContext);
               await _prefsService!.resetToDefaults();
+              if (!mounted) return;
               setState(() {});
-              if (mounted) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Paramètres réinitialisés',
-                      style: TextStyle(color: AppTheme.textPrimary),
-                    ),
-                    backgroundColor: AppTheme.success,
+              navigator.pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Paramètres réinitialisés',
+                    style: TextStyle(color: AppTheme.textPrimary),
                   ),
-                );
-              }
+                  backgroundColor: AppTheme.success,
+                ),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary2,

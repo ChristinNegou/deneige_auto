@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../../service/secure_storage_service.dart';
 
 /// Callback pour notifier la suspension d'un utilisateur
@@ -218,26 +219,26 @@ class AuthInterceptor extends Interceptor {
 class LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    print('🌐 REQUEST[${options.method}] => PATH: ${options.path}');
-    print('📤 Headers: ${options.headers}');
-    print('📦 Data: ${options.data}');
+    debugPrint('🌐 REQUEST[${options.method}] => PATH: ${options.path}');
+    debugPrint('📤 Headers: ${options.headers}');
+    debugPrint('📦 Data: ${options.data}');
     return super.onRequest(options, handler);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print(
+    debugPrint(
         '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}');
-    print('📥 Data: ${response.data}');
+    debugPrint('📥 Data: ${response.data}');
     return super.onResponse(response, handler);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    print(
+    debugPrint(
         '❌ ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}');
-    print('🔥 Message: ${err.message}');
-    print('📛 Response: ${err.response?.data}');
+    debugPrint('🔥 Message: ${err.message}');
+    debugPrint('📛 Response: ${err.response?.data}');
     return super.onError(err, handler);
   }
 }

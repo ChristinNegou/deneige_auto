@@ -94,7 +94,7 @@ class AvailabilityToggle extends StatelessWidget {
               child: Switch(
                 value: isAvailable,
                 onChanged: (_) => onToggle(),
-                activeColor: AppTheme.background,
+                activeThumbColor: AppTheme.background,
                 activeTrackColor: AppTheme.background.withValues(alpha: 0.5),
                 inactiveThumbColor: AppTheme.background,
                 inactiveTrackColor: AppTheme.background.withValues(alpha: 0.3),

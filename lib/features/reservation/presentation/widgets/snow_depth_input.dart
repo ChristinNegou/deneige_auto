@@ -6,10 +6,10 @@ class SnowDepthInput extends StatefulWidget {
   final ValueChanged<int?> onChanged;
 
   const SnowDepthInput({
-    Key? key,
+    super.key,
     this.initialValue,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<SnowDepthInput> createState() => _SnowDepthInputState();

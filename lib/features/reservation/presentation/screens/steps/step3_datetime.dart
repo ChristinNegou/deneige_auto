@@ -319,7 +319,6 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
               surface: AppTheme.surface,
               onSurface: AppTheme.textPrimary,
             ),
-            dialogBackgroundColor: AppTheme.surface,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 foregroundColor: AppTheme.primary,
@@ -352,7 +351,6 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                 surface: AppTheme.surface,
                 onSurface: AppTheme.textPrimary,
               ),
-              dialogBackgroundColor: AppTheme.surface,
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
                   foregroundColor: AppTheme.primary,

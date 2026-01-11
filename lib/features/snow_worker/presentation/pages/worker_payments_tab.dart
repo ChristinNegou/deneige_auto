@@ -97,11 +97,14 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur: $e'), backgroundColor: AppTheme.error),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

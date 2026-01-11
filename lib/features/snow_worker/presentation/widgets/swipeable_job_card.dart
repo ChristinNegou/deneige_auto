@@ -173,8 +173,8 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         elevation: widget.job.isPriority ? 6 : 2,
         shadowColor: widget.job.isPriority
-            ? AppTheme.warning.withOpacity(0.4)
-            : AppTheme.shadowColor.withOpacity(0.26),
+            ? AppTheme.warning.withValues(alpha: 0.4)
+            : AppTheme.shadowColor.withValues(alpha: 0.26),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: widget.job.isPriority
@@ -201,7 +201,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                               end: Alignment.bottomRight,
                               colors: [
                                 Colors.transparent,
-                                AppTheme.warning.withOpacity(0.1),
+                                AppTheme.warning.withValues(alpha: 0.1),
                                 Colors.transparent,
                               ],
                               stops: [
@@ -256,7 +256,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppTheme.info.withOpacity(0.1),
+                            color: AppTheme.info.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
@@ -416,12 +416,15 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppTheme.warning, AppTheme.warning.withOpacity(0.8)],
+                colors: [
+                  AppTheme.warning,
+                  AppTheme.warning.withValues(alpha: 0.8)
+                ],
               ),
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.warning.withOpacity(0.4),
+                  color: AppTheme.warning.withValues(alpha: 0.4),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -499,8 +502,8 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: isUrgent
-              ? AppTheme.error.withOpacity(0.3)
-              : AppTheme.info.withOpacity(0.3),
+              ? AppTheme.error.withValues(alpha: 0.3)
+              : AppTheme.info.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -532,7 +535,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
       decoration: BoxDecoration(
         color: AppTheme.successLight,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.success.withOpacity(0.3)),
+        border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -560,9 +563,9 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: optionData.color.withOpacity(0.1),
+            color: optionData.color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: optionData.color.withOpacity(0.3)),
+            border: Border.all(color: optionData.color.withValues(alpha: 0.3)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -735,9 +738,9 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

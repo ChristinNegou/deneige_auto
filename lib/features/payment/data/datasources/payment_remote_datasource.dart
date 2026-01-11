@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../domain/entities/refund.dart';
 import '../models/payment_model.dart';
@@ -57,7 +58,8 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
           reservations = [];
         }
 
-        print('📊 [PaymentHistory] Total réservations: ${reservations.length}');
+        debugPrint(
+            '📊 [PaymentHistory] Total réservations: ${reservations.length}');
 
         // Convert reservations to payments (only paid ones)
         final payments = <PaymentModel>[];
@@ -67,7 +69,7 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
             final paymentIntentId = reservation['paymentIntentId'];
             final totalPrice = reservation['totalPrice'];
 
-            print(
+            debugPrint(
                 '📊 [PaymentHistory] Réservation ${reservation['_id']}: paymentStatus=$status, paymentIntentId=$paymentIntentId, totalPrice=$totalPrice');
 
             // Inclure si:
@@ -82,14 +84,14 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
 
             if (isPaid || hasPaymentIntent) {
               payments.add(PaymentModel.fromReservation(reservation));
-              print('   ✅ Ajouté à l\'historique des paiements');
+              debugPrint('   ✅ Ajouté à l\'historique des paiements');
             } else {
-              print('   ❌ Non inclus (pas de paiement détecté)');
+              debugPrint('   ❌ Non inclus (pas de paiement détecté)');
             }
           }
         }
 
-        print('📊 [PaymentHistory] Paiements trouvés: ${payments.length}');
+        debugPrint('📊 [PaymentHistory] Paiements trouvés: ${payments.length}');
         return payments;
       } else {
         throw ServerException(

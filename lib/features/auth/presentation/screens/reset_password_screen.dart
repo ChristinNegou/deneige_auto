@@ -53,26 +53,25 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         color: AppTheme.background,
         child: SafeArea(
           child: BlocConsumer<AuthBloc, AuthState>(
-            listener: (context, state) {
+            listener: (listenerContext, state) {
               if (state is ResetPasswordSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(listenerContext).showSnackBar(
                   SnackBar(
                     content:
                         const Text('Mot de passe réinitialisé avec succès !'),
                     backgroundColor: AppTheme.success,
                   ),
                 );
-                // Rediriger vers la page de connexion après 2 secondes
+                final navigator = Navigator.of(context);
                 Future.delayed(const Duration(seconds: 2), () {
-                  if (mounted) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.login,
-                      (route) => false,
-                    );
-                  }
+                  if (!mounted) return;
+                  navigator.pushNamedAndRemoveUntil(
+                    AppRoutes.login,
+                    (route) => false,
+                  );
                 });
               } else if (state is AuthError) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(listenerContext).showSnackBar(
                   SnackBar(
                     content: Text(state.message),
                     backgroundColor: AppTheme.error,

@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 // Widget pour le résumé final (Step 4)
 class ReservationSummaryCard extends StatelessWidget {
-  const ReservationSummaryCard({Key? key}) : super(key: key);
+  const ReservationSummaryCard({super.key});
 
   @override
   Widget build(BuildContext context) {

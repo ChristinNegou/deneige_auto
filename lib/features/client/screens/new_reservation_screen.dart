@@ -761,7 +761,6 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
               surface: AppTheme.textPrimary,
               onSurface: AppTheme.shadowColor,
             ),
-            dialogBackgroundColor: AppTheme.textPrimary,
           ),
           child: child!,
         );

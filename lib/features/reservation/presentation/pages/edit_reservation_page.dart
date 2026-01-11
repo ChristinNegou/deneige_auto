@@ -199,7 +199,7 @@ class _EditReservationViewState extends State<EditReservationView> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _getValidVehicleValue(state),
+              initialValue: _getValidVehicleValue(state),
               decoration: const InputDecoration(
                 labelText: 'Sélectionner un véhicule',
                 border: OutlineInputBorder(),
@@ -244,7 +244,7 @@ class _EditReservationViewState extends State<EditReservationView> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _getValidParkingSpotValue(state),
+              initialValue: _getValidParkingSpotValue(state),
               decoration: const InputDecoration(
                 labelText: 'Sélectionner une place',
                 border: OutlineInputBorder(),

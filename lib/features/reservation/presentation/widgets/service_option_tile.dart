@@ -9,12 +9,12 @@ class ServiceOptionTile extends StatelessWidget {
   final VoidCallback onToggle;
 
   const ServiceOptionTile({
-    Key? key,
+    super.key,
     required this.option,
     required this.isSelected,
     required this.price,
     required this.onToggle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

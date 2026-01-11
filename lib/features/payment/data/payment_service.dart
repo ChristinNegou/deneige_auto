@@ -43,10 +43,10 @@ class PaymentService {
       await Stripe.instance.presentPaymentSheet();
       return true;
     } on StripeException catch (e) {
-      print('Erreur Stripe: ${e.error.message}');
+      debugPrint('Erreur Stripe: ${e.error.message}');
       return false;
     } catch (e) {
-      print('Erreur: $e');
+      debugPrint('Erreur: $e');
       return false;
     }
   }
@@ -68,10 +68,10 @@ class PaymentService {
       );
       return true;
     } on StripeException catch (e) {
-      print('Erreur Stripe: ${e.error.message}');
+      debugPrint('Erreur Stripe: ${e.error.message}');
       throw Exception(e.error.message ?? 'Erreur de paiement');
     } catch (e) {
-      print('Erreur: $e');
+      debugPrint('Erreur: $e');
       throw Exception('Erreur de paiement: $e');
     }
   }

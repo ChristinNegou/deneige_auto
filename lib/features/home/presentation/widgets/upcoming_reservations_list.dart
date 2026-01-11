@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../reservation/domain/entities/reservation.dart';
 
@@ -10,10 +11,10 @@ class UpcomingReservationsList extends StatelessWidget {
   final Function(Reservation) onReservationTap;
 
   const UpcomingReservationsList({
-    Key? key,
+    super.key,
     required this.reservations,
     required this.onReservationTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +68,8 @@ class _ReservationCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          _getStatusColor(reservation.status).withOpacity(0.2),
+                      color: _getStatusColor(reservation.status)
+                          .withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -153,7 +154,7 @@ class _ReservationCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(status) {
+  Color _getStatusColor(ReservationStatus status) {
     switch (status.toString().split('.').last) {
       case 'pending':
         return AppTheme.warning;
