@@ -4,11 +4,14 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 const cron = require('node-cron');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./config/database');
 const path = require('path');
 const { initializeFirebase } = require('./services/firebaseService');
 const { runFullCleanup, getDatabaseStats } = require('./services/databaseCleanupService');
 const { processExpiredJobs } = require('./services/expiredJobsService');
+const { generalLimiter } = require('./middleware/rateLimiter');
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -70,6 +73,14 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Security middleware
+app.use(helmet({
+    contentSecurityPolicy: false, // Désactivé pour les apps mobiles
+    crossOriginEmbedderPolicy: false,
+}));
+app.use(mongoSanitize()); // Protection contre les injections NoSQL
+app.use(generalLimiter); // Rate limiting général
 
 // Middleware spécial pour les webhooks Stripe (doit recevoir le raw body AVANT express.json())
 app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }));

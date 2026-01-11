@@ -8,6 +8,8 @@ const {
     getConnectBalance,
     getPayoutHistory,
     getPlatformFeeConfig,
+    regenerateOnboardingLink,
+    checkAccountRequirements,
     listBankAccounts,
     addBankAccount,
     deleteBankAccount,
@@ -47,6 +49,16 @@ router.get('/payout-history', protect, authorize('snowWorker'), getPayoutHistory
 // @desc    Obtenir la configuration des commissions
 // @access  Private
 router.get('/fee-config', protect, getPlatformFeeConfig);
+
+// @route   POST /api/stripe-connect/regenerate-onboarding
+// @desc    Régénérer le lien d'onboarding (si expiré)
+// @access  Private (snowWorker only)
+router.post('/regenerate-onboarding', protect, authorize('snowWorker'), regenerateOnboardingLink);
+
+// @route   GET /api/stripe-connect/requirements
+// @desc    Vérifier si des actions sont requises sur le compte
+// @access  Private (snowWorker only)
+router.get('/requirements', protect, authorize('snowWorker'), checkAccountRequirements);
 
 // ============== GESTION DES COMPTES BANCAIRES ==============
 

@@ -327,6 +327,138 @@ exports.getPlatformFeeConfig = async (req, res) => {
 };
 
 /**
+ * Régénérer le lien d'onboarding (en cas d'expiration)
+ * Les liens Stripe Account Links expirent après quelques minutes
+ */
+exports.regenerateOnboardingLink = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user.workerProfile?.stripeConnectId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucun compte de paiement configuré. Créez d\'abord un compte.',
+            });
+        }
+
+        // Vérifier le statut actuel du compte
+        const account = await stripe.accounts.retrieve(user.workerProfile.stripeConnectId);
+
+        // Si le compte est déjà complètement configuré
+        if (account.charges_enabled && account.payouts_enabled && account.details_submitted) {
+            return res.json({
+                success: true,
+                isComplete: true,
+                message: 'Votre compte est déjà complètement configuré',
+                chargesEnabled: account.charges_enabled,
+                payoutsEnabled: account.payouts_enabled,
+            });
+        }
+
+        // Créer un nouveau lien d'onboarding
+        const accountLink = await stripe.accountLinks.create({
+            account: user.workerProfile.stripeConnectId,
+            refresh_url: `${process.env.APP_URL}/worker/stripe-connect/refresh`,
+            return_url: `${process.env.APP_URL}/worker/stripe-connect/complete`,
+            type: 'account_onboarding',
+        });
+
+        console.log('✅ Nouveau lien d\'onboarding généré pour:', user.workerProfile.stripeConnectId);
+
+        res.json({
+            success: true,
+            onboardingUrl: accountLink.url,
+            expiresAt: accountLink.expires_at,
+            isComplete: false,
+        });
+    } catch (error) {
+        console.error('❌ Erreur régénération lien onboarding:', error);
+
+        // Si le compte n'existe plus sur Stripe
+        if (error.code === 'resource_missing' || error.code === 'account_invalid') {
+            // Nettoyer le profil et informer l'utilisateur qu'il doit recréer un compte
+            const user = await User.findById(req.user.id);
+            if (user?.workerProfile?.stripeConnectId) {
+                user.workerProfile.stripeConnectId = null;
+                await user.save();
+            }
+
+            return res.status(400).json({
+                success: false,
+                message: 'Votre compte de paiement n\'existe plus. Veuillez en créer un nouveau.',
+                needsNewAccount: true,
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+            stripeError: error.type || null,
+        });
+    }
+};
+
+/**
+ * Vérifier si le compte nécessite des actions (vérifications supplémentaires)
+ * Utile pour notifier le worker de vérifications d'identité requises
+ */
+exports.checkAccountRequirements = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user.workerProfile?.stripeConnectId) {
+            return res.json({
+                success: true,
+                hasAccount: false,
+                requirements: [],
+            });
+        }
+
+        const account = await stripe.accounts.retrieve(user.workerProfile.stripeConnectId);
+
+        const requirements = {
+            currentlyDue: account.requirements?.currently_due || [],
+            eventuallyDue: account.requirements?.eventually_due || [],
+            pastDue: account.requirements?.past_due || [],
+            pendingVerification: account.requirements?.pending_verification || [],
+            disabledReason: account.requirements?.disabled_reason || null,
+        };
+
+        // Déterminer le niveau d'urgence
+        let urgencyLevel = 'none';
+        let message = 'Votre compte est en règle.';
+
+        if (requirements.pastDue.length > 0) {
+            urgencyLevel = 'critical';
+            message = 'Des informations manquantes ont dépassé leur délai. Votre compte pourrait être désactivé.';
+        } else if (requirements.currentlyDue.length > 0) {
+            urgencyLevel = 'high';
+            message = 'Des informations supplémentaires sont requises pour continuer à recevoir des paiements.';
+        } else if (requirements.eventuallyDue.length > 0) {
+            urgencyLevel = 'low';
+            message = 'Des informations seront requises prochainement.';
+        }
+
+        res.json({
+            success: true,
+            hasAccount: true,
+            isComplete: account.details_submitted,
+            chargesEnabled: account.charges_enabled,
+            payoutsEnabled: account.payouts_enabled,
+            requirements,
+            urgencyLevel,
+            message,
+        });
+    } catch (error) {
+        console.error('❌ Erreur vérification requirements:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+/**
  * Récupérer TOUS les comptes bancaires configurés
  * Retourne la liste complète avec infos partielles pour chaque compte
  */

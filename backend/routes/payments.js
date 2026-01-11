@@ -18,6 +18,8 @@ const {
   getWorkerPayoutHistory,
   getWorkerEarningsSummary,
 } = require('../controllers/paymentController');
+const { paymentLimiter } = require('../middleware/rateLimiter');
+const { validatePaymentMethodId, validateTip, validateRefund, validateReservationId } = require('../middleware/validators');
 
 // Configuration commission plateforme
 const PLATFORM_FEE_PERCENT = 0.25; // 25%
@@ -25,7 +27,7 @@ const PLATFORM_FEE_PERCENT = 0.25; // 25%
 // @route   POST /api/payments/create-intent
 // @desc    Créer un Payment Intent Stripe avec transfert automatique au déneigeur
 // @access  Private
-router.post('/create-intent', protect, async (req, res) => {
+router.post('/create-intent', protect, paymentLimiter, async (req, res) => {
     try {
         const { amount, reservationId } = req.body;
 
@@ -121,7 +123,7 @@ router.post('/create-intent', protect, async (req, res) => {
 // @route   POST /api/payments/confirm
 // @desc    Confirmer un paiement et mettre à jour la réservation + payout
 // @access  Private
-router.post('/confirm', protect, async (req, res) => {
+router.post('/confirm', protect, paymentLimiter, async (req, res) => {
     try {
         const { paymentIntentId, reservationId } = req.body;
 
@@ -280,7 +282,7 @@ router.patch('/payment-methods/:id/default', protect, setDefaultPaymentMethod);
 // @route   POST /api/payments/refunds
 // @desc    Créer un remboursement
 // @access  Private
-router.post('/refunds', protect, createRefund);
+router.post('/refunds', protect, paymentLimiter, validateRefund, createRefund);
 
 // @route   GET /api/payments/refunds/:id
 // @desc    Récupérer le statut d'un remboursement

@@ -15,13 +15,15 @@ const {
     sendVerificationCode,
     isTwilioConfigured
 } = require('../services/twilioService');
+const { smsLimiter } = require('../middleware/rateLimiter');
+const { validateSendCode, validateVerifyCode } = require('../middleware/validators');
 
 /**
  * @route   POST /api/phone/send-code
  * @desc    Envoie un code de vérification par SMS et stocke les données d'inscription
  * @access  Public
  */
-router.post('/send-code', async (req, res) => {
+router.post('/send-code', smsLimiter, validateSendCode, async (req, res) => {
     try {
         const { phoneNumber, email, password, firstName, lastName, role } = req.body;
 
@@ -130,7 +132,7 @@ router.post('/send-code', async (req, res) => {
  * @desc    Vérifie le code et crée le compte si valide
  * @access  Public
  */
-router.post('/verify-code', async (req, res) => {
+router.post('/verify-code', validateVerifyCode, async (req, res) => {
     try {
         const { phoneNumber, code } = req.body;
 
@@ -255,7 +257,7 @@ router.post('/verify-code', async (req, res) => {
  * @desc    Renvoie un nouveau code de vérification
  * @access  Public
  */
-router.post('/resend-code', async (req, res) => {
+router.post('/resend-code', smsLimiter, async (req, res) => {
     try {
         const { phoneNumber } = req.body;
 

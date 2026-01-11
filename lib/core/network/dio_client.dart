@@ -16,9 +16,14 @@ class DioClient {
         baseUrl: _baseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 30),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+        },
+        validateStatus: (status) {
+          // Accepter tous les status pour gérer les erreurs manuellement
+          return status != null && status < 500;
         },
       ),
     );
@@ -26,9 +31,77 @@ class DioClient {
     // Ajout des intercepteurs
     _dio.interceptors.addAll([
       AuthInterceptor(secureStorage: secureStorage),
+      RetryInterceptor(dio: _dio),
       LoggingInterceptor(),
     ]);
   }
 
   Dio get dio => _dio;
+}
+
+/// Intercepteur pour réessayer les requêtes échouées
+class RetryInterceptor extends Interceptor {
+  final Dio dio;
+  final int maxRetries;
+  final Duration retryDelay;
+
+  RetryInterceptor({
+    required this.dio,
+    this.maxRetries = 3,
+    this.retryDelay = const Duration(seconds: 1),
+  });
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    // Ne pas réessayer pour certains types d'erreurs
+    if (_shouldNotRetry(err)) {
+      return handler.next(err);
+    }
+
+    // Récupérer le nombre de tentatives actuel
+    final extra = err.requestOptions.extra;
+    int retryCount = extra['retryCount'] ?? 0;
+
+    if (retryCount < maxRetries) {
+      retryCount++;
+      err.requestOptions.extra['retryCount'] = retryCount;
+
+      // Attendre avant de réessayer (backoff exponentiel)
+      final delay = retryDelay * retryCount;
+      await Future.delayed(delay);
+
+      try {
+        final response = await dio.fetch(err.requestOptions);
+        return handler.resolve(response);
+      } catch (e) {
+        // Continuer avec l'erreur si le retry échoue aussi
+        if (e is DioException) {
+          return handler.next(e);
+        }
+        return handler.next(err);
+      }
+    }
+
+    return handler.next(err);
+  }
+
+  bool _shouldNotRetry(DioException err) {
+    // Ne pas réessayer les erreurs client (4xx)
+    final statusCode = err.response?.statusCode;
+    if (statusCode != null && statusCode >= 400 && statusCode < 500) {
+      return true;
+    }
+
+    // Ne pas réessayer les annulations
+    if (err.type == DioExceptionType.cancel) {
+      return true;
+    }
+
+    // Ne pas réessayer les erreurs de certificat
+    if (err.type == DioExceptionType.badCertificate) {
+      return true;
+    }
+
+    return false;
+  }
 }

@@ -409,6 +409,15 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    // Refresh token pour JWT
+    refreshToken: {
+        type: String,
+        select: false, // Ne pas inclure par défaut dans les requêtes
+    },
+    refreshTokenExpire: {
+        type: Date,
+        select: false,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -470,12 +479,46 @@ userSchema.methods.getResetPasswordToken = function () {
     return resetToken;
 };
 
+// Générer un refresh token
+userSchema.methods.generateRefreshToken = function () {
+    const refreshToken = crypto.randomBytes(40).toString('hex');
+
+    // Hasher le refresh token pour le stocker
+    this.refreshToken = crypto
+        .createHash('sha256')
+        .update(refreshToken)
+        .digest('hex');
+
+    // Expiration dans 30 jours
+    this.refreshTokenExpire = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+    return refreshToken;
+};
+
+// Vérifier un refresh token
+userSchema.methods.verifyRefreshToken = function (candidateToken) {
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(candidateToken)
+        .digest('hex');
+
+    return this.refreshToken === hashedToken && this.refreshTokenExpire > Date.now();
+};
+
+// Invalider le refresh token (logout)
+userSchema.methods.invalidateRefreshToken = function () {
+    this.refreshToken = undefined;
+    this.refreshTokenExpire = undefined;
+};
+
 // Méthode pour obtenir l'objet utilisateur sans le mot de passe
 userSchema.methods.toJSON = function () {
     const user = this.toObject();
     delete user.password;
     delete user.resetPasswordToken;
     delete user.resetPasswordExpire;
+    delete user.refreshToken;
+    delete user.refreshTokenExpire;
     delete user.__v;
     return user;
 };

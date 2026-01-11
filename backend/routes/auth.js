@@ -5,18 +5,33 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const { sendPasswordResetEmail } = require('../config/email');
+const { authLimiter, registrationLimiter, forgotPasswordLimiter } = require('../middleware/rateLimiter');
+const {
+    validateRegister,
+    validateLogin,
+    validateForgotPassword,
+    validateResetPassword,
+    validateUpdateProfile,
+} = require('../middleware/validators');
 
-// Fonction pour générer un token JWT
+// Fonction pour générer un token JWT (access token - courte durée)
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE,
+        expiresIn: '15m', // 15 minutes pour l'access token
+    });
+};
+
+// Fonction pour générer un token JWT longue durée (compatibilité)
+const generateLongLivedToken = (id, role) => {
+    return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE || '7d',
     });
 };
 
 // @route   POST /api/auth/register
 // @desc    Enregistrer un nouvel utilisateur
 // @access  Public
-router.post('/register', async (req, res) => {
+router.post('/register', registrationLimiter, validateRegister, async (req, res) => {
     try {
         const { email, password, firstName, lastName, phoneNumber, role } = req.body;
 
@@ -89,7 +104,7 @@ router.post('/register', async (req, res) => {
 // @route   POST /api/auth/login
 // @desc    Connecter un utilisateur
 // @access  Public
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, validateLogin, async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -136,7 +151,10 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        const token = generateToken(user._id, user.role);
+        // Générer les tokens
+        const accessToken = generateToken(user._id, user.role);
+        const refreshToken = user.generateRefreshToken();
+        await user.save({ validateBeforeSave: false });
 
         res.status(200).json({
             success: true,
@@ -151,7 +169,9 @@ router.post('/login', async (req, res) => {
                 photoUrl: user.photoUrl,
                 createdAt: user.createdAt,
             },
-            token,
+            token: accessToken,
+            refreshToken: refreshToken,
+            expiresIn: 900, // 15 minutes en secondes
         });
     } catch (error) {
         console.error('Erreur lors de la connexion:', error);
@@ -162,10 +182,74 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// @route   POST /api/auth/refresh-token
+// @desc    Rafraîchir le token d'accès
+// @access  Public
+router.post('/refresh-token', async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+
+        if (!refreshToken) {
+            return res.status(400).json({
+                success: false,
+                message: 'Refresh token requis',
+            });
+        }
+
+        // Hasher le token pour le comparer
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(refreshToken)
+            .digest('hex');
+
+        // Trouver l'utilisateur avec ce refresh token
+        const user = await User.findOne({
+            refreshToken: hashedToken,
+            refreshTokenExpire: { $gt: Date.now() },
+        }).select('+refreshToken +refreshTokenExpire');
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Refresh token invalide ou expiré',
+            });
+        }
+
+        // Vérifier si l'utilisateur est suspendu
+        if (user.isSuspended) {
+            return res.status(403).json({
+                success: false,
+                code: 'USER_SUSPENDED',
+                message: 'Votre compte est suspendu',
+            });
+        }
+
+        // Générer un nouveau access token
+        const newAccessToken = generateToken(user._id, user.role);
+
+        // Optionnel: rotation du refresh token pour plus de sécurité
+        const newRefreshToken = user.generateRefreshToken();
+        await user.save({ validateBeforeSave: false });
+
+        res.status(200).json({
+            success: true,
+            token: newAccessToken,
+            refreshToken: newRefreshToken,
+            expiresIn: 900,
+        });
+    } catch (error) {
+        console.error('Erreur lors du refresh token:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors du rafraîchissement du token',
+        });
+    }
+});
+
 // @route   POST /api/auth/forgot-password
 // @desc    Envoyer un email de réinitialisation de mot de passe
 // @access  Public
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', forgotPasswordLimiter, validateForgotPassword, async (req, res) => {
     console.log('\n========================================');
     console.log('[DEBUG] Route /forgot-password appelée');
     console.log('[DEBUG] Body reçu:', req.body);
@@ -242,7 +326,7 @@ router.post('/forgot-password', async (req, res) => {
 // @route   PUT /api/auth/reset-password/:resetToken
 // @desc    Réinitialiser le mot de passe
 // @access  Public
-router.put('/reset-password/:resetToken', async (req, res) => {
+router.put('/reset-password/:resetToken', authLimiter, validateResetPassword, async (req, res) => {
     try {
         const { password } = req.body;
 
@@ -325,10 +409,17 @@ router.get('/me', protect, async (req, res) => {
 });
 
 // @route   POST /api/auth/logout
-// @desc    Déconnecter l'utilisateur
+// @desc    Déconnecter l'utilisateur et invalider le refresh token
 // @access  Private
 router.post('/logout', protect, async (req, res) => {
     try {
+        // Invalider le refresh token
+        const user = await User.findById(req.user.id).select('+refreshToken +refreshTokenExpire');
+        if (user) {
+            user.invalidateRefreshToken();
+            await user.save({ validateBeforeSave: false });
+        }
+
         res.status(200).json({
             success: true,
             message: 'Déconnexion réussie',
@@ -345,7 +436,7 @@ router.post('/logout', protect, async (req, res) => {
 // @route   PUT /api/auth/update-profile
 // @desc    Mettre à jour le profil utilisateur
 // @access  Private
-router.put('/update-profile', protect, async (req, res) => {
+router.put('/update-profile', protect, validateUpdateProfile, async (req, res) => {
     try {
         const { firstName, lastName, phoneNumber, photoUrl } = req.body;
 
