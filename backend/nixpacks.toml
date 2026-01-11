@@ -1,0 +1,12 @@
+[phases.install]
+cmds = ["npm install --omit=dev"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "npm start"
+
+# Disable the problematic cache
+[caches]
+node_modules_cache = false
