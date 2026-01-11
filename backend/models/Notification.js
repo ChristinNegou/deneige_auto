@@ -72,6 +72,9 @@ const notificationSchema = new mongoose.Schema({
 // Index composé pour optimiser les requêtes
 notificationSchema.index({ userId: 1, createdAt: -1 });
 notificationSchema.index({ userId: 1, isRead: 1 });
+notificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 }); // Pour liste filtrée
+notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 }); // TTL 90 jours
+notificationSchema.index({ type: 1, createdAt: -1 }); // Pour stats par type
 
 // Méthode pour créer une notification
 notificationSchema.statics.createNotification = async function(data) {

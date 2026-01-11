@@ -10,12 +10,13 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const Transaction = require('../models/Transaction');
 const { uploadFromBuffer } = require('../config/cloudinary');
+const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, FILE_UPLOAD, GEOLOCATION } = require('../config/constants');
 
 // Configure multer with memory storage for Cloudinary uploads
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
-        fileSize: 10 * 1024 * 1024, // 10MB max
+        fileSize: FILE_UPLOAD.MAX_FILE_SIZE,
     },
     fileFilter: function (req, file, cb) {
         // Accept only images
@@ -153,7 +154,7 @@ const workerHasRequiredEquipment = (workerEquipment, requiredEquipment) => {
 // @access  Private (Worker only)
 router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res) => {
     try {
-        const { lat, lng, radiusKm = 50, filterByEquipment = 'true' } = req.query; // Default radius: 50km
+        const { lat, lng, radiusKm = GEOLOCATION.DEFAULT_SEARCH_RADIUS_KM, filterByEquipment = 'true' } = req.query;
 
         console.log(`🔍 Available jobs request from worker ${req.user.firstName}: lat=${lat}, lng=${lng}, radius=${radiusKm}km`);
 
@@ -1067,11 +1068,9 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
 
         if (workerConnectId && isPaid && payoutNotDone) {
             try {
-                const PLATFORM_FEE_PERCENT = 0.25; // 25% commission plateforme
                 const grossAmount = reservation.totalPrice;
                 const platformFee = grossAmount * PLATFORM_FEE_PERCENT;
-                const stripeFee = (grossAmount * 0.029) + 0.30;
-                const workerAmount = grossAmount - platformFee;
+                const workerAmount = grossAmount * WORKER_PERCENT;
 
                 // Créer le transfert vers le compte Connect du déneigeur
                 const transfer = await stripe.transfers.create(

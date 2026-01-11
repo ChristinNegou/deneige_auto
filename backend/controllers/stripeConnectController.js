@@ -1,8 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
-
-// Configuration de la commission plateforme
-const PLATFORM_FEE_PERCENT = 0.25; // 25%
+const { PLATFORM_FEE_PERCENT } = require('../config/constants');
 
 /**
  * Créer un compte Stripe Connect pour un déneigeur

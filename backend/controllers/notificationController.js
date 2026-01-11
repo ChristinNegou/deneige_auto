@@ -94,14 +94,32 @@ exports.updateNotificationSettings = async (req, res) => {
 // @access  Private
 exports.getNotifications = async (req, res) => {
     try {
-        const notifications = await Notification.find({ userId: req.user.id })
-            .sort({ createdAt: -1 })
-            .limit(50)
-            .populate('workerId', 'firstName lastName')
-            .populate('reservationId', 'parkingSpotNumber departureTime status');
+        const { page = 1, limit = 20, unreadOnly = 'false' } = req.query;
+        const pageNum = Math.max(1, parseInt(page));
+        const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+        const skip = (pageNum - 1) * limitNum;
+
+        const query = { userId: req.user.id };
+        if (unreadOnly === 'true') {
+            query.isRead = false;
+        }
+
+        const [notifications, total] = await Promise.all([
+            Notification.find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limitNum)
+                .populate('workerId', 'firstName lastName')
+                .populate('reservationId', 'parkingSpotNumber departureTime status'),
+            Notification.countDocuments(query),
+        ]);
 
         res.json({
             success: true,
+            count: notifications.length,
+            total,
+            page: pageNum,
+            pages: Math.ceil(total / limitNum),
             notifications,
         });
     } catch (error) {

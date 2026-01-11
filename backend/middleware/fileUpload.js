@@ -4,6 +4,7 @@
 
 const multer = require('multer');
 const path = require('path');
+const { FILE_UPLOAD } = require('../config/constants');
 
 // Types MIME autorisés pour les images
 const ALLOWED_MIME_TYPES = [
@@ -18,9 +19,9 @@ const ALLOWED_MIME_TYPES = [
 // Extensions autorisées
 const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'];
 
-// Taille maximale des fichiers (en bytes)
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
-const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5 MB pour les photos de profil
+// Taille maximale des fichiers (depuis config)
+const MAX_FILE_SIZE = FILE_UPLOAD.MAX_FILE_SIZE;
+const MAX_PHOTO_SIZE = FILE_UPLOAD.MAX_PHOTO_SIZE;
 
 /**
  * Filtre pour valider les fichiers uploadés

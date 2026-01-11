@@ -3,9 +3,7 @@ const User = require('../models/User');
 const Reservation = require('../models/Reservation');
 const Notification = require('../models/Notification');
 const Transaction = require('../models/Transaction');
-
-// Configuration
-const PLATFORM_FEE_PERCENT = 0.25; // 25%
+const { PLATFORM_FEE_PERCENT, WORKER_PERCENT } = require('../config/constants');
 
 // Get payment methods from Stripe Customer
 exports.getPaymentMethods = async (req, res) => {

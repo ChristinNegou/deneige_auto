@@ -20,9 +20,7 @@ const {
 } = require('../controllers/paymentController');
 const { paymentLimiter } = require('../middleware/rateLimiter');
 const { validatePaymentMethodId, validateTip, validateRefund, validateReservationId } = require('../middleware/validators');
-
-// Configuration commission plateforme
-const PLATFORM_FEE_PERCENT = 0.25; // 25%
+const { PLATFORM_FEE_PERCENT } = require('../config/constants');
 
 // @route   POST /api/payments/create-intent
 // @desc    Créer un Payment Intent Stripe avec transfert automatique au déneigeur

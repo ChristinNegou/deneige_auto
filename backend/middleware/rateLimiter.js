@@ -4,6 +4,7 @@
  */
 
 const rateLimit = require('express-rate-limit');
+const { RATE_LIMITS } = require('../config/constants');
 
 // Message d'erreur en français
 const rateLimitMessage = {
@@ -14,11 +15,11 @@ const rateLimitMessage = {
 
 /**
  * Rate limiter général pour toutes les API
- * 100 requêtes par minute par IP
+ * Configurable via RATE_LIMITS.GENERAL
  */
 const generalLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 100,
+    windowMs: RATE_LIMITS.GENERAL.WINDOW_MS,
+    max: RATE_LIMITS.GENERAL.MAX_ATTEMPTS,
     message: rateLimitMessage,
     standardHeaders: true,
     legacyHeaders: false,
@@ -32,11 +33,11 @@ const generalLimiter = rateLimit({
 
 /**
  * Rate limiter strict pour l'authentification
- * 5 tentatives par 15 minutes par IP
+ * Configurable via RATE_LIMITS.AUTH
  */
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5,
+    windowMs: RATE_LIMITS.AUTH.WINDOW_MS,
+    max: RATE_LIMITS.AUTH.MAX_ATTEMPTS,
     message: {
         success: false,
         message: 'Trop de tentatives de connexion. Veuillez réessayer dans 15 minutes.',
@@ -79,11 +80,11 @@ const registrationLimiter = rateLimit({
 
 /**
  * Rate limiter pour les SMS/codes de vérification
- * 3 codes par 15 minutes par IP
+ * Configurable via RATE_LIMITS.SMS
  */
 const smsLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 3,
+    windowMs: RATE_LIMITS.SMS.WINDOW_MS,
+    max: RATE_LIMITS.SMS.MAX_ATTEMPTS,
     message: {
         success: false,
         message: 'Trop de demandes de code. Veuillez réessayer dans 15 minutes.',
@@ -102,11 +103,11 @@ const smsLimiter = rateLimit({
 
 /**
  * Rate limiter pour les paiements
- * 10 opérations par minute par IP
+ * Configurable via RATE_LIMITS.PAYMENT
  */
 const paymentLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 10,
+    windowMs: RATE_LIMITS.PAYMENT.WINDOW_MS,
+    max: RATE_LIMITS.PAYMENT.MAX_ATTEMPTS,
     message: {
         success: false,
         message: 'Trop d\'opérations de paiement. Veuillez réessayer dans une minute.',
@@ -167,11 +168,11 @@ const reservationLimiter = rateLimit({
 
 /**
  * Rate limiter pour les uploads de fichiers
- * 10 uploads par minute par utilisateur
+ * Configurable via RATE_LIMITS.UPLOAD
  */
 const uploadLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 10,
+    windowMs: RATE_LIMITS.UPLOAD.WINDOW_MS,
+    max: RATE_LIMITS.UPLOAD.MAX_ATTEMPTS,
     message: {
         success: false,
         message: 'Trop d\'uploads. Veuillez réessayer dans une minute.',

@@ -5,12 +5,10 @@ const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Notification = require('../models/Notification');
+const { PLATFORM_FEE_PERCENT } = require('../config/constants');
 
 // Webhook secret - à configurer dans .env
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
-
-// Commission plateforme (centralisé)
-const PLATFORM_FEE_PERCENT = 0.25;
 
 /**
  * @route   POST /api/webhooks/stripe

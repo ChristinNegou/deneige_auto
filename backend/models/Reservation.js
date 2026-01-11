@@ -439,10 +439,30 @@ const reservationSchema = new mongoose.Schema({
 
 
 
-// Index pour recherche rapide
+// ============================================
+// INDEX OPTIMIZATIONS
+// ============================================
+
+// Index composés pour les requêtes fréquentes
 reservationSchema.index({ userId: 1, status: 1, departureTime: -1 });
 reservationSchema.index({ workerId: 1, status: 1 });
 reservationSchema.index({ departureTime: 1, status: 1 });
+reservationSchema.index({ status: 1, createdAt: -1 }); // Pour admin dashboard
+reservationSchema.index({ paymentStatus: 1, status: 1 }); // Pour rapports paiements
+reservationSchema.index({ 'payout.status': 1, workerId: 1 }); // Pour versements workers
+
+// Index pour requêtes de date (rapports, stats)
+reservationSchema.index({ createdAt: -1 });
+reservationSchema.index({ completedAt: -1 });
+
+// Index pour recherche par paymentIntentId (webhooks Stripe)
+reservationSchema.index({ paymentIntentId: 1 }, { sparse: true });
+
+// Index pour les disputes
+reservationSchema.index({ 'dispute.hasDispute': 1, 'dispute.disputeStatus': 1 });
+
+// Index pour jobs expirés (cron job)
+reservationSchema.index({ status: 1, deadlineTime: 1 });
 
 // Geospatial index for location-based job discovery
 reservationSchema.index({ 'location': '2dsphere' });

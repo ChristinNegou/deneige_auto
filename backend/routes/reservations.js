@@ -6,14 +6,18 @@ const Reservation = require('../models/Reservation');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, CANCELLATION_POLICY } = require('../config/constants');
 
 
 // @route   GET /api/reservations
-// @desc    Obtenir toutes les réservations de l'utilisateur
+// @desc    Obtenir toutes les réservations de l'utilisateur (paginé)
 // @access  Private
 router.get('/', protect, async (req, res) => {
     try {
-        const { upcoming, status } = req.query;
+        const { upcoming, status, page = 1, limit = 20 } = req.query;
+        const pageNum = Math.max(1, parseInt(page));
+        const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+        const skip = (pageNum - 1) * limitNum;
 
         const query = { userId: req.user.id };
 
@@ -26,15 +30,23 @@ router.get('/', protect, async (req, res) => {
             query.status = status;
         }
 
-        const reservations = await Reservation.find(query)
-            .populate('vehicle')
-            .populate('parkingSpot')
-            .populate('workerId', 'firstName lastName phoneNumber photoUrl')
-            .sort({ departureTime: -1 });
+        const [reservations, total] = await Promise.all([
+            Reservation.find(query)
+                .populate('vehicle')
+                .populate('parkingSpot')
+                .populate('workerId', 'firstName lastName phoneNumber photoUrl')
+                .sort({ departureTime: -1 })
+                .skip(skip)
+                .limit(limitNum),
+            Reservation.countDocuments(query),
+        ]);
 
         res.status(200).json({
             success: true,
             count: reservations.length,
+            total,
+            page: pageNum,
+            pages: Math.ceil(total / limitNum),
             reservations,
         });
     } catch (error) {
@@ -527,8 +539,7 @@ router.patch('/:id/start', protect, async (req, res) => {
     }
 });
 
-// Configuration des commissions
-const PLATFORM_FEE_PERCENT = 0.25; // 25% pour la plateforme
+// Configuration des commissions (importée de config/constants.js)
 
 // @route   PATCH /api/reservations/:id/complete
 // @desc    Marquer le travail comme terminé et payer le déneigeur
@@ -710,17 +721,7 @@ router.post('/create-intent', protect, async (req, res) => {
 // LOGIQUE MÉTIER D'ANNULATION
 // ============================================================================
 
-// Constantes pour la politique d'annulation
-const CANCELLATION_POLICY = {
-    // Seuils d'avertissement pour les déneigeurs
-    WARNING_THRESHOLD: 2,        // Nombre d'annulations avant avertissement
-    SUSPENSION_THRESHOLD: 5,     // Nombre d'annulations avant suspension
-    SUSPENSION_DAYS: 7,          // Durée de suspension en jours
-
-    // Pénalités pour les clients
-    EN_ROUTE_FEE_PERCENT: 50,    // 50% si déneigeur en route
-    IN_PROGRESS_FEE_PERCENT: 100, // 100% si travail commencé
-};
+// Configuration d'annulation importée de config/constants.js
 
 // Raisons valables d'annulation pour les déneigeurs
 const VALID_WORKER_CANCELLATION_REASONS = [
@@ -1014,8 +1015,8 @@ router.patch('/:id/cancel-by-client', protect, async (req, res) => {
 
         // Payer le déneigeur si des frais sont appliqués et qu'il était assigné
         if (cancellationFeeAmount > 0 && reservation.workerId) {
-            const platformFee = cancellationFeeAmount * 0.25; // 25% plateforme
-            const workerAmount = cancellationFeeAmount * 0.75; // 75% déneigeur
+            const platformFee = cancellationFeeAmount * PLATFORM_FEE_PERCENT;
+            const workerAmount = cancellationFeeAmount * WORKER_PERCENT;
 
             reservation.payout = {
                 status: 'pending',

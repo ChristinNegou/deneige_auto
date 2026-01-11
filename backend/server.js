@@ -5,9 +5,11 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cron = require('node-cron');
 const helmet = require('helmet');
+const compression = require('compression');
 const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./config/database');
 const path = require('path');
+const mongoose = require('mongoose');
 const { initializeFirebase } = require('./services/firebaseService');
 const { runFullCleanup, getDatabaseStats } = require('./services/databaseCleanupService');
 const { processExpiredJobs } = require('./services/expiredJobsService');
@@ -82,6 +84,19 @@ app.use(helmet({
 app.use(mongoSanitize()); // Protection contre les injections NoSQL
 app.use(generalLimiter); // Rate limiting général
 
+// Compression des réponses (gzip)
+app.use(compression({
+    level: 6, // Niveau de compression (1-9)
+    threshold: 1024, // Compresser seulement si > 1KB
+    filter: (req, res) => {
+        // Ne pas compresser les webhooks Stripe (raw body)
+        if (req.path.includes('/webhook')) {
+            return false;
+        }
+        return compression.filter(req, res);
+    },
+}));
+
 // Middleware spécial pour les webhooks Stripe (doit recevoir le raw body AVANT express.json())
 app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }));
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
@@ -151,14 +166,88 @@ app.get('/', (req, res) => {
     });
 });
 
-// Route de santé
-app.get('/health', (req, res) => {
-    res.json({
+// Route de santé améliorée
+app.get('/health', async (req, res) => {
+    const healthCheck = {
         success: true,
         status: 'healthy',
-        database: 'connected',
-        uptime: process.uptime()
-    });
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        uptimeFormatted: formatUptime(process.uptime()),
+        memory: {
+            used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+            total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+            unit: 'MB',
+        },
+        database: {
+            status: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+            name: mongoose.connection.name || 'N/A',
+        },
+        environment: process.env.NODE_ENV || 'development',
+        version: process.env.npm_package_version || '1.0.0',
+    };
+
+    // Si la DB n'est pas connectée, retourner un status 503
+    if (mongoose.connection.readyState !== 1) {
+        healthCheck.success = false;
+        healthCheck.status = 'unhealthy';
+        return res.status(503).json(healthCheck);
+    }
+
+    res.json(healthCheck);
+});
+
+// Helper pour formater l'uptime
+function formatUptime(seconds) {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    const parts = [];
+    if (days > 0) parts.push(`${days}j`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}m`);
+    parts.push(`${secs}s`);
+
+    return parts.join(' ');
+}
+
+// Route de santé détaillée (pour monitoring)
+app.get('/health/detailed', async (req, res) => {
+    try {
+        // Test de latence DB
+        const dbStart = Date.now();
+        await mongoose.connection.db.admin().ping();
+        const dbLatency = Date.now() - dbStart;
+
+        res.json({
+            success: true,
+            status: 'healthy',
+            timestamp: new Date().toISOString(),
+            checks: {
+                database: {
+                    status: 'ok',
+                    latency: `${dbLatency}ms`,
+                },
+                memory: {
+                    status: process.memoryUsage().heapUsed < 500 * 1024 * 1024 ? 'ok' : 'warning',
+                    heapUsed: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`,
+                    heapTotal: `${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB`,
+                },
+                uptime: {
+                    status: 'ok',
+                    value: formatUptime(process.uptime()),
+                },
+            },
+        });
+    } catch (error) {
+        res.status(503).json({
+            success: false,
+            status: 'unhealthy',
+            error: error.message,
+        });
+    }
 });
 
 // Route 404
