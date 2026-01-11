@@ -6,6 +6,18 @@
 const rateLimit = require('express-rate-limit');
 const { RATE_LIMITS } = require('../config/constants');
 
+// Helper pour générer une clé à partir de l'IP (compatible IPv6)
+const getClientIp = (req) => {
+    // Utiliser x-forwarded-for pour les proxies (Railway, etc.)
+    const forwarded = req.headers['x-forwarded-for'];
+    if (forwarded) {
+        // Prendre la première IP (client original)
+        return forwarded.split(',')[0].trim();
+    }
+    // Fallback sur req.ip
+    return req.ip || 'unknown';
+};
+
 // En mode test, désactiver le rate limiting
 const isTestEnv = process.env.NODE_ENV === 'test';
 
@@ -168,8 +180,9 @@ const reservationLimiter = rateLimit({
     legacyHeaders: false,
     keyGenerator: (req) => {
         // Utiliser l'ID utilisateur si authentifié, sinon l'IP
-        return req.user?.id || req.ip;
+        return req.user?.id || getClientIp(req);
     },
+    validate: { xForwardedForHeader: false },
 });
 
 /**
@@ -186,8 +199,9 @@ const uploadLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator: (req) => {
-        return req.user?.id || req.ip;
+        return req.user?.id || getClientIp(req);
     },
+    validate: { xForwardedForHeader: false },
 });
 
 // Exporter les vrais limiters en production, ou noop en test
