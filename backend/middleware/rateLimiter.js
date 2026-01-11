@@ -6,6 +6,12 @@
 const rateLimit = require('express-rate-limit');
 const { RATE_LIMITS } = require('../config/constants');
 
+// En mode test, désactiver le rate limiting
+const isTestEnv = process.env.NODE_ENV === 'test';
+
+// Middleware qui ne fait rien (pour les tests)
+const noopMiddleware = (req, res, next) => next();
+
 // Message d'erreur en français
 const rateLimitMessage = {
     success: false,
@@ -184,7 +190,17 @@ const uploadLimiter = rateLimit({
     },
 });
 
-module.exports = {
+// Exporter les vrais limiters en production, ou noop en test
+module.exports = isTestEnv ? {
+    generalLimiter: noopMiddleware,
+    authLimiter: noopMiddleware,
+    registrationLimiter: noopMiddleware,
+    smsLimiter: noopMiddleware,
+    paymentLimiter: noopMiddleware,
+    forgotPasswordLimiter: noopMiddleware,
+    reservationLimiter: noopMiddleware,
+    uploadLimiter: noopMiddleware,
+} : {
     generalLimiter,
     authLimiter,
     registrationLimiter,
