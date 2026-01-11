@@ -15,7 +15,7 @@
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
     "lint": "echo 'Linting backend...' && exit 0",
-    "prepare": "cd .. && npx lefthook install"
+    "prepare": "cd .. && git rev-parse --git-dir > /dev/null 2>&1 && npx lefthook install || true"
   },
   "keywords": [
     "api",
