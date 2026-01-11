@@ -1381,4 +1381,63 @@ function generateReconciliationRecommendations(discrepancies, problematicCount) 
     return recommendations;
 }
 
+/**
+ * @route   POST /api/admin/finance/cleanup-test-reservations
+ * @desc    Supprimer les reservations de test (completed sans paiement)
+ * @access  Private (Admin)
+ */
+router.post('/finance/cleanup-test-reservations', protect, adminOnly, async (req, res) => {
+    try {
+        const { dryRun = true } = req.body;
+
+        // Trouver les reservations de test
+        const testReservations = await Reservation.find({
+            status: 'completed',
+            paymentStatus: 'pending',
+            $or: [
+                { paymentIntentId: { $exists: false } },
+                { paymentIntentId: null }
+            ]
+        }).select('_id totalPrice status paymentStatus createdAt');
+
+        const summary = {
+            found: testReservations.length,
+            totalAmount: testReservations.reduce((sum, r) => sum + (r.totalPrice || 0), 0),
+            reservations: testReservations.map(r => ({
+                id: r._id,
+                totalPrice: r.totalPrice,
+                createdAt: r.createdAt,
+            })),
+            deleted: 0,
+            dryRun,
+        };
+
+        if (!dryRun && testReservations.length > 0) {
+            const result = await Reservation.deleteMany({
+                status: 'completed',
+                paymentStatus: 'pending',
+                $or: [
+                    { paymentIntentId: { $exists: false } },
+                    { paymentIntentId: null }
+                ]
+            });
+            summary.deleted = result.deletedCount;
+        }
+
+        res.json({
+            success: true,
+            message: dryRun
+                ? `${summary.found} reservation(s) de test trouvee(s). Utilisez dryRun: false pour supprimer.`
+                : `${summary.deleted} reservation(s) de test supprimee(s)`,
+            summary,
+        });
+    } catch (error) {
+        console.error('Erreur cleanup:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors du nettoyage',
+        });
+    }
+});
+
 module.exports = router;
