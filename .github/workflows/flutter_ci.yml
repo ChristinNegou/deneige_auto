@@ -257,6 +257,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_android
     if: github.ref == 'refs/heads/develop'
+    continue-on-error: true  # Don't fail workflow if deploy fails
 
     steps:
       - name: Checkout code
@@ -286,6 +287,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_android
     if: github.ref == 'refs/heads/main'
+    continue-on-error: true  # Don't fail workflow if deploy fails
 
     steps:
       - name: Checkout code
