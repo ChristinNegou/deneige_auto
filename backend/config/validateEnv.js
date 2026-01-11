@@ -104,10 +104,22 @@ const requiredEnvVars = {
   // Stripe Webhook
   STRIPE_WEBHOOK_SECRET: {
     required: false,
-    description: 'Secret du webhook Stripe',
+    description: 'Secret du webhook Stripe (événements compte principal)',
     validate: (value) => {
       if (value && !value.startsWith('whsec_')) {
         return 'STRIPE_WEBHOOK_SECRET doit commencer par whsec_';
+      }
+      return null;
+    },
+  },
+
+  // Stripe Webhook Connect
+  STRIPE_WEBHOOK_SECRET_CONNECT: {
+    required: false,
+    description: 'Secret du webhook Stripe Connect (événements comptes workers)',
+    validate: (value) => {
+      if (value && !value.startsWith('whsec_')) {
+        return 'STRIPE_WEBHOOK_SECRET_CONNECT doit commencer par whsec_';
       }
       return null;
     },

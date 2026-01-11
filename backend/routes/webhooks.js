@@ -7,8 +7,9 @@ const Transaction = require('../models/Transaction');
 const Notification = require('../models/Notification');
 const { PLATFORM_FEE_PERCENT } = require('../config/constants');
 
-// Webhook secret - à configurer dans .env
+// Webhook secrets - à configurer dans .env
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+const WEBHOOK_SECRET_CONNECT = process.env.STRIPE_WEBHOOK_SECRET_CONNECT;
 
 /**
  * @route   POST /api/webhooks/stripe
@@ -22,7 +23,7 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
 
     try {
         // Vérifier la signature du webhook - OBLIGATOIRE en production
-        if (!WEBHOOK_SECRET) {
+        if (!WEBHOOK_SECRET && !WEBHOOK_SECRET_CONNECT) {
             if (process.env.NODE_ENV === 'production') {
                 console.error('❌ STRIPE_WEBHOOK_SECRET non configuré en production - webhook rejeté');
                 return res.status(500).json({ error: 'Webhook configuration error' });
@@ -31,8 +32,31 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
             console.warn('⚠️ STRIPE_WEBHOOK_SECRET non configuré - webhook non vérifié (dev mode only)');
             event = JSON.parse(req.body);
         } else {
-            // Vérification cryptographique de la signature Stripe
-            event = stripe.webhooks.constructEvent(req.body, sig, WEBHOOK_SECRET);
+            // Essayer de vérifier avec le secret principal d'abord
+            let verified = false;
+
+            if (WEBHOOK_SECRET) {
+                try {
+                    event = stripe.webhooks.constructEvent(req.body, sig, WEBHOOK_SECRET);
+                    verified = true;
+                } catch (e) {
+                    // Échec avec le secret principal, essayer le secret Connect
+                }
+            }
+
+            // Si non vérifié, essayer avec le secret Connect
+            if (!verified && WEBHOOK_SECRET_CONNECT) {
+                try {
+                    event = stripe.webhooks.constructEvent(req.body, sig, WEBHOOK_SECRET_CONNECT);
+                    verified = true;
+                } catch (e) {
+                    // Échec avec les deux secrets
+                }
+            }
+
+            if (!verified) {
+                throw new Error('Signature verification failed with all secrets');
+            }
         }
     } catch (err) {
         console.error('❌ Webhook signature verification failed:', err.message);
