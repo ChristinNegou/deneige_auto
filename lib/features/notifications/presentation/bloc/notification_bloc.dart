@@ -76,19 +76,27 @@ class NotificationState extends Equatable {
   });
 
   List<AppNotification> get unreadNotifications {
-    return notifications.where((n) => !n.isRead).toList();
+    final list = notifications.where((n) => !n.isRead).toList();
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
   }
 
   List<AppNotification> get readNotifications {
-    return notifications.where((n) => n.isRead).toList();
+    final list = notifications.where((n) => n.isRead).toList();
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
   }
 
   List<AppNotification> get todayNotifications {
-    return notifications.where((n) => n.isToday).toList();
+    final list = notifications.where((n) => n.isToday).toList();
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
   }
 
   List<AppNotification> get earlierNotifications {
-    return notifications.where((n) => !n.isToday).toList();
+    final list = notifications.where((n) => !n.isToday).toList();
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
   }
 
   NotificationState copyWith({
