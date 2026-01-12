@@ -825,6 +825,133 @@ router.post('/notifications/broadcast', protect, adminOnly, async (req, res) => 
     }
 });
 
+/**
+ * @route   POST /api/admin/notifications/test
+ * @desc    Envoyer une notification test à un utilisateur (avec FCM)
+ * @access  Private (Admin)
+ */
+router.post('/notifications/test', protect, adminOnly, async (req, res) => {
+    try {
+        const { userId, email } = req.body;
+
+        // Trouver l'utilisateur
+        let user;
+        if (userId) {
+            user = await User.findById(userId);
+        } else if (email) {
+            user = await User.findOne({ email: email.toLowerCase() });
+        } else {
+            // Si aucun paramètre, envoyer à l'admin qui fait la requête
+            user = await User.findById(req.user.id);
+        }
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Utilisateur non trouvé',
+            });
+        }
+
+        // Créer la notification (ceci enverra aussi le push FCM)
+        const notification = await Notification.createNotification({
+            userId: user._id,
+            type: 'systemNotification',
+            title: '🧪 Test Notification',
+            message: `Ceci est un test de notification push envoyé à ${user.firstName} ${user.lastName}`,
+            priority: 'high',
+        });
+
+        res.json({
+            success: true,
+            message: `Notification envoyée à ${user.email}`,
+            notification: {
+                id: notification._id,
+                title: notification.title,
+                message: notification.message,
+            },
+            fcmStatus: user.fcmToken ? 'Token présent - push envoyé' : 'Pas de token FCM - push non envoyé',
+            user: {
+                id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                hasFcmToken: !!user.fcmToken,
+            },
+        });
+    } catch (error) {
+        console.error('Erreur test notification:', error);
+        res.status(500).json({
+            success: false,
+            message: getErrorMessage(error),
+        });
+    }
+});
+
+/**
+ * @route   GET /api/admin/notifications/fcm-status
+ * @desc    Obtenir le statut FCM de tous les utilisateurs
+ * @access  Private (Admin)
+ */
+router.get('/notifications/fcm-status', protect, adminOnly, async (req, res) => {
+    try {
+        const users = await User.find({}, 'email firstName lastName role fcmToken notificationSettings createdAt')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const stats = {
+            total: users.length,
+            withFcmToken: 0,
+            withoutFcmToken: 0,
+            byRole: {},
+        };
+
+        const usersWithToken = [];
+        const usersWithoutToken = [];
+
+        users.forEach(user => {
+            const hasToken = !!user.fcmToken;
+            if (hasToken) {
+                stats.withFcmToken++;
+                usersWithToken.push({
+                    id: user._id,
+                    email: user.email,
+                    name: `${user.firstName} ${user.lastName}`,
+                    role: user.role,
+                    tokenPreview: user.fcmToken.substring(0, 20) + '...',
+                    pushEnabled: user.notificationSettings?.pushEnabled !== false,
+                });
+            } else {
+                stats.withoutFcmToken++;
+                usersWithoutToken.push({
+                    id: user._id,
+                    email: user.email,
+                    name: `${user.firstName} ${user.lastName}`,
+                    role: user.role,
+                });
+            }
+
+            // Stats par rôle
+            if (!stats.byRole[user.role]) {
+                stats.byRole[user.role] = { total: 0, withToken: 0 };
+            }
+            stats.byRole[user.role].total++;
+            if (hasToken) stats.byRole[user.role].withToken++;
+        });
+
+        res.json({
+            success: true,
+            stats,
+            usersWithToken,
+            usersWithoutToken,
+        });
+    } catch (error) {
+        console.error('Erreur FCM status:', error);
+        res.status(500).json({
+            success: false,
+            message: getErrorMessage(error),
+        });
+    }
+});
+
 // ============================================================================
 // REPORTS
 // ============================================================================
