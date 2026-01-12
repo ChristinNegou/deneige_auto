@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_illustration.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_state.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,6 +16,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _isCheckingAuth = true;
 
   final List<OnboardingContent> _pages = [
     OnboardingContent(
@@ -43,6 +47,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       accentColor: const Color(0xFFFAFAFA),
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Vérifier l'état d'auth après le premier frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthState();
+    });
+  }
+
+  void _checkAuthState() {
+    final authState = context.read<AuthBloc>().state;
+
+    // Si déjà authentifié, ne pas afficher l'onboarding
+    if (authState is AuthAuthenticated) {
+      // La navigation est gérée par le BlocListener dans deneigeauto_app.dart
+      return;
+    }
+
+    // Si l'état est initial ou loading, attendre
+    if (authState is AuthInitial || authState is AuthLoading) {
+      // Écouter les changements d'état
+      return;
+    }
+
+    // Si non authentifié, afficher l'onboarding
+    if (mounted) {
+      setState(() {
+        _isCheckingAuth = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -77,6 +113,65 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        // Si l'état change vers non-authentifié, afficher l'onboarding
+        if (state is AuthUnauthenticated && mounted) {
+          setState(() {
+            _isCheckingAuth = false;
+          });
+        }
+        // Si authentifié, la navigation est gérée par deneigeauto_app.dart
+      },
+      child:
+          _isCheckingAuth ? _buildLoadingScreen() : _buildOnboardingContent(),
+    );
+  }
+
+  Widget _buildLoadingScreen() {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Logo ou icône de l'app
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.primary, AppTheme.secondary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.ac_unit_rounded,
+                color: Colors.white,
+                size: 50,
+              ),
+            ),
+            const SizedBox(height: 32),
+            const CircularProgressIndicator(
+              color: AppTheme.primary,
+              strokeWidth: 3,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOnboardingContent() {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Container(
