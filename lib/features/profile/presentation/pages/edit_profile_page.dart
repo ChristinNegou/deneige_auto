@@ -812,6 +812,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       _devCode = null;
                                       _isLoading = false;
                                     });
+                                    // Restaurer l'état AuthAuthenticated
+                                    context
+                                        .read<AuthBloc>()
+                                        .add(RestoreAuthState());
                                   }
                                 });
                               },

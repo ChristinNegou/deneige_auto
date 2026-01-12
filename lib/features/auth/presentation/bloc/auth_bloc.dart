@@ -62,6 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<CheckPhoneAvailability>(_onCheckPhoneAvailability);
     on<SendPhoneChangeCode>(_onSendPhoneChangeCode);
     on<VerifyPhoneChangeCode>(_onVerifyPhoneChangeCode);
+    on<RestoreAuthState>(_onRestoreAuthState);
 
     // Écouter les événements de suspension de l'intercepteur
     _suspensionSubscription = AuthInterceptor.suspensionStream.listen((data) {
@@ -446,6 +447,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthAuthenticated(user: user));
       },
     );
+  }
+
+  // ============ RESTORE AUTH STATE ============
+
+  Future<void> _onRestoreAuthState(
+    RestoreAuthState event,
+    Emitter<AuthState> emit,
+  ) async {
+    // Restaure l'état AuthAuthenticated avec l'utilisateur actuel
+    if (_currentUser != null) {
+      emit(AuthAuthenticated(user: _currentUser!));
+    }
   }
 
   // ============ NOTIFICATION HELPERS ============

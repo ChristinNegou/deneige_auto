@@ -198,3 +198,6 @@ class VerifyPhoneChangeCode extends AuthEvent {
   @override
   List<Object?> get props => [phoneNumber, code];
 }
+
+/// Restaure l'état AuthAuthenticated (utilisé après annulation d'une opération)
+class RestoreAuthState extends AuthEvent {}

@@ -21,6 +21,12 @@ class RoleBasedHomeWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
+      buildWhen: (previous, current) {
+        // Ne reconstruire que pour les changements d'authentification
+        return current is AuthAuthenticated ||
+            current is AuthUnauthenticated ||
+            current is AuthLoading;
+      },
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final user = state.user;
