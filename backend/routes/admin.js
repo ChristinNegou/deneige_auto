@@ -1529,4 +1529,121 @@ router.post('/finance/fix-payouts', protect, adminOnly, async (req, res) => {
     }
 });
 
+/**
+ * @route   POST /api/admin/finance/process-pending-payouts
+ * @desc    Traiter les payouts en attente pour les réservations complétées et payées
+ * @access  Private (Admin)
+ */
+router.post('/finance/process-pending-payouts', protect, adminOnly, async (req, res) => {
+    try {
+        const { dryRun = true } = req.body;
+
+        // Trouver les réservations avec payout en attente
+        const pendingPayouts = await Reservation.find({
+            status: 'completed',
+            paymentStatus: 'paid',
+            'payout.status': { $in: ['pending', 'pending_payment', 'pending_account'] },
+        }).populate('workerId', 'firstName lastName workerProfile.stripeConnectId');
+
+        const summary = {
+            found: pendingPayouts.length,
+            processed: 0,
+            succeeded: 0,
+            failed: 0,
+            noAccount: 0,
+            details: [],
+        };
+
+        const PLATFORM_FEE_PERCENT_LOCAL = 0.25;
+
+        for (const reservation of pendingPayouts) {
+            const worker = reservation.workerId;
+            const totalAmount = reservation.totalPrice;
+            const tipAmount = reservation.tipAmount || 0;
+            const platformFee = reservation.payout?.platformFee || (totalAmount * PLATFORM_FEE_PERCENT_LOCAL);
+            const workerAmount = reservation.payout?.workerAmount || (totalAmount - platformFee + tipAmount);
+
+            const detail = {
+                reservationId: reservation._id,
+                workerName: worker ? `${worker.firstName} ${worker.lastName}` : 'N/A',
+                amount: workerAmount,
+                currentStatus: reservation.payout?.status,
+                hasStripeConnect: !!worker?.workerProfile?.stripeConnectId,
+            };
+
+            if (!worker?.workerProfile?.stripeConnectId) {
+                detail.result = 'no_account';
+                summary.noAccount++;
+            } else if (!dryRun) {
+                try {
+                    const transfer = await stripe.transfers.create(
+                        {
+                            amount: Math.round(workerAmount * 100),
+                            currency: 'cad',
+                            destination: worker.workerProfile.stripeConnectId,
+                            description: `Paiement job #${reservation._id}`,
+                            metadata: {
+                                reservationId: reservation._id.toString(),
+                                workerId: worker._id.toString(),
+                                originalAmount: totalAmount,
+                                platformFee: platformFee,
+                                tipAmount: tipAmount,
+                            },
+                        },
+                        {
+                            idempotencyKey: `transfer_job_${reservation._id}_retry`,
+                        }
+                    );
+
+                    reservation.payout = {
+                        ...reservation.payout,
+                        status: 'completed',
+                        stripeTransferId: transfer.id,
+                        processedAt: new Date(),
+                    };
+                    await reservation.save();
+
+                    // Update worker stats
+                    worker.workerProfile.totalJobsCompleted = (worker.workerProfile.totalJobsCompleted || 0) + 1;
+                    worker.workerProfile.totalEarnings = (worker.workerProfile.totalEarnings || 0) + workerAmount;
+                    worker.workerProfile.totalTipsReceived = (worker.workerProfile.totalTipsReceived || 0) + tipAmount;
+                    await worker.save();
+
+                    detail.result = 'success';
+                    detail.transferId = transfer.id;
+                    summary.succeeded++;
+
+                } catch (stripeError) {
+                    detail.result = 'failed';
+                    detail.error = stripeError.message;
+                    summary.failed++;
+
+                    reservation.payout.status = 'failed';
+                    reservation.payout.error = stripeError.message;
+                    await reservation.save();
+                }
+                summary.processed++;
+            } else {
+                detail.result = 'would_process';
+            }
+
+            summary.details.push(detail);
+        }
+
+        res.json({
+            success: true,
+            message: dryRun
+                ? `${summary.found} payout(s) en attente trouve(s). ${summary.noAccount} sans compte Stripe. Utilisez dryRun: false pour traiter.`
+                : `${summary.processed} payout(s) traite(s): ${summary.succeeded} reussi(s), ${summary.failed} echoue(s)`,
+            summary,
+        });
+    } catch (error) {
+        console.error('Erreur process-pending-payouts:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors du traitement des payouts',
+        });
+    }
+});
+
 module.exports = router;

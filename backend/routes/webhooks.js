@@ -7,6 +7,111 @@ const Transaction = require('../models/Transaction');
 const Notification = require('../models/Notification');
 const { PLATFORM_FEE_PERCENT } = require('../config/constants');
 
+// ============================================
+// PAYOUT HELPER FUNCTION
+// ============================================
+
+/**
+ * Process worker payout for a completed reservation
+ * @param {Object} reservation - The reservation document
+ * @param {Object} worker - The worker document (optional, will be fetched if not provided)
+ * @returns {Object} Result of the payout attempt
+ */
+async function processWorkerPayout(reservation, worker = null) {
+    // Fetch worker if not provided
+    if (!worker && reservation.workerId) {
+        worker = await User.findById(reservation.workerId);
+    }
+
+    if (!worker) {
+        console.log(`❌ No worker found for reservation ${reservation._id}`);
+        return { success: false, error: 'Worker not found' };
+    }
+
+    // Check if worker has Stripe Connect
+    if (!worker.workerProfile?.stripeConnectId) {
+        reservation.payout.status = 'pending_account';
+        reservation.payout.note = 'En attente de configuration du compte de paiement';
+        await reservation.save();
+        return { success: false, error: 'No Stripe Connect account', needsSetup: true };
+    }
+
+    // Check if payment is completed
+    if (reservation.paymentStatus !== 'paid') {
+        reservation.payout.status = 'pending_payment';
+        reservation.payout.note = 'En attente du paiement client';
+        await reservation.save();
+        return { success: false, error: 'Payment not completed' };
+    }
+
+    // Calculate amounts if not already set
+    const totalAmount = reservation.totalPrice;
+    const tipAmount = reservation.tipAmount || 0;
+    const platformFee = reservation.payout?.platformFee || (totalAmount * PLATFORM_FEE_PERCENT);
+    const workerAmount = reservation.payout?.workerAmount || (totalAmount - platformFee + tipAmount);
+
+    try {
+        const transfer = await stripe.transfers.create(
+            {
+                amount: Math.round(workerAmount * 100), // En cents
+                currency: 'cad',
+                destination: worker.workerProfile.stripeConnectId,
+                description: `Paiement job #${reservation._id}`,
+                metadata: {
+                    reservationId: reservation._id.toString(),
+                    workerId: worker._id.toString(),
+                    originalAmount: totalAmount,
+                    platformFee: platformFee,
+                    tipAmount: tipAmount,
+                },
+            },
+            {
+                idempotencyKey: `transfer_job_${reservation._id}`,
+            }
+        );
+
+        // Update reservation payout status
+        reservation.payout = {
+            ...reservation.payout,
+            status: 'completed',
+            workerAmount: workerAmount,
+            platformFee: platformFee,
+            tipAmount: tipAmount,
+            stripeTransferId: transfer.id,
+            processedAt: new Date(),
+        };
+        await reservation.save();
+
+        // Update worker stats
+        worker.workerProfile.totalJobsCompleted = (worker.workerProfile.totalJobsCompleted || 0) + 1;
+        worker.workerProfile.totalEarnings = (worker.workerProfile.totalEarnings || 0) + workerAmount;
+        worker.workerProfile.totalTipsReceived = (worker.workerProfile.totalTipsReceived || 0) + tipAmount;
+        await worker.save();
+
+        // Notify worker
+        await Notification.create({
+            userId: worker._id,
+            type: 'payout_success',
+            title: 'Paiement reçu!',
+            message: `${workerAmount.toFixed(2)}$ ont été transférés sur votre compte${tipAmount > 0 ? ` (incluant ${tipAmount.toFixed(2)}$ de pourboire)` : ''}.`,
+            data: { reservationId: reservation._id, amount: workerAmount },
+        });
+
+        console.log(`✅ Payout completed: ${transfer.id} - ${workerAmount}$ to worker ${worker._id}`);
+        return { success: true, transferId: transfer.id, amount: workerAmount };
+
+    } catch (stripeError) {
+        console.error(`❌ Payout failed for reservation ${reservation._id}:`, stripeError.message);
+        reservation.payout = {
+            ...reservation.payout,
+            status: 'failed',
+            error: stripeError.message,
+        };
+        await reservation.save();
+        return { success: false, error: stripeError.message };
+    }
+}
+
 // Webhook secrets - à configurer dans .env
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const WEBHOOK_SECRET_CONNECT = process.env.STRIPE_WEBHOOK_SECRET_CONNECT;
@@ -169,6 +274,21 @@ async function handlePaymentIntentSucceeded(paymentIntent) {
             });
         }
     }
+
+    // Si le job est déjà terminé et le payout en attente, déclencher le payout
+    if (reservation.status === 'completed' &&
+        reservation.payout?.status &&
+        ['pending', 'pending_payment'].includes(reservation.payout.status)) {
+
+        console.log(`💰 Job already completed, triggering payout for reservation ${reservationId}`);
+        const payoutResult = await processWorkerPayout(reservation);
+
+        if (payoutResult.success) {
+            console.log(`✅ Automatic payout triggered: ${payoutResult.transferId}`);
+        } else {
+            console.log(`⚠️ Payout pending: ${payoutResult.error}`);
+        }
+    }
 }
 
 async function handlePaymentIntentFailed(paymentIntent) {
@@ -226,6 +346,27 @@ async function handleAccountUpdated(account) {
             message: 'Votre compte est maintenant prêt à recevoir des paiements!',
             data: { stripeConnectId: account.id },
         });
+
+        // Traiter les payouts en attente pour ce worker
+        const pendingReservations = await Reservation.find({
+            workerId: worker._id,
+            status: 'completed',
+            paymentStatus: 'paid',
+            'payout.status': { $in: ['pending', 'pending_account'] },
+        });
+
+        if (pendingReservations.length > 0) {
+            console.log(`💰 Processing ${pendingReservations.length} pending payout(s) for worker ${worker._id}`);
+
+            for (const reservation of pendingReservations) {
+                const result = await processWorkerPayout(reservation, worker);
+                if (result.success) {
+                    console.log(`✅ Pending payout processed: ${result.transferId}`);
+                } else {
+                    console.log(`⚠️ Payout still pending: ${result.error}`);
+                }
+            }
+        }
     }
 }
 
