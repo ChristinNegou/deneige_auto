@@ -231,50 +231,61 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     super.build(context);
 
     return SafeArea(
-      child: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, authState) {
-          if (authState is! AuthAuthenticated) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppTheme.primary),
-            );
+      child: BlocListener<WorkerAvailabilityBloc, WorkerAvailabilityState>(
+        listener: (context, state) {
+          // Quand le profil est mis à jour, forcer un rebuild
+          if (state is WorkerProfileUpdated) {
+            // Le setState force le widget à se reconstruire
+            if (mounted) {
+              setState(() {});
+            }
           }
-
-          final user = authState.user;
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              HapticFeedback.mediumImpact();
-              await _onRefresh();
-            },
-            color: AppTheme.primary,
-            backgroundColor: AppTheme.surface,
-            strokeWidth: 2.5,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              slivers: [
-                SliverToBoxAdapter(
-                  child: _buildHeader(user.name),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.all(AppTheme.paddingLG),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      _buildAvailabilityCard(),
-                      const SizedBox(height: 20),
-                      _buildQuickStats(),
-                      const SizedBox(height: 24),
-                      _buildMyJobsSection(),
-                      _buildAvailableJobsSection(),
-                      const SizedBox(height: 20),
-                    ]),
-                  ),
-                ),
-              ],
-            ),
-          );
         },
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, authState) {
+            if (authState is! AuthAuthenticated) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppTheme.primary),
+              );
+            }
+
+            final user = authState.user;
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                HapticFeedback.mediumImpact();
+                await _onRefresh();
+              },
+              color: AppTheme.primary,
+              backgroundColor: AppTheme.surface,
+              strokeWidth: 2.5,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: _buildHeader(user.name),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.all(AppTheme.paddingLG),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        _buildAvailabilityCard(),
+                        const SizedBox(height: 20),
+                        _buildQuickStats(),
+                        const SizedBox(height: 24),
+                        _buildMyJobsSection(),
+                        _buildAvailableJobsSection(),
+                        const SizedBox(height: 20),
+                      ]),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
