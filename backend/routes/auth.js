@@ -14,7 +14,7 @@ const {
     validateUpdateProfile,
 } = require('../middleware/validators');
 const { profilePhotoUpload, handleMulterError } = require('../middleware/fileUpload');
-const { uploadToCloudinary } = require('../config/cloudinary');
+const { uploadFromBuffer } = require('../config/cloudinary');
 const { formatPhoneNumber } = require('../services/twilioService');
 
 // Fonction pour générer un token JWT (access token - courte durée)
@@ -548,7 +548,7 @@ router.post('/upload-profile-photo', protect, profilePhotoUpload.single('photo')
         }
 
         // Upload vers Cloudinary
-        const result = await uploadToCloudinary(req.file.buffer, {
+        const result = await uploadFromBuffer(req.file.buffer, {
             folder: `deneige-auto/profiles/${req.user.id}`,
             public_id: `profile_${Date.now()}`,
             transformation: [
@@ -560,14 +560,14 @@ router.post('/upload-profile-photo', protect, profilePhotoUpload.single('photo')
         // Mettre à jour l'utilisateur avec la nouvelle URL
         const user = await User.findByIdAndUpdate(
             req.user.id,
-            { photoUrl: result.secure_url, updatedAt: Date.now() },
+            { photoUrl: result.url, updatedAt: Date.now() },
             { new: true }
         );
 
         res.status(200).json({
             success: true,
             message: 'Photo de profil mise à jour',
-            photoUrl: result.secure_url,
+            photoUrl: result.url,
             user: {
                 id: user._id,
                 email: user.email,
