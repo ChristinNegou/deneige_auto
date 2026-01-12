@@ -134,11 +134,29 @@ async function testFCMNotifications() {
     if (testResult.data.success) {
         console.log('✅ Test notification sent!');
         console.log('   To:', testResult.data.user?.email);
-        console.log('   FCM Status:', testResult.data.fcmStatus);
-        console.log('   Title:', testResult.data.notification?.title);
-        console.log('\n   → Check the phone for push notification!');
+        console.log('   Has FCM Token:', testResult.data.user?.hasFcmToken);
+        console.log('   Token Preview:', testResult.data.user?.tokenPreview || 'N/A');
+        console.log('\n   Firebase Status:');
+        console.log('   - Initialized:', testResult.data.firebase?.status);
+        console.log('   - FCM Result:', JSON.stringify(testResult.data.firebase?.result, null, 2));
+
+        if (testResult.data.firebase?.result?.success) {
+            console.log('\n   ✅ Push notification sent successfully!');
+            console.log('   Message ID:', testResult.data.firebase.result.messageId);
+            console.log('\n   → Check the phone for push notification!');
+        } else if (testResult.data.firebase?.result?.invalidToken) {
+            console.log('\n   ❌ FCM Token is INVALID - user needs to re-login on app');
+        } else if (testResult.data.firebase?.status === 'not_configured') {
+            console.log('\n   ⚠️  Firebase is NOT CONFIGURED on backend!');
+            console.log('   → Set FIREBASE_SERVICE_ACCOUNT env variable on Railway');
+        } else if (!testResult.data.firebase?.result) {
+            console.log('\n   ⚠️  No FCM result - Firebase may not be configured');
+        }
     } else {
         console.log('❌ Failed:', testResult.data.message);
+        if (testResult.data.error) {
+            console.log('   Error:', testResult.data.error);
+        }
     }
 
     console.log('\n========================================');

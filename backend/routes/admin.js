@@ -831,8 +831,14 @@ router.post('/notifications/broadcast', protect, adminOnly, async (req, res) => 
  * @access  Private (Admin)
  */
 router.post('/notifications/test', protect, adminOnly, async (req, res) => {
+    const { sendPushNotification, initializeFirebase } = require('../services/firebaseService');
+
     try {
         const { userId, email } = req.body;
+
+        // Vérifier que Firebase est initialisé
+        const firebaseApp = initializeFirebase();
+        const firebaseStatus = firebaseApp ? 'initialized' : 'not_configured';
 
         // Trouver l'utilisateur
         let user;
@@ -852,7 +858,21 @@ router.post('/notifications/test', protect, adminOnly, async (req, res) => {
             });
         }
 
-        // Créer la notification (ceci enverra aussi le push FCM)
+        // Envoyer directement la notification push pour avoir le résultat
+        let fcmResult = null;
+        if (user.fcmToken && firebaseApp) {
+            fcmResult = await sendPushNotification(
+                user.fcmToken,
+                '🧪 Test Notification',
+                `Ceci est un test de notification push envoyé à ${user.firstName} ${user.lastName}`,
+                {
+                    type: 'test',
+                    timestamp: new Date().toISOString(),
+                }
+            );
+        }
+
+        // Créer aussi la notification en base
         const notification = await Notification.createNotification({
             userId: user._id,
             type: 'systemNotification',
@@ -869,12 +889,16 @@ router.post('/notifications/test', protect, adminOnly, async (req, res) => {
                 title: notification.title,
                 message: notification.message,
             },
-            fcmStatus: user.fcmToken ? 'Token présent - push envoyé' : 'Pas de token FCM - push non envoyé',
+            firebase: {
+                status: firebaseStatus,
+                result: fcmResult,
+            },
             user: {
                 id: user._id,
                 email: user.email,
                 firstName: user.firstName,
                 hasFcmToken: !!user.fcmToken,
+                tokenPreview: user.fcmToken ? user.fcmToken.substring(0, 30) + '...' : null,
             },
         });
     } catch (error) {
@@ -882,6 +906,7 @@ router.post('/notifications/test', protect, adminOnly, async (req, res) => {
         res.status(500).json({
             success: false,
             message: getErrorMessage(error),
+            error: process.env.NODE_ENV !== 'production' ? error.message : undefined,
         });
     }
 });
