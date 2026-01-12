@@ -32,6 +32,9 @@ initializeFirebase();
 // Initialiser Express
 const app = express();
 
+// Trust proxy pour Railway/Heroku (nécessaire pour express-rate-limit)
+app.set('trust proxy', 1);
+
 // Créer le serveur HTTP pour Socket.IO
 const httpServer = http.createServer(app);
 
