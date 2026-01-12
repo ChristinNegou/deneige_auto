@@ -1,4 +1,5 @@
 import '../../domain/entities/notification.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class NotificationModel extends AppNotification {
   const NotificationModel({
@@ -24,7 +25,7 @@ class NotificationModel extends AppNotification {
       message: json['message'],
       priority: _parseNotificationPriority(json['priority'] ?? 'normal'),
       isRead: json['isRead'] ?? false,
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
       reservationId: json['reservationId'] is Map
           ? json['reservationId']['_id']
           : json['reservationId'],

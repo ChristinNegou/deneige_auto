@@ -1,4 +1,5 @@
 import '../../domain/entities/parking_spot.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class ParkingSpotModel extends ParkingSpot {
   const ParkingSpotModel({
@@ -34,8 +35,8 @@ class ParkingSpotModel extends ParkingSpot {
       assignedUserId: json['assignedUserId'] as String?,
       isActive: json['isActive'] as bool? ?? true,
       notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
+      updatedAt: TimeUtils.parseUtcToLocal(json['updatedAt'] as String?),
     );
   }
 

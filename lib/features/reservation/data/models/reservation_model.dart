@@ -2,6 +2,7 @@ import 'package:deneige_auto/features/reservation/data/models/vehicule_model.dar
 
 import '../../domain/entities/reservation.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/utils/time_utils.dart';
 
 import 'parking_spot_model.dart';
 
@@ -49,10 +50,9 @@ class ReservationModel extends Reservation {
       workerPhotoUrl: _parseWorkerPhotoUrl(json['workerId']),
       parkingSpot: _parseParkingSpot(json),
       vehicle: _parseVehicle(json),
-      departureTime: DateTime.parse(json['departureTime'] as String),
-      deadlineTime: json['deadlineTime'] != null
-          ? DateTime.parse(json['deadlineTime'] as String)
-          : null,
+      departureTime: TimeUtils.parseUtcToLocal(json['departureTime'] as String),
+      deadlineTime:
+          TimeUtils.parseUtcToLocalOrNull(json['deadlineTime'] as String?),
       status: _parseReservationStatus(json['status'] as String),
       serviceOptions: (json['serviceOptions'] as List<dynamic>?)
               ?.map((e) => _parseServiceOption(e as String))
@@ -64,18 +64,12 @@ class ReservationModel extends Reservation {
           json['beforePhotoUrl'] as String?,
       afterPhotoUrl: _parsePhotoUrl(json['photos'], 'after') ??
           json['afterPhotoUrl'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
-          : DateTime.now(),
-      assignedAt: json['assignedAt'] != null
-          ? DateTime.parse(json['assignedAt'] as String)
-          : null,
-      startedAt: json['startedAt'] != null
-          ? DateTime.parse(json['startedAt'] as String)
-          : null,
-      completedAt: json['completedAt'] != null
-          ? DateTime.parse(json['completedAt'] as String)
-          : null,
+      createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
+      assignedAt:
+          TimeUtils.parseUtcToLocalOrNull(json['assignedAt'] as String?),
+      startedAt: TimeUtils.parseUtcToLocalOrNull(json['startedAt'] as String?),
+      completedAt:
+          TimeUtils.parseUtcToLocalOrNull(json['completedAt'] as String?),
       workerNotes: json['workerNotes'] as String?,
       rating:
           json['rating'] != null ? (json['rating'] as num).toDouble() : null,

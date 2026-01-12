@@ -2,6 +2,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import '../../domain/entities/weather.dart';
+import '../../../../core/utils/time_utils.dart';
 
 part 'weather_model.g.dart';
 
@@ -59,11 +60,10 @@ class WeatherModel extends Weather {
       humidity: json['humidity'] as int,
       windSpeed: (json['windSpeed'] as num).toDouble(),
       snowDepth: json['snowDepth'] as int?,
-      nextSnowfall: json['nextSnowfall'] != null
-          ? DateTime.parse(json['nextSnowfall'] as String)
-          : null,
+      nextSnowfall:
+          TimeUtils.parseUtcToLocalOrNull(json['nextSnowfall'] as String?),
       iconUrl: json['iconUrl'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      timestamp: TimeUtils.parseUtcToLocal(json['timestamp'] as String?),
     );
   }
 

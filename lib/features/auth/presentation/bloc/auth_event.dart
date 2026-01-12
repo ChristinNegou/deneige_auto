@@ -151,3 +151,50 @@ class ForcedLogout extends AuthEvent {
   List<Object?> get props =>
       [reason, suspensionReason, suspendedUntil, suspendedUntilDisplay];
 }
+
+/// Upload de photo de profil
+class UploadProfilePhoto extends AuthEvent {
+  final String filePath;
+
+  const UploadProfilePhoto({required this.filePath});
+
+  @override
+  List<Object?> get props => [filePath];
+}
+
+/// Suppression de photo de profil
+class DeleteProfilePhoto extends AuthEvent {}
+
+/// Vérification de disponibilité du numéro de téléphone
+class CheckPhoneAvailability extends AuthEvent {
+  final String phoneNumber;
+
+  const CheckPhoneAvailability({required this.phoneNumber});
+
+  @override
+  List<Object?> get props => [phoneNumber];
+}
+
+/// Envoi du code de vérification pour changer de numéro
+class SendPhoneChangeCode extends AuthEvent {
+  final String phoneNumber;
+
+  const SendPhoneChangeCode({required this.phoneNumber});
+
+  @override
+  List<Object?> get props => [phoneNumber];
+}
+
+/// Vérification du code pour changer de numéro
+class VerifyPhoneChangeCode extends AuthEvent {
+  final String phoneNumber;
+  final String code;
+
+  const VerifyPhoneChangeCode({
+    required this.phoneNumber,
+    required this.code,
+  });
+
+  @override
+  List<Object?> get props => [phoneNumber, code];
+}

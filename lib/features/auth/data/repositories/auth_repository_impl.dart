@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
@@ -223,6 +224,94 @@ class AuthRepositoryImpl implements AuthRepository {
       final result =
           await remoteDataSource.resendPhoneVerificationCode(phoneNumber);
       return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  // ============ PROFILE PHOTO METHODS ============
+
+  @override
+  Future<Either<Failure, User>> uploadProfilePhoto(File photoFile) async {
+    try {
+      final user = await remoteDataSource.uploadProfilePhoto(photoFile);
+      return Right(user);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(
+          ServerFailure(message: 'Erreur lors de l\'upload: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> deleteProfilePhoto() async {
+    try {
+      final user = await remoteDataSource.deleteProfilePhoto();
+      return Right(user);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(
+          message: 'Erreur lors de la suppression: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> checkPhoneAvailability(
+      String phoneNumber) async {
+    try {
+      final isAvailable =
+          await remoteDataSource.checkPhoneAvailability(phoneNumber);
+      return Right(isAvailable);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(
+          ServerFailure(message: 'Erreur de vérification: ${e.toString()}'));
+    }
+  }
+
+  // ============ PHONE CHANGE VERIFICATION METHODS ============
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> sendPhoneChangeCode(
+      String phoneNumber) async {
+    try {
+      final result = await remoteDataSource.sendPhoneChangeCode(phoneNumber);
+      return Right(result);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> verifyPhoneChangeCode({
+    required String phoneNumber,
+    required String code,
+  }) async {
+    try {
+      final user = await remoteDataSource.verifyPhoneChangeCode(
+        phoneNumber: phoneNumber,
+        code: code,
+      );
+      return Right(user);
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     } on NetworkException catch (e) {

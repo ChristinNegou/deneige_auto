@@ -1,4 +1,5 @@
 import '../../domain/entities/worker_job.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class ClientInfoModel extends ClientInfo {
   const ClientInfoModel({
@@ -100,9 +101,7 @@ class JobPhotoModel extends JobPhoto {
     return JobPhotoModel(
       url: json['url'] ?? '',
       type: json['type'] ?? 'before',
-      uploadedAt: json['uploadedAt'] != null
-          ? DateTime.parse(json['uploadedAt'])
-          : DateTime.now(),
+      uploadedAt: TimeUtils.parseUtcToLocal(json['uploadedAt'] as String?),
     );
   }
 
@@ -246,10 +245,10 @@ class WorkerJobModel extends WorkerJob {
       distanceKm: json['distanceKm'] != null
           ? (json['distanceKm'] as num).toDouble()
           : null,
-      departureTime: DateTime.parse(json['departureTime']),
-      deadlineTime: json['deadlineTime'] != null
-          ? DateTime.parse(json['deadlineTime'])
-          : null,
+      departureTime:
+          TimeUtils.parseUtcToLocal(json['departureTime'] as String?),
+      deadlineTime:
+          TimeUtils.parseUtcToLocalOrNull(json['deadlineTime'] as String?),
       serviceOptions: serviceOptions,
       totalPrice: (json['totalPrice'] as num?)?.toDouble() ?? 0,
       isPriority: json['isPriority'] ?? false,
@@ -258,20 +257,14 @@ class WorkerJobModel extends WorkerJob {
       workerNotes: json['workerNotes'],
       status: status,
       photos: photos,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
-          : DateTime.now(),
-      assignedAt: json['assignedAt'] != null
-          ? DateTime.parse(json['assignedAt'])
-          : null,
-      startedAt:
-          json['startedAt'] != null ? DateTime.parse(json['startedAt']) : null,
-      completedAt: json['completedAt'] != null
-          ? DateTime.parse(json['completedAt'])
-          : null,
-      estimatedArrivalTime: json['estimatedArrivalTime'] != null
-          ? DateTime.parse(json['estimatedArrivalTime'])
-          : null,
+      createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
+      assignedAt:
+          TimeUtils.parseUtcToLocalOrNull(json['assignedAt'] as String?),
+      startedAt: TimeUtils.parseUtcToLocalOrNull(json['startedAt'] as String?),
+      completedAt:
+          TimeUtils.parseUtcToLocalOrNull(json['completedAt'] as String?),
+      estimatedArrivalTime: TimeUtils.parseUtcToLocalOrNull(
+          json['estimatedArrivalTime'] as String?),
       tipAmount: tipAmount,
       rating: (json['rating'] as num?)?.toDouble(),
       review: json['review'],

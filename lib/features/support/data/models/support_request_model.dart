@@ -1,4 +1,5 @@
 import '../../domain/entities/support_request.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class SupportRequestModel extends SupportRequest {
   const SupportRequestModel({
@@ -18,12 +19,9 @@ class SupportRequestModel extends SupportRequest {
       message: json['message'] as String? ?? '',
       status: SupportStatus.fromString(json['status'] as String? ?? 'pending'),
       adminNotes: json['adminNotes'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
-          : null,
-      resolvedAt: json['resolvedAt'] != null
-          ? DateTime.parse(json['resolvedAt'] as String)
-          : null,
+      createdAt: TimeUtils.parseUtcToLocalOrNull(json['createdAt'] as String?),
+      resolvedAt:
+          TimeUtils.parseUtcToLocalOrNull(json['resolvedAt'] as String?),
     );
   }
 

@@ -13,6 +13,9 @@ const {
     validateResetPassword,
     validateUpdateProfile,
 } = require('../middleware/validators');
+const { profilePhotoUpload, handleMulterError } = require('../middleware/fileUpload');
+const { uploadToCloudinary } = require('../config/cloudinary');
+const { formatPhoneNumber } = require('../services/twilioService');
 
 // Fonction pour générer un token JWT (access token - courte durée)
 const generateToken = (id, role) => {
@@ -440,15 +443,34 @@ router.put('/update-profile', protect, validateUpdateProfile, async (req, res) =
     try {
         const { firstName, lastName, phoneNumber, photoUrl } = req.body;
 
+        // Si le numéro de téléphone est fourni et différent, vérifier qu'il n'est pas déjà utilisé
+        if (phoneNumber) {
+            const formattedPhone = formatPhoneNumber(phoneNumber);
+            const existingUser = await User.findOne({
+                phoneNumber: formattedPhone,
+                _id: { $ne: req.user.id }
+            });
+            if (existingUser) {
+                return res.status(409).json({
+                    success: false,
+                    message: 'Ce numéro de téléphone est déjà associé à un autre compte',
+                    code: 'PHONE_ALREADY_USED'
+                });
+            }
+        }
+
+        const updateData = {
+            updatedAt: Date.now(),
+        };
+
+        if (firstName !== undefined) updateData.firstName = firstName;
+        if (lastName !== undefined) updateData.lastName = lastName;
+        if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber ? formatPhoneNumber(phoneNumber) : phoneNumber;
+        if (photoUrl !== undefined) updateData.photoUrl = photoUrl;
+
         const user = await User.findByIdAndUpdate(
             req.user.id,
-            {
-                firstName,
-                lastName,
-                phoneNumber,
-                photoUrl,
-                updatedAt: Date.now(),
-            },
+            updateData,
             { new: true, runValidators: true }
         );
 
@@ -471,6 +493,133 @@ router.put('/update-profile', protect, validateUpdateProfile, async (req, res) =
         res.status(400).json({
             success: false,
             message: 'Erreur lors de la mise à jour du profil',
+        });
+    }
+});
+
+// @route   POST /api/auth/check-phone
+// @desc    Vérifier si un numéro de téléphone est disponible
+// @access  Private
+router.post('/check-phone', protect, async (req, res) => {
+    try {
+        const { phoneNumber } = req.body;
+
+        if (!phoneNumber) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le numéro de téléphone est requis'
+            });
+        }
+
+        const formattedPhone = formatPhoneNumber(phoneNumber);
+
+        // Vérifier si le numéro appartient à un autre utilisateur
+        const existingUser = await User.findOne({
+            phoneNumber: formattedPhone,
+            _id: { $ne: req.user.id }
+        });
+
+        res.status(200).json({
+            success: true,
+            available: !existingUser,
+            message: existingUser
+                ? 'Ce numéro de téléphone est déjà associé à un autre compte'
+                : 'Ce numéro de téléphone est disponible'
+        });
+    } catch (error) {
+        console.error('Erreur lors de la vérification du téléphone:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la vérification du numéro de téléphone'
+        });
+    }
+});
+
+// @route   POST /api/auth/upload-profile-photo
+// @desc    Téléverser une photo de profil
+// @access  Private
+router.post('/upload-profile-photo', protect, profilePhotoUpload.single('photo'), handleMulterError, async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucune photo fournie'
+            });
+        }
+
+        // Upload vers Cloudinary
+        const result = await uploadToCloudinary(req.file.buffer, {
+            folder: `deneige-auto/profiles/${req.user.id}`,
+            public_id: `profile_${Date.now()}`,
+            transformation: [
+                { width: 400, height: 400, crop: 'fill', gravity: 'face' },
+                { quality: 'auto:good' }
+            ]
+        });
+
+        // Mettre à jour l'utilisateur avec la nouvelle URL
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { photoUrl: result.secure_url, updatedAt: Date.now() },
+            { new: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Photo de profil mise à jour',
+            photoUrl: result.secure_url,
+            user: {
+                id: user._id,
+                email: user.email,
+                name: `${user.firstName} ${user.lastName}`,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phoneNumber: user.phoneNumber,
+                role: user.role,
+                photoUrl: user.photoUrl,
+                createdAt: user.createdAt,
+            }
+        });
+    } catch (error) {
+        console.error('Erreur lors de l\'upload de la photo:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'upload de la photo de profil'
+        });
+    }
+});
+
+// @route   DELETE /api/auth/delete-profile-photo
+// @desc    Supprimer la photo de profil
+// @access  Private
+router.delete('/delete-profile-photo', protect, async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { photoUrl: null, updatedAt: Date.now() },
+            { new: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Photo de profil supprimée',
+            user: {
+                id: user._id,
+                email: user.email,
+                name: `${user.firstName} ${user.lastName}`,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phoneNumber: user.phoneNumber,
+                role: user.role,
+                photoUrl: user.photoUrl,
+                createdAt: user.createdAt,
+            }
+        });
+    } catch (error) {
+        console.error('Erreur lors de la suppression de la photo:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la suppression de la photo de profil'
         });
     }
 });

@@ -117,3 +117,54 @@ class UserSuspended extends AuthState {
   List<Object?> get props =>
       [message, reason, suspendedUntil, suspendedUntilDisplay];
 }
+
+/// Résultat de la vérification de disponibilité du téléphone
+class PhoneAvailabilityChecked extends AuthState {
+  final bool isAvailable;
+  final String phoneNumber;
+
+  const PhoneAvailabilityChecked({
+    required this.isAvailable,
+    required this.phoneNumber,
+  });
+
+  @override
+  List<Object?> get props => [isAvailable, phoneNumber];
+}
+
+/// Photo de profil en cours d'upload
+class ProfilePhotoUploading extends AuthState {}
+
+/// Photo de profil uploadée avec succès
+class ProfilePhotoUploaded extends AuthState {
+  final User user;
+
+  const ProfilePhotoUploaded({required this.user});
+
+  @override
+  List<Object?> get props => [user];
+}
+
+/// Code de vérification envoyé pour changement de numéro
+class PhoneChangeCodeSent extends AuthState {
+  final String phoneNumber;
+  final String? devCode;
+
+  const PhoneChangeCodeSent({
+    required this.phoneNumber,
+    this.devCode,
+  });
+
+  @override
+  List<Object?> get props => [phoneNumber, devCode];
+}
+
+/// Numéro de téléphone changé avec succès
+class PhoneChangeSuccess extends AuthState {
+  final User user;
+
+  const PhoneChangeSuccess({required this.user});
+
+  @override
+  List<Object?> get props => [user];
+}

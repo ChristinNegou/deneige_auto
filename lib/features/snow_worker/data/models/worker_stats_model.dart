@@ -1,4 +1,5 @@
 import '../../domain/entities/worker_stats.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class TodayStatsModel extends TodayStats {
   const TodayStatsModel({
@@ -132,9 +133,7 @@ class EarningsBreakdownModel extends EarningsBreakdown {
 
     return EarningsBreakdownModel(
       period: json['period'] as String? ?? 'week',
-      startDate: json['startDate'] != null
-          ? DateTime.parse(json['startDate'])
-          : DateTime.now(),
+      startDate: TimeUtils.parseUtcToLocal(json['startDate'] as String?),
       daily: daily,
       summary: EarningsSummaryModel.fromJson(
           json['summary'] as Map<String, dynamic>? ?? {}),

@@ -1,4 +1,5 @@
 import '../../domain/entities/vehicle.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class VehicleModel extends Vehicle {
   const VehicleModel({
@@ -28,8 +29,8 @@ class VehicleModel extends Vehicle {
       photoUrl: json['photoUrl'] as String?,
       type: _parseVehicleType(json['type'] as String?),
       isDefault: json['isDefault'] as bool? ?? false,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
+      updatedAt: TimeUtils.parseUtcToLocal(json['updatedAt'] as String?),
     );
   }
 

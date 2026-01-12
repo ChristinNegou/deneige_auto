@@ -1,4 +1,5 @@
 import '../../../../core/config/app_config.dart' show AppConfig;
+import '../../../../core/utils/time_utils.dart';
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -20,9 +21,7 @@ class UserModel extends User {
           '${json['firstName'] ?? ''} ${json['lastName'] ?? ''}'.trim(),
       phoneNumber: json['phoneNumber'] as String?,
       photoUrl: _parsePhotoUrl(json['photoUrl']),
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
-          : DateTime.now(),
+      createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
       role: _parseRole(json['role'] as String?),
     );
   }

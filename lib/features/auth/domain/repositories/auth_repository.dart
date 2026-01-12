@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/user.dart';
@@ -37,4 +38,17 @@ abstract class AuthRepository {
 
   Future<Either<Failure, Map<String, dynamic>>> resendPhoneVerificationCode(
       String phoneNumber);
+
+  // Profile photo methods
+  Future<Either<Failure, User>> uploadProfilePhoto(File photoFile);
+  Future<Either<Failure, User>> deleteProfilePhoto();
+  Future<Either<Failure, bool>> checkPhoneAvailability(String phoneNumber);
+
+  // Phone change verification methods
+  Future<Either<Failure, Map<String, dynamic>>> sendPhoneChangeCode(
+      String phoneNumber);
+  Future<Either<Failure, User>> verifyPhoneChangeCode({
+    required String phoneNumber,
+    required String code,
+  });
 }

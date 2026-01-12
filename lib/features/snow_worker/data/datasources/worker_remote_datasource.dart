@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/utils/time_utils.dart';
 import '../models/worker_job_model.dart';
 import '../models/worker_profile_model.dart';
 import '../models/worker_stats_model.dart';
@@ -137,9 +138,8 @@ class WorkerCancellationConsequence {
     return WorkerCancellationConsequence(
       type: json['type'] as String? ?? '',
       message: json['message'] as String? ?? '',
-      suspendedUntil: json['suspendedUntil'] != null
-          ? DateTime.parse(json['suspendedUntil'] as String)
-          : null,
+      suspendedUntil:
+          TimeUtils.parseUtcToLocalOrNull(json['suspendedUntil'] as String?),
       warningCount: json['warningCount'] as int?,
     );
   }

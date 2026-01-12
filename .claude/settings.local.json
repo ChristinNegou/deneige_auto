@@ -31,7 +31,10 @@
       "WebFetch(domain:deneigeauto-production.up.railway.app)",
       "Bash(flutter build:*)",
       "Bash(powershell:*)",
-      "Bash(MONGODB_URI=\"mongodb+srv://deneigeauto_db:root@deneigeautocluster.o6fxvd.mongodb.net/deneige_auto?appName=deneigeAutoCluster\" node:*)"
+      "Bash(MONGODB_URI=\"mongodb+srv://deneigeauto_db:root@deneigeautocluster.o6fxvd.mongodb.net/deneige_auto?appName=deneigeAutoCluster\" node:*)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

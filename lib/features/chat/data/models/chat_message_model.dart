@@ -1,4 +1,5 @@
 import '../../domain/entities/chat_message.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class ChatMessageModel extends ChatMessage {
   const ChatMessageModel({
@@ -73,8 +74,8 @@ class ChatMessageModel extends ChatMessage {
       latitude: location?['latitude'] as double?,
       longitude: location?['longitude'] as double?,
       isRead: json['isRead'] as bool? ?? false,
-      readAt: json['readAt'] != null ? DateTime.parse(json['readAt']) : null,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      readAt: TimeUtils.parseUtcToLocalOrNull(json['readAt'] as String?),
+      createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
     );
   }
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
@@ -53,6 +54,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<VerifyPhoneCode>(_onVerifyPhoneCode);
     on<ResendPhoneVerificationCode>(_onResendPhoneVerificationCode);
     on<ForcedLogout>(_onForcedLogout);
+    on<UploadProfilePhoto>(_onUploadProfilePhoto);
+    on<DeleteProfilePhoto>(_onDeleteProfilePhoto);
+    on<CheckPhoneAvailability>(_onCheckPhoneAvailability);
+    on<SendPhoneChangeCode>(_onSendPhoneChangeCode);
+    on<VerifyPhoneChangeCode>(_onVerifyPhoneChangeCode);
 
     // Écouter les événements de suspension de l'intercepteur
     _suspensionSubscription = AuthInterceptor.suspensionStream.listen((data) {
@@ -295,6 +301,95 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
       (data) => emit(PhoneCodeResent(devCode: data['devCode'])),
+    );
+  }
+
+  // ============ PROFILE PHOTO HANDLERS ============
+
+  Future<void> _onUploadProfilePhoto(
+    UploadProfilePhoto event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(ProfilePhotoUploading());
+
+    final result =
+        await authRepository.uploadProfilePhoto(File(event.filePath));
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (user) {
+        emit(ProfilePhotoUploaded(user: user));
+        emit(AuthAuthenticated(user: user));
+      },
+    );
+  }
+
+  Future<void> _onDeleteProfilePhoto(
+    DeleteProfilePhoto event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    final result = await authRepository.deleteProfilePhoto();
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (user) => emit(AuthAuthenticated(user: user)),
+    );
+  }
+
+  Future<void> _onCheckPhoneAvailability(
+    CheckPhoneAvailability event,
+    Emitter<AuthState> emit,
+  ) async {
+    final result =
+        await authRepository.checkPhoneAvailability(event.phoneNumber);
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (isAvailable) => emit(PhoneAvailabilityChecked(
+        isAvailable: isAvailable,
+        phoneNumber: event.phoneNumber,
+      )),
+    );
+  }
+
+  // ============ PHONE CHANGE VERIFICATION HANDLERS ============
+
+  Future<void> _onSendPhoneChangeCode(
+    SendPhoneChangeCode event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    final result = await authRepository.sendPhoneChangeCode(event.phoneNumber);
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (data) => emit(PhoneChangeCodeSent(
+        phoneNumber: data['phoneNumber'] ?? event.phoneNumber,
+        devCode: data['devCode'],
+      )),
+    );
+  }
+
+  Future<void> _onVerifyPhoneChangeCode(
+    VerifyPhoneChangeCode event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    final result = await authRepository.verifyPhoneChangeCode(
+      phoneNumber: event.phoneNumber,
+      code: event.code,
+    );
+
+    result.fold(
+      (failure) => emit(AuthError(message: failure.message)),
+      (user) {
+        emit(PhoneChangeSuccess(user: user));
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 

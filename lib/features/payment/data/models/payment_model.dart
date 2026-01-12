@@ -1,4 +1,5 @@
 import '../../domain/entities/payment.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class PaymentModel extends Payment {
   const PaymentModel({
@@ -51,12 +52,9 @@ class PaymentModel extends Payment {
       status: status,
       methodType: _parsePaymentMethodType(json['paymentMethod']),
       paymentIntentId: paymentIntentId?.toString(),
-      createdAt: DateTime.parse(json['createdAt']),
-      paidAt: json['completedAt'] != null
-          ? DateTime.parse(json['completedAt'])
-          : json['updatedAt'] != null
-              ? DateTime.parse(json['updatedAt'])
-              : null,
+      createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
+      paidAt: TimeUtils.parseUtcToLocalOrNull(json['completedAt'] as String?) ??
+          TimeUtils.parseUtcToLocalOrNull(json['updatedAt'] as String?),
       // Extract vehicle and parking info
       vehicleMake: json['vehicle']?['make'],
       vehicleModel: json['vehicle']?['model'],

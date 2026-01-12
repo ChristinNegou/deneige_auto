@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../service/secure_storage_service.dart';
@@ -41,6 +42,18 @@ abstract class AuthRemoteDataSource {
     required String code,
   });
   Future<Map<String, dynamic>> resendPhoneVerificationCode(String phoneNumber);
+
+  // Profile photo methods
+  Future<UserModel> uploadProfilePhoto(File photoFile);
+  Future<UserModel> deleteProfilePhoto();
+  Future<bool> checkPhoneAvailability(String phoneNumber);
+
+  // Phone change verification methods
+  Future<Map<String, dynamic>> sendPhoneChangeCode(String phoneNumber);
+  Future<UserModel> verifyPhoneChangeCode({
+    required String phoneNumber,
+    required String code,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -417,6 +430,157 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           message: e.response?.data['message'] ??
               'Veuillez patienter avant de renvoyer',
           statusCode: 429,
+        );
+      }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  // ============ PROFILE PHOTO METHODS ============
+
+  @override
+  Future<UserModel> uploadProfilePhoto(File photoFile) async {
+    try {
+      final fileName = photoFile.path.split('/').last;
+      final formData = FormData.fromMap({
+        'photo': await MultipartFile.fromFile(
+          photoFile.path,
+          filename: fileName,
+        ),
+      });
+
+      final response = await dio.post(
+        '/auth/upload-profile-photo',
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(response.data['user']);
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de l\'upload',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw NetworkException(
+        message: e.response?.data['message'] ?? 'Erreur réseau',
+      );
+    }
+  }
+
+  @override
+  Future<UserModel> deleteProfilePhoto() async {
+    try {
+      final response = await dio.delete('/auth/delete-profile-photo');
+
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(response.data['user']);
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de la suppression',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw NetworkException(
+        message: e.response?.data['message'] ?? 'Erreur réseau',
+      );
+    }
+  }
+
+  @override
+  Future<bool> checkPhoneAvailability(String phoneNumber) async {
+    try {
+      final response = await dio.post(
+        '/auth/check-phone',
+        data: {'phoneNumber': phoneNumber},
+      );
+
+      if (response.statusCode == 200) {
+        return response.data['available'] as bool;
+      }
+      return false;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        return false;
+      }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  // ============ PHONE CHANGE VERIFICATION METHODS ============
+
+  @override
+  Future<Map<String, dynamic>> sendPhoneChangeCode(String phoneNumber) async {
+    try {
+      final response = await dio.post(
+        '/phone/send-change-code',
+        data: {'phoneNumber': phoneNumber},
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'phoneNumber': response.data['phoneNumber'],
+          'devCode': response.data['devCode'],
+          'simulated': response.data['simulated'] ?? false,
+        };
+      } else {
+        throw ServerException(
+          message:
+              response.data['message'] ?? 'Erreur lors de l\'envoi du code',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        throw AuthException(
+          message: e.response?.data['message'] ?? 'Ce numéro est déjà utilisé',
+          statusCode: 409,
+        );
+      }
+      if (e.response?.statusCode == 429) {
+        throw ServerException(
+          message: e.response?.data['message'] ??
+              'Veuillez patienter avant de renvoyer',
+          statusCode: 429,
+        );
+      }
+      throw NetworkException(message: 'Erreur réseau: ${e.message}');
+    }
+  }
+
+  @override
+  Future<UserModel> verifyPhoneChangeCode({
+    required String phoneNumber,
+    required String code,
+  }) async {
+    try {
+      final response = await dio.post(
+        '/phone/verify-change-code',
+        data: {
+          'phoneNumber': phoneNumber,
+          'code': code,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(response.data['user']);
+      } else {
+        throw ServerException(
+          message: response.data['message'] ?? 'Erreur lors de la vérification',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) {
+        throw AuthException(
+          message: e.response?.data['message'] ?? 'Code invalide',
+          statusCode: 400,
         );
       }
       throw NetworkException(message: 'Erreur réseau: ${e.message}');

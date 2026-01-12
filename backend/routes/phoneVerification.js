@@ -351,4 +351,171 @@ router.get('/status/:phoneNumber', async (req, res) => {
     }
 });
 
+/**
+ * @route   POST /api/phone/send-change-code
+ * @desc    Envoie un code de vérification pour changer de numéro de téléphone (utilisateur connecté)
+ * @access  Private
+ */
+const { protect } = require('../middleware/auth');
+
+router.post('/send-change-code', protect, smsLimiter, async (req, res) => {
+    try {
+        const { phoneNumber } = req.body;
+        const userId = req.user.id;
+
+        if (!phoneNumber) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le numéro de téléphone est requis'
+            });
+        }
+
+        // Valider le format du numéro
+        if (!isValidPhoneNumber(phoneNumber)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Format de numéro de téléphone invalide'
+            });
+        }
+
+        const formattedPhone = formatPhoneNumber(phoneNumber);
+
+        // Vérifier si le numéro est déjà utilisé par un autre compte
+        const existingUser = await User.findOne({
+            phoneNumber: formattedPhone,
+            _id: { $ne: userId }
+        });
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message: 'Ce numéro de téléphone est déjà associé à un autre compte'
+            });
+        }
+
+        // Vérifier si on peut renvoyer un code
+        const canResend = await PhoneVerification.canResendCode(formattedPhone);
+        if (!canResend.canResend) {
+            return res.status(429).json({
+                success: false,
+                message: canResend.message,
+                remainingSeconds: canResend.remainingSeconds
+            });
+        }
+
+        // Générer le code
+        const code = generateVerificationCode();
+
+        // Sauvegarder la vérification avec l'ID utilisateur pour le changement de numéro
+        await PhoneVerification.createOrUpdate(formattedPhone, code, {
+            isPhoneChange: true,
+            userId: userId
+        });
+
+        // Envoyer le SMS
+        const smsResult = await sendVerificationCode(formattedPhone, code);
+
+        const response = {
+            success: true,
+            message: 'Code de vérification envoyé au nouveau numéro',
+            phoneNumber: formattedPhone,
+            expiresIn: 15 * 60,
+            twilioConfigured: isTwilioConfigured()
+        };
+
+        if (smsResult.simulated) {
+            response.devCode = code;
+            response.simulated = true;
+        }
+
+        res.status(200).json(response);
+
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du code de changement:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'envoi du code de vérification'
+        });
+    }
+});
+
+/**
+ * @route   POST /api/phone/verify-change-code
+ * @desc    Vérifie le code et met à jour le numéro de téléphone
+ * @access  Private
+ */
+router.post('/verify-change-code', protect, async (req, res) => {
+    try {
+        const { phoneNumber, code } = req.body;
+        const userId = req.user.id;
+
+        if (!phoneNumber || !code) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le numéro de téléphone et le code sont requis'
+            });
+        }
+
+        const formattedPhone = formatPhoneNumber(phoneNumber);
+
+        // Vérifier le code
+        const verificationResult = await PhoneVerification.verifyCode(formattedPhone, code);
+
+        if (!verificationResult.success) {
+            return res.status(400).json({
+                success: false,
+                message: verificationResult.message,
+                expired: verificationResult.expired,
+                maxAttempts: verificationResult.maxAttempts,
+                attemptsRemaining: verificationResult.attemptsRemaining
+            });
+        }
+
+        // Vérifier que c'est bien un changement de numéro pour cet utilisateur
+        const pendingData = verificationResult.pendingRegistration;
+        if (!pendingData?.isPhoneChange || pendingData?.userId !== userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Vérification invalide pour ce compte'
+            });
+        }
+
+        // Mettre à jour le numéro de téléphone de l'utilisateur
+        const user = await User.findByIdAndUpdate(
+            userId,
+            {
+                phoneNumber: formattedPhone,
+                phoneVerified: true,
+                updatedAt: Date.now()
+            },
+            { new: true }
+        );
+
+        // Supprimer la vérification
+        await PhoneVerification.deleteOne({ phoneNumber: formattedPhone });
+
+        res.status(200).json({
+            success: true,
+            message: 'Numéro de téléphone mis à jour avec succès',
+            user: {
+                id: user._id,
+                email: user.email,
+                name: `${user.firstName} ${user.lastName}`,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phoneNumber: user.phoneNumber,
+                role: user.role,
+                photoUrl: user.photoUrl || null,
+                createdAt: user.createdAt
+            }
+        });
+
+    } catch (error) {
+        console.error('Erreur lors de la vérification du changement:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la vérification du code'
+        });
+    }
+});
+
 module.exports = router;
