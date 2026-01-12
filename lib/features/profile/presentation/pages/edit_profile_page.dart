@@ -70,6 +70,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ));
 
     return BlocConsumer<AuthBloc, AuthState>(
+      buildWhen: (previous, current) {
+        // Ne reconstruire que pour les états qui affectent l'affichage
+        return current is AuthAuthenticated ||
+            current is ProfilePhotoUploading ||
+            current is ProfilePhotoUploaded;
+      },
       listener: (context, state) {
         if (state is AuthError) {
           setState(() => _isLoading = false);
@@ -127,8 +133,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         }
       },
       builder: (context, state) {
-        final photoUrl =
-            state is AuthAuthenticated ? state.user.photoUrl : null;
+        // Récupérer la photoUrl depuis l'état actuel ou le dernier état AuthAuthenticated
+        String? photoUrl;
+        if (state is AuthAuthenticated) {
+          photoUrl = state.user.photoUrl;
+        } else if (state is ProfilePhotoUploaded) {
+          photoUrl = state.user.photoUrl;
+        }
 
         return Scaffold(
           backgroundColor: AppTheme.background,

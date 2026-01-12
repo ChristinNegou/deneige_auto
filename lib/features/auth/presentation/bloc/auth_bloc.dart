@@ -331,10 +331,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(ProfilePhotoUploading());
-    // Réémettre AuthAuthenticated pour que les autres pages conservent les données utilisateur
-    if (_currentUser != null) {
-      emit(AuthAuthenticated(user: _currentUser!));
-    }
 
     final result =
         await authRepository.uploadProfilePhoto(File(event.filePath));
@@ -421,10 +417,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           phoneNumber: data['phoneNumber'] ?? event.phoneNumber,
           devCode: data['devCode'],
         ));
-        // Réémettre AuthAuthenticated pour que les autres pages conservent les données utilisateur
-        if (_currentUser != null) {
-          emit(AuthAuthenticated(user: _currentUser!));
-        }
       },
     );
   }
