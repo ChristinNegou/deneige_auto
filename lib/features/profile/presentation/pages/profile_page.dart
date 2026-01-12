@@ -22,6 +22,11 @@ class ProfilePage extends StatelessWidget {
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: BlocBuilder<AuthBloc, AuthState>(
+          buildWhen: (previous, current) {
+            // Ne reconstruire que si AuthAuthenticated change ou si on se déconnecte
+            return current is AuthAuthenticated ||
+                current is AuthUnauthenticated;
+          },
           builder: (context, state) {
             final user = state is AuthAuthenticated ? state.user : null;
 
