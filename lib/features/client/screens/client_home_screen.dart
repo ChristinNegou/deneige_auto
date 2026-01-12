@@ -921,8 +921,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             children: [
               _buildNavItem(Icons.home_filled, 'Accueil', true, () {}),
               _buildNavItem(
-                Icons.calendar_month_outlined,
-                'Agenda',
+                Icons.event_note_outlined,
+                'Mes RDV',
                 false,
                 () => Navigator.pushNamed(context, AppRoutes.reservations),
               ),
