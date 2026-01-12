@@ -23,6 +23,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _emailController;
   bool _isLoading = false;
   bool _isUploadingPhoto = false;
+  bool _isUpdatingProfile =
+      false; // Flag pour savoir si on fait une mise à jour de profil
   String? _originalPhone;
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
@@ -78,7 +80,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       },
       listener: (context, state) {
         if (state is AuthError) {
-          setState(() => _isLoading = false);
+          setState(() {
+            _isLoading = false;
+            _isUpdatingProfile = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -124,11 +129,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
           );
           Navigator.pop(context);
         }
-        // Profil mis à jour (sans changement de numéro)
-        if (state is AuthAuthenticated &&
-            _isLoading &&
-            _pendingPhoneNumber == null) {
-          setState(() => _isLoading = false);
+        // Profil mis à jour (sans changement de numéro ni photo)
+        if (state is AuthAuthenticated && _isUpdatingProfile) {
+          setState(() {
+            _isLoading = false;
+            _isUpdatingProfile = false;
+          });
           Navigator.pop(context);
         }
       },
@@ -654,6 +660,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void _performProfileUpdate() {
+    setState(() => _isUpdatingProfile = true);
     context.read<AuthBloc>().add(
           UpdateProfile(
             firstName: _firstNameController.text,
@@ -804,19 +811,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             : () {
                                 Navigator.of(dialogContext).pop();
                                 // Reset states after dialog closes
-                                WidgetsBinding.instance
-                                    .addPostFrameCallback((_) {
-                                  if (mounted) {
-                                    setState(() {
-                                      _pendingPhoneNumber = null;
-                                      _devCode = null;
-                                      _isLoading = false;
-                                    });
-                                    // Restaurer l'état AuthAuthenticated
-                                    context
-                                        .read<AuthBloc>()
-                                        .add(RestoreAuthState());
-                                  }
+                                setState(() {
+                                  _pendingPhoneNumber = null;
+                                  _devCode = null;
+                                  _isLoading = false;
                                 });
                               },
                         child: const Text('Annuler'),
