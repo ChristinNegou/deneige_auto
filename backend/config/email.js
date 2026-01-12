@@ -1,58 +1,40 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Créer un transporteur pour l'envoi d'emails
-const createTransporter = () => {
-    console.log('[*] Création du transporteur email...');
-    console.log('[*] EMAIL_HOST:', process.env.EMAIL_HOST);
-    console.log('[*] EMAIL_PORT:', process.env.EMAIL_PORT);
-    console.log('[*] EMAIL_USER:', process.env.EMAIL_USER);
-    console.log('[*] EMAIL_PASSWORD configuré:', !!process.env.EMAIL_PASSWORD);
-
-
-    return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secure: false, // true pour 465, false pour les autres ports
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD,
-        },
-        debug: true, // Active les logs de debug
-        logger: true, // Active le logger
-
-    });
+// Initialiser Resend de manière lazy pour éviter les erreurs pendant les tests
+let resend = null;
+const getResend = () => {
+    if (!resend) {
+        const apiKey = process.env.RESEND_API_KEY || 'test_key';
+        resend = new Resend(apiKey);
+    }
+    return resend;
 };
 
 // Envoyer un email
 const sendEmail = async (options) => {
-    console.log('\n[*] Préparation de l\'envoi d\'email...');
+    console.log('\n[*] Préparation de l\'envoi d\'email avec Resend...');
     console.log('[*] Destinataire:', options.email);
     console.log('[*] Sujet:', options.subject);
 
-    const transporter = createTransporter();
-
-    const message = {
-        from: process.env.EMAIL_FROM,
-        to: options.email,
-        subject: options.subject,
-        html: options.html,
-    };
-
     try {
         console.log('[*] Envoi de l\'email en cours...');
-        const info = await transporter.sendMail(message);
-        console.log('[OK] Email envoyé avec succes:', info.messageId);
-        console.log('[OK] Message ID:', info.messageId);
+        const { data, error } = await getResend().emails.send({
+            from: process.env.EMAIL_FROM || 'Deneige Auto <onboarding@resend.dev>',
+            to: [options.email],
+            subject: options.subject,
+            html: options.html,
+        });
 
+        if (error) {
+            console.error('[X] Erreur Resend:', error);
+            throw new Error(error.message);
+        }
 
-        return info;
+        console.log('[OK] Email envoyé avec succes:', data.id);
+        return data;
     } catch (error) {
         console.error('[X] Erreur lors de l\'envoi de l\'email:', error);
         console.error('[X] Message:', error.message);
-        console.error('[X] Code:', error.code);
-        console.error('[X] Détails complets:', error);
-
-
         throw error;
     }
 };
@@ -60,7 +42,6 @@ const sendEmail = async (options) => {
 // Template d'email pour la réinitialisation de mot de passe
 const sendPasswordResetEmail = async (user, resetToken) => {
     console.log('[*] Génération du template email pour:', user.email);
-
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     console.log('[*] URL de réinitialisation:', resetUrl);
@@ -122,20 +103,20 @@ const sendPasswordResetEmail = async (user, resetToken) => {
                         <h1>❄️ Déneige Auto</h1>
                         <h2>Réinitialisation de mot de passe</h2>
                     </div>
-                    
+
                     <p>Bonjour <strong>${user.firstName} ${user.lastName}</strong>,</p>
-                    
+
                     <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Déneige Auto.</p>
-                    
+
                     <p>Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe :</p>
-                    
+
                     <div style="text-align: center;">
                         <a href="${resetUrl}" class="button">Réinitialiser mon mot de passe</a>
                     </div>
-                    
+
                     <p>Ou copiez-collez ce lien dans votre navigateur :</p>
                     <p style="word-break: break-all; color: #3B82F6;">${resetUrl}</p>
-                    
+
                     <div class="warning">
                         <p><strong>⚠️ Important :</strong></p>
                         <ul>
@@ -144,7 +125,7 @@ const sendPasswordResetEmail = async (user, resetToken) => {
                             <li>Votre mot de passe restera inchangé</li>
                         </ul>
                     </div>
-                    
+
                     <div class="footer">
                         <p>Cet email a été envoyé par Déneige Auto</p>
                         <p>Si vous avez des questions, contactez-nous à support@deneigeauto.com</p>
@@ -161,7 +142,6 @@ const sendPasswordResetEmail = async (user, resetToken) => {
         html,
     });
     console.log('[OK] Email de réinitialisation traité');
-
 };
 
 module.exports = {
