@@ -233,12 +233,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     return SafeArea(
       child: BlocListener<WorkerAvailabilityBloc, WorkerAvailabilityState>(
         listener: (context, state) {
-          // Quand le profil est mis à jour, forcer un rebuild
+          // Quand le profil est mis à jour, recharger les données
           if (state is WorkerProfileUpdated) {
-            // Le setState force le widget à se reconstruire
-            if (mounted) {
-              setState(() {});
-            }
+            // Recharger l'availability pour mettre à jour l'UI avec le nouveau profil
+            context
+                .read<WorkerAvailabilityBloc>()
+                .add(const LoadAvailability());
           }
         },
         child: BlocBuilder<AuthBloc, AuthState>(
