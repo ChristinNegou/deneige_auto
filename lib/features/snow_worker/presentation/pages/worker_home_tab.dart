@@ -17,6 +17,7 @@ import '../bloc/worker_stats_bloc.dart';
 import '../widgets/swipeable_job_card.dart';
 import '../widgets/shimmer_loading.dart';
 import '../../services/worker_notification_service.dart';
+import 'worker_main_dashboard.dart';
 
 class WorkerHomeTab extends StatefulWidget {
   const WorkerHomeTab({super.key});
@@ -1022,7 +1023,11 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           GestureDetector(
             onTap: () {
               HapticFeedback.mediumImpact();
-              Navigator.pushNamed(context, AppRoutes.workerSettings);
+              // Basculer vers l'onglet Profil (index 3)
+              WorkerMainDashboard.switchToTab(
+                context,
+                WorkerMainDashboard.profileTab,
+              );
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
@@ -1043,7 +1048,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(
-                    Icons.settings_rounded,
+                    Icons.build_rounded,
                     color: AppTheme.background,
                     size: 20,
                   ),

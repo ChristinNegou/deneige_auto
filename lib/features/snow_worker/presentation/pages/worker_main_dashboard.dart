@@ -15,12 +15,31 @@ import 'worker_profile_tab.dart';
 class WorkerMainDashboard extends StatefulWidget {
   const WorkerMainDashboard({super.key});
 
+  /// Permet de changer d'onglet depuis les enfants
+  static void switchToTab(BuildContext context, int tabIndex) {
+    final state = context.findAncestorStateOfType<_WorkerMainDashboardState>();
+    state?._switchToTab(tabIndex);
+  }
+
+  /// Index des onglets
+  static const int homeTab = 0;
+  static const int earningsTab = 1;
+  static const int paymentsTab = 2;
+  static const int profileTab = 3;
+
   @override
   State<WorkerMainDashboard> createState() => _WorkerMainDashboardState();
 }
 
 class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
   int _currentIndex = 0;
+
+  void _switchToTab(int index) {
+    if (index >= 0 && index < _pages.length && _currentIndex != index) {
+      HapticFeedback.lightImpact();
+      setState(() => _currentIndex = index);
+    }
+  }
 
   final List<Widget> _pages = const [
     WorkerHomeTab(),
