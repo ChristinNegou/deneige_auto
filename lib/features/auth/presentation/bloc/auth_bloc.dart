@@ -455,7 +455,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     RestoreAuthState event,
     Emitter<AuthState> emit,
   ) async {
-    // Restaure l'état AuthAuthenticated avec l'utilisateur actuel
     if (_currentUser != null) {
       emit(AuthAuthenticated(user: _currentUser!));
     }

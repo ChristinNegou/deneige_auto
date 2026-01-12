@@ -22,20 +22,14 @@ class RoleBasedHomeWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       buildWhen: (previous, current) {
-        // Ne reconstruire que pour les changements d'authentification
-        return current is AuthAuthenticated ||
-            current is AuthUnauthenticated ||
-            current is AuthLoading;
+        // Ne reconstruire que pour AuthAuthenticated ou AuthUnauthenticated
+        return current is AuthAuthenticated || current is AuthUnauthenticated;
       },
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final user = state.user;
-
-          // Utiliser une Key unique basée sur l'ID utilisateur et le rôle
-          // pour forcer une reconstruction complète lors du changement de compte
           final uniqueKey = ValueKey('${user.id}_${user.role.name}');
 
-          // Rediriger vers le bon dashboard selon le rôle
           switch (user.role) {
             case UserRole.client:
               return MultiBlocProvider(
@@ -53,7 +47,6 @@ class RoleBasedHomeWrapper extends StatelessWidget {
               );
 
             case UserRole.snowWorker:
-              // WorkerMainDashboard gère ses propres BlocProviders
               return WorkerMainDashboard(key: uniqueKey);
 
             case UserRole.admin:
@@ -65,7 +58,6 @@ class RoleBasedHomeWrapper extends StatelessWidget {
           }
         }
 
-        // Si pas authentifié, afficher un loader
         return const Scaffold(
           body: Center(
             child: CircularProgressIndicator(),

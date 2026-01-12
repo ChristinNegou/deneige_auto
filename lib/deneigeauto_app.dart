@@ -16,8 +16,15 @@ import 'features/home/presentation/bloc/home_bloc.dart';
 /// Clé globale pour le navigator afin de pouvoir naviguer depuis n'importe où
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-class DeneigeAutoApp extends StatelessWidget {
+class DeneigeAutoApp extends StatefulWidget {
   const DeneigeAutoApp({super.key});
+
+  @override
+  State<DeneigeAutoApp> createState() => _DeneigeAutoAppState();
+}
+
+class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
+  bool _hasNavigatedToHome = false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +36,14 @@ class DeneigeAutoApp extends StatelessWidget {
           if (state is UserSuspended) {
             _showSuspensionDialog(state);
           }
-          // Rediriger vers le dashboard si l'utilisateur est authentifié
-          else if (state is AuthAuthenticated) {
+          // Rediriger vers le dashboard SEULEMENT la première fois
+          else if (state is AuthAuthenticated && !_hasNavigatedToHome) {
+            _hasNavigatedToHome = true;
             _navigateToHome(state.user.role);
+          }
+          // Réinitialiser le flag si l'utilisateur se déconnecte
+          else if (state is AuthUnauthenticated) {
+            _hasNavigatedToHome = false;
           }
         },
         child: MaterialApp(

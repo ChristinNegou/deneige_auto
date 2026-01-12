@@ -25,6 +25,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   bool _isUploadingPhoto = false;
   bool _isUpdatingProfile =
       false; // Flag pour savoir si on fait une mise à jour de profil
+  bool _photoJustUploaded =
+      false; // Flag pour ignorer AuthAuthenticated après photo upload
   String? _originalPhone;
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
@@ -83,6 +85,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           setState(() {
             _isLoading = false;
             _isUpdatingProfile = false;
+            _isUploadingPhoto = false;
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -99,6 +102,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           setState(() {
             _isUploadingPhoto = false;
             _selectedImage = null;
+            _photoJustUploaded =
+                true; // Marquer pour ignorer le prochain AuthAuthenticated
           });
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -130,12 +135,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
           Navigator.pop(context);
         }
         // Profil mis à jour (sans changement de numéro ni photo)
-        if (state is AuthAuthenticated && _isUpdatingProfile) {
-          setState(() {
-            _isLoading = false;
-            _isUpdatingProfile = false;
-          });
-          Navigator.pop(context);
+        if (state is AuthAuthenticated) {
+          // Si c'est juste après un upload de photo, ignorer et réinitialiser le flag
+          if (_photoJustUploaded) {
+            setState(() => _photoJustUploaded = false);
+            return;
+          }
+          // Naviguer seulement si c'est une mise à jour de profil (nom, téléphone, etc.)
+          if (_isUpdatingProfile) {
+            setState(() {
+              _isLoading = false;
+              _isUpdatingProfile = false;
+            });
+            Navigator.pop(context);
+          }
         }
       },
       builder: (context, state) {
@@ -816,6 +829,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   _devCode = null;
                                   _isLoading = false;
                                 });
+                                // Restaurer l'état AuthAuthenticated pour garder les données utilisateur
+                                context
+                                    .read<AuthBloc>()
+                                    .add(RestoreAuthState());
                               },
                         child: const Text('Annuler'),
                       ),
