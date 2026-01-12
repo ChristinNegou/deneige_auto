@@ -33,6 +33,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   StreamSubscription<Map<String, dynamic>>? _suspensionSubscription;
 
+  // Stocke l'utilisateur courant pour pouvoir réémettre AuthAuthenticated après des erreurs temporaires
+  User? _currentUser;
+
   AuthBloc({
     required this.login,
     required this.register,
@@ -96,8 +99,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-      (failure) => emit(AuthError(message: failure.message)),
-      (user) => emit(AuthAuthenticated(user: user)),
+      (failure) {
+        emit(AuthError(message: failure.message));
+        // Réémettre AuthAuthenticated pour ne pas perdre les données utilisateur
+        if (_currentUser != null) {
+          emit(AuthAuthenticated(user: _currentUser!));
+        }
+      },
+      (user) {
+        _currentUser = user;
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
@@ -124,6 +136,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       },
       (user) {
+        _currentUser = user;
         // Enregistrer le token FCM et configurer les notifications
         _setupNotificationsForUser(user);
         emit(AuthAuthenticated(user: user));
@@ -137,6 +150,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     // Nettoyer toutes les ressources avant la déconnexion forcée
     await _cleanupAllResources();
+    _currentUser = null;
 
     // Émettre l'état UserSuspended pour afficher le dialog
     emit(UserSuspended(
@@ -165,6 +179,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
       (user) {
+        _currentUser = user;
         // Enregistrer le token FCM et configurer les notifications
         _setupNotificationsForUser(user);
         emit(AuthAuthenticated(user: user));
@@ -185,7 +200,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
-      (_) => emit(AuthUnauthenticated()),
+      (_) {
+        _currentUser = null;
+        emit(AuthUnauthenticated());
+      },
     );
   }
 
@@ -214,6 +232,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthUnauthenticated()),
       (user) {
+        _currentUser = user;
         // Configurer les notifications pour l'utilisateur déjà connecté
         _setupNotificationsForUser(user);
         emit(AuthAuthenticated(user: user));
@@ -278,6 +297,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
       (user) {
+        _currentUser = user;
         // Configurer les notifications pour le nouvel utilisateur
         _setupNotificationsForUser(user);
         // Émettre PhoneVerificationSuccess pour que l'UI puisse réagir
@@ -316,8 +336,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await authRepository.uploadProfilePhoto(File(event.filePath));
 
     result.fold(
-      (failure) => emit(AuthError(message: failure.message)),
+      (failure) {
+        emit(AuthError(message: failure.message));
+        // Réémettre AuthAuthenticated pour ne pas perdre les données utilisateur
+        if (_currentUser != null) {
+          emit(AuthAuthenticated(user: _currentUser!));
+        }
+      },
       (user) {
+        _currentUser = user;
         emit(ProfilePhotoUploaded(user: user));
         emit(AuthAuthenticated(user: user));
       },
@@ -333,8 +360,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await authRepository.deleteProfilePhoto();
 
     result.fold(
-      (failure) => emit(AuthError(message: failure.message)),
-      (user) => emit(AuthAuthenticated(user: user)),
+      (failure) {
+        emit(AuthError(message: failure.message));
+        if (_currentUser != null) {
+          emit(AuthAuthenticated(user: _currentUser!));
+        }
+      },
+      (user) {
+        _currentUser = user;
+        emit(AuthAuthenticated(user: user));
+      },
     );
   }
 
@@ -346,7 +381,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await authRepository.checkPhoneAvailability(event.phoneNumber);
 
     result.fold(
-      (failure) => emit(AuthError(message: failure.message)),
+      (failure) {
+        emit(AuthError(message: failure.message));
+        if (_currentUser != null) {
+          emit(AuthAuthenticated(user: _currentUser!));
+        }
+      },
       (isAvailable) => emit(PhoneAvailabilityChecked(
         isAvailable: isAvailable,
         phoneNumber: event.phoneNumber,
@@ -365,7 +405,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await authRepository.sendPhoneChangeCode(event.phoneNumber);
 
     result.fold(
-      (failure) => emit(AuthError(message: failure.message)),
+      (failure) {
+        emit(AuthError(message: failure.message));
+        // Réémettre AuthAuthenticated pour ne pas perdre les données utilisateur
+        if (_currentUser != null) {
+          emit(AuthAuthenticated(user: _currentUser!));
+        }
+      },
       (data) => emit(PhoneChangeCodeSent(
         phoneNumber: data['phoneNumber'] ?? event.phoneNumber,
         devCode: data['devCode'],
@@ -385,8 +431,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-      (failure) => emit(AuthError(message: failure.message)),
+      (failure) {
+        emit(AuthError(message: failure.message));
+        // Réémettre AuthAuthenticated pour ne pas perdre les données utilisateur
+        if (_currentUser != null) {
+          emit(AuthAuthenticated(user: _currentUser!));
+        }
+      },
       (user) {
+        _currentUser = user;
         emit(PhoneChangeSuccess(user: user));
         emit(AuthAuthenticated(user: user));
       },

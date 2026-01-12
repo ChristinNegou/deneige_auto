@@ -667,7 +667,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               if (state is AuthError) {
                 setDialogState(() => isVerifying = false);
               }
-              if (state is PhoneChangeSuccess || state is AuthAuthenticated) {
+              if (state is PhoneChangeSuccess) {
                 Navigator.of(dialogContext).pop();
               }
             },
@@ -782,47 +782,65 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 ],
               ),
+              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               actions: [
-                TextButton(
-                  onPressed: isVerifying
-                      ? null
-                      : () {
-                          setState(() {
-                            _pendingPhoneNumber = null;
-                            _devCode = null;
-                          });
-                          Navigator.of(dialogContext).pop();
-                        },
-                  child: const Text('Annuler'),
-                ),
-                ElevatedButton(
-                  onPressed: isVerifying
-                      ? null
-                      : () {
-                          if (codeController.text.length == 6) {
-                            setDialogState(() => isVerifying = true);
-                            context.read<AuthBloc>().add(
-                                  VerifyPhoneChangeCode(
-                                    phoneNumber: _pendingPhoneNumber!,
-                                    code: codeController.text,
-                                  ),
-                                );
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: isVerifying
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Vérifier'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: isVerifying
+                            ? null
+                            : () {
+                                Navigator.of(dialogContext).pop();
+                                // Reset states after dialog closes
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  if (mounted) {
+                                    setState(() {
+                                      _pendingPhoneNumber = null;
+                                      _devCode = null;
+                                      _isLoading = false;
+                                    });
+                                  }
+                                });
+                              },
+                        child: const Text('Annuler'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: isVerifying
+                            ? null
+                            : () {
+                                if (codeController.text.length == 6) {
+                                  setDialogState(() => isVerifying = true);
+                                  context.read<AuthBloc>().add(
+                                        VerifyPhoneChangeCode(
+                                          phoneNumber: _pendingPhoneNumber!,
+                                          code: codeController.text,
+                                        ),
+                                      );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: isVerifying
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text('Vérifier'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
