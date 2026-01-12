@@ -677,13 +677,28 @@ class AdminDashboardPage extends StatelessWidget {
           Row(
             children: [
               Icon(Icons.attach_money, color: AppTheme.background),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'Revenus',
                 style: TextStyle(
                   color: AppTheme.background,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.background.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${stats.revenue.reservationCount} réservations',
+                  style: TextStyle(
+                    color: AppTheme.background,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],
@@ -701,8 +716,19 @@ class AdminDashboardPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              _buildRevenueItem('Commission brute (25%)',
+                  stats.revenue.platformFeesGross, false),
+              _buildRevenueItem('Frais Stripe', stats.revenue.stripeFees, false,
+                  isNegative: true),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               _buildRevenueItem(
-                  'Commission plateforme', stats.revenue.platformFees, false),
+                  'Commission nette', stats.revenue.platformFeesNet, false,
+                  isHighlighted: true),
               _buildRevenueItem('Pourboires', stats.revenue.tips, false),
             ],
           ),
@@ -711,7 +737,8 @@ class AdminDashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRevenueItem(String label, double amount, bool isMain) {
+  Widget _buildRevenueItem(String label, double amount, bool isMain,
+      {bool isNegative = false, bool isHighlighted = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -723,13 +750,27 @@ class AdminDashboardPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          '${amount.toStringAsFixed(2)} \$',
-          style: TextStyle(
-            color: AppTheme.background,
-            fontSize: isMain ? 28 : 18,
-            fontWeight: FontWeight.bold,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isNegative)
+              Text(
+                '-',
+                style: TextStyle(
+                  color: AppTheme.background.withValues(alpha: 0.7),
+                  fontSize: isMain ? 28 : 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            Text(
+              '${amount.toStringAsFixed(2)} \$',
+              style: TextStyle(
+                color: isHighlighted ? AppTheme.success : AppTheme.background,
+                fontSize: isMain ? 28 : 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ],
     );

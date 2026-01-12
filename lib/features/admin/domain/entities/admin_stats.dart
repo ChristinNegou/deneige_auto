@@ -102,29 +102,47 @@ class ReservationStats {
 
 class RevenueStats {
   final double total;
-  final double platformFees;
+  final double platformFeesGross;
+  final double stripeFees;
+  final double platformFeesNet;
   final double workerPayouts;
   final double tips;
+  final int reservationCount;
   final double thisMonth;
-  final double monthlyPlatformFees;
+  final double monthlyPlatformFeesGross;
+  final double monthlyStripeFees;
+  final double monthlyPlatformFeesNet;
+  final double monthlyTips;
 
   RevenueStats({
     required this.total,
-    required this.platformFees,
+    required this.platformFeesGross,
+    required this.stripeFees,
+    required this.platformFeesNet,
     required this.workerPayouts,
     required this.tips,
+    required this.reservationCount,
     required this.thisMonth,
-    required this.monthlyPlatformFees,
+    required this.monthlyPlatformFeesGross,
+    required this.monthlyStripeFees,
+    required this.monthlyPlatformFeesNet,
+    required this.monthlyTips,
   });
 
   factory RevenueStats.fromJson(Map<String, dynamic> json) {
     return RevenueStats(
       total: _toDouble(json['total']),
-      platformFees: _toDouble(json['platformFees']),
+      platformFeesGross: _toDouble(json['platformFeesGross']),
+      stripeFees: _toDouble(json['stripeFees']),
+      platformFeesNet: _toDouble(json['platformFeesNet']),
       workerPayouts: _toDouble(json['workerPayouts']),
       tips: _toDouble(json['tips']),
+      reservationCount: _toInt(json['reservationCount']),
       thisMonth: _toDouble(json['thisMonth']),
-      monthlyPlatformFees: _toDouble(json['monthlyPlatformFees']),
+      monthlyPlatformFeesGross: _toDouble(json['monthlyPlatformFeesGross']),
+      monthlyStripeFees: _toDouble(json['monthlyStripeFees']),
+      monthlyPlatformFeesNet: _toDouble(json['monthlyPlatformFeesNet']),
+      monthlyTips: _toDouble(json['monthlyTips']),
     );
   }
 }

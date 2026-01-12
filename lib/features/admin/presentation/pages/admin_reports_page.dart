@@ -150,8 +150,8 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                       color: AppTheme.background.withValues(alpha: 0.3),
                     ),
                     _buildRevenueSubItem(
-                      'Commission',
-                      currencyFormat.format(stats.revenue.platformFees),
+                      'Commission nette',
+                      currencyFormat.format(stats.revenue.platformFeesNet),
                       Icons.percent,
                     ),
                   ],
@@ -248,10 +248,24 @@ class _AdminReportsPageState extends State<AdminReportsPage>
           ),
           const Divider(height: 24),
           _buildBreakdownRow(
-            'Commission plateforme',
-            revenue.platformFees,
+            'Commission brute (25%)',
+            revenue.platformFeesGross,
             AppTheme.primary,
             Icons.business,
+          ),
+          const Divider(height: 24),
+          _buildBreakdownRow(
+            'Frais Stripe (~3%)',
+            revenue.stripeFees,
+            AppTheme.error,
+            Icons.credit_card,
+          ),
+          const Divider(height: 24),
+          _buildBreakdownRow(
+            'Commission nette',
+            revenue.platformFeesNet,
+            AppTheme.success,
+            Icons.check_circle,
           ),
           const Divider(height: 24),
           _buildBreakdownRow(
@@ -307,7 +321,8 @@ class _AdminReportsPageState extends State<AdminReportsPage>
   }
 
   Widget _buildRevenueDistributionChart(RevenueStats revenue) {
-    final total = revenue.platformFees + revenue.workerPayouts + revenue.tips;
+    final total =
+        revenue.platformFeesNet + revenue.workerPayouts + revenue.tips;
     if (total == 0) {
       return Container(
         padding: const EdgeInsets.all(20),
@@ -321,7 +336,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
       );
     }
 
-    final platformPercent = (revenue.platformFees / total * 100);
+    final platformPercent = (revenue.platformFeesNet / total * 100);
     final workerPercent = (revenue.workerPayouts / total * 100);
     final tipsPercent = (revenue.tips / total * 100);
 
@@ -434,7 +449,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
   }
 
   Widget _buildMonthlyComparisonCard(RevenueStats revenue) {
-    final monthlyCommission = revenue.monthlyPlatformFees;
+    final monthlyCommission = revenue.monthlyPlatformFeesNet;
     final monthlyTotal = revenue.thisMonth;
 
     return Container(
