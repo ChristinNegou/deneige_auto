@@ -77,6 +77,7 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
             resolvedSupportRequests,
             closedSupportRequests,
             todaySupportRequests,
+            avgResponseTimeResult,
         ] = await Promise.all([
             User.countDocuments(),
             User.countDocuments({ role: 'client' }),
@@ -95,6 +96,21 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
             SupportRequest.countDocuments({ status: 'resolved' }),
             SupportRequest.countDocuments({ status: 'closed' }),
             SupportRequest.countDocuments({ createdAt: { $gte: today } }),
+            // Temps de réponse moyen
+            SupportRequest.aggregate([
+                { $match: { status: { $in: ['resolved', 'closed'] }, resolvedAt: { $exists: true, $ne: null } } },
+                {
+                    $project: {
+                        responseTime: { $subtract: ['$resolvedAt', '$createdAt'] },
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        avgResponseTime: { $avg: '$responseTime' },
+                    },
+                },
+            ]),
         ]);
 
         // Revenus
@@ -209,7 +225,9 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
                     resolved: resolvedSupportRequests,
                     closed: closedSupportRequests,
                     todayNew: todaySupportRequests,
-                    avgResponseTimeHours: 0, // TODO: calculer si besoin
+                    avgResponseTimeHours: avgResponseTimeResult[0]
+                        ? Math.round(avgResponseTimeResult[0].avgResponseTime / (1000 * 60 * 60))
+                        : 0,
                 },
             },
         });

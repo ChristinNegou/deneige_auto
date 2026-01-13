@@ -3,6 +3,10 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
+const Vehicle = require('../models/Vehicle');
+const Notification = require('../models/Notification');
+const SupportRequest = require('../models/SupportRequest');
+const PhoneVerification = require('../models/PhoneVerification');
 const { protect } = require('../middleware/auth');
 const { sendPasswordResetEmail } = require('../config/email');
 const { authLimiter, registrationLimiter, forgotPasswordLimiter } = require('../middleware/rateLimiter');
@@ -736,16 +740,34 @@ router.delete('/account', protect, async (req, res) => {
             });
         }
 
-        // Supprimer l'utilisateur
-        await User.findByIdAndDelete(req.user.id);
+        // Supprimer les données associées à l'utilisateur
+        const userId = req.user.id;
 
-        // TODO: Optionnel - Supprimer les données associées (véhicules, réservations, etc.)
-        // await Vehicle.deleteMany({ userId: req.user.id });
-        // await Reservation.deleteMany({ client: req.user.id });
+        // Supprimer en parallèle pour de meilleures performances
+        const deletionResults = await Promise.allSettled([
+            Vehicle.deleteMany({ userId }),
+            Notification.deleteMany({ userId }),
+            SupportRequest.deleteMany({ userId }),
+            PhoneVerification.deleteMany({ userId }),
+        ]);
+
+        // Logger les résultats de suppression pour le debugging
+        const deletionSummary = {
+            vehicles: deletionResults[0].status === 'fulfilled' ? deletionResults[0].value.deletedCount : 0,
+            notifications: deletionResults[1].status === 'fulfilled' ? deletionResults[1].value.deletedCount : 0,
+            supportRequests: deletionResults[2].status === 'fulfilled' ? deletionResults[2].value.deletedCount : 0,
+            phoneVerifications: deletionResults[3].status === 'fulfilled' ? deletionResults[3].value.deletedCount : 0,
+        };
+
+        console.log(`[Auth] Données supprimées pour utilisateur ${userId}:`, deletionSummary);
+
+        // Supprimer l'utilisateur
+        await User.findByIdAndDelete(userId);
 
         res.status(200).json({
             success: true,
             message: 'Compte supprimé avec succès',
+            deletedData: deletionSummary,
         });
     } catch (error) {
         console.error('Erreur lors de la suppression du compte:', error);

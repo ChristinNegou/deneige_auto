@@ -3,6 +3,7 @@ const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { sendPushNotification, sendMulticastNotification } = require('../services/firebaseService');
 
 // Configuration des pénalités
 const PENALTY_CONFIG = {
@@ -54,21 +55,81 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 // Envoyer une notification
 const sendNotification = async (userId, title, body, type, data = {}) => {
     try {
-        await Notification.create({
+        // Créer la notification en base de données
+        const notification = await Notification.create({
             userId,
             title,
-            body,
+            message: body,
             type,
-            data,
+            metadata: data,
         });
 
-        // TODO: Envoyer push notification via FCM si disponible
-        const user = await User.findById(userId).select('fcmToken');
-        if (user?.fcmToken) {
-            // FCM push notification logic here
+        // Envoyer push notification via FCM si l'utilisateur a un token
+        const user = await User.findById(userId).select('fcmToken notificationSettings');
+        if (user?.fcmToken && user.notificationSettings?.pushEnabled !== false) {
+            const result = await sendPushNotification(
+                user.fcmToken,
+                title,
+                body,
+                {
+                    ...data,
+                    notificationId: notification._id.toString(),
+                    type,
+                }
+            );
+
+            // Supprimer le token s'il est invalide
+            if (result?.invalidToken) {
+                await User.findByIdAndUpdate(userId, { fcmToken: null });
+                console.log(`[Dispute] Removed invalid FCM token for user ${userId}`);
+            }
         }
     } catch (error) {
         console.error('Error sending notification:', error);
+    }
+};
+
+// Notifier tous les admins
+const notifyAllAdmins = async (title, body, type, data = {}) => {
+    try {
+        // Récupérer tous les admins avec leurs tokens FCM
+        const admins = await User.find({ role: 'admin' }).select('_id fcmToken notificationSettings');
+
+        // Créer des notifications en base pour chaque admin
+        const notifications = admins.map(admin => ({
+            userId: admin._id,
+            title,
+            message: body,
+            type,
+            priority: 'high',
+            metadata: data,
+        }));
+
+        if (notifications.length > 0) {
+            await Notification.insertMany(notifications);
+        }
+
+        // Envoyer les push notifications aux admins qui ont des tokens FCM valides
+        const fcmTokens = admins
+            .filter(admin => admin.fcmToken && admin.notificationSettings?.pushEnabled !== false)
+            .map(admin => admin.fcmToken);
+
+        if (fcmTokens.length > 0) {
+            const result = await sendMulticastNotification(fcmTokens, title, body, { ...data, type });
+
+            // Nettoyer les tokens invalides
+            if (result?.invalidTokens?.length > 0) {
+                await User.updateMany(
+                    { fcmToken: { $in: result.invalidTokens } },
+                    { fcmToken: null }
+                );
+                console.log(`[Dispute] Removed ${result.invalidTokens.length} invalid admin FCM tokens`);
+            }
+        }
+
+        console.log(`[Dispute] Notified ${admins.length} admins: ${title}`);
+    } catch (error) {
+        console.error('Error notifying admins:', error);
     }
 };
 
@@ -858,13 +919,12 @@ exports.appealDispute = async (req, res) => {
         dispute.addHistory('appealed', 'Appel soumis', req.user.id);
         await dispute.save();
 
-        // Notifier l'admin
-        await sendNotification(
-            null, // TODO: Notifier tous les admins
+        // Notifier tous les admins
+        await notifyAllAdmins(
             'Appel de litige',
             `Un appel a été soumis pour le litige #${dispute._id}`,
             'admin_alert',
-            { disputeId: dispute._id }
+            { disputeId: dispute._id.toString() }
         );
 
         res.json({
