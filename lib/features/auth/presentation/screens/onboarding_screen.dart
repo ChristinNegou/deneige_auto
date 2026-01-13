@@ -55,6 +55,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAuthState();
     });
+
+    // Timeout de sécurité - si après 5 secondes on est toujours en chargement,
+    // afficher l'onboarding pour éviter un blocage infini
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted && _isCheckingAuth) {
+        setState(() {
+          _isCheckingAuth = false;
+        });
+      }
+    });
   }
 
   void _checkAuthState() {
@@ -66,13 +76,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       return;
     }
 
-    // Si l'état est initial ou loading, attendre
+    // Si l'état est initial ou loading, attendre un peu puis vérifier à nouveau
     if (authState is AuthInitial || authState is AuthLoading) {
-      // Écouter les changements d'état
+      // Attendre un court moment puis revérifier
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          final newState = context.read<AuthBloc>().state;
+          // Si toujours en loading après 500ms, on laisse le timeout global gérer
+          if (newState is AuthUnauthenticated || newState is AuthError) {
+            setState(() {
+              _isCheckingAuth = false;
+            });
+          } else if (newState is AuthAuthenticated) {
+            // Navigation gérée par BlocListener
+            return;
+          }
+        }
+      });
       return;
     }
 
-    // Si non authentifié, afficher l'onboarding
+    // Si erreur ou non authentifié, afficher l'onboarding
     if (mounted) {
       setState(() {
         _isCheckingAuth = false;
@@ -115,8 +139,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        // Si l'état change vers non-authentifié, afficher l'onboarding
-        if (state is AuthUnauthenticated && mounted) {
+        // Si l'état change vers non-authentifié ou erreur, afficher l'onboarding
+        if ((state is AuthUnauthenticated || state is AuthError) && mounted) {
           setState(() {
             _isCheckingAuth = false;
           });

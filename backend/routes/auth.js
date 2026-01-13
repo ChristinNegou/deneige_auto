@@ -21,10 +21,10 @@ const { profilePhotoUpload, handleMulterError } = require('../middleware/fileUpl
 const { uploadFromBuffer } = require('../config/cloudinary');
 const { formatPhoneNumber } = require('../services/twilioService');
 
-// Fonction pour générer un token JWT (access token - courte durée)
+// Fonction pour générer un token JWT (access token)
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET, {
-        expiresIn: '15m', // 15 minutes pour l'access token
+        expiresIn: process.env.JWT_EXPIRE || '7d', // Utiliser la variable d'env ou 7 jours par défaut
     });
 };
 
@@ -178,7 +178,7 @@ router.post('/login', authLimiter, validateLogin, async (req, res) => {
             },
             token: accessToken,
             refreshToken: refreshToken,
-            expiresIn: 900, // 15 minutes en secondes
+            expiresIn: 604800, // 7 jours en secondes
         });
     } catch (error) {
         console.error('Erreur lors de la connexion:', error);
@@ -242,7 +242,7 @@ router.post('/refresh-token', async (req, res) => {
             success: true,
             token: newAccessToken,
             refreshToken: newRefreshToken,
-            expiresIn: 900,
+            expiresIn: 604800, // 7 jours en secondes
         });
     } catch (error) {
         console.error('Erreur lors du refresh token:', error);
