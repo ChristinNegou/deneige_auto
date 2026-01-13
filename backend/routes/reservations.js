@@ -1025,9 +1025,54 @@ router.patch('/:id/cancel-by-client', protect, async (req, res) => {
                 platformFee,
                 stripeFee: 0,
             };
-            await reservation.save();
 
-            // TODO: Transférer au déneigeur via Stripe Connect si configuré
+            // Transférer au déneigeur via Stripe Connect si configuré
+            const workerId = reservation.workerId._id || reservation.workerId;
+            const worker = await User.findById(workerId).select('workerProfile');
+
+            if (worker?.workerProfile?.stripeConnectId) {
+                try {
+                    const transfer = await stripe.transfers.create(
+                        {
+                            amount: Math.round(workerAmount * 100), // En cents
+                            currency: 'cad',
+                            destination: worker.workerProfile.stripeConnectId,
+                            description: `Compensation annulation réservation #${reservation._id}`,
+                            metadata: {
+                                reservationId: reservation._id.toString(),
+                                workerId: workerId.toString(),
+                                type: 'cancellation_compensation',
+                                originalAmount: cancellationFeeAmount,
+                                platformFee: platformFee,
+                            },
+                        },
+                        {
+                            idempotencyKey: `cancel_transfer_${reservation._id}_${Date.now()}`,
+                        }
+                    );
+
+                    reservation.payout.status = 'paid';
+                    reservation.payout.stripeTransferId = transfer.id;
+                    reservation.payout.processedAt = new Date();
+                    console.log('✅ Compensation annulation transférée au déneigeur:', transfer.id);
+
+                    // Mettre à jour les stats du déneigeur
+                    await User.findByIdAndUpdate(workerId, {
+                        $inc: {
+                            'workerProfile.totalEarnings': workerAmount,
+                        },
+                    });
+                } catch (transferError) {
+                    console.error('❌ Erreur transfert compensation:', transferError.message);
+                    // Le payout reste en 'pending' pour traitement manuel ultérieur
+                    reservation.payout.error = transferError.message;
+                }
+            } else {
+                console.log('⚠️ Déneigeur sans compte Stripe Connect, payout en attente');
+                reservation.payout.status = 'pending_account';
+            }
+
+            await reservation.save();
         }
 
         // Notifier le déneigeur si assigné

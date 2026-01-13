@@ -84,9 +84,26 @@ notificationSchema.statics.createNotification = async function(data) {
     // Envoyer une push notification si l'utilisateur a un token FCM
     try {
         const User = mongoose.model('User');
-        const user = await User.findById(data.userId).select('fcmToken notificationSettings');
+        const user = await User.findById(data.userId).select('fcmToken notificationSettings email');
 
-        if (user && user.fcmToken && user.notificationSettings?.pushEnabled !== false) {
+        // Logging détaillé pour le debugging
+        const pushContext = {
+            userId: data.userId?.toString(),
+            notificationType: data.type,
+            hasFcmToken: !!user?.fcmToken,
+            pushEnabled: user?.notificationSettings?.pushEnabled !== false,
+        };
+
+        if (!user) {
+            console.warn('[FCM] Utilisateur non trouvé pour notification push:', pushContext);
+        } else if (!user.fcmToken) {
+            // Log silencieux - l'utilisateur n'a simplement pas de token (normal si pas d'app installée)
+            if (process.env.NODE_ENV !== 'production') {
+                console.debug('[FCM] Utilisateur sans token FCM:', { ...pushContext, email: user.email });
+            }
+        } else if (user.notificationSettings?.pushEnabled === false) {
+            console.debug('[FCM] Notifications push désactivées pour:', { ...pushContext, email: user.email });
+        } else {
             const pushData = {
                 notificationId: notification._id.toString(),
                 type: data.type,
@@ -104,11 +121,22 @@ notificationSchema.statics.createNotification = async function(data) {
             // Si le token est invalide, le supprimer
             if (result && result.invalidToken) {
                 await User.findByIdAndUpdate(data.userId, { fcmToken: null });
-                console.log(`Removed invalid FCM token for user ${data.userId}`);
+                console.warn('[FCM] Token invalide supprimé pour utilisateur:', {
+                    userId: data.userId?.toString(),
+                    email: user.email,
+                    errorCode: result.errorCode,
+                });
+            } else if (result && result.success) {
+                console.debug('[FCM] Push envoyée avec succès:', pushContext);
             }
         }
     } catch (error) {
-        console.error('Error sending push notification:', error.message);
+        console.error('[FCM] Erreur envoi notification push:', {
+            userId: data.userId?.toString(),
+            type: data.type,
+            error: error.message,
+            stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined,
+        });
         // Ne pas faire échouer la création de notification si la push échoue
     }
 

@@ -19,14 +19,14 @@ const {
   getWorkerEarningsSummary,
 } = require('../controllers/paymentController');
 const { paymentLimiter } = require('../middleware/rateLimiter');
-const { validatePaymentMethodId, validateTip, validateRefund, validateReservationId } = require('../middleware/validators');
+const { validatePaymentMethodId, validateCreatePaymentIntent, validateConfirmPayment, validateTip, validateRefund, validateReservationId } = require('../middleware/validators');
 const { PLATFORM_FEE_PERCENT } = require('../config/constants');
 const { handleError, safeNotify } = require('../utils/errorHandler');
 
 // @route   POST /api/payments/create-intent
 // @desc    Créer un Payment Intent Stripe avec transfert automatique au déneigeur
 // @access  Private
-router.post('/create-intent', protect, paymentLimiter, async (req, res) => {
+router.post('/create-intent', protect, paymentLimiter, validateCreatePaymentIntent, async (req, res) => {
     try {
         const { amount, reservationId } = req.body;
 
@@ -126,7 +126,7 @@ router.post('/create-intent', protect, paymentLimiter, async (req, res) => {
 // @route   POST /api/payments/confirm
 // @desc    Confirmer un paiement et mettre à jour la réservation + payout
 // @access  Private
-router.post('/confirm', protect, paymentLimiter, async (req, res) => {
+router.post('/confirm', protect, paymentLimiter, validateConfirmPayment, async (req, res) => {
     try {
         const { paymentIntentId, reservationId } = req.body;
 

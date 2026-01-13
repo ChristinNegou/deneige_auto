@@ -671,8 +671,17 @@ router.post('/reservations/:id/refund', protect, adminOnly, async (req, res) => 
         const alreadyRefunded = reservation.refundAmount || 0;
         const maxRefundable = reservation.totalPrice - alreadyRefunded;
 
-        // Validation du montant de remboursement
-        const refundAmount = amount || maxRefundable;
+        // Validation du montant de remboursement avec vérification NaN
+        const parsedAmount = amount ? parseFloat(amount) : maxRefundable;
+
+        if (isNaN(parsedAmount) || !Number.isFinite(parsedAmount)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le montant de remboursement doit être un nombre valide',
+            });
+        }
+
+        const refundAmount = parsedAmount;
 
         if (refundAmount <= 0) {
             return res.status(400).json({

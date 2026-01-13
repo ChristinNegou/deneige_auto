@@ -277,6 +277,44 @@ const validatePaymentMethodId = [
     handleValidationErrors,
 ];
 
+const validateCreatePaymentIntent = [
+    body('amount')
+        .notEmpty()
+        .withMessage('Le montant est requis')
+        .isFloat({ min: 0.50, max: 10000 })
+        .withMessage('Le montant doit être entre 0.50$ et 10,000$')
+        .custom((value) => {
+            if (isNaN(value) || !Number.isFinite(parseFloat(value))) {
+                throw new Error('Le montant doit être un nombre valide');
+            }
+            return true;
+        }),
+    body('reservationId')
+        .optional()
+        .custom((value) => {
+            // Allow 'temp' or valid MongoDB ObjectId
+            if (value === 'temp' || /^[0-9a-fA-F]{24}$/.test(value)) {
+                return true;
+            }
+            throw new Error('ID de réservation invalide');
+        }),
+    handleValidationErrors,
+];
+
+const validateConfirmPayment = [
+    body('paymentIntentId')
+        .notEmpty()
+        .withMessage('L\'ID du Payment Intent est requis')
+        .matches(/^pi_/)
+        .withMessage('Format de Payment Intent invalide'),
+    body('reservationId')
+        .notEmpty()
+        .withMessage('L\'ID de la réservation est requis')
+        .isMongoId()
+        .withMessage('ID de réservation invalide'),
+    handleValidationErrors,
+];
+
 const validateTip = [
     body('reservationId')
         .notEmpty()
@@ -447,6 +485,8 @@ module.exports = {
     validateVehicleId,
     // Payments
     validatePaymentMethodId,
+    validateCreatePaymentIntent,
+    validateConfirmPayment,
     validateTip,
     validateRefund,
     // Messages

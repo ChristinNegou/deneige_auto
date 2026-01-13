@@ -99,6 +99,8 @@ router.post('/:reservationId', protect, async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'Le chat n\'est plus disponible pour cette réservation',
+                currentStatus: reservation.status,
+                allowedStatuses: allowedStatuses,
             });
         }
 
@@ -141,16 +143,26 @@ router.post('/:reservationId', protect, async (req, res) => {
         // Émettre l'événement Socket.IO (si le socket est disponible)
         const io = req.app.get('io');
         if (io) {
-            // Envoyer au room de la réservation
-            io.to(`reservation:${reservationId}`).emit('message:new', {
-                message: populatedMessage,
-            });
+            try {
+                // Envoyer au room de la réservation
+                io.to(`reservation:${reservationId}`).emit('message:new', {
+                    message: populatedMessage,
+                });
 
-            // Aussi envoyer au destinataire spécifiquement
-            io.to(`user:${recipientId}`).emit('message:new', {
-                message: populatedMessage,
-                reservationId,
-            });
+                // Aussi envoyer au destinataire spécifiquement
+                io.to(`user:${recipientId}`).emit('message:new', {
+                    message: populatedMessage,
+                    reservationId,
+                });
+            } catch (socketError) {
+                console.error('[Socket.IO] Erreur émission message:new:', {
+                    reservationId,
+                    recipientId,
+                    error: socketError.message,
+                });
+            }
+        } else {
+            console.warn('[Socket.IO] Socket non disponible pour message:new');
         }
 
         res.status(201).json({
@@ -240,10 +252,17 @@ router.patch('/:reservationId/read', protect, async (req, res) => {
         // Émettre l'événement de lecture
         const io = req.app.get('io');
         if (io) {
-            io.to(`reservation:${reservationId}`).emit('message:read', {
-                readerId: req.user.id,
-                reservationId,
-            });
+            try {
+                io.to(`reservation:${reservationId}`).emit('message:read', {
+                    readerId: req.user.id,
+                    reservationId,
+                });
+            } catch (socketError) {
+                console.error('[Socket.IO] Erreur émission message:read:', {
+                    reservationId,
+                    error: socketError.message,
+                });
+            }
         }
 
         res.status(200).json({

@@ -1,5 +1,6 @@
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const { handleError } = require('../utils/errorHandler');
 
 // @desc    Register FCM token for push notifications
 // @route   POST /api/notifications/register-token
@@ -23,11 +24,7 @@ exports.registerFcmToken = async (req, res) => {
             message: 'Token FCM enregistré avec succès',
         });
     } catch (error) {
-        console.error('Error registering FCM token:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:register-token', 'Erreur lors de l\'enregistrement du token');
     }
 };
 
@@ -43,11 +40,7 @@ exports.unregisterFcmToken = async (req, res) => {
             message: 'Token FCM supprimé avec succès',
         });
     } catch (error) {
-        console.error('Error unregistering FCM token:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:unregister-token', 'Erreur lors de la suppression du token');
     }
 };
 
@@ -81,11 +74,7 @@ exports.updateNotificationSettings = async (req, res) => {
             settings: user.notificationSettings,
         });
     } catch (error) {
-        console.error('Error updating notification settings:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:update-settings', 'Erreur lors de la mise à jour des paramètres');
     }
 };
 
@@ -123,11 +112,7 @@ exports.getNotifications = async (req, res) => {
             notifications,
         });
     } catch (error) {
-        console.error('Error fetching notifications:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:get-all', 'Erreur lors de la récupération des notifications');
     }
 };
 
@@ -146,11 +131,7 @@ exports.getUnreadCount = async (req, res) => {
             count,
         });
     } catch (error) {
-        console.error('Error fetching unread count:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:unread-count', 'Erreur lors du comptage des notifications');
     }
 };
 
@@ -179,11 +160,7 @@ exports.markAsRead = async (req, res) => {
             message: 'Notification marquée comme lue',
         });
     } catch (error) {
-        console.error('Error marking notification as read:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:mark-read', 'Erreur lors du marquage de la notification');
     }
 };
 
@@ -192,7 +169,7 @@ exports.markAsRead = async (req, res) => {
 // @access  Private
 exports.markAllAsRead = async (req, res) => {
     try {
-        await Notification.updateMany(
+        const result = await Notification.updateMany(
             { userId: req.user.id, isRead: false },
             { isRead: true }
         );
@@ -200,13 +177,11 @@ exports.markAllAsRead = async (req, res) => {
         res.json({
             success: true,
             message: 'Toutes les notifications marquées comme lues',
+            modifiedCount: result.modifiedCount,
+            matchedCount: result.matchedCount,
         });
     } catch (error) {
-        console.error('Error marking all as read:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:mark-all-read', 'Erreur lors du marquage des notifications');
     }
 };
 
@@ -232,11 +207,7 @@ exports.deleteNotification = async (req, res) => {
             message: 'Notification supprimée',
         });
     } catch (error) {
-        console.error('Error deleting notification:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:delete', 'Erreur lors de la suppression de la notification');
     }
 };
 
@@ -245,18 +216,15 @@ exports.deleteNotification = async (req, res) => {
 // @access  Private
 exports.clearAllNotifications = async (req, res) => {
     try {
-        await Notification.deleteMany({ userId: req.user.id });
+        const result = await Notification.deleteMany({ userId: req.user.id });
 
         res.json({
             success: true,
             message: 'Toutes les notifications supprimées',
+            deletedCount: result.deletedCount,
         });
     } catch (error) {
-        console.error('Error clearing notifications:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:clear-all', 'Erreur lors de la suppression des notifications');
     }
 };
 
@@ -322,11 +290,7 @@ exports.sendNotificationToClient = async (req, res) => {
             notification: notification,
         });
     } catch (error) {
-        console.error('Error sending notification to client:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:send-to-client', 'Erreur lors de l\'envoi de la notification');
     }
 };
 
@@ -363,11 +327,7 @@ exports.getWorkerNotifications = async (req, res) => {
             notifications,
         });
     } catch (error) {
-        console.error('Error fetching worker notifications:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:worker-list', 'Erreur lors de la récupération des notifications');
     }
 };
 
@@ -401,11 +361,7 @@ exports.createWorkerNotification = async (req, res) => {
             notification,
         });
     } catch (error) {
-        console.error('Error creating worker notification:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:create-worker', 'Erreur lors de la création de la notification');
     }
 };
 
@@ -450,10 +406,6 @@ exports.broadcastZoneNotification = async (req, res) => {
             count: notifications.length,
         });
     } catch (error) {
-        console.error('Error broadcasting zone notification:', error);
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        return handleError(res, error, 'notifications:broadcast-zone', 'Erreur lors de la diffusion des notifications');
     }
 };

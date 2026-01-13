@@ -57,11 +57,11 @@ class PaymentMethodsState extends Equatable {
   });
 
   PaymentMethod? get defaultMethod {
-    try {
-      return methods.firstWhere((m) => m.isDefault);
-    } catch (e) {
+    if (methods.isEmpty) {
       return null;
     }
+    final defaultMethods = methods.where((m) => m.isDefault).toList();
+    return defaultMethods.isNotEmpty ? defaultMethods.first : null;
   }
 
   PaymentMethodsState copyWith({

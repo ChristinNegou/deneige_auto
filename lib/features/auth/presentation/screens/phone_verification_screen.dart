@@ -58,13 +58,16 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
   @override
   void dispose() {
+    _resendTimer?.cancel();
+    _resendTimer = null;
     for (var controller in _controllers) {
       controller.dispose();
     }
+    _controllers.clear();
     for (var node in _focusNodes) {
       node.dispose();
     }
-    _resendTimer?.cancel();
+    _focusNodes.clear();
     super.dispose();
   }
 
