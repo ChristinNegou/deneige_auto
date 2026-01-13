@@ -64,7 +64,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _handleRegister() {
-    if (_formKey.currentState!.validate()) {
+    final formState = _formKey.currentState;
+    if (formState != null && formState.validate()) {
       final formattedPhone = _formatPhoneNumber(_phoneController.text.trim());
       Navigator.of(context).pushNamed(
         AppRoutes.phoneVerification,

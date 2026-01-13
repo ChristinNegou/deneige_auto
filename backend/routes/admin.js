@@ -667,7 +667,33 @@ router.post('/reservations/:id/refund', protect, adminOnly, async (req, res) => 
             });
         }
 
-        const refundAmount = amount || reservation.totalPrice;
+        // Calculer le montant maximum remboursable
+        const alreadyRefunded = reservation.refundAmount || 0;
+        const maxRefundable = reservation.totalPrice - alreadyRefunded;
+
+        // Validation du montant de remboursement
+        const refundAmount = amount || maxRefundable;
+
+        if (refundAmount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le montant du remboursement doit être supérieur à 0',
+            });
+        }
+
+        if (refundAmount > maxRefundable) {
+            return res.status(400).json({
+                success: false,
+                message: `Le montant demandé (${refundAmount.toFixed(2)}$) dépasse le maximum remboursable (${maxRefundable.toFixed(2)}$)`,
+            });
+        }
+
+        if (maxRefundable <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cette réservation a déjà été entièrement remboursée',
+            });
+        }
 
         const refund = await stripe.refunds.create({
             payment_intent: reservation.paymentIntentId,

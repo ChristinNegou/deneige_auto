@@ -29,7 +29,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleLogin() {
-    if (_formKey.currentState!.validate()) {
+    final formState = _formKey.currentState;
+    if (formState != null && formState.validate()) {
       context.read<AuthBloc>().add(
             LoginRequested(
               email: _emailController.text.trim(),

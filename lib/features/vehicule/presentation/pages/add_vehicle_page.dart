@@ -752,7 +752,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
+    final formState = _formKey.currentState;
+    if (formState != null && formState.validate()) {
       final params = AddVehicleParams(
         make: _makeController.text.trim(),
         model: _modelController.text.trim(),

@@ -22,8 +22,9 @@ class DioClient {
           'Accept': 'application/json',
         },
         validateStatus: (status) {
-          // Accepter tous les status pour gérer les erreurs manuellement
-          return status != null && status < 500;
+          // Seuls les status 2xx sont considérés comme succès
+          // Les 4xx et 5xx lèveront des DioException pour un traitement approprié
+          return status != null && status >= 200 && status < 300;
         },
       ),
     );

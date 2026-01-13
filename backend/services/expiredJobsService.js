@@ -57,6 +57,7 @@ async function findJobsApproachingDeadline() {
 
 /**
  * Annule un job expire et gere les consequences
+ * Utilise une approche transactionnelle pour éviter les incohérences
  */
 async function cancelExpiredJob(reservation) {
     const now = new Date();
@@ -71,37 +72,82 @@ async function cancelExpiredJob(reservation) {
     console.log(`   Deadline: ${reservation.deadlineTime}`);
     console.log(`   Retard: ${minutesOverdue} minutes`);
 
-    // Mettre a jour le statut de la reservation
-    reservation.status = 'cancelled';
-    reservation.cancelledAt = now;
-    reservation.cancelledBy = 'system';
-    reservation.cancelReason = `Annulation automatique - Job non complete ${minutesOverdue} minutes apres la deadline`;
+    // Sauvegarder l'état précédent pour rollback si nécessaire
+    const previousStatus = reservation.status;
+    const previousPaymentStatus = reservation.paymentStatus;
 
-    // Rembourser le client si paye
-    if (reservation.paymentStatus === 'paid') {
-        reservation.paymentStatus = 'refunded';
-        reservation.refundAmount = reservation.totalPrice;
-        reservation.refundedAt = now;
-        // Note: Le remboursement Stripe reel devrait etre fait ici
-        // await refundPayment(reservation.paymentIntentId, reservation.totalPrice);
+    try {
+        // Mettre a jour le statut de la reservation
+        reservation.status = 'cancelled';
+        reservation.cancelledAt = now;
+        reservation.cancelledBy = 'system';
+        reservation.cancelReason = `Annulation automatique - Job non complete ${minutesOverdue} minutes apres la deadline`;
+
+        // Marquer pour remboursement si paye (le remboursement réel sera fait après la sauvegarde)
+        const needsRefund = reservation.paymentStatus === 'paid' && reservation.paymentIntentId;
+        if (needsRefund) {
+            reservation.paymentStatus = 'pending_refund';
+            reservation.refundAmount = reservation.totalPrice;
+        }
+
+        // Sauvegarder d'abord la reservation - POINT CRITIQUE
+        await reservation.save();
+        console.log(`   ✅ Reservation ${reservation._id} sauvegardée avec statut 'cancelled'`);
+
+        // Effectuer le remboursement Stripe si nécessaire
+        if (needsRefund) {
+            try {
+                const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+                await stripe.refunds.create({
+                    payment_intent: reservation.paymentIntentId,
+                    amount: Math.round(reservation.totalPrice * 100),
+                });
+                reservation.paymentStatus = 'refunded';
+                reservation.refundedAt = now;
+                await reservation.save();
+                console.log(`   ✅ Remboursement Stripe effectué pour ${reservation._id}`);
+            } catch (refundError) {
+                console.error(`   ⚠️ Erreur remboursement Stripe pour ${reservation._id}:`, refundError.message);
+                // Le statut reste 'pending_refund' pour traitement manuel
+            }
+        }
+
+        // Les notifications et pénalités sont envoyées APRÈS la sauvegarde réussie
+        // En cas d'échec de notification, le job est déjà annulé correctement
+
+        // Gerer les consequences pour le worker (non-bloquant)
+        if (reservation.workerId) {
+            penalizeWorker(reservation.workerId, reservation).catch(err => {
+                console.error(`   ⚠️ Erreur pénalisation worker:`, err.message);
+            });
+        }
+
+        // Notifier le client (non-bloquant)
+        notifyClientJobExpired(reservation).catch(err => {
+            console.error(`   ⚠️ Erreur notification client:`, err.message);
+        });
+
+        // Notifier le worker (non-bloquant)
+        if (reservation.workerId) {
+            notifyWorkerJobExpired(reservation).catch(err => {
+                console.error(`   ⚠️ Erreur notification worker:`, err.message);
+            });
+        }
+
+        return { action: 'cancelled', minutesOverdue, reservationId: reservation._id };
+
+    } catch (saveError) {
+        // Rollback en mémoire (la DB n'a pas été modifiée)
+        console.error(`   ❌ Erreur lors de l'annulation du job ${reservation._id}:`, saveError.message);
+        reservation.status = previousStatus;
+        reservation.paymentStatus = previousPaymentStatus;
+        reservation.cancelledAt = undefined;
+        reservation.cancelledBy = undefined;
+        reservation.cancelReason = undefined;
+        reservation.refundAmount = undefined;
+
+        return { action: 'error', error: saveError.message, reservationId: reservation._id };
     }
-
-    await reservation.save();
-
-    // Gerer les consequences pour le worker
-    if (reservation.workerId) {
-        await penalizeWorker(reservation.workerId, reservation);
-    }
-
-    // Notifier le client
-    await notifyClientJobExpired(reservation);
-
-    // Notifier le worker (s'il y en avait un)
-    if (reservation.workerId) {
-        await notifyWorkerJobExpired(reservation);
-    }
-
-    return { action: 'cancelled', minutesOverdue, reservationId: reservation._id };
 }
 
 /**
@@ -225,19 +271,26 @@ async function notifyWorkerJobExpired(reservation) {
 
 /**
  * Envoie des rappels aux workers pour les jobs qui approchent de leur deadline
+ * Optimisé pour utiliser des opérations batch au lieu de N+1 queries
  */
 async function sendDeadlineReminders() {
     const approachingJobs = await findJobsApproachingDeadline();
-    let remindersSent = 0;
 
-    for (const job of approachingJobs) {
-        if (!job.workerId) continue;
+    // Filtrer les jobs avec workers valides
+    const jobsWithWorkers = approachingJobs.filter(job => job.workerId);
 
+    if (jobsWithWorkers.length === 0) {
+        return 0;
+    }
+
+    const now = new Date();
+
+    // Préparer toutes les notifications en batch
+    const notificationsToCreate = jobsWithWorkers.map(job => {
         const worker = job.workerId;
-        const minutesLeft = Math.floor((job.deadlineTime - new Date()) / (1000 * 60));
+        const minutesLeft = Math.floor((job.deadlineTime - now) / (1000 * 60));
 
-        // Creer notification de rappel
-        await Notification.create({
+        return {
             userId: worker._id,
             type: 'reminder',
             title: 'Rappel - Deadline proche',
@@ -246,23 +299,39 @@ async function sendDeadlineReminders() {
                 reservationId: job._id,
                 type: 'deadline_reminder',
             },
-        });
+        };
+    });
 
-        // Push notification
-        if (worker.fcmToken) {
-            await sendPushNotification(
+    // Insertion batch des notifications (1 seule requête DB)
+    try {
+        await Notification.insertMany(notificationsToCreate, { ordered: false });
+    } catch (error) {
+        console.error('Erreur batch insertion notifications:', error.message);
+    }
+
+    // Envoyer les push notifications en parallèle (non-bloquant)
+    const pushPromises = jobsWithWorkers
+        .filter(job => job.workerId?.fcmToken)
+        .map(job => {
+            const worker = job.workerId;
+            const minutesLeft = Math.floor((job.deadlineTime - now) / (1000 * 60));
+
+            return sendPushNotification(
                 worker.fcmToken,
                 `⏰ ${minutesLeft} min restantes`,
                 `Completez le job rapidement pour eviter l'annulation automatique.`,
                 { reservationId: job._id.toString(), type: 'deadline_reminder' }
-            );
-        }
+            ).catch(err => {
+                console.error(`Push notification error for ${worker.email}:`, err.message);
+            });
+        });
 
-        remindersSent++;
-        console.log(`   ⏰ Rappel envoye a ${worker.email} (${minutesLeft} min restantes)`);
-    }
+    // Attendre toutes les push notifications en parallèle
+    await Promise.allSettled(pushPromises);
 
-    return remindersSent;
+    console.log(`   ⏰ ${jobsWithWorkers.length} rappels envoyes en batch`);
+
+    return jobsWithWorkers.length;
 }
 
 /**

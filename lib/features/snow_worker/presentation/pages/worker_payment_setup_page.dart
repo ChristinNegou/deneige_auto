@@ -50,6 +50,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
   }
 
   Future<void> _loadAccountStatus() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -60,6 +61,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
       debugPrint('=== PAYMENT PAGE: Account Status: $status ===');
       final feeConfig = await _stripeService.getFeeConfig();
 
+      if (!mounted) return;
       setState(() {
         _hasAccount = status['hasAccount'] ?? false;
         _isComplete = status['isComplete'] ?? false;
@@ -74,19 +76,24 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
       if (_hasAccount && _isComplete) {
         final balance = await _stripeService.getBalance();
         final bankAccounts = await _stripeService.listBankAccounts();
+        if (!mounted) return;
         setState(() {
           _balance = balance;
           _bankAccounts = bankAccounts;
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() => _errorMessage = e.toString());
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _createOrContinueSetup() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -149,8 +156,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
       }
     } catch (e) {
       debugPrint('=== Error: $e ===');
-      setState(() => _errorMessage = e.toString());
       if (mounted) {
+        setState(() => _errorMessage = e.toString());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur: ${e.toString()}'),
@@ -160,11 +167,14 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
         );
       }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _openDashboard() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {

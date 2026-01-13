@@ -1,13 +1,37 @@
 const { Resend } = require('resend');
 
+// Validation de la configuration email en production
+const isProduction = process.env.NODE_ENV === 'production';
+const isTest = process.env.NODE_ENV === 'test';
+
 // Initialiser Resend de manière lazy pour éviter les erreurs pendant les tests
 let resend = null;
 const getResend = () => {
     if (!resend) {
         const apiKey = process.env.RESEND_API_KEY || 'test_key';
+
+        // Validation critique en production
+        if (isProduction && (!apiKey || apiKey === 'test_key')) {
+            console.error('[CRITICAL] RESEND_API_KEY non configurée en production!');
+            throw new Error('RESEND_API_KEY doit être configurée en production');
+        }
+
         resend = new Resend(apiKey);
     }
     return resend;
+};
+
+// Valider l'adresse email d'envoi
+const getEmailFrom = () => {
+    const emailFrom = process.env.EMAIL_FROM;
+
+    // En production, interdire l'utilisation de l'adresse de test Resend
+    if (isProduction && (!emailFrom || emailFrom.includes('resend.dev'))) {
+        console.error('[CRITICAL] EMAIL_FROM non configurée correctement en production!');
+        throw new Error('EMAIL_FROM doit être une adresse email valide en production (pas resend.dev)');
+    }
+
+    return emailFrom || 'Deneige Auto <onboarding@resend.dev>';
 };
 
 // Envoyer un email
@@ -19,7 +43,7 @@ const sendEmail = async (options) => {
     try {
         console.log('[*] Envoi de l\'email en cours...');
         const { data, error } = await getResend().emails.send({
-            from: process.env.EMAIL_FROM || 'Deneige Auto <onboarding@resend.dev>',
+            from: getEmailFrom(),
             to: [options.email],
             subject: options.subject,
             html: options.html,

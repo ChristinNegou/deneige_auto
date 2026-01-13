@@ -4,6 +4,7 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/config/app_config.dart';
 
 class NewReservationScreen extends StatefulWidget {
   const NewReservationScreen({super.key});
@@ -13,8 +14,8 @@ class NewReservationScreen extends StatefulWidget {
 }
 
 class _NewReservationScreenState extends State<NewReservationScreen> {
-  // Clé API Google Places - À remplacer par votre clé
-  static const String kGoogleApiKey = 'AIzaSyC4JjnG-g798JbVyR_wPOS-ORvjHntzfps';
+  // Clé API Google Places - Chargée depuis la configuration centralisée
+  static String get kGoogleApiKey => AppConfig.googleMapsApiKey;
 
   int _currentStep = 0;
   String _selectedServiceType = 'standard';
@@ -841,8 +842,12 @@ class _NewReservationScreenState extends State<NewReservationScreen> {
         actions: [
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // Fermer le dialog
-              Navigator.pop(context); // Retour à l'accueil
+              // Fermer le dialog d'abord
+              Navigator.pop(context);
+              // Vérifier qu'on peut retourner en arrière avant de pop
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context); // Retour à l'accueil
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.info,

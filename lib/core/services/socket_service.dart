@@ -15,6 +15,9 @@ class SocketService {
   String? _authToken;
   bool _isConnecting = false;
 
+  // Track dynamic stream controllers created by on() method
+  final List<StreamController<dynamic>> _dynamicControllers = [];
+
   // Stream controllers pour les différents événements
   final _reservationUpdatesController =
       StreamController<Map<String, dynamic>>.broadcast();
@@ -238,6 +241,13 @@ class SocketService {
     _connectionStatusController.close();
     _chatMessageController.close();
     _chatTypingController.close();
+    // Fermer tous les controllers dynamiques créés par on()
+    for (final controller in _dynamicControllers) {
+      if (!controller.isClosed) {
+        controller.close();
+      }
+    }
+    _dynamicControllers.clear();
   }
 
   /// Émettre un événement générique
@@ -250,12 +260,16 @@ class SocketService {
   }
 
   /// Écouter un événement générique et retourner un Stream
+  /// Note: Les controllers créés sont trackés et fermés lors du dispose()
   Stream<dynamic> on(String event) {
     final controller = StreamController<dynamic>.broadcast();
+    _dynamicControllers.add(controller);
 
     if (_socket != null) {
       _socket!.on(event, (data) {
-        controller.add(data);
+        if (!controller.isClosed) {
+          controller.add(data);
+        }
       });
     }
 

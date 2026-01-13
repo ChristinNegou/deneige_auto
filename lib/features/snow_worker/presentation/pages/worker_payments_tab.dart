@@ -37,6 +37,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
   }
 
   Future<void> _loadAccountStatus() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -46,6 +47,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       final status = await _stripeService.getAccountStatus();
       final feeConfig = await _stripeService.getFeeConfig();
 
+      if (!mounted) return;
       setState(() {
         _hasAccount = status['hasAccount'] ?? false;
         _isComplete = status['isComplete'] ?? false;
@@ -56,16 +58,21 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
 
       if (_hasAccount && _isComplete) {
         final balance = await _stripeService.getBalance();
+        if (!mounted) return;
         setState(() => _balance = balance);
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() => _errorMessage = e.toString());
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _createOrContinueSetup() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -81,13 +88,17 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       await Future.delayed(const Duration(seconds: 2));
       await _loadAccountStatus();
     } catch (e) {
+      if (!mounted) return;
       setState(() => _errorMessage = e.toString());
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _openDashboard() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {

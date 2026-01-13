@@ -57,6 +57,10 @@ router.post('/create-intent', protect, paymentLimiter, async (req, res) => {
         const platformFeeInCents = Math.round(amountInCents * PLATFORM_FEE_PERCENT);
         const workerAmountInCents = amountInCents - platformFeeInCents;
 
+        // Générer une clé d'idempotence unique pour éviter les doubles charges
+        // Basée sur l'utilisateur, la réservation et le montant
+        const idempotencyKey = `payment_${req.user.id}_${reservationId || 'temp'}_${amountInCents}_${Date.now()}`;
+
         // Paramètres du Payment Intent
         const paymentIntentParams = {
             amount: amountInCents,
@@ -70,6 +74,7 @@ router.post('/create-intent', protect, paymentLimiter, async (req, res) => {
                 userEmail: req.user.email,
                 platformFee: platformFeeInCents,
                 workerAmount: workerAmountInCents,
+                idempotencyKey: idempotencyKey,
             },
         };
 
@@ -95,7 +100,10 @@ router.post('/create-intent', protect, paymentLimiter, async (req, res) => {
             });
         }
 
-        const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams);
+        const paymentIntent = await stripe.paymentIntents.create(
+            paymentIntentParams,
+            { idempotencyKey: idempotencyKey }
+        );
 
         console.log('✅ Payment Intent créé:', paymentIntent.id);
 

@@ -378,7 +378,8 @@ class _ContactTabState extends State<_ContactTab> {
                     onPressed: state.isSubmitting
                         ? null
                         : () {
-                            if (_formKey.currentState!.validate()) {
+                            final formState = _formKey.currentState;
+                            if (formState != null && formState.validate()) {
                               context.read<SupportBloc>().add(
                                     SubmitSupportRequest(
                                       subject: _selectedSubject,

@@ -253,10 +253,12 @@ router.post('/refresh-token', async (req, res) => {
 // @desc    Envoyer un email de réinitialisation de mot de passe
 // @access  Public
 router.post('/forgot-password', forgotPasswordLimiter, validateForgotPassword, async (req, res) => {
-    console.log('\n========================================');
-    console.log('[DEBUG] Route /forgot-password appelée');
-    console.log('[DEBUG] Body reçu:', req.body);
-    console.log('========================================\n');
+    // Note: Ne pas logger d'informations sensibles (email, tokens) en production
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    if (!isProduction) {
+        console.log('[DEBUG] Route /forgot-password appelée');
+    }
 
     try {
         const { email } = req.body;
@@ -269,35 +271,35 @@ router.post('/forgot-password', forgotPasswordLimiter, validateForgotPassword, a
                 message: 'Veuillez fournir un email',
             });
         }
-        console.log('[*] Recherche de l\'utilisateur avec email:', email);
+
         const user = await User.findOne({ email });
 
         if (!user) {
-            console.log('[!] Utilisateur non trouvé pour email:', email);
             // Pour des raisons de sécurité, ne pas révéler si l'email existe ou non
+            // Ne pas logger l'email pour éviter l'exposition de données
             return res.status(200).json({
                 success: true,
                 message: 'Si cet email existe, un lien de réinitialisation a été envoyé',
             });
         }
 
-        console.log('[OK] Utilisateur trouvé:', user.firstName, user.lastName);
-
         // Générer le token de réinitialisation
         const resetToken = user.getResetPasswordToken();
-        console.log('[OK] Token généré:', resetToken.substring(0, 10) + '...');
 
         // Sauvegarder le token dans la base de données
         await user.save({ validateBeforeSave: false });
-        console.log('[OK] Token sauvegardé dans la base de données');
 
         try {
-            console.log('[*] Tentative d\'envoi de l\'email...');
+            if (!isProduction) {
+                console.log('[*] Tentative d\'envoi de l\'email de réinitialisation...');
+            }
 
 
             // Envoyer l'email
             await sendPasswordResetEmail(user, resetToken);
-            console.log('[OK] Email envoyé avec succès !');
+            if (!isProduction) {
+                console.log('[OK] Email de réinitialisation envoyé');
+            }
 
             res.status(200).json({
                 success: true,

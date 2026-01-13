@@ -26,7 +26,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   void _handleResetPassword() {
-    if (_formKey.currentState!.validate()) {
+    final formState = _formKey.currentState;
+    if (formState != null && formState.validate()) {
       context.read<AuthBloc>().add(ForgotPasswordEvent(_emailController.text));
     }
   }

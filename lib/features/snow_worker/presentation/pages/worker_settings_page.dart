@@ -1065,7 +1065,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   void _saveSettings() {
-    if (_formKey.currentState!.validate()) {
+    final formState = _formKey.currentState;
+    if (formState != null && formState.validate()) {
       // Build equipment list
       final equipment = <String>[];
       if (_hasShovel) equipment.add('shovel');

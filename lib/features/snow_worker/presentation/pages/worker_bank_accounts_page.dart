@@ -27,6 +27,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
   }
 
   Future<void> _loadData() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -35,18 +36,23 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
     try {
       final accounts = await _stripeService.listBankAccounts();
       final banks = await _stripeService.getCanadianBanks();
+      if (!mounted) return;
       setState(() {
         _bankAccounts = accounts;
         _canadianBanks = banks;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _errorMessage = e.toString());
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _setAsDefault(String bankAccountId) async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -61,8 +67,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
         );
       }
     } catch (e) {
-      setState(() => _isLoading = false);
       if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur: $e'),
@@ -105,7 +111,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
       ),
     );
 
-    if (confirmed != true) return;
+    if (confirmed != true || !mounted) return;
 
     setState(() => _isLoading = true);
 
@@ -121,8 +127,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
         );
       }
     } catch (e) {
-      setState(() => _isLoading = false);
       if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur: $e'),
@@ -568,7 +574,8 @@ class _AddBankAccountModalState extends State<_AddBankAccountModal> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    final formState = _formKey.currentState;
+    if (formState == null || !formState.validate()) return;
 
     setState(() {
       _isLoading = true;

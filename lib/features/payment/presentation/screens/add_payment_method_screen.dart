@@ -301,7 +301,8 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
   }
 
   Future<void> _handleAddCard() async {
-    if (!_formKey.currentState!.validate()) return;
+    final formState = _formKey.currentState;
+    if (formState == null || !formState.validate()) return;
     if (!_cardComplete) return;
 
     setState(() => _isLoading = true);
