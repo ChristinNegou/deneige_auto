@@ -13,7 +13,6 @@ import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../home/presentation/bloc/home_event.dart';
 import '../../../home/presentation/bloc/home_state.dart';
-import '../../../home/presentation/widgets/weather_card.dart';
 import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_availability_bloc.dart';
 import '../bloc/worker_jobs_bloc.dart';
@@ -281,8 +280,6 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     padding: const EdgeInsets.all(AppTheme.paddingLG),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        _buildWeatherSection(),
-                        const SizedBox(height: 20),
                         _buildAvailabilityCard(),
                         const SizedBox(height: 20),
                         _buildQuickStats(),
@@ -434,6 +431,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               ],
             ),
           ),
+          // Weather badge
+          _buildWeatherBadge(),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: () {
               HapticFeedback.lightImpact();
@@ -459,25 +459,57 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     );
   }
 
-  Widget _buildWeatherSection() {
+  Widget _buildWeatherBadge() {
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
-        if (state.isLoading) {
+        if (!state.isLoading && state.weather != null) {
           return Container(
-            height: 180,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: AppTheme.shadowSM,
             ),
-            child: const Center(child: CircularProgressIndicator()),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _getWeatherIcon(state.weather!.condition),
+                  size: 18,
+                  color: AppTheme.primary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '${state.weather!.temperature.round()}°',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ],
+            ),
           );
-        }
-        if (state.weather != null) {
-          return WeatherCard(weather: state.weather!);
         }
         return const SizedBox.shrink();
       },
     );
+  }
+
+  IconData _getWeatherIcon(String condition) {
+    final lower = condition.toLowerCase();
+    if (lower.contains('snow') || lower.contains('neige')) {
+      return Icons.ac_unit;
+    } else if (lower.contains('rain') || lower.contains('pluie')) {
+      return Icons.water_drop;
+    } else if (lower.contains('cloud') || lower.contains('nuag')) {
+      return Icons.cloud;
+    } else if (lower.contains('sun') ||
+        lower.contains('clear') ||
+        lower.contains('soleil')) {
+      return Icons.wb_sunny;
+    }
+    return Icons.wb_cloudy;
   }
 
   Widget _buildAvailabilityCard() {
