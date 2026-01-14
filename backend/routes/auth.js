@@ -192,7 +192,7 @@ router.post('/login', authLimiter, validateLogin, async (req, res) => {
 // @route   POST /api/auth/refresh-token
 // @desc    Rafraîchir le token d'accès
 // @access  Public
-router.post('/refresh-token', async (req, res) => {
+router.post('/refresh-token', authLimiter, async (req, res) => {
     try {
         const { refreshToken } = req.body;
 

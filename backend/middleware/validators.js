@@ -375,18 +375,136 @@ const validateCreateDispute = [
         .withMessage('L\'ID de la réservation est requis')
         .isMongoId()
         .withMessage('ID de réservation invalide'),
-    body('reason')
+    body('type')
         .trim()
         .notEmpty()
-        .withMessage('La raison est requise')
-        .isIn(['quality', 'incomplete', 'damage', 'no_show', 'other'])
-        .withMessage('Raison invalide'),
+        .withMessage('Le type est requis')
+        .isIn(['no_show', 'incomplete_work', 'quality_issue', 'late_arrival', 'damage', 'wrong_location', 'overcharge', 'unprofessional', 'payment_issue', 'other'])
+        .withMessage('Type de litige invalide'),
     body('description')
         .trim()
         .notEmpty()
         .withMessage('La description est requise')
         .isLength({ min: 10, max: 2000 })
         .withMessage('La description doit contenir entre 10 et 2000 caractères'),
+    body('claimedAmount')
+        .optional()
+        .isFloat({ min: 0, max: 10000 })
+        .withMessage('Le montant réclamé doit être entre 0$ et 10,000$'),
+    body('photos')
+        .optional()
+        .isArray({ max: 10 })
+        .withMessage('Maximum 10 photos autorisées'),
+    body('gpsLocation.latitude')
+        .optional()
+        .isFloat({ min: -90, max: 90 })
+        .withMessage('Latitude invalide'),
+    body('gpsLocation.longitude')
+        .optional()
+        .isFloat({ min: -180, max: 180 })
+        .withMessage('Longitude invalide'),
+    handleValidationErrors,
+];
+
+const validateReportNoShow = [
+    param('reservationId')
+        .isMongoId()
+        .withMessage('ID de réservation invalide'),
+    body('description')
+        .optional()
+        .trim()
+        .isLength({ max: 2000 })
+        .withMessage('La description ne peut pas dépasser 2000 caractères'),
+    body('photos')
+        .optional()
+        .isArray({ max: 10 })
+        .withMessage('Maximum 10 photos autorisées'),
+    handleValidationErrors,
+];
+
+const validateDisputeResponse = [
+    param('id')
+        .isMongoId()
+        .withMessage('ID de litige invalide'),
+    body('text')
+        .trim()
+        .notEmpty()
+        .withMessage('La réponse est requise')
+        .isLength({ min: 20, max: 5000 })
+        .withMessage('La réponse doit contenir entre 20 et 5000 caractères'),
+    body('photos')
+        .optional()
+        .isArray({ max: 10 })
+        .withMessage('Maximum 10 photos autorisées'),
+    handleValidationErrors,
+];
+
+const validateDisputeAppeal = [
+    param('id')
+        .isMongoId()
+        .withMessage('ID de litige invalide'),
+    body('reason')
+        .trim()
+        .notEmpty()
+        .withMessage('La raison de l\'appel est requise')
+        .isLength({ min: 50, max: 5000 })
+        .withMessage('La raison doit contenir entre 50 et 5000 caractères'),
+    handleValidationErrors,
+];
+
+const validateResolveDispute = [
+    param('id')
+        .isMongoId()
+        .withMessage('ID de litige invalide'),
+    body('decision')
+        .trim()
+        .notEmpty()
+        .withMessage('La décision est requise')
+        .isIn(['favor_claimant', 'favor_respondent', 'partial_refund', 'full_refund', 'no_action', 'appeal_overturned'])
+        .withMessage('Décision invalide'),
+    body('refundAmount')
+        .optional()
+        .isFloat({ min: 0, max: 10000 })
+        .withMessage('Le montant de remboursement doit être entre 0$ et 10,000$'),
+    body('workerPenalty')
+        .optional()
+        .isIn(['none', 'warning', 'suspension_3days', 'suspension_7days', 'suspension_30days', 'permanent_ban'])
+        .withMessage('Pénalité worker invalide'),
+    body('clientPenalty')
+        .optional()
+        .isIn(['none', 'warning', 'suspension_3days', 'suspension_7days', 'suspension_30days', 'permanent_ban'])
+        .withMessage('Pénalité client invalide'),
+    body('notes')
+        .optional()
+        .trim()
+        .isLength({ max: 2000 })
+        .withMessage('Les notes ne peuvent pas dépasser 2000 caractères'),
+    handleValidationErrors,
+];
+
+const validateDisputePagination = [
+    query('page')
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage('Numéro de page invalide')
+        .toInt(),
+    query('limit')
+        .optional()
+        .isInt({ min: 1, max: 100 })
+        .withMessage('Limite invalide (1-100)')
+        .toInt(),
+    query('status')
+        .optional()
+        .isIn(['open', 'under_review', 'pending_response', 'resolved', 'closed', 'appealed', 'escalated'])
+        .withMessage('Statut invalide'),
+    query('type')
+        .optional()
+        .isIn(['no_show', 'incomplete_work', 'quality_issue', 'late_arrival', 'damage', 'wrong_location', 'overcharge', 'unprofessional', 'payment_issue', 'other'])
+        .withMessage('Type invalide'),
+    query('priority')
+        .optional()
+        .isIn(['low', 'medium', 'high', 'urgent'])
+        .withMessage('Priorité invalide'),
     handleValidationErrors,
 ];
 
@@ -493,6 +611,11 @@ module.exports = {
     validateSendMessage,
     // Disputes
     validateCreateDispute,
+    validateReportNoShow,
+    validateDisputeResponse,
+    validateDisputeAppeal,
+    validateResolveDispute,
+    validateDisputePagination,
     // Admin
     validateUserId,
     validatePagination,

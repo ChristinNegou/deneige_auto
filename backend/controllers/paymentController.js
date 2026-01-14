@@ -32,7 +32,7 @@ exports.getPaymentMethods = async (req, res) => {
     res.json({ success: true, paymentMethods: methodsWithDefault });
   } catch (error) {
     console.error('Error fetching payment methods:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de la récupération des méthodes de paiement' });
   }
 };
 
@@ -71,7 +71,7 @@ exports.savePaymentMethod = async (req, res) => {
     res.json({ success: true, message: 'Méthode de paiement ajoutée' });
   } catch (error) {
     console.error('Error saving payment method:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de l\'ajout de la méthode de paiement' });
   }
 };
 
@@ -82,7 +82,7 @@ exports.deletePaymentMethod = async (req, res) => {
     res.json({ success: true, message: 'Méthode de paiement supprimée' });
   } catch (error) {
     console.error('Error deleting payment method:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de la suppression de la méthode de paiement' });
   }
 };
 
@@ -107,7 +107,7 @@ exports.setDefaultPaymentMethod = async (req, res) => {
     res.json({ success: true, message: 'Méthode par défaut mise à jour' });
   } catch (error) {
     console.error('Error setting default payment method:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour de la méthode par défaut' });
   }
 };
 
@@ -182,7 +182,7 @@ exports.createRefund = async (req, res) => {
     res.json({ success: true, refund });
   } catch (error) {
     console.error('Error creating refund:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de la création du remboursement' });
   }
 };
 
@@ -193,7 +193,7 @@ exports.getRefundStatus = async (req, res) => {
     res.json({ success: true, refund });
   } catch (error) {
     console.error('Error fetching refund:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de la récupération du remboursement' });
   }
 };
 
@@ -328,7 +328,7 @@ exports.createWorkerPayout = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating worker payout:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors du versement au déneigeur' });
   }
 };
 
@@ -363,7 +363,7 @@ exports.getPendingPayouts = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching pending payouts:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de la récupération des paiements en attente' });
   }
 };
 
@@ -402,7 +402,7 @@ exports.getWorkerPayoutHistory = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching payout history:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de la récupération de l\'historique des paiements' });
   }
 };
 
@@ -452,6 +452,6 @@ exports.getWorkerEarningsSummary = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching earnings summary:', error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: 'Erreur lors de la récupération du résumé des gains' });
   }
 };
