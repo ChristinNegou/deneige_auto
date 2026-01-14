@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { protect, authorize } = require('../middleware/auth');
 const User = require('../models/User');
@@ -1619,7 +1620,12 @@ router.post('/finance/sync-stripe', protect, adminOnly, async (req, res) => {
 
             for (const pi of paymentIntents.data) {
                 if (pi.status === 'succeeded' && pi.metadata?.reservationId) {
-                    const reservation = await Reservation.findById(pi.metadata.reservationId);
+                    // Valider que reservationId est un ObjectId valide
+                    const reservationId = pi.metadata.reservationId;
+                    if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+                        continue; // Ignorer les IDs invalides (ex: "temp")
+                    }
+                    const reservation = await Reservation.findById(reservationId);
 
                     if (reservation && reservation.paymentStatus !== 'paid') {
                         reservation.paymentStatus = 'paid';
@@ -1694,7 +1700,12 @@ router.post('/finance/sync-stripe', protect, adminOnly, async (req, res) => {
 
             for (const transfer of transfers.data) {
                 if (transfer.metadata?.reservationId) {
-                    const reservation = await Reservation.findById(transfer.metadata.reservationId);
+                    // Valider que reservationId est un ObjectId valide
+                    const reservationId = transfer.metadata.reservationId;
+                    if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+                        continue; // Ignorer les IDs invalides
+                    }
+                    const reservation = await Reservation.findById(reservationId);
 
                     if (reservation && reservation.payout?.status !== 'completed') {
                         reservation.payout = reservation.payout || {};
