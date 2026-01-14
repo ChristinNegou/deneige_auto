@@ -88,7 +88,7 @@ class _MyDisputesPageState extends State<MyDisputesPage> {
                   const SizedBox(width: 8),
                   _buildFilterChip('En examen', DisputeStatus.underReview),
                   const SizedBox(width: 8),
-                  _buildFilterChip('Resolus', DisputeStatus.resolved),
+                  _buildFilterChip('Résolus', DisputeStatus.resolved),
                 ],
               ),
             ),

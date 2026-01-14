@@ -152,7 +152,8 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: ${e.toString()}'),
+            content: const Text(
+                'Impossible d\'envoyer la réponse. Veuillez réessayer.'),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -167,7 +168,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
-          'Details du litige',
+          'Détails du litige',
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         backgroundColor: AppTheme.surface,
@@ -414,7 +415,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           ],
           if (dispute.resolutionDeadline != null)
             _buildDeadlineRow(
-              'Resolution attendue avant',
+              'Résolution attendue avant',
               dateFormat.format(dispute.resolutionDeadline!),
               dispute.resolutionDeadline!.isBefore(DateTime.now()),
             ),
@@ -443,7 +444,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               Icon(Icons.gavel, color: AppTheme.success),
               const SizedBox(width: 8),
               Text(
-                'Resolution',
+                'Résolution',
                 style: TextStyle(
                   color: AppTheme.success,
                   fontWeight: FontWeight.bold,
@@ -471,7 +472,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Decision',
+                        'Décision',
                         style: TextStyle(
                           color: AppTheme.success.withValues(alpha: 0.7),
                           fontSize: 12,
@@ -521,7 +522,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           if (resolution['resolvedAt'] != null) ...[
             const SizedBox(height: 12),
             Text(
-              'Resolu le ${dateFormat.format(DateTime.parse(resolution['resolvedAt']))}',
+              'Résolu le ${dateFormat.format(DateTime.parse(resolution['resolvedAt']))}',
               style: TextStyle(
                 color: AppTheme.success.withValues(alpha: 0.6),
                 fontSize: 12,

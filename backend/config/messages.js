@@ -7,15 +7,15 @@ module.exports = {
     // ============== ERREURS D'AUTHENTIFICATION ==============
     AUTH: {
         INVALID_CREDENTIALS: 'Email ou mot de passe incorrect',
-        INVALID_TOKEN: 'Token invalide ou expiré',
+        INVALID_TOKEN: 'Session invalide ou expirée. Veuillez vous reconnecter',
         TOKEN_EXPIRED: 'Votre session a expiré. Veuillez vous reconnecter',
-        NO_TOKEN: 'Authentification requise',
+        NO_TOKEN: 'Connexion requise',
         UNAUTHORIZED: 'Vous n\'êtes pas autorisé à effectuer cette action',
         FORBIDDEN: 'Accès refusé',
         ACCOUNT_DISABLED: 'Votre compte a été désactivé',
         EMAIL_NOT_VERIFIED: 'Veuillez vérifier votre adresse email',
         PHONE_NOT_VERIFIED: 'Veuillez vérifier votre numéro de téléphone',
-        INVALID_REFRESH_TOKEN: 'Token de rafraîchissement invalide',
+        INVALID_REFRESH_TOKEN: 'Session expirée. Veuillez vous reconnecter',
         PASSWORD_TOO_WEAK: 'Le mot de passe doit contenir au moins 8 caractères',
         EMAIL_ALREADY_EXISTS: 'Cette adresse email est déjà utilisée',
         PHONE_ALREADY_EXISTS: 'Ce numéro de téléphone est déjà utilisé',
@@ -59,7 +59,7 @@ module.exports = {
         REFUND_FAILED: 'Le remboursement a échoué',
         PAYOUT_FAILED: 'Le versement a échoué',
         NO_PAYMENT_METHOD: 'Aucun moyen de paiement enregistré',
-        STRIPE_ACCOUNT_NOT_READY: 'Votre compte Stripe n\'est pas encore configuré',
+        STRIPE_ACCOUNT_NOT_READY: 'Votre compte de paiement n\'est pas encore configuré',
     },
 
     // ============== ERREURS WORKER ==============
@@ -68,7 +68,7 @@ module.exports = {
         NO_EQUIPMENT: 'Équipement manquant pour ce travail',
         ALREADY_HAS_JOB: 'Vous avez déjà un travail en cours',
         ACCOUNT_SUSPENDED: 'Votre compte est temporairement suspendu',
-        STRIPE_ACCOUNT_REQUIRED: 'Vous devez configurer votre compte Stripe pour recevoir des paiements',
+        STRIPE_ACCOUNT_REQUIRED: 'Vous devez configurer votre compte bancaire pour recevoir des paiements',
         IDENTITY_VERIFICATION_REQUIRED: 'Vérification d\'identité requise',
     },
 

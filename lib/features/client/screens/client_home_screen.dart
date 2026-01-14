@@ -145,7 +145,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur lors de l\'envoi: $e'),
+            content: const Text(
+                'Impossible d\'envoyer l\'évaluation. Veuillez réessayer.'),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -192,7 +193,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur lors de l\'envoi du pourboire: $e'),
+            content: const Text(
+                'Impossible d\'envoyer le pourboire. Veuillez réessayer.'),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),

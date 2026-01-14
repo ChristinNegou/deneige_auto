@@ -325,7 +325,9 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        _showSnackBar('Erreur: ${e.toString()}', isError: true);
+        _showSnackBar(
+            'Impossible d\'ajouter cette carte. Vérifiez les informations et réessayez.',
+            isError: true);
       }
     }
   }

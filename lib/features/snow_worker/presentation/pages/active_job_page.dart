@@ -1500,7 +1500,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur lors de la prise de photo: $e'),
+            content: const Text(
+                'Impossible de prendre la photo. Vérifiez les permissions de la caméra.'),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1571,7 +1572,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur lors de l\'envoi: $e'),
+            content: const Text(
+                'Impossible d\'envoyer la photo. Vérifiez votre connexion.'),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1677,7 +1679,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     } catch (e) {
       if (!context.mounted) return;
       Navigator.pop(context);
-      _showLocationError(context, 'Erreur de localisation: ${e.toString()}');
+      _showLocationError(context,
+          'Impossible de déterminer votre position. Activez la localisation et réessayez.');
     }
   }
 

@@ -90,7 +90,7 @@ class _AdminDisputesPageState extends State<AdminDisputesPage>
           unselectedLabelColor: AppTheme.textSecondary,
           tabs: const [
             Tab(text: 'En cours'),
-            Tab(text: 'Resolus'),
+            Tab(text: 'Résolus'),
             Tab(text: 'Stats'),
           ],
         ),
@@ -412,7 +412,7 @@ class _AdminDisputesPageState extends State<AdminDisputesPage>
           ),
           const SizedBox(height: 12),
           _buildStatCard(
-            'Temps moyen de resolution',
+            'Temps moyen de résolution',
             '${_stats!['avgResolutionTimeHours'] ?? 0}h',
             Icons.schedule,
             AppTheme.info,
@@ -683,7 +683,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
     if (_selectedDecision == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Selectionnez une decision'),
+          content: const Text('Sélectionnez une décision'),
           backgroundColor: AppTheme.warning,
         ),
       );
@@ -707,7 +707,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
         widget.onResolved();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Litige resolu avec succes'),
+            content: const Text('Litige résolu avec succès'),
             backgroundColor: AppTheme.success,
           ),
         );
@@ -716,7 +716,8 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: ${e.toString()}'),
+            content: const Text(
+                'Impossible de résoudre le litige. Veuillez réessayer.'),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -797,7 +798,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
                         value: _selectedDecision,
                         isExpanded: true,
                         hint: Text(
-                          'Selectionnez une decision',
+                          'Sélectionnez une décision',
                           style: TextStyle(color: AppTheme.textTertiary),
                         ),
                         dropdownColor: AppTheme.surface,
@@ -997,7 +998,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
                           ),
                         )
                       : const Text(
-                          'Confirmer la resolution',
+                          'Confirmer la résolution',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,

@@ -496,7 +496,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
         _showError('Paiement annulé');
       }
     } catch (e) {
-      if (mounted) _showError('Erreur: ${e.toString()}');
+      if (mounted) {
+        _showError('Le paiement a échoué. Vérifiez votre carte et réessayez.');
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

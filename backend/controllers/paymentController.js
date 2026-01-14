@@ -94,7 +94,7 @@ exports.setDefaultPaymentMethod = async (req, res) => {
     if (!user.stripeCustomerId) {
       return res.status(400).json({
         success: false,
-        message: 'Aucun client Stripe trouvé'
+        message: 'Aucune méthode de paiement configurée. Veuillez ajouter une carte.'
       });
     }
 

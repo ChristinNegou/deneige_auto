@@ -90,7 +90,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Signalement envoye',
+                  'Signalement envoyé',
                   style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontSize: 18,
@@ -105,8 +105,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
             children: [
               Text(
                 autoResolved
-                    ? 'Votre signalement a ete automatiquement confirme. Le remboursement sera traite sous 3-5 jours ouvrables.'
-                    : 'Votre signalement a ete envoye. Notre equipe va l\'examiner et vous informera de la decision.',
+                    ? 'Votre signalement a été automatiquement confirmé. Le remboursement sera traité sous 3-5 jours ouvrables.'
+                    : 'Votre signalement a été envoyé. Notre équipe va l\'examiner et vous informera de la décision.',
                 style: TextStyle(color: AppTheme.textSecondary),
               ),
               const SizedBox(height: 16),
@@ -122,7 +122,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Vous serez notifie des que le litige sera resolu.',
+                        'Vous serez notifié dès que le litige sera résolu.',
                         style: TextStyle(
                           color: AppTheme.info,
                           fontSize: 13,
@@ -158,7 +158,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erreur: ${e.toString()}'),
+          content: const Text(
+              'Impossible d\'envoyer le signalement. Veuillez réessayer.'),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
         ),
