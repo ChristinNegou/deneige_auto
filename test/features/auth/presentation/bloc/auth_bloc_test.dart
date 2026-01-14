@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:deneige_auto/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:deneige_auto/features/auth/presentation/bloc/auth_event.dart';
@@ -8,6 +9,7 @@ import 'package:deneige_auto/features/auth/presentation/bloc/auth_state.dart';
 import 'package:deneige_auto/features/auth/domain/entities/user.dart';
 import 'package:deneige_auto/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:deneige_auto/core/errors/failures.dart';
+import 'package:deneige_auto/service/secure_storage_service.dart';
 
 import '../../../../mocks/mock_usecases.dart';
 import '../../../../mocks/mock_repositories.dart';
@@ -24,6 +26,9 @@ void main() {
   late MockResetPasswordUseCase mockResetPassword;
   late MockUpdateProfileUseCase mockUpdateProfile;
   late MockAuthRepository mockAuthRepository;
+  late MockSecureStorageService mockSecureStorage;
+
+  final sl = GetIt.instance;
 
   setUp(() {
     mockLogin = MockLoginUseCase();
@@ -34,6 +39,13 @@ void main() {
     mockResetPassword = MockResetPasswordUseCase();
     mockUpdateProfile = MockUpdateProfileUseCase();
     mockAuthRepository = MockAuthRepository();
+    mockSecureStorage = MockSecureStorageService();
+
+    // Register mock SecureStorageService in GetIt
+    if (sl.isRegistered<SecureStorageService>()) {
+      sl.unregister<SecureStorageService>();
+    }
+    sl.registerSingleton<SecureStorageService>(mockSecureStorage);
 
     bloc = AuthBloc(
       login: mockLogin,
@@ -54,6 +66,9 @@ void main() {
 
   tearDown(() {
     bloc.close();
+    if (sl.isRegistered<SecureStorageService>()) {
+      sl.unregister<SecureStorageService>();
+    }
   });
 
   group('AuthBloc', () {
@@ -214,6 +229,9 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthLoading, AuthAuthenticated] when user is logged in',
         build: () {
+          // Mock hasToken to return true (token exists)
+          when(() => mockSecureStorage.hasToken())
+              .thenAnswer((_) async => true);
           when(() => mockGetCurrentUser())
               .thenAnswer((_) async => Right(tUser));
           return bloc;
@@ -228,6 +246,25 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [AuthLoading, AuthUnauthenticated] when no user',
         build: () {
+          // Mock hasToken to return false (no token)
+          when(() => mockSecureStorage.hasToken())
+              .thenAnswer((_) async => false);
+          return bloc;
+        },
+        act: (bloc) => bloc.add(CheckAuthStatus()),
+        expect: () => [
+          isA<AuthLoading>(),
+          isA<AuthUnauthenticated>(),
+        ],
+      );
+
+      blocTest<AuthBloc, AuthState>(
+        'emits [AuthLoading, AuthUnauthenticated] when token exists but server rejects',
+        build: () {
+          // Mock hasToken to return true (token exists)
+          when(() => mockSecureStorage.hasToken())
+              .thenAnswer((_) async => true);
+          // But server returns failure (invalid token)
           when(() => mockGetCurrentUser())
               .thenAnswer((_) async => const Left(authFailure));
           return bloc;
