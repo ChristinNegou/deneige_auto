@@ -2,6 +2,7 @@ import '../../domain/entities/admin_stats.dart';
 import '../../domain/entities/admin_user.dart';
 import '../../domain/entities/admin_reservation.dart';
 import '../../domain/entities/admin_support_request.dart';
+import '../../domain/entities/stripe_reconciliation.dart';
 
 enum AdminStatus { initial, loading, success, error }
 
@@ -40,6 +41,12 @@ class AdminState {
   final String? usersRoleFilter;
   final String? usersSearchQuery;
   final String? reservationsStatusFilter;
+
+  // Finance / Reconciliation
+  final StripeReconciliation? reconciliation;
+  final AdminStatus reconciliationStatus;
+  final StripeSyncResult? syncResult;
+  final AdminStatus syncStatus;
 
   // Actions
   final AdminStatus actionStatus;
@@ -81,6 +88,12 @@ class AdminState {
     this.usersRoleFilter,
     this.usersSearchQuery,
     this.reservationsStatusFilter,
+
+    // Finance / Reconciliation
+    this.reconciliation,
+    this.reconciliationStatus = AdminStatus.initial,
+    this.syncResult,
+    this.syncStatus = AdminStatus.initial,
 
     // Actions
     this.actionStatus = AdminStatus.initial,
@@ -129,6 +142,13 @@ class AdminState {
     bool clearUsersSearchQuery = false,
     String? reservationsStatusFilter,
     bool clearReservationsStatusFilter = false,
+
+    // Finance / Reconciliation
+    StripeReconciliation? reconciliation,
+    AdminStatus? reconciliationStatus,
+    StripeSyncResult? syncResult,
+    AdminStatus? syncStatus,
+    bool clearSyncResult = false,
 
     // Actions
     AdminStatus? actionStatus,
@@ -185,6 +205,12 @@ class AdminState {
       reservationsStatusFilter: clearReservationsStatusFilter
           ? null
           : (reservationsStatusFilter ?? this.reservationsStatusFilter),
+
+      // Finance / Reconciliation
+      reconciliation: reconciliation ?? this.reconciliation,
+      reconciliationStatus: reconciliationStatus ?? this.reconciliationStatus,
+      syncResult: clearSyncResult ? null : (syncResult ?? this.syncResult),
+      syncStatus: syncStatus ?? this.syncStatus,
 
       // Actions
       actionStatus: actionStatus ?? this.actionStatus,

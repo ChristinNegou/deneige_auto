@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../domain/entities/admin_stats.dart';
+import '../../domain/entities/stripe_reconciliation.dart';
 
 abstract class AdminRemoteDataSource {
   Future<AdminStats> getDashboardStats();
@@ -26,6 +27,14 @@ abstract class AdminRemoteDataSource {
     bool sendNotification = true,
   });
   Future<void> deleteSupportRequest(String requestId);
+  Future<StripeReconciliation> getStripeReconciliation({
+    DateTime? startDate,
+    DateTime? endDate,
+  });
+  Future<StripeSyncResult> syncWithStripe({
+    DateTime? startDate,
+    DateTime? endDate,
+  });
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
@@ -169,5 +178,38 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
   @override
   Future<void> deleteSupportRequest(String requestId) async {
     await dio.delete('/support/requests/$requestId');
+  }
+
+  @override
+  Future<StripeReconciliation> getStripeReconciliation({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    final queryParams = <String, dynamic>{};
+    if (startDate != null)
+      queryParams['startDate'] = startDate.toIso8601String();
+    if (endDate != null) queryParams['endDate'] = endDate.toIso8601String();
+
+    final response = await dio.get(
+      '/admin/finance/reconciliation',
+      queryParameters: queryParams,
+    );
+    return StripeReconciliation.fromJson(response.data);
+  }
+
+  @override
+  Future<StripeSyncResult> syncWithStripe({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    final data = <String, dynamic>{};
+    if (startDate != null) data['startDate'] = startDate.toIso8601String();
+    if (endDate != null) data['endDate'] = endDate.toIso8601String();
+
+    final response = await dio.post(
+      '/admin/finance/sync-stripe',
+      data: data,
+    );
+    return StripeSyncResult.fromJson(response.data);
   }
 }

@@ -107,6 +107,21 @@ class DeleteSupportRequest extends AdminEvent {
   DeleteSupportRequest(this.requestId);
 }
 
+// Finance Events
+class LoadStripeReconciliation extends AdminEvent {
+  final DateTime? startDate;
+  final DateTime? endDate;
+
+  LoadStripeReconciliation({this.startDate, this.endDate});
+}
+
+class SyncWithStripe extends AdminEvent {
+  final DateTime? startDate;
+  final DateTime? endDate;
+
+  SyncWithStripe({this.startDate, this.endDate});
+}
+
 // Clear Events
 class ClearUserDetails extends AdminEvent {}
 

@@ -23,6 +23,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<ClearUserDetails>(_onClearUserDetails);
     on<ClearReservationDetails>(_onClearReservationDetails);
     on<ClearError>(_onClearError);
+    on<LoadStripeReconciliation>(_onLoadStripeReconciliation);
+    on<SyncWithStripe>(_onSyncWithStripe);
   }
 
   Future<void> _onLoadDashboardStats(
@@ -396,5 +398,64 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       clearSuccessMessage: true,
       actionStatus: AdminStatus.initial,
     ));
+  }
+
+  Future<void> _onLoadStripeReconciliation(
+    LoadStripeReconciliation event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(state.copyWith(reconciliationStatus: AdminStatus.loading));
+    try {
+      final reconciliation = await repository.getStripeReconciliation(
+        startDate: event.startDate,
+        endDate: event.endDate,
+      );
+      emit(state.copyWith(
+        reconciliation: reconciliation,
+        reconciliationStatus: AdminStatus.success,
+      ));
+    } catch (e, stackTrace) {
+      print('Erreur réconciliation Stripe: $e');
+      print('Stack trace: $stackTrace');
+      String errorMsg = 'Erreur de chargement des données Stripe';
+      if (e.toString().contains('401') || e.toString().contains('autorisé')) {
+        errorMsg = 'Session expirée. Reconnectez-vous.';
+      } else if (e.toString().contains('404')) {
+        errorMsg = 'Endpoint non disponible sur le serveur';
+      } else if (e.toString().contains('500')) {
+        errorMsg = 'Erreur serveur Stripe. Réessayez plus tard.';
+      }
+      emit(state.copyWith(
+        reconciliationStatus: AdminStatus.error,
+        errorMessage: errorMsg,
+      ));
+    }
+  }
+
+  Future<void> _onSyncWithStripe(
+    SyncWithStripe event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(
+        state.copyWith(syncStatus: AdminStatus.loading, clearSyncResult: true));
+    try {
+      final result = await repository.syncWithStripe(
+        startDate: event.startDate,
+        endDate: event.endDate,
+      );
+      emit(state.copyWith(
+        syncResult: result,
+        syncStatus: AdminStatus.success,
+        successMessage: result.message,
+      ));
+      // Recharger les données de réconciliation pour voir les changements
+      add(LoadStripeReconciliation());
+    } catch (e) {
+      print('Erreur sync Stripe: $e');
+      emit(state.copyWith(
+        syncStatus: AdminStatus.error,
+        errorMessage: 'Erreur lors de la synchronisation: $e',
+      ));
+    }
   }
 }

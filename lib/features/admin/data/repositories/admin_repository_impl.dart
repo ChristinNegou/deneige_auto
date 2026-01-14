@@ -1,6 +1,7 @@
 import '../../domain/entities/admin_stats.dart';
 import '../../domain/entities/admin_user.dart';
 import '../../domain/entities/admin_reservation.dart';
+import '../../domain/entities/stripe_reconciliation.dart';
 import '../../domain/repositories/admin_repository.dart';
 import '../datasources/admin_remote_datasource.dart';
 
@@ -134,5 +135,27 @@ class AdminRepositoryImpl implements AdminRepository {
   @override
   Future<void> deleteSupportRequest(String requestId) async {
     await remoteDataSource.deleteSupportRequest(requestId);
+  }
+
+  @override
+  Future<StripeReconciliation> getStripeReconciliation({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    return await remoteDataSource.getStripeReconciliation(
+      startDate: startDate,
+      endDate: endDate,
+    );
+  }
+
+  @override
+  Future<StripeSyncResult> syncWithStripe({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    return await remoteDataSource.syncWithStripe(
+      startDate: startDate,
+      endDate: endDate,
+    );
   }
 }

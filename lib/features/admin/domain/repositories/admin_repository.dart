@@ -2,6 +2,7 @@ import '../entities/admin_stats.dart';
 import '../entities/admin_user.dart';
 import '../entities/admin_reservation.dart';
 import '../entities/admin_support_request.dart';
+import '../entities/stripe_reconciliation.dart';
 
 abstract class AdminRepository {
   Future<AdminStats> getDashboardStats();
@@ -49,6 +50,16 @@ abstract class AdminRepository {
     bool sendNotification = true,
   });
   Future<void> deleteSupportRequest(String requestId);
+
+  // Finance
+  Future<StripeReconciliation> getStripeReconciliation({
+    DateTime? startDate,
+    DateTime? endDate,
+  });
+  Future<StripeSyncResult> syncWithStripe({
+    DateTime? startDate,
+    DateTime? endDate,
+  });
 }
 
 class AdminUsersResponse {

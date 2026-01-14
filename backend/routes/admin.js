@@ -1587,6 +1587,192 @@ function generateReconciliationRecommendations(discrepancies, problematicCount) 
 }
 
 /**
+ * @route   POST /api/admin/finance/sync-stripe
+ * @desc    Synchroniser les donnees locales avec Stripe
+ * @access  Private (Admin)
+ */
+router.post('/finance/sync-stripe', protect, adminOnly, async (req, res) => {
+    try {
+        const { startDate, endDate } = req.body;
+
+        // Dates par defaut: 30 derniers jours
+        const end = endDate ? new Date(endDate) : new Date();
+        const start = startDate ? new Date(startDate) : new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        const syncResults = {
+            paymentsUpdated: 0,
+            refundsRecorded: 0,
+            transfersUpdated: 0,
+            errors: [],
+            details: [],
+        };
+
+        // 1. Synchroniser les paiements (PaymentIntents)
+        try {
+            const paymentIntents = await stripe.paymentIntents.list({
+                created: {
+                    gte: Math.floor(start.getTime() / 1000),
+                    lte: Math.floor(end.getTime() / 1000),
+                },
+                limit: 100,
+            });
+
+            for (const pi of paymentIntents.data) {
+                if (pi.status === 'succeeded' && pi.metadata?.reservationId) {
+                    const reservation = await Reservation.findById(pi.metadata.reservationId);
+
+                    if (reservation && reservation.paymentStatus !== 'paid') {
+                        reservation.paymentStatus = 'paid';
+                        reservation.paymentIntentId = pi.id;
+                        await reservation.save();
+
+                        syncResults.paymentsUpdated++;
+                        syncResults.details.push({
+                            type: 'payment',
+                            reservationId: reservation._id,
+                            amount: pi.amount / 100,
+                            message: `Paiement ${pi.id} synchronise`,
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            syncResults.errors.push(`Erreur sync paiements: ${error.message}`);
+        }
+
+        // 2. Synchroniser les remboursements
+        try {
+            const refunds = await stripe.refunds.list({
+                created: {
+                    gte: Math.floor(start.getTime() / 1000),
+                    lte: Math.floor(end.getTime() / 1000),
+                },
+                limit: 100,
+            });
+
+            for (const refund of refunds.data) {
+                if (refund.status === 'succeeded') {
+                    // Trouver la reservation associee via le payment_intent
+                    const reservation = await Reservation.findOne({
+                        paymentIntentId: refund.payment_intent,
+                        paymentStatus: { $ne: 'refunded' },
+                    });
+
+                    if (reservation) {
+                        const refundAmount = refund.amount / 100;
+                        const isFullRefund = refundAmount >= reservation.totalPrice * 0.95;
+
+                        reservation.paymentStatus = isFullRefund ? 'refunded' : 'partially_refunded';
+                        reservation.refundAmount = (reservation.refundAmount || 0) + refundAmount;
+                        reservation.refundId = refund.id;
+                        reservation.refundedAt = new Date(refund.created * 1000);
+                        await reservation.save();
+
+                        syncResults.refundsRecorded++;
+                        syncResults.details.push({
+                            type: 'refund',
+                            reservationId: reservation._id,
+                            amount: refundAmount,
+                            message: `Remboursement ${refund.id} synchronise`,
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            syncResults.errors.push(`Erreur sync remboursements: ${error.message}`);
+        }
+
+        // 3. Synchroniser les transferts (payouts workers)
+        try {
+            const transfers = await stripe.transfers.list({
+                created: {
+                    gte: Math.floor(start.getTime() / 1000),
+                    lte: Math.floor(end.getTime() / 1000),
+                },
+                limit: 100,
+            });
+
+            for (const transfer of transfers.data) {
+                if (transfer.metadata?.reservationId) {
+                    const reservation = await Reservation.findById(transfer.metadata.reservationId);
+
+                    if (reservation && reservation.payout?.status !== 'completed') {
+                        reservation.payout = reservation.payout || {};
+                        reservation.payout.status = 'completed';
+                        reservation.payout.transferId = transfer.id;
+                        reservation.payout.paidAt = new Date(transfer.created * 1000);
+                        await reservation.save();
+
+                        syncResults.transfersUpdated++;
+                        syncResults.details.push({
+                            type: 'transfer',
+                            reservationId: reservation._id,
+                            amount: transfer.amount / 100,
+                            message: `Transfert ${transfer.id} synchronise`,
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            syncResults.errors.push(`Erreur sync transferts: ${error.message}`);
+        }
+
+        // 4. Corriger les reservations avec statut incoherent
+        try {
+            const problematicReservations = await Reservation.find({
+                completedAt: { $gte: start, $lte: end },
+                status: 'completed',
+                paymentStatus: 'pending',
+                paymentIntentId: { $exists: true, $ne: null },
+            });
+
+            for (const reservation of problematicReservations) {
+                try {
+                    const pi = await stripe.paymentIntents.retrieve(reservation.paymentIntentId);
+
+                    if (pi.status === 'succeeded') {
+                        reservation.paymentStatus = 'paid';
+                        await reservation.save();
+
+                        syncResults.paymentsUpdated++;
+                        syncResults.details.push({
+                            type: 'payment_fix',
+                            reservationId: reservation._id,
+                            amount: reservation.totalPrice,
+                            message: `Statut paiement corrige pour ${reservation._id}`,
+                        });
+                    }
+                } catch (piError) {
+                    // PaymentIntent non trouve, ignorer
+                }
+            }
+        } catch (error) {
+            syncResults.errors.push(`Erreur correction statuts: ${error.message}`);
+        }
+
+        const totalUpdates = syncResults.paymentsUpdated + syncResults.refundsRecorded + syncResults.transfersUpdated;
+
+        res.json({
+            success: true,
+            message: totalUpdates > 0
+                ? `Synchronisation terminee: ${totalUpdates} mise(s) a jour effectuee(s)`
+                : 'Aucune mise a jour necessaire - les donnees sont deja synchronisees',
+            period: {
+                start: start.toISOString(),
+                end: end.toISOString(),
+            },
+            results: syncResults,
+        });
+    } catch (error) {
+        console.error('Erreur sync-stripe:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la synchronisation avec Stripe',
+        });
+    }
+});
+
+/**
  * @route   POST /api/admin/finance/cleanup-test-reservations
  * @desc    Supprimer les reservations de test (completed sans paiement)
  * @access  Private (Admin)
