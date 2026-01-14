@@ -55,53 +55,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAuthState();
     });
-
-    // Timeout de sécurité - si après 5 secondes on est toujours en chargement,
-    // afficher l'onboarding pour éviter un blocage infini
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted && _isCheckingAuth) {
-        setState(() {
-          _isCheckingAuth = false;
-        });
-      }
-    });
   }
 
   void _checkAuthState() {
     final authState = context.read<AuthBloc>().state;
 
-    // Si déjà authentifié, ne pas afficher l'onboarding
+    // Si déjà authentifié, ne rien faire - la navigation est gérée par deneigeauto_app.dart
     if (authState is AuthAuthenticated) {
-      // La navigation est gérée par le BlocListener dans deneigeauto_app.dart
       return;
     }
 
-    // Si l'état est initial ou loading, attendre un peu puis vérifier à nouveau
-    if (authState is AuthInitial || authState is AuthLoading) {
-      // Attendre un court moment puis revérifier
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          final newState = context.read<AuthBloc>().state;
-          // Si toujours en loading après 500ms, on laisse le timeout global gérer
-          if (newState is AuthUnauthenticated || newState is AuthError) {
-            setState(() {
-              _isCheckingAuth = false;
-            });
-          } else if (newState is AuthAuthenticated) {
-            // Navigation gérée par BlocListener
-            return;
-          }
-        }
-      });
+    // Si l'état est final (non authentifié ou erreur), afficher l'onboarding
+    if (authState is AuthUnauthenticated || authState is AuthError) {
+      if (mounted) {
+        setState(() {
+          _isCheckingAuth = false;
+        });
+      }
       return;
     }
 
-    // Si erreur ou non authentifié, afficher l'onboarding
-    if (mounted) {
-      setState(() {
-        _isCheckingAuth = false;
-      });
-    }
+    // Si l'état est initial ou loading, attendre la fin de la vérification
+    // Le BlocListener ci-dessous gérera le changement d'état
   }
 
   @override

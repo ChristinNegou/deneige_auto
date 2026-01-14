@@ -44,23 +44,37 @@ class AuthInterceptor extends Interceptor {
   AuthInterceptor({required this.secureStorage});
 
   @override
-  void onRequest(
+  Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Récupérer le token
-    final token = await secureStorage.getToken();
+    try {
+      // Récupérer le token
+      final token = await secureStorage.getToken();
 
-    // Ajouter le token dans les headers si disponible
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+      // Ajouter le token dans les headers si disponible
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+        if (kDebugMode) {
+          debugPrint('🔐 Token ajouté aux headers pour ${options.path}');
+        }
+      } else {
+        if (kDebugMode) {
+          debugPrint('⚠️ Aucun token disponible pour ${options.path}');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('❌ Erreur lors de la récupération du token: $e');
+      }
     }
 
-    return handler.next(options);
+    handler.next(options);
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+      DioException err, ErrorInterceptorHandler handler) async {
     // Gestion de la suspension utilisateur (403 USER_SUSPENDED)
     if (err.response?.statusCode == 403 &&
         err.response?.data['code'] == 'USER_SUSPENDED') {
@@ -112,12 +126,18 @@ class AuthInterceptor extends Interceptor {
           final response = await dio.fetch(options);
           return handler.resolve(response);
         } else {
-          // Token refresh échoué - forcer la déconnexion
-          await _handleForceLogout();
+          // Token refresh échoué - NE PAS forcer la déconnexion automatique
+          // L'utilisateur pourra se reconnecter manuellement si nécessaire
+          if (kDebugMode) {
+            debugPrint(
+                '⚠️ [AuthInterceptor] Refresh token échoué, mais pas de déconnexion forcée');
+          }
         }
       } catch (e) {
-        // Si le rafraîchissement échoue, forcer la déconnexion
-        await _handleForceLogout();
+        // Si le rafraîchissement échoue, NE PAS forcer la déconnexion
+        if (kDebugMode) {
+          debugPrint('⚠️ [AuthInterceptor] Erreur refresh: $e');
+        }
       }
     }
 
@@ -205,13 +225,6 @@ class AuthInterceptor extends Interceptor {
     } catch (e) {
       return null;
     }
-  }
-
-  /// Gère la déconnexion forcée
-  Future<void> _handleForceLogout() async {
-    await secureStorage.deleteAll();
-    _logoutController.add(null);
-    onForceLogout?.call();
   }
 }
 

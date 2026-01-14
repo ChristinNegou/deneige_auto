@@ -228,11 +228,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
 
+    // Vérifier d'abord si un token existe localement
+    final secureStorage = sl<SecureStorageService>();
+    final hasToken = await secureStorage.hasToken();
+
+    if (!hasToken) {
+      debugPrint('🔒 Aucun token trouvé - utilisateur non authentifié');
+      emit(AuthUnauthenticated());
+      return;
+    }
+
+    debugPrint('🔑 Token trouvé - vérification auprès du serveur...');
+
     final result = await getCurrentUser();
 
     result.fold(
-      (failure) => emit(AuthUnauthenticated()),
+      (failure) {
+        debugPrint('❌ Échec de la vérification du token: ${failure.message}');
+        emit(AuthUnauthenticated());
+      },
       (user) {
+        debugPrint('✅ Utilisateur authentifié: ${user.email}');
         _currentUser = user;
         // Configurer les notifications pour l'utilisateur déjà connecté
         _setupNotificationsForUser(user);
