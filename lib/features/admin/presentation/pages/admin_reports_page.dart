@@ -24,6 +24,8 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     context.read<AdminBloc>().add(LoadDashboardStats());
+    // Charger automatiquement les données Stripe
+    context.read<AdminBloc>().add(LoadStripeReconciliation());
   }
 
   @override
@@ -99,19 +101,32 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     final currencyFormat =
         NumberFormat.currency(symbol: '\$', decimalDigits: 2);
 
+    final reconciliation = state.reconciliation;
+    final isLoadingStripe = state.reconciliationStatus == AdminStatus.loading;
+
+    // Utiliser les données Stripe si disponibles, sinon local
+    final stripeRevenue = reconciliation?.stripe.chargesTotal ?? 0.0;
+    final stripeTransfers = reconciliation?.stripe.transfersTotal ?? 0.0;
+    final stripeFees = reconciliation?.stripe.feesTotal ?? 0.0;
+    final stripeRefunds = reconciliation?.stripe.refundsTotal ?? 0.0;
+    final stripeNetRevenue = stripeRevenue - stripeRefunds;
+    final platformCommission = stripeRevenue > 0
+        ? stripeRevenue - stripeTransfers - stripeFees
+        : stats.revenue.platformFeesNet;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Main revenue card
+          // Main revenue card - STRIPE DATA
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppTheme.primary,
-                  AppTheme.primary.withValues(alpha: 0.8),
+                  AppTheme.primary2,
+                  AppTheme.primary2.withValues(alpha: 0.8),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -120,86 +135,320 @@ class _AdminReportsPageState extends State<AdminReportsPage>
             ),
             child: Column(
               children: [
-                Text(
-                  'Revenu Total',
-                  style: TextStyle(
-                    color: AppTheme.background.withValues(alpha: 0.7),
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  currencyFormat.format(stats.revenue.total),
-                  style: TextStyle(
-                    color: AppTheme.background,
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildRevenueSubItem(
-                      'Ce mois',
-                      currencyFormat.format(stats.revenue.thisMonth),
-                      Icons.calendar_today,
+                    Icon(
+                      Icons.account_balance,
+                      color: AppTheme.background.withValues(alpha: 0.8),
+                      size: 20,
                     ),
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: AppTheme.background.withValues(alpha: 0.3),
-                    ),
-                    _buildRevenueSubItem(
-                      'Commission nette',
-                      currencyFormat.format(stats.revenue.platformFeesNet),
-                      Icons.percent,
+                    const SizedBox(width: 8),
+                    Text(
+                      'Revenus Stripe',
+                      style: TextStyle(
+                        color: AppTheme.background.withValues(alpha: 0.8),
+                        fontSize: 16,
+                      ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                if (isLoadingStripe)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: CircularProgressIndicator(
+                      color: AppTheme.background,
+                    ),
+                  )
+                else if (reconciliation != null)
+                  Column(
+                    children: [
+                      Text(
+                        currencyFormat.format(stripeNetRevenue),
+                        style: TextStyle(
+                          color: AppTheme.background,
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '(30 derniers jours)',
+                        style: TextStyle(
+                          color: AppTheme.background.withValues(alpha: 0.6),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    'Chargement...',
+                    style: TextStyle(
+                      color: AppTheme.background.withValues(alpha: 0.7),
+                      fontSize: 18,
+                    ),
+                  ),
+                const SizedBox(height: 16),
+                if (reconciliation != null)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildRevenueSubItem(
+                        'Commission',
+                        currencyFormat.format(platformCommission),
+                        Icons.business,
+                      ),
+                      Container(
+                        width: 1,
+                        height: 40,
+                        color: AppTheme.background.withValues(alpha: 0.3),
+                      ),
+                      _buildRevenueSubItem(
+                        'Frais Stripe',
+                        currencyFormat.format(stripeFees),
+                        Icons.credit_card,
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
+          const SizedBox(height: 16),
+
+          // Stripe Balance Card
+          if (reconciliation?.stripe.balance != null)
+            _buildStripeBalanceCard(reconciliation!.stripe.balance!),
           const SizedBox(height: 24),
 
-          // Revenue breakdown
+          // Stripe Revenue breakdown
+          if (reconciliation != null) ...[
+            const Text(
+              'Détails Stripe (30 jours)',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildStripeBreakdownCard(reconciliation),
+            const SizedBox(height: 24),
+          ],
+
+          // Comparaison avec données locales
           const Text(
-            'Répartition des revenus',
+            'Comparaison Local vs Stripe',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
-          _buildRevenueBreakdownCard(stats.revenue),
+          if (reconciliation != null)
+            _buildComparisonCard(
+                reconciliation, reconciliation.hasDiscrepancies)
+          else
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Center(
+                child: Text('Chargement des données...'),
+              ),
+            ),
           const SizedBox(height: 24),
 
-          // Revenue distribution visual
-          const Text(
-            'Distribution',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          // Sync section if discrepancies
+          if (reconciliation != null && reconciliation.hasDiscrepancies) ...[
+            _buildSyncSection(state),
+            const SizedBox(height: 24),
+          ],
+
+          // Sync result if any
+          if (state.syncResult != null &&
+              state.syncStatus == AdminStatus.success) ...[
+            _buildSyncResultCard(state.syncResult!),
+            const SizedBox(height: 24),
+          ],
+
+          // Problematic reservations if any
+          if (reconciliation != null &&
+              reconciliation.problematicReservations.isNotEmpty) ...[
+            _buildProblematicReservationsCard(
+                reconciliation.problematicReservations),
+            const SizedBox(height: 24),
+          ],
+
+          // Refresh button
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: isLoadingStripe
+                  ? null
+                  : () =>
+                      context.read<AdminBloc>().add(LoadStripeReconciliation()),
+              icon: isLoadingStripe
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.refresh),
+              label: const Text('Actualiser les données Stripe'),
             ),
           ),
-          const SizedBox(height: 16),
-          _buildRevenueDistributionChart(stats.revenue),
-          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
 
-          // Monthly comparison
-          const Text(
-            'Comparaison mensuelle',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+  Widget _buildStripeBreakdownCard(StripeReconciliation reconciliation) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.shadowColor.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildBreakdownRow(
+            'Paiements reçus',
+            reconciliation.stripe.chargesTotal,
+            AppTheme.success,
+            Icons.arrow_downward,
+          ),
+          const Divider(height: 24),
+          _buildBreakdownRow(
+            'Remboursements',
+            reconciliation.stripe.refundsTotal,
+            AppTheme.error,
+            Icons.arrow_upward,
+          ),
+          const Divider(height: 24),
+          _buildBreakdownRow(
+            'Transferts déneigeurs',
+            reconciliation.stripe.transfersTotal,
+            AppTheme.info,
+            Icons.people,
+          ),
+          const Divider(height: 24),
+          _buildBreakdownRow(
+            'Frais Stripe',
+            reconciliation.stripe.feesTotal,
+            AppTheme.warning,
+            Icons.credit_card,
+          ),
+          const Divider(height: 24),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child:
+                    Icon(Icons.account_balance_wallet, color: AppTheme.primary),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Text(
+                  'Revenu net plateforme',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                '${(reconciliation.stripe.chargesTotal - reconciliation.stripe.refundsTotal - reconciliation.stripe.transfersTotal - reconciliation.stripe.feesTotal).toStringAsFixed(2)} \$',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSyncSection(AdminState state) {
+    final isSyncing = state.syncStatus == AdminStatus.loading;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.warningLight,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.warning_amber, color: AppTheme.warning, size: 24),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Écarts détectés',
+                      style: TextStyle(
+                        color: AppTheme.warning,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Des différences ont été détectées entre les données locales et Stripe.',
+                      style: TextStyle(
+                        color: AppTheme.warning.withValues(alpha: 0.8),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: isSyncing
+                  ? null
+                  : () => context.read<AdminBloc>().add(SyncWithStripe()),
+              icon: isSyncing
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.sync),
+              label: Text(isSyncing
+                  ? 'Synchronisation...'
+                  : 'Synchroniser avec Stripe'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.warning,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          _buildMonthlyComparisonCard(stats.revenue),
-          const SizedBox(height: 24),
-
-          // Stripe Reconciliation Section
-          _buildStripeReconciliationSection(state),
         ],
       ),
     );
@@ -226,68 +475,6 @@ class _AdminReportsPageState extends State<AdminReportsPage>
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildRevenueBreakdownCard(RevenueStats revenue) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildBreakdownRow(
-            'Revenus bruts',
-            revenue.total,
-            AppTheme.success,
-            Icons.trending_up,
-          ),
-          const Divider(height: 24),
-          _buildBreakdownRow(
-            'Commission brute (25%)',
-            revenue.platformFeesGross,
-            AppTheme.primary,
-            Icons.business,
-          ),
-          const Divider(height: 24),
-          _buildBreakdownRow(
-            'Frais Stripe (~3%)',
-            revenue.stripeFees,
-            AppTheme.error,
-            Icons.credit_card,
-          ),
-          const Divider(height: 24),
-          _buildBreakdownRow(
-            'Commission nette',
-            revenue.platformFeesNet,
-            AppTheme.success,
-            Icons.check_circle,
-          ),
-          const Divider(height: 24),
-          _buildBreakdownRow(
-            'Paiement déneigeurs',
-            revenue.workerPayouts,
-            AppTheme.info,
-            Icons.people,
-          ),
-          const Divider(height: 24),
-          _buildBreakdownRow(
-            'Pourboires',
-            revenue.tips,
-            AppTheme.warning,
-            Icons.volunteer_activism,
-          ),
-        ],
-      ),
     );
   }
 
@@ -322,212 +509,6 @@ class _AdminReportsPageState extends State<AdminReportsPage>
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildRevenueDistributionChart(RevenueStats revenue) {
-    final total =
-        revenue.platformFeesNet + revenue.workerPayouts + revenue.tips;
-    if (total == 0) {
-      return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Center(
-          child: Text('Pas de données disponibles'),
-        ),
-      );
-    }
-
-    final platformPercent = (revenue.platformFeesNet / total * 100);
-    final workerPercent = (revenue.workerPayouts / total * 100);
-    final tipsPercent = (revenue.tips / total * 100);
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: platformPercent.round(),
-                child: Container(
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary,
-                    borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(12)),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: workerPercent.round(),
-                child: Container(
-                  height: 24,
-                  color: AppTheme.info,
-                ),
-              ),
-              Expanded(
-                flex: tipsPercent.round() > 0 ? tipsPercent.round() : 1,
-                child: Container(
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: AppTheme.warning,
-                    borderRadius: const BorderRadius.horizontal(
-                        right: Radius.circular(12)),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildLegendItem(
-                'Plateforme',
-                '${platformPercent.toStringAsFixed(1)}%',
-                AppTheme.primary,
-              ),
-              _buildLegendItem(
-                'Déneigeurs',
-                '${workerPercent.toStringAsFixed(1)}%',
-                AppTheme.info,
-              ),
-              _buildLegendItem(
-                'Pourboires',
-                '${tipsPercent.toStringAsFixed(1)}%',
-                AppTheme.warning,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLegendItem(String label, String value, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12,
-              ),
-            ),
-            Text(
-              value,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMonthlyComparisonCard(RevenueStats revenue) {
-    final monthlyCommission = revenue.monthlyPlatformFeesNet;
-    final monthlyTotal = revenue.thisMonth;
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildComparisonItem(
-                  'Revenu ce mois',
-                  monthlyTotal,
-                  Icons.trending_up,
-                  AppTheme.success,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildComparisonItem(
-                  'Commission ce mois',
-                  monthlyCommission,
-                  Icons.business,
-                  AppTheme.primary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildComparisonItem(
-      String label, double value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 8),
-          Text(
-            '${value.toStringAsFixed(2)} \$',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppTheme.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
     );
   }
 
@@ -1124,306 +1105,6 @@ class _AdminReportsPageState extends State<AdminReportsPage>
             color: color,
           ),
         ),
-      ],
-    );
-  }
-
-  // ==================== STRIPE RECONCILIATION SECTION ====================
-
-  Widget _buildStripeReconciliationSection(AdminState state) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Title row
-        Row(
-          children: [
-            Icon(Icons.sync, color: AppTheme.primary, size: 24),
-            const SizedBox(width: 8),
-            const Expanded(
-              child: Text(
-                'Vérification Stripe',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        // Button row
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: state.reconciliationStatus == AdminStatus.loading
-                ? null
-                : () =>
-                    context.read<AdminBloc>().add(LoadStripeReconciliation()),
-            icon: state.reconciliationStatus == AdminStatus.loading
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.refresh, size: 18),
-            label: Text(
-              state.reconciliation == null
-                  ? 'Charger les données Stripe'
-                  : 'Actualiser',
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Compare les données locales avec Stripe (30 derniers jours)',
-          style: TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 13,
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        if (state.reconciliationStatus == AdminStatus.loading)
-          Container(
-            padding: const EdgeInsets.all(40),
-            decoration: BoxDecoration(
-              color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Center(
-              child: Column(
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Chargement des données Stripe...'),
-                ],
-              ),
-            ),
-          )
-        else if (state.reconciliationStatus == AdminStatus.error)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppTheme.errorLight,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.error_outline, color: AppTheme.error),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        state.errorMessage ??
-                            'Erreur lors du chargement des données Stripe',
-                        style: TextStyle(
-                            color: AppTheme.error, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => context
-                        .read<AdminBloc>()
-                        .add(LoadStripeReconciliation()),
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Réessayer'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.error,
-                      side: BorderSide(color: AppTheme.error),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        else if (state.reconciliation != null)
-          _buildReconciliationData(state.reconciliation!, state)
-        else
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Center(
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.account_balance_wallet_outlined,
-                    size: 48,
-                    color: AppTheme.textTertiary,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Cliquez sur "Charger" pour comparer avec Stripe',
-                    style: TextStyle(color: AppTheme.textSecondary),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildReconciliationData(
-      StripeReconciliation reconciliation, AdminState state) {
-    final dateFormat = DateFormat('dd/MM/yyyy');
-    final hasDiscrepancies = reconciliation.hasDiscrepancies;
-    final isSyncing = state.syncStatus == AdminStatus.loading;
-
-    return Column(
-      children: [
-        // Period info
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppTheme.infoLight,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.date_range, color: AppTheme.info, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Période: ${dateFormat.format(reconciliation.period.start)} - ${dateFormat.format(reconciliation.period.end)}',
-                style: TextStyle(color: AppTheme.info, fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Stripe Balance
-        if (reconciliation.stripe.balance != null)
-          _buildStripeBalanceCard(reconciliation.stripe.balance!),
-        const SizedBox(height: 16),
-
-        // Comparison table
-        _buildComparisonCard(reconciliation, hasDiscrepancies),
-        const SizedBox(height: 16),
-
-        // Discrepancy alert if any
-        if (hasDiscrepancies)
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.warningLight,
-              borderRadius: BorderRadius.circular(12),
-              border:
-                  Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.warning_amber,
-                        color: AppTheme.warning, size: 24),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Écarts détectés',
-                            style: TextStyle(
-                              color: AppTheme.warning,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Des différences ont été détectées entre les données locales et Stripe.',
-                            style: TextStyle(
-                              color: AppTheme.warning.withValues(alpha: 0.8),
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                // Sync button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: isSyncing
-                        ? null
-                        : () => context.read<AdminBloc>().add(SyncWithStripe()),
-                    icon: isSyncing
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.sync),
-                    label: Text(isSyncing
-                        ? 'Synchronisation...'
-                        : 'Synchroniser avec Stripe'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.warning,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.successLight,
-              borderRadius: BorderRadius.circular(12),
-              border:
-                  Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.check_circle, color: AppTheme.success, size: 24),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Les données sont synchronisées avec Stripe',
-                    style: TextStyle(
-                      color: AppTheme.success,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-        // Sync result if any
-        if (state.syncResult != null &&
-            state.syncStatus == AdminStatus.success) ...[
-          const SizedBox(height: 16),
-          _buildSyncResultCard(state.syncResult!),
-        ],
-
-        // Problematic reservations if any
-        if (reconciliation.problematicReservations.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          _buildProblematicReservationsCard(
-              reconciliation.problematicReservations),
-        ],
       ],
     );
   }
