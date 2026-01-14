@@ -321,7 +321,6 @@ const io = new Server(httpServer, {
 // Middleware d'authentification Socket.IO
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
-const mongoose = require('mongoose');
 
 // Helper pour valider les ObjectId MongoDB
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
