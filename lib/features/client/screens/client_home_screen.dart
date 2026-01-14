@@ -12,6 +12,7 @@ import '../../auth/presentation/bloc/auth_state.dart';
 import '../../home/presentation/bloc/home_bloc.dart';
 import '../../home/presentation/bloc/home_event.dart';
 import '../../home/presentation/bloc/home_state.dart';
+import '../../home/presentation/widgets/weather_card.dart';
 import '../../notifications/presentation/bloc/notification_bloc.dart';
 import '../../reservation/domain/entities/reservation.dart';
 import '../../reservation/domain/repositories/reservation_repository.dart';
@@ -229,6 +230,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                         padding: const EdgeInsets.all(AppTheme.paddingLG),
                         sliver: SliverList(
                           delegate: SliverChildListDelegate([
+                            // Météo
+                            _buildWeatherSection(),
+                            const SizedBox(height: 16),
                             // Live tracking (si actif)
                             _buildLiveTrackingSection(),
                             // Actions rapides
@@ -369,6 +373,31 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       return Icons.wb_sunny;
     }
     return Icons.wb_cloudy;
+  }
+
+  Widget _buildWeatherSection() {
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return Container(
+            height: 180,
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (state.weather != null) {
+          return WeatherCard(weather: state.weather!);
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
   }
 
   Widget _buildNotificationButton(BuildContext context) {

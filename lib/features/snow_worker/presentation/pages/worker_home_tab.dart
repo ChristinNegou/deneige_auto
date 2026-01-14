@@ -10,6 +10,10 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../home/presentation/bloc/home_bloc.dart';
+import '../../../home/presentation/bloc/home_event.dart';
+import '../../../home/presentation/bloc/home_state.dart';
+import '../../../home/presentation/widgets/weather_card.dart';
 import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_availability_bloc.dart';
 import '../bloc/worker_jobs_bloc.dart';
@@ -51,6 +55,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     )..repeat(reverse: true);
     _initializeLocation();
     _startAutoRefresh();
+    // Load weather data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<HomeBloc>().add(LoadHomeData());
+      }
+    });
   }
 
   @override
@@ -271,6 +281,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     padding: const EdgeInsets.all(AppTheme.paddingLG),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
+                        _buildWeatherSection(),
+                        const SizedBox(height: 20),
                         _buildAvailabilityCard(),
                         const SizedBox(height: 20),
                         _buildQuickStats(),
@@ -444,6 +456,27 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildWeatherSection() {
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return Container(
+            height: 180,
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (state.weather != null) {
+          return WeatherCard(weather: state.weather!);
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 

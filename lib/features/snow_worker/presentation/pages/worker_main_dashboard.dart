@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../home/presentation/bloc/home_bloc.dart';
 import '../bloc/worker_availability_bloc.dart';
 import '../bloc/worker_jobs_bloc.dart';
 import '../bloc/worker_stats_bloc.dart';
@@ -57,6 +58,7 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
 
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => sl<HomeBloc>()),
         BlocProvider(create: (_) => sl<WorkerJobsBloc>()),
         BlocProvider(create: (_) => sl<WorkerAvailabilityBloc>()),
         BlocProvider(create: (_) => sl<WorkerStatsBloc>()),
