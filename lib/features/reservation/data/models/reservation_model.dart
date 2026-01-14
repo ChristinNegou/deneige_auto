@@ -42,7 +42,7 @@ class ReservationModel extends Reservation {
 
   factory ReservationModel.fromJson(Map<String, dynamic> json) {
     return ReservationModel(
-      id: json['id'] as String? ?? json['_id'] as String,
+      id: json['id'] as String? ?? json['_id'] as String? ?? 'unknown',
       userId: _parseUserId(json['userId']),
       workerId: _parseWorkerId(json['workerId']),
       workerName: _parseWorkerName(json['workerId']),
@@ -50,10 +50,11 @@ class ReservationModel extends Reservation {
       workerPhotoUrl: _parseWorkerPhotoUrl(json['workerId']),
       parkingSpot: _parseParkingSpot(json),
       vehicle: _parseVehicle(json),
-      departureTime: TimeUtils.parseUtcToLocal(json['departureTime'] as String),
+      departureTime: TimeUtils.parseUtcToLocal(
+          json['departureTime'] as String? ?? DateTime.now().toIso8601String()),
       deadlineTime:
           TimeUtils.parseUtcToLocalOrNull(json['deadlineTime'] as String?),
-      status: _parseReservationStatus(json['status'] as String),
+      status: _parseReservationStatus(json['status'] as String? ?? 'pending'),
       serviceOptions: (json['serviceOptions'] as List<dynamic>?)
               ?.map((e) => _parseServiceOption(e as String))
               .toList() ??

@@ -19,12 +19,12 @@ class VehicleModel extends Vehicle {
 
   factory VehicleModel.fromJson(Map<String, dynamic> json) {
     return VehicleModel(
-      id: json['id'] as String,
-      userId: json['userId'] as String,
-      make: json['make'] as String,
-      model: json['model'] as String,
+      id: json['id'] as String? ?? json['_id'] as String? ?? 'unknown',
+      userId: json['userId'] as String? ?? 'unknown',
+      make: json['make'] as String? ?? 'Inconnu',
+      model: json['model'] as String? ?? '',
       year: json['year'] as int?,
-      color: json['color'] as String,
+      color: json['color'] as String? ?? 'Inconnu',
       licensePlate: json['licensePlate'] as String?,
       photoUrl: json['photoUrl'] as String?,
       type: _parseVehicleType(json['type'] as String?),

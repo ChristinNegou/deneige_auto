@@ -20,8 +20,8 @@ class ParkingSpotModel extends ParkingSpot {
 
   factory ParkingSpotModel.fromJson(Map<String, dynamic> json) {
     return ParkingSpotModel(
-      id: json['id'] as String,
-      spotNumber: json['spotNumber'] as String,
+      id: json['id'] as String? ?? json['_id'] as String? ?? 'unknown',
+      spotNumber: json['spotNumber'] as String? ?? 'N/A',
       buildingCode: json['buildingCode'] as String?,
       level: _parseParkingLevel(json['level'] as String?),
       section: json['section'] as String?,
