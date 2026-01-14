@@ -321,6 +321,17 @@ const io = new Server(httpServer, {
 // Middleware d'authentification Socket.IO
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
+const mongoose = require('mongoose');
+
+// Helper pour valider les ObjectId MongoDB
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
+// Helper pour valider les coordonnées
+const isValidCoordinate = (lat, lng) => {
+    return typeof lat === 'number' && typeof lng === 'number' &&
+           lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
+           !isNaN(lat) && !isNaN(lng);
+};
 
 io.use(async (socket, next) => {
     try {
@@ -360,33 +371,66 @@ io.on('connection', (socket) => {
         socket.join('admins');
     }
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
         console.log(`🔌 Socket déconnecté: ${socket.userId}`);
+
+        // Nettoyer la position du worker si c'est un déneigeur
+        if (socket.userRole === 'snowWorker') {
+            try {
+                await User.findByIdAndUpdate(socket.userId, {
+                    'workerProfile.currentLocation.coordinates': null,
+                    'workerProfile.lastLocationUpdate': null,
+                });
+            } catch (error) {
+                console.error('Erreur nettoyage position à la déconnexion:', error);
+            }
+        }
     });
 
     // Événement pour mettre à jour la position du worker
     socket.on('worker:updateLocation', async (data) => {
         if (socket.userRole !== 'snowWorker') return;
 
+        // Valider les coordonnées
+        const lat = parseFloat(data?.latitude);
+        const lng = parseFloat(data?.longitude);
+
+        if (!isValidCoordinate(lat, lng)) {
+            socket.emit('error', { message: 'Coordonnées invalides' });
+            return;
+        }
+
         try {
             await User.findByIdAndUpdate(socket.userId, {
-                'workerProfile.currentLocation.coordinates': [data.longitude, data.latitude],
+                'workerProfile.currentLocation.coordinates': [lng, lat],
+                'workerProfile.lastLocationUpdate': new Date(),
             });
         } catch (error) {
             console.error('Erreur mise à jour position:', error);
+            socket.emit('error', { message: 'Erreur lors de la mise à jour de la position' });
         }
     });
 
     // Rejoindre une room de conversation pour une réservation
     socket.on('chat:join', async (data) => {
         const { reservationId } = data;
-        if (!reservationId) return;
+
+        // Valider l'ObjectId
+        if (!reservationId || !isValidObjectId(reservationId)) {
+            socket.emit('error', { message: 'ID de réservation invalide' });
+            return;
+        }
 
         try {
             const Reservation = require('./models/Reservation');
-            const reservation = await Reservation.findById(reservationId);
+            const reservation = await Reservation.findById(reservationId)
+                .select('userId workerId')
+                .lean();
 
-            if (!reservation) return;
+            if (!reservation) {
+                socket.emit('error', { message: 'Réservation non trouvée' });
+                return;
+            }
 
             const isClient = reservation.userId.toString() === socket.userId;
             const isWorker = reservation.workerId?.toString() === socket.userId;
@@ -394,16 +438,19 @@ io.on('connection', (socket) => {
             if (isClient || isWorker) {
                 socket.join(`reservation:${reservationId}`);
                 console.log(`💬 ${socket.userId} a rejoint le chat: reservation:${reservationId}`);
+            } else {
+                socket.emit('error', { message: 'Accès non autorisé à cette réservation' });
             }
         } catch (error) {
             console.error('Erreur chat:join:', error);
+            socket.emit('error', { message: 'Erreur lors de la connexion au chat' });
         }
     });
 
     // Quitter une room de conversation
     socket.on('chat:leave', (data) => {
         const { reservationId } = data;
-        if (reservationId) {
+        if (reservationId && isValidObjectId(reservationId)) {
             socket.leave(`reservation:${reservationId}`);
             console.log(`💬 ${socket.userId} a quitté le chat: reservation:${reservationId}`);
         }
@@ -412,10 +459,10 @@ io.on('connection', (socket) => {
     // Indicateur de frappe
     socket.on('chat:typing', (data) => {
         const { reservationId, isTyping } = data;
-        if (reservationId) {
+        if (reservationId && isValidObjectId(reservationId)) {
             socket.to(`reservation:${reservationId}`).emit('chat:typing', {
                 userId: socket.userId,
-                isTyping,
+                isTyping: !!isTyping,
             });
         }
     });

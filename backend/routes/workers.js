@@ -12,6 +12,7 @@ const Transaction = require('../models/Transaction');
 const { uploadFromBuffer } = require('../config/cloudinary');
 const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, FILE_UPLOAD, GEOLOCATION } = require('../config/constants');
 const { logError, safeNotify } = require('../utils/errorHandler');
+const { locationLimiter, uploadLimiter } = require('../middleware/rateLimiter');
 
 // Configure multer with memory storage for Cloudinary uploads
 const upload = multer({
@@ -80,7 +81,7 @@ router.patch('/availability', protect, authorize('snowWorker'), async (req, res)
 // @route   PUT /api/workers/location
 // @desc    Update worker current location
 // @access  Private (Worker only)
-router.put('/location', protect, authorize('snowWorker'), async (req, res) => {
+router.put('/location', protect, authorize('snowWorker'), locationLimiter, async (req, res) => {
     try {
         const { latitude, longitude } = req.body;
 
@@ -364,7 +365,8 @@ router.get('/my-jobs', protect, authorize('snowWorker'), async (req, res) => {
         })
             .populate('userId', 'firstName lastName phoneNumber')
             .populate('vehicle', 'make model color licensePlate photoUrl')
-            .sort({ departureTime: 1 });
+            .sort({ departureTime: 1 })
+            .lean();
 
         res.json({
             success: true,
@@ -406,7 +408,8 @@ router.get('/history', protect, authorize('snowWorker'), async (req, res) => {
             .populate('vehicle', 'make model color licensePlate photoUrl')
             .sort({ completedAt: -1 })
             .skip((page - 1) * limit)
-            .limit(parseInt(limit));
+            .limit(parseInt(limit))
+            .lean();
 
         res.json({
             success: true,
@@ -734,7 +737,7 @@ router.put('/profile', protect, authorize('snowWorker'), async (req, res) => {
 // @route   POST /api/workers/profile/photo
 // @desc    Upload worker profile photo
 // @access  Private (Worker only)
-router.post('/profile/photo', protect, authorize('snowWorker'), profileUpload.single('photo'), async (req, res) => {
+router.post('/profile/photo', protect, authorize('snowWorker'), uploadLimiter, profileUpload.single('photo'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -1149,7 +1152,7 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
 // @route   POST /api/workers/jobs/:id/photos/upload
 // @desc    Upload before/after photo to Cloudinary
 // @access  Private (Worker only)
-router.post('/jobs/:id/photos/upload', protect, authorize('snowWorker'), upload.single('photo'), async (req, res) => {
+router.post('/jobs/:id/photos/upload', protect, authorize('snowWorker'), uploadLimiter, upload.single('photo'), async (req, res) => {
     try {
         const { id } = req.params;
         const { type } = req.body;

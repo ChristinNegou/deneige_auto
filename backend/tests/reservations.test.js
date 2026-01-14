@@ -59,8 +59,9 @@ describe('Reservation Routes', () => {
       expect(res.body.total).toBe(0);
     });
 
-    // Note: Ce test échoue à cause d'un problème avec populate() dans l'environnement de test
+    // TODO: Ces tests échouent avec MongoMemoryServer + .lean() + populate()
     // La fonctionnalité est testée manuellement et fonctionne en production
+    // Issue: populate() retourne null pour les documents liés dans l'env de test
     it.skip('should return user reservations', async () => {
       await createTestReservation(testUser._id, testVehicle._id);
       await createTestReservation(testUser._id, testVehicle._id);
@@ -74,7 +75,6 @@ describe('Reservation Routes', () => {
       expect(res.body.reservations.length).toBe(2);
     });
 
-    // Note: Ces tests échouent à cause de populate() - voir TODO ci-dessus
     it.skip('should filter by status', async () => {
       await createTestReservation(testUser._id, testVehicle._id, { status: 'pending' });
 
@@ -114,7 +114,7 @@ describe('Reservation Routes', () => {
   });
 
   describe('GET /api/reservations/:id', () => {
-    // Note: Ce test échoue à cause de populate() dans l'environnement de test
+    // TODO: Ce test échoue avec MongoMemoryServer + .lean() + populate()
     it.skip('should return a specific reservation', async () => {
       const reservation = await createTestReservation(testUser._id, testVehicle._id);
 

@@ -204,6 +204,43 @@ const uploadLimiter = rateLimit({
     validate: { xForwardedForHeader: false },
 });
 
+/**
+ * Rate limiter pour les mises à jour de localisation
+ * 60 requêtes par minute par utilisateur (1 par seconde)
+ */
+const locationLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 60,
+    message: {
+        success: false,
+        message: 'Trop de mises à jour de position. Veuillez réessayer.',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+        return req.user?.id || getClientIp(req);
+    },
+    validate: { xForwardedForHeader: false },
+});
+
+/**
+ * Rate limiter pour les demandes de support
+ * 5 requêtes par heure par utilisateur
+ */
+const supportLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 heure
+    max: 5,
+    message: {
+        success: false,
+        message: 'Trop de demandes de support. Veuillez réessayer plus tard.',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+        return req.user?.id || getClientIp(req);
+    },
+});
+
 // Exporter les vrais limiters en production, ou noop en test
 module.exports = isTestEnv ? {
     generalLimiter: noopMiddleware,
@@ -214,6 +251,8 @@ module.exports = isTestEnv ? {
     forgotPasswordLimiter: noopMiddleware,
     reservationLimiter: noopMiddleware,
     uploadLimiter: noopMiddleware,
+    locationLimiter: noopMiddleware,
+    supportLimiter: noopMiddleware,
 } : {
     generalLimiter,
     authLimiter,
@@ -223,4 +262,6 @@ module.exports = isTestEnv ? {
     forgotPasswordLimiter,
     reservationLimiter,
     uploadLimiter,
+    locationLimiter,
+    supportLimiter,
 };

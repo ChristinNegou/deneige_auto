@@ -38,7 +38,8 @@ router.get('/', protect, async (req, res) => {
                 .populate('workerId', 'firstName lastName phoneNumber photoUrl')
                 .sort({ departureTime: -1 })
                 .skip(skip)
-                .limit(limitNum),
+                .limit(limitNum)
+                .lean(),
             Reservation.countDocuments(query),
         ]);
 
@@ -70,7 +71,8 @@ router.get('/:id', protect, async (req, res) => {
         })
             .populate('vehicle')
             .populate('parkingSpot')
-            .populate('workerId', 'firstName lastName phoneNumber photoUrl');
+            .populate('workerId', 'firstName lastName phoneNumber photoUrl')
+            .lean();
 
         if (!reservation) {
             return res.status(404).json({
@@ -1373,7 +1375,8 @@ router.get('/:id/rating', protect, async (req, res) => {
     try {
         const reservation = await Reservation.findById(req.params.id)
             .select('rating review ratedAt workerId userId')
-            .populate('workerId', 'firstName lastName workerProfile.averageRating');
+            .populate('workerId', 'firstName lastName workerProfile.averageRating')
+            .lean();
 
         if (!reservation) {
             return res.status(404).json({
@@ -1384,7 +1387,7 @@ router.get('/:id/rating', protect, async (req, res) => {
 
         // Vérifier les permissions (client ou worker de cette réservation)
         const isClient = reservation.userId.toString() === req.user.id;
-        const isWorker = reservation.workerId?._id.toString() === req.user.id;
+        const isWorker = reservation.workerId?._id?.toString() === req.user.id;
         const isAdmin = req.user.role === 'admin';
 
         if (!isClient && !isWorker && !isAdmin) {
@@ -1435,7 +1438,8 @@ router.get('/worker/:workerId/reviews', async (req, res) => {
                 .populate('userId', 'firstName lastName')
                 .sort({ ratedAt: -1 })
                 .skip(skip)
-                .limit(parseInt(limit)),
+                .limit(parseInt(limit))
+                .lean(),
             Reservation.countDocuments({
                 workerId: req.params.workerId,
                 rating: { $exists: true, $ne: null },
@@ -1444,7 +1448,8 @@ router.get('/worker/:workerId/reviews', async (req, res) => {
 
         // Récupérer les stats du worker
         const worker = await User.findById(req.params.workerId)
-            .select('firstName lastName workerProfile.averageRating workerProfile.totalRatingsCount');
+            .select('firstName lastName workerProfile.averageRating workerProfile.totalRatingsCount')
+            .lean();
 
         res.status(200).json({
             success: true,
