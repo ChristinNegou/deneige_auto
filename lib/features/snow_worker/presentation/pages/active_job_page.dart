@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../ai_features/presentation/widgets/ai_photo_feedback_dialog.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../chat/presentation/bloc/chat_bloc.dart';
@@ -1564,6 +1565,18 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
               ),
+            );
+            // Afficher l'analyse IA de la photo
+            AIPhotoFeedbackDialog.show(
+              context,
+              reservationId: _currentJob.id,
+              onDismiss: () {
+                // L'utilisateur peut continuer
+              },
+              onRetake: () {
+                // Reprendre une photo si la qualite est insuffisante
+                _takePhoto();
+              },
             );
           }
         },
