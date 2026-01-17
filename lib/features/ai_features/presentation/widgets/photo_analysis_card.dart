@@ -16,6 +16,10 @@ class PhotoAnalysisCard extends StatelessWidget {
   });
 
   Color get _scoreColor {
+    // Si photo suspecte ou pas de véhicule, toujours rouge
+    if (analysis.isSuspiciousPhoto || !analysis.vehicleDetected) {
+      return AppTheme.error;
+    }
     if (analysis.overallScore >= 80) return AppTheme.success;
     if (analysis.overallScore >= 60) return AppTheme.warning;
     return AppTheme.error;
@@ -82,12 +86,79 @@ class PhotoAnalysisCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Indicateur d'issues
-                  if (analysis.hasIssues) ...[
+                  // Badge type véhicule
+                  if (analysis.vehicleDetected) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary.withValues(alpha: 0.1),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusFull),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.directions_car,
+                            size: 12,
+                            color: AppTheme.primary,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            analysis.vehicleTypeLabel,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  // Alerte critique
+                  if (analysis.hasCriticalIssues) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.error.withValues(alpha: 0.1),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusFull),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.error,
+                            size: 12,
+                            color: AppTheme.error,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            'Alerte',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ] else if (analysis.hasIssues) ...[
+                    // Indicateur d'issues (warning)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
                       ),
                       decoration: BoxDecoration(
                         color: AppTheme.warning.withValues(alpha: 0.1),
@@ -99,14 +170,14 @@ class PhotoAnalysisCard extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.warning_amber,
-                            size: 14,
+                            size: 12,
                             color: AppTheme.warning,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 3),
                           Text(
                             '${analysis.issues.length}',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.warning,
                             ),
@@ -114,7 +185,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                   ],
                   // Flèche expand
                   if (onToggleExpand != null)
@@ -137,6 +208,154 @@ class PhotoAnalysisCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Alerte critique si photo suspecte ou pas de véhicule
+                  if (analysis.hasCriticalIssues) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.error.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                        border: Border.all(
+                          color: AppTheme.error.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.error,
+                                size: 18,
+                                color: AppTheme.error,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Problème critique détecté',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.error,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          if (analysis.isSuspiciousPhoto)
+                            Text(
+                              '• Photo suspecte (possible fraude)',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppTheme.error,
+                              ),
+                            ),
+                          if (!analysis.vehicleDetected)
+                            Text(
+                              '• Aucun véhicule détecté',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppTheme.error,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Info véhicule et neige
+                  Row(
+                    children: [
+                      // Type véhicule
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary.withValues(alpha: 0.1),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMD),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.directions_car,
+                                      size: 16, color: AppTheme.primary),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Véhicule',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppTheme.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                analysis.vehicleDetected
+                                    ? analysis.vehicleTypeLabel
+                                    : 'Non détecté',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: analysis.vehicleDetected
+                                      ? AppTheme.primary
+                                      : AppTheme.error,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Profondeur neige
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppTheme.info.withValues(alpha: 0.1),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMD),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.ac_unit,
+                                      size: 16, color: AppTheme.info),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Neige estimée',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppTheme.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                analysis.estimatedSnowDepthCm != null
+                                    ? '~${analysis.estimatedSnowDepthCm} cm'
+                                    : 'N/A',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.info,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
                   // Scores détaillés
                   Row(
                     children: [
