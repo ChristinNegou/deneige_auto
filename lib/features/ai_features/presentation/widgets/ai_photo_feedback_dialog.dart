@@ -160,10 +160,71 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
   Widget _buildResultState(BuildContext context, PhotoAnalysis analysis) {
     final scoreColor = _getScoreColor(analysis.overallScore);
     final isGoodScore = analysis.overallScore >= 70;
+    final hasCriticalAlert =
+        analysis.isSuspiciousPhoto || !analysis.vehicleDetected;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Alerte critique si photo suspecte ou pas de véhicule
+        if (hasCriticalAlert) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              border: Border.all(
+                color: AppTheme.error.withValues(alpha: 0.5),
+                width: 2,
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.warning_rounded,
+                      color: AppTheme.error,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Alerte Photo',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.error,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                if (analysis.isSuspiciousPhoto)
+                  Text(
+                    'Photo suspecte détectée - Veuillez reprendre une photo authentique',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppTheme.error,
+                    ),
+                  ),
+                if (!analysis.vehicleDetected)
+                  Text(
+                    'Aucun véhicule détecté sur la photo',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppTheme.error,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+
         // Score circle
         Stack(
           alignment: Alignment.center,
@@ -228,7 +289,87 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
+
+        // Info véhicule détecté et neige
+        if (analysis.vehicleDetected) ...[
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: [
+              // Badge type véhicule
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                  border: Border.all(
+                    color: AppTheme.primary.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.directions_car,
+                      size: 14,
+                      color: AppTheme.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      analysis.vehicleTypeLabel,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Badge profondeur neige si disponible
+              if (analysis.estimatedSnowDepthCm != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.info.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                    border: Border.all(
+                      color: AppTheme.info.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.ac_unit,
+                        size: 14,
+                        color: AppTheme.info,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '~${analysis.estimatedSnowDepthCm} cm neige',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.info,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
+
         // Summary
         if (analysis.summary.isNotEmpty) ...[
           Container(
