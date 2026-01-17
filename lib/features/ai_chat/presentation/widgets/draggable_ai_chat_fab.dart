@@ -21,10 +21,9 @@ class DraggableAIChatFab extends StatefulWidget {
 
 class _DraggableAIChatFabState extends State<DraggableAIChatFab>
     with SingleTickerProviderStateMixin {
-  // Position du FAB
-  double _xPosition = 0;
-  double _yPosition = 0;
-  bool _isInitialized = false;
+  // Position du FAB (null = utiliser position par défaut)
+  double? _xPosition;
+  double? _yPosition;
   bool _isDragging = false;
 
   // Animation
@@ -48,7 +47,7 @@ class _DraggableAIChatFabState extends State<DraggableAIChatFab>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-    _loadPosition();
+    _loadSavedPosition();
   }
 
   @override
@@ -57,64 +56,49 @@ class _DraggableAIChatFabState extends State<DraggableAIChatFab>
     super.dispose();
   }
 
-  Future<void> _loadPosition() async {
-    // Attendre que le contexte soit prêt
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final savedX = prefs.getDouble(_xPositionKey);
-        final savedY = prefs.getDouble(_yPositionKey);
-
-        if (savedX != null && savedY != null && mounted) {
-          final screenSize = MediaQuery.of(context).size;
-          final padding = MediaQuery.of(context).padding;
-
-          // Valider que la position est dans les limites de l'écran
-          final maxX = screenSize.width - _fabSize - 8;
-          final maxY =
-              screenSize.height - _fabSize - widget.bottomNavHeight - 8;
-          final minY = padding.top + 8;
-
-          if (savedX >= 8 &&
-              savedX <= maxX &&
-              savedY >= minY &&
-              savedY <= maxY) {
-            setState(() {
-              _xPosition = savedX;
-              _yPosition = savedY;
-              _isInitialized = true;
-            });
-          } else {
-            // Position sauvegardée hors limites, utiliser défaut
-            _setDefaultPositionNow();
-          }
-        } else {
-          // Pas de position sauvegardée
-          _setDefaultPositionNow();
-        }
-      } catch (e) {
-        _setDefaultPositionNow();
-      }
-    });
-  }
-
-  void _setDefaultPositionNow() {
-    if (!mounted) return;
-    final screenSize = MediaQuery.of(context).size;
-    setState(() {
-      _xPosition = screenSize.width - _fabSize - 16;
-      _yPosition = screenSize.height - _fabSize - widget.bottomNavHeight - 100;
-      _isInitialized = true;
-    });
-  }
-
-  Future<void> _savePosition() async {
+  Future<void> _loadSavedPosition() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setDouble(_xPositionKey, _xPosition);
-      await prefs.setDouble(_yPositionKey, _yPosition);
+      final savedX = prefs.getDouble(_xPositionKey);
+      final savedY = prefs.getDouble(_yPositionKey);
+
+      if (savedX != null && savedY != null && mounted) {
+        setState(() {
+          _xPosition = savedX;
+          _yPosition = savedY;
+        });
+      }
+    } catch (e) {
+      // Ignorer - on utilisera la position par défaut
+    }
+  }
+
+  // Calcule la position par défaut basée sur la taille de l'écran
+  double _getDefaultX(Size screenSize) {
+    return screenSize.width - _fabSize - 16;
+  }
+
+  double _getDefaultY(Size screenSize) {
+    return screenSize.height - _fabSize - widget.bottomNavHeight - 100;
+  }
+
+  // Valide et retourne une position dans les limites
+  double _getValidX(double x, Size screenSize) {
+    return x.clamp(8.0, screenSize.width - _fabSize - 8);
+  }
+
+  double _getValidY(double y, Size screenSize, EdgeInsets padding) {
+    return y.clamp(
+      padding.top + 8,
+      screenSize.height - _fabSize - widget.bottomNavHeight - 8,
+    );
+  }
+
+  Future<void> _savePosition(double x, double y) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(_xPositionKey, x);
+      await prefs.setDouble(_yPositionKey, y);
     } catch (e) {
       // Ignorer les erreurs de sauvegarde
     }
@@ -125,46 +109,33 @@ class _DraggableAIChatFabState extends State<DraggableAIChatFab>
     _animationController.forward();
   }
 
-  void _onPanUpdate(DragUpdateDetails details) {
-    final screenSize = MediaQuery.of(context).size;
-    final padding = MediaQuery.of(context).padding;
-
+  void _onPanUpdate(
+      DragUpdateDetails details, Size screenSize, EdgeInsets padding) {
     setState(() {
-      _xPosition += details.delta.dx;
-      _yPosition += details.delta.dy;
+      final currentX = _xPosition ?? _getDefaultX(screenSize);
+      final currentY = _yPosition ?? _getDefaultY(screenSize);
 
-      // Limiter aux bords de l'écran
-      _xPosition = _xPosition.clamp(8.0, screenSize.width - _fabSize - 8);
-      _yPosition = _yPosition.clamp(
-        padding.top + 8,
-        screenSize.height - _fabSize - widget.bottomNavHeight - 8,
-      );
+      _xPosition = _getValidX(currentX + details.delta.dx, screenSize);
+      _yPosition = _getValidY(currentY + details.delta.dy, screenSize, padding);
     });
   }
 
-  void _onPanEnd(DragEndDetails details) {
+  void _onPanEnd(DragEndDetails details, Size screenSize, EdgeInsets padding) {
     setState(() => _isDragging = false);
     _animationController.reverse();
-    _savePosition();
 
-    // Snap aux bords (optionnel - pour coller aux côtés)
-    _snapToEdge();
-  }
-
-  void _snapToEdge() {
-    final screenSize = MediaQuery.of(context).size;
+    // Snap aux bords
+    final currentX = _xPosition ?? _getDefaultX(screenSize);
     final centerX = screenSize.width / 2;
+    final newX = (currentX + _fabSize / 2 < centerX)
+        ? 16.0
+        : screenSize.width - _fabSize - 16;
 
     setState(() {
-      // Snap au bord le plus proche (gauche ou droite)
-      if (_xPosition + _fabSize / 2 < centerX) {
-        _xPosition = 16;
-      } else {
-        _xPosition = screenSize.width - _fabSize - 16;
-      }
+      _xPosition = newX;
     });
 
-    _savePosition();
+    _savePosition(newX, _yPosition ?? _getDefaultY(screenSize));
   }
 
   void _openAIChat() {
@@ -175,17 +146,30 @@ class _DraggableAIChatFabState extends State<DraggableAIChatFab>
 
   @override
   Widget build(BuildContext context) {
-    if (!_isInitialized) {
-      return const SizedBox.shrink();
+    final screenSize = MediaQuery.of(context).size;
+    final padding = MediaQuery.of(context).padding;
+
+    // Calculer la position effective
+    double effectiveX;
+    double effectiveY;
+
+    if (_xPosition != null && _yPosition != null) {
+      // Utiliser la position sauvegardée mais la valider
+      effectiveX = _getValidX(_xPosition!, screenSize);
+      effectiveY = _getValidY(_yPosition!, screenSize, padding);
+    } else {
+      // Position par défaut
+      effectiveX = _getDefaultX(screenSize);
+      effectiveY = _getDefaultY(screenSize);
     }
 
     return Positioned(
-      left: _xPosition,
-      top: _yPosition,
+      left: effectiveX,
+      top: effectiveY,
       child: GestureDetector(
         onPanStart: _onPanStart,
-        onPanUpdate: _onPanUpdate,
-        onPanEnd: _onPanEnd,
+        onPanUpdate: (details) => _onPanUpdate(details, screenSize, padding),
+        onPanEnd: (details) => _onPanEnd(details, screenSize, padding),
         onTap: _openAIChat,
         child: AnimatedBuilder(
           animation: _scaleAnimation,
