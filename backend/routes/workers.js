@@ -13,6 +13,7 @@ const { uploadFromBuffer } = require('../config/cloudinary');
 const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, FILE_UPLOAD, GEOLOCATION } = require('../config/constants');
 const { logError, safeNotify } = require('../utils/errorHandler');
 const { locationLimiter, uploadLimiter } = require('../middleware/rateLimiter');
+const smartNotifications = require('../services/smartNotificationService');
 
 // Configure multer with memory storage for Cloudinary uploads
 const upload = multer({
@@ -847,6 +848,9 @@ router.post('/jobs/:id/accept', protect, authorize('snowWorker'), async (req, re
             },
         });
 
+        // Envoyer notification push intelligente
+        await smartNotifications.notifyWorkerAssigned(reservation._id);
+
         console.log(`✅ Worker ${worker.firstName} accepted job ${reservation._id}`);
 
         res.json({
@@ -915,6 +919,9 @@ router.patch('/jobs/:id/en-route', protect, authorize('snowWorker'), async (req,
             },
         });
 
+        // Envoyer notification push intelligente avec ETA
+        await smartNotifications.notifyWorkerEnRoute(reservation._id);
+
         res.json({
             success: true,
             message: 'Statut mis à jour: en route',
@@ -968,6 +975,10 @@ router.patch('/jobs/:id/start', protect, authorize('snowWorker'), async (req, re
             reservationId: reservation._id,
             workerId: req.user.id,
         });
+
+        // Envoyer notifications push intelligentes (arrivé + travail commencé)
+        await smartNotifications.notifyWorkerArrived(reservation._id);
+        await smartNotifications.notifyJobStarted(reservation._id);
 
         res.json({
             success: true,
@@ -1047,6 +1058,12 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
                 totalPrice: reservation.totalPrice,
             },
         });
+
+        // Envoyer notification push intelligente avec durée réelle
+        const actualDuration = reservation.startedAt
+            ? Math.round((reservation.completedAt - reservation.startedAt) / 60000)
+            : null;
+        await smartNotifications.notifyJobCompleted(reservation._id, actualDuration);
 
         console.log(`✅ Job ${reservation._id} completed by worker ${worker.firstName}`);
 

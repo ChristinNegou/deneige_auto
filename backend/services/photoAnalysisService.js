@@ -38,6 +38,18 @@ async function imageUrlToBase64(url) {
 }
 
 /**
+ * Types de véhicules supportés
+ */
+const VEHICLE_TYPES = {
+  SEDAN: 'sedan',
+  SUV: 'suv',
+  TRUCK: 'truck',
+  COMPACT: 'compact',
+  MINIVAN: 'minivan',
+  UNKNOWN: 'unknown',
+};
+
+/**
  * Construit le prompt d'analyse pour Claude Vision
  */
 function buildAnalysisPrompt(photoType, hasBeforeAfter) {
@@ -46,16 +58,26 @@ function buildAnalysisPrompt(photoType, hasBeforeAfter) {
 
 Analyse ces photos AVANT et APRÈS le déneigement d'un véhicule et évalue:
 
-1. **Qualité du déneigement** (0-100):
+1. **Type de véhicule** (IMPORTANT):
+   - sedan (berline, voiture standard)
+   - compact (petite voiture)
+   - suv (VUS, crossover)
+   - truck (camion, pickup)
+   - minivan (fourgonnette)
+   - unknown (si impossible à déterminer)
+
+2. **Qualité du déneigement** (0-100):
    - La neige a-t-elle été correctement enlevée du véhicule?
    - Les vitres sont-elles bien dégagées?
    - Le toit, capot et coffre sont-ils dégagés?
 
-2. **Complétude du travail** (0-100):
+3. **Complétude du travail** (0-100):
    - Toutes les zones visibles ont-elles été traitées?
    - Y a-t-il des zones oubliées?
 
-3. **Problèmes détectés** (liste):
+4. **Estimation neige** (cm approximatif visible sur le véhicule AVANT)
+
+5. **Problèmes détectés** (liste):
    - neige_residuelle
    - vitres_non_degagees
    - toit_non_degage
@@ -63,17 +85,23 @@ Analyse ces photos AVANT et APRÈS le déneigement d'un véhicule et évalue:
    - photo_sombre
    - vehicule_different
    - travail_incomplet
+   - pas_de_vehicule (CRITIQUE: aucun véhicule visible)
+   - photo_fake (image suspecte/générée)
 
-4. **Résumé** (2-3 phrases en français québécois)
+6. **Résumé** (2-3 phrases en français québécois)
 
 Réponds en JSON avec ce format exact:
 {
+  "vehicleType": "sedan",
+  "vehicleDetected": true,
+  "estimatedSnowDepthCm": 15,
   "qualityScore": 85,
   "completenessScore": 90,
   "issues": ["neige_residuelle"],
   "summary": "Le déneigement est bien fait dans l'ensemble...",
   "beforePhotoQuality": "good",
-  "afterPhotoQuality": "good"
+  "afterPhotoQuality": "good",
+  "isSuspiciousPhoto": false
 }`;
   }
 
@@ -81,14 +109,29 @@ Réponds en JSON avec ce format exact:
 
 Analyse cette photo ${photoType === 'after' ? 'APRÈS' : 'AVANT'} déneigement et évalue:
 
-1. **Qualité de la photo** (good/average/poor)
-2. **Observations** sur l'état du véhicule
-3. **Problèmes potentiels** détectés
+1. **Type de véhicule**:
+   - sedan (berline), compact, suv (VUS), truck (pickup), minivan, unknown
+
+2. **Véhicule détecté**: true/false (CRITIQUE: y a-t-il vraiment un véhicule?)
+
+3. **Qualité de la photo** (good/average/poor)
+
+4. **Estimation neige** (cm approximatif si photo AVANT)
+
+5. **Observations** sur l'état du véhicule
+
+6. **Photo suspecte**: true/false (image fake, générée, ou inappropriée)
+
+7. **Problèmes potentiels** détectés
 
 Réponds en JSON:
 {
+  "vehicleType": "sedan",
+  "vehicleDetected": true,
+  "estimatedSnowDepthCm": 10,
   "photoQuality": "good",
   "observations": "Description de ce qu'on voit...",
+  "isSuspiciousPhoto": false,
   "issues": []
 }`;
 }
@@ -205,12 +248,16 @@ async function analyzeJobPhotos(reservationId) {
 
     // Construire le résultat final
     const result = {
+      vehicleType: analysis.vehicleType || 'unknown',
+      vehicleDetected: analysis.vehicleDetected !== false,
+      estimatedSnowDepthCm: analysis.estimatedSnowDepthCm || null,
       qualityScore: analysis.qualityScore || 0,
       completenessScore: analysis.completenessScore || 0,
       issues: analysis.issues || [],
       summary: analysis.summary || '',
       beforePhotoQuality: analysis.beforePhotoQuality || null,
       afterPhotoQuality: analysis.afterPhotoQuality || null,
+      isSuspiciousPhoto: analysis.isSuspiciousPhoto || false,
       photosAnalyzed: {
         before: beforePhotos.length,
         after: afterPhotos.length,
@@ -219,12 +266,17 @@ async function analyzeJobPhotos(reservationId) {
       modelVersion: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
     };
 
-    // Mettre à jour la réservation
+    // Mettre à jour la réservation avec toutes les infos IA
     await Reservation.findByIdAndUpdate(reservationId, {
       $set: {
         aiPhotoAnalysis: result,
         'qualityVerification.aiQualityScore': result.qualityScore,
         'qualityVerification.photoIssues': result.issues,
+        'qualityVerification.vehicleType': result.vehicleType,
+        'qualityVerification.vehicleDetected': result.vehicleDetected,
+        'qualityVerification.isSuspiciousPhoto': result.isSuspiciousPhoto,
+        // Mettre à jour l'estimation de neige si détectée par l'IA
+        ...(result.estimatedSnowDepthCm && { 'aiEstimatedSnowDepthCm': result.estimatedSnowDepthCm }),
       },
     });
 
@@ -375,4 +427,5 @@ module.exports = {
   analyzeJobPhotos,
   analyzePhoto,
   verifyVehicleConsistency,
+  VEHICLE_TYPES,
 };

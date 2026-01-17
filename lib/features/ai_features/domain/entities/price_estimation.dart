@@ -7,6 +7,7 @@ class PriceEstimation {
   final PriceRange priceRange;
   final PriceMultipliers multipliers;
   final List<PriceAdjustment> adjustments;
+  final TimeEstimation? timeEstimation;
   final String? reasoning;
   final DateTime calculatedAt;
 
@@ -18,6 +19,7 @@ class PriceEstimation {
     required this.priceRange,
     required this.multipliers,
     required this.adjustments,
+    this.timeEstimation,
     this.reasoning,
     required this.calculatedAt,
   });
@@ -36,6 +38,10 @@ class PriceEstimation {
               ?.map((e) => PriceAdjustment.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      timeEstimation: json['timeEstimation'] != null
+          ? TimeEstimation.fromJson(
+              json['timeEstimation'] as Map<String, dynamic>)
+          : null,
       reasoning: json['reasoning'] as String?,
       calculatedAt: json['calculatedAt'] != null
           ? DateTime.parse(json['calculatedAt'] as String)
@@ -49,6 +55,100 @@ class PriceEstimation {
   /// Total des majorations
   double get totalAdjustments =>
       adjustments.fold(0, (sum, adj) => sum + adj.amount);
+
+  /// Vérifie si l'estimation de temps est disponible
+  bool get hasTimeEstimation => timeEstimation != null;
+}
+
+/// Estimation du temps de déneigement
+class TimeEstimation {
+  final int estimatedMinutes;
+  final TimeRange timeRange;
+  final TimeBreakdown breakdown;
+
+  const TimeEstimation({
+    required this.estimatedMinutes,
+    required this.timeRange,
+    required this.breakdown,
+  });
+
+  factory TimeEstimation.fromJson(Map<String, dynamic> json) {
+    return TimeEstimation(
+      estimatedMinutes: (json['estimatedMinutes'] as num?)?.toInt() ?? 10,
+      timeRange:
+          TimeRange.fromJson(json['timeRange'] as Map<String, dynamic>? ?? {}),
+      breakdown: TimeBreakdown.fromJson(
+          json['breakdown'] as Map<String, dynamic>? ?? {}),
+    );
+  }
+
+  /// Formatte le temps estimé pour l'affichage
+  String get formattedTime {
+    if (estimatedMinutes < 60) {
+      return '$estimatedMinutes min';
+    }
+    final hours = estimatedMinutes ~/ 60;
+    final mins = estimatedMinutes % 60;
+    return mins > 0 ? '${hours}h ${mins}min' : '${hours}h';
+  }
+
+  /// Formatte la fourchette de temps
+  String get formattedRange => '${timeRange.min}-${timeRange.max} min';
+}
+
+class TimeRange {
+  final int min;
+  final int max;
+
+  const TimeRange({required this.min, required this.max});
+
+  factory TimeRange.fromJson(Map<String, dynamic> json) {
+    return TimeRange(
+      min: (json['min'] as num?)?.toInt() ?? 8,
+      max: (json['max'] as num?)?.toInt() ?? 15,
+    );
+  }
+}
+
+class TimeBreakdown {
+  final int baseTime;
+  final double snowMultiplier;
+  final int optionsTime;
+  final String vehicleType;
+
+  const TimeBreakdown({
+    required this.baseTime,
+    required this.snowMultiplier,
+    required this.optionsTime,
+    required this.vehicleType,
+  });
+
+  factory TimeBreakdown.fromJson(Map<String, dynamic> json) {
+    return TimeBreakdown(
+      baseTime: (json['baseTime'] as num?)?.toInt() ?? 10,
+      snowMultiplier: (json['snowMultiplier'] as num?)?.toDouble() ?? 1.0,
+      optionsTime: (json['optionsTime'] as num?)?.toInt() ?? 0,
+      vehicleType: json['vehicleType'] as String? ?? 'unknown',
+    );
+  }
+
+  /// Label du type de véhicule en français
+  String get vehicleTypeLabel {
+    switch (vehicleType) {
+      case 'compact':
+        return 'Compacte';
+      case 'sedan':
+        return 'Berline';
+      case 'suv':
+        return 'VUS';
+      case 'truck':
+        return 'Camion';
+      case 'minivan':
+        return 'Fourgonnette';
+      default:
+        return 'Véhicule';
+    }
+  }
 }
 
 class PriceTaxes {

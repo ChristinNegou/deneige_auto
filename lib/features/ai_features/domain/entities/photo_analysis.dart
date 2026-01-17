@@ -1,22 +1,30 @@
 /// Analyse IA des photos de job
 class PhotoAnalysis {
+  final String vehicleType;
+  final bool vehicleDetected;
+  final int? estimatedSnowDepthCm;
   final int qualityScore;
   final int completenessScore;
   final List<String> issues;
   final String summary;
   final String? beforePhotoQuality;
   final String? afterPhotoQuality;
+  final bool isSuspiciousPhoto;
   final PhotosAnalyzedCount photosAnalyzed;
   final DateTime analyzedAt;
   final String modelVersion;
 
   const PhotoAnalysis({
+    required this.vehicleType,
+    required this.vehicleDetected,
+    this.estimatedSnowDepthCm,
     required this.qualityScore,
     required this.completenessScore,
     required this.issues,
     required this.summary,
     this.beforePhotoQuality,
     this.afterPhotoQuality,
+    required this.isSuspiciousPhoto,
     required this.photosAnalyzed,
     required this.analyzedAt,
     required this.modelVersion,
@@ -24,6 +32,9 @@ class PhotoAnalysis {
 
   factory PhotoAnalysis.fromJson(Map<String, dynamic> json) {
     return PhotoAnalysis(
+      vehicleType: json['vehicleType'] as String? ?? 'unknown',
+      vehicleDetected: json['vehicleDetected'] as bool? ?? true,
+      estimatedSnowDepthCm: (json['estimatedSnowDepthCm'] as num?)?.toInt(),
       qualityScore: (json['qualityScore'] as num?)?.toInt() ?? 0,
       completenessScore: (json['completenessScore'] as num?)?.toInt() ?? 0,
       issues: (json['issues'] as List<dynamic>?)
@@ -33,6 +44,7 @@ class PhotoAnalysis {
       summary: json['summary'] as String? ?? '',
       beforePhotoQuality: json['beforePhotoQuality'] as String?,
       afterPhotoQuality: json['afterPhotoQuality'] as String?,
+      isSuspiciousPhoto: json['isSuspiciousPhoto'] as bool? ?? false,
       photosAnalyzed: PhotosAnalyzedCount.fromJson(
           json['photosAnalyzed'] as Map<String, dynamic>? ?? {}),
       analyzedAt: json['analyzedAt'] != null
@@ -83,11 +95,43 @@ class PhotoAnalysis {
           return 'Véhicule différent détecté';
         case 'travail_incomplet':
           return 'Travail incomplet';
+        case 'pas_de_vehicule':
+          return 'Aucun véhicule détecté';
+        case 'photo_fake':
+          return 'Photo suspecte détectée';
         default:
           return issue;
       }
     }).toList();
   }
+
+  /// Label du type de véhicule
+  String get vehicleTypeLabel {
+    switch (vehicleType) {
+      case 'compact':
+        return 'Compacte';
+      case 'sedan':
+        return 'Berline';
+      case 'suv':
+        return 'VUS';
+      case 'truck':
+        return 'Camion';
+      case 'minivan':
+        return 'Fourgonnette';
+      default:
+        return 'Véhicule';
+    }
+  }
+
+  /// Vérifie si la photo est valide (véhicule détecté et pas suspecte)
+  bool get isValidPhoto => vehicleDetected && !isSuspiciousPhoto;
+
+  /// Vérifie si des alertes critiques existent
+  bool get hasCriticalIssues =>
+      !vehicleDetected ||
+      isSuspiciousPhoto ||
+      issues.contains('pas_de_vehicule') ||
+      issues.contains('photo_fake');
 }
 
 class PhotosAnalyzedCount {

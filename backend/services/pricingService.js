@@ -38,6 +38,78 @@ const BASE_PRICING = {
 };
 
 /**
+ * Temps de base par type de véhicule (en minutes)
+ */
+const BASE_TIME_BY_VEHICLE = {
+  compact: 8,
+  sedan: 10,
+  suv: 14,
+  truck: 16,
+  minivan: 15,
+  unknown: 12, // Valeur par défaut
+};
+
+/**
+ * Temps additionnel par option (en minutes)
+ */
+const TIME_PER_OPTION = {
+  windowScraping: 3,
+  doorDeicing: 2,
+  wheelClearance: 4,
+};
+
+/**
+ * Calcule le temps estimé de déneigement
+ * @param {Object} params - Paramètres
+ * @returns {Object} - Estimation du temps
+ */
+function calculateEstimatedTime(params) {
+  const {
+    vehicleType = 'unknown',
+    snowDepthCm = 0,
+    serviceOptions = [],
+  } = params;
+
+  // Temps de base selon le véhicule
+  let baseTime = BASE_TIME_BY_VEHICLE[vehicleType] || BASE_TIME_BY_VEHICLE.unknown;
+
+  // Multiplicateur neige (chaque 5cm au-delà de 5cm ajoute 20%)
+  let snowMultiplier = 1.0;
+  if (snowDepthCm > 5) {
+    const extraCm = snowDepthCm - 5;
+    snowMultiplier = 1 + (Math.floor(extraCm / 5) * 0.2);
+  }
+
+  // Temps pour les options
+  let optionsTime = 0;
+  for (const option of serviceOptions) {
+    if (TIME_PER_OPTION[option]) {
+      optionsTime += TIME_PER_OPTION[option];
+    }
+  }
+
+  // Calcul final
+  const estimatedMinutes = Math.round(baseTime * snowMultiplier + optionsTime);
+
+  // Fourchette (±20%)
+  const timeRange = {
+    min: Math.round(estimatedMinutes * 0.8),
+    max: Math.round(estimatedMinutes * 1.2),
+  };
+
+  return {
+    estimatedMinutes,
+    timeRange,
+    breakdown: {
+      baseTime,
+      snowMultiplier: Math.round(snowMultiplier * 100) / 100,
+      optionsTime,
+      vehicleType,
+    },
+  };
+}
+
+/**
  * Calcule le prix de base avec options
  */
 function calculateBasePrice(serviceOptions = [], snowDepthCm = 0) {
@@ -187,7 +259,7 @@ Donne un bref commentaire sur ce prix et si des ajustements seraient recommandé
 /**
  * Estime le prix pour une réservation
  * @param {Object} params - Paramètres de la réservation
- * @returns {Object} - Estimation détaillée du prix
+ * @returns {Object} - Estimation détaillée du prix et du temps
  */
 async function estimatePrice(params) {
   const {
@@ -197,6 +269,7 @@ async function estimatePrice(params) {
     weatherCondition = '',
     location = null,
     distanceKm = 0,
+    vehicleType = 'unknown',
   } = params;
 
   // 1. Prix de base
@@ -263,7 +336,14 @@ async function estimatePrice(params) {
     });
   }
 
-  // 8. Obtenir le raisonnement IA (optionnel)
+  // 8. Calculer l'estimation du temps
+  const timeEstimation = calculateEstimatedTime({
+    vehicleType,
+    snowDepthCm,
+    serviceOptions,
+  });
+
+  // 9. Obtenir le raisonnement IA (optionnel)
   const reasoning = await getAIReasoning(
     {
       serviceOptions,
@@ -275,6 +355,8 @@ async function estimatePrice(params) {
       weatherMultiplier,
       demandMultiplier,
       locationMultiplier,
+      vehicleType,
+      estimatedMinutes: timeEstimation.estimatedMinutes,
     },
     totalPrice
   );
@@ -296,6 +378,12 @@ async function estimatePrice(params) {
       total: Math.round(totalMultiplier * 100) / 100,
     },
     adjustments,
+    // Nouvelle section: estimation du temps
+    timeEstimation: {
+      estimatedMinutes: timeEstimation.estimatedMinutes,
+      timeRange: timeEstimation.timeRange,
+      breakdown: timeEstimation.breakdown,
+    },
     reasoning,
     calculatedAt: new Date(),
   };
@@ -338,5 +426,8 @@ module.exports = {
   calculateUrgencyMultiplier,
   calculateWeatherMultiplier,
   calculateLocationMultiplier,
+  calculateEstimatedTime,
   BASE_PRICING,
+  BASE_TIME_BY_VEHICLE,
+  TIME_PER_OPTION,
 };
