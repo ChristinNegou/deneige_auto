@@ -4,14 +4,12 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// FAB déplaçable pour le chatbot IA
-/// Peut être glissé n'importe où sur l'écran et mémorise sa position
+/// Utilise un Overlay pour être positionné au-dessus de tout
 class DraggableAIChatFab extends StatefulWidget {
-  final double bottomNavHeight;
   final String screenId;
 
   const DraggableAIChatFab({
     super.key,
-    this.bottomNavHeight = 80,
     this.screenId = 'default',
   });
 
@@ -19,204 +17,107 @@ class DraggableAIChatFab extends StatefulWidget {
   State<DraggableAIChatFab> createState() => _DraggableAIChatFabState();
 }
 
-class _DraggableAIChatFabState extends State<DraggableAIChatFab>
-    with SingleTickerProviderStateMixin {
-  // Position du FAB (null = utiliser position par défaut)
-  double? _xPosition;
-  double? _yPosition;
-  bool _isDragging = false;
-
-  // Animation
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
+class _DraggableAIChatFabState extends State<DraggableAIChatFab> {
+  // Position du FAB
+  Offset _position = Offset.zero;
+  bool _isPositionLoaded = false;
 
   // Taille du FAB
   static const double _fabSize = 56;
 
-  // Clés pour SharedPreferences (dynamiques par écran)
-  String get _xPositionKey => 'ai_chat_fab_x_${widget.screenId}';
-  String get _yPositionKey => 'ai_chat_fab_y_${widget.screenId}';
+  // Clés pour SharedPreferences
+  String get _xKey => 'ai_fab_x_${widget.screenId}';
+  String get _yKey => 'ai_fab_y_${widget.screenId}';
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-    _loadSavedPosition();
+    _loadPosition();
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadSavedPosition() async {
+  Future<void> _loadPosition() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final savedX = prefs.getDouble(_xPositionKey);
-      final savedY = prefs.getDouble(_yPositionKey);
-
-      if (savedX != null && savedY != null && mounted) {
+      final x = prefs.getDouble(_xKey);
+      final y = prefs.getDouble(_yKey);
+      if (x != null && y != null && mounted) {
         setState(() {
-          _xPosition = savedX;
-          _yPosition = savedY;
+          _position = Offset(x, y);
+          _isPositionLoaded = true;
         });
       }
-    } catch (e) {
-      // Ignorer - on utilisera la position par défaut
-    }
+    } catch (_) {}
   }
 
-  // Calcule la position par défaut basée sur la taille de l'écran
-  double _getDefaultX(Size screenSize) {
-    return screenSize.width - _fabSize - 16;
-  }
-
-  double _getDefaultY(Size screenSize) {
-    return screenSize.height - _fabSize - widget.bottomNavHeight - 100;
-  }
-
-  // Valide et retourne une position dans les limites
-  double _getValidX(double x, Size screenSize) {
-    return x.clamp(8.0, screenSize.width - _fabSize - 8);
-  }
-
-  double _getValidY(double y, Size screenSize, EdgeInsets padding) {
-    return y.clamp(
-      padding.top + 8,
-      screenSize.height - _fabSize - widget.bottomNavHeight - 8,
-    );
-  }
-
-  Future<void> _savePosition(double x, double y) async {
+  Future<void> _savePosition() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setDouble(_xPositionKey, x);
-      await prefs.setDouble(_yPositionKey, y);
-    } catch (e) {
-      // Ignorer les erreurs de sauvegarde
-    }
-  }
-
-  void _onPanStart(DragStartDetails details) {
-    setState(() => _isDragging = true);
-    _animationController.forward();
-  }
-
-  void _onPanUpdate(
-      DragUpdateDetails details, Size screenSize, EdgeInsets padding) {
-    setState(() {
-      final currentX = _xPosition ?? _getDefaultX(screenSize);
-      final currentY = _yPosition ?? _getDefaultY(screenSize);
-
-      _xPosition = _getValidX(currentX + details.delta.dx, screenSize);
-      _yPosition = _getValidY(currentY + details.delta.dy, screenSize, padding);
-    });
-  }
-
-  void _onPanEnd(DragEndDetails details, Size screenSize, EdgeInsets padding) {
-    setState(() => _isDragging = false);
-    _animationController.reverse();
-
-    // Snap aux bords
-    final currentX = _xPosition ?? _getDefaultX(screenSize);
-    final centerX = screenSize.width / 2;
-    final newX = (currentX + _fabSize / 2 < centerX)
-        ? 16.0
-        : screenSize.width - _fabSize - 16;
-
-    setState(() {
-      _xPosition = newX;
-    });
-
-    _savePosition(newX, _yPosition ?? _getDefaultY(screenSize));
-  }
-
-  void _openAIChat() {
-    if (!_isDragging) {
-      Navigator.pushNamed(context, AppRoutes.aiChat);
-    }
+      await prefs.setDouble(_xKey, _position.dx);
+      await prefs.setDouble(_yKey, _position.dy);
+    } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     final padding = MediaQuery.of(context).padding;
 
-    // Calculer la position effective
-    double effectiveX;
-    double effectiveY;
-
-    if (_xPosition != null && _yPosition != null) {
-      // Utiliser la position sauvegardée mais la valider
-      effectiveX = _getValidX(_xPosition!, screenSize);
-      effectiveY = _getValidY(_yPosition!, screenSize, padding);
-    } else {
-      // Position par défaut
-      effectiveX = _getDefaultX(screenSize);
-      effectiveY = _getDefaultY(screenSize);
+    // Position par défaut en bas à droite
+    if (!_isPositionLoaded) {
+      _position = Offset(
+        size.width - _fabSize - 20,
+        size.height - _fabSize - padding.bottom - 100,
+      );
     }
 
+    // Assurer que la position est dans les limites
+    final minX = 10.0;
+    final maxX = size.width - _fabSize - 10;
+    final minY = padding.top + 10;
+    final maxY = size.height - _fabSize - padding.bottom - 10;
+
+    final clampedX = _position.dx.clamp(minX, maxX);
+    final clampedY = _position.dy.clamp(minY, maxY);
+
     return Positioned(
-      left: effectiveX,
-      top: effectiveY,
+      left: clampedX,
+      top: clampedY,
       child: GestureDetector(
-        onPanStart: _onPanStart,
-        onPanUpdate: (details) => _onPanUpdate(details, screenSize, padding),
-        onPanEnd: (details) => _onPanEnd(details, screenSize, padding),
-        onTap: _openAIChat,
-        child: AnimatedBuilder(
-          animation: _scaleAnimation,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: child,
+        onPanUpdate: (details) {
+          setState(() {
+            _position = Offset(
+              (_position.dx + details.delta.dx).clamp(minX, maxX),
+              (_position.dy + details.delta.dy).clamp(minY, maxY),
             );
-          },
+          });
+        },
+        onPanEnd: (_) {
+          // Snap au bord le plus proche
+          final centerX = size.width / 2;
+          setState(() {
+            if (_position.dx + _fabSize / 2 < centerX) {
+              _position = Offset(20, _position.dy);
+            } else {
+              _position = Offset(size.width - _fabSize - 20, _position.dy);
+            }
+          });
+          _savePosition();
+        },
+        onTap: () => Navigator.pushNamed(context, AppRoutes.aiChat),
+        child: Material(
+          elevation: 6,
+          borderRadius: BorderRadius.circular(16),
+          color: AppTheme.primary2,
           child: Container(
             width: _fabSize,
             height: _fabSize,
             decoration: BoxDecoration(
-              color: AppTheme.primary2,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primary2.withValues(alpha: 0.4),
-                  blurRadius: _isDragging ? 16 : 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Icône principale
-                const Icon(
-                  Icons.smart_toy,
-                  color: AppTheme.background,
-                  size: 28,
-                ),
-                // Indicateur de drag (petit point)
-                if (_isDragging)
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: AppTheme.background.withValues(alpha: 0.7),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-              ],
+            child: const Icon(
+              Icons.smart_toy,
+              color: Colors.white,
+              size: 28,
             ),
           ),
         ),
@@ -225,24 +126,146 @@ class _DraggableAIChatFabState extends State<DraggableAIChatFab>
   }
 }
 
-/// Widget helper pour utiliser le FAB dans un Stack
-class DraggableAIChatFabOverlay extends StatelessWidget {
+/// Widget simple pour ajouter le FAB IA à n'importe quel écran
+/// Wrap ton Scaffold body avec ce widget
+class AIChatFabWrapper extends StatefulWidget {
   final Widget child;
-  final double bottomNavHeight;
+  final String screenId;
 
-  const DraggableAIChatFabOverlay({
+  const AIChatFabWrapper({
     super.key,
     required this.child,
-    this.bottomNavHeight = 80,
+    this.screenId = 'default',
   });
 
   @override
+  State<AIChatFabWrapper> createState() => _AIChatFabWrapperState();
+}
+
+class _AIChatFabWrapperState extends State<AIChatFabWrapper> {
+  Offset _position = Offset.zero;
+  bool _initialized = false;
+  bool _isDragging = false;
+
+  static const double _fabSize = 56;
+
+  String get _xKey => 'ai_fab_x_${widget.screenId}';
+  String get _yKey => 'ai_fab_y_${widget.screenId}';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPosition();
+  }
+
+  Future<void> _loadPosition() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final x = prefs.getDouble(_xKey);
+      final y = prefs.getDouble(_yKey);
+      if (x != null && y != null && mounted) {
+        setState(() {
+          _position = Offset(x, y);
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _savePosition() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(_xKey, _position.dx);
+      await prefs.setDouble(_yKey, _position.dy);
+    } catch (_) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        child,
-        DraggableAIChatFab(bottomNavHeight: bottomNavHeight),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = Size(constraints.maxWidth, constraints.maxHeight);
+
+        // Initialiser la position par défaut
+        if (!_initialized) {
+          _position = Offset(
+            size.width - _fabSize - 20,
+            size.height - _fabSize - 100,
+          );
+          _initialized = true;
+        }
+
+        // Limites
+        final minX = 10.0;
+        final maxX = size.width - _fabSize - 10;
+        final minY = 10.0;
+        final maxY = size.height - _fabSize - 10;
+
+        final clampedX = _position.dx.clamp(minX, maxX);
+        final clampedY = _position.dy.clamp(minY, maxY);
+
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            widget.child,
+            Positioned(
+              left: clampedX,
+              top: clampedY,
+              child: GestureDetector(
+                onPanStart: (_) => setState(() => _isDragging = true),
+                onPanUpdate: (details) {
+                  setState(() {
+                    _position = Offset(
+                      (_position.dx + details.delta.dx).clamp(minX, maxX),
+                      (_position.dy + details.delta.dy).clamp(minY, maxY),
+                    );
+                  });
+                },
+                onPanEnd: (_) {
+                  setState(() => _isDragging = false);
+                  // Snap au bord
+                  final centerX = size.width / 2;
+                  setState(() {
+                    if (_position.dx + _fabSize / 2 < centerX) {
+                      _position = Offset(20, _position.dy);
+                    } else {
+                      _position =
+                          Offset(size.width - _fabSize - 20, _position.dy);
+                    }
+                  });
+                  _savePosition();
+                },
+                onTap: () {
+                  if (!_isDragging) {
+                    Navigator.pushNamed(context, AppRoutes.aiChat);
+                  }
+                },
+                child: AnimatedScale(
+                  scale: _isDragging ? 1.1 : 1.0,
+                  duration: const Duration(milliseconds: 150),
+                  child: Material(
+                    elevation: _isDragging ? 12 : 6,
+                    borderRadius: BorderRadius.circular(16),
+                    color: AppTheme.primary2,
+                    shadowColor: AppTheme.primary2.withValues(alpha: 0.4),
+                    child: Container(
+                      width: _fabSize,
+                      height: _fabSize,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.smart_toy,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

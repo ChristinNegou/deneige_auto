@@ -210,53 +210,47 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: AppTheme.background,
-        body: Stack(
-          children: [
-            SafeArea(
-              child: BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  if (state is AuthAuthenticated) {
-                    return BlocListener<reservation_bloc.ReservationListBloc,
-                        reservation_bloc.ReservationListState>(
-                      listener: (context, state) {
-                        _checkForCompletedReservations(state.reservations);
-                      },
-                      child: CustomScrollView(
-                        slivers: [
-                          // Header compact
-                          SliverToBoxAdapter(
-                            child: _buildHeader(context, state.user.name),
+        body: AIChatFabWrapper(
+          screenId: 'client_dashboard',
+          child: SafeArea(
+            child: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is AuthAuthenticated) {
+                  return BlocListener<reservation_bloc.ReservationListBloc,
+                      reservation_bloc.ReservationListState>(
+                    listener: (context, state) {
+                      _checkForCompletedReservations(state.reservations);
+                    },
+                    child: CustomScrollView(
+                      slivers: [
+                        // Header compact
+                        SliverToBoxAdapter(
+                          child: _buildHeader(context, state.user.name),
+                        ),
+                        // Contenu principal
+                        SliverPadding(
+                          padding: const EdgeInsets.all(AppTheme.paddingLG),
+                          sliver: SliverList(
+                            delegate: SliverChildListDelegate([
+                              // Live tracking (si actif)
+                              _buildLiveTrackingSection(),
+                              // Actions rapides
+                              _buildQuickActions(context),
+                              const SizedBox(height: 24),
+                              // Prochaines réservations
+                              _buildUpcomingSection(context),
+                              const SizedBox(height: 80),
+                            ]),
                           ),
-                          // Contenu principal
-                          SliverPadding(
-                            padding: const EdgeInsets.all(AppTheme.paddingLG),
-                            sliver: SliverList(
-                              delegate: SliverChildListDelegate([
-                                // Live tracking (si actif)
-                                _buildLiveTrackingSection(),
-                                // Actions rapides
-                                _buildQuickActions(context),
-                                const SizedBox(height: 24),
-                                // Prochaines réservations
-                                _buildUpcomingSection(context),
-                                const SizedBox(height: 80),
-                              ]),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                },
-              ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
             ),
-            // FAB IA déplaçable
-            const DraggableAIChatFab(
-              bottomNavHeight: 90,
-              screenId: 'client_dashboard',
-            ),
-          ],
+          ),
         ),
         bottomNavigationBar: _buildBottomNav(context),
       ),
