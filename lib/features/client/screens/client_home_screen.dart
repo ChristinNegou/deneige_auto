@@ -20,6 +20,7 @@ import '../../reservation/presentation/bloc/reservation_list_bloc.dart'
 import '../../widgets/service_completed_dialog.dart';
 import '../../chat/presentation/bloc/chat_bloc.dart';
 import '../../chat/presentation/pages/chat_screen.dart';
+import '../../ai_chat/presentation/widgets/draggable_ai_chat_fab.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -209,64 +210,52 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: AppTheme.background,
-        body: SafeArea(
-          child: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is AuthAuthenticated) {
-                return BlocListener<reservation_bloc.ReservationListBloc,
-                    reservation_bloc.ReservationListState>(
-                  listener: (context, state) {
-                    _checkForCompletedReservations(state.reservations);
-                  },
-                  child: CustomScrollView(
-                    slivers: [
-                      // Header compact
-                      SliverToBoxAdapter(
-                        child: _buildHeader(context, state.user.name),
+        body: Stack(
+          children: [
+            SafeArea(
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthAuthenticated) {
+                    return BlocListener<reservation_bloc.ReservationListBloc,
+                        reservation_bloc.ReservationListState>(
+                      listener: (context, state) {
+                        _checkForCompletedReservations(state.reservations);
+                      },
+                      child: CustomScrollView(
+                        slivers: [
+                          // Header compact
+                          SliverToBoxAdapter(
+                            child: _buildHeader(context, state.user.name),
+                          ),
+                          // Contenu principal
+                          SliverPadding(
+                            padding: const EdgeInsets.all(AppTheme.paddingLG),
+                            sliver: SliverList(
+                              delegate: SliverChildListDelegate([
+                                // Live tracking (si actif)
+                                _buildLiveTrackingSection(),
+                                // Actions rapides
+                                _buildQuickActions(context),
+                                const SizedBox(height: 24),
+                                // Prochaines réservations
+                                _buildUpcomingSection(context),
+                                const SizedBox(height: 80),
+                              ]),
+                            ),
+                          ),
+                        ],
                       ),
-                      // Contenu principal
-                      SliverPadding(
-                        padding: const EdgeInsets.all(AppTheme.paddingLG),
-                        sliver: SliverList(
-                          delegate: SliverChildListDelegate([
-                            // Live tracking (si actif)
-                            _buildLiveTrackingSection(),
-                            // Actions rapides
-                            _buildQuickActions(context),
-                            const SizedBox(height: 24),
-                            // Prochaines réservations
-                            _buildUpcomingSection(context),
-                            const SizedBox(height: 80),
-                          ]),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return const Center(child: CircularProgressIndicator());
-            },
-          ),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ),
+            // FAB IA déplaçable
+            const DraggableAIChatFab(bottomNavHeight: 90),
+          ],
         ),
         bottomNavigationBar: _buildBottomNav(context),
-        floatingActionButton: _buildAIChatFab(context),
-      ),
-    );
-  }
-
-  Widget _buildAIChatFab(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 70),
-      child: FloatingActionButton(
-        heroTag: 'ai_chat_fab',
-        onPressed: () => Navigator.pushNamed(context, AppRoutes.aiChat),
-        backgroundColor: AppTheme.primary2,
-        elevation: 4,
-        child: const Icon(
-          Icons.smart_toy,
-          color: AppTheme.background,
-          size: 26,
-        ),
       ),
     );
   }
