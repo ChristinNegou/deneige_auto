@@ -103,9 +103,9 @@ const welcomeMessages = [
 ];
 
 /**
- * Suggestions d'actions rapides
+ * Suggestions d'actions rapides pour les clients
  */
-const quickActions = [
+const clientQuickActions = [
     {
         id: 'create_reservation',
         label: 'Créer une réservation',
@@ -132,6 +132,52 @@ const quickActions = [
         prompt: "J'ai besoin de parler à un humain du support."
     }
 ];
+
+/**
+ * Suggestions d'actions rapides pour les déneigeurs
+ */
+const workerQuickActions = [
+    {
+        id: 'view_available_jobs',
+        label: 'Jobs disponibles',
+        prompt: "Montre-moi les jobs de déneigement disponibles près de moi."
+    },
+    {
+        id: 'my_earnings',
+        label: 'Mes revenus',
+        prompt: "Quel est le résumé de mes revenus cette semaine?"
+    },
+    {
+        id: 'payment_info',
+        label: 'Mes paiements',
+        prompt: "Quand vais-je recevoir mon prochain paiement?"
+    },
+    {
+        id: 'tips_optimize',
+        label: 'Conseils pour gagner plus',
+        prompt: "Donne-moi des conseils pour maximiser mes revenus en tant que déneigeur."
+    },
+    {
+        id: 'contact_support',
+        label: 'Contacter le support',
+        prompt: "J'ai besoin de parler à un humain du support."
+    }
+];
+
+/**
+ * Retourne les actions rapides en fonction du rôle
+ * @param {string} role - Rôle de l'utilisateur (client, snowWorker, admin)
+ * @returns {Array} Liste des actions rapides
+ */
+const getQuickActionsForRole = (role) => {
+    if (role === 'snowWorker') {
+        return workerQuickActions;
+    }
+    return clientQuickActions;
+};
+
+// Pour la rétrocompatibilité
+const quickActions = clientQuickActions;
 
 /**
  * Convertit un statut en libellé français
@@ -204,6 +250,9 @@ module.exports = {
     buildUserContext,
     welcomeMessages,
     quickActions,
+    clientQuickActions,
+    workerQuickActions,
+    getQuickActionsForRole,
     getStatusLabel,
     formatDateTime
 };

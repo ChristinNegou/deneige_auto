@@ -25,7 +25,6 @@ import '../../features/support/presentation/pages/help_support_page.dart';
 import '../../features/support/presentation/pages/worker_help_support_page.dart';
 import '../../features/ai_chat/presentation/pages/ai_chat_page.dart';
 import '../../features/ai_chat/presentation/bloc/ai_chat_bloc.dart';
-import '../../features/snow_worker/presentation/pages/snowworker_dashboard_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_job_details_page.dart';
 import '../../features/snow_worker/presentation/pages/active_job_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_history_page.dart';
@@ -284,12 +283,6 @@ class AppRouter {
         );
 
       // Routes déneigeur
-      case AppRoutes.snowWorkerDashboard:
-        return MaterialPageRoute(
-          builder: (_) => const SnowWorkerDashboardPage(),
-          settings: settings,
-        );
-
       case AppRoutes.jobsList:
         return MaterialPageRoute(
           builder: (_) => const JobsListPage(),

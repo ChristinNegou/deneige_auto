@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
@@ -35,6 +37,43 @@ class WorkerMainDashboard extends StatefulWidget {
 class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
   int _currentIndex = 0;
 
+  // FAB draggable state
+  double? _fabX;
+  double? _fabY;
+  bool _isDragging = false;
+  static const double _fabSize = 56;
+  static const String _fabXKey = 'worker_ai_fab_x';
+  static const String _fabYKey = 'worker_ai_fab_y';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFabPosition();
+  }
+
+  Future<void> _loadFabPosition() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final x = prefs.getDouble(_fabXKey);
+      final y = prefs.getDouble(_fabYKey);
+      if (mounted && x != null && y != null) {
+        setState(() {
+          _fabX = x;
+          _fabY = y;
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _saveFabPosition() async {
+    if (_fabX == null || _fabY == null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(_fabXKey, _fabX!);
+      await prefs.setDouble(_fabYKey, _fabY!);
+    } catch (_) {}
+  }
+
   void _switchToTab(int index) {
     if (index >= 0 && index < _pages.length && _currentIndex != index) {
       HapticFeedback.lightImpact();
@@ -65,11 +104,92 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
       ],
       child: Scaffold(
         backgroundColor: AppTheme.background,
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _pages,
+        body: Stack(
+          children: [
+            IndexedStack(
+              index: _currentIndex,
+              children: _pages,
+            ),
+            _buildDraggableFab(context),
+          ],
         ),
         bottomNavigationBar: _buildBottomNavBar(),
+      ),
+    );
+  }
+
+  Widget _buildDraggableFab(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final bottomPadding = mediaQuery.padding.bottom;
+    final topPadding = mediaQuery.padding.top;
+
+    const minX = 10.0;
+    final maxX = screenWidth - _fabSize - 10;
+    final minY = topPadding + 10;
+    final maxY =
+        screenHeight - _fabSize - bottomPadding - 140; // Above bottom nav
+
+    final currentX = _fabX ?? (screenWidth - _fabSize - 20);
+    final currentY = _fabY ?? (screenHeight - _fabSize - bottomPadding - 160);
+
+    final clampedX = currentX.clamp(minX, maxX);
+    final clampedY = currentY.clamp(minY, maxY);
+
+    return Positioned(
+      left: clampedX,
+      top: clampedY,
+      child: GestureDetector(
+        onPanStart: (_) => setState(() => _isDragging = true),
+        onPanUpdate: (details) {
+          setState(() {
+            _fabX = ((_fabX ?? currentX) + details.delta.dx).clamp(minX, maxX);
+            _fabY = ((_fabY ?? currentY) + details.delta.dy).clamp(minY, maxY);
+          });
+        },
+        onPanEnd: (_) {
+          setState(() => _isDragging = false);
+          // Snap to nearest edge
+          final centerX = screenWidth / 2;
+          setState(() {
+            if ((_fabX ?? currentX) + _fabSize / 2 < centerX) {
+              _fabX = 20;
+            } else {
+              _fabX = screenWidth - _fabSize - 20;
+            }
+          });
+          _saveFabPosition();
+        },
+        onTap: () {
+          if (!_isDragging) {
+            Navigator.pushNamed(context, AppRoutes.aiChat);
+          }
+        },
+        child: AnimatedScale(
+          scale: _isDragging ? 1.1 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          child: Container(
+            width: _fabSize,
+            height: _fabSize,
+            decoration: BoxDecoration(
+              color: AppTheme.primary2,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primary2.withValues(alpha: 0.4),
+                  blurRadius: _isDragging ? 16 : 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.smart_toy,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -62,7 +62,6 @@ class AppRoutes {
   static const String aiChat = '/ai-chat';
 
   // Routes déneigeur
-  static const String snowWorkerDashboard = '/snow-worker/dashboard';
   static const String jobsList = '/snow-worker/jobs';
   static const String jobDetails = '/snow-worker/jobs/details';
   static const String workerJobDetails = '/snow-worker/jobs/details';
