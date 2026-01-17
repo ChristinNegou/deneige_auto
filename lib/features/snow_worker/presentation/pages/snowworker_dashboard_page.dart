@@ -73,6 +73,7 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
 
     return Scaffold(
       backgroundColor: AppTheme.background,
+      floatingActionButton: _buildAIChatFab(context),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _onRefresh,
@@ -1114,5 +1115,19 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
       case JobStatus.cancelled:
         return Icons.cancel_rounded;
     }
+  }
+
+  Widget _buildAIChatFab(BuildContext context) {
+    return FloatingActionButton(
+      heroTag: 'ai_chat_fab_worker',
+      onPressed: () => Navigator.pushNamed(context, AppRoutes.aiChat),
+      backgroundColor: AppTheme.secondary,
+      elevation: 4,
+      child: const Icon(
+        Icons.smart_toy,
+        color: AppTheme.background,
+        size: 26,
+      ),
+    );
   }
 }

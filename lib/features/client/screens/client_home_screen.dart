@@ -249,6 +249,24 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           ),
         ),
         bottomNavigationBar: _buildBottomNav(context),
+        floatingActionButton: _buildAIChatFab(context),
+      ),
+    );
+  }
+
+  Widget _buildAIChatFab(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 70),
+      child: FloatingActionButton(
+        heroTag: 'ai_chat_fab',
+        onPressed: () => Navigator.pushNamed(context, AppRoutes.aiChat),
+        backgroundColor: AppTheme.primary2,
+        elevation: 4,
+        child: const Icon(
+          Icons.smart_toy,
+          color: AppTheme.background,
+          size: 26,
+        ),
       ),
     );
   }

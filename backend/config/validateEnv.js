@@ -124,6 +124,18 @@ const requiredEnvVars = {
       return null;
     },
   },
+
+  // Anthropic (Claude AI)
+  ANTHROPIC_API_KEY: {
+    required: false,
+    description: 'Clé API Anthropic pour l\'assistant IA Claude',
+    validate: (value) => {
+      if (value && !value.startsWith('sk-ant-')) {
+        return 'ANTHROPIC_API_KEY doit commencer par sk-ant-';
+      }
+      return null;
+    },
+  },
 };
 
 const optionalEnvVars = [

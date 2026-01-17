@@ -236,6 +236,15 @@ class AdminDashboardPage extends StatelessWidget {
               );
             },
           ),
+          _buildDrawerItem(
+            context,
+            icon: Icons.smart_toy,
+            title: 'Intelligence IA',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, AppRoutes.adminAI);
+            },
+          ),
           const Divider(),
           _buildDrawerItem(
             context,

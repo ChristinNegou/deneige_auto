@@ -180,6 +180,9 @@ app.use('/api/messages', require('./routes/messages'));
 app.use('/api/support', require('./routes/support'));
 app.use('/api/disputes', require('./routes/disputes'));
 app.use('/api/webhooks', require('./routes/webhooks'));
+app.use('/api/ai-chat', require('./routes/aiChat'));
+app.use('/api/ai', require('./routes/aiFeatures'));
+
 // ✅ Route pour la page de réinitialisation
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));

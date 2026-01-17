@@ -83,6 +83,19 @@ import '../../features/chat/data/repositories/chat_repository_impl.dart';
 import '../../features/chat/domain/repositories/chat_repository.dart';
 import '../../features/chat/presentation/bloc/chat_bloc.dart';
 
+// AI Chat
+import '../../features/ai_chat/data/datasources/ai_chat_remote_datasource.dart';
+import '../../features/ai_chat/data/repositories/ai_chat_repository_impl.dart';
+import '../../features/ai_chat/domain/repositories/ai_chat_repository.dart';
+import '../../features/ai_chat/domain/usecases/send_ai_message_usecase.dart';
+import '../../features/ai_chat/presentation/bloc/ai_chat_bloc.dart';
+
+// AI Features
+import '../../features/ai_features/data/datasources/ai_features_remote_datasource.dart';
+import '../../features/ai_features/data/repositories/ai_features_repository_impl.dart';
+import '../../features/ai_features/domain/repositories/ai_features_repository.dart';
+import '../../features/ai_features/presentation/bloc/ai_features_bloc.dart';
+
 // Snow Worker
 import '../../features/snow_worker/data/datasources/worker_remote_datasource.dart';
 import '../../features/snow_worker/data/repositories/worker_repository_impl.dart';
@@ -376,4 +389,32 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => SupportBloc(
         submitSupportRequest: sl(),
       ));
+
+  // =============== AI CHAT ===============
+  sl.registerLazySingleton<AIChatRemoteDataSource>(
+    () => AIChatRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<AIChatRepository>(
+    () => AIChatRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => SendAIMessageUseCase(sl()));
+  sl.registerLazySingleton(() => CreateConversationUseCase(sl()));
+  sl.registerLazySingleton(() => GetConversationsUseCase(sl()));
+  sl.registerLazySingleton(() => GetAIStatusUseCase(sl()));
+  sl.registerFactory(() => AIChatBloc(
+        repository: sl(),
+        sendAIMessage: sl(),
+        createConversation: sl(),
+        getConversations: sl(),
+        getAIStatus: sl(),
+      ));
+
+  // =============== AI FEATURES ===============
+  sl.registerLazySingleton<AIFeaturesRemoteDataSource>(
+    () => AIFeaturesRemoteDataSource(),
+  );
+  sl.registerLazySingleton<AIFeaturesRepository>(
+    () => AIFeaturesRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerFactory(() => AIFeaturesBloc(repository: sl()));
 }

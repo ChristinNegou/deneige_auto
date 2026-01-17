@@ -59,6 +59,7 @@ class AppRoutes {
 
   // Routes de chat
   static const String chat = '/chat';
+  static const String aiChat = '/ai-chat';
 
   // Routes déneigeur
   static const String snowWorkerDashboard = '/snow-worker/dashboard';
@@ -84,4 +85,5 @@ class AppRoutes {
   static const String adminReports = '/admin/reports';
   static const String adminSupport = '/admin/support';
   static const String adminStripeAccounts = '/admin/stripe-accounts';
+  static const String adminAI = '/admin/ai';
 }

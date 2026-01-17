@@ -1,0 +1,412 @@
+import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../domain/entities/photo_analysis.dart';
+
+/// Widget pour afficher les résultats d'analyse de photos IA
+class PhotoAnalysisCard extends StatelessWidget {
+  final PhotoAnalysis analysis;
+  final bool isExpanded;
+  final VoidCallback? onToggleExpand;
+
+  const PhotoAnalysisCard({
+    super.key,
+    required this.analysis,
+    this.isExpanded = false,
+    this.onToggleExpand,
+  });
+
+  Color get _scoreColor {
+    if (analysis.overallScore >= 80) return AppTheme.success;
+    if (analysis.overallScore >= 60) return AppTheme.warning;
+    return AppTheme.error;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        boxShadow: AppTheme.shadowSM,
+        border: Border.all(
+          color: _scoreColor.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header avec score
+          InkWell(
+            onTap: onToggleExpand,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Score circulaire
+                  _buildScoreCircle(),
+                  const SizedBox(width: 16),
+                  // Infos
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.smart_toy,
+                              size: 16,
+                              color: AppTheme.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            const Text(
+                              'Analyse IA',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          analysis.scoreLabel,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _scoreColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Indicateur d'issues
+                  if (analysis.hasIssues) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.warning.withValues(alpha: 0.1),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusFull),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.warning_amber,
+                            size: 14,
+                            color: AppTheme.warning,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${analysis.issues.length}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.warning,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  // Flèche expand
+                  if (onToggleExpand != null)
+                    Icon(
+                      isExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: AppTheme.textTertiary,
+                    ),
+                ],
+              ),
+            ),
+          ),
+
+          // Contenu détaillé
+          if (isExpanded) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Scores détaillés
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildScoreItem(
+                          'Qualité',
+                          analysis.qualityScore,
+                          Icons.high_quality,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildScoreItem(
+                          'Complétude',
+                          analysis.completenessScore,
+                          Icons.check_circle_outline,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Résumé IA
+                  if (analysis.summary.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.background,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.summarize,
+                                size: 14,
+                                color: AppTheme.textSecondary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Résumé',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            analysis.summary,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.textPrimary,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  // Issues détectées
+                  if (analysis.hasIssues) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'Problèmes détectés',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...analysis.issuesLabels.map(
+                      (issue) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: AppTheme.warning,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                issue,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  // Infos photos analysées
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.photo_library_outlined,
+                        size: 14,
+                        color: AppTheme.textTertiary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${analysis.photosAnalyzed.total} photos analysées',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.textTertiary,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        'Analysé le ${_formatDate(analysis.analyzedAt)}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.textTertiary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreCircle() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox(
+          width: 56,
+          height: 56,
+          child: CircularProgressIndicator(
+            value: analysis.overallScore / 100,
+            strokeWidth: 4,
+            backgroundColor: _scoreColor.withValues(alpha: 0.2),
+            valueColor: AlwaysStoppedAnimation<Color>(_scoreColor),
+          ),
+        ),
+        Text(
+          '${analysis.overallScore}',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: _scoreColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScoreItem(String label, int score, IconData icon) {
+    final color = score >= 80
+        ? AppTheme.success
+        : (score >= 60 ? AppTheme.warning : AppTheme.error);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                '$score',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+              Text(
+                '/100',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.textTertiary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+/// Widget compact pour afficher le score d'analyse
+class PhotoAnalysisBadge extends StatelessWidget {
+  final int score;
+  final VoidCallback? onTap;
+
+  const PhotoAnalysisBadge({
+    super.key,
+    required this.score,
+    this.onTap,
+  });
+
+  Color get _color {
+    if (score >= 80) return AppTheme.success;
+    if (score >= 60) return AppTheme.warning;
+    return AppTheme.error;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: _color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+          border: Border.all(color: _color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.smart_toy, size: 14, color: _color),
+            const SizedBox(width: 6),
+            Text(
+              '$score%',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: _color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

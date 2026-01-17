@@ -301,6 +301,62 @@ const disputeSchema = new mongoose.Schema({
         processedAt: Date,
     },
 
+    // Analyse IA du litige
+    aiAnalysis: {
+        evidenceStrength: {
+            type: Number,
+            min: 0,
+            max: 100,
+        },
+        recommendedDecision: {
+            type: String,
+            enum: [
+                'favor_claimant',
+                'favor_respondent',
+                'partial_refund',
+                'full_refund',
+                'warning_only',
+                'no_action',
+                'investigation_required',
+            ],
+        },
+        confidence: {
+            type: Number,
+            min: 0,
+            max: 1,
+        },
+        reasoning: String,
+        riskFactors: [String],
+        suggestedRefundPercent: {
+            type: Number,
+            min: 0,
+            max: 100,
+        },
+        suggestedPenalty: {
+            type: String,
+            enum: ['none', 'warning', 'suspension_24h', 'suspension_3days', 'suspension_7days', 'suspension_permanent', 'fee_deduction'],
+        },
+        keyFindings: [{
+            category: String,
+            finding: String,
+            impact: {
+                type: String,
+                enum: ['favorable_claimant', 'favorable_respondent', 'neutral'],
+            },
+        }],
+        analyzedAt: Date,
+        reviewedByAdmin: {
+            type: Boolean,
+            default: false,
+        },
+        reviewedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        reviewedAt: Date,
+        adminDecision: String,
+    },
+
 }, {
     timestamps: true,
 });

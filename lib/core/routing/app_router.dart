@@ -23,6 +23,8 @@ import '../../features/settings/presentation/pages/privacy_policy_page.dart';
 import '../../features/settings/presentation/pages/terms_of_service_page.dart';
 import '../../features/support/presentation/pages/help_support_page.dart';
 import '../../features/support/presentation/pages/worker_help_support_page.dart';
+import '../../features/ai_chat/presentation/pages/ai_chat_page.dart';
+import '../../features/ai_chat/presentation/bloc/ai_chat_bloc.dart';
 import '../../features/snow_worker/presentation/pages/snowworker_dashboard_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_job_details_page.dart';
 import '../../features/snow_worker/presentation/pages/active_job_page.dart';
@@ -54,6 +56,7 @@ import '../../features/admin/presentation/pages/admin_workers_page.dart';
 import '../../features/admin/presentation/pages/admin_reports_page.dart';
 import '../../features/admin/presentation/pages/admin_support_page.dart';
 import '../../features/admin/presentation/pages/admin_stripe_accounts_page.dart';
+import '../../features/admin/presentation/pages/admin_ai_page.dart';
 import '../../features/admin/presentation/bloc/admin_bloc.dart';
 import '../../features/admin/presentation/bloc/admin_event.dart';
 
@@ -246,6 +249,15 @@ class AppRouter {
           settings: settings,
         );
 
+      case AppRoutes.aiChat:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AIChatBloc>(),
+            child: const AIChatPage(),
+          ),
+          settings: settings,
+        );
+
       case AppRoutes.notifications:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -398,6 +410,12 @@ class AppRouter {
       case AppRoutes.adminStripeAccounts:
         return MaterialPageRoute(
           builder: (_) => const AdminStripeAccountsPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.adminAI:
+        return MaterialPageRoute(
+          builder: (_) => const AdminAIPage(),
           settings: settings,
         );
 

@@ -432,6 +432,84 @@ const reservationSchema = new mongoose.Schema({
         reviewedAt: Date,
         reviewNotes: String,
     },
+
+    // ============================================
+    // CHAMPS IA
+    // ============================================
+
+    // Analyse IA des photos
+    aiPhotoAnalysis: {
+        qualityScore: {
+            type: Number,
+            min: 0,
+            max: 100,
+        },
+        completenessScore: {
+            type: Number,
+            min: 0,
+            max: 100,
+        },
+        issues: [String],
+        summary: String,
+        beforePhotoQuality: String,
+        afterPhotoQuality: String,
+        photosAnalyzed: {
+            before: Number,
+            after: Number,
+        },
+        analyzedAt: Date,
+        modelVersion: String,
+    },
+
+    // Détails du matching intelligent
+    matchDetails: {
+        suggestedWorkers: [{
+            workerId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            },
+            workerName: String,
+            score: Number,
+            ranking: Number,
+            factors: {
+                distance: { value: Number, score: Number },
+                availability: { value: Number, score: Number },
+                rating: { value: Number, score: Number },
+                equipment: { value: Boolean, score: Number },
+                experience: { value: Number, score: Number },
+                specialization: { value: Number, score: Number },
+            },
+            distanceKm: Number,
+        }],
+        matchedAt: Date,
+        autoAssigned: {
+            type: Boolean,
+            default: false,
+        },
+        reasoning: String,
+    },
+
+    // Pricing dynamique IA
+    pricing: {
+        basePrice: Number,
+        snowMultiplier: Number,
+        urgencyMultiplier: Number,
+        demandMultiplier: Number,
+        locationMultiplier: Number,
+        calculatedPrice: Number,
+        suggestedPrice: Number,
+        priceRange: {
+            min: Number,
+            max: Number,
+        },
+        reasoning: String,
+        clientAcceptedPrice: Number,
+        adjustments: [{
+            type: { type: String },
+            amount: Number,
+            reason: String,
+        }],
+    },
 }, {
     timestamps: true,
 });
