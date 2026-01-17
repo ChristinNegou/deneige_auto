@@ -74,65 +74,59 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
 
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _onRefresh,
-              color: AppTheme.primary,
-              backgroundColor: AppTheme.surface,
-              strokeWidth: 2.5,
-              displacement: 60,
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: _buildHeader(context),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.all(AppTheme.paddingLG),
-                    sliver: BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
-                      builder: (context, state) {
-                        if (state is WorkerJobsLoading) {
-                          return const SliverToBoxAdapter(
-                            child: DashboardSkeleton(),
-                          );
-                        }
-
-                        return SliverList(
-                          delegate: SliverChildListDelegate([
-                            FadeSlideTransition(
-                              index: 0,
-                              child: _buildStatsSection(context),
-                            ),
-                            const SizedBox(height: 24),
-                            FadeSlideTransition(
-                              index: 1,
-                              child: _buildCurrentJobSection(context),
-                            ),
-                            const SizedBox(height: 24),
-                            FadeSlideTransition(
-                              index: 2,
-                              child: _buildQuickActions(context),
-                            ),
-                            const SizedBox(height: 100),
-                          ]),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+      body: AIChatFabWrapper(
+        screenId: 'worker_dashboard',
+        child: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: _onRefresh,
+            color: AppTheme.primary,
+            backgroundColor: AppTheme.surface,
+            strokeWidth: 2.5,
+            displacement: 60,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
               ),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _buildHeader(context),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.all(AppTheme.paddingLG),
+                  sliver: BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
+                    builder: (context, state) {
+                      if (state is WorkerJobsLoading) {
+                        return const SliverToBoxAdapter(
+                          child: DashboardSkeleton(),
+                        );
+                      }
+
+                      return SliverList(
+                        delegate: SliverChildListDelegate([
+                          FadeSlideTransition(
+                            index: 0,
+                            child: _buildStatsSection(context),
+                          ),
+                          const SizedBox(height: 24),
+                          FadeSlideTransition(
+                            index: 1,
+                            child: _buildCurrentJobSection(context),
+                          ),
+                          const SizedBox(height: 24),
+                          FadeSlideTransition(
+                            index: 2,
+                            child: _buildQuickActions(context),
+                          ),
+                          const SizedBox(height: 100),
+                        ]),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-          // FAB IA déplaçable
-          const DraggableAIChatFab(
-            bottomNavHeight: 20,
-            screenId: 'worker_dashboard',
-          ),
-        ],
+        ),
       ),
     );
   }
