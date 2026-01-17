@@ -166,6 +166,7 @@ class _AIChatFabWrapperState extends State<AIChatFabWrapper> {
       if (x != null && y != null && mounted) {
         setState(() {
           _position = Offset(x, y);
+          _initialized = true;
         });
       }
     } catch (_) {}
