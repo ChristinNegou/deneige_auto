@@ -128,7 +128,10 @@ class _SnowWorkerDashboardViewState extends State<_SnowWorkerDashboardView>
             ),
           ),
           // FAB IA déplaçable
-          const DraggableAIChatFab(bottomNavHeight: 20),
+          const DraggableAIChatFab(
+            bottomNavHeight: 20,
+            screenId: 'worker_dashboard',
+          ),
         ],
       ),
     );

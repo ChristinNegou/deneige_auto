@@ -252,7 +252,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               ),
             ),
             // FAB IA déplaçable
-            const DraggableAIChatFab(bottomNavHeight: 90),
+            const DraggableAIChatFab(
+              bottomNavHeight: 90,
+              screenId: 'client_dashboard',
+            ),
           ],
         ),
         bottomNavigationBar: _buildBottomNav(context),
