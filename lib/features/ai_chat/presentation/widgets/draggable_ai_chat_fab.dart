@@ -7,10 +7,12 @@ import '../../../../core/theme/app_theme.dart';
 /// Peut être glissé n'importe où sur l'écran et mémorise sa position
 class DraggableAIChatFab extends StatefulWidget {
   final double bottomNavHeight;
+  final String screenId;
 
   const DraggableAIChatFab({
     super.key,
     this.bottomNavHeight = 80,
+    this.screenId = 'default',
   });
 
   @override
@@ -29,12 +31,12 @@ class _DraggableAIChatFabState extends State<DraggableAIChatFab>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
-  // Clés pour SharedPreferences
-  static const String _xPositionKey = 'ai_chat_fab_x';
-  static const String _yPositionKey = 'ai_chat_fab_y';
-
   // Taille du FAB
   static const double _fabSize = 56;
+
+  // Clés pour SharedPreferences (dynamiques par écran)
+  String get _xPositionKey => 'ai_chat_fab_x_${widget.screenId}';
+  String get _yPositionKey => 'ai_chat_fab_y_${widget.screenId}';
 
   @override
   void initState() {
@@ -56,37 +58,55 @@ class _DraggableAIChatFabState extends State<DraggableAIChatFab>
   }
 
   Future<void> _loadPosition() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final savedX = prefs.getDouble(_xPositionKey);
-      final savedY = prefs.getDouble(_yPositionKey);
+    // Attendre que le contexte soit prêt
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
 
-      if (savedX != null && savedY != null) {
-        setState(() {
-          _xPosition = savedX;
-          _yPosition = savedY;
-          _isInitialized = true;
-        });
-      } else {
-        // Position par défaut (en bas à droite)
-        _setDefaultPosition();
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final savedX = prefs.getDouble(_xPositionKey);
+        final savedY = prefs.getDouble(_yPositionKey);
+
+        if (savedX != null && savedY != null && mounted) {
+          final screenSize = MediaQuery.of(context).size;
+          final padding = MediaQuery.of(context).padding;
+
+          // Valider que la position est dans les limites de l'écran
+          final maxX = screenSize.width - _fabSize - 8;
+          final maxY =
+              screenSize.height - _fabSize - widget.bottomNavHeight - 8;
+          final minY = padding.top + 8;
+
+          if (savedX >= 8 &&
+              savedX <= maxX &&
+              savedY >= minY &&
+              savedY <= maxY) {
+            setState(() {
+              _xPosition = savedX;
+              _yPosition = savedY;
+              _isInitialized = true;
+            });
+          } else {
+            // Position sauvegardée hors limites, utiliser défaut
+            _setDefaultPositionNow();
+          }
+        } else {
+          // Pas de position sauvegardée
+          _setDefaultPositionNow();
+        }
+      } catch (e) {
+        _setDefaultPositionNow();
       }
-    } catch (e) {
-      _setDefaultPosition();
-    }
+    });
   }
 
-  void _setDefaultPosition() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        final screenSize = MediaQuery.of(context).size;
-        setState(() {
-          _xPosition = screenSize.width - _fabSize - 16;
-          _yPosition =
-              screenSize.height - _fabSize - widget.bottomNavHeight - 100;
-          _isInitialized = true;
-        });
-      }
+  void _setDefaultPositionNow() {
+    if (!mounted) return;
+    final screenSize = MediaQuery.of(context).size;
+    setState(() {
+      _xPosition = screenSize.width - _fabSize - 16;
+      _yPosition = screenSize.height - _fabSize - widget.bottomNavHeight - 100;
+      _isInitialized = true;
     });
   }
 
