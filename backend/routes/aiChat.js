@@ -10,7 +10,7 @@ const AIChatConversation = require('../models/AIChatConversation');
 const Vehicle = require('../models/Vehicle');
 const Reservation = require('../models/Reservation');
 const { generateResponse, generateStreamingResponse, isClaudeConfigured, isAIEnabled } = require('../services/claudeService');
-const { buildUserContext, welcomeMessages, quickActions } = require('../config/aiPrompts');
+const { buildUserContext, welcomeMessages, getQuickActionsForRole } = require('../config/aiPrompts');
 
 // Rate limiter spécifique pour le chat IA
 const aiChatLimiter = rateLimit({
@@ -45,7 +45,7 @@ router.get('/status', protect, (req, res) => {
         success: true,
         enabled: isAIEnabled(),
         configured: isClaudeConfigured(),
-        quickActions: quickActions
+        quickActions: getQuickActionsForRole(req.user.role)
     });
 });
 
@@ -115,7 +115,7 @@ router.post('/conversations', protect, checkAIEnabled, async (req, res) => {
                 messages: conversation.messages,
                 createdAt: conversation.createdAt
             },
-            quickActions: quickActions
+            quickActions: getQuickActionsForRole(req.user.role)
         });
     } catch (error) {
         console.error('Erreur création conversation IA:', error);
