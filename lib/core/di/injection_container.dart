@@ -96,6 +96,10 @@ import '../../features/ai_features/data/repositories/ai_features_repository_impl
 import '../../features/ai_features/domain/repositories/ai_features_repository.dart';
 import '../../features/ai_features/presentation/bloc/ai_features_bloc.dart';
 
+// Verification
+import '../../features/verification/data/datasources/verification_remote_datasource.dart';
+import '../../features/verification/presentation/bloc/verification_bloc.dart';
+
 // Snow Worker
 import '../../features/snow_worker/data/datasources/worker_remote_datasource.dart';
 import '../../features/snow_worker/data/repositories/worker_repository_impl.dart';
@@ -184,6 +188,9 @@ Future<void> initializeDependencies() async {
   );
   sl.registerLazySingleton<ChatRemoteDataSource>(
     () => ChatRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<VerificationRemoteDatasource>(
+    () => VerificationRemoteDatasourceImpl(dio: sl()),
   );
 
   //! Repositories
@@ -355,6 +362,11 @@ Future<void> initializeDependencies() async {
   // Admin BLoC
   sl.registerFactory(() => AdminBloc(
         repository: sl(),
+      ));
+
+  // Verification BLoC
+  sl.registerFactory(() => VerificationBloc(
+        remoteDatasource: sl(),
       ));
 
   sl.registerFactory(() => ChatBloc(

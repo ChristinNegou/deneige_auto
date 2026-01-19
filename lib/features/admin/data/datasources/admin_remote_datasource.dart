@@ -35,6 +35,19 @@ abstract class AdminRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   });
+
+  // Identity Verification
+  Future<Map<String, dynamic>> getVerifications(
+      {int page, int limit, String? status, String? search});
+  Future<Map<String, dynamic>> getVerificationStats();
+  Future<Map<String, dynamic>> getVerificationDetails(String userId);
+  Future<void> submitVerificationDecision(
+    String userId, {
+    required String decision,
+    String? reason,
+    String? notes,
+  });
+  Future<Map<String, dynamic>> reanalyzeVerification(String userId);
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
@@ -211,5 +224,60 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       data: data,
     );
     return StripeSyncResult.fromJson(response.data);
+  }
+
+  // =============== IDENTITY VERIFICATION ===============
+
+  @override
+  Future<Map<String, dynamic>> getVerifications({
+    int page = 1,
+    int limit = 20,
+    String? status,
+    String? search,
+  }) async {
+    final queryParams = <String, dynamic>{
+      'page': page,
+      'limit': limit,
+    };
+    if (status != null) queryParams['status'] = status;
+    if (search != null) queryParams['search'] = search;
+
+    final response = await dio.get(
+      '/admin/verifications',
+      queryParameters: queryParams,
+    );
+    return response.data;
+  }
+
+  @override
+  Future<Map<String, dynamic>> getVerificationStats() async {
+    final response = await dio.get('/admin/verifications/stats');
+    return response.data;
+  }
+
+  @override
+  Future<Map<String, dynamic>> getVerificationDetails(String userId) async {
+    final response = await dio.get('/admin/verifications/$userId');
+    return response.data;
+  }
+
+  @override
+  Future<void> submitVerificationDecision(
+    String userId, {
+    required String decision,
+    String? reason,
+    String? notes,
+  }) async {
+    await dio.post('/admin/verifications/$userId/decision', data: {
+      'decision': decision,
+      if (reason != null) 'reason': reason,
+      if (notes != null) 'notes': notes,
+    });
+  }
+
+  @override
+  Future<Map<String, dynamic>> reanalyzeVerification(String userId) async {
+    final response = await dio.post('/admin/verifications/$userId/reanalyze');
+    return response.data;
   }
 }

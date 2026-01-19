@@ -72,6 +72,8 @@ class AppRoutes {
   static const String workerPaymentSetup = '/snow-worker/payment-setup';
   static const String workerBankAccounts = '/snow-worker/bank-accounts';
   static const String workerHelpSupport = '/snow-worker/help-support';
+  static const String identityVerification =
+      '/snow-worker/identity-verification';
 
   //Routes pour le dashboard client
   static const String clientHome = '/client-home';
@@ -93,4 +95,5 @@ class AppRoutes {
   static const String adminSupport = '/admin/support';
   static const String adminStripeAccounts = '/admin/stripe-accounts';
   static const String adminAI = '/admin/ai';
+  static const String adminVerifications = '/admin/verifications';
 }

@@ -189,6 +189,15 @@ class AdminDashboardPage extends StatelessWidget {
           ),
           _buildDrawerItem(
             context,
+            icon: Icons.verified_user,
+            title: 'Vérifications',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, AppRoutes.adminVerifications);
+            },
+          ),
+          _buildDrawerItem(
+            context,
             icon: Icons.account_balance_wallet,
             title: 'Comptes Stripe',
             onTap: () {

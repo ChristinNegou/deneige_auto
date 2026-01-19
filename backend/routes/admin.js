@@ -2098,10 +2098,24 @@ router.get('/verifications', protect, adminOnly, async (req, res) => {
             verification: {
                 status: worker.workerProfile?.identityVerification?.status || 'not_submitted',
                 submittedAt: worker.workerProfile?.identityVerification?.submittedAt,
+                documents: worker.workerProfile?.identityVerification?.documents ? {
+                    idFront: worker.workerProfile.identityVerification.documents.idFront?.url ? {
+                        url: worker.workerProfile.identityVerification.documents.idFront.url,
+                    } : null,
+                    idBack: worker.workerProfile.identityVerification.documents.idBack?.url ? {
+                        url: worker.workerProfile.identityVerification.documents.idBack.url,
+                    } : null,
+                    selfie: worker.workerProfile.identityVerification.documents.selfie?.url ? {
+                        url: worker.workerProfile.identityVerification.documents.selfie.url,
+                    } : null,
+                } : null,
                 aiAnalysis: worker.workerProfile?.identityVerification?.aiAnalysis ? {
                     overallScore: worker.workerProfile.identityVerification.aiAnalysis.overallScore,
                     faceMatchScore: worker.workerProfile.identityVerification.aiAnalysis.faceMatchScore,
+                    documentAuthenticityScore: worker.workerProfile.identityVerification.aiAnalysis.documentAuthenticityScore,
+                    livenessScore: worker.workerProfile.identityVerification.aiAnalysis.livenessScore,
                     issues: worker.workerProfile.identityVerification.aiAnalysis.issues,
+                    extractedData: worker.workerProfile.identityVerification.aiAnalysis.extractedData,
                 } : null,
                 decision: worker.workerProfile?.identityVerification?.decision,
                 attemptsCount: worker.workerProfile?.identityVerification?.attemptsCount || 0,
@@ -2262,6 +2276,68 @@ router.post('/verifications/:userId/decision', protect, adminOnly, async (req, r
         });
     } catch (error) {
         console.error('Error processing verification decision:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || getErrorMessage(error),
+        });
+    }
+});
+
+/**
+ * @route   POST /api/admin/verifications/:userId/reanalyze
+ * @desc    Re-trigger AI analysis for a pending verification
+ * @access  Private (Admin only)
+ */
+router.post('/verifications/:userId/reanalyze', protect, adminOnly, async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID utilisateur invalide',
+            });
+        }
+
+        // Check user exists and has pending verification with documents
+        const worker = await User.findOne({ _id: userId, role: 'snowWorker' });
+        if (!worker) {
+            return res.status(404).json({
+                success: false,
+                message: 'Déneigeur non trouvé',
+            });
+        }
+
+        const verification = worker.workerProfile?.identityVerification;
+        if (!verification?.documents?.idFront?.url || !verification?.documents?.selfie?.url) {
+            return res.status(400).json({
+                success: false,
+                message: 'Documents manquants. Le déneigeur doit d\'abord soumettre ses documents.',
+            });
+        }
+
+        if (verification.status === 'approved') {
+            return res.status(400).json({
+                success: false,
+                message: 'Cette vérification est déjà approuvée',
+            });
+        }
+
+        // Trigger AI analysis
+        console.log(`🔄 Admin ${req.user.id} triggered re-analysis for user ${userId}`);
+        const result = await identityVerificationService.analyzeIdentityDocuments(userId);
+
+        res.json({
+            success: true,
+            message: 'Analyse IA relancée avec succès',
+            data: {
+                status: result.status,
+                recommendation: result.recommendation,
+                overallScore: result.aiAnalysis?.overallScore,
+            },
+        });
+    } catch (error) {
+        console.error('Error re-analyzing verification:', error);
         res.status(500).json({
             success: false,
             message: error.message || getErrorMessage(error),

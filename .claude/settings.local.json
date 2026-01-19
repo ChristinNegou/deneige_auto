@@ -34,7 +34,13 @@
       "Bash(MONGODB_URI=\"mongodb+srv://deneigeauto_db:root@deneigeautocluster.o6fxvd.mongodb.net/deneige_auto?appName=deneigeAutoCluster\" node:*)",
       "Bash(npm install:*)",
       "WebFetch(domain:api.github.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(git for-each-ref:*)",
+      "Bash(git update-ref:*)",
+      "Bash(\"$LOCALAPPDATA/Android/Sdk/platform-tools/adb\" -s emulator-5554 shell am start -n com.deneigeauto.app/com.deneigeauto.app.MainActivity)",
+      "Bash(\"$LOCALAPPDATA/Android/Sdk/platform-tools/adb\" -s emulator-5554 shell pm list packages)",
+      "Bash(\"/c/Users/chris/AppData/Local/Android/Sdk/platform-tools/adb\" -s emulator-5554 shell pm list packages)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

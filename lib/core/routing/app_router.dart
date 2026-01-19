@@ -56,8 +56,11 @@ import '../../features/admin/presentation/pages/admin_reports_page.dart';
 import '../../features/admin/presentation/pages/admin_support_page.dart';
 import '../../features/admin/presentation/pages/admin_stripe_accounts_page.dart';
 import '../../features/admin/presentation/pages/admin_ai_page.dart';
+import '../../features/admin/presentation/pages/admin_verifications_page.dart';
 import '../../features/admin/presentation/bloc/admin_bloc.dart';
 import '../../features/admin/presentation/bloc/admin_event.dart';
+import '../../features/verification/presentation/bloc/verification_bloc.dart';
+import '../../features/verification/presentation/pages/identity_verification_page.dart';
 import '../../features/disputes/presentation/pages/my_disputes_page.dart';
 import '../../features/disputes/presentation/pages/dispute_details_page.dart';
 import '../../features/disputes/presentation/pages/create_dispute_page.dart';
@@ -351,6 +354,15 @@ class AppRouter {
           settings: settings,
         );
 
+      case AppRoutes.identityVerification:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<VerificationBloc>(),
+            child: const IdentityVerificationPage(),
+          ),
+          settings: settings,
+        );
+
       // Routes admin
       case AppRoutes.adminDashboard:
         return MaterialPageRoute(
@@ -415,6 +427,12 @@ class AppRouter {
       case AppRoutes.adminAI:
         return MaterialPageRoute(
           builder: (_) => const AdminAIPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.adminVerifications:
+        return MaterialPageRoute(
+          builder: (_) => const AdminVerificationsPage(),
           settings: settings,
         );
 

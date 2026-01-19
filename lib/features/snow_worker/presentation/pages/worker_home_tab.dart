@@ -7,9 +7,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../verification/presentation/bloc/verification_bloc.dart';
+import '../../../verification/presentation/bloc/verification_event.dart';
+import '../../../verification/presentation/bloc/verification_state.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../home/presentation/bloc/home_event.dart';
 import '../../../home/presentation/bloc/home_state.dart';
@@ -38,6 +42,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   Set<String> _previousJobIds = {};
   late AnimationController _pulseController;
   bool _isFirstLoad = true;
+  late VerificationBloc _verificationBloc;
 
   static const Duration _refreshInterval = Duration(seconds: 15);
 
@@ -48,6 +53,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   void initState() {
     super.initState();
     _notificationService.initialize();
+    _verificationBloc = sl<VerificationBloc>();
+    _verificationBloc.add(const LoadVerificationStatus());
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -275,6 +282,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 slivers: [
                   SliverToBoxAdapter(
                     child: _buildHeader(user.name),
+                  ),
+                  SliverToBoxAdapter(
+                    child: _buildVerificationBanner(),
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.all(AppTheme.paddingLG),
@@ -510,6 +520,162 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
       return Icons.wb_sunny;
     }
     return Icons.wb_cloudy;
+  }
+
+  Widget _buildVerificationBanner() {
+    return BlocBuilder<VerificationBloc, VerificationState>(
+      bloc: _verificationBloc,
+      builder: (context, state) {
+        // Ne rien afficher si en chargement ou si verification deja approuvee
+        if (state is VerificationLoading || state is VerificationInitial) {
+          return const SizedBox.shrink();
+        }
+
+        String? status;
+        String? rejectionReason;
+
+        if (state is VerificationStatusLoaded) {
+          status = state.status.status.name;
+          rejectionReason = state.status.decision?.reason;
+        }
+
+        // Si approuve, ne rien afficher
+        if (status == 'approved') {
+          return const SizedBox.shrink();
+        }
+
+        // Determiner le contenu de la banniere selon le statut
+        IconData icon;
+        Color color;
+        String title;
+        String subtitle;
+        bool showButton = false;
+
+        switch (status) {
+          case 'pending':
+            icon = Icons.hourglass_empty;
+            color = AppTheme.warning;
+            title = 'Verification en cours';
+            subtitle =
+                'Vos documents sont en cours d\'analyse. Vous serez notifie une fois la verification terminee.';
+            break;
+          case 'rejected':
+            icon = Icons.cancel_outlined;
+            color = AppTheme.error;
+            title = 'Verification refusee';
+            subtitle = rejectionReason ??
+                'Vos documents n\'ont pas ete approuves. Veuillez resoumettre des documents valides.';
+            showButton = true;
+            break;
+          case 'expired':
+            icon = Icons.timer_off_outlined;
+            color = AppTheme.warning;
+            title = 'Verification expiree';
+            subtitle =
+                'Votre verification a expire. Veuillez resoumettre vos documents.';
+            showButton = true;
+            break;
+          default: // not_submitted
+            icon = Icons.verified_user_outlined;
+            color = AppTheme.primary;
+            title = 'Verification requise';
+            subtitle =
+                'Verifiez votre identite pour pouvoir accepter des jobs de deneigement.';
+            showButton = true;
+        }
+
+        return Container(
+          margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                color.withValues(alpha: 0.15),
+                color.withValues(alpha: 0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: showButton
+                  ? () => Navigator.pushNamed(
+                      context, AppRoutes.identityVerification)
+                  : null,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                      ),
+                      child: Icon(icon, color: color, size: 24),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              color: color,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            subtitle,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.textSecondary,
+                              height: 1.3,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (showButton) ...[
+                      const SizedBox(width: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusSM),
+                        ),
+                        child: Text(
+                          status == 'not_submitted'
+                              ? 'Verifier'
+                              : 'Resoumettre',
+                          style: const TextStyle(
+                            color: AppTheme.background,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildAvailabilityCard() {
