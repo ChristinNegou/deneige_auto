@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/suspension_dialog.dart';
+import '../../../legal/presentation/pages/legal_page.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -103,6 +104,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Lien inscription
                       _buildSignUpLink(),
+
+                      const SizedBox(height: 32),
+
+                      // Liens légaux
+                      const LegalLinksWidget(),
                     ],
                   ),
                 ),

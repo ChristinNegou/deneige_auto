@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/di/injection_container.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_event.dart';
+import '../../legal/presentation/pages/legal_page.dart';
 import '../presentation/bloc/settings_bloc.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -162,20 +163,46 @@ class _SettingsPageState extends State<SettingsPage> {
                       // Section Légal
                       _buildSectionHeader('Légal'),
                       _buildListTile(
-                        icon: Icons.policy_outlined,
+                        icon: Icons.gavel_outlined,
+                        title: 'Mentions légales',
+                        subtitle: 'CGU, confidentialité, vos droits',
+                        trailing: const Icon(Icons.arrow_forward_ios,
+                            size: 16, color: AppTheme.textTertiary),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const LegalDocumentsListPage(),
+                          ),
+                        ),
+                      ),
+                      _buildListTile(
+                        icon: Icons.privacy_tip_outlined,
                         title: 'Politique de confidentialité',
                         trailing: const Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
-                        onTap: () =>
-                            Navigator.pushNamed(context, '/settings/privacy'),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LegalPage(
+                              documentType: LegalDocumentType.privacyPolicy,
+                            ),
+                          ),
+                        ),
                       ),
                       _buildListTile(
                         icon: Icons.description_outlined,
                         title: 'Conditions d\'utilisation',
                         trailing: const Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
-                        onTap: () =>
-                            Navigator.pushNamed(context, '/settings/terms'),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LegalPage(
+                              documentType: LegalDocumentType.termsOfService,
+                            ),
+                          ),
+                        ),
                       ),
 
                       const Divider(height: 32),
