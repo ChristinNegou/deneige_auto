@@ -1,256 +1,175 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/config/app_config.dart';
-import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/theme/app_theme.dart';
-import '../../../../ai_features/presentation/bloc/ai_features_bloc.dart';
-import '../../../../ai_features/presentation/bloc/ai_features_event.dart';
-// ai_features_state imported via bloc
 import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
 import '../../widgets/service_option_tile.dart';
 import '../../widgets/snow_depth_input.dart';
 import '../../widgets/price_summary_card.dart';
-import '../../widgets/ai_price_estimation_widget.dart';
 
-class Step4OptionsScreen extends StatefulWidget {
+class Step4OptionsScreen extends StatelessWidget {
   const Step4OptionsScreen({super.key});
 
   @override
-  State<Step4OptionsScreen> createState() => _Step4OptionsScreenState();
-}
-
-class _Step4OptionsScreenState extends State<Step4OptionsScreen> {
-  late AIFeaturesBloc _aiFeaturesBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _aiFeaturesBloc = sl<AIFeaturesBloc>();
-    // Declencher l'estimation IA au chargement
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _triggerAIEstimation();
-    });
-  }
-
-  @override
-  void dispose() {
-    _aiFeaturesBloc.close();
-    super.dispose();
-  }
-
-  void _triggerAIEstimation() {
-    final reservationState = context.read<NewReservationBloc>().state;
-
-    // Convertir les options en liste de strings
-    final serviceOptions =
-        reservationState.selectedOptions.map((opt) => opt.name).toList();
-
-    // Calculer le temps avant depart
-    int timeUntilDeparture = 120; // Default 2h
-    if (reservationState.departureDateTime != null) {
-      final now = DateTime.now();
-      timeUntilDeparture =
-          reservationState.departureDateTime!.difference(now).inMinutes;
-      if (timeUntilDeparture < 0) timeUntilDeparture = 120;
-    }
-
-    _aiFeaturesBloc.add(EstimatePriceEvent(
-      serviceOptions: serviceOptions,
-      snowDepthCm: reservationState.snowDepthCm ?? 0,
-      timeUntilDepartureMinutes: timeUntilDeparture,
-    ));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _aiFeaturesBloc,
-      child: BlocBuilder<NewReservationBloc, NewReservationState>(
-        builder: (context, state) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Section Options
-                _buildSectionHeader('Options supplementaires',
-                    Icons.add_circle_outline_rounded),
-                const SizedBox(height: 12),
+    return BlocBuilder<NewReservationBloc, NewReservationState>(
+      builder: (context, state) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section Options
+              _buildSectionHeader(
+                  'Options supplementaires', Icons.add_circle_outline_rounded),
+              const SizedBox(height: 12),
 
-                // Grid of compact options (2 columns)
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 2.4,
-                  children: [
-                    ServiceOptionTile(
-                      option: ServiceOption.windowScraping,
-                      isSelected: state.selectedOptions
-                          .contains(ServiceOption.windowScraping),
-                      price: AppConfig.iceRemovalSurcharge,
-                      compact: true,
-                      onToggle: () {
-                        context.read<NewReservationBloc>().add(
-                              const ToggleServiceOption(
-                                  ServiceOption.windowScraping),
-                            );
-                        Future.delayed(const Duration(milliseconds: 300),
-                            _triggerAIEstimation);
-                      },
-                    ),
-                    ServiceOptionTile(
-                      option: ServiceOption.doorDeicing,
-                      isSelected: state.selectedOptions
-                          .contains(ServiceOption.doorDeicing),
-                      price: AppConfig.doorDeicingSurcharge,
-                      compact: true,
-                      onToggle: () {
-                        context.read<NewReservationBloc>().add(
-                              const ToggleServiceOption(
-                                  ServiceOption.doorDeicing),
-                            );
-                        Future.delayed(const Duration(milliseconds: 300),
-                            _triggerAIEstimation);
-                      },
-                    ),
-                    ServiceOptionTile(
-                      option: ServiceOption.wheelClearance,
-                      isSelected: state.selectedOptions
-                          .contains(ServiceOption.wheelClearance),
-                      price: AppConfig.wheelClearanceSurcharge,
-                      compact: true,
-                      onToggle: () {
-                        context.read<NewReservationBloc>().add(
-                              const ToggleServiceOption(
-                                  ServiceOption.wheelClearance),
-                            );
-                        Future.delayed(const Duration(milliseconds: 300),
-                            _triggerAIEstimation);
-                      },
-                    ),
-                    ServiceOptionTile(
-                      option: ServiceOption.roofClearing,
-                      isSelected: state.selectedOptions
-                          .contains(ServiceOption.roofClearing),
-                      price: AppConfig.roofClearingSurcharge,
-                      compact: true,
-                      onToggle: () {
-                        context.read<NewReservationBloc>().add(
-                              const ToggleServiceOption(
-                                  ServiceOption.roofClearing),
-                            );
-                        Future.delayed(const Duration(milliseconds: 300),
-                            _triggerAIEstimation);
-                      },
-                    ),
-                    ServiceOptionTile(
-                      option: ServiceOption.saltSpreading,
-                      isSelected: state.selectedOptions
-                          .contains(ServiceOption.saltSpreading),
-                      price: AppConfig.saltSpreadingSurcharge,
-                      compact: true,
-                      onToggle: () {
-                        context.read<NewReservationBloc>().add(
-                              const ToggleServiceOption(
-                                  ServiceOption.saltSpreading),
-                            );
-                        Future.delayed(const Duration(milliseconds: 300),
-                            _triggerAIEstimation);
-                      },
-                    ),
-                    ServiceOptionTile(
-                      option: ServiceOption.lightsCleaning,
-                      isSelected: state.selectedOptions
-                          .contains(ServiceOption.lightsCleaning),
-                      price: AppConfig.lightsCleaningSurcharge,
-                      compact: true,
-                      onToggle: () {
-                        context.read<NewReservationBloc>().add(
-                              const ToggleServiceOption(
-                                  ServiceOption.lightsCleaning),
-                            );
-                        Future.delayed(const Duration(milliseconds: 300),
-                            _triggerAIEstimation);
-                      },
-                    ),
-                    ServiceOptionTile(
-                      option: ServiceOption.perimeterClearance,
-                      isSelected: state.selectedOptions
-                          .contains(ServiceOption.perimeterClearance),
-                      price: AppConfig.perimeterClearanceSurcharge,
-                      compact: true,
-                      onToggle: () {
-                        context.read<NewReservationBloc>().add(
-                              const ToggleServiceOption(
-                                  ServiceOption.perimeterClearance),
-                            );
-                        Future.delayed(const Duration(milliseconds: 300),
-                            _triggerAIEstimation);
-                      },
-                    ),
-                    ServiceOptionTile(
-                      option: ServiceOption.exhaustCheck,
-                      isSelected: state.selectedOptions
-                          .contains(ServiceOption.exhaustCheck),
-                      price: AppConfig.exhaustCheckSurcharge,
-                      compact: true,
-                      onToggle: () {
-                        context.read<NewReservationBloc>().add(
-                              const ToggleServiceOption(
-                                  ServiceOption.exhaustCheck),
-                            );
-                        Future.delayed(const Duration(milliseconds: 300),
-                            _triggerAIEstimation);
-                      },
-                    ),
-                  ],
-                ),
+              // Grid of compact options (2 columns)
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 2.0,
+                children: [
+                  ServiceOptionTile(
+                    option: ServiceOption.windowScraping,
+                    isSelected: state.selectedOptions
+                        .contains(ServiceOption.windowScraping),
+                    price: AppConfig.iceRemovalSurcharge,
+                    compact: true,
+                    onToggle: () {
+                      context.read<NewReservationBloc>().add(
+                            const ToggleServiceOption(
+                                ServiceOption.windowScraping),
+                          );
+                    },
+                  ),
+                  ServiceOptionTile(
+                    option: ServiceOption.doorDeicing,
+                    isSelected: state.selectedOptions
+                        .contains(ServiceOption.doorDeicing),
+                    price: AppConfig.doorDeicingSurcharge,
+                    compact: true,
+                    onToggle: () {
+                      context.read<NewReservationBloc>().add(
+                            const ToggleServiceOption(
+                                ServiceOption.doorDeicing),
+                          );
+                    },
+                  ),
+                  ServiceOptionTile(
+                    option: ServiceOption.wheelClearance,
+                    isSelected: state.selectedOptions
+                        .contains(ServiceOption.wheelClearance),
+                    price: AppConfig.wheelClearanceSurcharge,
+                    compact: true,
+                    onToggle: () {
+                      context.read<NewReservationBloc>().add(
+                            const ToggleServiceOption(
+                                ServiceOption.wheelClearance),
+                          );
+                    },
+                  ),
+                  ServiceOptionTile(
+                    option: ServiceOption.roofClearing,
+                    isSelected: state.selectedOptions
+                        .contains(ServiceOption.roofClearing),
+                    price: AppConfig.roofClearingSurcharge,
+                    compact: true,
+                    onToggle: () {
+                      context.read<NewReservationBloc>().add(
+                            const ToggleServiceOption(
+                                ServiceOption.roofClearing),
+                          );
+                    },
+                  ),
+                  ServiceOptionTile(
+                    option: ServiceOption.saltSpreading,
+                    isSelected: state.selectedOptions
+                        .contains(ServiceOption.saltSpreading),
+                    price: AppConfig.saltSpreadingSurcharge,
+                    compact: true,
+                    onToggle: () {
+                      context.read<NewReservationBloc>().add(
+                            const ToggleServiceOption(
+                                ServiceOption.saltSpreading),
+                          );
+                    },
+                  ),
+                  ServiceOptionTile(
+                    option: ServiceOption.lightsCleaning,
+                    isSelected: state.selectedOptions
+                        .contains(ServiceOption.lightsCleaning),
+                    price: AppConfig.lightsCleaningSurcharge,
+                    compact: true,
+                    onToggle: () {
+                      context.read<NewReservationBloc>().add(
+                            const ToggleServiceOption(
+                                ServiceOption.lightsCleaning),
+                          );
+                    },
+                  ),
+                  ServiceOptionTile(
+                    option: ServiceOption.perimeterClearance,
+                    isSelected: state.selectedOptions
+                        .contains(ServiceOption.perimeterClearance),
+                    price: AppConfig.perimeterClearanceSurcharge,
+                    compact: true,
+                    onToggle: () {
+                      context.read<NewReservationBloc>().add(
+                            const ToggleServiceOption(
+                                ServiceOption.perimeterClearance),
+                          );
+                    },
+                  ),
+                  ServiceOptionTile(
+                    option: ServiceOption.exhaustCheck,
+                    isSelected: state.selectedOptions
+                        .contains(ServiceOption.exhaustCheck),
+                    price: AppConfig.exhaustCheckSurcharge,
+                    compact: true,
+                    onToggle: () {
+                      context.read<NewReservationBloc>().add(
+                            const ToggleServiceOption(
+                                ServiceOption.exhaustCheck),
+                          );
+                    },
+                  ),
+                ],
+              ),
 
-                const SizedBox(height: 28),
+              const SizedBox(height: 28),
 
-                // Section Neige
-                _buildSectionHeader(
-                    'Profondeur de neige', Icons.ac_unit_rounded),
-                const SizedBox(height: 12),
+              // Section Neige
+              _buildSectionHeader('Profondeur de neige', Icons.ac_unit_rounded),
+              const SizedBox(height: 12),
 
-                SnowDepthInput(
-                  initialValue: state.snowDepthCm,
-                  onChanged: (value) {
-                    context.read<NewReservationBloc>().add(
-                          UpdateSnowDepth(value),
-                        );
-                    Future.delayed(const Duration(milliseconds: 500),
-                        _triggerAIEstimation);
-                  },
-                ),
+              SnowDepthInput(
+                initialValue: state.snowDepthCm,
+                onChanged: (value) {
+                  context.read<NewReservationBloc>().add(
+                        UpdateSnowDepth(value),
+                      );
+                },
+              ),
 
-                const SizedBox(height: 28),
+              const SizedBox(height: 28),
 
-                // Estimation IA
-                _buildSectionHeader('Estimation IA', Icons.smart_toy),
-                const SizedBox(height: 12),
-                const AIPriceEstimationWidget(),
+              // Recapitulatif prix
+              _buildSectionHeader('Recapitulatif', Icons.receipt_long_rounded),
+              const SizedBox(height: 12),
 
-                const SizedBox(height: 28),
+              const PriceSummaryCard(showBreakdown: true),
 
-                // Recapitulatif prix
-                _buildSectionHeader(
-                    'Recapitulatif', Icons.receipt_long_rounded),
-                const SizedBox(height: 12),
-
-                const PriceSummaryCard(showBreakdown: true),
-
-                const SizedBox(height: 24),
-              ],
-            ),
-          );
-        },
-      ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
     );
   }
 
