@@ -196,15 +196,46 @@ const applyPenalty = async (userId, penaltyType, reason, adminId = null) => {
 
     await user.save();
 
+    // Générer la notification de pénalité personnalisée
+    const penaltyNotification = generatePenaltyNotification(penaltyType, suspensionDays, isPermanent, reason, isWorker);
+
     // Notifier l'utilisateur
     await sendNotification(
         userId,
-        isPermanent ? 'Compte banni' : suspensionDays > 0 ? 'Compte suspendu' : 'Avertissement',
-        reason,
+        penaltyNotification.title,
+        penaltyNotification.message,
         'penalty'
     );
 
     return { penaltyType, suspensionDays, isPermanent };
+};
+
+// Générer le message de notification pour les pénalités
+const generatePenaltyNotification = (penaltyType, suspensionDays, isPermanent, reason, isWorker) => {
+    const role = isWorker ? 'déneigeur' : 'client';
+
+    if (isPermanent) {
+        return {
+            title: '🚫 Compte définitivement suspendu',
+            message: `Votre compte ${role} a été définitivement suspendu suite à des infractions répétées. Motif: ${reason}. Si vous pensez qu'il s'agit d'une erreur, contactez notre support.`,
+        };
+    }
+
+    if (suspensionDays > 0) {
+        const endDate = new Date(Date.now() + suspensionDays * 24 * 60 * 60 * 1000);
+        const formattedDate = endDate.toLocaleDateString('fr-CA', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        return {
+            title: `⏸️ Compte suspendu pour ${suspensionDays} jours`,
+            message: `Votre compte ${role} est temporairement suspendu jusqu'au ${formattedDate}. Motif: ${reason}. Après cette période, vous pourrez reprendre vos activités normalement.`,
+        };
+    }
+
+    // Avertissement
+    return {
+        title: '⚠️ Avertissement sur votre compte',
+        message: `Un avertissement a été ajouté à votre compte ${role}. Motif: ${reason}. Veuillez noter que des avertissements répétés peuvent mener à une suspension de votre compte.`,
+    };
 };
 
 // Déterminer la pénalité en fonction de l'historique
@@ -389,6 +420,25 @@ const generateRespondentNotification = (decision, penalty, disputeType, claimant
     }
 };
 
+// Générer le message de notification pour les résultats d'appel
+const generateAppealNotification = (decision, notes, newRefundAmount) => {
+    if (decision === 'upheld') {
+        const refundMessage = newRefundAmount > 0
+            ? ` Un nouveau remboursement de ${newRefundAmount.toFixed(2)}$ sera effectué sous 5-10 jours ouvrables.`
+            : '';
+
+        return {
+            title: '✅ Appel accepté',
+            message: `Bonne nouvelle! Votre appel a été accepté et la décision initiale a été révisée en votre faveur.${refundMessage}${notes ? ` Note de l'administrateur: ${notes}` : ''}`,
+        };
+    }
+
+    return {
+        title: '❌ Appel rejeté',
+        message: `Après réexamen de votre dossier, nous maintenons la décision initiale. Votre appel n'a pas été retenu.${notes ? ` Motif: ${notes}` : ''} Cette décision est définitive.`,
+    };
+};
+
 // ============== MAIN CONTROLLER FUNCTIONS ==============
 
 // @desc    Signaler un no-show (déneigeur pas venu)
@@ -548,12 +598,20 @@ exports.reportNoShow = async (req, res) => {
         await dispute.save();
 
         // Notifier le worker
+        const clientName = client ? `${client.firstName} ${client.lastName}` : 'Un client';
+        const departureTimeStr = reservation.departureTime.toLocaleString('fr-CA', {
+            day: 'numeric',
+            month: 'long',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+
         await sendNotification(
             reservation.workerId._id,
-            'Signalement No-Show',
-            `Un client a signalé que vous n'êtes pas venu pour la réservation. Vous avez ${DEADLINES.response}h pour répondre.`,
+            '🚨 Signalement d\'absence',
+            `${clientName} a signalé que vous n'êtes pas venu pour le déneigement prévu le ${departureTimeStr}. Vous avez ${DEADLINES.response}h pour contester ce signalement en fournissant votre version des faits. Sans réponse, le litige sera résolu automatiquement en faveur du client.`,
             'dispute',
-            { disputeId: dispute._id, reservationId }
+            { disputeId: dispute._id, reservationId, urgent: true }
         );
 
         // Si éligible à la résolution automatique, traiter immédiatement
@@ -715,13 +773,32 @@ exports.createDispute = async (req, res) => {
             });
         }
 
+        // Générer la notification pour le défendeur
+        const disputeTypeLabels = {
+            no_show: 'absence',
+            incomplete_work: 'travail incomplet',
+            quality_issue: 'qualité du travail',
+            late_arrival: 'retard',
+            damage: 'dommages',
+            wrong_location: 'erreur d\'emplacement',
+            overcharge: 'surfacturation',
+            unprofessional: 'comportement inapproprié',
+            other: 'autre motif',
+        };
+
+        const typeLabel = disputeTypeLabels[type] || type;
+        const claimantName = isClient
+            ? `${reservation.userId.firstName} ${reservation.userId.lastName}`
+            : `${reservation.workerId?.firstName || ''} ${reservation.workerId?.lastName || ''}`;
+        const claimantRole = isClient ? 'Le client' : 'Le déneigeur';
+
         // Notifier le défendeur
         await sendNotification(
             isClient ? reservation.workerId._id : reservation.userId._id,
-            'Nouveau litige ouvert',
-            `Un litige a été ouvert contre vous. Vous avez ${DEADLINES.response}h pour répondre.`,
+            '📋 Nouveau litige ouvert contre vous',
+            `${claimantRole} ${claimantName} a ouvert un litige pour: ${typeLabel}. Vous avez ${DEADLINES.response}h pour présenter votre version des faits. Consultez l'application pour plus de détails et répondre au litige.`,
             'dispute',
-            { disputeId: dispute._id, reservationId }
+            { disputeId: dispute._id, reservationId, type }
         );
 
         res.status(201).json({
@@ -893,13 +970,27 @@ exports.respondToDispute = async (req, res) => {
         dispute.addHistory('response_submitted', 'Réponse soumise par le défendeur', req.user.id);
         await dispute.save();
 
-        // Notifier le plaignant
+        // Notifier le plaignant avec un message personnalisé
+        const respondentRole = dispute.respondent.role === 'worker' ? 'Le déneigeur' : 'Le client';
+        const disputeTypeLabelsResponse = {
+            no_show: 'absence',
+            incomplete_work: 'travail incomplet',
+            quality_issue: 'qualité du travail',
+            late_arrival: 'retard',
+            damage: 'dommages',
+            wrong_location: 'erreur d\'emplacement',
+            overcharge: 'surfacturation',
+            unprofessional: 'comportement inapproprié',
+            other: 'votre réclamation',
+        };
+        const typeLabelResponse = disputeTypeLabelsResponse[dispute.type] || dispute.type;
+
         await sendNotification(
             dispute.claimant.user,
-            'Réponse au litige',
-            'Le défendeur a répondu à votre litige. Un administrateur va examiner le cas.',
+            '💬 Réponse reçue à votre litige',
+            `${respondentRole} a répondu à votre litige concernant ${typeLabelResponse}. Notre équipe va maintenant examiner les deux versions et prendra une décision dans les plus brefs délais. Vous serez notifié dès qu'une décision sera prise.`,
             'dispute',
-            { disputeId: dispute._id }
+            { disputeId: dispute._id, type: dispute.type }
         );
 
         res.json({
@@ -1392,13 +1483,16 @@ exports.resolveAppeal = async (req, res) => {
         dispute.addHistory('appeal_resolved', `Appel ${decision === 'upheld' ? 'accepté' : 'rejeté'}`, req.user.id);
         await dispute.save();
 
-        // Notifier les parties
+        // Générer une notification d'appel personnalisée
+        const appealNotification = generateAppealNotification(decision, notes, newRefundAmount);
+
+        // Notifier la personne qui a fait appel
         await sendNotification(
             dispute.appeal.appealedBy,
-            'Résultat de l\'appel',
-            `Votre appel a été ${decision === 'upheld' ? 'accepté' : 'rejeté'}. ${notes || ''}`,
+            appealNotification.title,
+            appealNotification.message,
             'dispute',
-            { disputeId: dispute._id }
+            { disputeId: dispute._id, appealDecision: decision }
         );
 
         res.json({
@@ -1521,21 +1615,32 @@ exports.processAutoResolution = async (disputeId) => {
             dispute.addHistory('resolved', 'Résolution automatique - No-show confirmé', null);
             await dispute.save();
 
-            // Notifier les parties
+            // Notifier le client (plaignant)
+            const refundAmount = dispute.resolution.refundAmount;
             await sendNotification(
                 dispute.claimant.user,
-                'Litige résolu automatiquement',
-                `Votre signalement no-show a été confirmé. Remboursement: ${dispute.resolution.refundAmount}$`,
+                '✅ Absence confirmée - Remboursement en cours',
+                `Votre signalement d'absence a été confirmé automatiquement car le déneigeur n'a pas contesté dans le délai imparti. Un remboursement de ${refundAmount.toFixed(2)}$ sera crédité sur votre carte sous 5-10 jours ouvrables. Nous nous excusons pour ce désagrément.`,
                 'dispute',
-                { disputeId: dispute._id }
+                { disputeId: dispute._id, refundAmount }
             );
+
+            // Notifier le worker (défendeur)
+            const penaltyLabels = {
+                warning: 'un avertissement',
+                suspension_3days: 'une suspension de 3 jours',
+                suspension_7days: 'une suspension de 7 jours',
+                suspension_30days: 'une suspension de 30 jours',
+                permanent_ban: 'un bannissement permanent',
+            };
+            const penaltyLabel = penaltyLabels[dispute.resolution.workerPenalty] || 'une pénalité';
 
             await sendNotification(
                 dispute.respondent.user._id,
-                'No-show confirmé',
-                'Le no-show a été confirmé automatiquement. Des pénalités ont été appliquées.',
+                '⚠️ Absence confirmée - Pénalité appliquée',
+                `Le signalement d'absence n'ayant pas été contesté dans le délai de 24h, il a été confirmé automatiquement. Conséquence: ${penaltyLabel} a été appliqué(e) à votre compte. Veuillez respecter vos engagements pour maintenir votre réputation.`,
                 'dispute',
-                { disputeId: dispute._id }
+                { disputeId: dispute._id, penalty: dispute.resolution.workerPenalty }
             );
 
             return { success: true, resolution: dispute.resolution };
