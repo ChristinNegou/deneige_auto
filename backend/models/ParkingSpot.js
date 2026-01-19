@@ -52,8 +52,7 @@ const parkingSpotSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Index pour recherche rapide
-parkingSpotSchema.index({ spotNumber: 1 });
+// Index pour recherche rapide (spotNumber a déjà un index via unique: true)
 parkingSpotSchema.index({ assignedTo: 1 });
 parkingSpotSchema.index({ isAvailable: 1, level: 1 });
 
