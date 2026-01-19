@@ -22,6 +22,24 @@ class WorkerFaqData {
           'Oui! Dans vos paramètres, vous pouvez définir vos zones préférées. Vous recevrez des notifications prioritaires pour les jobs dans ces zones, mais vous pouvez aussi accepter des jobs ailleurs.',
       category: FaqCategory.general,
     ),
+    FaqItem(
+      question: 'Qu\'est-ce que l\'Assistant IA?',
+      answer:
+          'L\'Assistant IA est votre aide virtuel disponible 24/7 dans l\'application. Il peut répondre à vos questions sur les jobs, vous aider à résoudre des problèmes, donner des conseils pour améliorer votre service et vous informer sur les conditions météo pour planifier votre journée.',
+      category: FaqCategory.general,
+    ),
+    FaqItem(
+      question: 'Comment utiliser l\'Assistant IA?',
+      answer:
+          'Accédez à l\'Assistant IA depuis le menu principal. Posez vos questions en langage naturel:\n• "Quels jobs sont disponibles près de moi?"\n• "Comment répondre à un litige?"\n• "Quelle météo est prévue demain?"\n• "Comment améliorer mon score?"\nL\'assistant vous répondra instantanément.',
+      category: FaqCategory.general,
+    ),
+    FaqItem(
+      question: 'L\'Assistant IA peut-il m\'aider avec la météo?',
+      answer:
+          'Oui! L\'Assistant IA a accès aux prévisions météo en temps réel. Demandez-lui les conditions actuelles ou les prévisions pour planifier vos disponibilités. Vous pouvez ainsi anticiper les journées de forte demande lors des tempêtes de neige.',
+      category: FaqCategory.general,
+    ),
 
     // Jobs / Réservations
     FaqItem(
@@ -95,9 +113,27 @@ class WorkerFaqData {
       category: FaqCategory.disputes,
     ),
     FaqItem(
-      question: 'Comment répondre à une réclamation client?',
+      question: 'Comment répondre à un litige?',
       answer:
-          'Vous recevrez une notification dès qu\'un litige est ouvert contre vous. Allez dans l\'application pour voir les détails et répondre. Expliquez votre version des faits et ajoutez des photos comme preuve si disponible. Vous avez généralement 48 heures pour répondre.',
+          'Pour répondre à un litige:\n1. Allez dans Profil > Mes litiges\n2. Ouvrez le litige concerné\n3. Appuyez sur "Répondre au litige"\n4. Expliquez votre version des faits en détail\n5. Ajoutez des photos comme preuves (avant/après, captures d\'écran, etc.)\n6. Soumettez votre réponse\n\nVous avez généralement 48 heures pour répondre.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment ajouter des preuves à ma défense?',
+      answer:
+          'Les preuves sont essentielles pour défendre votre position. Dans les détails du litige, utilisez "Ajouter des preuves" pour:\n• Photos avant/après le déneigement\n• Captures d\'écran de communications\n• Photos horodatées sur le site\n• Tout document pertinent\n\nVous pouvez ajouter jusqu\'à 10 photos et une description détaillée.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Qu\'est-ce que l\'analyse IA des litiges?',
+      answer:
+          'Notre système utilise l\'intelligence artificielle pour analyser objectivement chaque litige. L\'IA examine:\n• Les photos et preuves des deux parties\n• Les données GPS et timestamps\n• L\'historique du client et du déneigeur\n• La cohérence des déclarations\n\nCette analyse aide à prendre des décisions justes. Si l\'IA détecte un faux signalement, cela joue en votre faveur.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Pourquoi prendre des photos avant/après est important?',
+      answer:
+          'Les photos avant/après sont vos meilleures preuves:\n• Elles documentent l\'état initial et le travail accompli\n• L\'IA peut analyser la qualité du déneigement\n• En cas de litige, elles prouvent votre travail\n• Elles sont horodatées automatiquement\n\nPrenez l\'habitude de photographier chaque job!',
       category: FaqCategory.disputes,
     ),
     FaqItem(
