@@ -249,6 +249,146 @@ const processRefund = async (reservation, amount, reason) => {
     }
 };
 
+// Générer le message de notification pour le plaignant
+const generateClaimantNotification = (decision, refundAmount, disputeType) => {
+    const disputeTypeLabels = {
+        no_show: 'absence du déneigeur',
+        incomplete_work: 'travail incomplet',
+        quality_issue: 'qualité du travail',
+        late_arrival: 'retard',
+        damage: 'dommages',
+        wrong_location: 'mauvais emplacement',
+        overcharge: 'surfacturation',
+        unprofessional: 'comportement inapproprié',
+        other: 'votre réclamation',
+    };
+
+    const typeLabel = disputeTypeLabels[disputeType] || 'votre réclamation';
+
+    switch (decision) {
+        case 'favor_claimant':
+            return {
+                title: '✅ Litige résolu en votre faveur',
+                message: refundAmount > 0
+                    ? `Bonne nouvelle! Suite à l'examen de votre litige concernant ${typeLabel}, nous avons décidé en votre faveur. Un remboursement de ${refundAmount.toFixed(2)}$ sera crédité sur votre carte sous 5-10 jours ouvrables.`
+                    : `Bonne nouvelle! Suite à l'examen de votre litige concernant ${typeLabel}, nous avons décidé en votre faveur. Les mesures appropriées ont été prises.`,
+            };
+
+        case 'full_refund':
+            return {
+                title: '💰 Remboursement complet accordé',
+                message: `Suite à votre réclamation concernant ${typeLabel}, nous vous accordons un remboursement complet de ${refundAmount.toFixed(2)}$. Le montant sera crédité sur votre carte sous 5-10 jours ouvrables.`,
+            };
+
+        case 'partial_refund':
+            return {
+                title: '💵 Remboursement partiel accordé',
+                message: `Après examen de votre litige concernant ${typeLabel}, nous vous accordons un remboursement partiel de ${refundAmount.toFixed(2)}$. Le montant sera crédité sur votre carte sous 5-10 jours ouvrables.`,
+            };
+
+        case 'favor_respondent':
+            return {
+                title: '📋 Décision concernant votre litige',
+                message: `Après examen approfondi de votre réclamation concernant ${typeLabel}, nous n'avons pas pu confirmer les faits rapportés. Aucun remboursement ne sera effectué. Vous pouvez faire appel dans les 72h si vous avez des éléments supplémentaires.`,
+            };
+
+        case 'no_action':
+            return {
+                title: '📋 Litige examiné - Aucune action',
+                message: `Après examen de votre litige concernant ${typeLabel}, nous avons conclu qu'aucune action n'est nécessaire. Si vous avez des questions, n'hésitez pas à nous contacter.`,
+            };
+
+        case 'mutual_agreement':
+            return {
+                title: '🤝 Accord trouvé',
+                message: refundAmount > 0
+                    ? `Un accord a été trouvé concernant votre litige. Un remboursement de ${refundAmount.toFixed(2)}$ vous sera crédité sous 5-10 jours ouvrables.`
+                    : `Un accord a été trouvé concernant votre litige. Merci de votre compréhension.`,
+            };
+
+        default:
+            return {
+                title: '📋 Litige résolu',
+                message: refundAmount > 0
+                    ? `Votre litige a été résolu. Un remboursement de ${refundAmount.toFixed(2)}$ sera effectué.`
+                    : `Votre litige a été résolu. Merci de votre patience.`,
+            };
+    }
+};
+
+// Générer le message de notification pour le défenseur
+const generateRespondentNotification = (decision, penalty, disputeType, claimantRole) => {
+    const isWorkerDefendant = claimantRole === 'client';
+
+    const disputeTypeLabels = {
+        no_show: 'absence signalée',
+        incomplete_work: 'travail incomplet signalé',
+        quality_issue: 'qualité du travail',
+        late_arrival: 'retard signalé',
+        damage: 'dommages signalés',
+        wrong_location: 'erreur d\'emplacement',
+        overcharge: 'surfacturation signalée',
+        unprofessional: 'comportement signalé',
+        other: 'réclamation',
+    };
+
+    const penaltyLabels = {
+        warning: 'Un avertissement a été ajouté à votre dossier.',
+        suspension_3days: 'Votre compte est suspendu pour 3 jours.',
+        suspension_7days: 'Votre compte est suspendu pour 7 jours.',
+        suspension_30days: 'Votre compte est suspendu pour 30 jours.',
+        permanent_ban: 'Votre compte a été définitivement suspendu.',
+    };
+
+    const typeLabel = disputeTypeLabels[disputeType] || 'réclamation';
+    const penaltyMessage = penalty && penalty !== 'none' ? ` ${penaltyLabels[penalty] || ''}` : '';
+
+    switch (decision) {
+        case 'favor_claimant':
+        case 'full_refund':
+            return {
+                title: '⚠️ Litige résolu - Décision défavorable',
+                message: isWorkerDefendant
+                    ? `Le litige concernant ${typeLabel} a été résolu en faveur du client.${penaltyMessage} Nous vous encourageons à maintenir un service de qualité.`
+                    : `Le litige concernant ${typeLabel} a été résolu en faveur du plaignant.${penaltyMessage}`,
+            };
+
+        case 'partial_refund':
+            return {
+                title: '📋 Litige résolu - Remboursement partiel',
+                message: isWorkerDefendant
+                    ? `Le litige concernant ${typeLabel} a abouti à un remboursement partiel au client.${penaltyMessage} Aucune faute majeure n'a été retenue.`
+                    : `Le litige concernant ${typeLabel} a abouti à un remboursement partiel.${penaltyMessage}`,
+            };
+
+        case 'favor_respondent':
+            return {
+                title: '✅ Litige résolu en votre faveur',
+                message: isWorkerDefendant
+                    ? `Bonne nouvelle! Le litige concernant ${typeLabel} a été résolu en votre faveur. Aucune mesure n'a été prise contre vous. Continuez votre excellent travail!`
+                    : `Le litige concernant ${typeLabel} a été résolu en votre faveur. Aucune mesure n'a été prise.`,
+            };
+
+        case 'no_action':
+            return {
+                title: '📋 Litige classé sans suite',
+                message: `Le litige concernant ${typeLabel} a été classé sans suite. Aucune action n'a été prise contre vous.`,
+            };
+
+        case 'mutual_agreement':
+            return {
+                title: '🤝 Accord trouvé',
+                message: `Un accord a été trouvé concernant le litige.${penaltyMessage} Merci de votre coopération.`,
+            };
+
+        default:
+            return {
+                title: '📋 Litige résolu',
+                message: `Le litige concernant ${typeLabel} a été résolu.${penaltyMessage}`,
+            };
+    }
+};
+
 // ============== MAIN CONTROLLER FUNCTIONS ==============
 
 // @desc    Signaler un no-show (déneigeur pas venu)
@@ -1128,21 +1268,26 @@ exports.resolveDispute = async (req, res) => {
         dispute.addHistory('resolved', `Résolu: ${decision}`, req.user.id);
         await dispute.save();
 
-        // Notifier les parties
+        // Générer les messages de notification personnalisés
+        const claimantNotification = generateClaimantNotification(decision, refundAmount, dispute.type);
+        const respondentNotification = generateRespondentNotification(decision, workerPenalty, dispute.type, dispute.claimant.role);
+
+        // Notifier le plaignant
         await sendNotification(
             dispute.claimant.user._id,
-            'Litige résolu',
-            `Votre litige a été résolu. Décision: ${decision}${refundAmount > 0 ? `. Remboursement: ${refundAmount}$` : ''}`,
+            claimantNotification.title,
+            claimantNotification.message,
             'dispute',
-            { disputeId: dispute._id }
+            { disputeId: dispute._id, decision, refundAmount }
         );
 
+        // Notifier le défenseur
         await sendNotification(
             dispute.respondent.user._id,
-            'Litige résolu',
-            `Le litige contre vous a été résolu. Décision: ${decision}`,
+            respondentNotification.title,
+            respondentNotification.message,
             'dispute',
-            { disputeId: dispute._id }
+            { disputeId: dispute._id, decision }
         );
 
         res.json({
