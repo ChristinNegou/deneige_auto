@@ -5,12 +5,47 @@
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
+const axios = require('axios');
 const { protect } = require('../middleware/auth');
 const AIChatConversation = require('../models/AIChatConversation');
 const Vehicle = require('../models/Vehicle');
 const Reservation = require('../models/Reservation');
 const { generateResponse, generateStreamingResponse, isClaudeConfigured, isAIEnabled } = require('../services/claudeService');
 const { buildUserContext, welcomeMessages, getQuickActionsForRole } = require('../config/aiPrompts');
+
+/**
+ * Récupère la météo actuelle pour une localisation
+ * @param {number} lat - Latitude
+ * @param {number} lon - Longitude
+ * @returns {Object|null} Données météo ou null si erreur
+ */
+async function getCurrentWeather(lat = 46.3432, lon = -72.5476) {
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    if (!apiKey) {
+        return null;
+    }
+
+    try {
+        const response = await axios.get(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=fr`,
+            { timeout: 5000 }
+        );
+
+        const data = response.data;
+        return {
+            temperature: Math.round(data.main.temp),
+            feelsLike: Math.round(data.main.feels_like),
+            description: data.weather[0]?.description || 'Inconnu',
+            snowDepth: data.snow?.['1h'] || data.snow?.['3h'] || 0,
+            humidity: data.main.humidity,
+            windSpeed: Math.round(data.wind.speed * 3.6), // m/s -> km/h
+            city: data.name || 'Trois-Rivières'
+        };
+    } catch (error) {
+        console.error('Erreur récupération météo:', error.message);
+        return null;
+    }
+}
 
 // Rate limiter spécifique pour le chat IA
 const aiChatLimiter = rateLimit({
@@ -202,20 +237,21 @@ router.post('/conversations/:id/messages', protect, checkAIEnabled, aiChatLimite
         // Ajouter le message utilisateur
         conversation.addMessage('user', content.trim());
 
-        // Construire le contexte utilisateur
-        const [vehicles, reservations] = await Promise.all([
+        // Construire le contexte utilisateur avec météo
+        const [vehicles, reservations, weather] = await Promise.all([
             Vehicle.find({ userId: req.user.id }).lean(),
             Reservation.find({
                 userId: req.user.id,
                 status: { $in: ['pending', 'assigned', 'enRoute', 'inProgress'] }
-            }).lean()
+            }).lean(),
+            getCurrentWeather() // Météo de Trois-Rivières par défaut
         ]);
 
         const userContext = buildUserContext(
             req.user,
             vehicles,
             reservations,
-            null // TODO: Intégrer la météo si disponible
+            weather
         );
 
         // Préparer les messages pour Claude
@@ -308,16 +344,17 @@ router.post('/conversations/:id/messages/stream', protect, checkAIEnabled, aiCha
         // Ajouter le message utilisateur
         conversation.addMessage('user', content.trim());
 
-        // Construire le contexte
-        const [vehicles, reservations] = await Promise.all([
+        // Construire le contexte avec météo
+        const [vehicles, reservations, weather] = await Promise.all([
             Vehicle.find({ userId: req.user.id }).lean(),
             Reservation.find({
                 userId: req.user.id,
                 status: { $in: ['pending', 'assigned', 'enRoute', 'inProgress'] }
-            }).lean()
+            }).lean(),
+            getCurrentWeather()
         ]);
 
-        const userContext = buildUserContext(req.user, vehicles, reservations, null);
+        const userContext = buildUserContext(req.user, vehicles, reservations, weather);
         const messagesForClaude = conversation.getMessagesForClaude(20);
 
         // Configurer le streaming SSE
