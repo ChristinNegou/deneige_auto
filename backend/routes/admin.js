@@ -9,6 +9,7 @@ const Notification = require('../models/Notification');
 const SupportRequest = require('../models/SupportRequest');
 const Transaction = require('../models/Transaction');
 const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../services/databaseCleanupService');
+const identityVerificationService = require('../services/identityVerificationService');
 
 // Middleware pour vérifier le rôle admin
 const adminOnly = authorize('admin');
@@ -2044,6 +2045,226 @@ router.post('/finance/process-pending-payouts', protect, adminOnly, async (req, 
         res.status(500).json({
             success: false,
             message: 'Erreur lors du traitement des payouts',
+        });
+    }
+});
+
+// ============================================================================
+// IDENTITY VERIFICATION MANAGEMENT
+// ============================================================================
+
+/**
+ * @route   GET /api/admin/verifications
+ * @desc    Get list of identity verifications
+ * @access  Private (Admin only)
+ */
+router.get('/verifications', protect, adminOnly, async (req, res) => {
+    try {
+        const { status, search, page = 1, limit = 20 } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        // Build query
+        const query = { role: 'snowWorker' };
+
+        if (status && status !== 'all') {
+            query['workerProfile.identityVerification.status'] = status;
+        }
+
+        if (search) {
+            const searchRegex = new RegExp(escapeRegex(search), 'i');
+            query.$or = [
+                { firstName: searchRegex },
+                { lastName: searchRegex },
+                { email: searchRegex },
+            ];
+        }
+
+        // Get verifications
+        const workers = await User.find(query)
+            .select('firstName lastName email phoneNumber photoUrl workerProfile.identityVerification createdAt')
+            .sort({ 'workerProfile.identityVerification.submittedAt': -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const total = await User.countDocuments(query);
+
+        // Format response
+        const verifications = workers.map(worker => ({
+            userId: worker._id,
+            name: `${worker.firstName} ${worker.lastName}`,
+            email: worker.email,
+            phone: worker.phoneNumber,
+            photoUrl: worker.photoUrl,
+            verification: {
+                status: worker.workerProfile?.identityVerification?.status || 'not_submitted',
+                submittedAt: worker.workerProfile?.identityVerification?.submittedAt,
+                aiAnalysis: worker.workerProfile?.identityVerification?.aiAnalysis ? {
+                    overallScore: worker.workerProfile.identityVerification.aiAnalysis.overallScore,
+                    faceMatchScore: worker.workerProfile.identityVerification.aiAnalysis.faceMatchScore,
+                    issues: worker.workerProfile.identityVerification.aiAnalysis.issues,
+                } : null,
+                decision: worker.workerProfile?.identityVerification?.decision,
+                attemptsCount: worker.workerProfile?.identityVerification?.attemptsCount || 0,
+            },
+            createdAt: worker.createdAt,
+        }));
+
+        res.json({
+            success: true,
+            data: {
+                verifications,
+                pagination: {
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    total,
+                    totalPages: Math.ceil(total / parseInt(limit)),
+                },
+            },
+        });
+    } catch (error) {
+        console.error('Error getting verifications:', error);
+        res.status(500).json({
+            success: false,
+            message: getErrorMessage(error),
+        });
+    }
+});
+
+/**
+ * @route   GET /api/admin/verifications/stats
+ * @desc    Get verification statistics
+ * @access  Private (Admin only)
+ */
+router.get('/verifications/stats', protect, adminOnly, async (req, res) => {
+    try {
+        const stats = await identityVerificationService.getVerificationStats();
+
+        res.json({
+            success: true,
+            data: stats,
+        });
+    } catch (error) {
+        console.error('Error getting verification stats:', error);
+        res.status(500).json({
+            success: false,
+            message: getErrorMessage(error),
+        });
+    }
+});
+
+/**
+ * @route   GET /api/admin/verifications/:userId
+ * @desc    Get verification details for a specific user
+ * @access  Private (Admin only)
+ */
+router.get('/verifications/:userId', protect, adminOnly, async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID utilisateur invalide',
+            });
+        }
+
+        const worker = await User.findOne({ _id: userId, role: 'snowWorker' })
+            .select('firstName lastName email phoneNumber photoUrl workerProfile.identityVerification workerProfile.totalJobsCompleted workerProfile.averageRating createdAt');
+
+        if (!worker) {
+            return res.status(404).json({
+                success: false,
+                message: 'Déneigeur non trouvé',
+            });
+        }
+
+        const verification = worker.workerProfile?.identityVerification || {};
+
+        res.json({
+            success: true,
+            data: {
+                user: {
+                    id: worker._id,
+                    name: `${worker.firstName} ${worker.lastName}`,
+                    email: worker.email,
+                    phone: worker.phoneNumber,
+                    photoUrl: worker.photoUrl,
+                    totalJobsCompleted: worker.workerProfile?.totalJobsCompleted || 0,
+                    averageRating: worker.workerProfile?.averageRating || 0,
+                    createdAt: worker.createdAt,
+                },
+                verification: {
+                    status: verification.status || 'not_submitted',
+                    documents: verification.documents || {},
+                    aiAnalysis: verification.aiAnalysis || null,
+                    decision: verification.decision || null,
+                    submittedAt: verification.submittedAt,
+                    verifiedAt: verification.verifiedAt,
+                    expiresAt: verification.expiresAt,
+                    attemptsCount: verification.attemptsCount || 0,
+                },
+            },
+        });
+    } catch (error) {
+        console.error('Error getting verification details:', error);
+        res.status(500).json({
+            success: false,
+            message: getErrorMessage(error),
+        });
+    }
+});
+
+/**
+ * @route   POST /api/admin/verifications/:userId/decision
+ * @desc    Make a decision on a verification
+ * @access  Private (Admin only)
+ */
+router.post('/verifications/:userId/decision', protect, adminOnly, async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { decision, reason, notes } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID utilisateur invalide',
+            });
+        }
+
+        if (!decision || !['approved', 'rejected'].includes(decision)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Décision invalide. Utilisez "approved" ou "rejected"',
+            });
+        }
+
+        if (decision === 'rejected' && !reason) {
+            return res.status(400).json({
+                success: false,
+                message: 'Une raison est requise pour un rejet',
+            });
+        }
+
+        const result = await identityVerificationService.processAdminDecision(
+            userId,
+            req.user.id,
+            decision,
+            reason,
+            notes
+        );
+
+        res.json({
+            success: true,
+            message: decision === 'approved'
+                ? 'Vérification approuvée avec succès'
+                : 'Vérification refusée',
+            data: result,
+        });
+    } catch (error) {
+        console.error('Error processing verification decision:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || getErrorMessage(error),
         });
     }
 });
