@@ -4,10 +4,55 @@
  */
 
 const { sendPushNotification } = require('./firebaseService');
-const { calculateEstimatedTime, BASE_TIME_BY_VEHICLE } = require('./pricingService');
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const axios = require('axios');
+
+/**
+ * Temps de base par type de véhicule (en minutes)
+ */
+const BASE_TIME_BY_VEHICLE = {
+  compact: 8,
+  sedan: 10,
+  suv: 12,
+  truck: 15,
+  minivan: 12,
+  unknown: 10,
+};
+
+/**
+ * Calcule le temps estimé pour un travail de déneigement
+ * @param {Object} params - Paramètres du travail
+ * @param {string} params.vehicleType - Type de véhicule
+ * @param {number} params.snowDepthCm - Profondeur de neige en cm
+ * @param {Array} params.serviceOptions - Options de service sélectionnées
+ * @returns {Object} - { estimatedMinutes, breakdown }
+ */
+function calculateEstimatedTime({ vehicleType = 'sedan', snowDepthCm = 5, serviceOptions = [] }) {
+  // Temps de base selon le type de véhicule
+  let baseMinutes = BASE_TIME_BY_VEHICLE[vehicleType] || BASE_TIME_BY_VEHICLE.sedan;
+
+  // Ajout selon la profondeur de neige
+  const snowMultiplier = 1 + (snowDepthCm / 20); // +50% pour 10cm, +100% pour 20cm
+  baseMinutes = Math.round(baseMinutes * snowMultiplier);
+
+  // Temps supplémentaire pour les options
+  let optionsTime = 0;
+  if (serviceOptions.includes('windowScraping')) optionsTime += 3;
+  if (serviceOptions.includes('doorDeicing')) optionsTime += 2;
+  if (serviceOptions.includes('wheelClearance')) optionsTime += 4;
+
+  const totalMinutes = baseMinutes + optionsTime;
+
+  return {
+    estimatedMinutes: totalMinutes,
+    breakdown: {
+      baseTime: BASE_TIME_BY_VEHICLE[vehicleType] || 10,
+      snowAdjustment: Math.round((snowMultiplier - 1) * 100),
+      optionsTime,
+    },
+  };
+}
 
 /**
  * Types de notifications intelligentes

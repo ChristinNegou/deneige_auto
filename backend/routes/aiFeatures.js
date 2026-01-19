@@ -10,7 +10,6 @@ const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 
 // Services IA
-const pricingService = require('../services/pricingService');
 const photoAnalysisService = require('../services/photoAnalysisService');
 const smartMatchingService = require('../services/smartMatchingService');
 const demandPredictionService = require('../services/demandPredictionService');
@@ -28,47 +27,6 @@ const aiRateLimiter = rateLimit({
 
 // Validation ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
-
-// ============== ESTIMATION DE PRIX ==============
-
-/**
- * @route   POST /api/ai/estimate-price
- * @desc    Estime le prix d'une réservation
- * @access  Authenticated
- */
-router.post('/estimate-price', protect, aiRateLimiter, async (req, res) => {
-  try {
-    const {
-      serviceOptions,
-      snowDepthCm,
-      timeUntilDepartureMinutes,
-      weatherCondition,
-      location,
-      distanceKm,
-    } = req.body;
-
-    const estimation = await pricingService.estimatePrice({
-      serviceOptions: serviceOptions || [],
-      snowDepthCm: snowDepthCm || 0,
-      timeUntilDepartureMinutes: timeUntilDepartureMinutes || 120,
-      weatherCondition: weatherCondition || '',
-      location: location || null,
-      distanceKm: distanceKm || 0,
-    });
-
-    res.json({
-      success: true,
-      data: estimation,
-    });
-  } catch (error) {
-    console.error('Erreur estimation prix:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de l\'estimation du prix',
-      error: error.message,
-    });
-  }
-});
 
 // ============== ANALYSE DE PHOTOS ==============
 
@@ -476,7 +434,6 @@ router.put(
  */
 router.get('/status', protect, authorize('admin'), (req, res) => {
   const status = {
-    pricing: process.env.AI_PRICING_ENABLED === 'true',
     photoAnalysis: process.env.AI_PHOTO_ANALYSIS_ENABLED === 'true',
     smartMatching: process.env.AI_SMART_MATCHING_ENABLED === 'true',
     demandPrediction: process.env.AI_DEMAND_PREDICTION_ENABLED === 'true',
