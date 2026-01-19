@@ -1,9 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../ai_features/domain/entities/dispute_analysis.dart';
+import '../../../ai_features/presentation/bloc/ai_features_bloc.dart';
+import '../../../ai_features/presentation/bloc/ai_features_event.dart';
+import '../../../ai_features/presentation/bloc/ai_features_state.dart';
 
 class AdminDisputesPage extends StatefulWidget {
   const AdminDisputesPage({super.key});
@@ -673,10 +681,76 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
   String? _selectedClientPenalty;
   final _notesController = TextEditingController();
 
+  // AI Analysis
+  late AIFeaturesBloc _aiFeaturesBloc;
+  DisputeAnalysis? _aiAnalysis;
+  bool _isAnalyzing = false;
+  String? _aiError;
+
+  @override
+  void initState() {
+    super.initState();
+    _aiFeaturesBloc = sl<AIFeaturesBloc>();
+  }
+
   @override
   void dispose() {
     _notesController.dispose();
+    _aiFeaturesBloc.close();
     super.dispose();
+  }
+
+  Future<void> _requestAIAnalysis() async {
+    final disputeId = widget.dispute['_id'] as String?;
+    if (disputeId == null || disputeId.isEmpty) return;
+
+    setState(() {
+      _isAnalyzing = true;
+      _aiError = null;
+    });
+
+    HapticFeedback.mediumImpact();
+    _aiFeaturesBloc.add(AnalyzeDisputeEvent(disputeId));
+  }
+
+  void _applyAIRecommendation(DisputeAnalysis analysis) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      // Appliquer la decision recommandee
+      _selectedDecision = analysis.recommendedDecision;
+
+      // Appliquer le montant de remboursement suggere
+      if (analysis.suggestedRefundPercent > 0) {
+        final claimedAmount = (widget.dispute['claimedAmount'] ?? 0).toDouble();
+        _refundAmount = claimedAmount * (analysis.suggestedRefundPercent / 100);
+      }
+
+      // Appliquer la penalite suggeree
+      if (analysis.suggestedPenalty != null &&
+          analysis.suggestedPenalty!.isNotEmpty &&
+          analysis.suggestedPenalty != 'none') {
+        _selectedWorkerPenalty = analysis.suggestedPenalty;
+      }
+
+      // Ajouter le raisonnement IA dans les notes
+      if (analysis.reasoning != null && analysis.reasoning!.isNotEmpty) {
+        _notesController.text = '[Recommandation IA]\n${analysis.reasoning}';
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.smart_toy, color: AppTheme.background, size: 20),
+            const SizedBox(width: 8),
+            const Text('Recommandation IA appliquee'),
+          ],
+        ),
+        backgroundColor: AppTheme.success,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   Future<void> _resolveDispute() async {
@@ -730,286 +804,954 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
   Widget build(BuildContext context) {
     final claimedAmount = (widget.dispute['claimedAmount'] ?? 0).toDouble();
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        children: [
-          // Handle
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppTheme.border,
-              borderRadius: BorderRadius.circular(2),
-            ),
+    return BlocProvider.value(
+      value: _aiFeaturesBloc,
+      child: BlocListener<AIFeaturesBloc, AIFeaturesState>(
+        listener: (context, state) {
+          if (state.disputeAnalysis != null && _isAnalyzing) {
+            setState(() {
+              _aiAnalysis = state.disputeAnalysis;
+              _isAnalyzing = false;
+            });
+          }
+          if (state.disputeAnalysisError != null && _isAnalyzing) {
+            setState(() {
+              _aiError = state.disputeAnalysisError;
+              _isAnalyzing = false;
+            });
+          }
+        },
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.9,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
-
-          // Header
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Text(
-                  'Resoudre le litige',
-                  style: TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+          child: Column(
+            children: [
+              // Handle
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppTheme.border,
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                const Spacer(),
-                IconButton(
-                  icon: Icon(Icons.close, color: AppTheme.textSecondary),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
+              ),
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Decision dropdown
-                  Text(
-                    'Decision',
-                    style: TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.border),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedDecision,
-                        isExpanded: true,
-                        hint: Text(
-                          'Sélectionnez une décision',
-                          style: TextStyle(color: AppTheme.textTertiary),
-                        ),
-                        dropdownColor: AppTheme.surface,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'favor_claimant',
-                            child: Text('En faveur du plaignant'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'favor_respondent',
-                            child: Text('En faveur du defenseur'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'full_refund',
-                            child: Text('Remboursement complet'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'partial_refund',
-                            child: Text('Remboursement partiel'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'no_action',
-                            child: Text('Aucune action'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'mutual_agreement',
-                            child: Text('Accord mutuel'),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedDecision = value;
-                            if (value == 'full_refund') {
-                              _refundAmount = claimedAmount;
-                            }
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Refund amount
-                  if (_selectedDecision == 'partial_refund' ||
-                      _selectedDecision == 'full_refund') ...[
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
                     Text(
-                      'Montant du remboursement',
+                      'Resoudre le litige',
                       style: TextStyle(
                         color: AppTheme.textPrimary,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(color: AppTheme.textPrimary),
-                      decoration: InputDecoration(
-                        hintText: 'Montant en \$',
-                        hintStyle: TextStyle(color: AppTheme.textTertiary),
-                        prefixIcon:
-                            Icon(Icons.attach_money, color: AppTheme.info),
-                        suffixText: '/ ${claimedAmount.toStringAsFixed(2)} \$',
-                        filled: true,
-                        fillColor: AppTheme.surfaceContainer,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _refundAmount = double.tryParse(value) ?? 0;
-                        });
-                      },
+                    const Spacer(),
+                    IconButton(
+                      icon: Icon(Icons.close, color: AppTheme.textSecondary),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                    const SizedBox(height: 20),
                   ],
+                ),
+              ),
 
-                  // Worker penalty
-                  Text(
-                    'Penalite deneigeur (optionnel)',
-                    style: TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.border),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedWorkerPenalty,
-                        isExpanded: true,
-                        hint: Text(
-                          'Aucune penalite',
-                          style: TextStyle(color: AppTheme.textTertiary),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Evidence Photos Section
+                      _buildEvidenceSection(),
+                      const SizedBox(height: 20),
+
+                      // AI Analysis Section
+                      _buildAIAnalysisSection(),
+                      const SizedBox(height: 24),
+
+                      // Decision dropdown
+                      Text(
+                        'Decision',
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
                         ),
-                        dropdownColor: AppTheme.surface,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'none',
-                            child: Text('Aucune'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'warning',
-                            child: Text('Avertissement'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'suspension_3days',
-                            child: Text('Suspension 3 jours'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'suspension_7days',
-                            child: Text('Suspension 7 jours'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'suspension_30days',
-                            child: Text('Suspension 30 jours'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'permanent_ban',
-                            child: Text('Bannissement permanent'),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          setState(() => _selectedWorkerPenalty = value);
-                        },
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Notes
-                  Text(
-                    'Notes (optionnel)',
-                    style: TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _notesController,
-                    maxLines: 3,
-                    style: TextStyle(color: AppTheme.textPrimary),
-                    decoration: InputDecoration(
-                      hintText: 'Notes sur la decision...',
-                      hintStyle: TextStyle(color: AppTheme.textTertiary),
-                      filled: true,
-                      fillColor: AppTheme.surfaceContainer,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                ],
-              ),
-            ),
-          ),
-
-          // Actions
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppTheme.surface,
-              border: Border(
-                top: BorderSide(color: AppTheme.border),
-              ),
-            ),
-            child: SafeArea(
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _resolveDispute,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.success,
-                    foregroundColor: AppTheme.background,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: AppTheme.background,
-                            strokeWidth: 2,
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceContainer,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.border),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedDecision,
+                            isExpanded: true,
+                            hint: Text(
+                              'Sélectionnez une décision',
+                              style: TextStyle(color: AppTheme.textTertiary),
+                            ),
+                            dropdownColor: AppTheme.surface,
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'favor_claimant',
+                                child: Text('En faveur du plaignant'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'favor_respondent',
+                                child: Text('En faveur du defenseur'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'full_refund',
+                                child: Text('Remboursement complet'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'partial_refund',
+                                child: Text('Remboursement partiel'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'no_action',
+                                child: Text('Aucune action'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'mutual_agreement',
+                                child: Text('Accord mutuel'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedDecision = value;
+                                if (value == 'full_refund') {
+                                  _refundAmount = claimedAmount;
+                                }
+                              });
+                            },
                           ),
-                        )
-                      : const Text(
-                          'Confirmer la résolution',
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Refund amount
+                      if (_selectedDecision == 'partial_refund' ||
+                          _selectedDecision == 'full_refund') ...[
+                        Text(
+                          'Montant du remboursement',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: AppTheme.textPrimary),
+                          decoration: InputDecoration(
+                            hintText: 'Montant en \$',
+                            hintStyle: TextStyle(color: AppTheme.textTertiary),
+                            prefixIcon:
+                                Icon(Icons.attach_money, color: AppTheme.info),
+                            suffixText:
+                                '/ ${claimedAmount.toStringAsFixed(2)} \$',
+                            filled: true,
+                            fillColor: AppTheme.surfaceContainer,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _refundAmount = double.tryParse(value) ?? 0;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+
+                      // Worker penalty
+                      Text(
+                        'Penalite deneigeur (optionnel)',
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceContainer,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.border),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedWorkerPenalty,
+                            isExpanded: true,
+                            hint: Text(
+                              'Aucune penalite',
+                              style: TextStyle(color: AppTheme.textTertiary),
+                            ),
+                            dropdownColor: AppTheme.surface,
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'none',
+                                child: Text('Aucune'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'warning',
+                                child: Text('Avertissement'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'suspension_3days',
+                                child: Text('Suspension 3 jours'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'suspension_7days',
+                                child: Text('Suspension 7 jours'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'suspension_30days',
+                                child: Text('Suspension 30 jours'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'permanent_ban',
+                                child: Text('Bannissement permanent'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              setState(() => _selectedWorkerPenalty = value);
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Notes
+                      Text(
+                        'Notes (optionnel)',
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _notesController,
+                        maxLines: 3,
+                        style: TextStyle(color: AppTheme.textPrimary),
+                        decoration: InputDecoration(
+                          hintText: 'Notes sur la decision...',
+                          hintStyle: TextStyle(color: AppTheme.textTertiary),
+                          filled: true,
+                          fillColor: AppTheme.surfaceContainer,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Actions
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppTheme.surface,
+                  border: Border(
+                    top: BorderSide(color: AppTheme.border),
+                  ),
+                ),
+                child: SafeArea(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _resolveDispute,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.success,
+                        foregroundColor: AppTheme.background,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: AppTheme.background,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Confirmer la résolution',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEvidenceSection() {
+    final evidence = widget.dispute['evidence'] as Map<String, dynamic>?;
+    final response = widget.dispute['response'] as Map<String, dynamic>?;
+
+    final claimantPhotos = (evidence?['photos'] as List<dynamic>?) ?? [];
+    final respondentPhotos = (response?['photos'] as List<dynamic>?) ?? [];
+
+    final hasPhotos = claimantPhotos.isNotEmpty || respondentPhotos.isNotEmpty;
+
+    if (!hasPhotos) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.photo_library_outlined,
+                color: AppTheme.textTertiary, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Aucune photo fournie pour ce litige',
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 14,
                 ),
               ),
             ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.border),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.info.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.photo_library,
+                  color: AppTheme.info,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Preuves photo',
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${claimantPhotos.length + respondentPhotos.length} photo(s)',
+                  style: TextStyle(
+                    color: AppTheme.info,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
           ),
+
+          // Photos du plaignant
+          if (claimantPhotos.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text(
+              'Photos du plaignant',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: claimantPhotos.length,
+                itemBuilder: (context, index) {
+                  final photo = claimantPhotos[index] as Map<String, dynamic>;
+                  return _buildPhotoThumbnail(
+                    photo['url'] as String? ?? '',
+                    photo['description'] as String?,
+                    AppTheme.warning,
+                  );
+                },
+              ),
+            ),
+          ],
+
+          // Photos du defenseur
+          if (respondentPhotos.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text(
+              'Photos du defenseur',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: respondentPhotos.length,
+                itemBuilder: (context, index) {
+                  final photo = respondentPhotos[index] as Map<String, dynamic>;
+                  return _buildPhotoThumbnail(
+                    photo['url'] as String? ?? '',
+                    photo['description'] as String?,
+                    AppTheme.success,
+                  );
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  Widget _buildPhotoThumbnail(
+      String url, String? description, Color borderColor) {
+    if (url.isEmpty) return const SizedBox.shrink();
+
+    final fullUrl =
+        url.startsWith('http') ? url : '${AppConfig.apiBaseUrl}$url';
+
+    return GestureDetector(
+      onTap: () => _showFullScreenPhoto(fullUrl, description),
+      child: Container(
+        width: 100,
+        height: 100,
+        margin: const EdgeInsets.only(right: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor, width: 2),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              CachedNetworkImage(
+                imageUrl: fullUrl,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: AppTheme.surfaceContainer,
+                  child: Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: AppTheme.surfaceContainer,
+                  child: Icon(
+                    Icons.broken_image,
+                    color: AppTheme.textTertiary,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.7),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.zoom_in,
+                    color: AppTheme.background,
+                    size: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showFullScreenPhoto(String url, String? description) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Close button
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.background,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.close, color: AppTheme.textPrimary),
+                ),
+              ),
+            ),
+            // Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: CachedNetworkImage(
+                imageUrl: url,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => Container(
+                  height: 300,
+                  color: AppTheme.surfaceContainer,
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppTheme.primary),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  height: 300,
+                  color: AppTheme.surfaceContainer,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error, color: AppTheme.error, size: 48),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Impossible de charger l\'image',
+                        style: TextStyle(color: AppTheme.textSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Description
+            if (description != null && description.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  description,
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAIAnalysisSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primary.withValues(alpha: 0.1),
+            AppTheme.secondary.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.primary.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.smart_toy,
+                  color: AppTheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Analyse IA',
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      'Obtenez une recommandation intelligente',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Bouton d'analyse ou resultat
+          if (_aiAnalysis == null && !_isAnalyzing && _aiError == null)
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _requestAIAnalysis,
+                icon: const Icon(Icons.psychology),
+                label: const Text('Analyser avec Claude IA'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.primary,
+                  side: BorderSide(color: AppTheme.primary),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            )
+          else if (_isAnalyzing)
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppTheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Analyse en cours...',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else if (_aiError != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.error_outline, color: AppTheme.error, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _aiError!,
+                      style: TextStyle(color: AppTheme.error, fontSize: 13),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _requestAIAnalysis,
+                    child: const Text('Reessayer'),
+                  ),
+                ],
+              ),
+            )
+          else if (_aiAnalysis != null)
+            _buildAIResultCard(_aiAnalysis!),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAIResultCard(DisputeAnalysis analysis) {
+    final scoreColor = _getScoreColor(analysis.evidenceStrength);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Score et recommendation
+        Row(
+          children: [
+            // Score circulaire
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: CircularProgressIndicator(
+                    value: analysis.evidenceStrength / 100,
+                    strokeWidth: 6,
+                    backgroundColor: scoreColor.withValues(alpha: 0.2),
+                    valueColor: AlwaysStoppedAnimation(scoreColor),
+                  ),
+                ),
+                Text(
+                  '${analysis.evidenceStrength}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: scoreColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Force des preuves',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.textTertiary,
+                    ),
+                  ),
+                  Text(
+                    analysis.evidenceLabel,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: scoreColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Confiance: ${(analysis.confidence * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 16),
+
+        // Decision recommandee
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppTheme.info.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.lightbulb, color: AppTheme.info, size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Recommandation',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.info,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                analysis.decisionLabel,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              if (analysis.suggestedRefundPercent > 0) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Remboursement suggere: ${analysis.suggestedRefundPercent}%',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+              if (analysis.suggestedPenalty != null &&
+                  analysis.suggestedPenalty!.isNotEmpty &&
+                  analysis.suggestedPenalty != 'none') ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Penalite suggeree: ${_getPenaltyLabel(analysis.suggestedPenalty!)}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.warning,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+
+        // Raisonnement
+        if (analysis.reasoning != null && analysis.reasoning!.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(
+            'Raisonnement:',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            analysis.reasoning!,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppTheme.textSecondary,
+              height: 1.4,
+            ),
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+
+        const SizedBox(height: 16),
+
+        // Bouton appliquer
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () => _applyAIRecommendation(analysis),
+            icon: const Icon(Icons.check, size: 20),
+            label: const Text('Appliquer la recommandation'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.background,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Color _getScoreColor(int score) {
+    if (score >= 80) return AppTheme.success;
+    if (score >= 60) return AppTheme.warning;
+    return AppTheme.error;
+  }
+
+  String _getPenaltyLabel(String penalty) {
+    switch (penalty) {
+      case 'warning':
+        return 'Avertissement';
+      case 'suspension_3days':
+        return 'Suspension 3 jours';
+      case 'suspension_7days':
+        return 'Suspension 7 jours';
+      case 'suspension_30days':
+        return 'Suspension 30 jours';
+      case 'permanent_ban':
+        return 'Bannissement permanent';
+      default:
+        return penalty;
+    }
   }
 }
