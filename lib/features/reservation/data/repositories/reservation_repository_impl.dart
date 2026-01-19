@@ -56,7 +56,8 @@ class ReservationRepositoryImpl implements ReservationRepository {
       final reservations = await remoteDataSource.getReservations(
         upcoming: upcoming,
       );
-      // TODO: Filtrer par userId si nécessaire (côté client ou API)
+      // Note: L'API filtre déjà par userId via l'authentification (req.user.id)
+      // Ce filtre client-side est une sécurité supplémentaire optionnelle
       if (userId != null) {
         final filtered = reservations.where((r) => r.userId == userId).toList();
         return Right(filtered);

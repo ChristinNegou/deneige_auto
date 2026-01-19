@@ -105,10 +105,14 @@ class AIChatRepositoryImpl implements AIChatRepository {
   Stream<Either<Failure, String>> sendMessageStreaming(
     String conversationId,
     String content,
-  ) {
-    // TODO: Implémenter le streaming SSE si nécessaire
-    // Pour l'instant, on utilise la méthode non-streaming
-    throw UnimplementedError('Streaming non implémenté');
+  ) async* {
+    // Fallback vers la méthode non-streaming
+    // Le streaming SSE peut être implémenté plus tard si nécessaire
+    final result = await sendMessage(conversationId, content);
+    yield result.fold(
+      (failure) => Left(failure),
+      (message) => Right(message.content),
+    );
   }
 
   @override
