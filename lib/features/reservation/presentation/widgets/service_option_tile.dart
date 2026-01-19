@@ -31,7 +31,7 @@ class ServiceOptionTile extends StatelessWidget {
       onTap: onToggle,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
               ? AppTheme.primary.withValues(alpha: 0.1)
@@ -45,39 +45,42 @@ class ServiceOptionTile extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
                 color:
                     isSelected ? AppTheme.primary : AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
                 _getOptionIcon(option),
-                size: 18,
+                size: 16,
                 color:
                     isSelected ? AppTheme.background : AppTheme.textSecondary,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _getOptionTitle(option),
+                    _getCompactTitle(option),
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textPrimary,
+                      height: 1.2,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: 2),
                   Text(
                     '+${price.toStringAsFixed(0)} \$',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: isSelected
                           ? AppTheme.primary
@@ -88,8 +91,8 @@ class ServiceOptionTile extends StatelessWidget {
               ),
             ),
             Container(
-              width: 22,
-              height: 22,
+              width: 20,
+              height: 20,
               decoration: BoxDecoration(
                 color: isSelected ? AppTheme.primary : Colors.transparent,
                 borderRadius: BorderRadius.circular(4),
@@ -99,13 +102,34 @@ class ServiceOptionTile extends StatelessWidget {
                 ),
               ),
               child: isSelected
-                  ? Icon(Icons.check, size: 14, color: AppTheme.background)
+                  ? Icon(Icons.check, size: 12, color: AppTheme.background)
                   : null,
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _getCompactTitle(ServiceOption option) {
+    switch (option) {
+      case ServiceOption.windowScraping:
+        return 'Grattage vitres';
+      case ServiceOption.doorDeicing:
+        return 'Deglacage portes';
+      case ServiceOption.wheelClearance:
+        return 'Degagement roues';
+      case ServiceOption.roofClearing:
+        return 'Deneigement toit';
+      case ServiceOption.saltSpreading:
+        return 'Epandage sel';
+      case ServiceOption.lightsCleaning:
+        return 'Nettoyage phares';
+      case ServiceOption.perimeterClearance:
+        return 'Degagement perimetre';
+      case ServiceOption.exhaustCheck:
+        return 'Verif. echappement';
+    }
   }
 
   Widget _buildFullTile() {

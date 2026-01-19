@@ -1147,74 +1147,187 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildEmptyState() {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.primary.withValues(alpha: 0.1),
-                  AppTheme.secondary.withValues(alpha: 0.05),
-                ],
+    return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
+      builder: (context, state) {
+        // Determiner le nombre d'equipements coches
+        int equipmentCount = 0;
+        if (state is WorkerAvailabilityLoaded && state.profile != null) {
+          equipmentCount = state.profile!.equipmentList.length;
+        }
+
+        // Message contextuel selon l'equipement (afficher si 1-3 equipements)
+        final bool hasLimitedEquipment =
+            equipmentCount > 0 && equipmentCount < 4;
+
+        return Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            border: Border.all(color: AppTheme.border),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.primary.withValues(alpha: 0.1),
+                      AppTheme.secondary.withValues(alpha: 0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                ),
+                child: const Icon(
+                  Icons.hourglass_empty_rounded,
+                  size: 40,
+                  color: AppTheme.primary,
+                ),
               ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-            ),
-            child: const Icon(
-              Icons.hourglass_empty_rounded,
-              size: 40,
-              color: AppTheme.primary,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'En attente de jobs...',
-            style: AppTheme.headlineSmall.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Les nouveaux jobs apparaitront ici\nautomatiquement',
-            textAlign: TextAlign.center,
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.textTertiary,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: AppTheme.info.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              border: Border.all(color: AppTheme.info.withValues(alpha: 0.2)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.refresh_rounded, color: AppTheme.info, size: 16),
-                const SizedBox(width: 8),
-                Text(
-                  'Actualisation auto. toutes les 15s',
-                  style: TextStyle(
-                    color: AppTheme.info,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+              const SizedBox(height: 20),
+              Text(
+                'En attente de jobs...',
+                style: AppTheme.headlineSmall.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Les nouveaux jobs apparaitront ici\nautomatiquement',
+                textAlign: TextAlign.center,
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppTheme.textTertiary,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Message contextuel si equipement limite
+              if (hasLimitedEquipment) ...[
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppTheme.info.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                    border:
+                        Border.all(color: AppTheme.info.withValues(alpha: 0.2)),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.info.withValues(alpha: 0.15),
+                              borderRadius:
+                                  BorderRadius.circular(AppTheme.radiusSM),
+                            ),
+                            child: Icon(
+                              Icons.lightbulb_outline,
+                              color: AppTheme.info,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Astuce pour plus de jobs',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    color: AppTheme.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Vous avez $equipmentCount equipement${equipmentCount > 1 ? 's' : ''} coche${equipmentCount > 1 ? 's' : ''}. Plus vous cochez d\'equipements, plus vous recevrez de jobs.',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppTheme.textSecondary,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.mediumImpact();
+                          WorkerMainDashboard.switchToTab(
+                            context,
+                            WorkerMainDashboard.profileTab,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: AppTheme.info,
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSM),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.build_rounded,
+                                color: AppTheme.background,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Ajouter des equipements',
+                                style: TextStyle(
+                                  color: AppTheme.background,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                const SizedBox(height: 16),
               ],
-            ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppTheme.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  border:
+                      Border.all(color: AppTheme.info.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.refresh_rounded, color: AppTheme.info, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Actualisation auto. toutes les 15s',
+                      style: TextStyle(
+                        color: AppTheme.info,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

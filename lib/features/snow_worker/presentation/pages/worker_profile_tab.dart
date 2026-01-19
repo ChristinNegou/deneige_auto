@@ -154,6 +154,17 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             });
           }
 
+          // Recuperer photoUrl et phone pour le calcul de completion
+          String? photoUrl;
+          String userPhone = '';
+          if (state is WorkerAvailabilityLoaded) {
+            photoUrl = state.profile?.photoUrl;
+          }
+          final authState = context.read<AuthBloc>().state;
+          if (authState is AuthAuthenticated) {
+            userPhone = authState.user.phoneNumber ?? '';
+          }
+
           return CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),
@@ -164,6 +175,11 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 padding: const EdgeInsets.all(AppTheme.paddingLG),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
+                    // Profile completion indicator (hidden when 100%)
+                    _buildProfileCompletionCard(
+                      photoUrl: photoUrl,
+                      phoneNumber: userPhone,
+                    ),
                     _buildProfileCard(),
                     const SizedBox(height: 20),
                     _buildEquipmentSection(),
@@ -184,6 +200,64 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         },
       ),
     );
+  }
+
+  /// Calcule le pourcentage de completion du profil
+  int _calculateProfileCompletion({
+    required String? photoUrl,
+    required String phoneNumber,
+  }) {
+    int score = 0;
+    int total = 4; // 4 criteres principaux
+
+    // 1. Photo de profil (25%)
+    if (photoUrl != null && photoUrl.isNotEmpty) score++;
+
+    // 2. Equipement de base - pelle et balai (25%)
+    if (_hasShovel && _hasBrush) score++;
+
+    // 3. Telephone (25%)
+    if (phoneNumber.isNotEmpty) score++;
+
+    // 4. Au moins un equipement supplementaire (25%)
+    final hasExtraEquipment = _hasIceScraper ||
+        _hasSaltSpreader ||
+        _hasSnowBlower ||
+        _hasRoofBroom ||
+        _hasMicrofiberCloth ||
+        _hasDeicerSpray;
+    if (hasExtraEquipment) score++;
+
+    return ((score / total) * 100).round();
+  }
+
+  /// Retourne les elements manquants du profil
+  List<String> _getMissingProfileItems({
+    required String? photoUrl,
+    required String phoneNumber,
+  }) {
+    final missing = <String>[];
+
+    if (photoUrl == null || photoUrl.isEmpty) {
+      missing.add('Photo de profil');
+    }
+    if (!_hasShovel || !_hasBrush) {
+      missing.add('Equipement de base (pelle, balai)');
+    }
+    if (phoneNumber.isEmpty) {
+      missing.add('Numero de telephone');
+    }
+    final hasExtraEquipment = _hasIceScraper ||
+        _hasSaltSpreader ||
+        _hasSnowBlower ||
+        _hasRoofBroom ||
+        _hasMicrofiberCloth ||
+        _hasDeicerSpray;
+    if (!hasExtraEquipment) {
+      missing.add('Equipement supplementaire');
+    }
+
+    return missing;
   }
 
   Widget _buildHeader() {
@@ -244,6 +318,157 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileCompletionCard({
+    required String? photoUrl,
+    required String phoneNumber,
+  }) {
+    final completion = _calculateProfileCompletion(
+      photoUrl: photoUrl,
+      phoneNumber: phoneNumber,
+    );
+    final missing = _getMissingProfileItems(
+      photoUrl: photoUrl,
+      phoneNumber: phoneNumber,
+    );
+
+    // Ne pas afficher si le profil est complet
+    if (completion == 100) return const SizedBox.shrink();
+
+    final Color progressColor;
+    final IconData statusIcon;
+    if (completion >= 75) {
+      progressColor = AppTheme.success;
+      statusIcon = Icons.check_circle_outline;
+    } else if (completion >= 50) {
+      progressColor = AppTheme.warning;
+      statusIcon = Icons.info_outline;
+    } else {
+      progressColor = AppTheme.error;
+      statusIcon = Icons.warning_amber_rounded;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: progressColor.withValues(alpha: 0.3)),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: progressColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+                child: Icon(statusIcon, color: progressColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Completez votre profil',
+                      style: AppTheme.labelLarge.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'Augmentez vos chances de recevoir des jobs',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.textSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: progressColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                ),
+                child: Text(
+                  '$completion%',
+                  style: TextStyle(
+                    color: progressColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Barre de progression
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+            child: LinearProgressIndicator(
+              value: completion / 100,
+              backgroundColor: AppTheme.border,
+              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+              minHeight: 8,
+            ),
+          ),
+          if (missing.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              'Il vous manque:',
+              style: AppTheme.bodySmall.copyWith(
+                color: AppTheme.textTertiary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: missing.map((item) {
+                return Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.background,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.circle_outlined,
+                        size: 10,
+                        color: AppTheme.textTertiary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        item,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
         ],
       ),
     );
