@@ -13,6 +13,11 @@ enum ServiceOption {
   windowScraping,
   doorDeicing,
   wheelClearance,
+  roofClearing,
+  saltSpreading,
+  lightsCleaning,
+  perimeterClearance,
+  exhaustCheck,
 }
 
 class ClientInfo extends Equatable {
@@ -94,6 +99,9 @@ enum EquipmentType {
   iceScraper, // Grattoir à glace
   saltSpreader, // Épandeur de sel
   snowBlower, // Souffleuse
+  roofBroom, // Balai télescopique pour toit
+  microfiberCloth, // Chiffon microfibre
+  deicerSpray, // Spray déglaçant
 }
 
 /// Extension pour obtenir les labels d'équipement
@@ -110,6 +118,12 @@ extension EquipmentTypeExtension on EquipmentType {
         return 'Sel';
       case EquipmentType.snowBlower:
         return 'Souffleuse';
+      case EquipmentType.roofBroom:
+        return 'Balai toit';
+      case EquipmentType.microfiberCloth:
+        return 'Chiffon';
+      case EquipmentType.deicerSpray:
+        return 'Déglaçant';
     }
   }
 
@@ -125,6 +139,12 @@ extension EquipmentTypeExtension on EquipmentType {
         return '🧂';
       case EquipmentType.snowBlower:
         return '❄️';
+      case EquipmentType.roofBroom:
+        return '🧹';
+      case EquipmentType.microfiberCloth:
+        return '🧽';
+      case EquipmentType.deicerSpray:
+        return '💧';
     }
   }
 
@@ -140,6 +160,12 @@ extension EquipmentTypeExtension on EquipmentType {
         return EquipmentType.saltSpreader;
       case 'snow_blower':
         return EquipmentType.snowBlower;
+      case 'roof_broom':
+        return EquipmentType.roofBroom;
+      case 'microfiber_cloth':
+        return EquipmentType.microfiberCloth;
+      case 'deicer_spray':
+        return EquipmentType.deicerSpray;
       default:
         return null;
     }
@@ -157,6 +183,12 @@ extension EquipmentTypeExtension on EquipmentType {
         return 'salt_spreader';
       case EquipmentType.snowBlower:
         return 'snow_blower';
+      case EquipmentType.roofBroom:
+        return 'roof_broom';
+      case EquipmentType.microfiberCloth:
+        return 'microfiber_cloth';
+      case EquipmentType.deicerSpray:
+        return 'deicer_spray';
     }
   }
 }

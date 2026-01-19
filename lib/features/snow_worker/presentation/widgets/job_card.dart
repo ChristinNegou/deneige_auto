@@ -334,6 +334,16 @@ class JobCard extends StatelessWidget {
         return 'Déglaçage portes';
       case ServiceOption.wheelClearance:
         return 'Dégagement roues';
+      case ServiceOption.roofClearing:
+        return 'Déneigement toit';
+      case ServiceOption.saltSpreading:
+        return 'Épandage sel';
+      case ServiceOption.lightsCleaning:
+        return 'Nettoyage phares';
+      case ServiceOption.perimeterClearance:
+        return 'Dégagement périmètre';
+      case ServiceOption.exhaustCheck:
+        return 'Vérif. échappement';
     }
   }
 

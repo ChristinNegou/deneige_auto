@@ -35,6 +35,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   bool _hasIceScraper = false;
   bool _hasSaltSpreader = false;
   bool _hasSnowBlower = false;
+  bool _hasRoofBroom = false;
+  bool _hasMicrofiberCloth = false;
+  bool _hasDeicerSpray = false;
 
   // Max active jobs
   int _maxActiveJobs = 3;
@@ -82,6 +85,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     _hasIceScraper = equipment.contains('ice_scraper');
     _hasSaltSpreader = equipment.contains('salt_spreader');
     _hasSnowBlower = equipment.contains('snow_blower');
+    _hasRoofBroom = equipment.contains('roof_broom');
+    _hasMicrofiberCloth = equipment.contains('microfiber_cloth');
+    _hasDeicerSpray = equipment.contains('deicer_spray');
 
     // Load other settings
     _maxActiveJobs = profile.maxActiveJobs;
@@ -566,106 +572,167 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     color: AppTheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
-              Text('Mon equipement', style: AppTheme.headlineSmall),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Mon equipement', style: AppTheme.headlineSmall),
+                    Text(
+                      'Cochez les outils que vous possedez',
+                      style: AppTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
-          _buildEquipmentItem(
-            icon: '🪣',
-            label: 'Pelle a neige',
-            value: _hasShovel,
-            onChanged: (val) {
-              setState(() => _hasShovel = val!);
-              _autoSave();
-            },
-          ),
-          _buildEquipmentItem(
-            icon: '🧹',
-            label: 'Balai a neige',
-            value: _hasBrush,
-            onChanged: (val) {
-              setState(() => _hasBrush = val!);
-              _autoSave();
-            },
-          ),
-          _buildEquipmentItem(
-            icon: '🪟',
-            label: 'Grattoir a glace',
-            value: _hasIceScraper,
-            onChanged: (val) {
-              setState(() => _hasIceScraper = val!);
-              _autoSave();
-            },
-          ),
-          _buildEquipmentItem(
-            icon: '🧂',
-            label: 'Epandeur de sel',
-            value: _hasSaltSpreader,
-            onChanged: (val) {
-              setState(() => _hasSaltSpreader = val!);
-              _autoSave();
-            },
-          ),
-          _buildEquipmentItem(
-            icon: '❄️',
-            label: 'Souffleuse',
-            value: _hasSnowBlower,
-            onChanged: (val) {
-              setState(() => _hasSnowBlower = val!);
-              _autoSave();
-            },
-            isLast: true,
+          // Grid layout for equipment (2 columns)
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 2.8,
+            children: [
+              _buildCompactEquipmentItem(
+                icon: Icons.hardware_rounded,
+                label: 'Pelle',
+                value: _hasShovel,
+                onChanged: (val) {
+                  setState(() => _hasShovel = val);
+                  _autoSave();
+                },
+              ),
+              _buildCompactEquipmentItem(
+                icon: Icons.brush_rounded,
+                label: 'Balai',
+                value: _hasBrush,
+                onChanged: (val) {
+                  setState(() => _hasBrush = val);
+                  _autoSave();
+                },
+              ),
+              _buildCompactEquipmentItem(
+                icon: Icons.content_cut_rounded,
+                label: 'Grattoir',
+                value: _hasIceScraper,
+                onChanged: (val) {
+                  setState(() => _hasIceScraper = val);
+                  _autoSave();
+                },
+              ),
+              _buildCompactEquipmentItem(
+                icon: Icons.grain_rounded,
+                label: 'Sel/Epandeur',
+                value: _hasSaltSpreader,
+                onChanged: (val) {
+                  setState(() => _hasSaltSpreader = val);
+                  _autoSave();
+                },
+              ),
+              _buildCompactEquipmentItem(
+                icon: Icons.air_rounded,
+                label: 'Souffleuse',
+                value: _hasSnowBlower,
+                onChanged: (val) {
+                  setState(() => _hasSnowBlower = val);
+                  _autoSave();
+                },
+              ),
+              _buildCompactEquipmentItem(
+                icon: Icons.straighten_rounded,
+                label: 'Balai toit',
+                value: _hasRoofBroom,
+                onChanged: (val) {
+                  setState(() => _hasRoofBroom = val);
+                  _autoSave();
+                },
+              ),
+              _buildCompactEquipmentItem(
+                icon: Icons.cleaning_services_rounded,
+                label: 'Chiffon',
+                value: _hasMicrofiberCloth,
+                onChanged: (val) {
+                  setState(() => _hasMicrofiberCloth = val);
+                  _autoSave();
+                },
+              ),
+              _buildCompactEquipmentItem(
+                icon: Icons.water_drop_rounded,
+                label: 'Deglacant',
+                value: _hasDeicerSpray,
+                onChanged: (val) {
+                  setState(() => _hasDeicerSpray = val);
+                  _autoSave();
+                },
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEquipmentItem({
-    required String icon,
+  Widget _buildCompactEquipmentItem({
+    required IconData icon,
     required String label,
     required bool value,
-    required ValueChanged<bool?> onChanged,
-    bool isLast = false,
+    required ValueChanged<bool> onChanged,
   }) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: () => onChanged(!value),
-          borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              children: [
-                Text(icon, style: const TextStyle(fontSize: 22)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: AppTheme.bodyMedium
-                        .copyWith(fontWeight: FontWeight.w500),
-                  ),
-                ),
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: value ? AppTheme.success : AppTheme.background,
-                    borderRadius: BorderRadius.circular(6),
-                    border: value
-                        ? null
-                        : Border.all(color: AppTheme.border, width: 2),
-                  ),
-                  child: value
-                      ? Icon(Icons.check, color: AppTheme.background, size: 16)
-                      : null,
-                ),
-              ],
-            ),
+    return InkWell(
+      onTap: () => onChanged(!value),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: value
+              ? AppTheme.primary.withValues(alpha: 0.1)
+              : AppTheme.background,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: value ? AppTheme.primary : AppTheme.border,
+            width: value ? 2 : 1,
           ),
         ),
-        if (!isLast) const Divider(height: 1, color: AppTheme.divider),
-      ],
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: value ? AppTheme.primary : AppTheme.textTertiary,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: value ? AppTheme.textPrimary : AppTheme.textSecondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: value ? AppTheme.success : Colors.transparent,
+                borderRadius: BorderRadius.circular(4),
+                border: value
+                    ? null
+                    : Border.all(color: AppTheme.border, width: 1.5),
+              ),
+              child: value
+                  ? Icon(Icons.check, size: 12, color: AppTheme.background)
+                  : null,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1061,6 +1128,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     if (_hasIceScraper) equipment.add('ice_scraper');
     if (_hasSaltSpreader) equipment.add('salt_spreader');
     if (_hasSnowBlower) equipment.add('snow_blower');
+    if (_hasRoofBroom) equipment.add('roof_broom');
+    if (_hasMicrofiberCloth) equipment.add('microfiber_cloth');
+    if (_hasDeicerSpray) equipment.add('deicer_spray');
 
     final notificationPrefs = WorkerNotificationPreferences(
       newJobs: _notifyNewJobs,
