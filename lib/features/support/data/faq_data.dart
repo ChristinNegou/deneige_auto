@@ -21,6 +21,24 @@ class FaqData {
           'Notre service est disponible 7 jours sur 7, de 5h00 à 22h00. Les horaires peuvent varier pendant les périodes de tempête intense.',
       category: FaqCategory.general,
     ),
+    FaqItem(
+      question: 'Qu\'est-ce que l\'Assistant IA?',
+      answer:
+          'L\'Assistant IA est votre aide virtuel disponible 24/7 dans l\'application. Il peut répondre à vos questions sur le service, vous aider à résoudre des problèmes, donner des conseils et vous informer sur les conditions météo actuelles et prévues dans votre région.',
+      category: FaqCategory.general,
+    ),
+    FaqItem(
+      question: 'Comment utiliser l\'Assistant IA?',
+      answer:
+          'Accédez à l\'Assistant IA depuis le menu principal ou en appuyant sur l\'icône de chat. Posez vos questions en langage naturel et l\'assistant vous répondra instantanément. Il peut vous aider avec les réservations, les litiges, les paiements et bien plus.',
+      category: FaqCategory.general,
+    ),
+    FaqItem(
+      question: 'L\'Assistant IA peut-il me donner la météo?',
+      answer:
+          'Oui! L\'Assistant IA a accès aux données météo en temps réel. Demandez-lui simplement "Quelle est la météo?" ou "Va-t-il neiger demain?" pour obtenir les prévisions actuelles et à venir dans votre région.',
+      category: FaqCategory.general,
+    ),
 
     // Réservations
     FaqItem(
@@ -82,9 +100,27 @@ class FaqData {
       category: FaqCategory.disputes,
     ),
     FaqItem(
-      question: 'Comment signaler un problème avec le service?',
+      question: 'Comment créer un litige?',
       answer:
-          'Allez dans Profil > Mes litiges pour créer une réclamation. Vous pouvez signaler différents problèmes: travail incomplet, qualité insuffisante, retard important, dommage causé, surfacturation, etc. Décrivez la situation et ajoutez des photos si possible.',
+          'Pour créer un litige:\n1. Allez dans Profil > Mes litiges > Créer un litige\n2. Sélectionnez la réservation concernée\n3. Choisissez le type de problème (travail incomplet, qualité insuffisante, dommage, etc.)\n4. Décrivez la situation en détail\n5. Ajoutez des photos comme preuves\n6. Indiquez le montant réclamé si applicable\n7. Soumettez votre litige',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Quels types de litiges puis-je signaler?',
+      answer:
+          'Vous pouvez signaler plusieurs types de problèmes:\n• Déneigeur non venu (no-show)\n• Travail incomplet\n• Qualité insuffisante\n• Retard important\n• Dommage causé à votre véhicule\n• Mauvais emplacement déneigé\n• Surfacturation\n• Comportement inapproprié\n• Autre problème',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Comment ajouter des preuves à mon litige?',
+      answer:
+          'Les preuves renforcent votre dossier. Dans les détails du litige, appuyez sur "Ajouter des preuves" pour:\n• Prendre des photos ou les choisir depuis votre galerie (jusqu\'à 10 photos)\n• Ajouter une description détaillée\n\nConseils: prenez des photos claires, bien éclairées et horodatées si possible.',
+      category: FaqCategory.disputes,
+    ),
+    FaqItem(
+      question: 'Qu\'est-ce que l\'analyse IA des litiges?',
+      answer:
+          'Notre système utilise l\'intelligence artificielle pour analyser objectivement les litiges. L\'IA examine les preuves (photos, descriptions, données GPS, historique), évalue la force des arguments et propose une recommandation. Cette analyse aide notre équipe à prendre des décisions justes et rapides.',
       category: FaqCategory.disputes,
     ),
     FaqItem(
