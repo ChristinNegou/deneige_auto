@@ -76,6 +76,14 @@ class AppRoutes {
   //Routes pour le dashboard client
   static const String clientHome = '/client-home';
 
+  // Routes de litiges
+  static const String disputes = '/disputes';
+  static const String disputeDetails = '/disputes/details';
+  static const String createDispute = '/disputes/create';
+  static const String respondDispute = '/disputes/respond';
+  static const String addEvidence = '/disputes/add-evidence';
+  static const String reportNoShow = '/disputes/report-no-show';
+
   // Routes admin
   static const String adminDashboard = '/admin/dashboard';
   static const String adminUsers = '/admin/users';

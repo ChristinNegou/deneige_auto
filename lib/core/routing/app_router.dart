@@ -58,6 +58,12 @@ import '../../features/admin/presentation/pages/admin_stripe_accounts_page.dart'
 import '../../features/admin/presentation/pages/admin_ai_page.dart';
 import '../../features/admin/presentation/bloc/admin_bloc.dart';
 import '../../features/admin/presentation/bloc/admin_event.dart';
+import '../../features/disputes/presentation/pages/my_disputes_page.dart';
+import '../../features/disputes/presentation/pages/dispute_details_page.dart';
+import '../../features/disputes/presentation/pages/create_dispute_page.dart';
+import '../../features/disputes/presentation/pages/respond_dispute_page.dart';
+import '../../features/disputes/presentation/pages/add_evidence_page.dart';
+import '../../features/disputes/presentation/pages/report_no_show_page.dart';
 
 /// Classe qui gère la génération et la navigation des routes
 class AppRouter {
@@ -409,6 +415,70 @@ class AppRouter {
       case AppRoutes.adminAI:
         return MaterialPageRoute(
           builder: (_) => const AdminAIPage(),
+          settings: settings,
+        );
+
+      // Routes de litiges
+      case AppRoutes.disputes:
+        return MaterialPageRoute(
+          builder: (_) => const MyDisputesPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.disputeDetails:
+        final disputeId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => DisputeDetailsPage(disputeId: disputeId),
+          settings: settings,
+        );
+
+      case AppRoutes.createDispute:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => CreateDisputePage(
+            reservationId: args['reservationId'] as String,
+            workerName: args['workerName'] as String?,
+            totalPrice: args['totalPrice'] as double,
+            serviceDate: args['serviceDate'] != null
+                ? DateTime.parse(args['serviceDate'] as String)
+                : null,
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.respondDispute:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => RespondDisputePage(
+            disputeId: args['disputeId'] as String,
+            disputeType: args['disputeType'] as String,
+            disputeDescription: args['disputeDescription'] as String,
+            responseDeadline: args['responseDeadline'] != null
+                ? DateTime.parse(args['responseDeadline'] as String)
+                : null,
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.addEvidence:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => AddEvidencePage(
+            disputeId: args['disputeId'] as String,
+            disputeStatus: args['disputeStatus'] as String,
+          ),
+          settings: settings,
+        );
+
+      case AppRoutes.reportNoShow:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => ReportNoShowPage(
+            reservationId: args['reservationId'] as String,
+            workerName: args['workerName'] as String?,
+            totalPrice: args['totalPrice'] as double,
+            departureTime: DateTime.parse(args['departureTime'] as String),
+          ),
           settings: settings,
         );
 
