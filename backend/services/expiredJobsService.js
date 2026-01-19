@@ -184,8 +184,8 @@ async function penalizeWorker(workerId, reservation) {
             await Notification.create({
                 userId: worker._id,
                 type: 'systemNotification',
-                title: 'Compte suspendu',
-                message: `Votre compte deneigeur a ete suspendu suite a ${worker.workerProfile.warningCount} jobs non completes. Contactez le support pour plus d'informations.`,
+                title: '🚫 Compte déneigeur suspendu',
+                message: `Votre compte déneigeur a été temporairement suspendu suite à ${worker.workerProfile.warningCount} jobs non complétés dans les délais. Cette suspension restera en vigueur jusqu'à examen par notre équipe. Pour rétablir votre compte, veuillez contacter le support en expliquant les circonstances.`,
             });
         }
 
@@ -204,15 +204,18 @@ async function notifyClientJobExpired(reservation) {
     try {
         const client = reservation.userId;
         const vehicle = reservation.vehicle;
+        const vehicleName = vehicle ? `${vehicle.brand || ''} ${vehicle.model || ''}`.trim() : 'votre véhicule';
+        const refundAmount = reservation.totalPrice ? reservation.totalPrice.toFixed(2) : '';
 
         const notification = await Notification.create({
             userId: client._id,
             type: 'reservationUpdate',
-            title: 'Reservation annulee',
-            message: `Votre reservation pour ${vehicle?.brand || 'votre vehicule'} ${vehicle?.model || ''} a ete annulee car le deneigeur n'a pas pu completer le travail a temps. Vous serez rembourse integralement.`,
+            title: '😔 Réservation annulée - Remboursement prévu',
+            message: `Nous sommes désolés, votre réservation pour ${vehicleName} a dû être annulée car le déneigeur n'a pas pu compléter le travail dans le délai prévu.${refundAmount ? ` Un remboursement de ${refundAmount}$ sera automatiquement crédité sur votre carte sous 5-10 jours ouvrables.` : ' Vous serez remboursé intégralement.'} Nous nous excusons pour ce désagrément.`,
             metadata: {
                 reservationId: reservation._id,
                 reason: 'expired',
+                refundAmount: reservation.totalPrice,
             },
         });
 
@@ -220,13 +223,13 @@ async function notifyClientJobExpired(reservation) {
         if (client.fcmToken) {
             await sendPushNotification(
                 client.fcmToken,
-                'Reservation annulee',
-                `Votre reservation a ete annulee. Un remboursement sera effectue.`,
+                '😔 Réservation annulée',
+                `Votre réservation pour ${vehicleName} a été annulée. Un remboursement sera effectué automatiquement.`,
                 { reservationId: reservation._id.toString(), type: 'reservation_expired' }
             );
         }
 
-        console.log(`   📱 Client ${client.email} notifie`);
+        console.log(`   📱 Client ${client.email} notifié`);
 
     } catch (error) {
         console.error('Erreur notification client:', error);
@@ -241,11 +244,15 @@ async function notifyWorkerJobExpired(reservation) {
         const worker = reservation.workerId;
         if (!worker) return;
 
+        const vehicle = reservation.vehicle;
+        const vehicleName = vehicle ? `${vehicle.brand || ''} ${vehicle.model || ''}`.trim() : 'le véhicule';
+        const clientName = reservation.userId?.firstName || 'le client';
+
         const notification = await Notification.create({
             userId: worker._id,
             type: 'systemNotification',
-            title: 'Job annule - Non complete',
-            message: `Le job #${reservation._id.toString().slice(-6)} a ete annule car il n'a pas ete complete avant la deadline. Un avertissement a ete ajoute a votre compte.`,
+            title: '⚠️ Job annulé - Délai dépassé',
+            message: `Le job pour ${vehicleName} de ${clientName} (réf: #${reservation._id.toString().slice(-6)}) a été annulé car il n'a pas été complété avant la deadline. Un avertissement a été ajouté à votre compte. Rappel: 3 avertissements entraînent une suspension temporaire.`,
             metadata: {
                 reservationId: reservation._id,
                 reason: 'expired',
@@ -256,13 +263,13 @@ async function notifyWorkerJobExpired(reservation) {
         if (worker.fcmToken) {
             await sendPushNotification(
                 worker.fcmToken,
-                'Job annule',
-                `Un job a ete annule car non complete a temps. Verifiez votre compte.`,
+                '⚠️ Job annulé - Avertissement',
+                `Le job #${reservation._id.toString().slice(-6)} a été annulé (délai dépassé). Un avertissement a été ajouté à votre compte.`,
                 { reservationId: reservation._id.toString(), type: 'job_expired_warning' }
             );
         }
 
-        console.log(`   📱 Worker ${worker.email} notifie`);
+        console.log(`   📱 Worker ${worker.email} notifié`);
 
     } catch (error) {
         console.error('Erreur notification worker:', error);
@@ -289,15 +296,18 @@ async function sendDeadlineReminders() {
     const notificationsToCreate = jobsWithWorkers.map(job => {
         const worker = job.workerId;
         const minutesLeft = Math.floor((job.deadlineTime - now) / (1000 * 60));
+        const clientName = job.userId?.firstName || 'le client';
+        const vehicleName = job.vehicle ? `${job.vehicle.brand || ''} ${job.vehicle.model || ''}`.trim() : 'le véhicule';
 
         return {
             userId: worker._id,
             type: 'reminder',
-            title: 'Rappel - Deadline proche',
-            message: `Il vous reste ${minutesLeft} minutes pour completer le job pour ${job.userId?.firstName || 'le client'}. Vehicule: ${job.vehicle?.brand || ''} ${job.vehicle?.model || ''}`,
+            title: `⏰ ${minutesLeft} min restantes - Action requise`,
+            message: `Il vous reste ${minutesLeft} minutes pour compléter le déneigement de ${vehicleName} pour ${clientName}. Passé ce délai, le job sera automatiquement annulé et un avertissement sera ajouté à votre compte.`,
             metadata: {
                 reservationId: job._id,
                 type: 'deadline_reminder',
+                minutesLeft,
             },
         };
     });
@@ -315,12 +325,13 @@ async function sendDeadlineReminders() {
         .map(job => {
             const worker = job.workerId;
             const minutesLeft = Math.floor((job.deadlineTime - now) / (1000 * 60));
+            const clientName = job.userId?.firstName || 'le client';
 
             return sendPushNotification(
                 worker.fcmToken,
-                `⏰ ${minutesLeft} min restantes`,
-                `Completez le job rapidement pour eviter l'annulation automatique.`,
-                { reservationId: job._id.toString(), type: 'deadline_reminder' }
+                `⏰ ${minutesLeft} min restantes!`,
+                `Terminez le job de ${clientName} rapidement pour éviter l'annulation automatique et un avertissement.`,
+                { reservationId: job._id.toString(), type: 'deadline_reminder', urgent: true }
             ).catch(err => {
                 console.error(`Push notification error for ${worker.email}:`, err.message);
             });
