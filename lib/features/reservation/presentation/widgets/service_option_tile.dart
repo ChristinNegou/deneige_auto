@@ -7,6 +7,7 @@ class ServiceOptionTile extends StatelessWidget {
   final bool isSelected;
   final double price;
   final VoidCallback onToggle;
+  final bool compact;
 
   const ServiceOptionTile({
     super.key,
@@ -14,10 +15,100 @@ class ServiceOptionTile extends StatelessWidget {
     required this.isSelected,
     required this.price,
     required this.onToggle,
+    this.compact = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (compact) {
+      return _buildCompactTile();
+    }
+    return _buildFullTile();
+  }
+
+  Widget _buildCompactTile() {
+    return InkWell(
+      onTap: onToggle,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppTheme.primary.withValues(alpha: 0.1)
+              : AppTheme.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? AppTheme.primary : AppTheme.border,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color:
+                    isSelected ? AppTheme.primary : AppTheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                _getOptionIcon(option),
+                size: 18,
+                color:
+                    isSelected ? AppTheme.background : AppTheme.textSecondary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _getOptionTitle(option),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '+${price.toStringAsFixed(0)} \$',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? AppTheme.primary
+                          : AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                color: isSelected ? AppTheme.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: isSelected ? AppTheme.primary : AppTheme.textTertiary,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? Icon(Icons.check, size: 14, color: AppTheme.background)
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFullTile() {
     return InkWell(
       onTap: onToggle,
       borderRadius: BorderRadius.circular(12),
@@ -121,6 +212,16 @@ class ServiceOptionTile extends StatelessWidget {
         return Icons.door_front_door;
       case ServiceOption.wheelClearance:
         return Icons.tire_repair;
+      case ServiceOption.roofClearing:
+        return Icons.car_rental;
+      case ServiceOption.saltSpreading:
+        return Icons.grain_rounded;
+      case ServiceOption.lightsCleaning:
+        return Icons.highlight_rounded;
+      case ServiceOption.perimeterClearance:
+        return Icons.crop_free_rounded;
+      case ServiceOption.exhaustCheck:
+        return Icons.air_rounded;
     }
   }
 
@@ -132,6 +233,16 @@ class ServiceOptionTile extends StatelessWidget {
         return 'Déglaçage des portes';
       case ServiceOption.wheelClearance:
         return 'Dégagement des roues';
+      case ServiceOption.roofClearing:
+        return 'Déneigement du toit';
+      case ServiceOption.saltSpreading:
+        return 'Épandage de sel';
+      case ServiceOption.lightsCleaning:
+        return 'Nettoyage phares/feux';
+      case ServiceOption.perimeterClearance:
+        return 'Dégagement périmètre';
+      case ServiceOption.exhaustCheck:
+        return 'Vérif. échappement';
     }
   }
 
@@ -143,6 +254,16 @@ class ServiceOptionTile extends StatelessWidget {
         return 'Dégivrage des poignées et serrures';
       case ServiceOption.wheelClearance:
         return 'Dégagement de la neige autour des roues';
+      case ServiceOption.roofClearing:
+        return 'Enlever la neige accumulée sur le toit';
+      case ServiceOption.saltSpreading:
+        return 'Application de sel autour du véhicule';
+      case ServiceOption.lightsCleaning:
+        return 'Nettoyage des phares et feux arrière';
+      case ServiceOption.perimeterClearance:
+        return 'Déneigement complet autour du véhicule';
+      case ServiceOption.exhaustCheck:
+        return 'Vérifier que l\'échappement est dégagé';
     }
   }
 }

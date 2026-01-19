@@ -785,6 +785,36 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
           icon: Icons.trip_origin,
           color: AppTheme.primary2,
         );
+      case ServiceOption.roofClearing:
+        return _ServiceOptionData(
+          label: 'Toit',
+          icon: Icons.car_rental,
+          color: AppTheme.warning,
+        );
+      case ServiceOption.saltSpreading:
+        return _ServiceOptionData(
+          label: 'Sel',
+          icon: Icons.grain_rounded,
+          color: AppTheme.info,
+        );
+      case ServiceOption.lightsCleaning:
+        return _ServiceOptionData(
+          label: 'Phares',
+          icon: Icons.highlight_rounded,
+          color: AppTheme.secondary,
+        );
+      case ServiceOption.perimeterClearance:
+        return _ServiceOptionData(
+          label: 'Périmètre',
+          icon: Icons.crop_free_rounded,
+          color: AppTheme.primary,
+        );
+      case ServiceOption.exhaustCheck:
+        return _ServiceOptionData(
+          label: 'Échapp.',
+          icon: Icons.air_rounded,
+          color: AppTheme.textSecondary,
+        );
     }
   }
 

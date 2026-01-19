@@ -259,6 +259,16 @@ class ReservationModel extends Reservation {
         return 'doorDeicing';
       case ServiceOption.wheelClearance:
         return 'wheelClearance';
+      case ServiceOption.roofClearing:
+        return 'roofClearing';
+      case ServiceOption.saltSpreading:
+        return 'saltSpreading';
+      case ServiceOption.lightsCleaning:
+        return 'lightsCleaning';
+      case ServiceOption.perimeterClearance:
+        return 'perimeterClearance';
+      case ServiceOption.exhaustCheck:
+        return 'exhaustCheck';
     }
   }
 

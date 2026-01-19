@@ -70,6 +70,11 @@ class AppConfig {
   static const double iceRemovalSurcharge = 5.0;
   static const double doorDeicingSurcharge = 3.0;
   static const double wheelClearanceSurcharge = 4.0;
+  static const double roofClearingSurcharge = 8.0;
+  static const double saltSpreadingSurcharge = 5.0;
+  static const double lightsCleaningSurcharge = 3.0;
+  static const double perimeterClearanceSurcharge = 12.0;
+  static const double exhaustCheckSurcharge = 2.0;
 
   // Taxes (Québec)
   static const double tpsRate = 0.05; // TPS - Taxe fédérale (5%)
@@ -163,6 +168,11 @@ enum ServiceOption {
   windowScraping, // Grattage vitres
   doorDeicing, // Déglaçage portes
   wheelClearance, // Dégagement roues
+  roofClearing, // Déneigement du toit
+  saltSpreading, // Épandage de sel
+  lightsCleaning, // Nettoyage phares/feux
+  perimeterClearance, // Dégagement périmètre complet
+  exhaustCheck, // Vérification échappement
 }
 
 class AppStrings {

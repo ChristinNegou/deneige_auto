@@ -358,13 +358,28 @@ class NewReservationBloc
     for (final option in state.selectedOptions) {
       switch (option) {
         case ServiceOption.windowScraping:
-          optionsCost += 5.0;
+          optionsCost += AppConfig.iceRemovalSurcharge;
           break;
         case ServiceOption.doorDeicing:
           optionsCost += AppConfig.doorDeicingSurcharge;
           break;
         case ServiceOption.wheelClearance:
           optionsCost += AppConfig.wheelClearanceSurcharge;
+          break;
+        case ServiceOption.roofClearing:
+          optionsCost += AppConfig.roofClearingSurcharge;
+          break;
+        case ServiceOption.saltSpreading:
+          optionsCost += AppConfig.saltSpreadingSurcharge;
+          break;
+        case ServiceOption.lightsCleaning:
+          optionsCost += AppConfig.lightsCleaningSurcharge;
+          break;
+        case ServiceOption.perimeterClearance:
+          optionsCost += AppConfig.perimeterClearanceSurcharge;
+          break;
+        case ServiceOption.exhaustCheck:
+          optionsCost += AppConfig.exhaustCheckSurcharge;
           break;
       }
     }

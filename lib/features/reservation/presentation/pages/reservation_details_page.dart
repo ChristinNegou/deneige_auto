@@ -1083,6 +1083,16 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         return Icons.door_front_door;
       case ServiceOption.wheelClearance:
         return Icons.trip_origin;
+      case ServiceOption.roofClearing:
+        return Icons.car_rental;
+      case ServiceOption.saltSpreading:
+        return Icons.grain_rounded;
+      case ServiceOption.lightsCleaning:
+        return Icons.highlight_rounded;
+      case ServiceOption.perimeterClearance:
+        return Icons.crop_free_rounded;
+      case ServiceOption.exhaustCheck:
+        return Icons.air_rounded;
     }
   }
 
@@ -1094,6 +1104,16 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         return 'Déglaçage des portes';
       case ServiceOption.wheelClearance:
         return 'Dégagement des roues';
+      case ServiceOption.roofClearing:
+        return 'Déneigement du toit';
+      case ServiceOption.saltSpreading:
+        return 'Épandage de sel';
+      case ServiceOption.lightsCleaning:
+        return 'Nettoyage phares/feux';
+      case ServiceOption.perimeterClearance:
+        return 'Dégagement périmètre';
+      case ServiceOption.exhaustCheck:
+        return 'Vérif. échappement';
     }
   }
 
@@ -1105,6 +1125,16 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         return 3.0;
       case ServiceOption.wheelClearance:
         return 4.0;
+      case ServiceOption.roofClearing:
+        return 8.0;
+      case ServiceOption.saltSpreading:
+        return 5.0;
+      case ServiceOption.lightsCleaning:
+        return 3.0;
+      case ServiceOption.perimeterClearance:
+        return 12.0;
+      case ServiceOption.exhaustCheck:
+        return 2.0;
     }
   }
 

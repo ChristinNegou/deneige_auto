@@ -79,50 +79,136 @@ class _Step4OptionsScreenState extends State<Step4OptionsScreen> {
                     Icons.add_circle_outline_rounded),
                 const SizedBox(height: 12),
 
-                ServiceOptionTile(
-                  option: ServiceOption.windowScraping,
-                  isSelected: state.selectedOptions
-                      .contains(ServiceOption.windowScraping),
-                  price: 5.0,
-                  onToggle: () {
-                    context.read<NewReservationBloc>().add(
-                          const ToggleServiceOption(
-                              ServiceOption.windowScraping),
-                        );
-                    Future.delayed(const Duration(milliseconds: 300),
-                        _triggerAIEstimation);
-                  },
-                ),
-                const SizedBox(height: 8),
-
-                ServiceOptionTile(
-                  option: ServiceOption.doorDeicing,
-                  isSelected:
-                      state.selectedOptions.contains(ServiceOption.doorDeicing),
-                  price: AppConfig.doorDeicingSurcharge,
-                  onToggle: () {
-                    context.read<NewReservationBloc>().add(
-                          const ToggleServiceOption(ServiceOption.doorDeicing),
-                        );
-                    Future.delayed(const Duration(milliseconds: 300),
-                        _triggerAIEstimation);
-                  },
-                ),
-                const SizedBox(height: 8),
-
-                ServiceOptionTile(
-                  option: ServiceOption.wheelClearance,
-                  isSelected: state.selectedOptions
-                      .contains(ServiceOption.wheelClearance),
-                  price: AppConfig.wheelClearanceSurcharge,
-                  onToggle: () {
-                    context.read<NewReservationBloc>().add(
-                          const ToggleServiceOption(
-                              ServiceOption.wheelClearance),
-                        );
-                    Future.delayed(const Duration(milliseconds: 300),
-                        _triggerAIEstimation);
-                  },
+                // Grid of compact options (2 columns)
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 2.4,
+                  children: [
+                    ServiceOptionTile(
+                      option: ServiceOption.windowScraping,
+                      isSelected: state.selectedOptions
+                          .contains(ServiceOption.windowScraping),
+                      price: AppConfig.iceRemovalSurcharge,
+                      compact: true,
+                      onToggle: () {
+                        context.read<NewReservationBloc>().add(
+                              const ToggleServiceOption(
+                                  ServiceOption.windowScraping),
+                            );
+                        Future.delayed(const Duration(milliseconds: 300),
+                            _triggerAIEstimation);
+                      },
+                    ),
+                    ServiceOptionTile(
+                      option: ServiceOption.doorDeicing,
+                      isSelected: state.selectedOptions
+                          .contains(ServiceOption.doorDeicing),
+                      price: AppConfig.doorDeicingSurcharge,
+                      compact: true,
+                      onToggle: () {
+                        context.read<NewReservationBloc>().add(
+                              const ToggleServiceOption(
+                                  ServiceOption.doorDeicing),
+                            );
+                        Future.delayed(const Duration(milliseconds: 300),
+                            _triggerAIEstimation);
+                      },
+                    ),
+                    ServiceOptionTile(
+                      option: ServiceOption.wheelClearance,
+                      isSelected: state.selectedOptions
+                          .contains(ServiceOption.wheelClearance),
+                      price: AppConfig.wheelClearanceSurcharge,
+                      compact: true,
+                      onToggle: () {
+                        context.read<NewReservationBloc>().add(
+                              const ToggleServiceOption(
+                                  ServiceOption.wheelClearance),
+                            );
+                        Future.delayed(const Duration(milliseconds: 300),
+                            _triggerAIEstimation);
+                      },
+                    ),
+                    ServiceOptionTile(
+                      option: ServiceOption.roofClearing,
+                      isSelected: state.selectedOptions
+                          .contains(ServiceOption.roofClearing),
+                      price: AppConfig.roofClearingSurcharge,
+                      compact: true,
+                      onToggle: () {
+                        context.read<NewReservationBloc>().add(
+                              const ToggleServiceOption(
+                                  ServiceOption.roofClearing),
+                            );
+                        Future.delayed(const Duration(milliseconds: 300),
+                            _triggerAIEstimation);
+                      },
+                    ),
+                    ServiceOptionTile(
+                      option: ServiceOption.saltSpreading,
+                      isSelected: state.selectedOptions
+                          .contains(ServiceOption.saltSpreading),
+                      price: AppConfig.saltSpreadingSurcharge,
+                      compact: true,
+                      onToggle: () {
+                        context.read<NewReservationBloc>().add(
+                              const ToggleServiceOption(
+                                  ServiceOption.saltSpreading),
+                            );
+                        Future.delayed(const Duration(milliseconds: 300),
+                            _triggerAIEstimation);
+                      },
+                    ),
+                    ServiceOptionTile(
+                      option: ServiceOption.lightsCleaning,
+                      isSelected: state.selectedOptions
+                          .contains(ServiceOption.lightsCleaning),
+                      price: AppConfig.lightsCleaningSurcharge,
+                      compact: true,
+                      onToggle: () {
+                        context.read<NewReservationBloc>().add(
+                              const ToggleServiceOption(
+                                  ServiceOption.lightsCleaning),
+                            );
+                        Future.delayed(const Duration(milliseconds: 300),
+                            _triggerAIEstimation);
+                      },
+                    ),
+                    ServiceOptionTile(
+                      option: ServiceOption.perimeterClearance,
+                      isSelected: state.selectedOptions
+                          .contains(ServiceOption.perimeterClearance),
+                      price: AppConfig.perimeterClearanceSurcharge,
+                      compact: true,
+                      onToggle: () {
+                        context.read<NewReservationBloc>().add(
+                              const ToggleServiceOption(
+                                  ServiceOption.perimeterClearance),
+                            );
+                        Future.delayed(const Duration(milliseconds: 300),
+                            _triggerAIEstimation);
+                      },
+                    ),
+                    ServiceOptionTile(
+                      option: ServiceOption.exhaustCheck,
+                      isSelected: state.selectedOptions
+                          .contains(ServiceOption.exhaustCheck),
+                      price: AppConfig.exhaustCheckSurcharge,
+                      compact: true,
+                      onToggle: () {
+                        context.read<NewReservationBloc>().add(
+                              const ToggleServiceOption(
+                                  ServiceOption.exhaustCheck),
+                            );
+                        Future.delayed(const Duration(milliseconds: 300),
+                            _triggerAIEstimation);
+                      },
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 28),

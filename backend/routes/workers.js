@@ -127,12 +127,29 @@ const computeRequiredEquipment = (reservation) => {
     const required = ['shovel', 'brush']; // Base equipment always required
 
     if (reservation.serviceOptions && reservation.serviceOptions.length > 0) {
+        // Grattage des vitres
         if (reservation.serviceOptions.includes('windowScraping')) {
             required.push('ice_scraper');
         }
+        // Déglaçage des portes
         if (reservation.serviceOptions.includes('doorDeicing')) {
+            required.push('ice_scraper');
+            required.push('deicer_spray');
+        }
+        // Déneigement du toit
+        if (reservation.serviceOptions.includes('roofClearing')) {
+            required.push('roof_broom');
+        }
+        // Épandage de sel
+        if (reservation.serviceOptions.includes('saltSpreading')) {
             required.push('salt_spreader');
         }
+        // Nettoyage des phares/feux
+        if (reservation.serviceOptions.includes('lightsCleaning')) {
+            required.push('microfiber_cloth');
+        }
+        // perimeterClearance - uses shovel (already in base)
+        // exhaustCheck - no specific equipment needed (visual check)
     }
 
     // Heavy snow requires snow blower

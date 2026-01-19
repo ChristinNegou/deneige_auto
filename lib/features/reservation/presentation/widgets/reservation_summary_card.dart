@@ -138,9 +138,19 @@ class ReservationSummaryCard extends StatelessWidget {
       case ServiceOption.windowScraping:
         return 'Vitres';
       case ServiceOption.doorDeicing:
-        return 'Roues';
-      case ServiceOption.wheelClearance:
         return 'Portes';
+      case ServiceOption.wheelClearance:
+        return 'Roues';
+      case ServiceOption.roofClearing:
+        return 'Toit';
+      case ServiceOption.saltSpreading:
+        return 'Sel';
+      case ServiceOption.lightsCleaning:
+        return 'Phares';
+      case ServiceOption.perimeterClearance:
+        return 'Périmètre';
+      case ServiceOption.exhaustCheck:
+        return 'Échapp.';
     }
   }
 }
