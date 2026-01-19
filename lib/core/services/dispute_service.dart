@@ -49,6 +49,101 @@ enum DisputeStatus {
   }
 }
 
+/// Modèle de preuve photo
+class DisputePhoto {
+  final String url;
+  final DateTime? uploadedAt;
+  final String? description;
+
+  DisputePhoto({
+    required this.url,
+    this.uploadedAt,
+    this.description,
+  });
+
+  factory DisputePhoto.fromJson(Map<String, dynamic> json) {
+    return DisputePhoto(
+      url: json['url'] ?? '',
+      uploadedAt: json['uploadedAt'] != null
+          ? DateTime.tryParse(json['uploadedAt'])
+          : null,
+      description: json['description'],
+    );
+  }
+}
+
+/// Modèle de constat clé de l'analyse IA
+class AIKeyFinding {
+  final String category;
+  final String finding;
+  final String
+      impact; // 'favorable_claimant', 'favorable_respondent', 'neutral'
+
+  AIKeyFinding({
+    required this.category,
+    required this.finding,
+    required this.impact,
+  });
+
+  factory AIKeyFinding.fromJson(Map<String, dynamic> json) {
+    return AIKeyFinding(
+      category: json['category'] ?? '',
+      finding: json['finding'] ?? '',
+      impact: json['impact'] ?? 'neutral',
+    );
+  }
+}
+
+/// Modèle d'analyse IA
+class DisputeAIAnalysis {
+  final int? evidenceStrength; // 0-100
+  final String? recommendedDecision;
+  final double? confidence; // 0-1
+  final String? reasoning;
+  final List<String> riskFactors;
+  final int? suggestedRefundPercent; // 0-100
+  final String? suggestedPenalty;
+  final List<AIKeyFinding> keyFindings;
+  final DateTime? analyzedAt;
+  final bool reviewedByAdmin;
+
+  DisputeAIAnalysis({
+    this.evidenceStrength,
+    this.recommendedDecision,
+    this.confidence,
+    this.reasoning,
+    this.riskFactors = const [],
+    this.suggestedRefundPercent,
+    this.suggestedPenalty,
+    this.keyFindings = const [],
+    this.analyzedAt,
+    this.reviewedByAdmin = false,
+  });
+
+  factory DisputeAIAnalysis.fromJson(Map<String, dynamic> json) {
+    return DisputeAIAnalysis(
+      evidenceStrength: json['evidenceStrength'],
+      recommendedDecision: json['recommendedDecision'],
+      confidence: (json['confidence'] as num?)?.toDouble(),
+      reasoning: json['reasoning'],
+      riskFactors: (json['riskFactors'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      suggestedRefundPercent: json['suggestedRefundPercent'],
+      suggestedPenalty: json['suggestedPenalty'],
+      keyFindings: (json['keyFindings'] as List<dynamic>?)
+              ?.map((e) => AIKeyFinding.fromJson(e))
+              .toList() ??
+          [],
+      analyzedAt: json['analyzedAt'] != null
+          ? DateTime.tryParse(json['analyzedAt'])
+          : null,
+      reviewedByAdmin: json['reviewedByAdmin'] ?? false,
+    );
+  }
+}
+
 /// Modèle de litige
 class Dispute {
   final String id;
@@ -66,6 +161,10 @@ class Dispute {
   final Map<String, dynamic>? resolution;
   final Map<String, dynamic>? response;
   final bool? autoResolutionEligible;
+  // Nouveaux champs
+  final List<DisputePhoto> evidencePhotos;
+  final List<DisputePhoto> responsePhotos;
+  final DisputeAIAnalysis? aiAnalysis;
 
   Dispute({
     required this.id,
@@ -83,9 +182,35 @@ class Dispute {
     this.resolution,
     this.response,
     this.autoResolutionEligible,
+    this.evidencePhotos = const [],
+    this.responsePhotos = const [],
+    this.aiAnalysis,
   });
 
   factory Dispute.fromJson(Map<String, dynamic> json) {
+    // Parser les photos de preuves
+    List<DisputePhoto> evidencePhotos = [];
+    if (json['evidence']?['photos'] != null) {
+      evidencePhotos = (json['evidence']['photos'] as List<dynamic>)
+          .map((e) => DisputePhoto.fromJson(e))
+          .toList();
+    }
+
+    // Parser les photos de réponse
+    List<DisputePhoto> responsePhotos = [];
+    if (json['response']?['photos'] != null) {
+      responsePhotos = (json['response']['photos'] as List<dynamic>)
+          .map((e) => DisputePhoto.fromJson(e))
+          .toList();
+    }
+
+    // Parser l'analyse IA
+    DisputeAIAnalysis? aiAnalysis;
+    if (json['aiAnalysis'] != null &&
+        json['aiAnalysis']['analyzedAt'] != null) {
+      aiAnalysis = DisputeAIAnalysis.fromJson(json['aiAnalysis']);
+    }
+
     return Dispute(
       id: json['_id'] ?? json['id'] ?? '',
       type: DisputeType.fromValue(json['type'] ?? 'other'),
@@ -106,6 +231,9 @@ class Dispute {
       resolution: json['resolution'],
       response: json['response'],
       autoResolutionEligible: json['autoResolution']?['eligible'],
+      evidencePhotos: evidencePhotos,
+      responsePhotos: responsePhotos,
+      aiAnalysis: aiAnalysis,
     );
   }
 
@@ -118,6 +246,12 @@ class Dispute {
       status == DisputeStatus.open || status == DisputeStatus.pendingResponse;
 
   bool get canAppeal => status == DisputeStatus.resolved;
+
+  bool get hasResponse => response != null && response!['text'] != null;
+
+  bool get hasEvidence => evidencePhotos.isNotEmpty;
+
+  bool get hasAIAnalysis => aiAnalysis != null;
 }
 
 /// Service pour gérer les litiges

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
@@ -162,6 +163,89 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
     }
   }
 
+  void _navigateToAddEvidence() {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.addEvidence,
+      arguments: {
+        'disputeId': widget.disputeId,
+        'disputeStatus': _dispute!.status.value,
+      },
+    ).then((result) {
+      if (result == true) {
+        _loadDispute();
+      }
+    });
+  }
+
+  void _navigateToRespond() {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.respondDispute,
+      arguments: {
+        'disputeId': widget.disputeId,
+        'disputeType': _dispute!.type.label,
+        'disputeDescription': _dispute!.description,
+        'responseDeadline': _dispute!.responseDeadline?.toIso8601String(),
+      },
+    ).then((result) {
+      if (result == true) {
+        _loadDispute();
+      }
+    });
+  }
+
+  void _showPhotoViewer(List<DisputePhoto> photos, int initialIndex) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          children: [
+            PageView.builder(
+              controller: PageController(initialPage: initialIndex),
+              itemCount: photos.length,
+              itemBuilder: (context, index) {
+                return InteractiveViewer(
+                  child: Center(
+                    child: Image.network(
+                      photos[index].url,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppTheme.primary,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+            Positioned(
+              top: 40,
+              right: 16,
+              child: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.background.withValues(alpha: 0.8),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.close, color: AppTheme.textPrimary),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -199,10 +283,28 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                             _buildDetailsCard(),
                             const SizedBox(height: 16),
 
+                            // Evidence Photos Card
+                            if (_dispute!.hasEvidence) ...[
+                              _buildEvidenceCard(),
+                              const SizedBox(height: 16),
+                            ],
+
+                            // Response Card (from worker)
+                            if (_dispute!.hasResponse) ...[
+                              _buildResponseCard(),
+                              const SizedBox(height: 16),
+                            ],
+
                             // Timeline Card
                             if (_dispute!.responseDeadline != null ||
                                 _dispute!.resolutionDeadline != null)
                               _buildDeadlinesCard(),
+
+                            // AI Analysis Card (for admin)
+                            if (_dispute!.hasAIAnalysis) ...[
+                              const SizedBox(height: 16),
+                              _buildAIAnalysisCard(),
+                            ],
 
                             // Resolution Card
                             if (_dispute!.resolution != null) ...[
@@ -210,11 +312,9 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                               _buildResolutionCard(),
                             ],
 
-                            // Appeal Button
-                            if (_dispute!.canAppeal) ...[
-                              const SizedBox(height: 24),
-                              _buildAppealButton(),
-                            ],
+                            // Action Buttons
+                            const SizedBox(height: 24),
+                            _buildActionButtons(),
 
                             const SizedBox(height: 40),
                           ],
@@ -534,26 +634,530 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
     );
   }
 
-  Widget _buildAppealButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          HapticFeedback.mediumImpact();
-          _showAppealDialog();
-        },
-        icon: Icon(Icons.gavel, color: AppTheme.background),
-        label: const Text('Faire appel de la decision'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primary,
-          foregroundColor: AppTheme.background,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildEvidenceCard() {
+    final dispute = _dispute!;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.photo_library, color: AppTheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                'Preuves (${dispute.evidencePhotos.length})',
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
-        ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
+            itemCount: dispute.evidencePhotos.length,
+            itemBuilder: (context, index) {
+              final photo = dispute.evidencePhotos[index];
+              return GestureDetector(
+                onTap: () => _showPhotoViewer(dispute.evidencePhotos, index),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    photo.url,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: AppTheme.surfaceContainer,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppTheme.primary,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: AppTheme.surfaceContainer,
+                        child: Icon(
+                          Icons.broken_image,
+                          color: AppTheme.textTertiary,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildResponseCard() {
+    final dispute = _dispute!;
+    final response = dispute.response!;
+    final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.reply, color: AppTheme.info),
+              const SizedBox(width: 8),
+              Text(
+                'Réponse du défendeur',
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              response['text'] ?? 'Aucune réponse',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                height: 1.5,
+              ),
+            ),
+          ),
+          if (response['submittedAt'] != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Soumis le ${dateFormat.format(DateTime.parse(response['submittedAt']))}',
+              style: TextStyle(
+                color: AppTheme.textTertiary,
+                fontSize: 12,
+              ),
+            ),
+          ],
+          if (dispute.responsePhotos.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text(
+              'Photos jointes:',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 80,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: dispute.responsePhotos.length,
+                itemBuilder: (context, index) {
+                  final photo = dispute.responsePhotos[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: GestureDetector(
+                      onTap: () =>
+                          _showPhotoViewer(dispute.responsePhotos, index),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          photo.url,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAIAnalysisCard() {
+    final analysis = _dispute!.aiAnalysis!;
+    final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primary.withValues(alpha: 0.1),
+            AppTheme.primary.withValues(alpha: 0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child:
+                    Icon(Icons.psychology, color: AppTheme.primary, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Analyse IA',
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (analysis.analyzedAt != null)
+                      Text(
+                        dateFormat.format(analysis.analyzedAt!),
+                        style: TextStyle(
+                          color: AppTheme.textTertiary,
+                          fontSize: 12,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (analysis.confidence != null)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Confiance: ${(analysis.confidence! * 100).toInt()}%',
+                    style: TextStyle(
+                      color: AppTheme.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Evidence Strength
+          if (analysis.evidenceStrength != null) ...[
+            _buildAnalysisRow(
+              'Force des preuves',
+              '${analysis.evidenceStrength}%',
+              _getStrengthColor(analysis.evidenceStrength!),
+            ),
+            const SizedBox(height: 8),
+          ],
+
+          // Recommended Decision
+          if (analysis.recommendedDecision != null) ...[
+            _buildAnalysisRow(
+              'Décision recommandée',
+              _getDecisionLabel(analysis.recommendedDecision),
+              AppTheme.info,
+            ),
+            const SizedBox(height: 8),
+          ],
+
+          // Suggested Refund
+          if (analysis.suggestedRefundPercent != null &&
+              analysis.suggestedRefundPercent! > 0) ...[
+            _buildAnalysisRow(
+              'Remboursement suggéré',
+              '${analysis.suggestedRefundPercent}%',
+              AppTheme.success,
+            ),
+            const SizedBox(height: 8),
+          ],
+
+          // Reasoning
+          if (analysis.reasoning != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Raisonnement:',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              analysis.reasoning!,
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+          ],
+
+          // Risk Factors
+          if (analysis.riskFactors.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              'Facteurs de risque:',
+              style: TextStyle(
+                color: AppTheme.warning,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: analysis.riskFactors.map((factor) {
+                return Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.warning.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    factor,
+                    style: TextStyle(
+                      color: AppTheme.warning,
+                      fontSize: 12,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+
+          // Key Findings
+          if (analysis.keyFindings.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              'Constats clés:',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...analysis.keyFindings
+                .map((finding) => _buildKeyFindingRow(finding)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnalysisRow(String label, String value, Color color) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: AppTheme.textSecondary,
+            fontSize: 13,
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKeyFindingRow(AIKeyFinding finding) {
+    Color impactColor;
+    IconData impactIcon;
+    switch (finding.impact) {
+      case 'favorable_claimant':
+        impactColor = AppTheme.success;
+        impactIcon = Icons.arrow_upward;
+        break;
+      case 'favorable_respondent':
+        impactColor = AppTheme.error;
+        impactIcon = Icons.arrow_downward;
+        break;
+      default:
+        impactColor = AppTheme.textTertiary;
+        impactIcon = Icons.remove;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(impactIcon, color: impactColor, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  finding.category,
+                  style: TextStyle(
+                    color: AppTheme.textTertiary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  finding.finding,
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStrengthColor(int strength) {
+    if (strength >= 70) return AppTheme.success;
+    if (strength >= 40) return AppTheme.warning;
+    return AppTheme.error;
+  }
+
+  Widget _buildActionButtons() {
+    final dispute = _dispute!;
+    final List<Widget> buttons = [];
+
+    // Bouton d'ajout de preuves (si litige ouvert)
+    if (dispute.isOpen) {
+      buttons.add(
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: _navigateToAddEvidence,
+            icon: const Icon(Icons.add_photo_alternate),
+            label: const Text('Ajouter preuves'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppTheme.primary,
+              side: BorderSide(color: AppTheme.primary),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Bouton de réponse (si le litige attend une réponse et l'utilisateur peut répondre)
+    if (dispute.canRespond && !dispute.hasResponse) {
+      if (buttons.isNotEmpty) {
+        buttons.add(const SizedBox(width: 12));
+      }
+      buttons.add(
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: _navigateToRespond,
+            icon: Icon(Icons.reply, color: AppTheme.background),
+            label: const Text('Répondre'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.background,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Bouton d'appel (si résolu)
+    if (dispute.canAppeal) {
+      if (buttons.isNotEmpty) {
+        buttons.add(const SizedBox(width: 12));
+      }
+      buttons.add(
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              _showAppealDialog();
+            },
+            icon: Icon(Icons.gavel, color: AppTheme.background),
+            label: const Text('Faire appel'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.warning,
+              foregroundColor: AppTheme.background,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (buttons.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(children: buttons);
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
