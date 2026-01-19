@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../legal/presentation/pages/legal_page.dart';
 import '../../domain/entities/user.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
@@ -29,6 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _acceptedTerms = false;
 
   @override
   void dispose() {
@@ -66,6 +68,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _handleRegister() {
     final formState = _formKey.currentState;
     if (formState != null && formState.validate()) {
+      if (!_acceptedTerms) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+                'Veuillez accepter les conditions d\'utilisation et la politique de confidentialité'),
+            backgroundColor: AppTheme.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+            ),
+          ),
+        );
+        return;
+      }
+
       final formattedPhone = _formatPhoneNumber(_phoneController.text.trim());
       Navigator.of(context).pushNamed(
         AppRoutes.phoneVerification,
@@ -395,6 +412,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 return 'Les mots de passe ne correspondent pas';
               }
               return null;
+            },
+          ),
+
+          const SizedBox(height: 20),
+
+          // Checkbox conditions d'utilisation
+          LegalLinksWidget(
+            showCheckbox: true,
+            isChecked: _acceptedTerms,
+            onCheckChanged: (value) {
+              setState(() => _acceptedTerms = value ?? false);
             },
           ),
 
