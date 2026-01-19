@@ -14,6 +14,8 @@ const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, FILE_UPLOAD, GEOLOCATION } = requi
 const { logError, safeNotify } = require('../utils/errorHandler');
 const { locationLimiter, uploadLimiter } = require('../middleware/rateLimiter');
 const smartNotifications = require('../services/smartNotificationService');
+const verificationRequired = require('../middleware/verificationRequired');
+const identityVerificationService = require('../services/identityVerificationService');
 
 // Configure multer with memory storage for Cloudinary uploads
 const upload = multer({
@@ -53,7 +55,7 @@ const profileUpload = multer({
 // @route   PATCH /api/workers/availability
 // @desc    Toggle worker availability
 // @access  Private (Worker only)
-router.patch('/availability', protect, authorize('snowWorker'), async (req, res) => {
+router.patch('/availability', protect, authorize('snowWorker'), verificationRequired, async (req, res) => {
     try {
         const { isAvailable } = req.body;
 
@@ -170,7 +172,7 @@ const workerHasRequiredEquipment = (workerEquipment, requiredEquipment) => {
 // @route   GET /api/workers/available-jobs
 // @desc    Get available jobs near worker location (filtered by worker's equipment)
 // @access  Private (Worker only)
-router.get('/available-jobs', protect, authorize('snowWorker'), async (req, res) => {
+router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequired, async (req, res) => {
     try {
         const { lat, lng, radiusKm = GEOLOCATION.DEFAULT_SEARCH_RADIUS_KM, filterByEquipment = 'true' } = req.query;
 
@@ -804,7 +806,7 @@ router.post('/profile/photo', protect, authorize('snowWorker'), uploadLimiter, p
 // @route   POST /api/workers/jobs/:id/accept
 // @desc    Accept a job
 // @access  Private (Worker only)
-router.post('/jobs/:id/accept', protect, authorize('snowWorker'), async (req, res) => {
+router.post('/jobs/:id/accept', protect, authorize('snowWorker'), verificationRequired, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -1309,5 +1311,201 @@ router.post('/jobs/:id/photos', protect, authorize('snowWorker'), async (req, re
         });
     }
 });
+
+// ============================================
+// IDENTITY VERIFICATION
+// ============================================
+
+// Configure multer for verification documents
+const verificationUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB max per document
+    },
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Seules les images sont acceptées'), false);
+        }
+    }
+});
+
+// @route   GET /api/workers/verification/status
+// @desc    Get worker's identity verification status
+// @access  Private (Worker only)
+router.get('/verification/status', protect, authorize('snowWorker'), async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const verification = user.workerProfile?.identityVerification || {};
+
+        // Check if can resubmit
+        const resubmitInfo = await identityVerificationService.canResubmit(req.user.id);
+
+        res.json({
+            success: true,
+            data: {
+                status: verification.status || 'not_submitted',
+                submittedAt: verification.submittedAt || null,
+                verifiedAt: verification.verifiedAt || null,
+                expiresAt: verification.expiresAt || null,
+                decision: verification.decision ? {
+                    result: verification.decision.result,
+                    reason: verification.decision.reason,
+                    decidedAt: verification.decision.decidedAt,
+                } : null,
+                aiAnalysis: verification.aiAnalysis ? {
+                    overallScore: verification.aiAnalysis.overallScore,
+                    issues: verification.aiAnalysis.issues,
+                } : null,
+                canResubmit: resubmitInfo.canResubmit,
+                attemptsRemaining: resubmitInfo.attemptsRemaining,
+            },
+        });
+    } catch (error) {
+        console.error('Error getting verification status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération du statut de vérification',
+        });
+    }
+});
+
+// @route   POST /api/workers/verification/submit
+// @desc    Submit identity verification documents
+// @access  Private (Worker only)
+router.post(
+    '/verification/submit',
+    protect,
+    authorize('snowWorker'),
+    uploadLimiter,
+    verificationUpload.fields([
+        { name: 'idFront', maxCount: 1 },
+        { name: 'idBack', maxCount: 1 },
+        { name: 'selfie', maxCount: 1 },
+    ]),
+    async (req, res) => {
+        try {
+            const user = await User.findById(req.user.id);
+            const verification = user.workerProfile?.identityVerification;
+
+            // Check if can submit
+            if (verification?.status === 'pending') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Une vérification est déjà en cours',
+                });
+            }
+
+            if (verification?.status === 'approved') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Votre identité est déjà vérifiée',
+                });
+            }
+
+            // Check attempts
+            const resubmitInfo = await identityVerificationService.canResubmit(req.user.id);
+            if (!resubmitInfo.canResubmit && verification?.status === 'rejected') {
+                return res.status(400).json({
+                    success: false,
+                    message: resubmitInfo.reason,
+                });
+            }
+
+            // Validate required files
+            if (!req.files?.idFront?.[0] || !req.files?.selfie?.[0]) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'La pièce d\'identité (recto) et le selfie sont requis',
+                });
+            }
+
+            // Upload documents to Cloudinary
+            const uploadPromises = [];
+            const documents = {};
+
+            // ID Front
+            const idFrontResult = await uploadFromBuffer(
+                req.files.idFront[0].buffer,
+                `deneige-auto/verification/${req.user.id}`,
+                `id-front-${Date.now()}`
+            );
+            if (idFrontResult.success) {
+                documents.idFront = {
+                    url: idFrontResult.url,
+                    publicId: idFrontResult.publicId,
+                    uploadedAt: new Date(),
+                };
+            }
+
+            // ID Back (optional)
+            if (req.files?.idBack?.[0]) {
+                const idBackResult = await uploadFromBuffer(
+                    req.files.idBack[0].buffer,
+                    `deneige-auto/verification/${req.user.id}`,
+                    `id-back-${Date.now()}`
+                );
+                if (idBackResult.success) {
+                    documents.idBack = {
+                        url: idBackResult.url,
+                        publicId: idBackResult.publicId,
+                        uploadedAt: new Date(),
+                    };
+                }
+            }
+
+            // Selfie
+            const selfieResult = await uploadFromBuffer(
+                req.files.selfie[0].buffer,
+                `deneige-auto/verification/${req.user.id}`,
+                `selfie-${Date.now()}`
+            );
+            if (selfieResult.success) {
+                documents.selfie = {
+                    url: selfieResult.url,
+                    publicId: selfieResult.publicId,
+                    uploadedAt: new Date(),
+                };
+            }
+
+            // Update user with documents
+            const attemptsCount = (verification?.attemptsCount || 0) + 1;
+            await User.findByIdAndUpdate(req.user.id, {
+                $set: {
+                    'workerProfile.identityVerification.documents': documents,
+                    'workerProfile.identityVerification.status': 'pending',
+                    'workerProfile.identityVerification.submittedAt': new Date(),
+                    'workerProfile.identityVerification.attemptsCount': attemptsCount,
+                },
+            });
+
+            // Trigger AI analysis (async - don't wait)
+            identityVerificationService.analyzeIdentityDocuments(req.user.id)
+                .then(result => {
+                    console.log(`✅ Identity verification analyzed for user ${req.user.id}: ${result.status}`);
+                })
+                .catch(err => {
+                    console.error(`❌ Error analyzing identity for user ${req.user.id}:`, err.message);
+                });
+
+            res.json({
+                success: true,
+                message: 'Documents soumis avec succès. Vérification en cours...',
+                data: {
+                    status: 'pending',
+                    submittedAt: new Date(),
+                    attemptsCount,
+                },
+            });
+        } catch (error) {
+            console.error('Error submitting verification:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la soumission des documents',
+            });
+        }
+    }
+);
 
 module.exports = router;

@@ -401,6 +401,83 @@ const userSchema = new mongoose.Schema({
             type: Number,
             default: 0,
         },
+
+        // Identity Verification (KYC)
+        identityVerification: {
+            status: {
+                type: String,
+                enum: ['not_submitted', 'pending', 'approved', 'rejected', 'expired'],
+                default: 'not_submitted',
+            },
+            // Submitted documents
+            documents: {
+                idFront: {
+                    url: String,
+                    publicId: String,
+                    uploadedAt: Date,
+                },
+                idBack: {
+                    url: String,
+                    publicId: String,
+                    uploadedAt: Date,
+                },
+                selfie: {
+                    url: String,
+                    publicId: String,
+                    uploadedAt: Date,
+                },
+            },
+            // AI Analysis results
+            aiAnalysis: {
+                faceMatchScore: {
+                    type: Number,
+                    min: 0,
+                    max: 100,
+                },
+                documentAuthenticityScore: {
+                    type: Number,
+                    min: 0,
+                    max: 100,
+                },
+                livenessScore: {
+                    type: Number,
+                    min: 0,
+                    max: 100,
+                },
+                overallScore: {
+                    type: Number,
+                    min: 0,
+                    max: 100,
+                },
+                issues: [String],
+                extractedData: {
+                    documentType: String,
+                    fullName: String,
+                    expiryDate: String,
+                },
+                analyzedAt: Date,
+                modelVersion: String,
+            },
+            // Decision
+            decision: {
+                result: {
+                    type: String,
+                    enum: ['approved', 'rejected'],
+                },
+                decidedBy: String, // 'auto' or admin ObjectId
+                decidedAt: Date,
+                reason: String,
+                adminNotes: String,
+            },
+            // Metadata
+            submittedAt: Date,
+            verifiedAt: Date,
+            expiresAt: Date,
+            attemptsCount: {
+                type: Number,
+                default: 0,
+            },
+        },
     },
 
     resetPasswordToken: String,
@@ -437,6 +514,7 @@ userSchema.index({ role: 1 });                                         // Role-b
 userSchema.index({ role: 1, 'workerProfile.isAvailable': 1 });         // Admin: available workers
 userSchema.index({ role: 1, 'workerProfile.totalJobsCompleted': -1 }); // Admin: top workers ranking
 userSchema.index({ role: 1, isActive: 1 });                            // Active users by role
+userSchema.index({ role: 1, 'workerProfile.identityVerification.status': 1 }); // Admin: verification status
 
 // Hash le mot de passe avant de sauvegarder
 userSchema.pre('save', async function (next) {
