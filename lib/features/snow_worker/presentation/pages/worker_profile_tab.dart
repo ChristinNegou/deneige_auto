@@ -324,19 +324,35 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
           }
         },
         buildWhen: (previous, current) {
-          // Ne jamais reconstruire pour ces états intermédiaires
+          // Ne jamais reconstruire pour ces états intermédiaires (gérés par listener)
           if (current is WorkerProfileUpdated) return false;
           if (current is WorkerPhotoUploading) return false;
           if (current is WorkerPhotoUploaded) return false;
 
-          // Pour l'état Loaded, ne reconstruire que lors du chargement initial
-          // Ceci bloque le rebuild après UpdateProfile qui émet:
-          // Loaded(isUpdating:true) -> ProfileUpdated -> Loaded(isUpdating:false)
+          // Toujours permettre Loading (affiche le spinner)
+          if (current is WorkerAvailabilityLoading) return true;
+
+          // Toujours permettre Error
+          if (current is WorkerAvailabilityError) return true;
+
+          // Pour l'état Loaded:
           if (current is WorkerAvailabilityLoaded) {
-            return !_initialized;
+            // Premier chargement - toujours permettre
+            if (!_initialized) return true;
+
+            // Venant de Loading (refresh/reload) - permettre
+            if (previous is WorkerAvailabilityLoading) return true;
+
+            // Venant de Initial (démarrage) - permettre
+            if (previous is WorkerAvailabilityInitial) return true;
+
+            // Venant de Error (retry après erreur) - permettre
+            if (previous is WorkerAvailabilityError) return true;
+
+            // Sinon (Loaded → Loaded ou ProfileUpdated → Loaded) = sauvegarde, bloquer
+            return false;
           }
 
-          // Pour les autres états (Initial, Loading, Error), permettre le rebuild
           return true;
         },
         builder: (context, state) {
