@@ -324,20 +324,19 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
           }
         },
         buildWhen: (previous, current) {
-          // Ne reconstruire que lors du chargement initial
-          // Éviter le rebuild lors des sauvegardes en arrière-plan
+          // Ne jamais reconstruire pour ces états intermédiaires
           if (current is WorkerProfileUpdated) return false;
           if (current is WorkerPhotoUploading) return false;
           if (current is WorkerPhotoUploaded) return false;
 
-          // Si on passe de Loaded à Loaded, ne pas reconstruire
-          // (c'est juste une mise à jour de isUpdating ou du profil après save)
-          if (previous is WorkerAvailabilityLoaded &&
-              current is WorkerAvailabilityLoaded) {
-            // Reconstruire uniquement si c'est le chargement initial (pas encore initialisé)
+          // Pour l'état Loaded, ne reconstruire que lors du chargement initial
+          // Ceci bloque le rebuild après UpdateProfile qui émet:
+          // Loaded(isUpdating:true) -> ProfileUpdated -> Loaded(isUpdating:false)
+          if (current is WorkerAvailabilityLoaded) {
             return !_initialized;
           }
 
+          // Pour les autres états (Initial, Loading, Error), permettre le rebuild
           return true;
         },
         builder: (context, state) {
