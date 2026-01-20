@@ -169,37 +169,13 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.success,
-                  AppTheme.success.withValues(alpha: 0.7)
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.success.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppTheme.background,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Text(
+          const Text(
             'Paiements',
-            style: AppTheme.headlineMedium,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimary,
+            ),
           ),
           const Spacer(),
           GestureDetector(
@@ -208,16 +184,17 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               _loadAccountStatus();
             },
             child: Container(
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: AppTheme.success.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppTheme.border),
               ),
               child: Icon(
                 Icons.refresh_rounded,
-                color: AppTheme.success,
-                size: 22,
+                color: AppTheme.textSecondary,
+                size: 20,
               ),
             ),
           ),
@@ -251,61 +228,42 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
   }
 
   Widget _buildStatusCard() {
-    // Compte entièrement configuré: paiements et virements actifs
     final bool isConfigured = _hasAccount && _payoutsEnabled && _chargesEnabled;
-    // En attente de vérification: compte créé avec charges OU details soumis, mais virements pas encore actifs
     final bool isPendingVerification =
         _hasAccount && (_isComplete || _chargesEnabled) && !_payoutsEnabled;
 
+    final Color statusColor = isConfigured
+        ? AppTheme.success
+        : isPendingVerification
+            ? AppTheme.warning
+            : AppTheme.textSecondary;
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isConfigured
-              ? [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)]
-              : isPendingVerification
-                  ? [AppTheme.warning, AppTheme.warning.withValues(alpha: 0.7)]
-                  : [AppTheme.primary, AppTheme.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isConfigured
+              ? AppTheme.success.withValues(alpha: 0.3)
+              : AppTheme.border,
         ),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: [
-          BoxShadow(
-            color: (isConfigured
-                    ? AppTheme.success
-                    : isPendingVerification
-                        ? AppTheme.warning
-                        : AppTheme.primary)
-                .withValues(alpha: 0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: AppTheme.background.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: Icon(
-                  isConfigured
-                      ? Icons.account_balance
-                      : isPendingVerification
-                          ? Icons.hourglass_top_rounded
-                          : Icons.account_balance_wallet,
-                  color: AppTheme.background,
-                  size: 26,
-                ),
+              Icon(
+                isConfigured
+                    ? Icons.check_circle
+                    : isPendingVerification
+                        ? Icons.hourglass_top_rounded
+                        : Icons.account_balance_wallet,
+                color: statusColor,
+                size: 24,
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,12 +275,12 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                               ? 'Verification en cours'
                               : 'Configurez vos paiements',
                       style: const TextStyle(
-                        color: AppTheme.background,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       isConfigured
                           ? 'Pret a recevoir des paiements'
@@ -330,8 +288,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                               ? 'Stripe verifie vos informations'
                               : 'Recevez vos gains directement',
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.85),
-                        fontSize: 14,
+                        color: AppTheme.textTertiary,
+                        fontSize: 13,
                       ),
                     ),
                   ],
@@ -339,71 +297,69 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           if (isConfigured) ...[
             _buildStatusRow('Compte verifie', _isComplete),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             _buildStatusRow('Paiements actifs', _chargesEnabled),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             _buildStatusRow('Virements actifs', _payoutsEnabled),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _openDashboard,
-                icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                label: const Text('Voir mon dashboard Stripe'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.background,
-                  side:
-                      const BorderSide(color: AppTheme.background, width: 1.5),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              child: GestureDetector(
+                onTap: _openDashboard,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.background,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.open_in_new_rounded,
+                          size: 16, color: AppTheme.textSecondary),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Voir mon dashboard Stripe',
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ] else if (isPendingVerification) ...[
             _buildStatusRow('Informations de base', _isComplete),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             _buildStatusRow('Paiements actifs', _chargesEnabled),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             _buildStatusRow('Documents verifies', _payoutsEnabled),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.background.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                color: AppTheme.warning.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.warning_amber_rounded,
-                      color: AppTheme.background, size: 20),
+                  Icon(Icons.info_outline, color: AppTheme.warning, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Documents requis',
-                          style: TextStyle(
-                            color: AppTheme.background,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Pour encaisser vos gains, envoyez vos documents d\'identite via le bouton ci-dessous. Stripe verifiera votre compte sous 24-48h.',
-                          style: TextStyle(
-                            color: AppTheme.background.withValues(alpha: 0.9),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'Envoyez vos documents d\'identite pour activer les virements.',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -412,34 +368,22 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _openDashboard,
-                icon: const Icon(Icons.upload_file_rounded, size: 18),
-                label: const Text('Envoyer mes documents'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.background,
-                  foregroundColor: AppTheme.warning,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              child: GestureDetector(
+                onTap: _openDashboard,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.warning,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _loadAccountStatus,
-                icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Actualiser le statut'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.background,
-                  side:
-                      const BorderSide(color: AppTheme.background, width: 1.5),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  child: const Text(
+                    'Envoyer mes documents',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
               ),
@@ -447,24 +391,25 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
           ] else ...[
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _createOrContinueSetup,
-                icon: const Icon(Icons.add_card_rounded, size: 20),
-                label: Text(
-                  _hasAccount
-                      ? 'Continuer la configuration'
-                      : 'Configurer maintenant',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 15),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.background,
-                  foregroundColor: AppTheme.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              child: GestureDetector(
+                onTap: _createOrContinueSetup,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.textPrimary,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  elevation: 0,
+                  child: Text(
+                    _hasAccount
+                        ? 'Continuer la configuration'
+                        : 'Configurer maintenant',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -477,27 +422,17 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
   Widget _buildStatusRow(String label, bool isActive) {
     return Row(
       children: [
-        Container(
-          width: 22,
-          height: 22,
-          decoration: BoxDecoration(
-            color: isActive
-                ? AppTheme.background
-                : AppTheme.background.withValues(alpha: 0.3),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            isActive ? Icons.check : Icons.close,
-            size: 14,
-            color: isActive ? AppTheme.success : AppTheme.background,
-          ),
+        Icon(
+          isActive ? Icons.check_circle : Icons.radio_button_unchecked,
+          size: 16,
+          color: isActive ? AppTheme.success : AppTheme.textTertiary,
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Text(
           label,
           style: TextStyle(
-            color: AppTheme.background.withValues(alpha: 0.95),
-            fontSize: 14,
+            color: AppTheme.textSecondary,
+            fontSize: 13,
           ),
         ),
       ],
@@ -509,32 +444,25 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
     final pending = (_balance?['pending'] ?? 0.0) as num;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.success.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: Icon(Icons.account_balance_wallet,
-                    color: AppTheme.success, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text('Solde', style: AppTheme.headlineSmall),
-            ],
+          Text(
+            'Solde',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textSecondary,
+              letterSpacing: 0.5,
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
@@ -543,14 +471,16 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   children: [
                     Text(
                       'Disponible',
-                      style: AppTheme.labelSmall
-                          .copyWith(color: AppTheme.textTertiary),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textTertiary,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${available.toStringAsFixed(2)} \$',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.success,
                       ),
@@ -559,26 +489,28 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 ),
               ),
               Container(
-                height: 50,
+                height: 40,
                 width: 1,
                 color: AppTheme.border,
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
+                  padding: const EdgeInsets.only(left: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'En attente',
-                        style: AppTheme.labelSmall
-                            .copyWith(color: AppTheme.textTertiary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textTertiary,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${pending.toStringAsFixed(2)} \$',
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 24,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.warning,
                         ),
@@ -596,39 +528,35 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
 
   Widget _buildPayoutSchedule() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.infoLight,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        border: Border.all(color: AppTheme.info.withValues(alpha: 0.2)),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppTheme.info.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-            ),
-            child: Icon(Icons.schedule_rounded, color: AppTheme.info, size: 22),
-          ),
-          const SizedBox(width: 14),
+          Icon(Icons.schedule_rounded, color: AppTheme.textSecondary, size: 20),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Virements automatiques',
-                  style: AppTheme.labelLarge.copyWith(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.info,
+                    fontSize: 14,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Vos gains sont deposes sur votre compte bancaire sous 2-3 jours ouvrables',
-                  style: AppTheme.bodySmall.copyWith(color: AppTheme.info),
+                  'Depots sous 2-3 jours ouvrables',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.textTertiary,
+                  ),
                 ),
               ],
             ),
@@ -644,61 +572,58 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
     final workerPercent = 100 - platformPercent;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.pie_chart_outline,
-                    color: AppTheme.primary, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text('Repartition des paiements', style: AppTheme.headlineSmall),
-            ],
+          Text(
+            'Repartition des paiements',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textSecondary,
+              letterSpacing: 0.5,
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           _buildCommissionRow(
             'Vous recevez',
             '$workerPercent%',
             AppTheme.success,
             workerPercent / 100,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           _buildCommissionRow(
             'Commission plateforme',
             '$platformPercent%',
             AppTheme.textTertiary,
             platformPercent / 100,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppTheme.infoLight,
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              border: Border.all(color: AppTheme.info.withValues(alpha: 0.1)),
+              color: AppTheme.background,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: AppTheme.border),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, color: AppTheme.info, size: 18),
-                const SizedBox(width: 10),
+                Icon(Icons.info_outline,
+                    color: AppTheme.textTertiary, size: 16),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Exemple: Pour un job a 50\$, vous recevez ${(50 * workerPercent / 100).toStringAsFixed(2)}\$',
-                    style: TextStyle(fontSize: 13, color: AppTheme.info),
+                    'Ex: Job a 50\$ = ${(50 * workerPercent / 100).toStringAsFixed(2)}\$ pour vous',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ),
               ],
@@ -717,22 +642,31 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: AppTheme.bodyMedium),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: AppTheme.textSecondary,
+              ),
+            ),
             Text(
               percent,
-              style: AppTheme.labelLarge
-                  .copyWith(fontWeight: FontWeight.w600, color: color),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
           ],
         ),
         const SizedBox(height: 6),
         ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(3),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: AppTheme.background,
+            backgroundColor: AppTheme.border,
             valueColor: AlwaysStoppedAnimation(color),
-            minHeight: 8,
+            minHeight: 6,
           ),
         ),
       ],
@@ -741,36 +675,28 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
 
   Widget _buildHowItWorks() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.secondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.lightbulb_outline_rounded,
-                    color: AppTheme.secondary, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text('Comment ca fonctionne', style: AppTheme.headlineSmall),
-            ],
+          Text(
+            'Comment ca fonctionne',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textSecondary,
+              letterSpacing: 0.5,
+            ),
           ),
-          const SizedBox(height: 20),
-          _buildStep(1, 'Le client paie', 'Le paiement est traite par Stripe'),
-          _buildStep(2, 'Repartition automatique',
-              'Votre part est calculee instantanement'),
-          _buildStep(3, 'Depot sur votre compte', 'Sous 2-3 jours ouvrables'),
+          const SizedBox(height: 14),
+          _buildStep(1, 'Le client paie', 'Paiement traite par Stripe'),
+          _buildStep(2, 'Repartition', 'Votre part est calculee'),
+          _buildStep(3, 'Depot', 'Sous 2-3 jours ouvrables'),
         ],
       ),
     );
@@ -778,40 +704,48 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
 
   Widget _buildStep(int number, String title, String subtitle) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 26,
+            height: 26,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primary, AppTheme.secondary],
-              ),
+              color: AppTheme.background,
               shape: BoxShape.circle,
+              border: Border.all(color: AppTheme.border),
             ),
             child: Center(
               child: Text(
                 '$number',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.background,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style:
-                      AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
                 ),
-                Text(subtitle, style: AppTheme.bodySmall),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppTheme.textTertiary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -822,40 +756,35 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
 
   Widget _buildSecurityInfo() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.successLight,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        border: Border.all(color: AppTheme.success.withValues(alpha: 0.2)),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppTheme.success.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-            ),
-            child: Icon(Icons.verified_user_outlined,
-                color: AppTheme.success, size: 22),
-          ),
-          const SizedBox(width: 14),
+          Icon(Icons.verified_user_outlined, color: AppTheme.success, size: 20),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Paiements securises',
-                  style: AppTheme.labelLarge.copyWith(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.success,
+                    fontSize: 14,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Propulse par Stripe, leader mondial des paiements',
-                  style: AppTheme.bodySmall.copyWith(color: AppTheme.success),
+                  'Propulse par Stripe',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.textTertiary,
+                  ),
                 ),
               ],
             ),

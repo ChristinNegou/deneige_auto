@@ -326,22 +326,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppTheme.secondary, AppTheme.primary],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primary.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  color: AppTheme.background,
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(color: AppTheme.border, width: 2),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                  borderRadius: BorderRadius.circular(24),
                   child: photoUrl != null && photoUrl.isNotEmpty
                       ? CachedNetworkImage(
                           imageUrl: photoUrl,
@@ -353,7 +343,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                color: AppTheme.background,
+                                color: AppTheme.textTertiary,
                                 strokeWidth: 2,
                               ),
                             ),
@@ -363,10 +353,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                               userName.isNotEmpty
                                   ? userName[0].toUpperCase()
                                   : 'D',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.background,
+                                fontWeight: FontWeight.w600,
+                                color: AppTheme.textSecondary,
                               ),
                             ),
                           ),
@@ -376,10 +366,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                             userName.isNotEmpty
                                 ? userName[0].toUpperCase()
                                 : 'D',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.background,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
                             ),
                           ),
                         ),
@@ -394,8 +384,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               children: [
                 Text(
                   'Bonjour, ${userName.split(' ').first}',
-                  style: AppTheme.headlineSmall.copyWith(
-                    fontWeight: FontWeight.w700,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -415,22 +407,13 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                                 ? AppTheme.success
                                 : AppTheme.textTertiary,
                             shape: BoxShape.circle,
-                            boxShadow: isAvailable
-                                ? [
-                                    BoxShadow(
-                                      color: AppTheme.success
-                                          .withValues(alpha: 0.4),
-                                      blurRadius: 6,
-                                      spreadRadius: 1,
-                                    ),
-                                  ]
-                                : null,
                           ),
                         ),
                         const SizedBox(width: 6),
                         Text(
                           isAvailable ? 'Disponible' : 'Hors ligne',
-                          style: AppTheme.bodySmall.copyWith(
+                          style: TextStyle(
+                            fontSize: 13,
                             color: AppTheme.textTertiary,
                           ),
                         ),
@@ -454,8 +437,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               height: 44,
               decoration: BoxDecoration(
                 color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppTheme.border),
               ),
               child: const Icon(
                 Icons.notifications_outlined,
@@ -478,7 +461,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             decoration: BoxDecoration(
               color: AppTheme.surface,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: AppTheme.shadowSM,
+              border: Border.all(color: AppTheme.border),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -486,7 +469,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 Icon(
                   _getWeatherIcon(state.weather!.condition),
                   size: 18,
-                  color: AppTheme.primary,
+                  color: AppTheme.textSecondary,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -587,15 +570,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
         return Container(
           margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                color.withValues(alpha: 0.15),
-                color.withValues(alpha: 0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Material(
@@ -605,21 +581,13 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                   ? () => Navigator.pushNamed(
                       context, AppRoutes.identityVerification)
                   : null,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              borderRadius: BorderRadius.circular(12),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(14),
                 child: Row(
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                      ),
-                      child: Icon(icon, color: color, size: 24),
-                    ),
-                    const SizedBox(width: 14),
+                    Icon(icon, color: color, size: 22),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -627,12 +595,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                           Text(
                             title,
                             style: TextStyle(
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               fontSize: 14,
-                              color: color,
+                              color: AppTheme.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Text(
                             subtitle,
                             style: TextStyle(
@@ -647,25 +615,11 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                       ),
                     ),
                     if (showButton) ...[
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusSM),
-                        ),
-                        child: Text(
-                          status == 'not_submitted'
-                              ? 'Verifier'
-                              : 'Resoumettre',
-                          style: const TextStyle(
-                            color: AppTheme.background,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                        ),
+                      const SizedBox(width: 10),
+                      Icon(
+                        Icons.chevron_right,
+                        size: 20,
+                        color: AppTheme.textTertiary,
                       ),
                     ],
                   ],
@@ -700,51 +654,37 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                       .read<WorkerAvailabilityBloc>()
                       .add(const ToggleAvailability());
                 },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            padding: const EdgeInsets.all(18),
+          child: Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: isAvailable
-                  ? LinearGradient(
-                      colors: [
-                        AppTheme.success,
-                        AppTheme.success.withValues(alpha: 0.85),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : null,
-              color: isAvailable ? null : AppTheme.surface,
-              borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-              boxShadow: [
-                BoxShadow(
-                  color: isAvailable
-                      ? AppTheme.success.withValues(alpha: 0.3)
-                      : AppTheme.shadowColor.withValues(alpha: 0.05),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isAvailable ? AppTheme.success : AppTheme.border,
+                width: isAvailable ? 1.5 : 1,
+              ),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 56,
-                  height: 56,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     color: isAvailable
-                        ? AppTheme.background.withValues(alpha: 0.2)
+                        ? AppTheme.success.withValues(alpha: 0.1)
                         : AppTheme.background,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                    borderRadius: BorderRadius.circular(12),
+                    border:
+                        isAvailable ? null : Border.all(color: AppTheme.border),
                   ),
                   child: isLoading
                       ? const Center(
                           child: SizedBox(
-                            width: 24,
-                            height: 24,
+                            width: 22,
+                            height: 22,
                             child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: AppTheme.primary,
+                              strokeWidth: 2,
+                              color: AppTheme.textTertiary,
                             ),
                           ),
                         )
@@ -753,12 +693,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                               ? Icons.work_rounded
                               : Icons.work_off_rounded,
                           color: isAvailable
-                              ? AppTheme.background
+                              ? AppTheme.success
                               : AppTheme.textTertiary,
-                          size: 28,
+                          size: 24,
                         ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -767,59 +707,56 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                         isAvailable
                             ? 'Vous etes disponible'
                             : 'Vous etes hors ligne',
-                        style: TextStyle(
-                          color: isAvailable
-                              ? AppTheme.background
-                              : AppTheme.textPrimary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
+                        style: const TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         isAvailable
                             ? 'Vous recevez les nouveaux jobs'
                             : 'Activez pour recevoir des jobs',
                         style: TextStyle(
-                          color: isAvailable
-                              ? AppTheme.background.withValues(alpha: 0.85)
-                              : AppTheme.textTertiary,
+                          color: AppTheme.textTertiary,
                           fontSize: 13,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: isAvailable
-                        ? AppTheme.background.withValues(alpha: 0.2)
-                        : AppTheme.background,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                  ),
-                  child: Switch(
-                    value: isAvailable,
-                    onChanged: isLoading
-                        ? null
-                        : (_) {
-                            HapticFeedback.mediumImpact();
-                            context
-                                .read<WorkerAvailabilityBloc>()
-                                .add(const ToggleAvailability());
-                          },
-                    activeThumbColor: AppTheme.background,
-                    activeTrackColor:
-                        AppTheme.background.withValues(alpha: 0.3),
-                    inactiveThumbColor: AppTheme.textTertiary,
-                    inactiveTrackColor: AppTheme.border,
-                  ),
-                ),
+                _buildCustomSwitch(isAvailable),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildCustomSwitch(bool value) {
+    return Container(
+      width: 48,
+      height: 26,
+      decoration: BoxDecoration(
+        color: value ? AppTheme.success : AppTheme.background,
+        borderRadius: BorderRadius.circular(13),
+        border: value ? null : Border.all(color: AppTheme.border, width: 1.5),
+      ),
+      child: AnimatedAlign(
+        duration: const Duration(milliseconds: 150),
+        alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          width: 20,
+          height: 20,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          decoration: BoxDecoration(
+            color: value ? Colors.white : AppTheme.textTertiary,
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
     );
   }
 
@@ -890,40 +827,27 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-            ),
-            child: Icon(icon, color: iconColor, size: 20),
-          ),
-          const SizedBox(height: 10),
+          Icon(icon, color: iconColor, size: 22),
+          const SizedBox(height: 8),
           Text(
             value,
-            style: AppTheme.headlineSmall.copyWith(
+            style: const TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 18,
+              color: AppTheme.textPrimary,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: AppTheme.labelSmall.copyWith(
+            style: TextStyle(
               color: AppTheme.textTertiary,
-              fontSize: 10,
+              fontSize: 11,
             ),
             textAlign: TextAlign.center,
           ),
@@ -951,55 +875,34 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppTheme.secondary.withValues(alpha: 0.15),
-                            AppTheme.primary.withValues(alpha: 0.1),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                      ),
-                      child: const Icon(
-                        Icons.work_rounded,
-                        color: AppTheme.secondary,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Mes jobs actifs',
-                      style: AppTheme.headlineSmall.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+                Text(
+                  'Mes jobs actifs',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textSecondary,
+                    letterSpacing: 0.5,
+                  ),
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppTheme.secondary, AppTheme.primary],
-                    ),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                    color: AppTheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${myJobs.length} actif${myJobs.length > 1 ? 's' : ''}',
-                    style: const TextStyle(
-                      color: AppTheme.background,
+                    style: TextStyle(
+                      color: AppTheme.primary,
                       fontWeight: FontWeight.w600,
-                      fontSize: 12,
+                      fontSize: 11,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             ...myJobs.map((job) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: SwipeableJobCard(
@@ -1096,87 +999,59 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                       children: [
                         Text(
                           'Jobs disponibles',
-                          style: AppTheme.headlineSmall.copyWith(
-                            fontWeight: FontWeight.w700,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textSecondary,
+                            letterSpacing: 0.5,
                           ),
                         ),
                         if (availableJobs.any((j) => j.isPriority)) ...[
                           const SizedBox(width: 10),
-                          AnimatedBuilder(
-                            animation: _pulseController,
-                            builder: (context, child) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 5,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.warning.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.bolt,
+                                  color: AppTheme.warning,
+                                  size: 12,
                                 ),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppTheme.warning,
-                                      AppTheme.warning.withValues(
-                                        alpha: 0.7 +
-                                            (_pulseController.value * 0.3),
-                                      ),
-                                    ],
+                                const SizedBox(width: 3),
+                                Text(
+                                  '${availableJobs.where((j) => j.isPriority).length} urgent',
+                                  style: TextStyle(
+                                    color: AppTheme.warning,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                      AppTheme.radiusFull),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppTheme.warning
-                                          .withValues(alpha: 0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.bolt,
-                                      color: AppTheme.background,
-                                      size: 14,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${availableJobs.where((j) => j.isPriority).length} urgent',
-                                      style: const TextStyle(
-                                        color: AppTheme.background,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                              ],
+                            ),
                           ),
                         ],
                       ],
                     ),
                     if (availableJobs.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppTheme.info.withValues(alpha: 0.1),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusFull),
-                        ),
-                        child: Text(
-                          '${availableJobs.length} job${availableJobs.length > 1 ? 's' : ''}',
-                          style: TextStyle(
-                            color: AppTheme.info,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
+                      Text(
+                        '${availableJobs.length} job${availableJobs.length > 1 ? 's' : ''}',
+                        style: TextStyle(
+                          color: AppTheme.textTertiary,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
                         ),
                       ),
                   ],
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 // Afficher un message si aucun équipement n'est configuré
                 if (!hasEquipment)
                   _buildNoEquipmentWarning()
@@ -1217,97 +1092,61 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
 
   Widget _buildNoEquipmentWarning() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.warning.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppTheme.warning.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-            ),
-            child: const Icon(
-              Icons.build_rounded,
-              size: 36,
-              color: AppTheme.warning,
-            ),
+          Icon(
+            Icons.build_rounded,
+            size: 32,
+            color: AppTheme.warning,
           ),
-          const SizedBox(height: 20),
-          Text(
-            'Configurez votre équipement',
-            style: AppTheme.headlineSmall.copyWith(
-              fontWeight: FontWeight.w700,
+          const SizedBox(height: 14),
+          const Text(
+            'Configurez votre equipement',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+              color: AppTheme.textPrimary,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
           Text(
-            'Pour voir les jobs disponibles, vous devez d\'abord indiquer les équipements que vous possédez dans "Mon équipement".',
+            'Indiquez vos equipements pour voir les jobs disponibles.',
             textAlign: TextAlign.center,
-            style: AppTheme.bodySmall.copyWith(
+            style: TextStyle(
               color: AppTheme.textSecondary,
+              fontSize: 13,
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Les jobs sont filtrés selon votre équipement.',
-            textAlign: TextAlign.center,
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.textTertiary,
-              fontStyle: FontStyle.italic,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           GestureDetector(
             onTap: () {
               HapticFeedback.mediumImpact();
-              // Basculer vers l'onglet Profil (index 3)
               WorkerMainDashboard.switchToTab(
                 context,
                 WorkerMainDashboard.profileTab,
               );
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.warning, Color(0xFFFF9800)],
-                ),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.warning.withValues(alpha: 0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppTheme.warning,
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.build_rounded,
-                    color: AppTheme.background,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Configurer mon équipement',
-                    style: TextStyle(
-                      color: AppTheme.background,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
+              child: const Text(
+                'Configurer',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
             ),
           ),
@@ -1319,179 +1158,82 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   Widget _buildEmptyState() {
     return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
       builder: (context, state) {
-        // Determiner le nombre d'equipements coches
         int equipmentCount = 0;
         if (state is WorkerAvailabilityLoaded && state.profile != null) {
           equipmentCount = state.profile!.equipmentList.length;
         }
 
-        // Message contextuel selon l'equipement (afficher si 1-3 equipements)
         final bool hasLimitedEquipment =
             equipmentCount > 0 && equipmentCount < 4;
 
         return Container(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppTheme.border),
           ),
           child: Column(
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppTheme.primary.withValues(alpha: 0.1),
-                      AppTheme.secondary.withValues(alpha: 0.05),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                ),
-                child: const Icon(
-                  Icons.hourglass_empty_rounded,
-                  size: 40,
-                  color: AppTheme.primary,
-                ),
+              Icon(
+                Icons.hourglass_empty_rounded,
+                size: 36,
+                color: AppTheme.textTertiary,
               ),
-              const SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 14),
+              const Text(
                 'En attente de jobs...',
-                style: AppTheme.headlineSmall.copyWith(
-                  fontWeight: FontWeight.w700,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  color: AppTheme.textPrimary,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
-                'Les nouveaux jobs apparaitront ici\nautomatiquement',
+                'Les nouveaux jobs apparaitront ici automatiquement',
                 textAlign: TextAlign.center,
-                style: AppTheme.bodySmall.copyWith(
+                style: TextStyle(
                   color: AppTheme.textTertiary,
+                  fontSize: 13,
                 ),
               ),
-              const SizedBox(height: 20),
-              // Message contextuel si equipement limite
               if (hasLimitedEquipment) ...[
+                const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppTheme.info.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                    border:
-                        Border.all(color: AppTheme.info.withValues(alpha: 0.2)),
+                    color: AppTheme.background,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppTheme.border),
                   ),
-                  child: Column(
+                  child: Row(
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppTheme.info.withValues(alpha: 0.15),
-                              borderRadius:
-                                  BorderRadius.circular(AppTheme.radiusSM),
-                            ),
-                            child: Icon(
-                              Icons.lightbulb_outline,
-                              color: AppTheme.info,
-                              size: 18,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Astuce pour plus de jobs',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                    color: AppTheme.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Vous avez $equipmentCount equipement${equipmentCount > 1 ? 's' : ''} coche${equipmentCount > 1 ? 's' : ''}. Plus vous cochez d\'equipements, plus vous recevrez de jobs.',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: AppTheme.textSecondary,
-                                    height: 1.3,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      Icon(
+                        Icons.lightbulb_outline,
+                        color: AppTheme.textSecondary,
+                        size: 18,
                       ),
-                      const SizedBox(height: 12),
-                      GestureDetector(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                          WorkerMainDashboard.switchToTab(
-                            context,
-                            WorkerMainDashboard.profileTab,
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.info,
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusSM),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.build_rounded,
-                                color: AppTheme.background,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Ajouter des equipements',
-                                style: TextStyle(
-                                  color: AppTheme.background,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Ajoutez plus d\'equipements pour recevoir plus de jobs.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.textSecondary,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
               ],
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppTheme.info.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  border:
-                      Border.all(color: AppTheme.info.withValues(alpha: 0.2)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.refresh_rounded, color: AppTheme.info, size: 16),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Actualisation auto. toutes les 15s',
-                      style: TextStyle(
-                        color: AppTheme.info,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 14),
+              Text(
+                'Actualisation auto. toutes les 15s',
+                style: TextStyle(
+                  color: AppTheme.textTertiary,
+                  fontSize: 11,
                 ),
               ),
             ],
@@ -1503,77 +1245,56 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
 
   Widget _buildErrorState(String message) {
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.error.withValues(alpha: 0.2)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppTheme.error.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-            ),
-            child: Icon(
-              Icons.error_outline_rounded,
-              size: 32,
-              color: AppTheme.error,
-            ),
+          Icon(
+            Icons.error_outline_rounded,
+            size: 32,
+            color: AppTheme.error,
           ),
-          const SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 14),
+          const Text(
             'Oups!',
-            style: AppTheme.headlineSmall.copyWith(
-              fontWeight: FontWeight.w700,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+              color: AppTheme.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: AppTheme.bodySmall.copyWith(
+            style: TextStyle(
               color: AppTheme.textTertiary,
+              fontSize: 13,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           GestureDetector(
             onTap: () {
               HapticFeedback.mediumImpact();
               _loadDataWithDefaultLocation();
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.primary, AppTheme.secondary],
-                ),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppTheme.textPrimary,
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.refresh_rounded,
-                      color: AppTheme.background, size: 18),
-                  SizedBox(width: 8),
-                  Text(
-                    'Reessayer',
-                    style: TextStyle(
-                      color: AppTheme.background,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              child: const Text(
+                'Reessayer',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
             ),
           ),
@@ -1584,79 +1305,56 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
 
   Widget _buildVerificationRequiredState() {
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppTheme.warning.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-            ),
-            child: Icon(
-              Icons.verified_user_outlined,
-              size: 36,
-              color: AppTheme.warning,
+          Icon(
+            Icons.verified_user_outlined,
+            size: 32,
+            color: AppTheme.warning,
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'Verification requise',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+              color: AppTheme.textPrimary,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 6),
           Text(
-            'Vérification requise',
-            style: AppTheme.headlineSmall.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Vous devez faire vérifier votre identité avant de pouvoir voir et accepter des jobs de déneigement.',
+            'Verifiez votre identite pour accepter des jobs.',
             textAlign: TextAlign.center,
-            style: AppTheme.bodySmall.copyWith(
+            style: TextStyle(
               color: AppTheme.textTertiary,
-              height: 1.5,
+              fontSize: 13,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           GestureDetector(
             onTap: () {
               HapticFeedback.mediumImpact();
               Navigator.of(context).pushNamed(AppRoutes.identityVerification);
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.primary, AppTheme.secondary],
-                ),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppTheme.warning,
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.verified_user_rounded,
-                      color: AppTheme.background, size: 20),
-                  SizedBox(width: 10),
-                  Text(
-                    'Vérifier mon identité',
-                    style: TextStyle(
-                      color: AppTheme.background,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
+              child: const Text(
+                'Verifier',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
             ),
           ),
