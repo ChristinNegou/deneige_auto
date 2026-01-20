@@ -290,22 +290,22 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                                   vertical: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.primary,
+                                  color: AppTheme.success,
                                   borderRadius: BorderRadius.circular(24),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
                                       Icons.camera_alt,
-                                      color: Colors.white,
+                                      color: AppTheme.background,
                                       size: 20,
                                     ),
-                                    SizedBox(width: 8),
+                                    const SizedBox(width: 8),
                                     Text(
                                       'Prendre le selfie',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: AppTheme.background,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
