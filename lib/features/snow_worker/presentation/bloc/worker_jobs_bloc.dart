@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/errors/failures.dart';
 import '../../domain/entities/worker_job.dart';
 import '../../domain/usecases/get_available_jobs_usecase.dart';
 import '../../domain/usecases/get_my_jobs_usecase.dart';
@@ -254,6 +255,19 @@ class WorkerJobsError extends WorkerJobsState {
   List<Object?> get props => [message, previousState];
 }
 
+class VerificationRequired extends WorkerJobsState {
+  final String message;
+  final String? verificationStatus;
+
+  const VerificationRequired({
+    required this.message,
+    this.verificationStatus,
+  });
+
+  @override
+  List<Object?> get props => [message, verificationStatus];
+}
+
 class JobCancellationSuccess extends WorkerJobsState {
   final WorkerCancellationResult result;
   final WorkerJobsLoaded? previousState;
@@ -324,7 +338,16 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     final myJobsResult = await getMyJobsUseCase();
 
     availableResult.fold(
-      (failure) => emit(WorkerJobsError(failure.message)),
+      (failure) {
+        if (failure is VerificationRequiredFailure) {
+          emit(VerificationRequired(
+            message: failure.message,
+            verificationStatus: failure.verificationStatus,
+          ));
+        } else {
+          emit(WorkerJobsError(failure.message));
+        }
+      },
       (availableJobs) {
         myJobsResult.fold(
           (failure) => emit(WorkerJobsError(failure.message)),

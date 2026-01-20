@@ -1066,6 +1066,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               return _buildErrorState(state.message);
             }
 
+            if (state is VerificationRequired) {
+              return _buildVerificationRequiredState();
+            }
+
             List<WorkerJob> availableJobs = [];
             String? loadingJobId;
 
@@ -1567,6 +1571,89 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     style: TextStyle(
                       color: AppTheme.background,
                       fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerificationRequiredState() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppTheme.warning.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+            ),
+            child: Icon(
+              Icons.verified_user_outlined,
+              size: 36,
+              color: AppTheme.warning,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Vérification requise',
+            style: AppTheme.headlineSmall.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Vous devez faire vérifier votre identité avant de pouvoir voir et accepter des jobs de déneigement.',
+            textAlign: TextAlign.center,
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textTertiary,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              Navigator.of(context).pushNamed(AppRoutes.identityVerification);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppTheme.primary, AppTheme.secondary],
+                ),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.verified_user_rounded,
+                      color: AppTheme.background, size: 20),
+                  SizedBox(width: 10),
+                  Text(
+                    'Vérifier mon identité',
+                    style: TextStyle(
+                      color: AppTheme.background,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
                     ),
                   ),
                 ],

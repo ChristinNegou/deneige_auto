@@ -40,3 +40,12 @@ class SuspendedFailure extends Failure {
     this.suspendedUntilDisplay,
   });
 }
+
+class VerificationRequiredFailure extends Failure {
+  final String? verificationStatus;
+
+  const VerificationRequiredFailure({
+    super.message = 'Vérification d\'identité requise',
+    this.verificationStatus,
+  });
+}
