@@ -14,216 +14,6 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/bloc/auth_event.dart' show LogoutRequested;
 
-/// Data class to hold equipment selection state
-class EquipmentSelection {
-  final bool hasShovel;
-  final bool hasBrush;
-  final bool hasIceScraper;
-  final bool hasSaltSpreader;
-  final bool hasSnowBlower;
-  final bool hasRoofBroom;
-  final bool hasMicrofiberCloth;
-  final bool hasDeicerSpray;
-
-  const EquipmentSelection({
-    this.hasShovel = false,
-    this.hasBrush = false,
-    this.hasIceScraper = false,
-    this.hasSaltSpreader = false,
-    this.hasSnowBlower = false,
-    this.hasRoofBroom = false,
-    this.hasMicrofiberCloth = false,
-    this.hasDeicerSpray = false,
-  });
-
-  factory EquipmentSelection.fromList(List<String> equipment) {
-    return EquipmentSelection(
-      hasShovel: equipment.contains('shovel'),
-      hasBrush: equipment.contains('brush'),
-      hasIceScraper: equipment.contains('ice_scraper'),
-      hasSaltSpreader: equipment.contains('salt_spreader'),
-      hasSnowBlower: equipment.contains('snow_blower'),
-      hasRoofBroom: equipment.contains('roof_broom'),
-      hasMicrofiberCloth: equipment.contains('microfiber_cloth'),
-      hasDeicerSpray: equipment.contains('deicer_spray'),
-    );
-  }
-
-  List<String> toList() {
-    final equipment = <String>[];
-    if (hasShovel) equipment.add('shovel');
-    if (hasBrush) equipment.add('brush');
-    if (hasIceScraper) equipment.add('ice_scraper');
-    if (hasSaltSpreader) equipment.add('salt_spreader');
-    if (hasSnowBlower) equipment.add('snow_blower');
-    if (hasRoofBroom) equipment.add('roof_broom');
-    if (hasMicrofiberCloth) equipment.add('microfiber_cloth');
-    if (hasDeicerSpray) equipment.add('deicer_spray');
-    return equipment;
-  }
-
-  EquipmentSelection copyWith({
-    bool? hasShovel,
-    bool? hasBrush,
-    bool? hasIceScraper,
-    bool? hasSaltSpreader,
-    bool? hasSnowBlower,
-    bool? hasRoofBroom,
-    bool? hasMicrofiberCloth,
-    bool? hasDeicerSpray,
-  }) {
-    return EquipmentSelection(
-      hasShovel: hasShovel ?? this.hasShovel,
-      hasBrush: hasBrush ?? this.hasBrush,
-      hasIceScraper: hasIceScraper ?? this.hasIceScraper,
-      hasSaltSpreader: hasSaltSpreader ?? this.hasSaltSpreader,
-      hasSnowBlower: hasSnowBlower ?? this.hasSnowBlower,
-      hasRoofBroom: hasRoofBroom ?? this.hasRoofBroom,
-      hasMicrofiberCloth: hasMicrofiberCloth ?? this.hasMicrofiberCloth,
-      hasDeicerSpray: hasDeicerSpray ?? this.hasDeicerSpray,
-    );
-  }
-}
-
-/// Separate StatefulWidget for equipment grid to isolate state changes
-class _EquipmentGridWidget extends StatefulWidget {
-  final EquipmentSelection initialSelection;
-  final ValueChanged<EquipmentSelection> onSelectionChanged;
-
-  const _EquipmentGridWidget({
-    required this.initialSelection,
-    required this.onSelectionChanged,
-  });
-
-  @override
-  State<_EquipmentGridWidget> createState() => _EquipmentGridWidgetState();
-}
-
-class _EquipmentGridWidgetState extends State<_EquipmentGridWidget> {
-  late EquipmentSelection _selection;
-
-  @override
-  void initState() {
-    super.initState();
-    _selection = widget.initialSelection;
-  }
-
-  @override
-  void didUpdateWidget(covariant _EquipmentGridWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Only update if initial selection changed from external source
-    if (oldWidget.initialSelection != widget.initialSelection) {
-      _selection = widget.initialSelection;
-    }
-  }
-
-  void _updateSelection(EquipmentSelection newSelection) {
-    setState(() => _selection = newSelection);
-    widget.onSelectionChanged(newSelection);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final items = [
-      (
-        'Pelle',
-        _selection.hasShovel,
-        () => _updateSelection(
-            _selection.copyWith(hasShovel: !_selection.hasShovel))
-      ),
-      (
-        'Balai',
-        _selection.hasBrush,
-        () => _updateSelection(
-            _selection.copyWith(hasBrush: !_selection.hasBrush))
-      ),
-      (
-        'Grattoir',
-        _selection.hasIceScraper,
-        () => _updateSelection(
-            _selection.copyWith(hasIceScraper: !_selection.hasIceScraper))
-      ),
-      (
-        'Sel/Epandeur',
-        _selection.hasSaltSpreader,
-        () => _updateSelection(
-            _selection.copyWith(hasSaltSpreader: !_selection.hasSaltSpreader))
-      ),
-      (
-        'Souffleuse',
-        _selection.hasSnowBlower,
-        () => _updateSelection(
-            _selection.copyWith(hasSnowBlower: !_selection.hasSnowBlower))
-      ),
-      (
-        'Balai toit',
-        _selection.hasRoofBroom,
-        () => _updateSelection(
-            _selection.copyWith(hasRoofBroom: !_selection.hasRoofBroom))
-      ),
-      (
-        'Chiffon',
-        _selection.hasMicrofiberCloth,
-        () => _updateSelection(_selection.copyWith(
-            hasMicrofiberCloth: !_selection.hasMicrofiberCloth))
-      ),
-      (
-        'Deglacant',
-        _selection.hasDeicerSpray,
-        () => _updateSelection(
-            _selection.copyWith(hasDeicerSpray: !_selection.hasDeicerSpray))
-      ),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: items.map((item) {
-          final (label, value, onTap) = item;
-          return GestureDetector(
-            onTap: onTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: value
-                    ? AppTheme.primary.withValues(alpha: 0.1)
-                    : AppTheme.background,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: value ? AppTheme.primary : AppTheme.border,
-                  width: value ? 1.5 : 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    value ? Icons.check_circle : Icons.circle_outlined,
-                    size: 16,
-                    color: value ? AppTheme.primary : AppTheme.textTertiary,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: value ? FontWeight.w600 : FontWeight.w500,
-                      color:
-                          value ? AppTheme.textPrimary : AppTheme.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
-
 class WorkerProfileTab extends StatefulWidget {
   const WorkerProfileTab({super.key});
 
@@ -239,8 +29,15 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   Timer? _debounceTimer;
   bool _isSaving = false;
 
-  // Equipment - stored without setState to avoid parent rebuilds
-  EquipmentSelection _equipmentSelection = const EquipmentSelection();
+  // Use ValueNotifiers for equipment - completely isolated from widget rebuilds
+  final _hasShovel = ValueNotifier<bool>(false);
+  final _hasBrush = ValueNotifier<bool>(false);
+  final _hasIceScraper = ValueNotifier<bool>(false);
+  final _hasSaltSpreader = ValueNotifier<bool>(false);
+  final _hasSnowBlower = ValueNotifier<bool>(false);
+  final _hasRoofBroom = ValueNotifier<bool>(false);
+  final _hasMicrofiberCloth = ValueNotifier<bool>(false);
+  final _hasDeicerSpray = ValueNotifier<bool>(false);
 
   // Max active jobs
   int _maxActiveJobs = 3;
@@ -264,6 +61,14 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _hasShovel.dispose();
+    _hasBrush.dispose();
+    _hasIceScraper.dispose();
+    _hasSaltSpreader.dispose();
+    _hasSnowBlower.dispose();
+    _hasRoofBroom.dispose();
+    _hasMicrofiberCloth.dispose();
+    _hasDeicerSpray.dispose();
     super.dispose();
   }
 
@@ -280,12 +85,33 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     if (_initialized) return;
     _initialized = true;
 
-    _equipmentSelection = EquipmentSelection.fromList(profile.equipmentList);
+    final equipment = profile.equipmentList;
+    _hasShovel.value = equipment.contains('shovel');
+    _hasBrush.value = equipment.contains('brush');
+    _hasIceScraper.value = equipment.contains('ice_scraper');
+    _hasSaltSpreader.value = equipment.contains('salt_spreader');
+    _hasSnowBlower.value = equipment.contains('snow_blower');
+    _hasRoofBroom.value = equipment.contains('roof_broom');
+    _hasMicrofiberCloth.value = equipment.contains('microfiber_cloth');
+    _hasDeicerSpray.value = equipment.contains('deicer_spray');
 
     _maxActiveJobs = profile.maxActiveJobs;
     _notifyNewJobs = profile.notificationPreferences.newJobs;
     _notifyUrgentJobs = profile.notificationPreferences.urgentJobs;
     _notifyTips = profile.notificationPreferences.tips;
+  }
+
+  List<String> _getEquipmentList() {
+    final equipment = <String>[];
+    if (_hasShovel.value) equipment.add('shovel');
+    if (_hasBrush.value) equipment.add('brush');
+    if (_hasIceScraper.value) equipment.add('ice_scraper');
+    if (_hasSaltSpreader.value) equipment.add('salt_spreader');
+    if (_hasSnowBlower.value) equipment.add('snow_blower');
+    if (_hasRoofBroom.value) equipment.add('roof_broom');
+    if (_hasMicrofiberCloth.value) equipment.add('microfiber_cloth');
+    if (_hasDeicerSpray.value) equipment.add('deicer_spray');
+    return equipment;
   }
 
   @override
@@ -295,7 +121,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     return SafeArea(
       child: BlocConsumer<WorkerAvailabilityBloc, WorkerAvailabilityState>(
         listenWhen: (previous, current) {
-          // Écouter uniquement les changements pertinents
           return current is WorkerProfileUpdated ||
               current is WorkerPhotoUploading ||
               current is WorkerPhotoUploaded ||
@@ -324,32 +149,23 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
           }
         },
         buildWhen: (previous, current) {
-          // Ne jamais reconstruire pour ces états intermédiaires (gérés par listener)
+          // Block intermediate states
           if (current is WorkerProfileUpdated) return false;
           if (current is WorkerPhotoUploading) return false;
           if (current is WorkerPhotoUploaded) return false;
 
-          // Toujours permettre Loading (affiche le spinner)
+          // Always allow Loading
           if (current is WorkerAvailabilityLoading) return true;
 
-          // Toujours permettre Error
+          // Always allow Error
           if (current is WorkerAvailabilityError) return true;
 
-          // Pour l'état Loaded:
+          // For Loaded state:
           if (current is WorkerAvailabilityLoaded) {
-            // Premier chargement - toujours permettre
             if (!_initialized) return true;
-
-            // Venant de Loading (refresh/reload) - permettre
             if (previous is WorkerAvailabilityLoading) return true;
-
-            // Venant de Initial (démarrage) - permettre
             if (previous is WorkerAvailabilityInitial) return true;
-
-            // Venant de Error (retry après erreur) - permettre
             if (previous is WorkerAvailabilityError) return true;
-
-            // Sinon (Loaded → Loaded ou ProfileUpdated → Loaded) = sauvegarde, bloquer
             return false;
           }
 
@@ -365,12 +181,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
           if (state is WorkerAvailabilityLoaded &&
               state.profile != null &&
               !_initialized) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) {
-                _initializeFromProfile(state.profile!);
-                setState(() {});
-              }
-            });
+            // Initialize synchronously to avoid extra rebuilds
+            _initializeFromProfile(state.profile!);
           }
 
           String? photoUrl;
@@ -587,12 +399,70 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildEquipmentGrid() {
-    return _EquipmentGridWidget(
-      initialSelection: _equipmentSelection,
-      onSelectionChanged: (newSelection) {
-        // Update local state without setState to avoid parent rebuild
-        _equipmentSelection = newSelection;
-        _autoSave();
+    // Use ValueListenableBuilder for each item - completely isolated updates
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          _buildEquipmentChip('Pelle', _hasShovel),
+          _buildEquipmentChip('Balai', _hasBrush),
+          _buildEquipmentChip('Grattoir', _hasIceScraper),
+          _buildEquipmentChip('Sel/Epandeur', _hasSaltSpreader),
+          _buildEquipmentChip('Souffleuse', _hasSnowBlower),
+          _buildEquipmentChip('Balai toit', _hasRoofBroom),
+          _buildEquipmentChip('Chiffon', _hasMicrofiberCloth),
+          _buildEquipmentChip('Deglacant', _hasDeicerSpray),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEquipmentChip(String label, ValueNotifier<bool> notifier) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: notifier,
+      builder: (context, value, child) {
+        return GestureDetector(
+          onTap: () {
+            notifier.value = !notifier.value;
+            _autoSave();
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: value
+                  ? AppTheme.primary.withValues(alpha: 0.1)
+                  : AppTheme.background,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: value ? AppTheme.primary : AppTheme.border,
+                width: value ? 1.5 : 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  value ? Icons.check_circle : Icons.circle_outlined,
+                  size: 16,
+                  color: value ? AppTheme.primary : AppTheme.textTertiary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: value ? FontWeight.w600 : FontWeight.w500,
+                    color:
+                        value ? AppTheme.textPrimary : AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }
@@ -919,7 +789,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
     context.read<WorkerAvailabilityBloc>().add(
           UpdateProfile(
-            equipmentList: _equipmentSelection.toList(),
+            equipmentList: _getEquipmentList(),
             maxActiveJobs: _maxActiveJobs,
             notificationPreferences: notificationPrefs,
           ),
