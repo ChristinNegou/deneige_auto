@@ -192,8 +192,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           ElevatedButton(
             onPressed: () => _startVerification(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.success,
+              foregroundColor: AppTheme.background,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -473,8 +473,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ElevatedButton(
               onPressed: () => _startVerification(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                foregroundColor: Colors.white,
+                backgroundColor: AppTheme.success,
+                foregroundColor: AppTheme.background,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -558,8 +558,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ElevatedButton(
               onPressed: () => _startVerification(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                foregroundColor: Colors.white,
+                backgroundColor: AppTheme.success,
+                foregroundColor: AppTheme.background,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(

@@ -439,7 +439,14 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
         if (currentState is WorkerJobsLoaded) {
           emit(currentState.copyWith(isRefreshing: false));
         }
-        emit(WorkerJobsError(failure.message));
+        if (failure is VerificationRequiredFailure) {
+          emit(VerificationRequired(
+            message: failure.message,
+            verificationStatus: failure.verificationStatus,
+          ));
+        } else {
+          emit(WorkerJobsError(failure.message));
+        }
       },
       (availableJobs) {
         myJobsResult.fold(
