@@ -355,11 +355,21 @@ class WorkerRepositoryImpl implements WorkerRepository {
       final statusCode = e.response?.statusCode;
       final errorMessage =
           e.response?.data?['message'] as String? ?? 'Erreur serveur';
+      final errorCode = e.response?.data?['error'] as String?;
+      final verificationStatus =
+          e.response?.data?['verificationStatus'] as String?;
 
       if (statusCode == 401) {
         return UnauthorizedFailure(message: errorMessage);
       }
       if (statusCode == 403) {
+        // Check if it's a verification required error
+        if (errorCode == 'VERIFICATION_REQUIRED') {
+          return VerificationRequiredFailure(
+            message: errorMessage,
+            verificationStatus: verificationStatus,
+          );
+        }
         return const AuthFailure(message: 'Accès non autorisé');
       }
       if (statusCode == 404) {

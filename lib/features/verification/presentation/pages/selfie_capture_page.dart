@@ -378,6 +378,7 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                       foregroundColor: Colors.white,
                       disabledBackgroundColor:
                           AppTheme.textTertiary.withValues(alpha: 0.3),
+                      disabledForegroundColor: AppTheme.textTertiary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
