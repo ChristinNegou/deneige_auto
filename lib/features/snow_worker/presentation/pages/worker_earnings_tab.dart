@@ -142,34 +142,13 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.success, Color(0xFF059669)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.success.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.trending_up_rounded,
-              color: AppTheme.background,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Text(
+          const Text(
             'Mes revenus',
-            style: AppTheme.headlineMedium,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimary,
+            ),
           ),
           const Spacer(),
           GestureDetector(
@@ -180,16 +159,17 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
               _animationController.forward();
             },
             child: Container(
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: AppTheme.success.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppTheme.border),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.refresh_rounded,
-                color: AppTheme.success,
-                size: 22,
+                color: AppTheme.textSecondary,
+                size: 20,
               ),
             ),
           ),
@@ -202,21 +182,22 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        boxShadow: AppTheme.shadowSM,
+        color: AppTheme.background,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppTheme.border),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          color: AppTheme.success,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          color: AppTheme.textPrimary,
+          borderRadius: BorderRadius.circular(8),
         ),
-        labelColor: AppTheme.background,
+        labelColor: Colors.white,
         unselectedLabelColor: AppTheme.textSecondary,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
+        indicatorPadding: const EdgeInsets.all(3),
         tabs: const [
           Tab(text: 'Jour'),
           Tab(text: 'Semaine'),
@@ -332,24 +313,11 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppTheme.success,
-                AppTheme.success.withValues(alpha: 0.8)
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.success.withValues(alpha: 0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.border),
           ),
           child: Column(
             children: [
@@ -360,32 +328,32 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
               Text(
                 title,
                 style: TextStyle(
-                  color: AppTheme.background.withValues(alpha: 0.9),
-                  fontSize: 14,
+                  color: AppTheme.textSecondary,
+                  fontSize: 13,
                   letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     animatedAmount.toStringAsFixed(2),
                     style: const TextStyle(
-                      color: AppTheme.background,
-                      fontSize: 44,
+                      color: AppTheme.textPrimary,
+                      fontSize: 36,
                       fontWeight: FontWeight.bold,
                       fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: const EdgeInsets.only(bottom: 4),
                     child: Text(
                       ' \$',
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.7),
-                        fontSize: 22,
+                        color: AppTheme.textSecondary,
+                        fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -393,45 +361,42 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                 ],
               ),
               const SizedBox(height: 20),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: AppTheme.background.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildSummaryItem(
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildSummaryItem(
                       icon: Icons.check_circle_outline_rounded,
                       label: 'Jobs',
                       value: animatedJobs.toString(),
                     ),
-                    Container(
-                      height: 36,
-                      width: 1,
-                      color: AppTheme.background.withValues(alpha: 0.3),
-                    ),
-                    _buildSummaryItem(
+                  ),
+                  Container(
+                    height: 40,
+                    width: 1,
+                    color: AppTheme.border,
+                  ),
+                  Expanded(
+                    child: _buildSummaryItem(
                       icon: Icons.volunteer_activism_rounded,
                       label: 'Pourboires',
                       value: '${animatedTips.toStringAsFixed(0)} \$',
                     ),
-                    Container(
-                      height: 36,
-                      width: 1,
-                      color: AppTheme.background.withValues(alpha: 0.3),
-                    ),
-                    _buildSummaryItem(
+                  ),
+                  Container(
+                    height: 40,
+                    width: 1,
+                    color: AppTheme.border,
+                  ),
+                  Expanded(
+                    child: _buildSummaryItem(
                       icon: Icons.trending_up_rounded,
                       label: 'Moyenne',
                       value: jobsCount > 0
                           ? '${(amount / jobsCount).toStringAsFixed(0)} \$'
                           : '0 \$',
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -444,61 +409,69 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
     const double dailyGoal = 100.0;
     final progress = (currentAmount / dailyGoal).clamp(0.0, 1.0);
 
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Objectif: ${dailyGoal.toInt()}\$',
-              style: TextStyle(
-                color: AppTheme.background.withValues(alpha: 0.8),
-                fontSize: 12,
-              ),
-            ),
-            Text(
-              '${(progress * 100).toInt()}%',
-              style: const TextStyle(
-                color: AppTheme.background,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: AppTheme.background.withValues(alpha: 0.2),
-            valueColor: AlwaysStoppedAnimation<Color>(
-              progress >= 1.0 ? AppTheme.warning : AppTheme.background,
-            ),
-            minHeight: 6,
-          ),
-        ),
-        if (progress >= 1.0)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.emoji_events_rounded,
-                    color: AppTheme.warning, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  'Objectif atteint!',
-                  style: TextStyle(
-                    color: AppTheme.warning,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Objectif: ${dailyGoal.toInt()}\$',
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 12,
                 ),
-              ],
+              ),
+              Text(
+                '${(progress * 100).toInt()}%',
+                style: TextStyle(
+                  color:
+                      progress >= 1.0 ? AppTheme.success : AppTheme.textPrimary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: AppTheme.border,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                progress >= 1.0 ? AppTheme.success : AppTheme.textPrimary,
+              ),
+              minHeight: 5,
             ),
           ),
-      ],
+          if (progress >= 1.0)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.check_circle, color: AppTheme.success, size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Objectif atteint!',
+                    style: TextStyle(
+                      color: AppTheme.success,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -509,20 +482,19 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }) {
     return Column(
       children: [
-        Icon(icon, color: AppTheme.background, size: 18),
-        const SizedBox(height: 4),
         Text(
           value,
           style: const TextStyle(
-            color: AppTheme.background,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
           ),
         ),
+        const SizedBox(height: 2),
         Text(
           label,
           style: TextStyle(
-            color: AppTheme.background.withValues(alpha: 0.8),
+            color: AppTheme.textTertiary,
             fontSize: 11,
           ),
         ),
@@ -603,32 +575,31 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        boxShadow: AppTheme.shadowSM,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(height: 10),
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 8),
           Text(
             value,
-            style: AppTheme.headlineSmall,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             title,
-            style: AppTheme.labelSmall,
+            style: TextStyle(
+              fontSize: 11,
+              color: AppTheme.textTertiary,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -643,44 +614,41 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         Navigator.pushNamed(context, AppRoutes.workerHistory);
       },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          boxShadow: AppTheme.shadowSM,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppTheme.border),
         ),
         child: Row(
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              ),
-              child: const Icon(Icons.history_rounded,
-                  color: AppTheme.primary, size: 22),
-            ),
-            const SizedBox(width: 14),
+            Icon(Icons.history_rounded,
+                color: AppTheme.textSecondary, size: 20),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Historique des jobs',
-                    style: AppTheme.labelLarge
-                        .copyWith(fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     'Voir tous vos jobs termines',
-                    style: AppTheme.bodySmall,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textTertiary,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded,
-                color: AppTheme.textTertiary),
+            Icon(Icons.chevron_right, color: AppTheme.textTertiary, size: 20),
           ],
         ),
       ),
@@ -696,19 +664,27 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
     final maxHeight = maxEarning > 0 ? maxEarning : 100.0;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        boxShadow: AppTheme.shadowSM,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Revenus par jour', style: AppTheme.headlineSmall),
-          const SizedBox(height: 24),
+          Text(
+            'Revenus par jour',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textSecondary,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 20),
           SizedBox(
-            height: 150,
+            height: 130,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -717,7 +693,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                     ? earnings.daily[index].total
                     : 0.0;
                 final height =
-                    maxHeight > 0 ? (earning / maxHeight) * 120 : 0.0;
+                    maxHeight > 0 ? (earning / maxHeight) * 100 : 0.0;
 
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -725,19 +701,28 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                     if (earning > 0)
                       Text(
                         '${earning.toInt()}\$',
-                        style: AppTheme.labelSmall.copyWith(fontSize: 10),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: AppTheme.textSecondary,
+                        ),
                       ),
                     const SizedBox(height: 4),
                     Container(
-                      width: 32,
-                      height: height.clamp(4.0, 120.0),
+                      width: 28,
+                      height: height.clamp(4.0, 100.0),
                       decoration: BoxDecoration(
-                        color: AppTheme.success,
+                        color: AppTheme.textPrimary.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(days[index], style: AppTheme.labelSmall),
+                    const SizedBox(height: 6),
+                    Text(
+                      days[index],
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: AppTheme.textTertiary,
+                      ),
+                    ),
                   ],
                 );
               }),
@@ -750,32 +735,25 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
 
   Widget _buildAllTimeStats(AllTimeStats allTime) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        boxShadow: AppTheme.shadowSM,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.analytics_rounded,
-                    color: AppTheme.primary, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text('Statistiques globales', style: AppTheme.headlineSmall),
-            ],
+          Text(
+            'Statistiques globales',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textSecondary,
+              letterSpacing: 0.5,
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           _buildAllTimeRow('Total jobs', allTime.completed.toString()),
           _buildAllTimeRow(
               'Revenus totaux', '${allTime.earnings.toStringAsFixed(2)} \$'),
@@ -794,13 +772,25 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
 
   Widget _buildAllTimeRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: AppTheme.bodySmall),
-          Text(value,
-              style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimary,
+            ),
+          ),
         ],
       ),
     );
