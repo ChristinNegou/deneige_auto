@@ -99,6 +99,13 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
     return SafeArea(
       child: BlocConsumer<WorkerAvailabilityBloc, WorkerAvailabilityState>(
+        listenWhen: (previous, current) {
+          // Écouter uniquement les changements pertinents
+          return current is WorkerProfileUpdated ||
+              current is WorkerPhotoUploading ||
+              current is WorkerPhotoUploaded ||
+              current is WorkerAvailabilityError;
+        },
         listener: (context, state) {
           if (state is WorkerProfileUpdated) {
             _isSaving = false;
@@ -120,6 +127,23 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               ),
             );
           }
+        },
+        buildWhen: (previous, current) {
+          // Ne reconstruire que lors du chargement initial
+          // Éviter le rebuild lors des sauvegardes en arrière-plan
+          if (current is WorkerProfileUpdated) return false;
+          if (current is WorkerPhotoUploading) return false;
+          if (current is WorkerPhotoUploaded) return false;
+
+          // Si on passe de Loaded à Loaded, ne pas reconstruire
+          // (c'est juste une mise à jour de isUpdating ou du profil après save)
+          if (previous is WorkerAvailabilityLoaded &&
+              current is WorkerAvailabilityLoaded) {
+            // Reconstruire uniquement si c'est le chargement initial (pas encore initialisé)
+            return !_initialized;
+          }
+
+          return true;
         },
         builder: (context, state) {
           if (state is WorkerAvailabilityLoading) {
