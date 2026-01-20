@@ -181,23 +181,29 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   Widget _buildTabBar() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppTheme.background,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.border),
+        color: AppTheme.border.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          color: AppTheme.textPrimary,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
-        labelColor: Colors.white,
-        unselectedLabelColor: AppTheme.textSecondary,
+        labelColor: AppTheme.textPrimary,
+        unselectedLabelColor: AppTheme.textTertiary,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
-        indicatorPadding: const EdgeInsets.all(3),
         tabs: const [
           Tab(text: 'Jour'),
           Tab(text: 'Semaine'),
