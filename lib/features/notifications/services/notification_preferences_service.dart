@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/entities/notification.dart';
 
 /// Service de gestion des préférences de notification
@@ -129,27 +130,42 @@ class NotificationPreferencesService {
 
   /// Catégories pour regrouper les types de notifications
   static const Map<String, List<NotificationType>> categories = {
-    'Réservations': [
+    'reservations': [
       NotificationType.reservationAssigned,
       NotificationType.workerEnRoute,
       NotificationType.workStarted,
       NotificationType.workCompleted,
       NotificationType.reservationCancelled,
     ],
-    'Paiements': [
+    'payments': [
       NotificationType.paymentSuccess,
       NotificationType.paymentFailed,
       NotificationType.refundProcessed,
     ],
-    'Alertes': [
+    'alerts': [
       NotificationType.weatherAlert,
       NotificationType.urgentRequest,
     ],
-    'Communications': [
+    'communications': [
       NotificationType.workerMessage,
       NotificationType.systemNotification,
     ],
   };
+
+  static String localizedCategoryName(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'reservations':
+        return l10n.notifCategory_reservations;
+      case 'payments':
+        return l10n.notifCategory_payments;
+      case 'alerts':
+        return l10n.notifCategory_alerts;
+      case 'communications':
+        return l10n.notifCategory_communications;
+      default:
+        return key;
+    }
+  }
 
   /// Active/désactive une catégorie entière
   Future<void> setCategoryEnabled(String category, bool enabled) async {
@@ -257,38 +273,38 @@ class NotificationPreferencesService {
 /// Extension pour obtenir des informations sur les types de notification
 extension NotificationTypeInfo on NotificationType {
   /// Description du type pour l'affichage dans les paramètres
-  String get settingsDescription {
+  String localizedSettingsDescription(AppLocalizations l10n) {
     switch (this) {
       case NotificationType.reservationAssigned:
-        return 'Quand un déneigeur accepte votre demande';
+        return l10n.notifDesc_reservationAssigned;
       case NotificationType.workerEnRoute:
-        return 'Quand le déneigeur est en route';
+        return l10n.notifDesc_workerEnRoute;
       case NotificationType.workStarted:
-        return 'Quand le déneigement commence';
+        return l10n.notifDesc_workStarted;
       case NotificationType.workCompleted:
-        return 'Quand le déneigement est terminé';
+        return l10n.notifDesc_workCompleted;
       case NotificationType.reservationCancelled:
-        return 'Quand une réservation est annulée';
+        return l10n.notifDesc_reservationCancelled;
       case NotificationType.paymentSuccess:
-        return 'Confirmation de paiement réussi';
+        return l10n.notifDesc_paymentSuccess;
       case NotificationType.paymentFailed:
-        return 'Alerte de paiement échoué';
+        return l10n.notifDesc_paymentFailed;
       case NotificationType.refundProcessed:
-        return 'Confirmation de remboursement';
+        return l10n.notifDesc_refundProcessed;
       case NotificationType.weatherAlert:
-        return 'Alertes météo neige';
+        return l10n.notifDesc_weatherAlert;
       case NotificationType.urgentRequest:
-        return 'Demandes urgentes';
+        return l10n.notifDesc_urgentRequest;
       case NotificationType.workerMessage:
-        return 'Messages du déneigeur';
+        return l10n.notifDesc_workerMessage;
       case NotificationType.newMessage:
-        return 'Nouveaux messages de chat';
+        return l10n.notifDesc_newMessage;
       case NotificationType.tipReceived:
-        return 'Pourboires reçus';
+        return l10n.notifDesc_tipReceived;
       case NotificationType.rating:
-        return 'Évaluations reçues';
+        return l10n.notifDesc_rating;
       case NotificationType.systemNotification:
-        return 'Mises à jour système';
+        return l10n.notifDesc_systemNotification;
     }
   }
 

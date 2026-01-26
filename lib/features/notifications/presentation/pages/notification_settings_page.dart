@@ -81,6 +81,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Widget _buildMasterToggle() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -127,8 +128,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 ),
                 Text(
                   _prefsService!.isEnabled
-                      ? 'Les notifications sont activées'
-                      : 'Les notifications sont désactivées',
+                      ? l10n.notifSettings_enabled
+                      : l10n.notifSettings_disabled,
                   style: TextStyle(
                     color: AppTheme.textPrimary.withValues(alpha: 0.8),
                     fontSize: 14,
@@ -152,6 +153,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Widget _buildQuickSettings() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.surface,
@@ -162,8 +164,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         children: [
           _buildSettingTile(
             icon: Icons.volume_up,
-            title: 'Sons',
-            subtitle: 'Jouer un son pour les nouvelles notifications',
+            title: l10n.notifSettings_sounds,
+            subtitle: l10n.notifSettings_soundsDesc,
             value: _prefsService!.isSoundEnabled,
             onChanged: (value) async {
               await _prefsService!.setSoundEnabled(value);
@@ -173,8 +175,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           Divider(height: 1, color: AppTheme.border),
           _buildSettingTile(
             icon: Icons.vibration,
-            title: 'Vibration',
-            subtitle: 'Vibrer pour les nouvelles notifications',
+            title: l10n.notifSettings_vibration,
+            subtitle: l10n.notifSettings_vibrationDesc,
             value: _prefsService!.isVibrationEnabled,
             onChanged: (value) async {
               await _prefsService!.setVibrationEnabled(value);
@@ -184,8 +186,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           Divider(height: 1, color: AppTheme.border),
           _buildSettingTile(
             icon: Icons.circle_notifications,
-            title: 'Badge',
-            subtitle: 'Afficher le compteur sur l\'icône de l\'app',
+            title: l10n.notifSettings_badge,
+            subtitle: l10n.notifSettings_badgeDesc,
             value: _prefsService!.isBadgeEnabled,
             onChanged: (value) async {
               await _prefsService!.setBadgeEnabled(value);
@@ -195,8 +197,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           Divider(height: 1, color: AppTheme.border),
           _buildSettingTile(
             icon: Icons.preview,
-            title: 'Aperçu',
-            subtitle: 'Afficher le contenu des notifications',
+            title: l10n.notifSettings_preview,
+            subtitle: l10n.notifSettings_previewDesc,
             value: _prefsService!.isPreviewEnabled,
             onChanged: (value) async {
               await _prefsService!.setPreviewEnabled(value);
@@ -209,6 +211,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Widget _buildQuietHoursSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -219,7 +222,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               Icon(Icons.nights_stay, color: AppTheme.textSecondary, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Mode silencieux',
+                l10n.notifSettings_quietMode,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -239,8 +242,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             children: [
               _buildSettingTile(
                 icon: Icons.do_not_disturb_on,
-                title: 'Mode silencieux',
-                subtitle: 'Pas de notifications pendant les heures définies',
+                title: l10n.notifSettings_quietMode,
+                subtitle: l10n.notifSettings_quietModeDesc,
                 value: _prefsService!.isQuietHoursEnabled,
                 onChanged: (value) async {
                   await _prefsService!.setQuietHoursEnabled(value);
@@ -252,11 +255,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 ListTile(
                   leading: Icon(Icons.schedule, color: AppTheme.primary2),
                   title: Text(
-                    'Heures',
+                    l10n.notifSettings_hours,
                     style: TextStyle(color: AppTheme.textPrimary),
                   ),
                   subtitle: Text(
-                    'De ${_prefsService!.quietHoursStart} à ${_prefsService!.quietHoursEnd}',
+                    l10n.notifSettings_hoursRange(
+                        _prefsService!.quietHoursStart,
+                        _prefsService!.quietHoursEnd),
                     style: TextStyle(color: AppTheme.primary2),
                   ),
                   trailing:
@@ -278,7 +283,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Mode silencieux actuellement actif',
+                            l10n.notifSettings_quietModeActive,
                             style: TextStyle(
                               color: AppTheme.warning,
                               fontSize: 13,
@@ -297,7 +302,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text(
-            'Les notifications urgentes seront toujours envoyées',
+            l10n.notifSettings_urgentAlways,
             style: TextStyle(
               fontSize: 12,
               color: AppTheme.textTertiary,
@@ -309,13 +314,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Widget _buildCategoriesSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
-            'Types de notifications',
+            l10n.notifSettings_notifTypes,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -331,6 +337,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Widget _buildCategoryCard(String categoryName, List<NotificationType> types) {
+    final l10n = AppLocalizations.of(context)!;
     final isFullyEnabled = _prefsService!.isCategoryFullyEnabled(categoryName);
     final isPartiallyEnabled =
         _prefsService!.isCategoryPartiallyEnabled(categoryName);
@@ -354,7 +361,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ),
               const SizedBox(width: 12),
               Text(
-                categoryName,
+                NotificationPreferencesService.localizedCategoryName(
+                    categoryName, l10n),
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
@@ -395,7 +403,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ListTile(
               dense: true,
               title: Text(
-                isFullyEnabled ? 'Tout désactiver' : 'Tout activer',
+                isFullyEnabled
+                    ? l10n.notifSettings_disableAll
+                    : l10n.notifSettings_enableAll,
                 style: TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 13,
@@ -420,6 +430,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Widget _buildNotificationTypeTile(NotificationType type) {
+    final l10n = AppLocalizations.of(context)!;
     final isEnabled = _prefsService!.isTypeEnabled(type);
 
     return ListTile(
@@ -430,14 +441,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         color: isEnabled ? AppTheme.textSecondary : AppTheme.textTertiary,
       ),
       title: Text(
-        type.displayName,
+        type.localizedDisplayName(l10n),
         style: TextStyle(
           fontSize: 14,
           color: isEnabled ? AppTheme.textPrimary : AppTheme.textSecondary,
         ),
       ),
       subtitle: Text(
-        type.settingsDescription,
+        type.localizedSettingsDescription(l10n),
         style: TextStyle(
           fontSize: 12,
           color: AppTheme.textTertiary,
@@ -451,7 +462,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                'Critique',
+                l10n.notifSettings_critical,
                 style: TextStyle(
                   fontSize: 10,
                   color: AppTheme.error,
@@ -496,12 +507,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Widget _buildResetButton() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: TextButton.icon(
         onPressed: () => _showResetConfirmation(),
         icon: Icon(Icons.restore, size: 20, color: AppTheme.textSecondary),
         label: Text(
-          'Réinitialiser les paramètres',
+          l10n.notifSettings_resetSettings,
           style: TextStyle(color: AppTheme.textSecondary),
         ),
       ),
@@ -509,12 +521,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   void _showQuietHoursDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.surface,
         title: Text(
-          'Heures du mode silencieux',
+          l10n.notifSettings_quietHoursTitle,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         content: Column(
@@ -522,7 +535,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           children: [
             ListTile(
               title: Text(
-                'Début',
+                l10n.notifSettings_start,
                 style: TextStyle(color: AppTheme.textPrimary),
               ),
               subtitle: Text(
@@ -547,7 +560,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
             ListTile(
               title: Text(
-                'Fin',
+                l10n.notifSettings_end,
                 style: TextStyle(color: AppTheme.textPrimary),
               ),
               subtitle: Text(
@@ -586,16 +599,17 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   void _showResetConfirmation() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.surface,
         title: Text(
-          'Réinitialiser?',
+          l10n.notifSettings_resetConfirm,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         content: Text(
-          'Tous les paramètres de notification seront remis à leurs valeurs par défaut.',
+          l10n.notifSettings_resetConfirmMessage,
           style: TextStyle(color: AppTheme.textSecondary),
         ),
         actions: [
@@ -616,7 +630,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Paramètres réinitialisés',
+                    l10n.notifSettings_resetDone,
                     style: TextStyle(color: AppTheme.textPrimary),
                   ),
                   backgroundColor: AppTheme.success,
@@ -627,7 +641,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               backgroundColor: AppTheme.primary2,
               foregroundColor: AppTheme.textPrimary,
             ),
-            child: const Text('Réinitialiser'),
+            child: Text(l10n.notifSettings_reset),
           ),
         ],
       ),
@@ -648,13 +662,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
-      case 'Réservations':
+      case 'reservations':
         return Icons.calendar_today;
-      case 'Paiements':
+      case 'payments':
         return Icons.payment;
-      case 'Alertes':
+      case 'alerts':
         return Icons.warning;
-      case 'Communications':
+      case 'communications':
         return Icons.message;
       default:
         return Icons.notifications;

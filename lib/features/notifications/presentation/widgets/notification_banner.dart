@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/notification.dart';
 import '../../services/notification_navigation_service.dart';
 
@@ -81,9 +82,10 @@ class _NotificationBannerState extends State<NotificationBanner>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final navigationService = NotificationNavigationService();
     final action =
-        navigationService.getActionForNotification(widget.notification);
+        navigationService.getActionForNotification(widget.notification, l10n);
 
     return SlideTransition(
       position: _slideAnimation,
@@ -154,7 +156,7 @@ class _NotificationBannerState extends State<NotificationBanner>
                                         ),
                                       ),
                                       Text(
-                                        'maintenant',
+                                        l10n.notif_now,
                                         style: TextStyle(
                                           color: AppTheme.textTertiary,
                                           fontSize: 12,

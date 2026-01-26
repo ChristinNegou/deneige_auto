@@ -2479,4 +2479,341 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get payment_addCard => 'Ajouter une carte';
+
+  @override
+  String get notifSettings_enabled => 'Les notifications sont activées';
+
+  @override
+  String get notifSettings_disabled => 'Les notifications sont désactivées';
+
+  @override
+  String get notifSettings_sounds => 'Sons';
+
+  @override
+  String get notifSettings_soundsDesc =>
+      'Jouer un son pour les nouvelles notifications';
+
+  @override
+  String get notifSettings_vibration => 'Vibration';
+
+  @override
+  String get notifSettings_vibrationDesc =>
+      'Vibrer pour les nouvelles notifications';
+
+  @override
+  String get notifSettings_badge => 'Badge';
+
+  @override
+  String get notifSettings_badgeDesc =>
+      'Afficher le compteur sur l\'icône de l\'app';
+
+  @override
+  String get notifSettings_preview => 'Aperçu';
+
+  @override
+  String get notifSettings_previewDesc =>
+      'Afficher le contenu des notifications';
+
+  @override
+  String get notifSettings_quietMode => 'Mode silencieux';
+
+  @override
+  String get notifSettings_quietModeDesc =>
+      'Pas de notifications pendant les heures définies';
+
+  @override
+  String get notifSettings_hours => 'Heures';
+
+  @override
+  String notifSettings_hoursRange(String start, String end) {
+    return 'De $start à $end';
+  }
+
+  @override
+  String get notifSettings_quietModeActive =>
+      'Mode silencieux actuellement actif';
+
+  @override
+  String get notifSettings_urgentAlways =>
+      'Les notifications urgentes seront toujours envoyées';
+
+  @override
+  String get notifSettings_notifTypes => 'Types de notifications';
+
+  @override
+  String get notifSettings_disableAll => 'Tout désactiver';
+
+  @override
+  String get notifSettings_enableAll => 'Tout activer';
+
+  @override
+  String get notifSettings_critical => 'Critique';
+
+  @override
+  String get notifSettings_resetSettings => 'Réinitialiser les paramètres';
+
+  @override
+  String get notifSettings_quietHoursTitle => 'Heures du mode silencieux';
+
+  @override
+  String get notifSettings_start => 'Début';
+
+  @override
+  String get notifSettings_end => 'Fin';
+
+  @override
+  String get notifSettings_resetConfirm => 'Réinitialiser?';
+
+  @override
+  String get notifSettings_resetConfirmMessage =>
+      'Tous les paramètres de notification seront remis à leurs valeurs par défaut.';
+
+  @override
+  String get notifSettings_resetDone => 'Paramètres réinitialisés';
+
+  @override
+  String get notifSettings_reset => 'Réinitialiser';
+
+  @override
+  String get notif_justNow => 'À l\'instant';
+
+  @override
+  String notif_minutesAgo(int minutes) {
+    return 'Il y a $minutes min';
+  }
+
+  @override
+  String notif_hoursAgo(int hours) {
+    return 'Il y a $hours h';
+  }
+
+  @override
+  String notif_daysAgo(int days) {
+    return 'Il y a $days j';
+  }
+
+  @override
+  String notif_weeksAgo(int weeks) {
+    return 'Il y a $weeks sem';
+  }
+
+  @override
+  String get notif_now => 'maintenant';
+
+  @override
+  String get notif_urgent => 'Urgent';
+
+  @override
+  String get notifType_reservationAssigned => 'Tâche acceptée';
+
+  @override
+  String get notifType_workerEnRoute => 'Déneigeur en route';
+
+  @override
+  String get notifType_workStarted => 'Travail commencé';
+
+  @override
+  String get notifType_workCompleted => 'Travail terminé';
+
+  @override
+  String get notifType_reservationCancelled => 'Réservation annulée';
+
+  @override
+  String get notifType_paymentSuccess => 'Paiement réussi';
+
+  @override
+  String get notifType_paymentFailed => 'Paiement échoué';
+
+  @override
+  String get notifType_refundProcessed => 'Remboursement';
+
+  @override
+  String get notifType_weatherAlert => 'Alerte météo';
+
+  @override
+  String get notifType_urgentRequest => 'Urgent';
+
+  @override
+  String get notifType_workerMessage => 'Message';
+
+  @override
+  String get notifType_newMessage => 'Nouveau message';
+
+  @override
+  String get notifType_tipReceived => 'Pourboire reçu';
+
+  @override
+  String get notifType_rating => 'Évaluation';
+
+  @override
+  String get notifType_systemNotification => 'Système';
+
+  @override
+  String get notifCategory_reservations => 'Réservations';
+
+  @override
+  String get notifCategory_payments => 'Paiements';
+
+  @override
+  String get notifCategory_alerts => 'Alertes';
+
+  @override
+  String get notifCategory_communications => 'Communications';
+
+  @override
+  String get notifDesc_reservationAssigned =>
+      'Quand un déneigeur accepte votre demande';
+
+  @override
+  String get notifDesc_workerEnRoute => 'Quand le déneigeur est en route';
+
+  @override
+  String get notifDesc_workStarted => 'Quand le déneigement commence';
+
+  @override
+  String get notifDesc_workCompleted => 'Quand le déneigement est terminé';
+
+  @override
+  String get notifDesc_reservationCancelled =>
+      'Quand une réservation est annulée';
+
+  @override
+  String get notifDesc_paymentSuccess => 'Confirmation de paiement réussi';
+
+  @override
+  String get notifDesc_paymentFailed => 'Alerte de paiement échoué';
+
+  @override
+  String get notifDesc_refundProcessed => 'Confirmation de remboursement';
+
+  @override
+  String get notifDesc_weatherAlert => 'Alertes météo neige';
+
+  @override
+  String get notifDesc_urgentRequest => 'Demandes urgentes';
+
+  @override
+  String get notifDesc_workerMessage => 'Messages du déneigeur';
+
+  @override
+  String get notifDesc_newMessage => 'Nouveaux messages de chat';
+
+  @override
+  String get notifDesc_tipReceived => 'Pourboires reçus';
+
+  @override
+  String get notifDesc_rating => 'Évaluations reçues';
+
+  @override
+  String get notifDesc_systemNotification => 'Mises à jour système';
+
+  @override
+  String get notifAction_viewDetails => 'Voir les détails';
+
+  @override
+  String get notifAction_trackReservation => 'Suivre la réservation';
+
+  @override
+  String get notifAction_viewProgress => 'Voir la progression';
+
+  @override
+  String get notifAction_managePayments => 'Gérer les paiements';
+
+  @override
+  String get notifAction_viewHistory => 'Voir l\'historique';
+
+  @override
+  String get notifAction_newReservation => 'Nouvelle réservation';
+
+  @override
+  String get notifAction_bookNow => 'Réserver maintenant';
+
+  @override
+  String get notifAction_viewJobs => 'Voir les jobs';
+
+  @override
+  String get notifAction_openChat => 'Ouvrir le chat';
+
+  @override
+  String get notifAction_reply => 'Répondre';
+
+  @override
+  String get notifAction_viewRating => 'Voir l\'évaluation';
+
+  @override
+  String get notifAction_viewMessage => 'Voir le message';
+
+  @override
+  String get notifAction_userNotAuthenticated =>
+      'Erreur: utilisateur non authentifié';
+
+  @override
+  String get notifAction_defaultUser => 'Utilisateur';
+
+  @override
+  String get notif_allMarkedRead =>
+      'Toutes les notifications marquées comme lues';
+
+  @override
+  String get notif_allDeleted => 'Toutes les notifications supprimées';
+
+  @override
+  String get notif_noReadToDelete => 'Aucune notification lue à supprimer';
+
+  @override
+  String get notif_someNotDeleted =>
+      'Certaines notifications n\'ont pas pu être supprimées';
+
+  @override
+  String notif_deletedCount(int count) {
+    return '$count notification(s) supprimée(s)';
+  }
+
+  @override
+  String notif_autoDeleteEnabled(int seconds) {
+    return 'Suppression automatique activée (${seconds}s)';
+  }
+
+  @override
+  String get notif_autoDeleteDisabled => 'Suppression automatique désactivée';
+
+  @override
+  String get notif_errorLoading => 'Erreur lors du chargement';
+
+  @override
+  String get notif_errorRefreshing => 'Erreur lors du rafraîchissement';
+
+  @override
+  String get notif_errorLoadingNotifications =>
+      'Erreur lors du chargement des notifications';
+
+  @override
+  String get notif_errorCountingUnread =>
+      'Erreur lors du comptage des notifications non lues';
+
+  @override
+  String get notif_errorMarkingRead =>
+      'Erreur lors du marquage de la notification';
+
+  @override
+  String get notif_errorMarkingAllRead =>
+      'Erreur lors du marquage des notifications';
+
+  @override
+  String get notif_errorDeleting =>
+      'Erreur lors de la suppression de la notification';
+
+  @override
+  String get notif_errorDeletingAll =>
+      'Erreur lors de la suppression des notifications';
+
+  @override
+  String get notif_connectionTimeout =>
+      'Délai de connexion dépassé. Vérifiez votre connexion.';
+
+  @override
+  String get notif_cannotConnect => 'Impossible de se connecter au serveur.';
+
+  @override
+  String get notif_serverError => 'Une erreur serveur est survenue.';
 }

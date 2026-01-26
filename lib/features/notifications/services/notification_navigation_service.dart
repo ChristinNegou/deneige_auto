@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/di/injection_container.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_state.dart';
 import '../../chat/presentation/bloc/chat_bloc.dart';
@@ -56,6 +57,7 @@ class NotificationNavigationService {
   /// Affiche les détails complets d'une notification système
   void _showNotificationDetails(
       BuildContext context, AppNotification notification) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -115,7 +117,7 @@ class NotificationNavigationService {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    notification.timeAgo,
+                    notification.localizedTimeAgo(l10n),
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[600],
@@ -129,7 +131,7 @@ class NotificationNavigationService {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Fermer'),
+            child: Text(l10n.common_close),
           ),
         ],
       ),
@@ -145,11 +147,12 @@ class NotificationNavigationService {
       return;
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erreur: utilisateur non authentifié'),
+        SnackBar(
+          content: Text(l10n.notifAction_userNotAuthenticated),
           backgroundColor: Colors.red,
         ),
       );
@@ -157,11 +160,11 @@ class NotificationNavigationService {
     }
 
     // Extraire le nom de l'expéditeur depuis les metadata ou le message
-    String otherUserName = 'Utilisateur';
+    String otherUserName = l10n.notifAction_defaultUser;
     if (notification.metadata != null) {
       otherUserName = notification.metadata!['senderName'] as String? ??
           notification.metadata!['workerName'] as String? ??
-          'Utilisateur';
+          l10n.notifAction_defaultUser;
     }
 
     Navigator.of(context).push(
@@ -249,18 +252,19 @@ class NotificationNavigationService {
   }
 
   /// Obtient le call-to-action approprié pour une notification
-  NotificationAction? getActionForNotification(AppNotification notification) {
+  NotificationAction? getActionForNotification(
+      AppNotification notification, AppLocalizations l10n) {
     switch (notification.type) {
       case NotificationType.reservationAssigned:
         return NotificationAction(
-          label: 'Voir les détails',
+          label: l10n.notifAction_viewDetails,
           icon: Icons.visibility,
           route: AppRoutes.reservationDetails,
         );
 
       case NotificationType.workerEnRoute:
         return NotificationAction(
-          label: 'Suivre la réservation',
+          label: l10n.notifAction_trackReservation,
           icon: Icons.location_on,
           route: AppRoutes.reservationDetails,
           isHighlighted: true,
@@ -268,14 +272,14 @@ class NotificationNavigationService {
 
       case NotificationType.workStarted:
         return NotificationAction(
-          label: 'Voir la progression',
+          label: l10n.notifAction_viewProgress,
           icon: Icons.timer,
           route: AppRoutes.reservationDetails,
         );
 
       case NotificationType.workCompleted:
         return NotificationAction(
-          label: 'Voir les détails',
+          label: l10n.notifAction_viewDetails,
           icon: Icons.check_circle,
           route: AppRoutes.reservationDetails,
           isHighlighted: true,
@@ -283,7 +287,7 @@ class NotificationNavigationService {
 
       case NotificationType.paymentFailed:
         return NotificationAction(
-          label: 'Gérer les paiements',
+          label: l10n.notifAction_managePayments,
           icon: Icons.payment,
           route: AppRoutes.payments,
           isHighlighted: true,
@@ -292,28 +296,28 @@ class NotificationNavigationService {
 
       case NotificationType.paymentSuccess:
         return NotificationAction(
-          label: 'Voir l\'historique',
+          label: l10n.notifAction_viewHistory,
           icon: Icons.receipt,
           route: AppRoutes.payments,
         );
 
       case NotificationType.refundProcessed:
         return NotificationAction(
-          label: 'Voir les détails',
+          label: l10n.notifAction_viewDetails,
           icon: Icons.info,
           route: AppRoutes.payments,
         );
 
       case NotificationType.reservationCancelled:
         return NotificationAction(
-          label: 'Nouvelle réservation',
+          label: l10n.notifAction_newReservation,
           icon: Icons.add,
           route: AppRoutes.newReservation,
         );
 
       case NotificationType.weatherAlert:
         return NotificationAction(
-          label: 'Réserver maintenant',
+          label: l10n.notifAction_bookNow,
           icon: Icons.ac_unit,
           route: AppRoutes.newReservation,
           isHighlighted: true,
@@ -321,7 +325,7 @@ class NotificationNavigationService {
 
       case NotificationType.urgentRequest:
         return NotificationAction(
-          label: 'Voir les jobs',
+          label: l10n.notifAction_viewJobs,
           icon: Icons.priority_high,
           route: AppRoutes.jobsList,
           isUrgent: true,
@@ -329,7 +333,7 @@ class NotificationNavigationService {
 
       case NotificationType.workerMessage:
         return NotificationAction(
-          label: 'Ouvrir le chat',
+          label: l10n.notifAction_openChat,
           icon: Icons.chat_bubble_rounded,
           route: '', // Géré par _navigateToChat
           isHighlighted: true,
@@ -337,7 +341,7 @@ class NotificationNavigationService {
 
       case NotificationType.newMessage:
         return NotificationAction(
-          label: 'Répondre',
+          label: l10n.notifAction_reply,
           icon: Icons.chat_bubble_rounded,
           route: '', // Géré par _navigateToChat
           isHighlighted: true,
@@ -345,7 +349,7 @@ class NotificationNavigationService {
 
       case NotificationType.tipReceived:
         return NotificationAction(
-          label: 'Voir les détails',
+          label: l10n.notifAction_viewDetails,
           icon: Icons.attach_money_rounded,
           route: AppRoutes.reservationDetails,
           isHighlighted: true,
@@ -353,14 +357,14 @@ class NotificationNavigationService {
 
       case NotificationType.rating:
         return NotificationAction(
-          label: 'Voir l\'évaluation',
+          label: l10n.notifAction_viewRating,
           icon: Icons.star_rounded,
           route: AppRoutes.reservationDetails,
         );
 
       case NotificationType.systemNotification:
         return NotificationAction(
-          label: 'Voir le message',
+          label: l10n.notifAction_viewMessage,
           icon: Icons.visibility,
           route: '',
         );

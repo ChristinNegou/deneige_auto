@@ -186,7 +186,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       final failure = result.fold((l) => l, (r) => null);
       emit(state.copyWith(
         isLoading: false,
-        errorMessage: failure?.message ?? 'Erreur lors du chargement',
+        errorMessage: failure?.message ?? 'notif_errorLoading',
       ));
       return;
     }
@@ -217,7 +217,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     if (result.isLeft()) {
       final failure = result.fold((l) => l, (r) => null);
       emit(state.copyWith(
-          errorMessage: failure?.message ?? 'Erreur lors du rafraîchissement'));
+          errorMessage: failure?.message ?? 'notif_errorRefreshing'));
       return;
     }
 
@@ -300,7 +300,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         emit(state.copyWith(
           notifications: updatedNotifications,
           unreadCount: 0,
-          successMessage: 'Toutes les notifications marquées comme lues',
+          successMessage: 'notif_allMarkedRead',
         ));
 
         // Planifier la suppression automatique de toutes les notifications si activée
@@ -360,7 +360,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         emit(state.copyWith(
           notifications: [],
           unreadCount: 0,
-          successMessage: 'Toutes les notifications supprimées',
+          successMessage: 'notif_allDeleted',
         ));
       },
     );
@@ -375,8 +375,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         state.notifications.where((n) => n.isRead).toList();
 
     if (readNotifications.isEmpty) {
-      emit(state.copyWith(
-          successMessage: 'Aucune notification lue à supprimer'));
+      emit(state.copyWith(successMessage: 'notif_noReadToDelete'));
       return;
     }
 
@@ -396,9 +395,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     if (hasError) {
       // Rafraîchir pour synchroniser l'état
       add(RefreshNotifications());
-      emit(state.copyWith(
-          errorMessage:
-              'Certaines notifications n\'ont pas pu être supprimées'));
+      emit(state.copyWith(errorMessage: 'notif_someNotDeleted'));
     } else {
       // Garder uniquement les notifications non lues
       final unreadNotifications =
@@ -406,8 +403,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
       emit(state.copyWith(
         notifications: unreadNotifications,
-        successMessage:
-            '${readNotifications.length} notification${readNotifications.length > 1 ? 's' : ''} supprimée${readNotifications.length > 1 ? 's' : ''}',
+        successMessage: 'notif_deletedCount:${readNotifications.length}',
       ));
     }
   }
@@ -420,8 +416,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       autoDeleteEnabled: event.enabled,
       autoDeleteDelaySeconds: event.delaySeconds,
       successMessage: event.enabled
-          ? 'Suppression automatique activée (${event.delaySeconds}s)'
-          : 'Suppression automatique désactivée',
+          ? 'notif_autoDeleteEnabled:${event.delaySeconds}'
+          : 'notif_autoDeleteDisabled',
     ));
   }
 }

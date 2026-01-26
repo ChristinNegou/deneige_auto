@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 enum NotificationType {
   reservationAssigned, // Déneigeur a accepté la tâche
   workerEnRoute, // Déneigeur est en route
@@ -82,6 +84,22 @@ class AppNotification extends Equatable {
       return 'Il y a ${difference.inDays} j';
     } else {
       return 'Il y a ${difference.inDays ~/ 7} sem';
+    }
+  }
+
+  String localizedTimeAgo(AppLocalizations l10n) {
+    final now = DateTime.now();
+    final difference = now.difference(createdAt);
+    if (difference.inMinutes < 1) {
+      return l10n.notif_justNow;
+    } else if (difference.inMinutes < 60) {
+      return l10n.notif_minutesAgo(difference.inMinutes);
+    } else if (difference.inHours < 24) {
+      return l10n.notif_hoursAgo(difference.inHours);
+    } else if (difference.inDays < 7) {
+      return l10n.notif_daysAgo(difference.inDays);
+    } else {
+      return l10n.notif_weeksAgo(difference.inDays ~/ 7);
     }
   }
 
@@ -169,38 +187,38 @@ extension NotificationTypeExtension on NotificationType {
     }
   }
 
-  String get displayName {
+  String localizedDisplayName(AppLocalizations l10n) {
     switch (this) {
       case NotificationType.reservationAssigned:
-        return 'Tâche acceptée';
+        return l10n.notifType_reservationAssigned;
       case NotificationType.workerEnRoute:
-        return 'Déneigeur en route';
+        return l10n.notifType_workerEnRoute;
       case NotificationType.workStarted:
-        return 'Travail commencé';
+        return l10n.notifType_workStarted;
       case NotificationType.workCompleted:
-        return 'Travail terminé';
+        return l10n.notifType_workCompleted;
       case NotificationType.reservationCancelled:
-        return 'Réservation annulée';
+        return l10n.notifType_reservationCancelled;
       case NotificationType.paymentSuccess:
-        return 'Paiement réussi';
+        return l10n.notifType_paymentSuccess;
       case NotificationType.paymentFailed:
-        return 'Paiement échoué';
+        return l10n.notifType_paymentFailed;
       case NotificationType.refundProcessed:
-        return 'Remboursement';
+        return l10n.notifType_refundProcessed;
       case NotificationType.weatherAlert:
-        return 'Alerte météo';
+        return l10n.notifType_weatherAlert;
       case NotificationType.urgentRequest:
-        return 'Urgent';
+        return l10n.notifType_urgentRequest;
       case NotificationType.workerMessage:
-        return 'Message';
+        return l10n.notifType_workerMessage;
       case NotificationType.newMessage:
-        return 'Nouveau message';
+        return l10n.notifType_newMessage;
       case NotificationType.tipReceived:
-        return 'Pourboire reçu';
+        return l10n.notifType_tipReceived;
       case NotificationType.rating:
-        return 'Évaluation';
+        return l10n.notifType_rating;
       case NotificationType.systemNotification:
-        return 'Système';
+        return l10n.notifType_systemNotification;
     }
   }
 }

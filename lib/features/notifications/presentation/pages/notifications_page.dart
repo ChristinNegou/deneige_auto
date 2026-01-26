@@ -42,7 +42,8 @@ class NotificationsPageContent extends StatelessWidget {
                   if (state.errorMessage != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.errorMessage!),
+                        content:
+                            Text(_translateMessage(state.errorMessage!, l10n)),
                         backgroundColor: AppTheme.error,
                         behavior: SnackBarBehavior.floating,
                       ),
@@ -51,7 +52,8 @@ class NotificationsPageContent extends StatelessWidget {
                   if (state.successMessage != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.successMessage!),
+                        content: Text(
+                            _translateMessage(state.successMessage!, l10n)),
                         backgroundColor: AppTheme.success,
                         behavior: SnackBarBehavior.floating,
                       ),
@@ -244,7 +246,9 @@ class NotificationsPageContent extends StatelessWidget {
 
   Widget _buildNotificationCard(
       BuildContext context, AppNotification notification) {
-    final action = _navigationService.getActionForNotification(notification);
+    final l10n = AppLocalizations.of(context)!;
+    final action =
+        _navigationService.getActionForNotification(notification, l10n);
 
     return Dismissible(
       key: Key(notification.id),
@@ -375,7 +379,7 @@ class NotificationsPageContent extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              notification.timeAgo,
+                              notification.localizedTimeAgo(l10n),
                               style: AppTheme.labelSmall,
                             ),
                             if (notification.isUrgent) ...[
@@ -388,7 +392,7 @@ class NotificationsPageContent extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  'Urgent',
+                                  l10n.notif_urgent,
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
@@ -511,6 +515,56 @@ class NotificationsPageContent extends StatelessWidget {
         return AppTheme.warning;
       case NotificationType.systemNotification:
         return AppTheme.textSecondary;
+    }
+  }
+
+  String _translateMessage(String key, AppLocalizations l10n) {
+    // Handle parameterized keys (format: 'key:value')
+    if (key.startsWith('notif_deletedCount:')) {
+      final count = int.tryParse(key.split(':')[1]) ?? 0;
+      return l10n.notif_deletedCount(count);
+    }
+    if (key.startsWith('notif_autoDeleteEnabled:')) {
+      final seconds = int.tryParse(key.split(':')[1]) ?? 3;
+      return l10n.notif_autoDeleteEnabled(seconds);
+    }
+
+    // Simple keys
+    switch (key) {
+      case 'notif_allMarkedRead':
+        return l10n.notif_allMarkedRead;
+      case 'notif_allDeleted':
+        return l10n.notif_allDeleted;
+      case 'notif_noReadToDelete':
+        return l10n.notif_noReadToDelete;
+      case 'notif_someNotDeleted':
+        return l10n.notif_someNotDeleted;
+      case 'notif_autoDeleteDisabled':
+        return l10n.notif_autoDeleteDisabled;
+      case 'notif_errorLoading':
+        return l10n.notif_errorLoading;
+      case 'notif_errorRefreshing':
+        return l10n.notif_errorRefreshing;
+      case 'notif_errorLoadingNotifications':
+        return l10n.notif_errorLoadingNotifications;
+      case 'notif_errorCountingUnread':
+        return l10n.notif_errorCountingUnread;
+      case 'notif_errorMarkingRead':
+        return l10n.notif_errorMarkingRead;
+      case 'notif_errorMarkingAllRead':
+        return l10n.notif_errorMarkingAllRead;
+      case 'notif_errorDeleting':
+        return l10n.notif_errorDeleting;
+      case 'notif_errorDeletingAll':
+        return l10n.notif_errorDeletingAll;
+      case 'notif_connectionTimeout':
+        return l10n.notif_connectionTimeout;
+      case 'notif_cannotConnect':
+        return l10n.notif_cannotConnect;
+      case 'notif_serverError':
+        return l10n.notif_serverError;
+      default:
+        return key;
     }
   }
 }

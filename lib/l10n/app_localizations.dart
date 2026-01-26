@@ -4741,6 +4741,612 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Ajouter une carte'**
   String get payment_addCard;
+
+  /// No description provided for @notifSettings_enabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les notifications sont activées'**
+  String get notifSettings_enabled;
+
+  /// No description provided for @notifSettings_disabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les notifications sont désactivées'**
+  String get notifSettings_disabled;
+
+  /// No description provided for @notifSettings_sounds.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sons'**
+  String get notifSettings_sounds;
+
+  /// No description provided for @notifSettings_soundsDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jouer un son pour les nouvelles notifications'**
+  String get notifSettings_soundsDesc;
+
+  /// No description provided for @notifSettings_vibration.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vibration'**
+  String get notifSettings_vibration;
+
+  /// No description provided for @notifSettings_vibrationDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vibrer pour les nouvelles notifications'**
+  String get notifSettings_vibrationDesc;
+
+  /// No description provided for @notifSettings_badge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Badge'**
+  String get notifSettings_badge;
+
+  /// No description provided for @notifSettings_badgeDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher le compteur sur l\'icône de l\'app'**
+  String get notifSettings_badgeDesc;
+
+  /// No description provided for @notifSettings_preview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aperçu'**
+  String get notifSettings_preview;
+
+  /// No description provided for @notifSettings_previewDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher le contenu des notifications'**
+  String get notifSettings_previewDesc;
+
+  /// No description provided for @notifSettings_quietMode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode silencieux'**
+  String get notifSettings_quietMode;
+
+  /// No description provided for @notifSettings_quietModeDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de notifications pendant les heures définies'**
+  String get notifSettings_quietModeDesc;
+
+  /// No description provided for @notifSettings_hours.
+  ///
+  /// In fr, this message translates to:
+  /// **'Heures'**
+  String get notifSettings_hours;
+
+  /// No description provided for @notifSettings_hoursRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'De {start} à {end}'**
+  String notifSettings_hoursRange(String start, String end);
+
+  /// No description provided for @notifSettings_quietModeActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode silencieux actuellement actif'**
+  String get notifSettings_quietModeActive;
+
+  /// No description provided for @notifSettings_urgentAlways.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les notifications urgentes seront toujours envoyées'**
+  String get notifSettings_urgentAlways;
+
+  /// No description provided for @notifSettings_notifTypes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Types de notifications'**
+  String get notifSettings_notifTypes;
+
+  /// No description provided for @notifSettings_disableAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout désactiver'**
+  String get notifSettings_disableAll;
+
+  /// No description provided for @notifSettings_enableAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout activer'**
+  String get notifSettings_enableAll;
+
+  /// No description provided for @notifSettings_critical.
+  ///
+  /// In fr, this message translates to:
+  /// **'Critique'**
+  String get notifSettings_critical;
+
+  /// No description provided for @notifSettings_resetSettings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser les paramètres'**
+  String get notifSettings_resetSettings;
+
+  /// No description provided for @notifSettings_quietHoursTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Heures du mode silencieux'**
+  String get notifSettings_quietHoursTitle;
+
+  /// No description provided for @notifSettings_start.
+  ///
+  /// In fr, this message translates to:
+  /// **'Début'**
+  String get notifSettings_start;
+
+  /// No description provided for @notifSettings_end.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fin'**
+  String get notifSettings_end;
+
+  /// No description provided for @notifSettings_resetConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser?'**
+  String get notifSettings_resetConfirm;
+
+  /// No description provided for @notifSettings_resetConfirmMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les paramètres de notification seront remis à leurs valeurs par défaut.'**
+  String get notifSettings_resetConfirmMessage;
+
+  /// No description provided for @notifSettings_resetDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paramètres réinitialisés'**
+  String get notifSettings_resetDone;
+
+  /// No description provided for @notifSettings_reset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser'**
+  String get notifSettings_reset;
+
+  /// No description provided for @notif_justNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'À l\'instant'**
+  String get notif_justNow;
+
+  /// No description provided for @notif_minutesAgo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il y a {minutes} min'**
+  String notif_minutesAgo(int minutes);
+
+  /// No description provided for @notif_hoursAgo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il y a {hours} h'**
+  String notif_hoursAgo(int hours);
+
+  /// No description provided for @notif_daysAgo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il y a {days} j'**
+  String notif_daysAgo(int days);
+
+  /// No description provided for @notif_weeksAgo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il y a {weeks} sem'**
+  String notif_weeksAgo(int weeks);
+
+  /// No description provided for @notif_now.
+  ///
+  /// In fr, this message translates to:
+  /// **'maintenant'**
+  String get notif_now;
+
+  /// No description provided for @notif_urgent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Urgent'**
+  String get notif_urgent;
+
+  /// No description provided for @notifType_reservationAssigned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tâche acceptée'**
+  String get notifType_reservationAssigned;
+
+  /// No description provided for @notifType_workerEnRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigeur en route'**
+  String get notifType_workerEnRoute;
+
+  /// No description provided for @notifType_workStarted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Travail commencé'**
+  String get notifType_workStarted;
+
+  /// No description provided for @notifType_workCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Travail terminé'**
+  String get notifType_workCompleted;
+
+  /// No description provided for @notifType_reservationCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation annulée'**
+  String get notifType_reservationCancelled;
+
+  /// No description provided for @notifType_paymentSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement réussi'**
+  String get notifType_paymentSuccess;
+
+  /// No description provided for @notifType_paymentFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement échoué'**
+  String get notifType_paymentFailed;
+
+  /// No description provided for @notifType_refundProcessed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remboursement'**
+  String get notifType_refundProcessed;
+
+  /// No description provided for @notifType_weatherAlert.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alerte météo'**
+  String get notifType_weatherAlert;
+
+  /// No description provided for @notifType_urgentRequest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Urgent'**
+  String get notifType_urgentRequest;
+
+  /// No description provided for @notifType_workerMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message'**
+  String get notifType_workerMessage;
+
+  /// No description provided for @notifType_newMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau message'**
+  String get notifType_newMessage;
+
+  /// No description provided for @notifType_tipReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourboire reçu'**
+  String get notifType_tipReceived;
+
+  /// No description provided for @notifType_rating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Évaluation'**
+  String get notifType_rating;
+
+  /// No description provided for @notifType_systemNotification.
+  ///
+  /// In fr, this message translates to:
+  /// **'Système'**
+  String get notifType_systemNotification;
+
+  /// No description provided for @notifCategory_reservations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get notifCategory_reservations;
+
+  /// No description provided for @notifCategory_payments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements'**
+  String get notifCategory_payments;
+
+  /// No description provided for @notifCategory_alerts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alertes'**
+  String get notifCategory_alerts;
+
+  /// No description provided for @notifCategory_communications.
+  ///
+  /// In fr, this message translates to:
+  /// **'Communications'**
+  String get notifCategory_communications;
+
+  /// No description provided for @notifDesc_reservationAssigned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quand un déneigeur accepte votre demande'**
+  String get notifDesc_reservationAssigned;
+
+  /// No description provided for @notifDesc_workerEnRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quand le déneigeur est en route'**
+  String get notifDesc_workerEnRoute;
+
+  /// No description provided for @notifDesc_workStarted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quand le déneigement commence'**
+  String get notifDesc_workStarted;
+
+  /// No description provided for @notifDesc_workCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quand le déneigement est terminé'**
+  String get notifDesc_workCompleted;
+
+  /// No description provided for @notifDesc_reservationCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quand une réservation est annulée'**
+  String get notifDesc_reservationCancelled;
+
+  /// No description provided for @notifDesc_paymentSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmation de paiement réussi'**
+  String get notifDesc_paymentSuccess;
+
+  /// No description provided for @notifDesc_paymentFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alerte de paiement échoué'**
+  String get notifDesc_paymentFailed;
+
+  /// No description provided for @notifDesc_refundProcessed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmation de remboursement'**
+  String get notifDesc_refundProcessed;
+
+  /// No description provided for @notifDesc_weatherAlert.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alertes météo neige'**
+  String get notifDesc_weatherAlert;
+
+  /// No description provided for @notifDesc_urgentRequest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandes urgentes'**
+  String get notifDesc_urgentRequest;
+
+  /// No description provided for @notifDesc_workerMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Messages du déneigeur'**
+  String get notifDesc_workerMessage;
+
+  /// No description provided for @notifDesc_newMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveaux messages de chat'**
+  String get notifDesc_newMessage;
+
+  /// No description provided for @notifDesc_tipReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourboires reçus'**
+  String get notifDesc_tipReceived;
+
+  /// No description provided for @notifDesc_rating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Évaluations reçues'**
+  String get notifDesc_rating;
+
+  /// No description provided for @notifDesc_systemNotification.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mises à jour système'**
+  String get notifDesc_systemNotification;
+
+  /// No description provided for @notifAction_viewDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les détails'**
+  String get notifAction_viewDetails;
+
+  /// No description provided for @notifAction_trackReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivre la réservation'**
+  String get notifAction_trackReservation;
+
+  /// No description provided for @notifAction_viewProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir la progression'**
+  String get notifAction_viewProgress;
+
+  /// No description provided for @notifAction_managePayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer les paiements'**
+  String get notifAction_managePayments;
+
+  /// No description provided for @notifAction_viewHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir l\'historique'**
+  String get notifAction_viewHistory;
+
+  /// No description provided for @notifAction_newReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle réservation'**
+  String get notifAction_newReservation;
+
+  /// No description provided for @notifAction_bookNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réserver maintenant'**
+  String get notifAction_bookNow;
+
+  /// No description provided for @notifAction_viewJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les jobs'**
+  String get notifAction_viewJobs;
+
+  /// No description provided for @notifAction_openChat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir le chat'**
+  String get notifAction_openChat;
+
+  /// No description provided for @notifAction_reply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Répondre'**
+  String get notifAction_reply;
+
+  /// No description provided for @notifAction_viewRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir l\'évaluation'**
+  String get notifAction_viewRating;
+
+  /// No description provided for @notifAction_viewMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir le message'**
+  String get notifAction_viewMessage;
+
+  /// No description provided for @notifAction_userNotAuthenticated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur: utilisateur non authentifié'**
+  String get notifAction_userNotAuthenticated;
+
+  /// No description provided for @notifAction_defaultUser.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisateur'**
+  String get notifAction_defaultUser;
+
+  /// No description provided for @notif_allMarkedRead.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les notifications marquées comme lues'**
+  String get notif_allMarkedRead;
+
+  /// No description provided for @notif_allDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les notifications supprimées'**
+  String get notif_allDeleted;
+
+  /// No description provided for @notif_noReadToDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune notification lue à supprimer'**
+  String get notif_noReadToDelete;
+
+  /// No description provided for @notif_someNotDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Certaines notifications n\'ont pas pu être supprimées'**
+  String get notif_someNotDeleted;
+
+  /// No description provided for @notif_deletedCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} notification(s) supprimée(s)'**
+  String notif_deletedCount(int count);
+
+  /// No description provided for @notif_autoDeleteEnabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suppression automatique activée ({seconds}s)'**
+  String notif_autoDeleteEnabled(int seconds);
+
+  /// No description provided for @notif_autoDeleteDisabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suppression automatique désactivée'**
+  String get notif_autoDeleteDisabled;
+
+  /// No description provided for @notif_errorLoading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors du chargement'**
+  String get notif_errorLoading;
+
+  /// No description provided for @notif_errorRefreshing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors du rafraîchissement'**
+  String get notif_errorRefreshing;
+
+  /// No description provided for @notif_errorLoadingNotifications.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors du chargement des notifications'**
+  String get notif_errorLoadingNotifications;
+
+  /// No description provided for @notif_errorCountingUnread.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors du comptage des notifications non lues'**
+  String get notif_errorCountingUnread;
+
+  /// No description provided for @notif_errorMarkingRead.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors du marquage de la notification'**
+  String get notif_errorMarkingRead;
+
+  /// No description provided for @notif_errorMarkingAllRead.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors du marquage des notifications'**
+  String get notif_errorMarkingAllRead;
+
+  /// No description provided for @notif_errorDeleting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de la suppression de la notification'**
+  String get notif_errorDeleting;
+
+  /// No description provided for @notif_errorDeletingAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de la suppression des notifications'**
+  String get notif_errorDeletingAll;
+
+  /// No description provided for @notif_connectionTimeout.
+  ///
+  /// In fr, this message translates to:
+  /// **'Délai de connexion dépassé. Vérifiez votre connexion.'**
+  String get notif_connectionTimeout;
+
+  /// No description provided for @notif_cannotConnect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de se connecter au serveur.'**
+  String get notif_cannotConnect;
+
+  /// No description provided for @notif_serverError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur serveur est survenue.'**
+  String get notif_serverError;
 }
 
 class _AppLocalizationsDelegate
