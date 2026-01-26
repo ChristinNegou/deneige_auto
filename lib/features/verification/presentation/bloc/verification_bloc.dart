@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/datasources/verification_remote_datasource.dart';
+import '../../domain/repositories/verification_repository.dart';
 import 'verification_event.dart';
 import 'verification_state.dart';
 
 class VerificationBloc extends Bloc<VerificationEvent, VerificationState> {
-  final VerificationRemoteDatasource remoteDatasource;
+  final VerificationRepository repository;
 
-  VerificationBloc({required this.remoteDatasource})
+  VerificationBloc({required this.repository})
       : super(const VerificationInitial()) {
     on<LoadVerificationStatus>(_onLoadVerificationStatus);
     on<SubmitVerification>(_onSubmitVerification);
@@ -20,12 +20,11 @@ class VerificationBloc extends Bloc<VerificationEvent, VerificationState> {
   ) async {
     emit(const VerificationLoading());
 
-    try {
-      final status = await remoteDatasource.getVerificationStatus();
-      emit(VerificationStatusLoaded(status));
-    } catch (e) {
-      emit(VerificationError(e.toString()));
-    }
+    final result = await repository.getVerificationStatus();
+    result.fold(
+      (failure) => emit(VerificationError(failure.message)),
+      (status) => emit(VerificationStatusLoaded(status)),
+    );
   }
 
   Future<void> _onSubmitVerification(
@@ -34,23 +33,25 @@ class VerificationBloc extends Bloc<VerificationEvent, VerificationState> {
   ) async {
     emit(const VerificationSubmitting());
 
-    try {
-      await remoteDatasource.submitVerification(
-        idFront: event.idFront,
-        idBack: event.idBack,
-        selfie: event.selfie,
-      );
+    final result = await repository.submitVerification(
+      idFront: event.idFront,
+      idBack: event.idBack,
+      selfie: event.selfie,
+    );
 
-      emit(const VerificationSubmitted(
-        message: 'Documents soumis avec succès. Vérification en cours...',
-      ));
+    result.fold(
+      (failure) => emit(VerificationError(failure.message)),
+      (status) {
+        emit(const VerificationSubmitted(
+          message: 'Documents soumis avec succes. Verification en cours...',
+        ));
 
-      // Reload status after a brief delay
-      await Future.delayed(const Duration(seconds: 1));
-      add(const LoadVerificationStatus());
-    } catch (e) {
-      emit(VerificationError(e.toString()));
-    }
+        // Reload status after a brief delay
+        Future.delayed(const Duration(seconds: 1), () {
+          add(const LoadVerificationStatus());
+        });
+      },
+    );
   }
 
   void _onResetState(

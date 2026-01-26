@@ -10,6 +10,7 @@ import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../bloc/reservation_list_bloc.dart';
@@ -93,6 +94,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<ReservationListBloc, ReservationListState>(
       builder: (context, state) {
         final reservation = state.selectedReservation;
@@ -104,7 +106,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             backgroundColor: AppTheme.background,
             appBar: AppBar(
               title: Text(
-                'Détails de la réservation',
+                l10n.reservation_details,
                 style: TextStyle(color: AppTheme.textPrimary),
               ),
               backgroundColor: AppTheme.surface,
@@ -122,7 +124,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             backgroundColor: AppTheme.background,
             appBar: AppBar(
               title: Text(
-                'Détails de la réservation',
+                l10n.reservation_details,
                 style: TextStyle(color: AppTheme.textPrimary),
               ),
               backgroundColor: AppTheme.surface,
@@ -140,7 +142,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                       size: 64, color: AppTheme.textTertiary),
                   const SizedBox(height: 16),
                   Text(
-                    'Réservation introuvable',
+                    l10n.reservation_notFound,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -149,7 +151,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Cette réservation n\'existe plus ou a été supprimée',
+                    l10n.reservation_notFoundSubtitle,
                     style: TextStyle(color: AppTheme.textSecondary),
                     textAlign: TextAlign.center,
                   ),
@@ -161,7 +163,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                           .add(LoadReservationById(widget.reservationId));
                     },
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Actualiser'),
+                    label: Text(l10n.reservation_refresh),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.info,
                       foregroundColor: AppTheme.textPrimary,
@@ -171,7 +173,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(
-                      'Retour',
+                      l10n.common_back,
                       style: TextStyle(color: AppTheme.textSecondary),
                     ),
                   ),
@@ -245,7 +247,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'EN DIRECT',
+                                l10n.reservation_live,
                                 style: TextStyle(
                                   color: AppTheme.textPrimary,
                                   fontSize: 11,
@@ -353,6 +355,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildStatusHeader(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
       child: Column(
@@ -390,7 +393,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           ),
           const SizedBox(height: 8),
           Text(
-            _getStatusDescription(reservation),
+            _getStatusDescription(l10n, reservation),
             style: TextStyle(
               fontSize: 14,
               color: AppTheme.textPrimary.withValues(alpha: 0.9),
@@ -402,26 +405,28 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     );
   }
 
-  String _getStatusDescription(Reservation reservation) {
+  String _getStatusDescription(AppLocalizations l10n, Reservation reservation) {
     switch (reservation.status) {
       case ReservationStatus.pending:
-        return 'En attente d\'un déneigeur disponible';
+        return l10n.reservation_statusPending;
       case ReservationStatus.assigned:
-        return 'Un déneigeur a été assigné à votre demande';
+        return l10n.reservation_statusAssigned;
       case ReservationStatus.enRoute:
-        return '${reservation.workerName ?? "Le déneigeur"} est en route vers vous';
+        return l10n.reservation_statusEnRoute(
+            reservation.workerName ?? 'Le d\u00e9neigeur');
       case ReservationStatus.inProgress:
-        return 'Votre véhicule est en cours de déneigement';
+        return l10n.reservation_statusInProgress;
       case ReservationStatus.completed:
-        return 'Service terminé avec succès';
+        return l10n.reservation_statusCompleted;
       case ReservationStatus.cancelled:
-        return 'Cette réservation a été annulée';
+        return l10n.reservation_statusCancelled;
       case ReservationStatus.late:
-        return 'Le service est en retard';
+        return l10n.reservation_statusDelayed;
     }
   }
 
   Widget _buildTimeline(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     final statuses = [
       ReservationStatus.pending,
       ReservationStatus.assigned,
@@ -448,7 +453,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               Icon(Icons.timeline, color: AppTheme.info),
               const SizedBox(width: 8),
               Text(
-                'Progression',
+                l10n.reservation_progress,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -521,7 +526,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               return SizedBox(
                 width: 50,
                 child: Text(
-                  _getShortStatusName(status),
+                  _getShortStatusName(l10n, status),
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
@@ -540,26 +545,27 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     );
   }
 
-  String _getShortStatusName(ReservationStatus status) {
+  String _getShortStatusName(AppLocalizations l10n, ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
-        return 'Attente';
+        return l10n.reservation_shortPending;
       case ReservationStatus.assigned:
-        return 'Assigné';
+        return l10n.reservation_shortAssigned;
       case ReservationStatus.enRoute:
-        return 'En route';
+        return l10n.reservation_shortEnRoute;
       case ReservationStatus.inProgress:
-        return 'En cours';
+        return l10n.reservation_shortInProgress;
       case ReservationStatus.completed:
-        return 'Terminé';
+        return l10n.reservation_shortCompleted;
       case ReservationStatus.cancelled:
-        return 'Annulé';
+        return l10n.reservation_shortCancelled;
       case ReservationStatus.late:
-        return 'En retard';
+        return l10n.reservation_shortDelayed;
     }
   }
 
   Widget _buildWorkerCard(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -637,7 +643,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Votre déneigeur',
+                  l10n.reservation_yourWorker,
                   style: TextStyle(
                     fontSize: 12,
                     color: AppTheme.textSecondary,
@@ -645,7 +651,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  reservation.workerName ?? 'Déneigeur assigné',
+                  reservation.workerName ?? l10n.reservation_workerAssigned,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -705,12 +711,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildQuickActions(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: _buildQuickActionButton(
             icon: Icons.phone,
-            label: 'Appeler',
+            label: l10n.common_call,
             color: AppTheme.success,
             onTap: () => _callWorker(reservation),
           ),
@@ -724,7 +731,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         Expanded(
           child: _buildQuickActionButton(
             icon: Icons.map,
-            label: 'Carte',
+            label: l10n.reservation_map,
             color: AppTheme.primary2,
             onTap: () => _openMap(reservation),
           ),
@@ -734,6 +741,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildChatButton(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return Material(
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
@@ -766,7 +774,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     color: AppTheme.textPrimary, size: 24),
                 const SizedBox(height: 6),
                 Text(
-                  'Chat',
+                  l10n.reservation_chat,
                   style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontSize: 12,
@@ -782,12 +790,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   void _openChat(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Erreur: utilisateur non authentifié',
+            l10n.reservation_userNotAuth,
             style: TextStyle(color: AppTheme.textPrimary),
           ),
           backgroundColor: AppTheme.error,
@@ -809,7 +818,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               Icon(Icons.info_outline, color: AppTheme.textPrimary),
               const SizedBox(width: 12),
               Text(
-                'Aucun déneigeur assigné pour le moment',
+                l10n.reservation_noWorkerYet,
                 style: TextStyle(color: AppTheme.textPrimary),
               ),
             ],
@@ -877,6 +886,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildDetailsCard(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
 
     return Container(
@@ -895,7 +905,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               Icon(Icons.info_outline, color: AppTheme.info),
               const SizedBox(width: 8),
               Text(
-                'Informations',
+                l10n.reservation_info,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -907,35 +917,35 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           Divider(height: 24, color: AppTheme.border),
           _buildDetailRow(
             Icons.directions_car,
-            'Véhicule',
+            l10n.reservation_vehicle,
             reservation.vehicle.displayName,
             subtitle: reservation.vehicle.color,
           ),
           const SizedBox(height: 16),
           _buildDetailRow(
             Icons.local_parking,
-            'Emplacement',
+            l10n.reservation_location,
             reservation.parkingSpot.displayName,
           ),
           if (reservation.locationAddress != null) ...[
             const SizedBox(height: 16),
             _buildDetailRow(
               Icons.location_on,
-              'Adresse',
+              l10n.common_address,
               reservation.locationAddress!,
             ),
           ],
           const SizedBox(height: 16),
           _buildDetailRow(
             Icons.schedule,
-            'Heure de départ souhaitée',
+            l10n.reservation_departureTime,
             dateFormat.format(reservation.departureTime),
           ),
           if (reservation.assignedAt != null) ...[
             const SizedBox(height: 16),
             _buildDetailRow(
               Icons.person_add,
-              'Assignée le',
+              l10n.reservation_assignedAt,
               dateFormat.format(reservation.assignedAt!),
             ),
           ],
@@ -943,7 +953,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             const SizedBox(height: 16),
             _buildDetailRow(
               Icons.play_arrow,
-              'Commencée le',
+              l10n.reservation_startedAt,
               dateFormat.format(reservation.startedAt!),
             ),
           ],
@@ -951,7 +961,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             const SizedBox(height: 16),
             _buildDetailRow(
               Icons.check_circle,
-              'Terminée le',
+              l10n.reservation_completedAt,
               dateFormat.format(reservation.completedAt!),
             ),
           ],
@@ -962,6 +972,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
 
   Widget _buildServiceOptionsCard(
       BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -978,7 +989,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               Icon(Icons.ac_unit, color: AppTheme.info),
               const SizedBox(width: 8),
               Text(
-                'Services demandés',
+                l10n.reservation_servicesRequested,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -991,7 +1002,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           // Base service
           _buildServiceItem(
             icon: Icons.cleaning_services,
-            label: 'Déneigement de base',
+            label: l10n.reservation_basicSnowRemoval,
             price: reservation.basePrice,
             isIncluded: true,
           ),
@@ -1002,7 +1013,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 padding: const EdgeInsets.only(bottom: 12),
                 child: _buildServiceItem(
                   icon: _getOptionIcon(option),
-                  label: _getOptionLabel(option),
+                  label: _getOptionLabel(l10n, option),
                   price: _getOptionPrice(option),
                   isIncluded: true,
                 ),
@@ -1023,7 +1034,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Profondeur de neige: ${reservation.snowDepthCm} cm',
+                  l10n.reservation_snowDepthCm(
+                      reservation.snowDepthCm.toString()),
                   style: TextStyle(
                     color: AppTheme.textSecondary,
                   ),
@@ -1096,24 +1108,24 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     }
   }
 
-  String _getOptionLabel(ServiceOption option) {
+  String _getOptionLabel(AppLocalizations l10n, ServiceOption option) {
     switch (option) {
       case ServiceOption.windowScraping:
-        return 'Grattage des vitres';
+        return l10n.reservation_windowScraping;
       case ServiceOption.doorDeicing:
-        return 'Déglaçage des portes';
+        return l10n.reservation_doorDeicing;
       case ServiceOption.wheelClearance:
-        return 'Dégagement des roues';
+        return l10n.reservation_wheelClearing;
       case ServiceOption.roofClearing:
-        return 'Déneigement du toit';
+        return l10n.reservation_roofSnowRemoval;
       case ServiceOption.saltSpreading:
-        return 'Épandage de sel';
+        return l10n.reservation_saltSpreading;
       case ServiceOption.lightsCleaning:
-        return 'Nettoyage phares/feux';
+        return l10n.reservation_lightsCleanup;
       case ServiceOption.perimeterClearance:
-        return 'Dégagement périmètre';
+        return l10n.reservation_perimeterClearing;
       case ServiceOption.exhaustCheck:
-        return 'Vérif. échappement';
+        return l10n.reservation_exhaustCheck;
     }
   }
 
@@ -1139,6 +1151,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildPhotosCard(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1163,7 +1176,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               ),
               const SizedBox(width: 12),
               Text(
-                'Photos du service',
+                l10n.reservation_photos,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -1177,7 +1190,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           // After Photo (primary - result)
           if (reservation.afterPhotoUrl != null) ...[
             Text(
-              'Résultat final',
+              l10n.reservation_afterPhoto,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -1189,7 +1202,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               onTap: () => _showPhotoFullscreen(
                 context,
                 reservation.afterPhotoUrl!,
-                'Résultat final',
+                l10n.reservation_afterPhoto,
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -1213,7 +1226,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             color: AppTheme.textTertiary, size: 40),
                         const SizedBox(height: 8),
                         Text(
-                          'Photo non disponible',
+                          l10n.reservation_photoUnavailable,
                           style: TextStyle(color: AppTheme.textSecondary),
                         ),
                       ],
@@ -1230,7 +1243,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   Icon(Icons.touch_app, size: 14, color: AppTheme.textTertiary),
                   const SizedBox(width: 4),
                   Text(
-                    'Appuyez pour agrandir',
+                    l10n.reservation_tapToEnlarge,
                     style: TextStyle(
                       fontSize: 12,
                       color: AppTheme.textTertiary,
@@ -1245,7 +1258,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           if (reservation.beforePhotoUrl != null) ...[
             if (reservation.afterPhotoUrl != null) const SizedBox(height: 20),
             Text(
-              'Avant le service',
+              l10n.reservation_beforePhoto,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -1257,7 +1270,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               onTap: () => _showPhotoFullscreen(
                 context,
                 reservation.beforePhotoUrl!,
-                'Avant le service',
+                l10n.reservation_beforePhoto,
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -1281,7 +1294,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             color: AppTheme.textTertiary, size: 32),
                         const SizedBox(height: 4),
                         Text(
-                          'Photo non disponible',
+                          l10n.reservation_photoUnavailable,
                           style: TextStyle(
                             color: AppTheme.textSecondary,
                             fontSize: 12,
@@ -1336,6 +1349,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildPriceCard(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1361,7 +1375,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Prix total',
+                l10n.reservation_totalPrice,
                 style: TextStyle(
                   fontSize: 14,
                   color: AppTheme.textPrimary.withValues(alpha: 0.8),
@@ -1408,7 +1422,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                       Icon(Icons.favorite, color: AppTheme.warning, size: 16),
                       const SizedBox(width: 6),
                       Text(
-                        '+${reservation.tip!.toStringAsFixed(2)}\$ pourboire',
+                        l10n.reservation_tipAmount(
+                            reservation.tip!.toStringAsFixed(2)),
                         style: TextStyle(
                           color: AppTheme.warning,
                           fontWeight: FontWeight.w600,
@@ -1433,7 +1448,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   Icon(Icons.bolt, color: AppTheme.background, size: 18),
                   const SizedBox(width: 6),
                   Text(
-                    'URGENT',
+                    l10n.reservation_urgent,
                     style: TextStyle(
                       color: AppTheme.background,
                       fontWeight: FontWeight.bold,
@@ -1449,6 +1464,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildRatingSection(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     if (reservation.rating != null) {
       // Already rated - show the rating
       return Container(
@@ -1475,7 +1491,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Votre évaluation',
+                    l10n.reservation_yourRating,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -1667,7 +1683,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Évaluer le service',
+                        l10n.reservation_rateService,
                         style: TextStyle(
                           color: AppTheme.background,
                           fontWeight: FontWeight.bold,
@@ -1676,7 +1692,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Partagez votre expérience et ajoutez un pourboire',
+                        l10n.reservation_rateSubtitle,
                         style: TextStyle(
                           color: AppTheme.background.withValues(alpha: 0.8),
                           fontSize: 13,
@@ -1751,6 +1767,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildEditButton(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -1763,7 +1780,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           );
         },
         icon: const Icon(Icons.edit),
-        label: const Text('Modifier la réservation'),
+        label: Text(l10n.reservation_edit),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.info,
           foregroundColor: AppTheme.textPrimary,
@@ -1777,12 +1794,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   Widget _buildCancelButton(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () => _showCancelDialog(context, reservation),
         icon: const Icon(Icons.cancel),
-        label: const Text('Annuler la réservation'),
+        label: Text(l10n.reservation_cancelReservation),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppTheme.error,
           side: BorderSide(color: AppTheme.error),
@@ -1796,6 +1814,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   }
 
   void _showCancelDialog(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     HapticFeedback.mediumImpact();
 
     // Calculer les frais selon le statut
@@ -1807,19 +1826,18 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       case ReservationStatus.pending:
       case ReservationStatus.assigned:
         feePercent = 0;
-        feeMessage = 'Remboursement complet - Aucun frais';
+        feeMessage = l10n.reservation_cancelFullRefund;
         feeColor = AppTheme.success;
         break;
       case ReservationStatus.enRoute:
         feePercent = 50;
-        feeMessage =
-            'Le déneigeur est en route.\nFrais d\'annulation: 50% (${(reservation.totalPrice * 0.5).toStringAsFixed(2)}\$)';
+        feeMessage = l10n.reservation_cancelHalfRefund(
+            (reservation.totalPrice * 0.5).toStringAsFixed(2));
         feeColor = AppTheme.warning;
         break;
       case ReservationStatus.inProgress:
         feePercent = 100;
-        feeMessage =
-            'Le travail a commencé.\nAucun remboursement (100% facturé)';
+        feeMessage = l10n.reservation_cancelNoRefund;
         feeColor = AppTheme.error;
         break;
       default:
@@ -1845,7 +1863,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             ),
             const SizedBox(width: 12),
             Text(
-              'Annuler?',
+              l10n.reservation_cancelConfirmTitle,
               style: TextStyle(color: AppTheme.textPrimary),
             ),
           ],
@@ -1855,7 +1873,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Êtes-vous sûr de vouloir annuler cette réservation?',
+              l10n.reservation_cancelConfirmMessage,
               style: TextStyle(color: AppTheme.textPrimary),
             ),
             const SizedBox(height: 16),
@@ -1893,7 +1911,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Non, garder',
+              l10n.reservation_cancelKeep,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
           ),
@@ -1909,7 +1927,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               backgroundColor: AppTheme.error,
               foregroundColor: AppTheme.textPrimary,
             ),
-            child: const Text('Oui, annuler'),
+            child: Text(l10n.reservation_cancelYes),
           ),
         ],
       ),
@@ -1924,10 +1942,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       }
     } else {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Numéro de téléphone non disponible',
+              l10n.reservation_phoneUnavailable,
               style: TextStyle(color: AppTheme.textPrimary),
             ),
             backgroundColor: AppTheme.warning,
@@ -2011,6 +2030,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
 
   Widget _buildReportNoShowButton(
       BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
@@ -2041,7 +2061,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                       Icon(Icons.check_circle, color: AppTheme.textPrimary),
                       const SizedBox(width: 12),
                       Text(
-                        'Signalement envoyé',
+                        l10n.reservation_noShowReported,
                         style: TextStyle(color: AppTheme.textPrimary),
                       ),
                     ],
@@ -2058,7 +2078,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         },
         icon: Icon(Icons.person_off, color: AppTheme.error),
         label: Text(
-          'Signaler un no-show',
+          l10n.reservation_reportNoShow,
           style: TextStyle(color: AppTheme.error),
         ),
         style: OutlinedButton.styleFrom(

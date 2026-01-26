@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/suspension_dialog.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../legal/presentation/pages/legal_page.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
@@ -43,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
@@ -93,17 +96,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 40),
 
                       // Logo et titre
-                      _buildHeader(),
+                      _buildHeader(l10n),
 
                       const SizedBox(height: 40),
 
                       // Formulaire de connexion
-                      _buildLoginForm(isLoading),
+                      _buildLoginForm(isLoading, l10n),
 
                       const SizedBox(height: 24),
 
                       // Lien inscription
-                      _buildSignUpLink(),
+                      _buildSignUpLink(l10n),
 
                       const SizedBox(height: 32),
 
@@ -120,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Column(
       children: [
         // Logo
@@ -150,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 24),
         Text(
-          'Bienvenue',
+          l10n.login_welcome,
           style: AppTheme.headlineLarge.copyWith(
             fontSize: 28,
             letterSpacing: -0.5,
@@ -158,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Connectez-vous à votre compte',
+          l10n.login_subtitle,
           style: AppTheme.bodyMedium.copyWith(
             color: AppTheme.textSecondary,
           ),
@@ -167,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLoginForm(bool isLoading) {
+  Widget _buildLoginForm(bool isLoading, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -181,16 +184,16 @@ class _LoginScreenState extends State<LoginScreen> {
           // Champ Email
           _buildTextField(
             controller: _emailController,
-            label: 'Email',
-            hint: 'exemple@email.com',
+            label: l10n.common_email,
+            hint: l10n.login_emailHint,
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Veuillez entrer votre email';
+                return l10n.login_emailRequired;
               }
               if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(value)) {
-                return 'Email invalide';
+                return l10n.login_emailInvalid;
               }
               return null;
             },
@@ -200,8 +203,8 @@ class _LoginScreenState extends State<LoginScreen> {
           // Champ Mot de passe
           _buildTextField(
             controller: _passwordController,
-            label: 'Mot de passe',
-            hint: 'Entrez votre mot de passe',
+            label: l10n.common_password,
+            hint: l10n.login_passwordHint,
             icon: Icons.lock_outline_rounded,
             obscureText: _obscurePassword,
             suffixIcon: GestureDetector(
@@ -216,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Veuillez entrer votre mot de passe';
+                return l10n.login_passwordRequired;
               }
               return null;
             },
@@ -236,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               child: Text(
-                'Mot de passe oublié ?',
+                l10n.login_forgotPassword,
                 style: AppTheme.labelMedium.copyWith(
                   color: AppTheme.primary,
                   fontWeight: FontWeight.w600,
@@ -248,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 24),
 
           // Bouton connexion
-          _buildLoginButton(isLoading),
+          _buildLoginButton(isLoading, l10n),
         ],
       ),
     );
@@ -329,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLoginButton(bool isLoading) {
+  Widget _buildLoginButton(bool isLoading, AppLocalizations l10n) {
     return GestureDetector(
       onTap: isLoading ? null : _handleLogin,
       child: Container(
@@ -360,7 +363,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 )
               : Text(
-                  'Se connecter',
+                  l10n.login_submit,
                   style: TextStyle(
                     color: AppTheme.background,
                     fontSize: 16,
@@ -372,12 +375,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSignUpLink() {
+  Widget _buildSignUpLink(AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Pas encore de compte ? ',
+          l10n.login_noAccount,
           style: AppTheme.bodyMedium.copyWith(
             color: AppTheme.textSecondary,
           ),
@@ -385,7 +388,7 @@ class _LoginScreenState extends State<LoginScreen> {
         GestureDetector(
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.accountType),
           child: Text(
-            'S\'inscrire',
+            l10n.login_register,
             style: AppTheme.bodyMedium.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,

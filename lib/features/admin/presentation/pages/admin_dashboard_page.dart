@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/admin_stats.dart';
 import '../bloc/admin_bloc.dart';
 import '../bloc/admin_event.dart';
@@ -15,9 +16,10 @@ class AdminDashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard Admin'),
+        title: Text(l10n.admin_dashboard),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -26,7 +28,7 @@ class AdminDashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      drawer: _buildDrawer(context),
+      drawer: _buildDrawer(context, l10n),
       body: BlocConsumer<AdminBloc, AdminState>(
         listener: (context, state) {
           if (state.successMessage != null) {
@@ -61,12 +63,12 @@ class AdminDashboardPage extends StatelessWidget {
                 children: [
                   Icon(Icons.error_outline, size: 64, color: AppTheme.error),
                   const SizedBox(height: 16),
-                  Text(state.errorMessage ?? 'Erreur de chargement'),
+                  Text(state.errorMessage ?? l10n.admin_loadError),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () =>
                         context.read<AdminBloc>().add(LoadDashboardStats()),
-                    child: const Text('Réessayer'),
+                    child: Text(l10n.common_retry),
                   ),
                 ],
               ),
@@ -74,7 +76,7 @@ class AdminDashboardPage extends StatelessWidget {
           }
 
           if (state.stats == null) {
-            return const Center(child: Text('Aucune donnée'));
+            return Center(child: Text(l10n.common_noData));
           }
 
           return RefreshIndicator(
@@ -105,7 +107,7 @@ class AdminDashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
+  Widget _buildDrawer(BuildContext context, AppLocalizations l10n) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -136,7 +138,7 @@ class AdminDashboardPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Administration',
+                  l10n.admin_administration,
                   style: TextStyle(
                     color: AppTheme.background,
                     fontSize: 22,
@@ -156,14 +158,14 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.dashboard,
-            title: 'Dashboard',
+            title: l10n.admin_dashboard,
             isSelected: true,
             onTap: () => Navigator.pop(context),
           ),
           _buildDrawerItem(
             context,
             icon: Icons.people,
-            title: 'Utilisateurs',
+            title: l10n.admin_users,
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminUsers);
@@ -172,7 +174,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.calendar_today,
-            title: 'Réservations',
+            title: l10n.admin_reservations,
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminReservations);
@@ -181,7 +183,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.ac_unit,
-            title: 'Déneigeurs',
+            title: l10n.admin_workers,
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminWorkers);
@@ -190,7 +192,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.verified_user,
-            title: 'Vérifications',
+            title: l10n.admin_verifications,
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminVerifications);
@@ -199,7 +201,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.account_balance_wallet,
-            title: 'Comptes Stripe',
+            title: l10n.admin_stripeAccounts,
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminStripeAccounts);
@@ -209,7 +211,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.notifications,
-            title: 'Envoyer notification',
+            title: l10n.admin_sendNotification,
             onTap: () {
               Navigator.pop(context);
               _showBroadcastDialog(context);
@@ -218,7 +220,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.bar_chart,
-            title: 'Rapports',
+            title: l10n.admin_reports,
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminReports);
@@ -227,7 +229,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.support_agent,
-            title: 'Support',
+            title: l10n.admin_support,
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminSupport);
@@ -236,7 +238,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.gavel,
-            title: 'Litiges',
+            title: l10n.admin_disputes,
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -248,7 +250,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.smart_toy,
-            title: 'Intelligence IA',
+            title: l10n.admin_aiIntelligence,
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, AppRoutes.adminAI);
@@ -258,7 +260,7 @@ class AdminDashboardPage extends StatelessWidget {
           _buildDrawerItem(
             context,
             icon: Icons.logout_rounded,
-            title: 'Déconnexion',
+            title: l10n.common_logout,
             isLogout: true,
             onTap: () {
               Navigator.pop(context);

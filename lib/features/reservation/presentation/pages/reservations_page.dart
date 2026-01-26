@@ -7,6 +7,7 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_illustration.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../reservation/presentation/bloc/reservation_list_bloc.dart';
 
 class ReservationsPage extends StatelessWidget {
@@ -27,6 +28,7 @@ class ReservationsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -39,7 +41,7 @@ class ReservationsView extends StatelessWidget {
             }
           },
         ),
-        title: const Text('Mes réservations'),
+        title: Text(l10n.reservation_myReservations),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -78,9 +80,9 @@ class ReservationsView extends StatelessWidget {
           if (state.reservations.isEmpty) {
             return EmptyStateWidget(
               illustrationType: IllustrationType.emptyReservations,
-              title: 'Aucune réservation',
-              subtitle: 'Commencez par créer votre première réservation',
-              buttonText: 'Nouvelle réservation',
+              title: l10n.reservation_empty,
+              subtitle: l10n.reservation_emptySubtitle,
+              buttonText: l10n.reservation_new,
               onButtonPressed: () =>
                   Navigator.pushNamed(context, AppRoutes.newReservation),
             );
@@ -110,7 +112,8 @@ class ReservationsView extends StatelessWidget {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Place ${reservation.parkingSpot.displayName}'),
+                        Text(l10n.reservation_parkingSpot(
+                            reservation.parkingSpot.displayName)),
                         Text(
                           DateFormat('d MMM yyyy, HH:mm')
                               .format(reservation.departureTime),
@@ -170,7 +173,7 @@ class ReservationsView extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.pushNamed(context, AppRoutes.newReservation),
         icon: const Icon(Icons.add),
-        label: const Text('Nouvelle'),
+        label: Text(l10n.reservation_newShort),
       ),
     );
   }

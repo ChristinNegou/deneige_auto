@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/weather.dart';
 
 class WeatherCard extends StatelessWidget {
@@ -14,6 +15,7 @@ class WeatherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -42,7 +44,7 @@ class WeatherCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Météo',
+                    l10n.weather_title,
                     style: TextStyle(
                       color: AppTheme.textPrimary.withValues(alpha: 0.7),
                       fontSize: 14,
@@ -97,7 +99,8 @@ class WeatherCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     if (weather.snowDepth != null)
                       Text(
-                        '${weather.snowDepth} cm au sol',
+                        l10n.weather_snowDepthValue(
+                            weather.snowDepth.toString()),
                         style: TextStyle(
                           color: AppTheme.textPrimary.withValues(alpha: 0.7),
                           fontSize: 14,
@@ -117,14 +120,14 @@ class WeatherCard extends StatelessWidget {
               Expanded(
                 child: _WeatherInfo(
                   icon: Icons.water_drop,
-                  label: 'Humidité',
+                  label: l10n.weather_humidity,
                   value: '${weather.humidity}%',
                 ),
               ),
               Expanded(
                 child: _WeatherInfo(
                   icon: Icons.air,
-                  label: 'Vent',
+                  label: l10n.weather_wind,
                   value: '${weather.windSpeed.round()} km/h',
                 ),
               ),
@@ -154,7 +157,7 @@ class WeatherCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      weather.alertDescription ?? 'Alerte neige',
+                      weather.alertDescription ?? l10n.weather_snowAlert,
                       style: TextStyle(
                         color: AppTheme.textPrimary,
                         fontSize: 13,

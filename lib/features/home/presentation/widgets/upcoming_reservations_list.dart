@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../reservation/domain/entities/reservation.dart';
 
 class UpcomingReservationsList extends StatelessWidget {
@@ -45,6 +46,7 @@ class _ReservationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -139,7 +141,8 @@ class _ReservationCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Place ${reservation.parkingSpot.displayName}',
+                    l10n.reservation_parkingSpot(
+                        reservation.parkingSpot.displayName),
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.textSecondary,

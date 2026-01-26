@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_illustration.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/notification.dart';
 import '../../services/notification_navigation_service.dart';
 import '../bloc/notification_bloc.dart';
@@ -23,6 +24,7 @@ class NotificationsPageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
@@ -64,7 +66,7 @@ class NotificationsPageContent extends StatelessWidget {
                   }
 
                   if (state.notifications.isEmpty) {
-                    return _buildEmptyState();
+                    return _buildEmptyState(l10n);
                   }
 
                   return RefreshIndicator(
@@ -78,11 +80,11 @@ class NotificationsPageContent extends StatelessWidget {
                       padding: const EdgeInsets.all(AppTheme.paddingLG),
                       children: [
                         if (state.unreadCount > 0) ...[
-                          _buildUnreadBadge(state.unreadCount),
+                          _buildUnreadBadge(state.unreadCount, l10n),
                           const SizedBox(height: 16),
                         ],
                         if (state.todayNotifications.isNotEmpty) ...[
-                          _buildSectionHeader('Aujourd\'hui'),
+                          _buildSectionHeader(l10n.common_today),
                           const SizedBox(height: 8),
                           ...state.todayNotifications.map(
                             (notification) =>
@@ -91,7 +93,7 @@ class NotificationsPageContent extends StatelessWidget {
                           const SizedBox(height: 16),
                         ],
                         if (state.earlierNotifications.isNotEmpty) ...[
-                          _buildSectionHeader('Plus tôt'),
+                          _buildSectionHeader(l10n.common_earlier),
                           const SizedBox(height: 8),
                           ...state.earlierNotifications.map(
                             (notification) =>
@@ -111,6 +113,7 @@ class NotificationsPageContent extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Row(
@@ -134,7 +137,7 @@ class NotificationsPageContent extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Text(
-            'Notifications',
+            l10n.notifications_title,
             style: AppTheme.headlineMedium,
           ),
           const Spacer(),
@@ -164,7 +167,7 @@ class NotificationsPageContent extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Tout lire',
+                          l10n.notifications_readAll,
                           style: AppTheme.labelSmall.copyWith(
                             color: AppTheme.primary,
                             fontWeight: FontWeight.w600,
@@ -183,15 +186,15 @@ class NotificationsPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
-    return const EmptyStateWidget(
+  Widget _buildEmptyState(AppLocalizations l10n) {
+    return EmptyStateWidget(
       illustrationType: IllustrationType.emptyNotifications,
-      title: 'Aucune notification',
-      subtitle: 'Vous n\'avez pas de nouvelles notifications',
+      title: l10n.notifications_empty,
+      subtitle: l10n.notifications_emptySubtitle,
     );
   }
 
-  Widget _buildUnreadBadge(int count) {
+  Widget _buildUnreadBadge(int count, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -221,7 +224,7 @@ class NotificationsPageContent extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            '$count notification${count > 1 ? 's' : ''} non lue${count > 1 ? 's' : ''}',
+            '$count ${count > 1 ? l10n.notifications_unreadPlural : l10n.notifications_unreadSingular}',
             style: AppTheme.labelLarge.copyWith(
               color: AppTheme.primary,
               fontWeight: FontWeight.w600,

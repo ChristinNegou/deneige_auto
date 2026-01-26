@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../bloc/auth_bloc.dart';
@@ -34,6 +35,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Container(
@@ -45,7 +48,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 setState(() => _emailSent = true);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Email de réinitialisation envoyé !'),
+                    content: Text(l10n.forgotPassword_emailSent),
                     backgroundColor: AppTheme.success,
                   ),
                 );
@@ -89,7 +92,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                       // Titre
                       Text(
-                        'Mot de passe oublié ?',
+                        l10n.forgotPassword_title,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 28,
@@ -102,8 +105,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       // Description
                       Text(
                         _emailSent
-                            ? 'Un email de réinitialisation a été envoyé à ${_emailController.text}'
-                            : 'Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe',
+                            ? '${l10n.forgotPassword_emailSentTo} ${_emailController.text}'
+                            : l10n.forgotPassword_subtitle,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
@@ -121,25 +124,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             children: [
                               AppTextField(
                                 controller: _emailController,
-                                label: 'Email',
-                                hint: 'exemple@email.com',
+                                label: l10n.common_email,
+                                hint: l10n.login_emailHint,
                                 prefixIcon: Icons.email,
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Veuillez entrer votre email';
+                                    return l10n.login_emailRequired;
                                   }
                                   if (!RegExp(
                                           r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$')
                                       .hasMatch(value)) {
-                                    return 'Email invalide';
+                                    return l10n.login_emailInvalid;
                                   }
                                   return null;
                                 },
                               ),
                               const SizedBox(height: 24),
                               AppButton(
-                                text: 'Envoyer le lien',
+                                text: l10n.forgotPassword_sendLink,
                                 onPressed:
                                     isLoading ? null : _handleResetPassword,
                                 isLoading: isLoading,
@@ -161,7 +164,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'Email envoyé !',
+                                l10n.forgotPassword_sent,
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -170,13 +173,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Vérifiez votre boîte de réception et suivez les instructions pour réinitialiser votre mot de passe.',
+                                l10n.forgotPassword_checkInbox,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(color: AppTheme.textSecondary),
                               ),
                               const SizedBox(height: 24),
                               AppButton(
-                                text: 'Retour à la connexion',
+                                text: l10n.forgotPassword_backToLogin,
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
@@ -190,7 +193,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   });
                                 },
                                 child: Text(
-                                  'Renvoyer l\'email',
+                                  l10n.forgotPassword_resend,
                                   style: TextStyle(color: AppTheme.textPrimary),
                                 ),
                               ),
@@ -206,13 +209,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Vous vous souvenez de votre mot de passe ? ',
+                            l10n.forgotPassword_rememberPassword,
                             style: TextStyle(color: AppTheme.textSecondary),
                           ),
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
                             child: Text(
-                              'Se connecter',
+                              l10n.login_submit,
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontWeight: FontWeight.bold,

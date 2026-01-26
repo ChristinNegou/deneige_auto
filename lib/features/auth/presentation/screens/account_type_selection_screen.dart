@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/user.dart';
 
 class AccountTypeSelectionScreen extends StatelessWidget {
@@ -8,6 +9,8 @@ class AccountTypeSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -25,7 +28,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Déneige Auto',
+                l10n.appTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 32,
@@ -35,7 +38,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Bienvenue ! Sélectionnez votre type de compte',
+                l10n.accountType_welcome,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -46,8 +49,8 @@ class AccountTypeSelectionScreen extends StatelessWidget {
 
               // Carte Client
               _AccountTypeCard(
-                title: 'Client',
-                subtitle: 'Je cherche un service de déneigement',
+                title: l10n.accountType_client,
+                subtitle: l10n.accountType_clientSubtitle,
                 icon: Icons.home,
                 isClient: true,
                 onTap: () {
@@ -62,8 +65,8 @@ class AccountTypeSelectionScreen extends StatelessWidget {
 
               // Carte Déneigeur
               _AccountTypeCard(
-                title: 'Déneigeur',
-                subtitle: 'Je propose mes services de déneigement',
+                title: l10n.accountType_snowWorker,
+                subtitle: l10n.accountType_snowWorkerSubtitle,
                 icon: Icons.local_shipping,
                 isClient: false,
                 onTap: () {
@@ -81,7 +84,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Vous avez déjà un compte ? ',
+                    l10n.register_hasAccount,
                     style: TextStyle(color: AppTheme.textSecondary),
                   ),
                   TextButton(
@@ -89,7 +92,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                       Navigator.of(context).pushNamed(AppRoutes.login);
                     },
                     child: Text(
-                      'Se connecter',
+                      l10n.login_submit,
                       style: TextStyle(
                         color: AppTheme.textPrimary,
                         fontWeight: FontWeight.bold,

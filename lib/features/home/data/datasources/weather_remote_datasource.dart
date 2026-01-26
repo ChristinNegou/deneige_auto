@@ -1,12 +1,14 @@
 // lib/features/home/data/datasources/weather_remote_datasource.dart
 
 import 'package:dio/dio.dart';
+import '../../../../core/errors/exceptions.dart';
 import '../models/weather_model.dart';
 import '../../../../core/config/app_config.dart';
 
 abstract class WeatherRemoteDatasource {
   Future<WeatherModel> getCurrentWeather();
   Future<WeatherModel> getWeatherByCoordinates(double lat, double lon);
+  Future<Map<String, dynamic>> getForecast();
 }
 
 class WeatherRemoteDatasourceImpl implements WeatherRemoteDatasource {
@@ -23,22 +25,23 @@ class WeatherRemoteDatasourceImpl implements WeatherRemoteDatasource {
           'q': '${AppConfig.defaultCity},${AppConfig.defaultCountryCode}',
           'appid': AppConfig.openWeatherApiKey,
           'units': 'metric', // Celsius
-          'lang': 'fr', // Texte en français
+          'lang': 'fr', // Texte en francais
         },
       );
 
       if (response.statusCode == 200) {
         return WeatherModel.fromOpenWeatherJson(response.data);
       } else {
-        throw Exception('Failed to load weather');
+        throw const ServerException(
+            message: 'Erreur lors du chargement de la meteo');
       }
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('Clé API invalide. Vérifiez votre configuration.');
-      } else if (e.response?.statusCode == 404) {
-        throw Exception('Ville non trouvée.');
-      }
-      throw Exception('Erreur réseau: ${e.message}');
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors du chargement de la meteo: $e');
     }
   }
 
@@ -59,14 +62,21 @@ class WeatherRemoteDatasourceImpl implements WeatherRemoteDatasource {
       if (response.statusCode == 200) {
         return WeatherModel.fromOpenWeatherJson(response.data);
       } else {
-        throw Exception('Failed to load weather');
+        throw const ServerException(
+            message: 'Erreur lors du chargement de la meteo');
       }
     } on DioException catch (e) {
-      throw Exception('Erreur météo: ${e.message}');
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors du chargement de la meteo: $e');
     }
   }
 
-  /// Récupère les prévisions (pour détecter la neige à venir)
+  /// Recupere les previsions (pour detecter la neige a venir)
+  @override
   Future<Map<String, dynamic>> getForecast() async {
     try {
       final response = await dio.get(
@@ -80,8 +90,46 @@ class WeatherRemoteDatasourceImpl implements WeatherRemoteDatasource {
       );
 
       return response.data;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
     } catch (e) {
-      throw Exception('Erreur prévisions: $e');
+      throw ServerException(
+          message: 'Erreur lors du chargement des previsions: $e');
+    }
+  }
+
+  AppException _handleDioError(DioException e) {
+    final statusCode = e.response?.statusCode;
+    final message = e.response?.data?['message'] as String?;
+
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return const NetworkException(
+          message: 'Delai de connexion depasse. Verifiez votre connexion.',
+        );
+      case DioExceptionType.connectionError:
+        return const NetworkException(
+          message: 'Impossible de se connecter au serveur.',
+        );
+      default:
+        if (statusCode == 401) {
+          return const ServerException(
+            message: 'Cle API invalide. Verifiez votre configuration.',
+            statusCode: 401,
+          );
+        }
+        if (statusCode == 404) {
+          return const ServerException(
+            message: 'Ville non trouvee.',
+            statusCode: 404,
+          );
+        }
+        return ServerException(
+          message: message ?? 'Une erreur serveur est survenue.',
+          statusCode: statusCode,
+        );
     }
   }
 }

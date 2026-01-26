@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/errors/exceptions.dart';
 import '../models/user_preferences_model.dart';
 
 abstract class SettingsRemoteDataSource {
@@ -21,10 +22,16 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
       if (response.statusCode == 200 && response.data['success'] == true) {
         return UserPreferencesModel.fromJson(response.data['preferences']);
       } else {
-        throw Exception('Failed to load preferences');
+        throw const ServerException(
+            message: 'Erreur lors du chargement des preferences');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error fetching preferences: $e');
+      throw ServerException(
+          message: 'Erreur lors du chargement des preferences: $e');
     }
   }
 
@@ -40,10 +47,16 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
       if (response.statusCode == 200 && response.data['success'] == true) {
         return UserPreferencesModel.fromJson(response.data['preferences']);
       } else {
-        throw Exception('Failed to update preferences');
+        throw const ServerException(
+            message: 'Erreur lors de la mise a jour des preferences');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error updating preferences: $e');
+      throw ServerException(
+          message: 'Erreur lors de la mise a jour des preferences: $e');
     }
   }
 
@@ -56,16 +69,46 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
       );
 
       if (response.statusCode != 200 || response.data['success'] != true) {
-        final message = response.data['message'] ?? 'Failed to delete account';
-        throw Exception(message);
+        final message = response.data['message'] ??
+            'Erreur lors de la suppression du compte';
+        throw ServerException(message: message);
       }
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('Mot de passe incorrect');
-      }
-      throw Exception('Error deleting account: ${e.message}');
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error deleting account: $e');
+      throw ServerException(
+          message: 'Erreur lors de la suppression du compte: $e');
+    }
+  }
+
+  AppException _handleDioError(DioException e) {
+    final statusCode = e.response?.statusCode;
+    final message = e.response?.data?['message'] as String?;
+
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return const NetworkException(
+          message: 'Delai de connexion depasse. Verifiez votre connexion.',
+        );
+      case DioExceptionType.connectionError:
+        return const NetworkException(
+          message: 'Impossible de se connecter au serveur.',
+        );
+      default:
+        if (statusCode == 401) {
+          return const ServerException(
+            message: 'Mot de passe incorrect',
+            statusCode: 401,
+          );
+        }
+        return ServerException(
+          message: message ?? 'Une erreur serveur est survenue.',
+          statusCode: statusCode,
+        );
     }
   }
 }

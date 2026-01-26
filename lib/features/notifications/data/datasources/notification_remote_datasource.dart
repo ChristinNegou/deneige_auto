@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/errors/exceptions.dart';
 import '../models/notification_model.dart';
 
 abstract class NotificationRemoteDataSource {
@@ -26,10 +27,16 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             .map((json) => NotificationModel.fromJson(json))
             .toList();
       } else {
-        throw Exception('Failed to load notifications');
+        throw const ServerException(
+            message: 'Erreur lors du chargement des notifications');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error fetching notifications: $e');
+      throw ServerException(
+          message: 'Erreur lors du chargement des notifications: $e');
     }
   }
 
@@ -41,10 +48,16 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       if (response.statusCode == 200 && response.data['success'] == true) {
         return response.data['count'] as int;
       } else {
-        throw Exception('Failed to get unread count');
+        throw const ServerException(
+            message: 'Erreur lors du comptage des notifications non lues');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error fetching unread count: $e');
+      throw ServerException(
+          message: 'Erreur lors du comptage des notifications: $e');
     }
   }
 
@@ -54,10 +67,16 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       final response = await dio.patch('/notifications/$notificationId/read');
 
       if (response.statusCode != 200 || response.data['success'] != true) {
-        throw Exception('Failed to mark notification as read');
+        throw const ServerException(
+            message: 'Erreur lors du marquage de la notification');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error marking notification as read: $e');
+      throw ServerException(
+          message: 'Erreur lors du marquage de la notification: $e');
     }
   }
 
@@ -67,10 +86,16 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       final response = await dio.patch('/notifications/mark-all-read');
 
       if (response.statusCode != 200 || response.data['success'] != true) {
-        throw Exception('Failed to mark all as read');
+        throw const ServerException(
+            message: 'Erreur lors du marquage des notifications');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error marking all as read: $e');
+      throw ServerException(
+          message: 'Erreur lors du marquage des notifications: $e');
     }
   }
 
@@ -80,10 +105,16 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       final response = await dio.delete('/notifications/$notificationId');
 
       if (response.statusCode != 200 || response.data['success'] != true) {
-        throw Exception('Failed to delete notification');
+        throw const ServerException(
+            message: 'Erreur lors de la suppression de la notification');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error deleting notification: $e');
+      throw ServerException(
+          message: 'Erreur lors de la suppression de la notification: $e');
     }
   }
 
@@ -93,10 +124,39 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       final response = await dio.delete('/notifications/clear-all');
 
       if (response.statusCode != 200 || response.data['success'] != true) {
-        throw Exception('Failed to clear notifications');
+        throw const ServerException(
+            message: 'Erreur lors de la suppression des notifications');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error clearing notifications: $e');
+      throw ServerException(
+          message: 'Erreur lors de la suppression des notifications: $e');
+    }
+  }
+
+  AppException _handleDioError(DioException e) {
+    final statusCode = e.response?.statusCode;
+    final message = e.response?.data?['message'] as String?;
+
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return const NetworkException(
+          message: 'Delai de connexion depasse. Verifiez votre connexion.',
+        );
+      case DioExceptionType.connectionError:
+        return const NetworkException(
+          message: 'Impossible de se connecter au serveur.',
+        );
+      default:
+        return ServerException(
+          message: message ?? 'Une erreur serveur est survenue.',
+          statusCode: statusCode,
+        );
     }
   }
 }

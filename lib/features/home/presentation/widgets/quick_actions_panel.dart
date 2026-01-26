@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class QuickActionsPanel extends StatelessWidget {
   final VoidCallback onNewReservation;
@@ -16,6 +17,7 @@ class QuickActionsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -32,9 +34,9 @@ class QuickActionsPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Actions rapides',
-            style: TextStyle(
+          Text(
+            l10n.clientHome_quickActions,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -46,7 +48,7 @@ class QuickActionsPanel extends StatelessWidget {
                 child: _buildActionButton(
                   context,
                   icon: Icons.add_circle_outline,
-                  label: 'Nouvelle\nréservation',
+                  label: l10n.reservation_new,
                   color: Colors.blue,
                   onTap: onNewReservation,
                 ),
@@ -56,7 +58,7 @@ class QuickActionsPanel extends StatelessWidget {
                 child: _buildActionButton(
                   context,
                   icon: Icons.list_alt,
-                  label: 'Mes\nréservations',
+                  label: l10n.reservation_myReservations,
                   color: Colors.green,
                   onTap: onViewReservations,
                 ),
@@ -70,7 +72,7 @@ class QuickActionsPanel extends StatelessWidget {
                 child: _buildActionButton(
                   context,
                   icon: Icons.directions_car,
-                  label: 'Mes\nvéhicules',
+                  label: l10n.vehicle_myVehicles,
                   color: Colors.orange,
                   onTap: onViewVehicles,
                 ),
@@ -80,7 +82,7 @@ class QuickActionsPanel extends StatelessWidget {
                 child: _buildActionButton(
                   context,
                   icon: Icons.card_membership,
-                  label: 'Mon\nabonnement',
+                  label: l10n.clientHome_mySubscription,
                   color: Colors.purple,
                   onTap: onViewSubscription,
                 ),

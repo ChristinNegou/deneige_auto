@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../bloc/auth_bloc.dart';
@@ -48,6 +49,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Container(
@@ -58,8 +61,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               if (state is ResetPasswordSuccess) {
                 ScaffoldMessenger.of(listenerContext).showSnackBar(
                   SnackBar(
-                    content:
-                        const Text('Mot de passe réinitialisé avec succès !'),
+                    content: Text(l10n.resetPassword_resetSuccess),
                     backgroundColor: AppTheme.success,
                   ),
                 );
@@ -104,7 +106,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                       // Titre
                       Text(
-                        isSuccess ? 'Succès !' : 'Nouveau mot de passe',
+                        isSuccess
+                            ? l10n.resetPassword_successTitle
+                            : l10n.resetPassword_title,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 28,
@@ -117,8 +121,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       // Description
                       Text(
                         isSuccess
-                            ? 'Votre mot de passe a été réinitialisé avec succès. Vous allez être redirigé vers la page de connexion.'
-                            : 'Entrez votre nouveau mot de passe',
+                            ? l10n.resetPassword_successDescription
+                            : l10n.resetPassword_description,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
@@ -137,7 +141,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               // Champ mot de passe
                               AppTextField(
                                 controller: _passwordController,
-                                label: 'Nouveau mot de passe',
+                                label: l10n.resetPassword_newPassword,
                                 hint: '••••••••',
                                 prefixIcon: Icons.lock,
                                 obscureText: _obscurePassword,
@@ -156,10 +160,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Veuillez entrer un mot de passe';
+                                    return l10n.register_passwordRequired;
                                   }
                                   if (value.length < 6) {
-                                    return 'Le mot de passe doit contenir au moins 6 caractères';
+                                    return l10n.resetPassword_minChars;
                                   }
                                   return null;
                                 },
@@ -169,7 +173,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               // Champ confirmation mot de passe
                               AppTextField(
                                 controller: _confirmPasswordController,
-                                label: 'Confirmer le mot de passe',
+                                label: l10n.register_confirmPassword,
                                 hint: '••••••••',
                                 prefixIcon: Icons.lock_outline,
                                 obscureText: _obscureConfirmPassword,
@@ -189,10 +193,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Veuillez confirmer le mot de passe';
+                                    return l10n
+                                        .register_confirmPasswordRequired;
                                   }
                                   if (value != _passwordController.text) {
-                                    return 'Les mots de passe ne correspondent pas';
+                                    return l10n.register_passwordMismatch;
                                   }
                                   return null;
                                 },
@@ -201,13 +206,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                               // Indicateur de force du mot de passe
                               if (_passwordController.text.isNotEmpty) ...[
-                                _buildPasswordStrengthIndicator(),
+                                _buildPasswordStrengthIndicator(l10n),
                                 const SizedBox(height: 24),
                               ],
 
                               // Bouton de réinitialisation
                               AppButton(
-                                text: 'Réinitialiser le mot de passe',
+                                text: l10n.resetPassword_resetButton,
                                 onPressed:
                                     isLoading ? null : _handleResetPassword,
                                 isLoading: isLoading,
@@ -229,7 +234,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'Mot de passe réinitialisé !',
+                                l10n.resetPassword_resetDone,
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -238,13 +243,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.',
+                                l10n.resetPassword_canNowLogin,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(color: AppTheme.textSecondary),
                               ),
                               const SizedBox(height: 24),
                               AppButton(
-                                text: 'Aller à la connexion',
+                                text: l10n.resetPassword_goToLogin,
                                 onPressed: () {
                                   Navigator.of(context).pushNamedAndRemoveUntil(
                                     AppRoutes.login,
@@ -265,7 +270,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Vous vous souvenez de votre mot de passe ? ',
+                              l10n.forgotPassword_rememberPassword,
                               style: TextStyle(color: AppTheme.textSecondary),
                             ),
                             TextButton(
@@ -276,7 +281,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                 );
                               },
                               child: Text(
-                                'Se connecter',
+                                l10n.login_submit,
                                 style: TextStyle(
                                   color: AppTheme.textPrimary,
                                   fontWeight: FontWeight.bold,
@@ -296,7 +301,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  Widget _buildPasswordStrengthIndicator() {
+  Widget _buildPasswordStrengthIndicator(AppLocalizations l10n) {
     final password = _passwordController.text;
     int strength = 0;
     String strengthText = '';
@@ -311,17 +316,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     switch (strength) {
       case 0:
       case 1:
-        strengthText = 'Faible';
+        strengthText = l10n.resetPassword_strengthWeak;
         strengthColor = AppTheme.error;
         break;
       case 2:
       case 3:
-        strengthText = 'Moyen';
+        strengthText = l10n.resetPassword_strengthMedium;
         strengthColor = AppTheme.warning;
         break;
       case 4:
       case 5:
-        strengthText = 'Fort';
+        strengthText = l10n.resetPassword_strengthStrong;
         strengthColor = AppTheme.success;
         break;
     }
@@ -351,7 +356,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Le mot de passe doit contenir au moins 6 caractères',
+          l10n.resetPassword_minChars,
           style: TextStyle(
             fontSize: 12,
             color: AppTheme.textTertiary,

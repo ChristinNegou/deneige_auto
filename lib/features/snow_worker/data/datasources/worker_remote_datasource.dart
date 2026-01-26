@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/errors/exceptions.dart';
 import '../../../../core/utils/time_utils.dart';
 import '../models/worker_job_model.dart';
 import '../models/worker_profile_model.dart';
@@ -250,29 +251,43 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     required double longitude,
     double radiusKm = 10,
   }) async {
-    final response = await dio.get(
-      '/workers/available-jobs',
-      queryParameters: {
-        'lat': latitude,
-        'lng': longitude,
-        'radiusKm': radiusKm,
-      },
-    );
+    try {
+      final response = await dio.get(
+        '/workers/available-jobs',
+        queryParameters: {
+          'lat': latitude,
+          'lng': longitude,
+          'radiusKm': radiusKm,
+        },
+      );
 
-    final data = response.data['data'] as List<dynamic>? ?? [];
-    return data
-        .map((job) => WorkerJobModel.fromJson(job as Map<String, dynamic>))
-        .toList();
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data
+          .map((job) => WorkerJobModel.fromJson(job as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors du chargement des jobs disponibles: $e');
+    }
   }
 
   @override
   Future<List<WorkerJobModel>> getMyJobs() async {
-    final response = await dio.get('/workers/my-jobs');
+    try {
+      final response = await dio.get('/workers/my-jobs');
 
-    final data = response.data['data'] as List<dynamic>? ?? [];
-    return data
-        .map((job) => WorkerJobModel.fromJson(job as Map<String, dynamic>))
-        .toList();
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data
+          .map((job) => WorkerJobModel.fromJson(job as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors du chargement de vos jobs: $e');
+    }
   }
 
   @override
@@ -282,52 +297,78 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final queryParams = <String, dynamic>{
-      'page': page,
-      'limit': limit,
-    };
+    try {
+      final queryParams = <String, dynamic>{
+        'page': page,
+        'limit': limit,
+      };
 
-    if (startDate != null) {
-      queryParams['startDate'] = startDate.toIso8601String();
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+      }
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await dio.get(
+        '/workers/history',
+        queryParameters: queryParams,
+      );
+
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return data
+          .map((job) => WorkerJobModel.fromJson(job as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors du chargement de l\'historique: $e');
     }
-    if (endDate != null) {
-      queryParams['endDate'] = endDate.toIso8601String();
-    }
-
-    final response = await dio.get(
-      '/workers/history',
-      queryParameters: queryParams,
-    );
-
-    final data = response.data['data'] as List<dynamic>? ?? [];
-    return data
-        .map((job) => WorkerJobModel.fromJson(job as Map<String, dynamic>))
-        .toList();
   }
 
   @override
   Future<WorkerStatsModel> getStats() async {
-    final response = await dio.get('/workers/stats');
-    return WorkerStatsModel.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+    try {
+      final response = await dio.get('/workers/stats');
+      return WorkerStatsModel.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors du chargement des statistiques: $e');
+    }
   }
 
   @override
   Future<EarningsBreakdownModel> getEarnings({String period = 'week'}) async {
-    final response = await dio.get(
-      '/workers/earnings',
-      queryParameters: {'period': period},
-    );
+    try {
+      final response = await dio.get(
+        '/workers/earnings',
+        queryParameters: {'period': period},
+      );
 
-    return EarningsBreakdownModel.fromJson(
-        response.data as Map<String, dynamic>);
+      return EarningsBreakdownModel.fromJson(
+          response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(message: 'Erreur lors du chargement des gains: $e');
+    }
   }
 
   @override
   Future<WorkerProfileModel> getProfile() async {
-    final response = await dio.get('/workers/profile');
-    return WorkerProfileModel.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+    try {
+      final response = await dio.get('/workers/profile');
+      return WorkerProfileModel.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(message: 'Erreur lors du chargement du profil: $e');
+    }
   }
 
   @override
@@ -338,36 +379,50 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     int? maxActiveJobs,
     Map<String, bool>? notificationPreferences,
   }) async {
-    final body = <String, dynamic>{};
+    try {
+      final body = <String, dynamic>{};
 
-    if (preferredZones != null) {
-      body['preferredZones'] = preferredZones.map((z) => z.toJson()).toList();
-    }
-    if (equipmentList != null) {
-      body['equipmentList'] = equipmentList;
-    }
-    if (vehicleType != null) {
-      body['vehicleType'] = vehicleType;
-    }
-    if (maxActiveJobs != null) {
-      body['maxActiveJobs'] = maxActiveJobs;
-    }
-    if (notificationPreferences != null) {
-      body['notificationPreferences'] = notificationPreferences;
-    }
+      if (preferredZones != null) {
+        body['preferredZones'] = preferredZones.map((z) => z.toJson()).toList();
+      }
+      if (equipmentList != null) {
+        body['equipmentList'] = equipmentList;
+      }
+      if (vehicleType != null) {
+        body['vehicleType'] = vehicleType;
+      }
+      if (maxActiveJobs != null) {
+        body['maxActiveJobs'] = maxActiveJobs;
+      }
+      if (notificationPreferences != null) {
+        body['notificationPreferences'] = notificationPreferences;
+      }
 
-    final response = await dio.put('/workers/profile', data: body);
-    return WorkerProfileModel.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+      final response = await dio.put('/workers/profile', data: body);
+      return WorkerProfileModel.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors de la mise à jour du profil: $e');
+    }
   }
 
   @override
   Future<bool> toggleAvailability(bool isAvailable) async {
-    final response = await dio.patch(
-      '/workers/availability',
-      data: {'isAvailable': isAvailable},
-    );
-    return response.data['isAvailable'] as bool? ?? isAvailable;
+    try {
+      final response = await dio.patch(
+        '/workers/availability',
+        data: {'isAvailable': isAvailable},
+      );
+      return response.data['isAvailable'] as bool? ?? isAvailable;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors du changement de disponibilité: $e');
+    }
   }
 
   @override
@@ -375,20 +430,34 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     required double latitude,
     required double longitude,
   }) async {
-    await dio.put(
-      '/workers/location',
-      data: {
-        'latitude': latitude,
-        'longitude': longitude,
-      },
-    );
+    try {
+      await dio.put(
+        '/workers/location',
+        data: {
+          'latitude': latitude,
+          'longitude': longitude,
+        },
+      );
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors de la mise à jour de la position: $e');
+    }
   }
 
   @override
   Future<WorkerJobModel> acceptJob(String jobId) async {
-    final response = await dio.post('/workers/jobs/$jobId/accept');
-    return WorkerJobModel.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+    try {
+      final response = await dio.post('/workers/jobs/$jobId/accept');
+      return WorkerJobModel.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors de l\'acceptation du job: $e');
+    }
   }
 
   @override
@@ -398,25 +467,37 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     double? longitude,
     int? estimatedMinutes,
   }) async {
-    final body = <String, dynamic>{};
+    try {
+      final body = <String, dynamic>{};
 
-    if (latitude != null) body['latitude'] = latitude;
-    if (longitude != null) body['longitude'] = longitude;
-    if (estimatedMinutes != null) body['estimatedMinutes'] = estimatedMinutes;
+      if (latitude != null) body['latitude'] = latitude;
+      if (longitude != null) body['longitude'] = longitude;
+      if (estimatedMinutes != null) body['estimatedMinutes'] = estimatedMinutes;
 
-    final response = await dio.patch(
-      '/workers/jobs/$jobId/en-route',
-      data: body,
-    );
-    return WorkerJobModel.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+      final response = await dio.patch(
+        '/workers/jobs/$jobId/en-route',
+        data: body,
+      );
+      return WorkerJobModel.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(message: 'Erreur lors du marquage en route: $e');
+    }
   }
 
   @override
   Future<WorkerJobModel> startJob(String jobId) async {
-    final response = await dio.patch('/workers/jobs/$jobId/start');
-    return WorkerJobModel.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+    try {
+      final response = await dio.patch('/workers/jobs/$jobId/start');
+      return WorkerJobModel.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(message: 'Erreur lors du démarrage du job: $e');
+    }
   }
 
   @override
@@ -424,15 +505,21 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     required String jobId,
     String? workerNotes,
   }) async {
-    final body = <String, dynamic>{};
-    if (workerNotes != null) body['workerNotes'] = workerNotes;
+    try {
+      final body = <String, dynamic>{};
+      if (workerNotes != null) body['workerNotes'] = workerNotes;
 
-    final response = await dio.patch(
-      '/workers/jobs/$jobId/complete',
-      data: body,
-    );
-    return WorkerJobModel.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+      final response = await dio.patch(
+        '/workers/jobs/$jobId/complete',
+        data: body,
+      );
+      return WorkerJobModel.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(message: 'Erreur lors de la complétion du job: $e');
+    }
   }
 
   @override
@@ -441,13 +528,19 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     required String type,
     required String photoUrl,
   }) async {
-    await dio.post(
-      '/workers/jobs/$jobId/photos',
-      data: {
-        'type': type,
-        'photoUrl': photoUrl,
-      },
-    );
+    try {
+      await dio.post(
+        '/workers/jobs/$jobId/photos',
+        data: {
+          'type': type,
+          'photoUrl': photoUrl,
+        },
+      );
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(message: 'Erreur lors de l\'ajout de la photo: $e');
+    }
   }
 
   @override
@@ -456,52 +549,66 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     required String type,
     required File photoFile,
   }) async {
-    final fileName = photoFile.path.split('/').last;
-    final formData = FormData.fromMap({
-      'type': type,
-      'photo': await MultipartFile.fromFile(
-        photoFile.path,
-        filename: fileName,
-      ),
-    });
+    try {
+      final fileName = photoFile.path.split('/').last;
+      final formData = FormData.fromMap({
+        'type': type,
+        'photo': await MultipartFile.fromFile(
+          photoFile.path,
+          filename: fileName,
+        ),
+      });
 
-    final response = await dio.post(
-      '/workers/jobs/$jobId/photos/upload',
-      data: formData,
-      options: Options(
-        contentType: 'multipart/form-data',
-      ),
-    );
+      final response = await dio.post(
+        '/workers/jobs/$jobId/photos/upload',
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      );
 
-    return response.data['data']['url'] as String;
+      return response.data['data']['url'] as String;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors de l\'upload de la photo: $e');
+    }
   }
 
   @override
   Future<String> uploadProfilePhoto(File photoFile) async {
-    final fileName = photoFile.path.split('/').last;
+    try {
+      final fileName = photoFile.path.split('/').last;
 
-    final formData = FormData.fromMap({
-      'photo': await MultipartFile.fromFile(
-        photoFile.path,
-        filename: fileName,
-      ),
-    });
+      final formData = FormData.fromMap({
+        'photo': await MultipartFile.fromFile(
+          photoFile.path,
+          filename: fileName,
+        ),
+      });
 
-    final response = await dio.post(
-      '/workers/profile/photo',
-      data: formData,
-      options: Options(
-        contentType: 'multipart/form-data',
-      ),
-    );
+      final response = await dio.post(
+        '/workers/profile/photo',
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      );
 
-    final photoUrl = response.data['data']['photoUrl'] as String;
+      final photoUrl = response.data['data']['photoUrl'] as String;
 
-    // Convert relative URL to absolute URL
-    if (photoUrl.startsWith('/')) {
-      return '${AppConfig.apiBaseUrl}$photoUrl';
+      // Convert relative URL to absolute URL
+      if (photoUrl.startsWith('/')) {
+        return '${AppConfig.apiBaseUrl}$photoUrl';
+      }
+      return photoUrl;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors de l\'upload de la photo de profil: $e');
     }
-    return photoUrl;
   }
 
   @override
@@ -511,24 +618,61 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
     String? reason,
     String? description,
   }) async {
-    final response = await dio.patch(
-      '/reservations/$jobId/cancel-by-worker',
-      data: {
-        'reasonCode': reasonCode,
-        if (reason != null) 'reason': reason,
-        if (description != null) 'description': description,
-      },
-    );
+    try {
+      final response = await dio.patch(
+        '/reservations/$jobId/cancel-by-worker',
+        data: {
+          'reasonCode': reasonCode,
+          if (reason != null) 'reason': reason,
+          if (description != null) 'description': description,
+        },
+      );
 
-    return WorkerCancellationResult.fromJson(
-        response.data as Map<String, dynamic>);
+      return WorkerCancellationResult.fromJson(
+          response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(message: 'Erreur lors de l\'annulation du job: $e');
+    }
   }
 
   @override
   Future<WorkerCancellationReasons> getCancellationReasons() async {
-    final response = await dio.get('/reservations/worker/cancellation-reasons');
+    try {
+      final response =
+          await dio.get('/reservations/worker/cancellation-reasons');
 
-    return WorkerCancellationReasons.fromJson(
-        response.data as Map<String, dynamic>);
+      return WorkerCancellationReasons.fromJson(
+          response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw ServerException(
+          message: 'Erreur lors du chargement des raisons d\'annulation: $e');
+    }
+  }
+
+  AppException _handleDioError(DioException e) {
+    final statusCode = e.response?.statusCode;
+    final message = e.response?.data?['message'] as String?;
+
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return const NetworkException(
+          message: 'Délai de connexion dépassé. Vérifiez votre connexion.',
+        );
+      case DioExceptionType.connectionError:
+        return const NetworkException(
+          message: 'Impossible de se connecter au serveur.',
+        );
+      default:
+        return ServerException(
+          message: message ?? 'Une erreur serveur est survenue.',
+          statusCode: statusCode,
+        );
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/errors/exceptions.dart';
 import '../models/support_request_model.dart';
 
 abstract class SupportRemoteDataSource {
@@ -20,13 +21,16 @@ class SupportRemoteDataSourceImpl implements SupportRemoteDataSource {
       );
 
       if (response.statusCode != 201 || response.data['success'] != true) {
-        final message = response.data['message'] ?? 'Failed to submit request';
-        throw Exception(message);
+        final message = response.data['message'] ?? 'Erreur lors de l\'envoi';
+        throw ServerException(message: message);
       }
     } on DioException catch (e) {
-      throw Exception('Error submitting request: ${e.message}');
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error submitting request: $e');
+      throw ServerException(
+          message: 'Erreur lors de l\'envoi de la demande de support: $e');
     }
   }
 
@@ -41,10 +45,39 @@ class SupportRemoteDataSourceImpl implements SupportRemoteDataSource {
             .map((json) => SupportRequestModel.fromJson(json))
             .toList();
       } else {
-        throw Exception('Failed to load requests');
+        throw const ServerException(
+            message: 'Erreur lors du chargement des demandes de support');
       }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } on AppException {
+      rethrow;
     } catch (e) {
-      throw Exception('Error fetching requests: $e');
+      throw ServerException(
+          message: 'Erreur lors du chargement des demandes de support: $e');
+    }
+  }
+
+  AppException _handleDioError(DioException e) {
+    final statusCode = e.response?.statusCode;
+    final message = e.response?.data?['message'] as String?;
+
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return const NetworkException(
+          message: 'Delai de connexion depasse. Verifiez votre connexion.',
+        );
+      case DioExceptionType.connectionError:
+        return const NetworkException(
+          message: 'Impossible de se connecter au serveur.',
+        );
+      default:
+        return ServerException(
+          message: message ?? 'Une erreur serveur est survenue.',
+          statusCode: statusCode,
+        );
     }
   }
 }

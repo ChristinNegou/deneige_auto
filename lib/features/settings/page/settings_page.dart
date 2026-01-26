@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/injection_container.dart';
+import '../../../core/services/locale_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_event.dart';
 import '../../legal/presentation/pages/legal_page.dart';
@@ -16,8 +18,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  String _language = 'fr';
   String _appVersion = '1.0.0';
+  final LocaleService _localeService = sl<LocaleService>();
 
   @override
   void initState() {
@@ -36,8 +38,15 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  void _changeLanguage(String languageCode) {
+    _localeService.setLocale(Locale(languageCode));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final currentLanguage = _localeService.locale.languageCode;
+
     return BlocProvider(
       create: (context) => sl<SettingsBloc>()..add(LoadSettings()),
       child: BlocConsumer<SettingsBloc, SettingsState>(
@@ -69,7 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
           return Scaffold(
             backgroundColor: AppTheme.background,
             appBar: AppBar(
-              title: const Text('Paramètres'),
+              title: Text(l10n.settings_title),
               backgroundColor: AppTheme.surface,
             ),
             body: state.isLoading
@@ -77,11 +86,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 : ListView(
                     children: [
                       // Section Notifications
-                      _buildSectionHeader('Notifications'),
+                      _buildSectionHeader(l10n.settings_notifications),
                       _buildSwitchTile(
                         icon: Icons.notifications_outlined,
-                        title: 'Notifications push',
-                        subtitle: 'Recevoir des alertes sur votre appareil',
+                        title: l10n.settings_pushNotifications,
+                        subtitle: l10n.settings_pushNotificationsDesc,
                         value: state.preferences.pushNotificationsEnabled,
                         onChanged: (value) {
                           context
@@ -91,8 +100,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       _buildSwitchTile(
                         icon: Icons.volume_up_outlined,
-                        title: 'Sons',
-                        subtitle: 'Activer les sons de notification',
+                        title: l10n.settings_sounds,
+                        subtitle: l10n.settings_soundsDesc,
                         value: state.preferences.soundEnabled,
                         onChanged: (value) {
                           context.read<SettingsBloc>().add(UpdateSound(value));
@@ -102,11 +111,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       const Divider(height: 32),
 
                       // Section Apparence
-                      _buildSectionHeader('Apparence'),
+                      _buildSectionHeader(l10n.settings_appearance),
                       _buildSwitchTile(
                         icon: Icons.dark_mode_outlined,
-                        title: 'Thème sombre',
-                        subtitle: 'Utiliser le thème sombre',
+                        title: l10n.settings_darkTheme,
+                        subtitle: l10n.settings_darkThemeDesc,
                         value: state.preferences.darkThemeEnabled,
                         onChanged: (value) {
                           context
@@ -117,33 +126,38 @@ class _SettingsPageState extends State<SettingsPage> {
 
                       const Divider(height: 32),
 
-                      // Section Langue (NE PAS MODIFIER)
-                      _buildSectionHeader('Langue'),
+                      // Section Langue
+                      _buildSectionHeader(l10n.settings_language),
                       _buildListTile(
                         icon: Icons.language,
-                        title: 'Langue',
+                        title: l10n.settings_language,
                         trailing: DropdownButton<String>(
-                          value: _language,
+                          value: currentLanguage,
                           underline: const SizedBox(),
                           dropdownColor: AppTheme.surfaceElevated,
-                          items: const [
+                          items: [
                             DropdownMenuItem(
-                                value: 'fr', child: Text('Français')),
+                                value: 'fr',
+                                child: Text(l10n.settings_languageFrench)),
                             DropdownMenuItem(
-                                value: 'en', child: Text('English')),
+                                value: 'en',
+                                child: Text(l10n.settings_languageEnglish)),
                           ],
-                          onChanged: (value) =>
-                              setState(() => _language = value!),
+                          onChanged: (value) {
+                            if (value != null) {
+                              _changeLanguage(value);
+                            }
+                          },
                         ),
                       ),
 
                       const Divider(height: 32),
 
                       // Section Compte
-                      _buildSectionHeader('Compte'),
+                      _buildSectionHeader(l10n.settings_account),
                       _buildListTile(
                         icon: Icons.person_outline,
-                        title: 'Modifier le profil',
+                        title: l10n.settings_editProfile,
                         trailing: const Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
                         onTap: () =>
@@ -151,21 +165,21 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       _buildListTile(
                         icon: Icons.delete_outline,
-                        title: 'Supprimer mon compte',
+                        title: l10n.settings_deleteAccount,
                         titleColor: AppTheme.error,
                         trailing: const Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.error),
-                        onTap: () => _showDeleteAccountDialog(context),
+                        onTap: () => _showDeleteAccountDialog(context, l10n),
                       ),
 
                       const Divider(height: 32),
 
-                      // Section Légal
-                      _buildSectionHeader('Légal'),
+                      // Section Legal
+                      _buildSectionHeader(l10n.settings_legal),
                       _buildListTile(
                         icon: Icons.gavel_outlined,
-                        title: 'Mentions légales',
-                        subtitle: 'CGU, confidentialité, vos droits',
+                        title: l10n.settings_legalMentions,
+                        subtitle: l10n.settings_legalSubtitle,
                         trailing: const Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
                         onTap: () => Navigator.push(
@@ -178,7 +192,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       _buildListTile(
                         icon: Icons.privacy_tip_outlined,
-                        title: 'Politique de confidentialité',
+                        title: l10n.settings_privacyPolicy,
                         trailing: const Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
                         onTap: () => Navigator.push(
@@ -192,7 +206,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       _buildListTile(
                         icon: Icons.description_outlined,
-                        title: 'Conditions d\'utilisation',
+                        title: l10n.settings_termsOfService,
                         trailing: const Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
                         onTap: () => Navigator.push(
@@ -207,11 +221,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
                       const Divider(height: 32),
 
-                      // Section À propos
-                      _buildSectionHeader('À propos'),
+                      // Section About
+                      _buildSectionHeader(l10n.settings_about),
                       _buildListTile(
                         icon: Icons.info_outline,
-                        title: 'Version de l\'application',
+                        title: l10n.settings_appVersion,
                         subtitle: _appVersion,
                       ),
 
@@ -303,7 +317,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showDeleteAccountDialog(BuildContext context) {
+  void _showDeleteAccountDialog(BuildContext context, AppLocalizations l10n) {
     final passwordController = TextEditingController();
     bool obscurePassword = true;
 
@@ -312,13 +326,13 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: AppTheme.surfaceElevated,
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: AppTheme.error),
-              SizedBox(width: 12),
+              const Icon(Icons.warning_amber_rounded, color: AppTheme.error),
+              const SizedBox(width: 12),
               Text(
-                'Supprimer le compte',
-                style: TextStyle(color: AppTheme.textPrimary),
+                l10n.settings_deleteAccountTitle,
+                style: const TextStyle(color: AppTheme.textPrimary),
               ),
             ],
           ),
@@ -326,14 +340,14 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Cette action est irréversible. Toutes vos données seront supprimées.',
-                style: TextStyle(color: AppTheme.textSecondary),
+              Text(
+                l10n.settings_deleteAccountWarning,
+                style: const TextStyle(color: AppTheme.textSecondary),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Entrez votre mot de passe pour confirmer:',
-                style: TextStyle(
+              Text(
+                l10n.settings_enterPassword,
+                style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w500,
                 ),
@@ -344,7 +358,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 obscureText: obscurePassword,
                 style: const TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
-                  hintText: 'Mot de passe',
+                  hintText: l10n.common_password,
                   hintStyle: const TextStyle(color: AppTheme.textTertiary),
                   filled: true,
                   fillColor: AppTheme.surfaceContainer,
@@ -370,9 +384,9 @@ class _SettingsPageState extends State<SettingsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text(
-                'Annuler',
-                style: TextStyle(color: AppTheme.textSecondary),
+              child: Text(
+                l10n.common_cancel,
+                style: const TextStyle(color: AppTheme.textSecondary),
               ),
             ),
             BlocBuilder<SettingsBloc, SettingsState>(
@@ -383,9 +397,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       : () {
                           if (passwordController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text('Veuillez entrer votre mot de passe'),
+                              SnackBar(
+                                content: Text(l10n.settings_passwordRequired),
                                 backgroundColor: AppTheme.error,
                               ),
                             );
@@ -409,7 +422,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Supprimer'),
+                      : Text(l10n.common_delete),
                 );
               },
             ),
