@@ -4141,6 +4141,606 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{count} nouvelle(s) demande(s) aujourd\'hui'**
   String admin_newRequestsToday(int count);
+
+  /// No description provided for @common_add.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter'**
+  String get common_add;
+
+  /// No description provided for @common_description.
+  ///
+  /// In fr, this message translates to:
+  /// **'Description'**
+  String get common_description;
+
+  /// No description provided for @dispute_imageLoadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger l\'image'**
+  String get dispute_imageLoadError;
+
+  /// No description provided for @dispute_addPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une photo'**
+  String get dispute_addPhoto;
+
+  /// No description provided for @dispute_chooseFromGallery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir depuis la galerie'**
+  String get dispute_chooseFromGallery;
+
+  /// No description provided for @dispute_claimedAmountOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant réclamé (optionnel)'**
+  String get dispute_claimedAmountOptional;
+
+  /// No description provided for @dispute_photosEvidence.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photos (preuves)'**
+  String get dispute_photosEvidence;
+
+  /// No description provided for @dispute_workerNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigeur: {name}'**
+  String dispute_workerNameLabel(String name);
+
+  /// No description provided for @dispute_describeInDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décrivez le problème en détail...'**
+  String get dispute_describeInDetail;
+
+  /// No description provided for @dispute_descriptionTooShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Description trop courte (minimum 20 caractères)'**
+  String get dispute_descriptionTooShort;
+
+  /// No description provided for @dispute_invalidAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant invalide'**
+  String get dispute_invalidAmount;
+
+  /// No description provided for @dispute_submit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Soumettre le litige'**
+  String get dispute_submit;
+
+  /// No description provided for @dispute_submitSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre litige a été soumis avec succès. Notre équipe va l\'examiner et vous tiendra informé de l\'avancement.'**
+  String get dispute_submitSuccess;
+
+  /// No description provided for @dispute_workerResponseDeadline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le déneigeur a 48h pour répondre à votre plainte.'**
+  String get dispute_workerResponseDeadline;
+
+  /// No description provided for @dispute_addPhotos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter des photos'**
+  String get dispute_addPhotos;
+
+  /// No description provided for @dispute_addAnotherPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une autre photo'**
+  String get dispute_addAnotherPhoto;
+
+  /// No description provided for @dispute_maxPhotosHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Maximum 5 photos. Les photos aident à traiter votre demande plus rapidement.'**
+  String get dispute_maxPhotosHint;
+
+  /// No description provided for @worker_myPayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes paiements'**
+  String get worker_myPayments;
+
+  /// No description provided for @worker_configureBankAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurer mon compte bancaire'**
+  String get worker_configureBankAccount;
+
+  /// No description provided for @worker_saltSpreaderLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Épandeur de sel'**
+  String get worker_saltSpreaderLabel;
+
+  /// No description provided for @worker_snowBlowerLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Souffleuse'**
+  String get worker_snowBlowerLabel;
+
+  /// No description provided for @worker_vehicleCar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voiture'**
+  String get worker_vehicleCar;
+
+  /// No description provided for @worker_vehicleTruck.
+  ///
+  /// In fr, this message translates to:
+  /// **'Camionnette'**
+  String get worker_vehicleTruck;
+
+  /// No description provided for @worker_vehicleAtv.
+  ///
+  /// In fr, this message translates to:
+  /// **'VTT / Quad'**
+  String get worker_vehicleAtv;
+
+  /// No description provided for @worker_vehicleOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre'**
+  String get worker_vehicleOther;
+
+  /// No description provided for @worker_vehicleCarDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Petites entrées, stationnements'**
+  String get worker_vehicleCarDesc;
+
+  /// No description provided for @worker_vehicleTruckDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Grandes entrées, équipement lourd'**
+  String get worker_vehicleTruckDesc;
+
+  /// No description provided for @worker_vehicleAtvDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès difficile, terrains variés'**
+  String get worker_vehicleAtvDesc;
+
+  /// No description provided for @worker_recommendedJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recommandé: 2-3 jobs'**
+  String get worker_recommendedJobs;
+
+  /// No description provided for @worker_notifNewJobsDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alerte pour les nouveaux jobs disponibles'**
+  String get worker_notifNewJobsDesc;
+
+  /// No description provided for @worker_notifUrgentJobsDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alertes prioritaires'**
+  String get worker_notifUrgentJobsDesc;
+
+  /// No description provided for @worker_addZone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une zone'**
+  String get worker_addZone;
+
+  /// No description provided for @worker_zoneName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom de la zone'**
+  String get worker_zoneName;
+
+  /// No description provided for @worker_zoneHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex: Trois-Rivières Ouest'**
+  String get worker_zoneHint;
+
+  /// No description provided for @worker_account.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte'**
+  String get worker_account;
+
+  /// No description provided for @worker_logoutConfirmWorker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous vraiment vous déconnecter de votre compte déneigeur ?'**
+  String get worker_logoutConfirmWorker;
+
+  /// No description provided for @worker_priorityNotifications.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications prioritaires'**
+  String get worker_priorityNotifications;
+
+  /// No description provided for @worker_history.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique'**
+  String get worker_history;
+
+  /// No description provided for @worker_yourCompletedJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos jobs terminés'**
+  String get worker_yourCompletedJobs;
+
+  /// No description provided for @worker_filterAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous'**
+  String get worker_filterAll;
+
+  /// No description provided for @worker_filterThisWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette semaine'**
+  String get worker_filterThisWeek;
+
+  /// No description provided for @worker_filterThisMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce mois'**
+  String get worker_filterThisMonth;
+
+  /// No description provided for @worker_filterWithTip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avec pourboire'**
+  String get worker_filterWithTip;
+
+  /// No description provided for @worker_noHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun job dans l\'historique'**
+  String get worker_noHistory;
+
+  /// No description provided for @worker_completedJobsAppearHere.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos jobs terminés apparaîtront ici'**
+  String get worker_completedJobsAppearHere;
+
+  /// No description provided for @worker_dateUnknown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date inconnue'**
+  String get worker_dateUnknown;
+
+  /// No description provided for @worker_completedStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get worker_completedStatus;
+
+  /// No description provided for @worker_revenueLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenus'**
+  String get worker_revenueLabel;
+
+  /// No description provided for @worker_clientRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Évaluation client:'**
+  String get worker_clientRating;
+
+  /// No description provided for @worker_returnToDashboard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retourner au dashboard'**
+  String get worker_returnToDashboard;
+
+  /// No description provided for @worker_photoSelectionError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de la sélection de la photo'**
+  String get worker_photoSelectionError;
+
+  /// No description provided for @worker_notifications.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications'**
+  String get worker_notifications;
+
+  /// No description provided for @worker_tipsReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourboires reçus'**
+  String get worker_tipsReceived;
+
+  /// No description provided for @admin_userManagement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gestion des utilisateurs'**
+  String get admin_userManagement;
+
+  /// No description provided for @admin_searchUser.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher un utilisateur...'**
+  String get admin_searchUser;
+
+  /// No description provided for @admin_clientsLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clients'**
+  String get admin_clientsLabel;
+
+  /// No description provided for @admin_adminsLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Admins'**
+  String get admin_adminsLabel;
+
+  /// No description provided for @admin_suspended.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suspendu'**
+  String get admin_suspended;
+
+  /// No description provided for @admin_jobsCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jobs terminés'**
+  String get admin_jobsCompleted;
+
+  /// No description provided for @admin_averageRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note moyenne'**
+  String get admin_averageRating;
+
+  /// No description provided for @admin_totalEarnings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gains totaux'**
+  String get admin_totalEarnings;
+
+  /// No description provided for @admin_warnings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avertissements'**
+  String get admin_warnings;
+
+  /// No description provided for @admin_clientStats.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statistiques Client'**
+  String get admin_clientStats;
+
+  /// No description provided for @admin_registeredAt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inscrit le'**
+  String get admin_registeredAt;
+
+  /// No description provided for @admin_accountSuspended.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte suspendu'**
+  String get admin_accountSuspended;
+
+  /// No description provided for @admin_suspendUser.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suspendre l\'utilisateur'**
+  String get admin_suspendUser;
+
+  /// No description provided for @admin_liftSuspension.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lever la suspension'**
+  String get admin_liftSuspension;
+
+  /// No description provided for @admin_aboutToSuspend.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous allez suspendre {name}'**
+  String admin_aboutToSuspend(String name);
+
+  /// No description provided for @admin_1day.
+  ///
+  /// In fr, this message translates to:
+  /// **'1 jour'**
+  String get admin_1day;
+
+  /// No description provided for @admin_3days.
+  ///
+  /// In fr, this message translates to:
+  /// **'3 jours'**
+  String get admin_3days;
+
+  /// No description provided for @admin_7days.
+  ///
+  /// In fr, this message translates to:
+  /// **'7 jours'**
+  String get admin_7days;
+
+  /// No description provided for @admin_14days.
+  ///
+  /// In fr, this message translates to:
+  /// **'14 jours'**
+  String get admin_14days;
+
+  /// No description provided for @admin_30days.
+  ///
+  /// In fr, this message translates to:
+  /// **'30 jours'**
+  String get admin_30days;
+
+  /// No description provided for @admin_1year.
+  ///
+  /// In fr, this message translates to:
+  /// **'1 an'**
+  String get admin_1year;
+
+  /// No description provided for @admin_suspend.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suspendre'**
+  String get admin_suspend;
+
+  /// No description provided for @admin_reason.
+  ///
+  /// In fr, this message translates to:
+  /// **'Raison: {reason}'**
+  String admin_reason(String reason);
+
+  /// No description provided for @admin_suspendedUntil.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jusqu\'au: {date}'**
+  String admin_suspendedUntil(String date);
+
+  /// No description provided for @payment_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement'**
+  String get payment_title;
+
+  /// No description provided for @payment_amountToPay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant à payer'**
+  String get payment_amountToPay;
+
+  /// No description provided for @payment_useNewCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utiliser une nouvelle carte'**
+  String get payment_useNewCard;
+
+  /// No description provided for @payment_expires.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expire {date}'**
+  String payment_expires(String date);
+
+  /// No description provided for @payment_securePayment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement sécurisé'**
+  String get payment_securePayment;
+
+  /// No description provided for @payment_securePaymentDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'SSL 256-bit · PCI DSS · Propulsé par Stripe'**
+  String get payment_securePaymentDetails;
+
+  /// No description provided for @payment_payAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Payer {amount} \$'**
+  String payment_payAmount(String amount);
+
+  /// No description provided for @payment_success.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement réussi !'**
+  String get payment_success;
+
+  /// No description provided for @payment_cancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement annulé'**
+  String get payment_cancelled;
+
+  /// No description provided for @payment_failedRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le paiement a échoué. Vérifiez votre carte et réessayez.'**
+  String get payment_failedRetry;
+
+  /// No description provided for @payment_payments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements'**
+  String get payment_payments;
+
+  /// No description provided for @payment_historyTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique'**
+  String get payment_historyTab;
+
+  /// No description provided for @payment_methodsTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'Méthodes'**
+  String get payment_methodsTab;
+
+  /// No description provided for @payment_totalSpent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total dépensé'**
+  String get payment_totalSpent;
+
+  /// No description provided for @payment_transactions.
+  ///
+  /// In fr, this message translates to:
+  /// **'transactions'**
+  String get payment_transactions;
+
+  /// No description provided for @payment_noPayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun paiement'**
+  String get payment_noPayments;
+
+  /// No description provided for @payment_transactionsAppearHere.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos transactions apparaîtront ici'**
+  String get payment_transactionsAppearHere;
+
+  /// No description provided for @payment_noCardsRegistered.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune carte enregistrée'**
+  String get payment_noCardsRegistered;
+
+  /// No description provided for @payment_addCardToFacilitate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez une carte pour faciliter vos paiements'**
+  String get payment_addCardToFacilitate;
+
+  /// No description provided for @payment_setDefault.
+  ///
+  /// In fr, this message translates to:
+  /// **'Définir par défaut'**
+  String get payment_setDefault;
+
+  /// No description provided for @payment_deleteCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer la carte'**
+  String get payment_deleteCardTitle;
+
+  /// No description provided for @payment_deleteCardConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous vraiment supprimer la carte {number} ?'**
+  String payment_deleteCardConfirm(String number);
+
+  /// No description provided for @payment_addCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une carte'**
+  String get payment_addCard;
 }
 
 class _AppLocalizationsDelegate

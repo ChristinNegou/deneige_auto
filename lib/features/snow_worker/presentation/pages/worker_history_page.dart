@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_jobs_bloc.dart';
 import '../../../../core/di/injection_container.dart';
@@ -66,6 +67,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
@@ -76,8 +78,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
-            _buildFilterChips(),
+            _buildHeader(l10n),
+            _buildFilterChips(l10n),
             Expanded(
               child: BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
                 builder: (context, state) {
@@ -86,14 +88,14 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                   }
 
                   if (state is WorkerJobsError) {
-                    return _buildErrorState(state.message);
+                    return _buildErrorState(state.message, l10n);
                   }
 
                   if (state is JobHistoryLoaded) {
                     final jobs = _filterJobs(state.jobs);
 
                     if (jobs.isEmpty) {
-                      return _buildEmptyState();
+                      return _buildEmptyState(l10n);
                     }
 
                     return RefreshIndicator(
@@ -127,14 +129,14 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                           return FadeSlideTransition(
                             index: index,
                             delay: const Duration(milliseconds: 30),
-                            child: _buildHistoryCard(jobs[index]),
+                            child: _buildHistoryCard(jobs[index], l10n),
                           );
                         },
                       ),
                     );
                   }
 
-                  return _buildEmptyState();
+                  return _buildEmptyState(l10n);
                 },
               ),
             ),
@@ -207,7 +209,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Row(
@@ -238,13 +240,13 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Historique',
+                  l10n.worker_history,
                   style: AppTheme.headlineMedium.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
-                  'Vos jobs termines',
+                  l10n.worker_yourCompletedJobs,
                   style: AppTheme.bodySmall.copyWith(
                     color: AppTheme.textTertiary,
                   ),
@@ -283,7 +285,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
     );
   }
 
-  Widget _buildFilterChips() {
+  Widget _buildFilterChips(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: SingleChildScrollView(
@@ -291,14 +293,17 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
         physics: const BouncingScrollPhysics(),
         child: Row(
           children: [
-            _buildFilterChip('all', 'Tous', Icons.list_alt_rounded),
-            const SizedBox(width: 10),
-            _buildFilterChip('week', 'Cette semaine', Icons.date_range_rounded),
-            const SizedBox(width: 10),
-            _buildFilterChip('month', 'Ce mois', Icons.calendar_month_rounded),
+            _buildFilterChip(
+                'all', l10n.worker_filterAll, Icons.list_alt_rounded),
             const SizedBox(width: 10),
             _buildFilterChip(
-                'tips', 'Avec pourboire', Icons.volunteer_activism_rounded),
+                'week', l10n.worker_filterThisWeek, Icons.date_range_rounded),
+            const SizedBox(width: 10),
+            _buildFilterChip('month', l10n.worker_filterThisMonth,
+                Icons.calendar_month_rounded),
+            const SizedBox(width: 10),
+            _buildFilterChip('tips', l10n.worker_filterWithTip,
+                Icons.volunteer_activism_rounded),
           ],
         ),
       ),
@@ -385,7 +390,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
     }
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -412,14 +417,14 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
           ),
           const SizedBox(height: 24),
           Text(
-            'Aucun job dans l\'historique',
+            l10n.worker_noHistory,
             style: AppTheme.headlineSmall.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Vos jobs termines apparaitront ici',
+            l10n.worker_completedJobsAppearHere,
             style: AppTheme.bodySmall.copyWith(
               color: AppTheme.textTertiary,
             ),
@@ -434,7 +439,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                 borderRadius: BorderRadius.circular(AppTheme.radiusFull),
               ),
               child: Text(
-                'Retourner au dashboard',
+                l10n.worker_returnToDashboard,
                 style: TextStyle(
                   color: AppTheme.primary,
                   fontWeight: FontWeight.w600,
@@ -447,7 +452,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
     );
   }
 
-  Widget _buildErrorState(String message) {
+  Widget _buildErrorState(String message, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -469,7 +474,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
             ),
             const SizedBox(height: 20),
             Text(
-              'Oups!',
+              l10n.worker_oops,
               style: AppTheme.headlineSmall.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -511,7 +516,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                         color: AppTheme.background, size: 20),
                     SizedBox(width: 8),
                     Text(
-                      'Reessayer',
+                      l10n.common_retry,
                       style: TextStyle(
                         color: AppTheme.background,
                         fontWeight: FontWeight.w600,
@@ -527,7 +532,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
     );
   }
 
-  Widget _buildHistoryCard(WorkerJob job) {
+  Widget _buildHistoryCard(WorkerJob job, AppLocalizations l10n) {
     final dateFormat = DateFormat('dd MMM yyyy, HH:mm', 'fr_FR');
     final hasTip = job.tipAmount != null && job.tipAmount! > 0;
 
@@ -581,7 +586,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                       Text(
                         job.completedAt != null
                             ? dateFormat.format(job.completedAt!)
-                            : 'Date inconnue',
+                            : l10n.worker_dateUnknown,
                         style: AppTheme.labelSmall.copyWith(
                           color: AppTheme.textSecondary,
                         ),
@@ -609,8 +614,8 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                           size: 12,
                         ),
                         const SizedBox(width: 4),
-                        const Text(
-                          'Termine',
+                        Text(
+                          l10n.worker_completedStatus,
                           style: TextStyle(
                             color: AppTheme.background,
                             fontWeight: FontWeight.w600,
@@ -765,7 +770,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Revenus',
+                        l10n.worker_revenueLabel,
                         style: AppTheme.labelMedium.copyWith(
                           fontWeight: FontWeight.w500,
                           color: AppTheme.textSecondary,
@@ -846,7 +851,7 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
                       child: Row(
                         children: [
                           Text(
-                            'Evaluation client:',
+                            l10n.worker_clientRating,
                             style: AppTheme.labelSmall.copyWith(
                               color: AppTheme.textSecondary,
                             ),

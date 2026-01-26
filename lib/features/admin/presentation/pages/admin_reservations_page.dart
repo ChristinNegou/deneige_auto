@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/admin_reservation.dart';
 import '../bloc/admin_bloc.dart';
 import '../bloc/admin_event.dart';
@@ -25,9 +26,10 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion des réservations'),
+        title: Text(l10n.admin_reservationsManagement),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -72,6 +74,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
   }
 
   Widget _buildStatusFilters(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -88,20 +91,22 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildStatusChip(context, 'Toutes', null),
+            _buildStatusChip(context, l10n.admin_all, null),
             const SizedBox(width: 8),
             _buildStatusChip(
-                context, 'En attente', 'pending', AppTheme.warning),
-            const SizedBox(width: 8),
-            _buildStatusChip(context, 'Assignées', 'assigned', AppTheme.info),
+                context, l10n.admin_pending, 'pending', AppTheme.warning),
             const SizedBox(width: 8),
             _buildStatusChip(
-                context, 'En cours', 'inProgress', AppTheme.primary2),
+                context, l10n.admin_assigned, 'assigned', AppTheme.info),
+            const SizedBox(width: 8),
+            _buildStatusChip(context, l10n.admin_inProgress, 'inProgress',
+                AppTheme.primary2),
             const SizedBox(width: 8),
             _buildStatusChip(
-                context, 'Terminées', 'completed', AppTheme.success),
+                context, l10n.admin_completed, 'completed', AppTheme.success),
             const SizedBox(width: 8),
-            _buildStatusChip(context, 'Annulées', 'cancelled', AppTheme.error),
+            _buildStatusChip(
+                context, l10n.admin_cancelled, 'cancelled', AppTheme.error),
           ],
         ),
       ),
@@ -136,6 +141,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
   }
 
   Widget _buildReservationsList(BuildContext context, AdminState state) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (state.reservationsStatus == AdminStatus.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -147,12 +154,12 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
           children: [
             Icon(Icons.error_outline, size: 64, color: AppTheme.error),
             const SizedBox(height: 16),
-            Text(state.errorMessage ?? 'Une erreur est survenue'),
+            Text(state.errorMessage ?? l10n.common_errorOccurred),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () =>
                   context.read<AdminBloc>().add(LoadReservations()),
-              child: const Text('Réessayer'),
+              child: Text(l10n.common_retry),
             ),
           ],
         ),
@@ -160,13 +167,14 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
     }
 
     if (state.reservations.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.calendar_today, size: 64, color: AppTheme.textTertiary),
-            SizedBox(height: 16),
-            Text('Aucune réservation trouvée'),
+            const Icon(Icons.calendar_today,
+                size: 64, color: AppTheme.textTertiary),
+            const SizedBox(height: 16),
+            Text(l10n.admin_noReservations),
           ],
         ),
       );
@@ -199,6 +207,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
 
   Widget _buildReservationCard(
       BuildContext context, AdminReservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     final statusColor = _getStatusColor(reservation.status);
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
@@ -308,7 +317,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                     Expanded(
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.refresh, size: 18),
-                        label: const Text('Rembourser'),
+                        label: Text(l10n.admin_refund),
                         onPressed: () =>
                             _showRefundDialog(context, reservation),
                         style: OutlinedButton.styleFrom(
@@ -320,7 +329,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                   Expanded(
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.visibility, size: 18),
-                      label: const Text('Détails'),
+                      label: Text(l10n.admin_viewDetails),
                       onPressed: () =>
                           _showReservationDetails(context, reservation),
                     ),
@@ -354,6 +363,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
   }
 
   Widget _buildPagination(BuildContext context, AdminState state) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -371,7 +381,8 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                 : null,
           ),
           Text(
-            'Page ${state.reservationsPage} / ${state.reservationsTotalPages}',
+            l10n.admin_pageOf(
+                state.reservationsPage, state.reservationsTotalPages),
             style: const TextStyle(fontWeight: FontWeight.w500),
           ),
           IconButton(
@@ -392,6 +403,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
 
   void _showReservationDetails(
       BuildContext context, AdminReservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
     final statusColor = _getStatusColor(reservation.status);
     final pageContext = context; // Capture avant le shadowing
@@ -455,80 +467,85 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                _buildInfoSection('Informations de la réservation', [
-                  _buildInfoRow('ID', reservation.id),
-                  _buildInfoRow('Date prévue',
+                _buildInfoSection(l10n.admin_reservationInfo, [
+                  _buildInfoRow(l10n.admin_id, reservation.id),
+                  _buildInfoRow(l10n.admin_plannedDate,
                       dateFormat.format(reservation.departureTime)),
-                  _buildInfoRow(
-                      'Créée le', dateFormat.format(reservation.createdAt)),
+                  _buildInfoRow(l10n.admin_createdAt,
+                      dateFormat.format(reservation.createdAt)),
                   if (reservation.completedAt != null)
-                    _buildInfoRow('Terminée le',
+                    _buildInfoRow(l10n.admin_completedAt,
                         dateFormat.format(reservation.completedAt!)),
                   if (reservation.cancelledAt != null)
-                    _buildInfoRow('Annulée le',
+                    _buildInfoRow(l10n.admin_cancelledAt,
                         dateFormat.format(reservation.cancelledAt!)),
                   if (reservation.parkingSpotNumber != null)
                     _buildInfoRow(
-                        'Place de parking', reservation.parkingSpotNumber!),
+                        l10n.admin_parkingSpot, reservation.parkingSpotNumber!),
                 ]),
                 const SizedBox(height: 20),
-                _buildInfoSection('Détails financiers', [
-                  _buildInfoRow('Prix total',
+                _buildInfoSection(l10n.admin_financialDetails, [
+                  _buildInfoRow(l10n.admin_totalPrice,
                       '${reservation.totalPrice.toStringAsFixed(2)} \$'),
-                  _buildInfoRow('Commission plateforme',
+                  _buildInfoRow(l10n.admin_platformFee,
                       '${reservation.platformFee.toStringAsFixed(2)} \$'),
-                  _buildInfoRow('Paiement déneigeur',
+                  _buildInfoRow(l10n.admin_workerPayment,
                       '${reservation.workerPayout.toStringAsFixed(2)} \$'),
-                  _buildInfoRow(
-                      'Statut paiement', reservation.paymentStatus ?? 'N/A'),
+                  _buildInfoRow(l10n.admin_paymentStatus,
+                      reservation.paymentStatus ?? 'N/A'),
                   if (reservation.isRefunded)
-                    _buildInfoRow('Remboursé',
+                    _buildInfoRow(l10n.admin_refunded,
                         '${reservation.refundAmount?.toStringAsFixed(2) ?? 0} \$'),
                 ]),
                 if (reservation.client != null) ...[
                   const SizedBox(height: 20),
-                  _buildInfoSection('Client', [
-                    _buildInfoRow('Nom', reservation.client!.fullName),
+                  _buildInfoSection(l10n.admin_client, [
+                    _buildInfoRow(
+                        l10n.common_name, reservation.client!.fullName),
                     if (reservation.client!.email != null)
-                      _buildInfoRow('Email', reservation.client!.email!),
+                      _buildInfoRow(
+                          l10n.common_email, reservation.client!.email!),
                     if (reservation.client!.phoneNumber != null)
                       _buildInfoRow(
-                          'Téléphone', reservation.client!.phoneNumber!),
+                          l10n.common_phone, reservation.client!.phoneNumber!),
                   ]),
                 ],
                 if (reservation.worker != null) ...[
                   const SizedBox(height: 20),
-                  _buildInfoSection('Déneigeur', [
-                    _buildInfoRow('Nom', reservation.worker!.fullName),
+                  _buildInfoSection(l10n.admin_workerLabel, [
+                    _buildInfoRow(
+                        l10n.common_name, reservation.worker!.fullName),
                     if (reservation.worker!.phoneNumber != null)
                       _buildInfoRow(
-                          'Téléphone', reservation.worker!.phoneNumber!),
+                          l10n.common_phone, reservation.worker!.phoneNumber!),
                     if (reservation.worker!.rating != null)
-                      _buildInfoRow('Note',
+                      _buildInfoRow(l10n.admin_note,
                           reservation.worker!.rating!.toStringAsFixed(1)),
                   ]),
                 ],
                 if (reservation.vehicle != null) ...[
                   const SizedBox(height: 20),
-                  _buildInfoSection('Véhicule', [
-                    _buildInfoRow('Véhicule', reservation.vehicle!.displayName),
+                  _buildInfoSection(l10n.reservation_vehicle, [
+                    _buildInfoRow(l10n.reservation_vehicle,
+                        reservation.vehicle!.displayName),
                     if (reservation.vehicle!.color != null)
-                      _buildInfoRow('Couleur', reservation.vehicle!.color!),
-                    if (reservation.vehicle!.licensePlate != null)
                       _buildInfoRow(
-                          'Plaque', reservation.vehicle!.licensePlate!),
+                          l10n.admin_color, reservation.vehicle!.color!),
+                    if (reservation.vehicle!.licensePlate != null)
+                      _buildInfoRow(l10n.admin_plateNumber,
+                          reservation.vehicle!.licensePlate!),
                   ]),
                 ],
                 if (reservation.serviceOptions.isNotEmpty) ...[
                   const SizedBox(height: 20),
-                  _buildInfoSection('Services', [
-                    _buildInfoRow(
-                        'Options', reservation.serviceOptions.join(', ')),
+                  _buildInfoSection(l10n.admin_services, [
+                    _buildInfoRow(l10n.admin_services,
+                        reservation.serviceOptions.join(', ')),
                   ]),
                 ],
                 if (reservation.notes != null) ...[
                   const SizedBox(height: 20),
-                  _buildInfoSection('Notes', [
+                  _buildInfoSection(l10n.common_notes, [
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Text(reservation.notes!),
@@ -553,7 +570,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                             Icon(Icons.cancel, color: AppTheme.error),
                             const SizedBox(width: 8),
                             Text(
-                              'Raison d\'annulation',
+                              l10n.admin_cancellationReason,
                               style: TextStyle(
                                 color: AppTheme.error,
                                 fontWeight: FontWeight.bold,
@@ -573,7 +590,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Procéder au remboursement'),
+                      label: Text(l10n.admin_proceedRefund),
                       onPressed: () {
                         Navigator.pop(sheetContext);
                         _showRefundDialog(pageContext, reservation);
@@ -651,6 +668,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
   }
 
   void _showRefundDialog(BuildContext context, AdminReservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
     final amountController = TextEditingController(
       text: reservation.totalPrice.toStringAsFixed(2),
     );
@@ -660,30 +678,30 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Rembourser la réservation'),
+        title: Text(l10n.admin_refundTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Montant maximum: ${reservation.totalPrice.toStringAsFixed(2)} \$',
+              '${l10n.admin_maxAmount} ${reservation.totalPrice.toStringAsFixed(2)} \$',
               style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Montant à rembourser',
+              decoration: InputDecoration(
+                labelText: l10n.admin_refundAmount,
                 prefixText: '\$ ',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
-              decoration: const InputDecoration(
-                labelText: 'Raison (optionnel)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.admin_reasonOptional,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 2,
             ),
@@ -692,7 +710,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text(l10n.common_cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -702,7 +720,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
                   amount > reservation.totalPrice) {
                 ScaffoldMessenger.of(dialogContext).showSnackBar(
                   SnackBar(
-                    content: Text('Montant invalide'),
+                    content: Text(l10n.admin_invalidAmount),
                     backgroundColor: AppTheme.error,
                   ),
                 );
@@ -718,7 +736,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
               ));
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.warning),
-            child: const Text('Rembourser'),
+            child: Text(l10n.admin_refund),
           ),
         ],
       ),

@@ -10,6 +10,7 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_illustration.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/vehicule_bloc.dart';
 
 class VehiclesListPage extends StatelessWidget {
@@ -114,7 +115,7 @@ class VehiclesListView extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Text(
-            'Mes véhicules',
+            AppLocalizations.of(context)!.vehicle_myVehicles,
             style: AppTheme.headlineMedium,
           ),
           const Spacer(),
@@ -153,12 +154,12 @@ class VehiclesListView extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return EmptyStateWidget(
       illustrationType: IllustrationType.emptyVehicles,
-      title: 'Aucun véhicule enregistré',
-      subtitle:
-          'Ajoutez votre premier véhicule pour\ncommencer à utiliser le service',
-      buttonText: 'Ajouter un véhicule',
+      title: l10n.vehicle_empty,
+      subtitle: l10n.vehicle_emptySubtitle,
+      buttonText: l10n.vehicle_add,
       onButtonPressed: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
     );
   }
@@ -205,7 +206,7 @@ class VehiclesListView extends StatelessWidget {
                               BorderRadius.circular(AppTheme.radiusFull),
                         ),
                         child: Text(
-                          'Par défaut',
+                          AppLocalizations.of(context)!.common_default,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -348,6 +349,7 @@ class VehiclesListView extends StatelessWidget {
   }
 
   void _showPhotoOptions(BuildContext context, Vehicle vehicle) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surface,
@@ -371,12 +373,12 @@ class VehiclesListView extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Photo du véhicule',
+                  l10n.vehicle_photoTitle,
                   style: AppTheme.headlineSmall,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Cette photo sera visible par le déneigeur',
+                  l10n.vehicle_photoDescription,
                   style: AppTheme.bodySmall
                       .copyWith(color: AppTheme.textSecondary),
                 ),
@@ -392,9 +394,9 @@ class VehiclesListView extends StatelessWidget {
                     child: const Icon(Icons.camera_alt_rounded,
                         color: AppTheme.primary),
                   ),
-                  title: const Text('Prendre une photo'),
+                  title: Text(l10n.vehicle_takePhoto),
                   subtitle: Text(
-                    'Utiliser l\'appareil photo',
+                    l10n.vehicle_takePhotoSubtitle,
                     style: AppTheme.bodySmall
                         .copyWith(color: AppTheme.textSecondary),
                   ),
@@ -414,9 +416,9 @@ class VehiclesListView extends StatelessWidget {
                     child: const Icon(Icons.photo_library_rounded,
                         color: AppTheme.info),
                   ),
-                  title: const Text('Choisir une photo'),
+                  title: Text(l10n.vehicle_choosePhoto),
                   subtitle: Text(
-                    'Depuis la galerie',
+                    l10n.vehicle_choosePhotoSubtitle,
                     style: AppTheme.bodySmall
                         .copyWith(color: AppTheme.textSecondary),
                   ),
@@ -486,7 +488,7 @@ class VehiclesListView extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Text(
-              'Ajouter un véhicule',
+              AppLocalizations.of(context)!.vehicle_add,
               style: AppTheme.labelLarge.copyWith(
                 color: AppTheme.primary,
                 fontWeight: FontWeight.w600,
@@ -499,19 +501,20 @@ class VehiclesListView extends StatelessWidget {
   }
 
   void _showDeleteConfirmation(BuildContext context, String vehicleId) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         ),
-        title: const Text('Supprimer le véhicule'),
-        content: const Text('Êtes-vous sûr de vouloir supprimer ce véhicule ?'),
+        title: Text(l10n.vehicle_deleteTitle),
+        content: Text(l10n.vehicle_deleteConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Annuler',
+              l10n.common_cancel,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
           ),
@@ -520,8 +523,8 @@ class VehiclesListView extends StatelessWidget {
               context.read<VehicleBloc>().add(DeleteVehicle(vehicleId));
               Navigator.pop(dialogContext);
             },
-            child: const Text(
-              'Supprimer',
+            child: Text(
+              l10n.common_delete,
               style: TextStyle(color: AppTheme.error),
             ),
           ),

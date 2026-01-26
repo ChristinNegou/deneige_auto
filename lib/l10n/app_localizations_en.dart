@@ -2136,4 +2136,328 @@ class AppLocalizationsEn extends AppLocalizations {
   String admin_newRequestsToday(int count) {
     return '$count new request(s) today';
   }
+
+  @override
+  String get common_add => 'Add';
+
+  @override
+  String get common_description => 'Description';
+
+  @override
+  String get dispute_imageLoadError => 'Unable to load image';
+
+  @override
+  String get dispute_addPhoto => 'Add a photo';
+
+  @override
+  String get dispute_chooseFromGallery => 'Choose from gallery';
+
+  @override
+  String get dispute_claimedAmountOptional => 'Claimed amount (optional)';
+
+  @override
+  String get dispute_photosEvidence => 'Photos (evidence)';
+
+  @override
+  String dispute_workerNameLabel(String name) {
+    return 'Snow worker: $name';
+  }
+
+  @override
+  String get dispute_describeInDetail => 'Describe the problem in detail...';
+
+  @override
+  String get dispute_descriptionTooShort =>
+      'Description too short (minimum 20 characters)';
+
+  @override
+  String get dispute_invalidAmount => 'Invalid amount';
+
+  @override
+  String get dispute_submit => 'Submit dispute';
+
+  @override
+  String get dispute_submitSuccess =>
+      'Your dispute has been submitted successfully. Our team will review it and keep you updated.';
+
+  @override
+  String get dispute_workerResponseDeadline =>
+      'The snow worker has 48h to respond to your complaint.';
+
+  @override
+  String get dispute_addPhotos => 'Add photos';
+
+  @override
+  String get dispute_addAnotherPhoto => 'Add another photo';
+
+  @override
+  String get dispute_maxPhotosHint =>
+      'Maximum 5 photos. Photos help process your request faster.';
+
+  @override
+  String get worker_myPayments => 'My payments';
+
+  @override
+  String get worker_configureBankAccount => 'Configure my bank account';
+
+  @override
+  String get worker_saltSpreaderLabel => 'Salt spreader';
+
+  @override
+  String get worker_snowBlowerLabel => 'Snow blower';
+
+  @override
+  String get worker_vehicleCar => 'Car';
+
+  @override
+  String get worker_vehicleTruck => 'Pickup truck';
+
+  @override
+  String get worker_vehicleAtv => 'ATV / Quad';
+
+  @override
+  String get worker_vehicleOther => 'Other';
+
+  @override
+  String get worker_vehicleCarDesc => 'Small driveways, parking lots';
+
+  @override
+  String get worker_vehicleTruckDesc => 'Large driveways, heavy equipment';
+
+  @override
+  String get worker_vehicleAtvDesc => 'Difficult access, varied terrain';
+
+  @override
+  String get worker_recommendedJobs => 'Recommended: 2-3 jobs';
+
+  @override
+  String get worker_notifNewJobsDesc => 'Alert for new available jobs';
+
+  @override
+  String get worker_notifUrgentJobsDesc => 'Priority alerts';
+
+  @override
+  String get worker_addZone => 'Add a zone';
+
+  @override
+  String get worker_zoneName => 'Zone name';
+
+  @override
+  String get worker_zoneHint => 'E.g.: West side';
+
+  @override
+  String get worker_account => 'Account';
+
+  @override
+  String get worker_logoutConfirmWorker =>
+      'Are you sure you want to log out of your snow worker account?';
+
+  @override
+  String get worker_priorityNotifications => 'Priority notifications';
+
+  @override
+  String get worker_history => 'History';
+
+  @override
+  String get worker_yourCompletedJobs => 'Your completed jobs';
+
+  @override
+  String get worker_filterAll => 'All';
+
+  @override
+  String get worker_filterThisWeek => 'This week';
+
+  @override
+  String get worker_filterThisMonth => 'This month';
+
+  @override
+  String get worker_filterWithTip => 'With tip';
+
+  @override
+  String get worker_noHistory => 'No jobs in history';
+
+  @override
+  String get worker_completedJobsAppearHere =>
+      'Your completed jobs will appear here';
+
+  @override
+  String get worker_dateUnknown => 'Unknown date';
+
+  @override
+  String get worker_completedStatus => 'Completed';
+
+  @override
+  String get worker_revenueLabel => 'Revenue';
+
+  @override
+  String get worker_clientRating => 'Client rating:';
+
+  @override
+  String get worker_returnToDashboard => 'Return to dashboard';
+
+  @override
+  String get worker_photoSelectionError => 'Error selecting photo';
+
+  @override
+  String get worker_notifications => 'Notifications';
+
+  @override
+  String get worker_tipsReceived => 'Tips received';
+
+  @override
+  String get admin_userManagement => 'User management';
+
+  @override
+  String get admin_searchUser => 'Search for a user...';
+
+  @override
+  String get admin_clientsLabel => 'Clients';
+
+  @override
+  String get admin_adminsLabel => 'Admins';
+
+  @override
+  String get admin_suspended => 'Suspended';
+
+  @override
+  String get admin_jobsCompleted => 'Jobs completed';
+
+  @override
+  String get admin_averageRating => 'Average rating';
+
+  @override
+  String get admin_totalEarnings => 'Total earnings';
+
+  @override
+  String get admin_warnings => 'Warnings';
+
+  @override
+  String get admin_clientStats => 'Client Statistics';
+
+  @override
+  String get admin_registeredAt => 'Registered on';
+
+  @override
+  String get admin_accountSuspended => 'Account suspended';
+
+  @override
+  String get admin_suspendUser => 'Suspend user';
+
+  @override
+  String get admin_liftSuspension => 'Lift suspension';
+
+  @override
+  String admin_aboutToSuspend(String name) {
+    return 'You are about to suspend $name';
+  }
+
+  @override
+  String get admin_1day => '1 day';
+
+  @override
+  String get admin_3days => '3 days';
+
+  @override
+  String get admin_7days => '7 days';
+
+  @override
+  String get admin_14days => '14 days';
+
+  @override
+  String get admin_30days => '30 days';
+
+  @override
+  String get admin_1year => '1 year';
+
+  @override
+  String get admin_suspend => 'Suspend';
+
+  @override
+  String admin_reason(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String admin_suspendedUntil(String date) {
+    return 'Until: $date';
+  }
+
+  @override
+  String get payment_title => 'Payment';
+
+  @override
+  String get payment_amountToPay => 'Amount to pay';
+
+  @override
+  String get payment_useNewCard => 'Use a new card';
+
+  @override
+  String payment_expires(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String get payment_securePayment => 'Secure payment';
+
+  @override
+  String get payment_securePaymentDetails =>
+      'SSL 256-bit · PCI DSS · Powered by Stripe';
+
+  @override
+  String payment_payAmount(String amount) {
+    return 'Pay $amount \$';
+  }
+
+  @override
+  String get payment_success => 'Payment successful!';
+
+  @override
+  String get payment_cancelled => 'Payment cancelled';
+
+  @override
+  String get payment_failedRetry =>
+      'Payment failed. Check your card and try again.';
+
+  @override
+  String get payment_payments => 'Payments';
+
+  @override
+  String get payment_historyTab => 'History';
+
+  @override
+  String get payment_methodsTab => 'Methods';
+
+  @override
+  String get payment_totalSpent => 'Total spent';
+
+  @override
+  String get payment_transactions => 'transactions';
+
+  @override
+  String get payment_noPayments => 'No payments';
+
+  @override
+  String get payment_transactionsAppearHere =>
+      'Your transactions will appear here';
+
+  @override
+  String get payment_noCardsRegistered => 'No cards registered';
+
+  @override
+  String get payment_addCardToFacilitate =>
+      'Add a card to facilitate your payments';
+
+  @override
+  String get payment_setDefault => 'Set as default';
+
+  @override
+  String get payment_deleteCardTitle => 'Delete card';
+
+  @override
+  String payment_deleteCardConfirm(String number) {
+    return 'Are you sure you want to delete card $number?';
+  }
+
+  @override
+  String get payment_addCard => 'Add a card';
 }

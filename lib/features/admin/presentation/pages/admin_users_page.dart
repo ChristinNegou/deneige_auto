@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/admin_user.dart';
 import '../bloc/admin_bloc.dart';
 import '../bloc/admin_event.dart';
@@ -31,9 +32,10 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion des utilisateurs'),
+        title: Text(l10n.admin_userManagement),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -81,6 +83,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   }
 
   Widget _buildFilters(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -98,7 +101,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Rechercher un utilisateur...',
+              hintText: l10n.admin_searchUser,
               prefixIcon: const Icon(Icons.search),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -128,13 +131,13 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip(context, 'Tous', null),
+                _buildFilterChip(context, l10n.admin_all, null),
                 const SizedBox(width: 8),
-                _buildFilterChip(context, 'Clients', 'client'),
+                _buildFilterChip(context, l10n.admin_clientsLabel, 'client'),
                 const SizedBox(width: 8),
-                _buildFilterChip(context, 'Déneigeurs', 'snowWorker'),
+                _buildFilterChip(context, l10n.admin_workers, 'snowWorker'),
                 const SizedBox(width: 8),
-                _buildFilterChip(context, 'Admins', 'admin'),
+                _buildFilterChip(context, l10n.admin_adminsLabel, 'admin'),
               ],
             ),
           ),
@@ -163,6 +166,8 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   }
 
   Widget _buildUsersList(BuildContext context, AdminState state) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (state.usersStatus == AdminStatus.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -174,11 +179,11 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
           children: [
             Icon(Icons.error_outline, size: 64, color: AppTheme.error),
             const SizedBox(height: 16),
-            Text(state.errorMessage ?? 'Une erreur est survenue'),
+            Text(state.errorMessage ?? l10n.common_errorOccurred),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.read<AdminBloc>().add(LoadUsers()),
-              child: const Text('Réessayer'),
+              child: Text(l10n.common_retry),
             ),
           ],
         ),
@@ -186,13 +191,14 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     }
 
     if (state.users.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.people_outline, size: 64, color: AppTheme.textTertiary),
-            SizedBox(height: 16),
-            Text('Aucun utilisateur trouvé'),
+            const Icon(Icons.people_outline,
+                size: 64, color: AppTheme.textTertiary),
+            const SizedBox(height: 16),
+            Text(l10n.admin_noUsers),
           ],
         ),
       );
@@ -226,6 +232,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   }
 
   Widget _buildUserCard(BuildContext context, AdminUser user) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -267,7 +274,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                             ),
                           ),
                         ),
-                        _buildRoleBadge(user.role),
+                        _buildRoleBadge(context, user.role),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -296,7 +303,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                                     size: 14, color: AppTheme.error),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Suspendu',
+                                  l10n.admin_suspended,
                                   style: TextStyle(
                                     color: AppTheme.error,
                                     fontSize: 12,
@@ -345,18 +352,19 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
     );
   }
 
-  Widget _buildRoleBadge(String role) {
+  Widget _buildRoleBadge(BuildContext context, String role) {
+    final l10n = AppLocalizations.of(context)!;
     final color = _getRoleColor(role);
     String label;
     switch (role) {
       case 'admin':
-        label = 'Admin';
+        label = l10n.admin_adminsLabel;
         break;
       case 'snowWorker':
-        label = 'Déneigeur';
+        label = l10n.admin_workerLabel;
         break;
       default:
-        label = 'Client';
+        label = l10n.admin_client;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -387,6 +395,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   }
 
   Widget _buildPagination(BuildContext context, AdminState state) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -407,7 +416,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                 : null,
           ),
           Text(
-            'Page ${state.usersPage} / ${state.usersTotalPages}',
+            l10n.admin_pageOf(state.usersPage, state.usersTotalPages),
             style: const TextStyle(fontWeight: FontWeight.w500),
           ),
           IconButton(
@@ -430,6 +439,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   }
 
   void _showUserDetails(BuildContext context, AdminUser user) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -490,19 +500,20 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          _buildRoleBadge(user.role),
+                          _buildRoleBadge(context, user.role),
                         ],
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                _buildDetailRow(Icons.email, 'Email', user.email),
+                _buildDetailRow(Icons.email, l10n.common_email, user.email),
                 if (user.phoneNumber != null)
-                  _buildDetailRow(Icons.phone, 'Téléphone', user.phoneNumber!),
+                  _buildDetailRow(
+                      Icons.phone, l10n.common_phone, user.phoneNumber!),
                 _buildDetailRow(
                   Icons.calendar_today,
-                  'Inscrit le',
+                  l10n.admin_registeredAt,
                   _formatDate(user.createdAt),
                 ),
                 if (user.isSuspended) ...[
@@ -523,7 +534,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                             Icon(Icons.block, color: AppTheme.error),
                             const SizedBox(width: 8),
                             Text(
-                              'Compte suspendu',
+                              l10n.admin_accountSuspended,
                               style: TextStyle(
                                 color: AppTheme.error,
                                 fontWeight: FontWeight.bold,
@@ -533,12 +544,12 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                         ),
                         if (user.suspensionReason != null) ...[
                           const SizedBox(height: 8),
-                          Text('Raison: ${user.suspensionReason}'),
+                          Text(l10n.admin_reason(user.suspensionReason!)),
                         ],
                         if (user.suspendedUntil != null) ...[
                           const SizedBox(height: 4),
-                          Text(
-                              'Jusqu\'au: ${_formatDate(user.suspendedUntil!)}'),
+                          Text(l10n.admin_suspendedUntil(
+                              _formatDate(user.suspendedUntil!))),
                         ],
                       ],
                     ),
@@ -547,9 +558,9 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                 if (user.role == 'snowWorker' &&
                     user.workerProfile != null) ...[
                   const Divider(height: 32),
-                  const Text(
-                    'Statistiques Déneigeur',
-                    style: TextStyle(
+                  Text(
+                    l10n.admin_workerStats,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -559,7 +570,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                     children: [
                       Expanded(
                         child: _buildStatBox(
-                          'Jobs terminés',
+                          l10n.admin_jobsCompleted,
                           user.workerProfile!.totalJobsCompleted.toString(),
                           Icons.check_circle,
                           AppTheme.success,
@@ -568,7 +579,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatBox(
-                          'Note moyenne',
+                          l10n.admin_averageRating,
                           user.workerProfile!.averageRating.toStringAsFixed(1),
                           Icons.star,
                           AppTheme.warning,
@@ -581,7 +592,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                     children: [
                       Expanded(
                         child: _buildStatBox(
-                          'Gains totaux',
+                          l10n.admin_totalEarnings,
                           '${user.workerProfile!.totalEarnings.toStringAsFixed(0)} \$',
                           Icons.attach_money,
                           AppTheme.info,
@@ -590,7 +601,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatBox(
-                          'Avertissements',
+                          l10n.admin_warnings,
                           user.workerProfile!.warningCount.toString(),
                           Icons.warning,
                           AppTheme.warning,
@@ -601,9 +612,9 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                 ],
                 if (user.role == 'client') ...[
                   const Divider(height: 32),
-                  const Text(
-                    'Statistiques Client',
-                    style: TextStyle(
+                  Text(
+                    l10n.admin_clientStats,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -613,7 +624,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                     children: [
                       Expanded(
                         child: _buildStatBox(
-                          'Réservations',
+                          l10n.admin_reservations,
                           user.reservationsCount.toString(),
                           Icons.calendar_today,
                           AppTheme.primary2,
@@ -622,7 +633,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatBox(
-                          'Total dépensé',
+                          l10n.admin_totalSpent,
                           '${user.totalSpent.toStringAsFixed(0)} \$',
                           Icons.attach_money,
                           AppTheme.info,
@@ -704,6 +715,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   }
 
   void _showUserActions(BuildContext context, AdminUser user) {
+    final l10n = AppLocalizations.of(context)!;
     final adminBloc = context.read<AdminBloc>();
 
     showModalBottomSheet(
@@ -736,7 +748,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             if (!user.isSuspended)
               ListTile(
                 leading: Icon(Icons.block, color: AppTheme.error),
-                title: const Text('Suspendre l\'utilisateur'),
+                title: Text(l10n.admin_suspendUser),
                 onTap: () {
                   Navigator.pop(sheetContext);
                   _showSuspendDialog(context, user);
@@ -745,7 +757,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
             else
               ListTile(
                 leading: Icon(Icons.check_circle, color: AppTheme.success),
-                title: const Text('Lever la suspension'),
+                title: Text(l10n.admin_liftSuspension),
                 onTap: () {
                   Navigator.pop(sheetContext);
                   adminBloc.add(UnsuspendUser(user.id));
@@ -753,7 +765,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
               ),
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text('Voir les détails'),
+              title: Text(l10n.admin_viewDetails),
               onTap: () {
                 Navigator.pop(sheetContext);
                 _showUserDetails(context, user);
@@ -767,6 +779,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
   }
 
   void _showSuspendDialog(BuildContext context, AdminUser user) {
+    final l10n = AppLocalizations.of(context)!;
     final reasonController = TextEditingController();
     int selectedDays = 7;
     final adminBloc = context.read<AdminBloc>();
@@ -775,34 +788,34 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setState) => AlertDialog(
-          title: const Text('Suspendre l\'utilisateur'),
+          title: Text(l10n.admin_suspendUser),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Vous allez suspendre ${user.fullName}'),
+              Text(l10n.admin_aboutToSuspend(user.fullName)),
               const SizedBox(height: 16),
               TextField(
                 controller: reasonController,
-                decoration: const InputDecoration(
-                  labelText: 'Raison (optionnel)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.admin_reasonOptional,
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 2,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<int>(
                 initialValue: selectedDays,
-                decoration: const InputDecoration(
-                  labelText: 'Durée',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.admin_duration,
+                  border: const OutlineInputBorder(),
                 ),
-                items: const [
-                  DropdownMenuItem(value: 1, child: Text('1 jour')),
-                  DropdownMenuItem(value: 3, child: Text('3 jours')),
-                  DropdownMenuItem(value: 7, child: Text('7 jours')),
-                  DropdownMenuItem(value: 14, child: Text('14 jours')),
-                  DropdownMenuItem(value: 30, child: Text('30 jours')),
-                  DropdownMenuItem(value: 365, child: Text('1 an')),
+                items: [
+                  DropdownMenuItem(value: 1, child: Text(l10n.admin_1day)),
+                  DropdownMenuItem(value: 3, child: Text(l10n.admin_3days)),
+                  DropdownMenuItem(value: 7, child: Text(l10n.admin_7days)),
+                  DropdownMenuItem(value: 14, child: Text(l10n.admin_14days)),
+                  DropdownMenuItem(value: 30, child: Text(l10n.admin_30days)),
+                  DropdownMenuItem(value: 365, child: Text(l10n.admin_1year)),
                 ],
                 onChanged: (value) => setState(() => selectedDays = value!),
               ),
@@ -811,7 +824,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Annuler'),
+              child: Text(l10n.common_cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -825,7 +838,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
                 ));
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
-              child: const Text('Suspendre'),
+              child: Text(l10n.admin_suspend),
             ),
           ],
         ),

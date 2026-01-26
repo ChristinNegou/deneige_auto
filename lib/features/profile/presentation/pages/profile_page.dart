@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -59,6 +60,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context, dynamic user) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: Row(
@@ -82,7 +84,7 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Text(
-            'Mon profil',
+            l10n.profile_title,
             style: AppTheme.headlineMedium,
           ),
           const Spacer(),
@@ -108,10 +110,11 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildProfileCard(BuildContext context, dynamic user) {
-    final firstName = user?.firstName ?? 'Utilisateur';
+    final l10n = AppLocalizations.of(context)!;
+    final firstName = user?.firstName ?? l10n.profile_defaultName;
     final lastName = user?.lastName ?? '';
     final email = user?.email ?? 'email@example.com';
-    final phone = user?.phoneNumber ?? 'Non renseigné';
+    final phone = user?.phoneNumber ?? l10n.common_notSpecified;
     final photoUrl = user?.photoUrl;
 
     return Container(
@@ -174,9 +177,9 @@ class ProfilePage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // Info items
-          _buildInfoRow(Icons.email_outlined, 'Email', email),
+          _buildInfoRow(Icons.email_outlined, l10n.common_email, email),
           const Divider(height: 24, color: AppTheme.divider),
-          _buildInfoRow(Icons.phone_outlined, 'Téléphone', phone),
+          _buildInfoRow(Icons.phone_outlined, l10n.common_phone, phone),
         ],
       ),
     );
@@ -217,6 +220,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildMenuSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.surface,
@@ -229,8 +233,8 @@ class ProfilePage extends StatelessWidget {
             context,
             icon: Icons.directions_car_outlined,
             iconColor: AppTheme.primary,
-            title: 'Mes véhicules',
-            subtitle: 'Gérer mes véhicules',
+            title: l10n.profile_myVehicles,
+            subtitle: l10n.profile_manageVehicles,
             onTap: () => Navigator.pushNamed(context, AppRoutes.vehicles),
           ),
           const Divider(height: 1, indent: 56, color: AppTheme.divider),
@@ -238,8 +242,8 @@ class ProfilePage extends StatelessWidget {
             context,
             icon: Icons.payment_outlined,
             iconColor: AppTheme.success,
-            title: 'Paiements',
-            subtitle: 'Historique et méthodes',
+            title: l10n.profile_payments,
+            subtitle: l10n.profile_paymentHistory,
             onTap: () => Navigator.pushNamed(context, AppRoutes.payments),
           ),
           const Divider(height: 1, indent: 56, color: AppTheme.divider),
@@ -247,8 +251,8 @@ class ProfilePage extends StatelessWidget {
             context,
             icon: Icons.gavel_outlined,
             iconColor: AppTheme.error,
-            title: 'Mes litiges',
-            subtitle: 'Signalements et réclamations',
+            title: l10n.profile_myDisputes,
+            subtitle: l10n.profile_disputesSubtitle,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const MyDisputesPage()),
@@ -259,8 +263,8 @@ class ProfilePage extends StatelessWidget {
             context,
             icon: Icons.notifications_outlined,
             iconColor: AppTheme.warning,
-            title: 'Notifications',
-            subtitle: 'Paramètres de notification',
+            title: l10n.profile_notifications,
+            subtitle: l10n.notifications_settings,
             onTap: () => Navigator.pushNamed(context, AppRoutes.notifications),
           ),
           const Divider(height: 1, indent: 56, color: AppTheme.divider),
@@ -268,8 +272,8 @@ class ProfilePage extends StatelessWidget {
             context,
             icon: Icons.settings_outlined,
             iconColor: AppTheme.textSecondary,
-            title: 'Paramètres',
-            subtitle: 'Préférences de l\'app',
+            title: l10n.profile_settings,
+            subtitle: l10n.profile_settingsSubtitle,
             onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
           ),
           const Divider(height: 1, indent: 56, color: AppTheme.divider),
@@ -277,8 +281,8 @@ class ProfilePage extends StatelessWidget {
             context,
             icon: Icons.help_outline_rounded,
             iconColor: AppTheme.info,
-            title: 'Aide et support',
-            subtitle: 'FAQ et contact',
+            title: l10n.profile_helpSupport,
+            subtitle: l10n.profile_helpSubtitle,
             onTap: () => Navigator.pushNamed(context, AppRoutes.helpSupport),
           ),
         ],
@@ -339,6 +343,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildLogoutButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => _showLogoutDialog(context),
       child: Container(
@@ -358,7 +363,7 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Déconnexion',
+              l10n.common_logout,
               style: AppTheme.labelLarge.copyWith(
                 color: AppTheme.error,
                 fontWeight: FontWeight.w600,
@@ -371,6 +376,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -389,17 +395,17 @@ class ProfilePage extends StatelessWidget {
                   Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
             ),
             const SizedBox(width: 12),
-            const Text('Déconnexion'),
+            Text(l10n.common_logout),
           ],
         ),
-        content: const Text(
-          'Voulez-vous vraiment vous déconnecter de votre compte ?',
+        content: Text(
+          l10n.common_logoutConfirmAccount,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Annuler',
+              l10n.common_cancel,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
           ),
@@ -422,7 +428,7 @@ class ProfilePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
             ),
-            child: const Text('Déconnexion'),
+            child: Text(l10n.common_logout),
           ),
         ],
       ),

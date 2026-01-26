@@ -10,6 +10,7 @@ import '../bloc/worker_availability_bloc.dart';
 import '../../domain/entities/worker_profile.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/bloc/auth_event.dart' show LogoutRequested;
@@ -237,6 +238,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildContent() {
+    final l10n = AppLocalizations.of(context)!;
+
     // Show loading only for initial load
     if (_isLoading) {
       return const Center(
@@ -266,7 +269,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 });
                 _loadProfile();
               },
-              child: const Text('Réessayer'),
+              child: Text(l10n.common_retry),
             ),
           ],
         ),
@@ -280,17 +283,17 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         _buildProfileHeader(),
         const SizedBox(height: 16),
         _buildSection(
-          title: 'Equipement',
+          title: l10n.worker_myEquipment,
           child: _buildEquipmentGrid(),
         ),
         const SizedBox(height: 12),
         _buildSection(
-          title: 'Preferences',
+          title: l10n.worker_workPreferences,
           child: _buildPreferencesContent(),
         ),
         const SizedBox(height: 12),
         _buildSection(
-          title: 'Notifications',
+          title: l10n.worker_notifications,
           child: _buildNotificationsContent(),
         ),
         const SizedBox(height: 12),
@@ -301,9 +304,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildProfileHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
-        String userName = 'Deneigeur';
+        String userName = l10n.worker_badge;
         String userEmail = '';
         String userPhone = '';
 
@@ -423,7 +427,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  'Deneigeur',
+                  l10n.worker_badge,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -480,6 +484,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildEquipmentGrid() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
       child: Wrap(
@@ -487,31 +492,35 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         runSpacing: 8,
         children: [
           _EquipmentChip(
-              label: 'Pelle', notifier: _hasShovel, onChanged: _autoSave),
+              label: l10n.worker_equipShovel,
+              notifier: _hasShovel,
+              onChanged: _autoSave),
           _EquipmentChip(
-              label: 'Balai', notifier: _hasBrush, onChanged: _autoSave),
+              label: l10n.worker_equipBroom,
+              notifier: _hasBrush,
+              onChanged: _autoSave),
           _EquipmentChip(
-              label: 'Grattoir',
+              label: l10n.worker_equipScraper,
               notifier: _hasIceScraper,
               onChanged: _autoSave),
           _EquipmentChip(
-              label: 'Sel/Epandeur',
+              label: l10n.worker_equipSaltSpreader,
               notifier: _hasSaltSpreader,
               onChanged: _autoSave),
           _EquipmentChip(
-              label: 'Souffleuse',
+              label: l10n.worker_equipSnowBlower,
               notifier: _hasSnowBlower,
               onChanged: _autoSave),
           _EquipmentChip(
-              label: 'Balai toit',
+              label: l10n.worker_equipRoofBroom,
               notifier: _hasRoofBroom,
               onChanged: _autoSave),
           _EquipmentChip(
-              label: 'Chiffon',
+              label: l10n.worker_equipCloth,
               notifier: _hasMicrofiberCloth,
               onChanged: _autoSave),
           _EquipmentChip(
-              label: 'Deglacant',
+              label: l10n.worker_equipDeicer,
               notifier: _hasDeicerSpray,
               onChanged: _autoSave),
         ],
@@ -520,6 +529,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildPreferencesContent() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
       child: Row(
@@ -529,14 +539,14 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Jobs simultanes max',
+                  l10n.worker_maxSimultaneousJobs,
                   style: TextStyle(
                     fontSize: 14,
                     color: AppTheme.textPrimary,
                   ),
                 ),
                 Text(
-                  'Nombre de jobs actifs en meme temps',
+                  l10n.worker_maxSimultaneousJobsDesc,
                   style: TextStyle(
                     fontSize: 11,
                     color: AppTheme.textTertiary,
@@ -555,22 +565,23 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildNotificationsContent() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         _NotificationToggle(
-          label: 'Nouveaux jobs',
+          label: l10n.worker_notifNewJobs,
           notifier: _notifyNewJobs,
           onChanged: _autoSave,
         ),
         Divider(height: 1, color: AppTheme.border, indent: 14, endIndent: 14),
         _NotificationToggle(
-          label: 'Jobs urgents',
+          label: l10n.worker_notifUrgentJobs,
           notifier: _notifyUrgentJobs,
           onChanged: _autoSave,
         ),
         Divider(height: 1, color: AppTheme.border, indent: 14, endIndent: 14),
         _NotificationToggle(
-          label: 'Pourboires recus',
+          label: l10n.worker_tipsReceived,
           notifier: _notifyTips,
           onChanged: _autoSave,
         ),
@@ -580,6 +591,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildActionsList() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.surface,
@@ -590,14 +602,14 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         children: [
           _buildActionItem(
             icon: Icons.help_outline,
-            label: 'Aide et support',
+            label: l10n.worker_helpSupport,
             onTap: () =>
                 Navigator.pushNamed(context, AppRoutes.workerHelpSupport),
           ),
           Divider(height: 1, color: AppTheme.border, indent: 50),
           _buildActionItem(
             icon: Icons.logout,
-            label: 'Se deconnecter',
+            label: l10n.common_logout,
             isDestructive: true,
             onTap: () => _showLogoutDialog(context),
           ),
@@ -644,6 +656,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   void _showPhotoOptions() {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surface,
@@ -666,7 +679,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Prendre une photo'),
+              title: Text(l10n.vehicle_takePhoto),
               onTap: () {
                 Navigator.pop(context);
                 _pickPhoto(ImageSource.camera);
@@ -674,7 +687,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choisir une photo'),
+              title: Text(l10n.vehicle_choosePhoto),
               onTap: () {
                 Navigator.pop(context);
                 _pickPhoto(ImageSource.gallery);
@@ -702,9 +715,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Erreur lors de la selection de la photo'),
+            content: Text(l10n.worker_photoSelectionError),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -713,21 +727,22 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        title: const Text('Deconnexion'),
-        content: const Text(
-          'Voulez-vous vraiment vous deconnecter ?',
+        title: Text(l10n.common_logout),
+        content: Text(
+          l10n.common_logoutConfirm,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Annuler',
+              l10n.common_cancel,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
           ),
@@ -742,7 +757,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               );
             },
             child: Text(
-              'Deconnexion',
+              l10n.common_logout,
               style: TextStyle(color: AppTheme.error),
             ),
           ),

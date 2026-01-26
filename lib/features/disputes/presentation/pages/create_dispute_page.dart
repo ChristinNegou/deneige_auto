@@ -6,6 +6,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Écran de création d'un litige général
 class CreateDisputePage extends StatefulWidget {
@@ -69,9 +70,10 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Impossible de charger l\'image'),
+            content: Text(l10n.dispute_imageLoadError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -81,6 +83,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   }
 
   void _showImageSourceDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surface,
@@ -94,7 +97,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Ajouter une photo',
+                l10n.dispute_addPhoto,
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 18,
@@ -112,7 +115,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                   child: Icon(Icons.camera_alt, color: AppTheme.primary),
                 ),
                 title: Text(
-                  'Prendre une photo',
+                  l10n.vehicle_takePhoto,
                   style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 onTap: () {
@@ -130,7 +133,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                   child: Icon(Icons.photo_library, color: AppTheme.primary),
                 ),
                 title: Text(
-                  'Choisir depuis la galerie',
+                  l10n.dispute_chooseFromGallery,
                   style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 onTap: () {
@@ -148,6 +151,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   Future<void> _submitDispute() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isLoading = true);
 
     try {
@@ -186,7 +190,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
           content: Text(
             e.toString().contains('Exception:')
                 ? e.toString().replaceFirst('Exception: ', '')
-                : 'Erreur lors de la création du litige',
+                : l10n.dispute_createError,
           ),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
@@ -200,6 +204,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   }
 
   void _showSuccessDialog(Map<String, dynamic> result) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -221,7 +226,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Litige créé',
+                l10n.dispute_created,
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 18,
@@ -235,7 +240,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Votre litige a été soumis avec succès. Notre équipe va l\'examiner et vous tiendra informé de l\'avancement.',
+              l10n.dispute_submitSuccess,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 16),
@@ -251,7 +256,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Le déneigeur a 48h pour répondre à votre plainte.',
+                      l10n.dispute_workerResponseDeadline,
                       style: TextStyle(
                         color: AppTheme.info,
                         fontSize: 13,
@@ -276,7 +281,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Compris'),
+            child: Text(l10n.common_understood),
           ),
         ],
       ),
@@ -285,11 +290,12 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
-          'Signaler un problème',
+          l10n.dispute_reportProblem,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         backgroundColor: AppTheme.surface,
@@ -309,25 +315,25 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                 const SizedBox(height: 24),
 
                 // Type de litige
-                _buildSectionTitle('Type de problème'),
+                _buildSectionTitle(l10n.dispute_problemType),
                 const SizedBox(height: 12),
                 _buildTypeSelector(),
                 const SizedBox(height: 24),
 
                 // Description
-                _buildSectionTitle('Description'),
+                _buildSectionTitle(l10n.common_description),
                 const SizedBox(height: 12),
                 _buildDescriptionField(),
                 const SizedBox(height: 24),
 
                 // Montant réclamé (optionnel)
-                _buildSectionTitle('Montant réclamé (optionnel)'),
+                _buildSectionTitle(l10n.dispute_claimedAmountOptional),
                 const SizedBox(height: 12),
                 _buildAmountField(),
                 const SizedBox(height: 24),
 
                 // Photos
-                _buildSectionTitle('Photos (preuves)'),
+                _buildSectionTitle(l10n.dispute_photosEvidence),
                 const SizedBox(height: 12),
                 _buildPhotoSection(),
                 const SizedBox(height: 32),
@@ -344,6 +350,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   }
 
   Widget _buildInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -369,7 +376,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Réservation',
+                      l10n.dispute_reservation,
                       style: TextStyle(
                         color: AppTheme.textSecondary,
                         fontSize: 12,
@@ -389,7 +396,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'Montant payé',
+                    l10n.dispute_amountPaid,
                     style: TextStyle(
                       color: AppTheme.textSecondary,
                       fontSize: 12,
@@ -415,7 +422,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                 Icon(Icons.person, color: AppTheme.textSecondary, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Déneigeur: ${widget.workerName}',
+                  l10n.dispute_workerNameLabel(widget.workerName!),
                   style: TextStyle(color: AppTheme.textSecondary),
                 ),
               ],
@@ -470,13 +477,14 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   }
 
   Widget _buildDescriptionField() {
+    final l10n = AppLocalizations.of(context)!;
     return TextFormField(
       controller: _descriptionController,
       maxLines: 5,
       maxLength: 1000,
       style: TextStyle(color: AppTheme.textPrimary),
       decoration: InputDecoration(
-        hintText: 'Décrivez le problème en détail...',
+        hintText: l10n.dispute_describeInDetail,
         hintStyle: TextStyle(color: AppTheme.textTertiary),
         filled: true,
         fillColor: AppTheme.surfaceContainer,
@@ -500,10 +508,10 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Veuillez décrire le problème';
+          return l10n.dispute_describeRequired;
         }
         if (value.trim().length < 20) {
-          return 'Description trop courte (minimum 20 caractères)';
+          return l10n.dispute_descriptionTooShort;
         }
         return null;
       },
@@ -511,6 +519,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   }
 
   Widget _buildAmountField() {
+    final l10n = AppLocalizations.of(context)!;
     return TextFormField(
       controller: _amountController,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -545,13 +554,13 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
         if (value != null && value.isNotEmpty) {
           final amount = double.tryParse(value);
           if (amount == null) {
-            return 'Montant invalide';
+            return l10n.dispute_invalidAmount;
           }
           if (amount > widget.totalPrice) {
-            return 'Le montant ne peut pas dépasser le prix payé';
+            return l10n.dispute_amountExceedsPaid;
           }
           if (amount <= 0) {
-            return 'Le montant doit être positif';
+            return l10n.dispute_amountMustBePositive;
           }
         }
         return null;
@@ -560,6 +569,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   }
 
   Widget _buildPhotoSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Photo grid
@@ -636,8 +646,8 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                   const SizedBox(width: 12),
                   Text(
                     _photos.isEmpty
-                        ? 'Ajouter des photos'
-                        : 'Ajouter une autre photo',
+                        ? l10n.dispute_addPhotos
+                        : l10n.dispute_addAnotherPhoto,
                     style: TextStyle(
                       color: AppTheme.primary,
                       fontWeight: FontWeight.w600,
@@ -650,7 +660,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
 
         const SizedBox(height: 8),
         Text(
-          'Maximum 5 photos. Les photos aident à traiter votre demande plus rapidement.',
+          l10n.dispute_maxPhotosHint,
           style: TextStyle(
             color: AppTheme.textTertiary,
             fontSize: 12,
@@ -662,6 +672,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   }
 
   Widget _buildSubmitButton() {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 54,
@@ -685,9 +696,9 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                       AlwaysStoppedAnimation<Color>(AppTheme.background),
                 ),
               )
-            : const Text(
-                'Soumettre le litige',
-                style: TextStyle(
+            : Text(
+                l10n.dispute_submit,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),

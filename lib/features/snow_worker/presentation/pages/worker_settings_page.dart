@@ -7,6 +7,7 @@ import '../../domain/entities/worker_profile.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart' show LogoutRequested;
 
@@ -166,6 +167,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Row(
@@ -189,7 +191,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
           ),
           const SizedBox(width: 16),
           Text(
-            'Paramètres',
+            l10n.settings_title,
             style: AppTheme.headlineMedium,
           ),
           const Spacer(),
@@ -205,7 +207,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 Icon(Icons.ac_unit, size: 14, color: AppTheme.warning),
                 const SizedBox(width: 6),
                 Text(
-                  'Déneigeur',
+                  l10n.worker_badge,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -221,6 +223,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildPaymentSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, AppRoutes.workerPaymentSetup),
       child: Container(
@@ -261,7 +264,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Mes paiements',
+                    l10n.worker_myPayments,
                     style: TextStyle(
                       color: AppTheme.background,
                       fontSize: 16,
@@ -270,7 +273,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Configurer mon compte bancaire',
+                    l10n.worker_configureBankAccount,
                     style: TextStyle(
                       color: AppTheme.background.withValues(alpha: 0.8),
                       fontSize: 13,
@@ -291,6 +294,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildEquipmentSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -314,37 +318,37 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                     color: AppTheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
-              Text('Mon équipement', style: AppTheme.headlineSmall),
+              Text(l10n.worker_myEquipment, style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
           _buildEquipmentItem(
             icon: '🪣',
-            label: 'Pelle à neige',
+            label: l10n.worker_snowShovel,
             value: _hasShovel,
             onChanged: (val) => setState(() => _hasShovel = val!),
           ),
           _buildEquipmentItem(
             icon: '🧹',
-            label: 'Balai à neige',
+            label: l10n.worker_snowBroom,
             value: _hasBrush,
             onChanged: (val) => setState(() => _hasBrush = val!),
           ),
           _buildEquipmentItem(
             icon: '🪟',
-            label: 'Grattoir à glace',
+            label: l10n.worker_iceScraper,
             value: _hasIceScraper,
             onChanged: (val) => setState(() => _hasIceScraper = val!),
           ),
           _buildEquipmentItem(
             icon: '🧂',
-            label: 'Épandeur de sel',
+            label: l10n.worker_saltSpreaderLabel,
             value: _hasSaltSpreader,
             onChanged: (val) => setState(() => _hasSaltSpreader = val!),
           ),
           _buildEquipmentItem(
             icon: '❄️',
-            label: 'Souffleuse',
+            label: l10n.worker_snowBlowerLabel,
             value: _hasSnowBlower,
             onChanged: (val) => setState(() => _hasSnowBlower = val!),
             isLast: true,
@@ -403,6 +407,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildVehicleSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -426,7 +431,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                     color: AppTheme.secondary, size: 20),
               ),
               const SizedBox(width: 12),
-              Text('Mon véhicule', style: AppTheme.headlineSmall),
+              Text(l10n.worker_myVehicle, style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
@@ -437,6 +442,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildVehicleOption(VehicleType type) {
+    final l10n = AppLocalizations.of(context)!;
     final isSelected = _selectedVehicle == type;
     final emoji = _getVehicleEmoji(type);
 
@@ -463,7 +469,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _getVehicleLabel(type),
+                    _getVehicleLabel(l10n, type),
                     style: AppTheme.labelLarge.copyWith(
                       fontWeight: FontWeight.w600,
                       color:
@@ -472,7 +478,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _getVehicleDescription(type),
+                    _getVehicleDescription(l10n, type),
                     style: AppTheme.bodySmall,
                   ),
                 ],
@@ -499,6 +505,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildWorkPreferencesSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -522,17 +529,17 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                     color: AppTheme.success, size: 20),
               ),
               const SizedBox(width: 12),
-              Text('Préférences de travail', style: AppTheme.headlineSmall),
+              Text(l10n.worker_workPreferences, style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 20),
           Text(
-            'Jobs simultanés maximum',
+            l10n.worker_maxSimultaneousJobs,
             style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
           Text(
-            'Nombre de jobs actifs en même temps',
+            l10n.worker_maxSimultaneousJobsDesc,
             style: AppTheme.bodySmall,
           ),
           const SizedBox(height: 16),
@@ -606,7 +613,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 borderRadius: BorderRadius.circular(AppTheme.radiusFull),
               ),
               child: Text(
-                'Recommandé: 2-3 jobs',
+                l10n.worker_recommendedJobs,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -621,6 +628,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildZonesSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -648,10 +656,11 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Zones préférées', style: AppTheme.headlineSmall),
+                    Text(l10n.worker_preferredZones,
+                        style: AppTheme.headlineSmall),
                     const SizedBox(height: 2),
                     Text(
-                      'Notifications prioritaires',
+                      l10n.worker_priorityNotifications,
                       style: AppTheme.bodySmall,
                     ),
                   ],
@@ -682,7 +691,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                       Icon(Icons.add, size: 16, color: AppTheme.primary),
                       const SizedBox(width: 6),
                       Text(
-                        'Ajouter',
+                        l10n.common_add,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -745,6 +754,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildNotificationsSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -768,22 +778,22 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                     color: AppTheme.info, size: 20),
               ),
               const SizedBox(width: 12),
-              Text('Notifications', style: AppTheme.headlineSmall),
+              Text(l10n.worker_notifications, style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
           _buildNotificationToggle(
             icon: Icons.work_outline_rounded,
-            title: 'Nouveaux jobs',
-            subtitle: 'Alerte pour les nouveaux jobs disponibles',
+            title: l10n.worker_notifNewJobs,
+            subtitle: l10n.worker_notifNewJobsDesc,
             value: _notifyNewJobs,
             onChanged: (val) => setState(() => _notifyNewJobs = val),
           ),
           const Divider(height: 1, color: AppTheme.divider),
           _buildNotificationToggle(
             icon: Icons.priority_high_rounded,
-            title: 'Jobs urgents',
-            subtitle: 'Alertes prioritaires',
+            title: l10n.worker_notifUrgentJobs,
+            subtitle: l10n.worker_notifUrgentJobsDesc,
             value: _notifyUrgentJobs,
             onChanged: (val) => setState(() => _notifyUrgentJobs = val),
             iconColor: AppTheme.error,
@@ -791,8 +801,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
           const Divider(height: 1, color: AppTheme.divider),
           _buildNotificationToggle(
             icon: Icons.monetization_on_outlined,
-            title: 'Pourboires',
-            subtitle: 'Notification de réception',
+            title: l10n.worker_notifTipsReceived,
+            subtitle: l10n.worker_tipsReceived,
             value: _notifyTips,
             onChanged: (val) => setState(() => _notifyTips = val),
             iconColor: AppTheme.success,
@@ -869,6 +879,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildHelpSupportSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, AppRoutes.workerHelpSupport),
       child: Container(
@@ -899,7 +910,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Aide et support',
+                    l10n.worker_helpSupport,
                     style: TextStyle(
                       color: AppTheme.textPrimary,
                       fontSize: 16,
@@ -908,7 +919,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'FAQ et contact',
+                    l10n.profile_helpSubtitle,
                     style: TextStyle(
                       color: AppTheme.textSecondary,
                       fontSize: 13,
@@ -929,6 +940,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildSaveButton() {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: _saveSettings,
       child: Container(
@@ -955,7 +967,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
             Icon(Icons.save_rounded, color: AppTheme.background, size: 22),
             const SizedBox(width: 10),
             Text(
-              'Sauvegarder',
+              l10n.common_save,
               style: TextStyle(
                 color: AppTheme.background,
                 fontSize: 17,
@@ -981,29 +993,29 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
     }
   }
 
-  String _getVehicleLabel(VehicleType type) {
+  String _getVehicleLabel(AppLocalizations l10n, VehicleType type) {
     switch (type) {
       case VehicleType.car:
-        return 'Voiture';
+        return l10n.worker_vehicleCar;
       case VehicleType.truck:
-        return 'Camionnette';
+        return l10n.worker_vehicleTruck;
       case VehicleType.atv:
-        return 'VTT / Quad';
+        return l10n.worker_vehicleAtv;
       case VehicleType.other:
-        return 'Autre';
+        return l10n.worker_vehicleOther;
     }
   }
 
-  String _getVehicleDescription(VehicleType type) {
+  String _getVehicleDescription(AppLocalizations l10n, VehicleType type) {
     switch (type) {
       case VehicleType.car:
-        return 'Petites entrées, stationnements';
+        return l10n.worker_vehicleCarDesc;
       case VehicleType.truck:
-        return 'Grandes entrées, équipement lourd';
+        return l10n.worker_vehicleTruckDesc;
       case VehicleType.atv:
-        return 'Accès difficile, terrains variés';
+        return l10n.worker_vehicleAtvDesc;
       case VehicleType.other:
-        return 'Autre type de véhicule';
+        return l10n.worker_otherVehicleType;
     }
   }
 
@@ -1012,55 +1024,58 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        title: Row(
-          children: [
-            Icon(Icons.add_location_alt_rounded, color: AppTheme.primary),
-            const SizedBox(width: 10),
-            const Text('Ajouter une zone'),
-          ],
-        ),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: 'Nom de la zone',
-            hintText: 'Ex: Trois-Rivières Ouest',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-            ),
-            prefixIcon: const Icon(Icons.location_on_outlined),
+      builder: (dialogContext) {
+        final dialogL10n = AppLocalizations.of(dialogContext)!;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Annuler',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
+          title: Row(
+            children: [
+              Icon(Icons.add_location_alt_rounded, color: AppTheme.primary),
+              const SizedBox(width: 10),
+              Text(dialogL10n.worker_addZone),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              if (controller.text.isNotEmpty) {
-                setState(() {
-                  _zones.add(controller.text);
-                });
-              }
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              shape: RoundedRectangleBorder(
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: dialogL10n.worker_zoneName,
+              hintText: dialogL10n.worker_zoneHint,
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
+              prefixIcon: const Icon(Icons.location_on_outlined),
             ),
-            child: const Text('Ajouter'),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                dialogL10n.common_cancel,
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (controller.text.isNotEmpty) {
+                  setState(() {
+                    _zones.add(controller.text);
+                  });
+                }
+                Navigator.pop(dialogContext);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+              ),
+              child: Text(dialogL10n.common_add),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1086,6 +1101,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   }
 
   Widget _buildLogoutSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1110,7 +1126,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                     color: AppTheme.error, size: 20),
               ),
               const SizedBox(width: 12),
-              Text('Compte', style: AppTheme.headlineSmall),
+              Text(l10n.worker_account, style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
@@ -1131,7 +1147,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
                   const SizedBox(width: 10),
                   Text(
-                    'Se déconnecter',
+                    l10n.common_logout,
                     style: AppTheme.labelLarge.copyWith(
                       color: AppTheme.error,
                       fontWeight: FontWeight.w600,
@@ -1149,59 +1165,62 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+      builder: (dialogContext) {
+        final dialogL10n = AppLocalizations.of(dialogContext)!;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+          ),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+                child:
+                    Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
               ),
-              child:
-                  Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
+              const SizedBox(width: 12),
+              Text(dialogL10n.common_logout),
+            ],
+          ),
+          content: Text(
+            dialogL10n.worker_logoutConfirmWorker,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                dialogL10n.common_cancel,
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
             ),
-            const SizedBox(width: 12),
-            const Text('Déconnexion'),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                // Déclencher la déconnexion via AuthBloc
+                context.read<AuthBloc>().add(LogoutRequested());
+                // Naviguer vers la page de sélection de compte
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.accountType,
+                  (route) => false,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.error,
+                foregroundColor: AppTheme.background,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+              ),
+              child: Text(dialogL10n.common_logout),
+            ),
           ],
-        ),
-        content: const Text(
-          'Voulez-vous vraiment vous déconnecter de votre compte déneigeur ?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              'Annuler',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              // Déclencher la déconnexion via AuthBloc
-              context.read<AuthBloc>().add(LogoutRequested());
-              // Naviguer vers la page de sélection de compte
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.accountType,
-                (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.error,
-              foregroundColor: AppTheme.background,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-            ),
-            child: const Text('Déconnexion'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

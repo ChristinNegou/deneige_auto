@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/payment.dart';
 import '../../domain/entities/payment_method.dart';
 import '../bloc/payment_history_bloc.dart';
@@ -54,10 +55,11 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Paiements'),
+        title: Text(l10n.payment_payments),
         backgroundColor: AppTheme.surface,
         elevation: 0,
         actions: [
@@ -75,9 +77,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
           unselectedLabelColor: AppTheme.textSecondary,
           indicatorColor: AppTheme.primary,
           indicatorWeight: 2,
-          tabs: const [
-            Tab(text: 'Historique'),
-            Tab(text: 'Méthodes'),
+          tabs: [
+            Tab(text: l10n.payment_historyTab),
+            Tab(text: l10n.payment_methodsTab),
           ],
         ),
       ),
@@ -99,6 +101,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildSummaryCard() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<PaymentHistoryBloc, PaymentHistoryState>(
       builder: (context, state) {
         return Container(
@@ -115,7 +118,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total dépensé',
+                      l10n.payment_totalSpent,
                       style: TextStyle(
                         fontSize: 12,
                         color: AppTheme.background.withValues(alpha: 0.7),
@@ -150,7 +153,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                       ),
                     ),
                     Text(
-                      'transactions',
+                      l10n.payment_transactions,
                       style: TextStyle(
                         fontSize: 11,
                         color: AppTheme.background.withValues(alpha: 0.7),
@@ -167,6 +170,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildHistoryTab() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<PaymentHistoryBloc, PaymentHistoryState>(
       builder: (context, state) {
         if (state.isLoading && state.payments.isEmpty) {
@@ -184,8 +188,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
         if (state.filteredPayments.isEmpty) {
           return _buildEmptyState(
             Icons.receipt_long_outlined,
-            'Aucun paiement',
-            'Vos transactions apparaîtront ici',
+            l10n.payment_noPayments,
+            l10n.payment_transactionsAppearHere,
           );
         }
 
@@ -372,6 +376,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildEmptyMethodsMessage() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
       margin: const EdgeInsets.only(bottom: 16),
@@ -384,13 +389,13 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
           Icon(Icons.credit_card_off_outlined,
               size: 48, color: AppTheme.textTertiary),
           const SizedBox(height: 12),
-          const Text(
-            'Aucune carte enregistrée',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          Text(
+            l10n.payment_noCardsRegistered,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
           Text(
-            'Ajoutez une carte pour faciliter vos paiements',
+            l10n.payment_addCardToFacilitate,
             style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
             textAlign: TextAlign.center,
           ),
@@ -400,6 +405,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildMethodCard(PaymentMethod method) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -463,7 +469,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          'Par défaut',
+                          l10n.common_default,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -476,7 +482,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Expire ${method.expiryDisplay}',
+                  l10n.payment_expires(method.expiryDisplay),
                   style: TextStyle(
                     fontSize: 12,
                     color: method.isExpired
@@ -504,14 +510,14 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             },
             itemBuilder: (context) => [
               if (!method.isDefault)
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'default',
-                  child: Text('Définir par défaut'),
+                  child: Text(l10n.payment_setDefault),
                 ),
               PopupMenuItem(
                 value: 'delete',
-                child:
-                    Text('Supprimer', style: TextStyle(color: AppTheme.error)),
+                child: Text(l10n.common_delete,
+                    style: TextStyle(color: AppTheme.error)),
               ),
             ],
           ),
@@ -521,17 +527,17 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   void _showDeleteConfirmation(BuildContext context, PaymentMethod method) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('Supprimer la carte'),
-        content: Text(
-            'Voulez-vous vraiment supprimer la carte ${method.displayNumber} ?'),
+        title: Text(l10n.payment_deleteCardTitle),
+        content: Text(l10n.payment_deleteCardConfirm(method.displayNumber)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Annuler'),
+            child: Text(l10n.common_cancel),
           ),
           TextButton(
             onPressed: () {
@@ -540,7 +546,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                     DeletePaymentMethod(method.stripePaymentMethodId!),
                   );
             },
-            child: Text('Supprimer', style: TextStyle(color: AppTheme.error)),
+            child: Text(l10n.common_delete,
+                style: TextStyle(color: AppTheme.error)),
           ),
         ],
       ),
@@ -548,6 +555,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildAddCardButton() {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () async {
         final result =
@@ -569,7 +577,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             Icon(Icons.add, color: AppTheme.primary, size: 20),
             const SizedBox(width: 8),
             Text(
-              'Ajouter une carte',
+              l10n.payment_addCard,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -604,6 +612,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   }
 
   Widget _buildErrorState(String message, VoidCallback onRetry) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -614,7 +623,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
           const SizedBox(height: 16),
           TextButton(
             onPressed: onRetry,
-            child: const Text('Réessayer'),
+            child: Text(l10n.common_retry),
           ),
         ],
       ),

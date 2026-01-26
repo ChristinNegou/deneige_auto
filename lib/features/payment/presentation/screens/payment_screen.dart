@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/payment_method.dart';
 import '../bloc/payment_methods_bloc.dart';
 import '../../data/payment_service.dart';
@@ -35,13 +36,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (_) => sl<PaymentMethodsBloc>()..add(LoadPaymentMethods()),
       child: Scaffold(
         backgroundColor: AppTheme.background,
         appBar: AppBar(
           title: Text(
-            'Paiement',
+            l10n.payment_title,
             style: TextStyle(color: AppTheme.textPrimary),
           ),
           backgroundColor: AppTheme.surface,
@@ -80,7 +82,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(height: 28),
 
                   // Méthodes de paiement
-                  _buildSectionTitle('Méthode de paiement'),
+                  _buildSectionTitle(l10n.reservation_paymentMethod),
                   const SizedBox(height: 12),
 
                   if (state.methods.isNotEmpty) ...[
@@ -125,6 +127,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildAmountCard() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
@@ -135,7 +138,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       child: Column(
         children: [
           Text(
-            'Montant à payer',
+            l10n.payment_amountToPay,
             style: TextStyle(
               fontSize: 13,
               color: AppTheme.background.withValues(alpha: 0.7),
@@ -171,6 +174,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildPaymentMethodTile(PaymentMethod method) {
+    final l10n = AppLocalizations.of(context)!;
     final isSelected = !_useNewCard &&
         _selectedPaymentMethod?.stripePaymentMethodId ==
             method.stripePaymentMethodId;
@@ -255,7 +259,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'Par défaut',
+                            l10n.common_default,
                             style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w600,
@@ -268,7 +272,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Expire ${method.expMonth.toString().padLeft(2, '0')}/${method.expYear}',
+                    l10n.payment_expires(
+                        '${method.expMonth.toString().padLeft(2, '0')}/${method.expYear}'),
                     style:
                         TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                   ),
@@ -282,6 +287,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildNewCardTile() {
+    final l10n = AppLocalizations.of(context)!;
     final isSelected = _useNewCard;
 
     return GestureDetector(
@@ -337,7 +343,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
             // Texte
             Text(
-              'Utiliser une nouvelle carte',
+              l10n.payment_useNewCard,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -351,6 +357,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildSecurityInfo() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -367,7 +374,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Paiement sécurisé',
+                  l10n.payment_securePayment,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -376,7 +383,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'SSL 256-bit · PCI DSS · Propulsé par Stripe',
+                  l10n.payment_securePaymentDetails,
                   style: TextStyle(
                       fontSize: 11,
                       color: AppTheme.info.withValues(alpha: 0.8)),
@@ -390,6 +397,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildPaymentButton() {
+    final l10n = AppLocalizations.of(context)!;
     final canPay =
         (_selectedPaymentMethod != null || _useNewCard) && !_isLoading;
 
@@ -415,7 +423,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     strokeWidth: 2, color: AppTheme.background),
               )
             : Text(
-                'Payer ${widget.amount.toStringAsFixed(2)} \$',
+                l10n.payment_payAmount(
+                    '${widget.amount.toStringAsFixed(2)} \$'),
                 style:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
@@ -454,6 +463,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Future<void> _handlePayment() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isLoading = true);
 
     try {
@@ -483,7 +493,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                'Paiement réussi !',
+                l10n.payment_success,
                 style: TextStyle(color: AppTheme.textPrimary),
               ),
               backgroundColor: AppTheme.success),
@@ -493,11 +503,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'paymentIntentId': paymentData['paymentIntentId'],
         });
       } else if (mounted) {
-        _showError('Paiement annulé');
+        _showError(l10n.payment_cancelled);
       }
     } catch (e) {
       if (mounted) {
-        _showError('Le paiement a échoué. Vérifiez votre carte et réessayez.');
+        _showError(l10n.payment_failedRetry);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
