@@ -62,10 +62,10 @@ dependencies:
   intl: ^0.20.0
 
   # Firebase
-  firebase_core: ^3.8.1
-  firebase_messaging: ^15.1.6
-  firebase_crashlytics: ^4.2.1
-  firebase_analytics: ^11.4.1
+  firebase_core: ^4.4.0
+  firebase_messaging: ^16.1.1
+  firebase_crashlytics: ^5.0.7
+  firebase_analytics: ^12.1.1
   flutter_local_notifications: ^19.5.0
 
   # Payments
