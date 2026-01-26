@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:deneige_auto/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:deneige_auto/features/auth/presentation/bloc/auth_state.dart';
 import 'package:deneige_auto/features/auth/presentation/screens/login_screen.dart';
+import 'package:deneige_auto/l10n/app_localizations.dart';
 
 class MockAuthBloc extends Mock implements AuthBloc {}
 
@@ -21,6 +22,9 @@ void main() {
     when(() => mockAuthBloc.stream).thenAnswer((_) => Stream.value(state));
 
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('fr'),
       home: BlocProvider<AuthBloc>.value(
         value: mockAuthBloc,
         child: const LoginScreen(),
