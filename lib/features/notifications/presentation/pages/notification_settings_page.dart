@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/notification.dart';
 import '../../services/notification_preferences_service.dart';
 
@@ -33,11 +34,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
-          'Notifications',
+          l10n.notifications_title,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         backgroundColor: AppTheme.surface,
@@ -116,7 +118,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Notifications',
+                  AppLocalizations.of(context)!.notifications_title,
                   style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontSize: 18,
@@ -574,7 +576,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Fermer',
+              AppLocalizations.of(context)!.common_close,
               style: TextStyle(color: AppTheme.primary2),
             ),
           ),
@@ -600,7 +602,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
-              'Annuler',
+              AppLocalizations.of(context)!.common_cancel,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
           ),

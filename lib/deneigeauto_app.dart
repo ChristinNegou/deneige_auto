@@ -5,15 +5,16 @@ import 'core/constants/app_routes.dart';
 import 'core/di/injection_container.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/analytics_service.dart';
+import 'core/services/locale_service.dart';
 import 'core/widgets/suspension_dialog.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/auth/presentation/bloc/auth_state.dart';
 import 'features/auth/domain/entities/user.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'features/home/presentation/bloc/home_bloc.dart';
+import 'l10n/app_localizations.dart';
 
-/// Clé globale pour le navigator afin de pouvoir naviguer depuis n'importe où
+/// Cle globale pour le navigator afin de pouvoir naviguer depuis n'importe ou
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class DeneigeAutoApp extends StatefulWidget {
@@ -25,6 +26,24 @@ class DeneigeAutoApp extends StatefulWidget {
 
 class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
   bool _hasNavigatedToHome = false;
+  final LocaleService _localeService = sl<LocaleService>();
+
+  @override
+  void initState() {
+    super.initState();
+    _localeService.loadLocale();
+    _localeService.addListener(_onLocaleChanged);
+  }
+
+  @override
+  void dispose() {
+    _localeService.removeListener(_onLocaleChanged);
+    super.dispose();
+  }
+
+  void _onLocaleChanged() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +51,12 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
       create: (context) => sl<AuthBloc>()..add(CheckAuthStatus()),
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          // Écouter l'état de suspension pour afficher le dialog
           if (state is UserSuspended) {
             _showSuspensionDialog(state);
-          }
-          // Rediriger vers le dashboard SEULEMENT la première fois
-          else if (state is AuthAuthenticated && !_hasNavigatedToHome) {
+          } else if (state is AuthAuthenticated && !_hasNavigatedToHome) {
             _hasNavigatedToHome = true;
             _navigateToHome(state.user.role);
-          }
-          // Réinitialiser le flag si l'utilisateur se déconnecte
-          else if (state is AuthUnauthenticated) {
+          } else if (state is AuthUnauthenticated) {
             _hasNavigatedToHome = false;
           }
         },
@@ -52,32 +66,19 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
           theme: AppTheme.lightTheme,
           initialRoute: AppRoutes.onboarding,
           debugShowCheckedModeBanner: false,
-
-          // Analytics observer pour tracker les navigations automatiquement
           navigatorObservers: [
             AnalyticsService.instance.observer,
           ],
-
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('fr', 'FR'),
-            Locale('en', 'US'),
-          ],
-          locale: const Locale('fr', 'FR'),
-
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: _localeService.locale,
           onGenerateRoute: AppRouter.generateRoute,
         ),
       ),
     );
   }
 
-  /// Redirige vers le home selon le rôle de l'utilisateur
   void _navigateToHome(UserRole role) {
-    // Attendre que le navigator soit prêt
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final navigator = navigatorKey.currentState;
       if (navigator != null) {
@@ -89,7 +90,6 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
     });
   }
 
-  /// Affiche le dialog de suspension et redirige vers la page de connexion
   void _showSuspensionDialog(UserSuspended state) {
     final context = navigatorKey.currentContext;
     if (context == null) return;
@@ -100,7 +100,6 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
       reason: state.reason,
       suspendedUntilDisplay: state.suspendedUntilDisplay,
       onDismiss: () {
-        // Rediriger vers la page de sélection de compte (déconnexion)
         navigatorKey.currentState?.pushNamedAndRemoveUntil(
           AppRoutes.accountType,
           (route) => false,
@@ -110,7 +109,7 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
   }
 }
 
-/// Widget qui gère la navigation initiale selon l'état d'authentification
+/// Widget qui gere la navigation initiale selon l'etat d'authentification
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -118,7 +117,6 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        // Navigation basée sur l'état d'authentification
         if (state is AuthAuthenticated) {
           _navigateBasedOnRole(context, state.user.role);
         } else if (state is AuthUnauthenticated) {
@@ -141,7 +139,6 @@ class AuthWrapper extends StatelessWidget {
           return _getHomeScreenForRole(state.user.role);
         }
 
-        // Par défaut, afficher l'écran de sélection de type de compte
         return const Scaffold(
           body: Center(
             child: CircularProgressIndicator(),
@@ -151,10 +148,7 @@ class AuthWrapper extends StatelessWidget {
     );
   }
 
-  /// Navigation basée sur le rôle de l'utilisateur
   void _navigateBasedOnRole(BuildContext context, UserRole role) {
-    // Tous les rôles utilisent /home qui délègue à RoleBasedHomeWrapper
-    // RoleBasedHomeWrapper affiche le bon dashboard selon le rôle
     const String route = AppRoutes.home;
 
     Navigator.of(context).pushNamedAndRemoveUntil(
@@ -163,7 +157,6 @@ class AuthWrapper extends StatelessWidget {
     );
   }
 
-  /// Retourne l'écran d'accueil selon le rôle
   Widget _getHomeScreenForRole(UserRole role) {
     switch (role) {
       case UserRole.client:

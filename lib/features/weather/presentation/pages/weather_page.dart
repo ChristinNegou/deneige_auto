@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../home/presentation/bloc/home_event.dart';
 import '../../../home/presentation/bloc/home_state.dart';
@@ -22,9 +23,10 @@ class WeatherView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Météo'),
+        title: Text(l10n.weather_title),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -52,7 +54,7 @@ class WeatherView extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Données météo non disponibles',
+                    l10n.weather_unavailable,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 24),
@@ -61,7 +63,7 @@ class WeatherView extends StatelessWidget {
                       context.read<HomeBloc>().add(RefreshWeather());
                     },
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Réessayer'),
+                    label: Text(l10n.common_retry),
                   ),
                 ],
               ),
@@ -111,14 +113,14 @@ class WeatherView extends StatelessWidget {
                           _buildWeatherInfo(
                             context,
                             Icons.water_drop,
-                            'Humidité',
+                            l10n.weather_humidity,
                             '${weather.humidity}%',
                           ),
                           const Divider(),
                           _buildWeatherInfo(
                             context,
                             Icons.air,
-                            'Vent',
+                            l10n.weather_wind,
                             '${weather.windSpeed.round()} km/h',
                           ),
                           if (weather.snowDepth != null) ...[
@@ -126,7 +128,7 @@ class WeatherView extends StatelessWidget {
                             _buildWeatherInfo(
                               context,
                               Icons.ac_unit,
-                              'Neige au sol',
+                              l10n.weather_snowDepth,
                               '${weather.snowDepth} cm',
                             ),
                           ],
@@ -155,7 +157,7 @@ class WeatherView extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Alerte neige',
+                                    l10n.weather_snowAlert,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.orange.shade900,
@@ -165,7 +167,7 @@ class WeatherView extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     weather.alertDescription ??
-                                        'Prévision de chutes de neige importantes',
+                                        l10n.weather_snowAlertDefault,
                                     style: TextStyle(
                                       color: Colors.orange.shade800,
                                     ),

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -123,10 +124,11 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
   }
 
   void _verifyCode() {
+    final l10n = AppLocalizations.of(context)!;
     final code = _getEnteredCode();
     if (code.length != 6) {
       setState(() {
-        _errorMessage = 'Veuillez entrer le code complet à 6 chiffres';
+        _errorMessage = l10n.phoneVerification_invalidCode;
       });
       return;
     }
@@ -170,6 +172,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is PhoneCodeSent) {
@@ -181,7 +185,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
           }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Code de vérification envoyé'),
+              content: Text(l10n.phoneVerification_codeSent),
               backgroundColor: AppTheme.success,
             ),
           );
@@ -208,7 +212,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
         backgroundColor: AppTheme.background,
         appBar: AppBar(
           title: Text(
-            'Vérification',
+            l10n.phoneVerification_title,
             style: TextStyle(color: AppTheme.textPrimary),
           ),
           backgroundColor: AppTheme.surface,
@@ -242,7 +246,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
                 // Titre
                 Text(
-                  'Vérification du téléphone',
+                  l10n.phoneVerification_subtitle,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -255,7 +259,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
 
                 // Description
                 Text(
-                  'Entrez le code à 6 chiffres envoyé au',
+                  l10n.phoneVerification_enterCode,
                   style: TextStyle(
                     fontSize: 16,
                     color: AppTheme.textSecondary,
@@ -293,7 +297,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                         Icon(Icons.bug_report, color: AppTheme.warning),
                         const SizedBox(width: 12),
                         Text(
-                          'Mode dev - Code: $_devCode',
+                          l10n.phoneVerification_devCode(_devCode!),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: AppTheme.warning,
@@ -412,9 +416,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text(
-                            'Vérifier',
-                            style: TextStyle(
+                        : Text(
+                            l10n.phoneVerification_verify,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -429,14 +433,14 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Vous n\'avez pas reçu le code? ',
+                      l10n.phoneVerification_noCode,
                       style: TextStyle(color: AppTheme.textSecondary),
                     ),
                     if (_canResend)
                       TextButton(
                         onPressed: _resendCode,
                         child: Text(
-                          'Renvoyer',
+                          l10n.phoneVerification_resend,
                           style: TextStyle(
                             color: AppTheme.primary2,
                             fontWeight: FontWeight.bold,
@@ -445,7 +449,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                       )
                     else
                       Text(
-                        'Renvoyer dans ${_resendCountdown}s',
+                        l10n.phoneVerification_resendIn(_resendCountdown),
                         style: TextStyle(
                           color: AppTheme.textTertiary,
                           fontWeight: FontWeight.w500,
@@ -462,7 +466,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   icon:
                       Icon(Icons.edit, size: 18, color: AppTheme.textSecondary),
                   label: Text(
-                    'Modifier le numéro',
+                    l10n.phoneVerification_changeNumber,
                     style: TextStyle(color: AppTheme.textSecondary),
                   ),
                 ),

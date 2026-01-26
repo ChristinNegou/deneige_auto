@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_state.dart';
 import '../domain/entities/worker_job.dart';
@@ -75,6 +76,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
       HapticFeedback.heavyImpact();
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -99,8 +101,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                     children: [
                       Text(
                         newJobs.length == 1
-                            ? 'Nouveau job!'
-                            : '${newJobs.length} nouveaux jobs!',
+                            ? l10n.worker_newJob
+                            : l10n.worker_newJobs(newJobs.length),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -307,6 +309,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Widget _buildHeader(String userName) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
       child: Row(
@@ -345,7 +349,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bonjour, ${userName.split(' ').first}',
+                  l10n.home_greeting(userName.split(' ').first),
                   style: AppTheme.headlineSmall.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -381,7 +385,9 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          isAvailable ? 'Disponible' : 'Hors ligne',
+                          isAvailable
+                              ? l10n.worker_available
+                              : l10n.worker_offline,
                           style: AppTheme.bodySmall.copyWith(
                             color: AppTheme.textTertiary,
                           ),
@@ -432,6 +438,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Widget _buildAvailabilityCard() {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
       builder: (context, state) {
         bool isAvailable = false;
@@ -518,8 +526,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                     children: [
                       Text(
                         isAvailable
-                            ? 'Vous etes disponible'
-                            : 'Vous etes hors ligne',
+                            ? l10n.worker_youAreAvailable
+                            : l10n.worker_youAreOffline,
                         style: TextStyle(
                           color: isAvailable
                               ? AppTheme.background
@@ -531,8 +539,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                       const SizedBox(height: 4),
                       Text(
                         isAvailable
-                            ? 'Vous recevez les nouveaux jobs'
-                            : 'Activez pour recevoir des jobs',
+                            ? l10n.worker_receivingJobs
+                            : l10n.worker_activateToReceive,
                         style: TextStyle(
                           color: isAvailable
                               ? AppTheme.background.withValues(alpha: 0.85)
@@ -577,6 +585,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Widget _buildStatsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocBuilder<WorkerStatsBloc, WorkerStatsState>(
       builder: (context, state) {
         if (state is WorkerStatsLoading) {
@@ -608,7 +618,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Aujourd'hui",
+                  l10n.worker_todayLabel,
                   style: AppTheme.headlineSmall.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -629,7 +639,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Details',
+                          l10n.common_details,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -656,7 +666,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                     icon: Icons.check_circle_rounded,
                     iconColor: AppTheme.success,
                     value: completed.toString(),
-                    label: 'Termines',
+                    label: l10n.worker_earningsCompleted,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -665,7 +675,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                     icon: Icons.pending_rounded,
                     iconColor: AppTheme.warning,
                     value: inProgress.toString(),
-                    label: 'En cours',
+                    label: l10n.reservation_shortInProgress,
                   ),
                 ),
               ],
@@ -687,7 +697,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                     icon: Icons.star_rounded,
                     iconColor: const Color(0xFFFFB800),
                     value: rating > 0 ? rating.toStringAsFixed(1) : '-',
-                    label: 'Note',
+                    label: l10n.worker_ratingLabel,
                   ),
                 ),
               ],
@@ -762,6 +772,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Widget _buildMyJobsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
       builder: (context, state) {
         List<WorkerJob> myJobs = [];
@@ -801,7 +813,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Mes jobs actifs',
+                      l10n.worker_myActiveJobs,
                       style: AppTheme.headlineSmall.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -818,7 +830,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                     borderRadius: BorderRadius.circular(AppTheme.radiusFull),
                   ),
                   child: Text(
-                    '${myJobs.length} actif${myJobs.length > 1 ? 's' : ''}',
+                    '${myJobs.length} ${myJobs.length > 1 ? l10n.worker_activeJobPlural : l10n.worker_activeJobSingular}',
                     style: TextStyle(
                       color: AppTheme.background,
                       fontWeight: FontWeight.w600,
@@ -853,6 +865,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Widget _buildAvailableJobsSection() {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocConsumer<WorkerJobsBloc, WorkerJobsState>(
       listener: (context, state) {
         if (state is WorkerJobsLoaded) {
@@ -869,7 +883,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Jobs disponibles',
+                l10n.worker_availableJobs,
                 style: AppTheme.headlineSmall.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -911,7 +925,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                 Row(
                   children: [
                     Text(
-                      'Jobs disponibles',
+                      l10n.worker_availableJobs,
                       style: AppTheme.headlineSmall.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -1023,6 +1037,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -1064,14 +1080,14 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
           ),
           const SizedBox(height: 20),
           Text(
-            'En attente de jobs...',
+            l10n.worker_waitingForJobs,
             style: AppTheme.headlineSmall.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Les nouveaux jobs apparaitront ici\nautomatiquement',
+            l10n.worker_waitingSubtitle,
             textAlign: TextAlign.center,
             style: AppTheme.bodySmall.copyWith(
               color: AppTheme.textTertiary,
@@ -1091,7 +1107,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                 Icon(Icons.refresh_rounded, color: AppTheme.info, size: 16),
                 const SizedBox(width: 8),
                 Text(
-                  'Actualisation auto. toutes les 15s',
+                  l10n.worker_autoRefresh,
                   style: TextStyle(
                     color: AppTheme.info,
                     fontSize: 12,
@@ -1107,6 +1123,8 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
   }
 
   Widget _buildErrorState(String message) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -1131,7 +1149,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
           ),
           const SizedBox(height: 16),
           Text(
-            'Oups!',
+            l10n.worker_oops,
             style: AppTheme.headlineSmall.copyWith(
               fontWeight: FontWeight.w700,
             ),
@@ -1172,7 +1190,7 @@ class _SnowWorkerHomeScreenState extends State<SnowWorkerHomeScreen>
                       color: AppTheme.background, size: 18),
                   SizedBox(width: 8),
                   Text(
-                    'Reessayer',
+                    l10n.common_retry,
                     style: TextStyle(
                       color: AppTheme.background,
                       fontWeight: FontWeight.w600,

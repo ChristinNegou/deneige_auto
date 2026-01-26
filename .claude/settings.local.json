@@ -40,7 +40,9 @@
       "Bash(\"$LOCALAPPDATA/Android/Sdk/platform-tools/adb\" -s emulator-5554 shell am start -n com.deneigeauto.app/com.deneigeauto.app.MainActivity)",
       "Bash(\"$LOCALAPPDATA/Android/Sdk/platform-tools/adb\" -s emulator-5554 shell pm list packages)",
       "Bash(\"/c/Users/chris/AppData/Local/Android/Sdk/platform-tools/adb\" -s emulator-5554 shell pm list packages)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(flutter clean:*)",
+      "Bash(flutter gen-l10n:*)"
     ],
     "deny": [],
     "ask": []

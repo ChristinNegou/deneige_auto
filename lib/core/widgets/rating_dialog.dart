@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Dialog pour noter un déneigeur après un job complété
 class RatingDialog extends StatefulWidget {
@@ -80,20 +81,20 @@ class _RatingDialogState extends State<RatingDialog>
     super.dispose();
   }
 
-  String _getRatingText() {
+  String _getRatingText(AppLocalizations l10n) {
     switch (_selectedRating) {
       case 1:
-        return 'Très insatisfait';
+        return l10n.rating_1star;
       case 2:
-        return 'Insatisfait';
+        return l10n.rating_2stars;
       case 3:
-        return 'Correct';
+        return l10n.rating_3stars;
       case 4:
-        return 'Satisfait';
+        return l10n.rating_4stars;
       case 5:
-        return 'Excellent !';
+        return l10n.rating_5stars;
       default:
-        return 'Touchez pour noter';
+        return l10n.rating_tapToRate;
     }
   }
 
@@ -115,10 +116,11 @@ class _RatingDialogState extends State<RatingDialog>
   }
 
   void _handleSubmit() {
+    final l10n = AppLocalizations.of(context)!;
     if (_selectedRating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Veuillez sélectionner une note'),
+          content: Text(l10n.rating_selectRequired),
           backgroundColor: AppTheme.warning,
         ),
       );
@@ -136,6 +138,7 @@ class _RatingDialogState extends State<RatingDialog>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ScaleTransition(
       scale: _scaleAnimation,
       child: AlertDialog(
@@ -150,12 +153,12 @@ class _RatingDialogState extends State<RatingDialog>
             mainAxisSize: MainAxisSize.min,
             children: [
               // Header avec avatar
-              _buildHeader(),
+              _buildHeader(l10n),
               const SizedBox(height: 20),
 
               // Texte d'invitation
               Text(
-                'Comment s\'est passé le déneigement ?',
+                l10n.rating_question,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -164,7 +167,7 @@ class _RatingDialogState extends State<RatingDialog>
               ),
               const SizedBox(height: 8),
               Text(
-                'Votre avis aide à améliorer le service',
+                l10n.rating_subtitle,
                 style: AppTheme.bodySmall.copyWith(
                   color: AppTheme.textSecondary,
                 ),
@@ -180,7 +183,7 @@ class _RatingDialogState extends State<RatingDialog>
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 child: Text(
-                  _getRatingText(),
+                  _getRatingText(l10n),
                   key: ValueKey(_selectedRating),
                   style: TextStyle(
                     color: _getRatingColor(),
@@ -192,11 +195,11 @@ class _RatingDialogState extends State<RatingDialog>
               const SizedBox(height: 24),
 
               // Champ de commentaire (optionnel)
-              _buildReviewField(),
+              _buildReviewField(l10n),
               const SizedBox(height: 24),
 
               // Boutons
-              _buildButtons(),
+              _buildButtons(l10n),
             ],
           ),
         ),
@@ -204,7 +207,7 @@ class _RatingDialogState extends State<RatingDialog>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Column(
       children: [
         // Avatar du déneigeur
@@ -256,7 +259,7 @@ class _RatingDialogState extends State<RatingDialog>
           ),
         ),
         Text(
-          'Déneigeur',
+          l10n.rating_workerTitle,
           style: AppTheme.bodySmall.copyWith(
             color: AppTheme.textSecondary,
           ),
@@ -288,13 +291,13 @@ class _RatingDialogState extends State<RatingDialog>
     );
   }
 
-  Widget _buildReviewField() {
+  Widget _buildReviewField(AppLocalizations l10n) {
     return TextField(
       controller: _reviewController,
       maxLines: 3,
       maxLength: 500,
       decoration: InputDecoration(
-        hintText: 'Ajouter un commentaire (optionnel)',
+        hintText: l10n.rating_commentHint,
         hintStyle: TextStyle(color: AppTheme.textTertiary),
         filled: true,
         fillColor: AppTheme.surfaceContainer,
@@ -315,7 +318,7 @@ class _RatingDialogState extends State<RatingDialog>
     );
   }
 
-  Widget _buildButtons() {
+  Widget _buildButtons(AppLocalizations l10n) {
     return Column(
       children: [
         // Bouton soumettre
@@ -341,9 +344,9 @@ class _RatingDialogState extends State<RatingDialog>
                       strokeWidth: 2,
                     ),
                   )
-                : const Text(
-                    'Envoyer mon avis',
-                    style: TextStyle(
+                : Text(
+                    l10n.rating_submit,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
@@ -357,7 +360,7 @@ class _RatingDialogState extends State<RatingDialog>
           TextButton(
             onPressed: widget.onSkip,
             child: Text(
-              'Peut-être plus tard',
+              l10n.rating_later,
               style: TextStyle(
                 color: AppTheme.textSecondary,
                 fontWeight: FontWeight.w500,

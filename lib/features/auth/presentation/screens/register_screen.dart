@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../legal/presentation/pages/legal_page.dart';
 import '../../domain/entities/user.dart';
 import '../bloc/auth_bloc.dart';
@@ -51,28 +52,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return '+$cleaned';
   }
 
-  String? _validatePhoneNumber(String? value) {
+  String? _validatePhoneNumber(String? value, AppLocalizations l10n) {
     if (value == null || value.isEmpty) {
-      return 'Le numéro de téléphone est obligatoire';
+      return l10n.register_phoneRequired;
     }
     String cleaned = value.replaceAll(RegExp(r'[^\d]'), '');
     if (cleaned.length < 10 || cleaned.length > 11) {
-      return 'Numéro de téléphone invalide';
+      return l10n.register_phoneInvalid;
     }
     if (cleaned.length == 11 && !cleaned.startsWith('1')) {
-      return 'Numéro de téléphone invalide';
+      return l10n.register_phoneInvalid;
     }
     return null;
   }
 
-  void _handleRegister() {
+  void _handleRegister(AppLocalizations l10n) {
     final formState = _formKey.currentState;
     if (formState != null && formState.validate()) {
       if (!_acceptedTerms) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-                'Veuillez accepter les conditions d\'utilisation et la politique de confidentialité'),
+            content: Text(l10n.register_acceptTerms),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -98,8 +98,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  String get _roleTitle =>
-      widget.role == UserRole.client ? 'Client' : 'Déneigeur';
+  String _getRoleTitle(AppLocalizations l10n) => widget.role == UserRole.client
+      ? l10n.accountType_client
+      : l10n.accountType_snowWorker;
 
   IconData get _roleIcon => widget.role == UserRole.client
       ? Icons.home_rounded
@@ -111,6 +112,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
@@ -145,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               children: [
                 // Header
-                _buildHeader(),
+                _buildHeader(l10n),
 
                 // Form
                 Expanded(
@@ -157,17 +160,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // Role badge
-                          _buildRoleBadge(),
+                          _buildRoleBadge(l10n),
 
                           const SizedBox(height: 24),
 
                           // Form card
-                          _buildFormCard(isLoading),
+                          _buildFormCard(isLoading, l10n),
 
                           const SizedBox(height: 24),
 
                           // Login link
-                          _buildLoginLink(),
+                          _buildLoginLink(l10n),
 
                           const SizedBox(height: 20),
                         ],
@@ -183,7 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Row(
@@ -207,7 +210,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(width: 16),
           Text(
-            'Inscription',
+            l10n.register_title,
             style: AppTheme.headlineMedium,
           ),
         ],
@@ -215,7 +218,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildRoleBadge() {
+  Widget _buildRoleBadge(AppLocalizations l10n) {
+    final roleTitle = _getRoleTitle(l10n);
     return Center(
       child: Column(
         children: [
@@ -240,7 +244,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               borderRadius: BorderRadius.circular(AppTheme.radiusFull),
             ),
             child: Text(
-              'Compte $_roleTitle',
+              l10n.register_accountLabel(roleTitle),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -250,7 +254,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Créez votre compte pour commencer',
+            l10n.register_subtitle,
             style: AppTheme.bodySmall,
           ),
         ],
@@ -258,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildFormCard(bool isLoading) {
+  Widget _buildFormCard(bool isLoading, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -275,12 +279,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Expanded(
                 child: _buildTextField(
                   controller: _firstNameController,
-                  label: 'Prénom',
-                  hint: 'Jean',
+                  label: l10n.common_firstName,
+                  hint: l10n.register_firstNameHint,
                   icon: Icons.person_outline_rounded,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Requis';
+                      return l10n.common_required;
                     }
                     return null;
                   },
@@ -290,12 +294,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Expanded(
                 child: _buildTextField(
                   controller: _lastNameController,
-                  label: 'Nom',
-                  hint: 'Dupont',
+                  label: l10n.common_name,
+                  hint: l10n.register_lastNameHint,
                   icon: Icons.badge_outlined,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Requis';
+                      return l10n.common_required;
                     }
                     return null;
                   },
@@ -308,16 +312,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Email
           _buildTextField(
             controller: _emailController,
-            label: 'Email',
-            hint: 'exemple@email.com',
+            label: l10n.common_email,
+            hint: l10n.login_emailHint,
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Veuillez entrer votre email';
+                return l10n.login_emailRequired;
               }
               if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(value)) {
-                return 'Email invalide';
+                return l10n.login_emailInvalid;
               }
               return null;
             },
@@ -327,11 +331,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Téléphone
           _buildTextField(
             controller: _phoneController,
-            label: 'Téléphone',
-            hint: '+1 (514) 123-4567',
+            label: l10n.common_phone,
+            hint: l10n.register_phoneHint,
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
-            validator: _validatePhoneNumber,
+            validator: (value) => _validatePhoneNumber(value, l10n),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 6, left: 4),
@@ -345,7 +349,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Un code de vérification sera envoyé',
+                    l10n.register_verificationCodeSent,
                     style: TextStyle(
                       fontSize: 11,
                       color: AppTheme.textSecondary,
@@ -360,8 +364,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Mot de passe
           _buildTextField(
             controller: _passwordController,
-            label: 'Mot de passe',
-            hint: 'Minimum 6 caractères',
+            label: l10n.common_password,
+            hint: l10n.register_passwordMinChars,
             icon: Icons.lock_outline_rounded,
             obscureText: _obscurePassword,
             suffixIcon: GestureDetector(
@@ -376,10 +380,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Veuillez entrer un mot de passe';
+                return l10n.register_passwordRequired;
               }
               if (value.length < 6) {
-                return 'Minimum 6 caractères';
+                return l10n.register_passwordMinChars;
               }
               return null;
             },
@@ -389,8 +393,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Confirmer mot de passe
           _buildTextField(
             controller: _confirmPasswordController,
-            label: 'Confirmer le mot de passe',
-            hint: 'Répétez votre mot de passe',
+            label: l10n.register_confirmPassword,
+            hint: l10n.register_confirmPasswordHint,
             icon: Icons.lock_outline_rounded,
             obscureText: _obscureConfirmPassword,
             suffixIcon: GestureDetector(
@@ -406,10 +410,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Veuillez confirmer votre mot de passe';
+                return l10n.register_confirmPasswordRequired;
               }
               if (value != _passwordController.text) {
-                return 'Les mots de passe ne correspondent pas';
+                return l10n.register_passwordMismatch;
               }
               return null;
             },
@@ -429,7 +433,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const SizedBox(height: 24),
 
           // Bouton inscription
-          _buildRegisterButton(isLoading),
+          _buildRegisterButton(isLoading, l10n),
         ],
       ),
     );
@@ -511,9 +515,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildRegisterButton(bool isLoading) {
+  Widget _buildRegisterButton(bool isLoading, AppLocalizations l10n) {
     return GestureDetector(
-      onTap: isLoading ? null : _handleRegister,
+      onTap: isLoading ? null : () => _handleRegister(l10n),
       child: Container(
         height: 50,
         decoration: BoxDecoration(
@@ -545,7 +549,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'S\'inscrire',
+                      l10n.register_submit,
                       style: TextStyle(
                         color: AppTheme.background,
                         fontSize: 16,
@@ -565,12 +569,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildLoginLink() {
+  Widget _buildLoginLink(AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Vous avez déjà un compte ? ',
+          l10n.register_hasAccount,
           style: AppTheme.bodySmall.copyWith(
             color: AppTheme.textSecondary,
           ),
@@ -578,7 +582,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         GestureDetector(
           onTap: () => Navigator.of(context).pushNamed(AppRoutes.login),
           child: Text(
-            'Se connecter',
+            l10n.login_submit,
             style: AppTheme.bodySmall.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,

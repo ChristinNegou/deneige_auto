@@ -2,6 +2,7 @@ import 'package:deneige_auto/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../payment/presentation/screens/payment_screen.dart';
 import '../bloc/new_reservation_bloc.dart';
 import '../bloc/new_reservation_event.dart';
@@ -89,8 +90,9 @@ class NewReservationView extends StatelessWidget {
     BuildContext context,
     NewReservationState state,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return AppBar(
-      title: const Text('Nouvelle réservation'),
+      title: Text(l10n.reservation_new),
       leading: IconButton(
         icon: const Icon(Icons.close),
         onPressed: () => _showCancelDialog(context),
@@ -188,14 +190,15 @@ class NewReservationView extends StatelessWidget {
   }
 
   Widget _buildStepContent(BuildContext context, NewReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state.isLoadingData) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Chargement des données...'),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(l10n.common_loading),
           ],
         ),
       );
@@ -221,6 +224,7 @@ class NewReservationView extends StatelessWidget {
     BuildContext context,
     NewReservationState state,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final bloc = context.read<NewReservationBloc>();
 
     return Container(
@@ -244,7 +248,7 @@ class NewReservationView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('Retour'),
+                  child: Text(l10n.common_back),
                 ),
               ),
             if (state.currentStep > 0) const SizedBox(width: 12),
@@ -273,7 +277,7 @@ class NewReservationView extends StatelessWidget {
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(_getNextButtonText(state)),
+                          Text(_getNextButtonText(state, l10n)),
                           const SizedBox(width: 8),
                           Icon(
                             state.currentStep == 4
@@ -291,20 +295,14 @@ class NewReservationView extends StatelessWidget {
     );
   }
 
-  String _getNextButtonText(NewReservationState state) {
+  String _getNextButtonText(NewReservationState state, AppLocalizations l10n) {
     switch (state.currentStep) {
-      case 0:
-        return 'Continuer';
-      case 1:
-        return 'Continuer';
-      case 2:
-        return 'Continuer';
       case 3:
-        return 'Voir le résumé';
+        return l10n.reservation_viewSummary;
       case 4:
-        return 'Confirmer et payer';
+        return l10n.reservation_confirmAndPay;
       default:
-        return 'Continuer';
+        return l10n.reservation_continue;
     }
   }
 
@@ -336,16 +334,17 @@ class NewReservationView extends StatelessWidget {
   }
 
   void _showCancelDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.surfaceElevated,
         title: Text(
-          'Annuler la réservation?',
+          l10n.reservation_cancelNewTitle,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         content: Text(
-          'Êtes-vous sûr de vouloir quitter? Les informations saisies seront perdues.',
+          l10n.reservation_cancelNewWarning,
           style: TextStyle(color: AppTheme.textSecondary),
         ),
         shape: RoundedRectangleBorder(
@@ -355,7 +354,7 @@ class NewReservationView extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
-              'Non, continuer',
+              l10n.reservation_noContinue,
               style: TextStyle(color: AppTheme.textPrimary),
             ),
           ),
@@ -367,7 +366,7 @@ class NewReservationView extends StatelessWidget {
             style: TextButton.styleFrom(
               foregroundColor: AppTheme.error,
             ),
-            child: const Text('Oui, annuler'),
+            child: Text(l10n.reservation_yesCancel),
           ),
         ],
       ),
@@ -377,6 +376,7 @@ class NewReservationView extends StatelessWidget {
   // Modifier la méthode _showPaymentDialog
 
   void _showPaymentDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bloc = context.read<NewReservationBloc>();
     final state = bloc.state;
 
@@ -402,7 +402,7 @@ class NewReservationView extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Méthode de paiement',
+                  l10n.reservation_paymentMethod,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -414,8 +414,8 @@ class NewReservationView extends StatelessWidget {
             const SizedBox(height: 24),
             _PaymentMethodTile(
               icon: Icons.credit_card,
-              title: 'Carte de crédit',
-              subtitle: 'Visa, Mastercard, Amex',
+              title: l10n.reservation_creditCard,
+              subtitle: l10n.reservation_creditCardSubtitle,
               onTap: () async {
                 Navigator.of(sheetContext).pop();
 
@@ -452,7 +452,7 @@ class NewReservationView extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Text('Création de la réservation...'),
+                            Text(l10n.reservation_creatingReservation),
                           ],
                         ),
                         backgroundColor: AppTheme.primary,
@@ -474,7 +474,7 @@ class NewReservationView extends StatelessWidget {
             const SizedBox(height: 24),
             Center(
               child: Text(
-                'Paiement sécurisé par Stripe',
+                l10n.reservation_securePayment,
                 style: TextStyle(
                   fontSize: 12,
                   color: AppTheme.textTertiary,

@@ -41,6 +41,7 @@ import '../../features/home/data/datasources/weather_remote_datasource.dart';
 import '../../features/home/data/repositories/weather_repository_impl.dart';
 import '../../features/home/domain/repositories/weather_repository.dart';
 import '../../features/home/domain/usecases/get_weather_usecase.dart';
+import '../../features/home/domain/usecases/get_weather_forecast_usecase.dart';
 
 // Reservation
 import '../../features/reservation/data/datasources/reservation_remote_datasource.dart';
@@ -98,6 +99,8 @@ import '../../features/ai_features/presentation/bloc/ai_features_bloc.dart';
 
 // Verification
 import '../../features/verification/data/datasources/verification_remote_datasource.dart';
+import '../../features/verification/data/repositories/verification_repository_impl.dart';
+import '../../features/verification/domain/repositories/verification_repository.dart';
 import '../../features/verification/presentation/bloc/verification_bloc.dart';
 
 // Snow Worker
@@ -136,6 +139,13 @@ import '../../features/support/domain/repositories/support_repository.dart';
 import '../../features/support/domain/usecases/submit_support_request_usecase.dart';
 import '../../features/support/presentation/bloc/support_bloc.dart';
 
+// Services
+import '../services/tax_service.dart';
+import '../services/dispute_service.dart';
+import '../services/connectivity_service.dart';
+import '../services/cache_service.dart';
+import '../services/locale_service.dart';
+
 // BLoCs
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
@@ -163,6 +173,15 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<ReservationCache>(() => ReservationCache());
   sl.registerLazySingleton<SyncQueue>(() => SyncQueue());
   sl.registerLazySingleton<SyncService>(() => SyncService());
+
+  //! Services
+  sl.registerLazySingleton<TaxService>(() => TaxService());
+  sl.registerLazySingleton<DisputeService>(
+    () => DisputeService(dioClient: sl()),
+  );
+  sl.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
+  sl.registerLazySingleton<ApiCacheService>(() => ApiCacheService());
+  sl.registerLazySingleton<LocaleService>(() => LocaleService());
 
   //! Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -218,6 +237,9 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<VerificationRepository>(
+    () => VerificationRepositoryImpl(remoteDatasource: sl()),
+  );
 
   //! Use cases
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
@@ -265,6 +287,12 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => MarkEnRouteUseCase(sl()));
   sl.registerLazySingleton(() => StartJobUseCase(sl()));
   sl.registerLazySingleton(() => CompleteJobUseCase(sl()));
+  sl.registerLazySingleton(() => UploadJobPhotoUseCase(sl()));
+  sl.registerLazySingleton(() => CancelJobUseCase(sl()));
+  sl.registerLazySingleton(() => GetCancellationReasonsUseCase(sl()));
+
+  // Weather forecast
+  sl.registerLazySingleton(() => GetWeatherForecastUseCase(sl()));
 
   //! BLoCs
   // AuthBloc doit être un singleton pour maintenir l'état d'authentification
@@ -346,6 +374,7 @@ Future<void> initializeDependencies() async {
         markEnRouteUseCase: sl(),
         startJobUseCase: sl(),
         completeJobUseCase: sl(),
+        cancelJobUseCase: sl(),
       ));
 
   sl.registerFactory(() => WorkerStatsBloc(
@@ -366,7 +395,7 @@ Future<void> initializeDependencies() async {
 
   // Verification BLoC
   sl.registerFactory(() => VerificationBloc(
-        remoteDatasource: sl(),
+        repository: sl(),
       ));
 
   sl.registerFactory(() => ChatBloc(
@@ -413,6 +442,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => CreateConversationUseCase(sl()));
   sl.registerLazySingleton(() => GetConversationsUseCase(sl()));
   sl.registerLazySingleton(() => GetAIStatusUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteConversationUseCase(sl()));
   sl.registerFactory(() => AIChatBloc(
         repository: sl(),
         sendAIMessage: sl(),
@@ -423,7 +453,7 @@ Future<void> initializeDependencies() async {
 
   // =============== AI FEATURES ===============
   sl.registerLazySingleton<AIFeaturesRemoteDataSource>(
-    () => AIFeaturesRemoteDataSource(),
+    () => AIFeaturesRemoteDataSource(dio: sl()),
   );
   sl.registerLazySingleton<AIFeaturesRepository>(
     () => AIFeaturesRepositoryImpl(remoteDataSource: sl()),

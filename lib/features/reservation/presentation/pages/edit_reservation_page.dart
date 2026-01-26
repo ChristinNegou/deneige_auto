@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/parking_spot.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/entities/vehicle.dart';
@@ -44,12 +45,13 @@ class _EditReservationViewState extends State<EditReservationView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocConsumer<EditReservationBloc, EditReservationState>(
       listener: (context, state) {
         if (state.isUpdateSuccessful) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Réservation modifiée avec succès'),
+              content: Text(l10n.reservation_modifiedSuccess),
               backgroundColor: AppTheme.success,
               behavior: SnackBarBehavior.floating,
             ),
@@ -77,7 +79,7 @@ class _EditReservationViewState extends State<EditReservationView> {
       builder: (context, state) {
         if (state.isLoadingData) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Modifier la réservation')),
+            appBar: AppBar(title: Text(l10n.reservation_editTitle)),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
@@ -86,7 +88,7 @@ class _EditReservationViewState extends State<EditReservationView> {
         if (state.originalReservation != null &&
             !state.originalReservation!.canBeEdited) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Modifier la réservation')),
+            appBar: AppBar(title: Text(l10n.reservation_editTitle)),
             body: Center(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -100,7 +102,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Modification impossible',
+                      l10n.reservation_editImpossible,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -109,7 +111,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Cette réservation ne peut plus être modifiée.\nSeules les réservations en attente peuvent être éditées.',
+                      l10n.reservation_editImpossibleMessage,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
@@ -120,7 +122,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                     ElevatedButton.icon(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_back),
-                      label: const Text('Retour'),
+                      label: Text(l10n.common_back),
                     ),
                   ],
                 ),
@@ -131,7 +133,7 @@ class _EditReservationViewState extends State<EditReservationView> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Modifier la réservation'),
+            title: Text(l10n.reservation_editTitle),
           ),
           body: ListView(
             padding: const EdgeInsets.all(16),
@@ -149,7 +151,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Modifiez les informations ci-dessous',
+                          l10n.reservation_editSubtitle,
                           style: TextStyle(color: AppTheme.info),
                         ),
                       ),
@@ -179,6 +181,7 @@ class _EditReservationViewState extends State<EditReservationView> {
 
   Widget _buildVehicleSection(
       BuildContext context, EditReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -190,7 +193,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                 const Icon(Icons.directions_car),
                 const SizedBox(width: 8),
                 Text(
-                  'Véhicule',
+                  l10n.reservation_vehicle,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -200,9 +203,9 @@ class _EditReservationViewState extends State<EditReservationView> {
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _getValidVehicleValue(state),
-              decoration: const InputDecoration(
-                labelText: 'Sélectionner un véhicule',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.reservation_selectVehicle,
+                border: const OutlineInputBorder(),
               ),
               items: _buildVehicleItems(state),
               onChanged: (value) {
@@ -224,6 +227,7 @@ class _EditReservationViewState extends State<EditReservationView> {
 
   Widget _buildParkingSpotSection(
       BuildContext context, EditReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -235,7 +239,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                 const Icon(Icons.local_parking),
                 const SizedBox(width: 8),
                 Text(
-                  'Place de parking',
+                  l10n.reservation_location,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -245,9 +249,9 @@ class _EditReservationViewState extends State<EditReservationView> {
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _getValidParkingSpotValue(state),
-              decoration: const InputDecoration(
-                labelText: 'Sélectionner une place',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.reservation_selectSpot,
+                border: const OutlineInputBorder(),
               ),
               items: _buildParkingSpotItems(state),
               onChanged: (value) {
@@ -269,6 +273,7 @@ class _EditReservationViewState extends State<EditReservationView> {
 
   Widget _buildLocationSection(
       BuildContext context, EditReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -280,7 +285,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                 const Icon(Icons.location_on),
                 const SizedBox(width: 8),
                 Text(
-                  'Adresse du véhicule',
+                  l10n.reservation_vehicleAddress,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -291,8 +296,8 @@ class _EditReservationViewState extends State<EditReservationView> {
             TextField(
               controller: _addressController,
               decoration: InputDecoration(
-                labelText: 'Adresse',
-                hintText: 'Ex: 123 Rue Principale, Montréal, QC',
+                labelText: l10n.common_address,
+                hintText: l10n.reservation_addressHint,
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.home),
                 suffixIcon: _isSearchingAddress
@@ -329,7 +334,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Position GPS enregistrée',
+                        l10n.reservation_gpsRecorded,
                         style: TextStyle(
                           fontSize: 12,
                           color: AppTheme.success,
@@ -347,6 +352,7 @@ class _EditReservationViewState extends State<EditReservationView> {
   }
 
   Future<void> _searchAddress(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final address = _addressController.text.trim();
     if (address.isEmpty) return;
 
@@ -366,7 +372,7 @@ class _EditReservationViewState extends State<EditReservationView> {
               );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Adresse validée avec succès'),
+              content: Text(l10n.reservation_addressValidated),
               backgroundColor: AppTheme.success,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 2),
@@ -377,7 +383,7 @@ class _EditReservationViewState extends State<EditReservationView> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Adresse non trouvée. Veuillez réessayer.'),
+              content: Text(l10n.reservation_addressNotFound),
               backgroundColor: AppTheme.warning,
               behavior: SnackBarBehavior.floating,
             ),
@@ -388,7 +394,7 @@ class _EditReservationViewState extends State<EditReservationView> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Erreur lors de la recherche de l\'adresse'),
+            content: Text(l10n.reservation_addressError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -403,6 +409,7 @@ class _EditReservationViewState extends State<EditReservationView> {
 
   Widget _buildDepartureTimeSection(
       BuildContext context, EditReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
 
     return Card(
@@ -416,7 +423,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                 const Icon(Icons.access_time),
                 const SizedBox(width: 8),
                 Text(
-                  'Heure de départ',
+                  l10n.reservation_departureTime,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -427,15 +434,15 @@ class _EditReservationViewState extends State<EditReservationView> {
             InkWell(
               onTap: () => _selectDateTime(context, state),
               child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Sélectionner une date et heure',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.calendar_today),
+                decoration: InputDecoration(
+                  labelText: l10n.reservation_selectDateTime,
+                  border: const OutlineInputBorder(),
+                  suffixIcon: const Icon(Icons.calendar_today),
                 ),
                 child: Text(
                   state.departureTime != null
                       ? dateFormat.format(state.departureTime!)
-                      : 'Aucune date sélectionnée',
+                      : l10n.reservation_noDateSelected,
                 ),
               ),
             ),
@@ -492,6 +499,7 @@ class _EditReservationViewState extends State<EditReservationView> {
 
   Widget _buildServiceOptionsSection(
       BuildContext context, EditReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -503,7 +511,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                 const Icon(Icons.miscellaneous_services),
                 const SizedBox(width: 8),
                 Text(
-                  'Options de service',
+                  l10n.reservation_serviceOptions,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -515,22 +523,22 @@ class _EditReservationViewState extends State<EditReservationView> {
               context,
               state,
               ServiceOption.windowScraping,
-              'Grattage des vitres',
-              '+5\$',
+              l10n.reservation_windowScraping,
+              l10n.service_windowScraping5,
             ),
             _buildServiceOptionTile(
               context,
               state,
               ServiceOption.doorDeicing,
-              'Déglaçage des portes',
-              '+3\$',
+              l10n.reservation_doorDeicing,
+              l10n.service_doorDeicing3,
             ),
             _buildServiceOptionTile(
               context,
               state,
               ServiceOption.wheelClearance,
-              'Dégagement des roues',
-              '+4\$',
+              l10n.reservation_wheelClearing,
+              l10n.service_wheelClearing4,
             ),
           ],
         ),
@@ -562,6 +570,7 @@ class _EditReservationViewState extends State<EditReservationView> {
   }
 
   Widget _buildPriceCard(BuildContext context, EditReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       color: AppTheme.primaryLight,
       child: Padding(
@@ -573,7 +582,7 @@ class _EditReservationViewState extends State<EditReservationView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Prix total',
+                  l10n.reservation_totalPrice,
                   style: TextStyle(
                     fontSize: 14,
                     color: AppTheme.textSecondary,
@@ -597,7 +606,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'Prix original',
+                    l10n.reservation_originalPrice,
                     style: TextStyle(
                       fontSize: 12,
                       color: AppTheme.textSecondary,
@@ -621,6 +630,7 @@ class _EditReservationViewState extends State<EditReservationView> {
   }
 
   Widget _buildSubmitButton(BuildContext context, EditReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
     final canSubmit = state.canSubmit && state.hasChanges;
 
     return SizedBox(
@@ -646,10 +656,10 @@ class _EditReservationViewState extends State<EditReservationView> {
             : const Icon(Icons.check),
         label: Text(
           state.isLoading
-              ? 'Modification en cours...'
+              ? l10n.reservation_modifying
               : !state.hasChanges
-                  ? 'Aucune modification'
-                  : 'Enregistrer les modifications',
+                  ? l10n.reservation_noChanges
+                  : l10n.reservation_saveChanges,
         ),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.all(16),

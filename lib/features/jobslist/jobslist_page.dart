@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/app_routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/di/injection_container.dart';
+import '../../l10n/app_localizations.dart';
 import '../snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../snow_worker/domain/entities/worker_job.dart';
 
@@ -51,20 +52,21 @@ class _JobsListViewState extends State<JobsListView>
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
     ));
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
-            _buildTabBar(),
+            _buildHeader(context, l10n),
+            _buildTabBar(l10n),
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildAvailableJobsList(),
-                  _buildMyJobsList(),
+                  _buildAvailableJobsList(l10n),
+                  _buildMyJobsList(l10n),
                 ],
               ),
             ),
@@ -74,7 +76,7 @@ class _JobsListViewState extends State<JobsListView>
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Row(
@@ -98,7 +100,7 @@ class _JobsListViewState extends State<JobsListView>
           ),
           const SizedBox(width: 16),
           Text(
-            'Jobs',
+            l10n.worker_jobs,
             style: AppTheme.headlineMedium,
           ),
           const Spacer(),
@@ -128,7 +130,7 @@ class _JobsListViewState extends State<JobsListView>
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildTabBar(AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
@@ -147,15 +149,15 @@ class _JobsListViewState extends State<JobsListView>
         labelStyle: const TextStyle(fontWeight: FontWeight.w600),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
-        tabs: const [
-          Tab(text: 'Disponibles'),
-          Tab(text: 'Mes jobs'),
+        tabs: [
+          Tab(text: l10n.worker_jobsAvailable),
+          Tab(text: l10n.worker_jobsMyJobs),
         ],
       ),
     );
   }
 
-  Widget _buildAvailableJobsList() {
+  Widget _buildAvailableJobsList(AppLocalizations l10n) {
     return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
       builder: (context, state) {
         if (state is WorkerJobsLoading) {
@@ -168,8 +170,8 @@ class _JobsListViewState extends State<JobsListView>
           if (state.availableJobs.isEmpty) {
             return _buildEmptyState(
               icon: Icons.inbox_rounded,
-              title: 'Aucun job disponible',
-              subtitle: 'Les nouveaux jobs apparaîtront ici',
+              title: l10n.worker_noJobs,
+              subtitle: l10n.worker_noJobsSubtitle,
             );
           }
 
@@ -204,7 +206,7 @@ class _JobsListViewState extends State<JobsListView>
                     context.read<WorkerJobsBloc>().add(const LoadAvailableJobs(
                         latitude: 45.5017, longitude: -73.5673, radiusKm: 50));
                   },
-                  child: const Text('Réessayer'),
+                  child: Text(l10n.common_retry),
                 ),
               ],
             ),
@@ -213,14 +215,14 @@ class _JobsListViewState extends State<JobsListView>
 
         return _buildEmptyState(
           icon: Icons.work_outline_rounded,
-          title: 'Chargement...',
+          title: l10n.common_loading,
           subtitle: '',
         );
       },
     );
   }
 
-  Widget _buildMyJobsList() {
+  Widget _buildMyJobsList(AppLocalizations l10n) {
     return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
       builder: (context, state) {
         if (state is WorkerJobsLoading) {
@@ -233,8 +235,8 @@ class _JobsListViewState extends State<JobsListView>
           if (state.myJobs.isEmpty) {
             return _buildEmptyState(
               icon: Icons.assignment_outlined,
-              title: 'Aucun job assigné',
-              subtitle: 'Acceptez des jobs disponibles pour les voir ici',
+              title: l10n.worker_noAssignedJobs,
+              subtitle: l10n.worker_noAssignedSubtitle,
             );
           }
 
@@ -256,7 +258,7 @@ class _JobsListViewState extends State<JobsListView>
 
         return _buildEmptyState(
           icon: Icons.work_outline_rounded,
-          title: 'Chargement...',
+          title: l10n.common_loading,
           subtitle: '',
         );
       },
@@ -292,12 +294,13 @@ class _JobsListViewState extends State<JobsListView>
 
   Widget _buildJobCard(BuildContext context, WorkerJob job,
       {required bool isAvailable}) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
           context,
           AppRoutes.workerJobDetails,
-          arguments: job.id,
+          arguments: job,
         );
       },
       child: Container(
@@ -362,7 +365,7 @@ class _JobsListViewState extends State<JobsListView>
                   ),
                 ),
                 StatusBadge(
-                  label: _getStatusLabel(job.status),
+                  label: _getStatusLabel(job.status, l10n),
                   color: _getStatusColor(job.status),
                   small: true,
                 ),
@@ -398,8 +401,8 @@ class _JobsListViewState extends State<JobsListView>
                       color: AppTheme.success,
                       borderRadius: BorderRadius.circular(AppTheme.radiusFull),
                     ),
-                    child: const Text(
-                      'Accepter',
+                    child: Text(
+                      l10n.worker_accept,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -447,20 +450,20 @@ class _JobsListViewState extends State<JobsListView>
     return '$hour:$minute';
   }
 
-  String _getStatusLabel(JobStatus status) {
+  String _getStatusLabel(JobStatus status, AppLocalizations l10n) {
     switch (status) {
       case JobStatus.pending:
-        return 'En attente';
+        return l10n.reservation_shortPending;
       case JobStatus.assigned:
-        return 'Assigné';
+        return l10n.reservation_shortAssigned;
       case JobStatus.enRoute:
-        return 'En route';
+        return l10n.reservation_shortEnRoute;
       case JobStatus.inProgress:
-        return 'En cours';
+        return l10n.reservation_shortInProgress;
       case JobStatus.completed:
-        return 'Terminé';
+        return l10n.reservation_shortCompleted;
       case JobStatus.cancelled:
-        return 'Annulé';
+        return l10n.reservation_shortCancelled;
     }
   }
 

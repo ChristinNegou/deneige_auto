@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_illustration.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 
@@ -18,35 +19,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentPage = 0;
   bool _isCheckingAuth = true;
 
-  final List<OnboardingContent> _pages = [
-    OnboardingContent(
-      title: 'Bienvenue sur Déneige Auto',
-      description:
-          'La solution moderne pour gérer le déneigement de votre véhicule en toute simplicité',
-      illustrationType: IllustrationType.welcome,
-      accentColor: const Color(0xFFFAFAFA),
-    ),
-    OnboardingContent(
-      title: 'Réservez en quelques clics',
-      description:
-          'Planifiez vos services de déneigement selon vos besoins et votre horaire',
-      illustrationType: IllustrationType.calendar,
-      accentColor: const Color(0xFFFAFAFA),
-    ),
-    OnboardingContent(
-      title: 'Suivi en temps réel',
-      description:
-          'Suivez l\'avancement du déneigement et recevez des notifications instantanées',
-      illustrationType: IllustrationType.location,
-      accentColor: const Color(0xFFFAFAFA),
-    ),
-    OnboardingContent(
-      title: 'Paiement sécurisé',
-      description: 'Payez en toute sécurité et gérez vos factures facilement',
-      illustrationType: IllustrationType.payment,
-      accentColor: const Color(0xFFFAFAFA),
-    ),
-  ];
+  List<OnboardingContent> _getPages(AppLocalizations l10n) {
+    return [
+      OnboardingContent(
+        title: l10n.onboarding_title1,
+        description: l10n.onboarding_desc1,
+        illustrationType: IllustrationType.welcome,
+        accentColor: const Color(0xFFFAFAFA),
+      ),
+      OnboardingContent(
+        title: l10n.onboarding_title2,
+        description: l10n.onboarding_desc2,
+        illustrationType: IllustrationType.calendar,
+        accentColor: const Color(0xFFFAFAFA),
+      ),
+      OnboardingContent(
+        title: l10n.onboarding_title3,
+        description: l10n.onboarding_desc3,
+        illustrationType: IllustrationType.location,
+        accentColor: const Color(0xFFFAFAFA),
+      ),
+      OnboardingContent(
+        title: l10n.onboarding_title4,
+        description: l10n.onboarding_desc4,
+        illustrationType: IllustrationType.payment,
+        accentColor: const Color(0xFFFAFAFA),
+      ),
+    ];
+  }
 
   @override
   void initState() {
@@ -91,8 +91,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
-  void _nextPage() {
-    if (_currentPage < _pages.length - 1) {
+  void _nextPage(List<OnboardingContent> pages) {
+    if (_currentPage < pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -112,6 +112,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final pages = _getPages(l10n);
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         // Si l'état change vers non-authentifié ou erreur, afficher l'onboarding
@@ -122,8 +125,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         }
         // Si authentifié, la navigation est gérée par deneigeauto_app.dart
       },
-      child:
-          _isCheckingAuth ? _buildLoadingScreen() : _buildOnboardingContent(),
+      child: _isCheckingAuth
+          ? _buildLoadingScreen()
+          : _buildOnboardingContent(l10n, pages),
     );
   }
 
@@ -170,7 +174,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildOnboardingContent() {
+  Widget _buildOnboardingContent(
+      AppLocalizations l10n, List<OnboardingContent> pages) {
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Container(
@@ -180,7 +185,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             end: Alignment.bottomCenter,
             colors: [
               AppTheme.background,
-              _pages[_currentPage].accentColor.withValues(alpha: 0.15),
+              pages[_currentPage].accentColor.withValues(alpha: 0.15),
               AppTheme.background,
             ],
             stops: const [0.0, 0.5, 1.0],
@@ -197,7 +202,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: TextButton(
                     onPressed: _skipOnboarding,
                     child: Text(
-                      'Passer',
+                      l10n.common_skip,
                       style: TextStyle(
                         color: AppTheme.textSecondary,
                         fontSize: 16,
@@ -213,9 +218,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: PageView.builder(
                   controller: _pageController,
                   onPageChanged: _onPageChanged,
-                  itemCount: _pages.length,
+                  itemCount: pages.length,
                   itemBuilder: (context, index) {
-                    return _buildPage(_pages[index]);
+                    return _buildPage(pages[index]);
                   },
                 ),
               ),
@@ -226,8 +231,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    _pages.length,
-                    (index) => _buildPageIndicator(index),
+                    pages.length,
+                    (index) => _buildPageIndicator(index, pages),
                   ),
                 ),
               ),
@@ -239,12 +244,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _nextPage,
+                    onPressed: () => _nextPage(pages),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _pages[_currentPage].accentColor,
+                      backgroundColor: pages[_currentPage].accentColor,
                       foregroundColor: Colors.black54,
                       elevation: 8,
-                      shadowColor: _pages[_currentPage]
+                      shadowColor: pages[_currentPage]
                           .accentColor
                           .withValues(alpha: 0.5),
                       shape: RoundedRectangleBorder(
@@ -252,9 +257,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     child: Text(
-                      _currentPage == _pages.length - 1
-                          ? 'Commencer'
-                          : 'Suivant',
+                      _currentPage == pages.length - 1
+                          ? l10n.onboarding_start
+                          : l10n.common_next,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -312,7 +317,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildPageIndicator(int index) {
+  Widget _buildPageIndicator(int index, List<OnboardingContent> pages) {
     final isActive = _currentPage == index;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -321,7 +326,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       width: isActive ? 24 : 8,
       decoration: BoxDecoration(
         color: isActive
-            ? _pages[_currentPage].accentColor
+            ? pages[_currentPage].accentColor
             : AppTheme.textTertiary.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(4),
       ),

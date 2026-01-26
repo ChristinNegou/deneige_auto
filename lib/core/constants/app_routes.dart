@@ -14,7 +14,6 @@ class AppRoutes {
 
   // Routes principales
   static const String home = '/home';
-  static const String dashboard = '/dashboard';
 
   // Routes de réservations
   static const String reservations = '/reservations';
@@ -28,7 +27,6 @@ class AppRoutes {
 
   // Routes de véhicules
   static const String vehicles = '/vehicles';
-  static const String vehicleDetails = '/vehicles/details';
   static const String addVehicle = '/vehicles/add';
 
   // Routes d'abonnement
@@ -58,12 +56,10 @@ class AppRoutes {
   static const String notifications = '/notifications';
 
   // Routes de chat
-  static const String chat = '/chat';
   static const String aiChat = '/ai-chat';
 
   // Routes déneigeur
   static const String jobsList = '/snow-worker/jobs';
-  static const String jobDetails = '/snow-worker/jobs/details';
   static const String workerJobDetails = '/snow-worker/jobs/details';
   static const String workerActiveJob = '/snow-worker/active-job';
   static const String workerHistory = '/snow-worker/history';
@@ -74,9 +70,6 @@ class AppRoutes {
   static const String workerHelpSupport = '/snow-worker/help-support';
   static const String identityVerification =
       '/snow-worker/identity-verification';
-
-  //Routes pour le dashboard client
-  static const String clientHome = '/client-home';
 
   // Routes de litiges
   static const String disputes = '/disputes';
