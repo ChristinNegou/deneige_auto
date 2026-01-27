@@ -249,7 +249,7 @@ void main() {
               .having(
                   (s) => s.autoDeleteDelaySeconds, 'autoDeleteDelaySeconds', 5)
               .having((s) => s.successMessage, 'successMessage',
-                  contains('activée')),
+                  contains('notif_autoDeleteEnabled')),
         ],
       );
 
@@ -262,7 +262,7 @@ void main() {
           isA<NotificationState>()
               .having((s) => s.autoDeleteEnabled, 'autoDeleteEnabled', false)
               .having((s) => s.successMessage, 'successMessage',
-                  contains('désactivée')),
+                  contains('notif_autoDeleteDisabled')),
         ],
       );
     });
