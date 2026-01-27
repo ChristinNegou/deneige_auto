@@ -1,4 +1,5 @@
-/// Classe de base pour toutes les exceptions personnalisées
+/// Classe de base pour toutes les exceptions personnalisees de l'application.
+/// Chaque sous-classe represente un type d'erreur specifique (serveur, reseau, auth, etc.).
 abstract class AppException implements Exception {
   final String message;
   final int? statusCode;
@@ -12,7 +13,7 @@ abstract class AppException implements Exception {
   String toString() => message;
 }
 
-/// Exception levée lorsqu'une erreur serveur se produit
+/// Exception levee lors d'une erreur serveur (5xx).
 class ServerException extends AppException {
   const ServerException({
     required super.message,
@@ -20,7 +21,7 @@ class ServerException extends AppException {
   });
 }
 
-/// Exception levée lorsqu'une erreur réseau se produit
+/// Exception levee lors d'une erreur reseau (pas de connexion, timeout).
 class NetworkException extends AppException {
   const NetworkException({
     required super.message,
@@ -28,14 +29,14 @@ class NetworkException extends AppException {
   });
 }
 
-/// Exception levée lorsque les données du cache sont invalides
+/// Exception levee lorsque les donnees du cache sont invalides ou absentes.
 class CacheException extends AppException {
   const CacheException({
     required super.message,
   });
 }
 
-/// Exception levée lors d'erreurs d'authentification
+/// Exception levee lors d'erreurs d'authentification (token invalide, session expiree).
 class AuthException extends AppException {
   const AuthException({
     required super.message,
@@ -43,7 +44,8 @@ class AuthException extends AppException {
   });
 }
 
-/// Exception levée lors d'erreurs de validation
+/// Exception levee lors d'erreurs de validation des donnees saisies.
+/// [errors] contient les messages d'erreur par champ.
 class ValidationException extends AppException {
   final Map<String, String>? errors;
 
@@ -53,7 +55,8 @@ class ValidationException extends AppException {
   });
 }
 
-/// Exception levée lorsqu'un utilisateur est suspendu
+/// Exception levee lorsqu'un compte utilisateur est suspendu.
+/// Contient la raison et la date de fin de suspension le cas echeant.
 class SuspendedException extends AppException {
   final String? reason;
   final DateTime? suspendedUntil;

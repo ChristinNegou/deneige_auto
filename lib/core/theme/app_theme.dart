@@ -2,11 +2,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Thème Dark Premium - Design moderne inspiré de Uber
+/// Theme sombre premium de l'application Deneige Auto.
+/// Palette de couleurs, typographie, decorations et composants UI reutilisables
+/// inspires du design Uber avec un mode sombre confortable pour les yeux.
 class AppTheme {
   AppTheme._();
 
-  // ============ COULEURS PRINCIPALES ============
+  // --- Couleurs principales ---
 
   /// Fond principal - Noir profond chaleureux (pas noir pur)
   static const Color background = Color(0xFF0A0A0A);
@@ -71,8 +73,7 @@ class AppTheme {
   /// Couleur d'ombre
   static const Color shadowColor = Color(0xFF000000);
 
-  // ============ COULEURS DE STATUT ============
-  // Couleurs optimisées pour le mode sombre avec bonne lisibilité
+  // --- Couleurs de statut de reservation ---
 
   static const Color statusPending = Color(0xFFFBBF24);
   static const Color statusPendingBg = Color(0xFF2D2612);
@@ -92,7 +93,7 @@ class AppTheme {
   static const Color statusCancelled = Color(0xFF9CA3AF);
   static const Color statusCancelledBg = Color(0xFF1F2125);
 
-  // ============ DIMENSIONS ============
+  // --- Dimensions et espacements ---
 
   /// Padding standard
   static const double paddingXS = 4.0;
@@ -159,7 +160,7 @@ class AppTheme {
         ),
       ];
 
-  // ============ DECORATIONS ============
+  // --- Decorations de cartes et conteneurs ---
 
   /// Décoration carte glassmorphism
   static BoxDecoration get glassCard => BoxDecoration(
@@ -205,7 +206,7 @@ class AppTheme {
         boxShadow: shadowMD,
       );
 
-  // ============ TEXT STYLES ============
+  // --- Styles de texte ---
 
   /// Titre principal (page)
   static const TextStyle headlineLarge = TextStyle(
@@ -268,8 +269,9 @@ class AppTheme {
     color: textTertiary,
   );
 
-  // ============ THEME DATA ============
+  // --- ThemeData Material 3 ---
 
+  /// Configuration complete du ThemeData Material 3 en mode sombre.
   static ThemeData get darkTheme => ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
@@ -436,7 +438,8 @@ class AppTheme {
   static ThemeData get lightTheme => darkTheme;
 }
 
-/// Widget de carte glassmorphism optimisé pour le dark mode
+/// Carte avec effet glassmorphism (flou d'arriere-plan) optimisee pour le mode sombre.
+/// Utilisee pour les elements de contenu principaux avec un effet visuel premium.
 class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -501,7 +504,8 @@ class GlassCard extends StatelessWidget {
   }
 }
 
-/// Badge de statut compact optimisé pour le dark mode
+/// Badge de statut compact avec couleur de fond et bordure subtile.
+/// Utilise pour afficher les statuts de reservation, jobs, etc.
 class StatusBadge extends StatelessWidget {
   final String label;
   final Color color;
@@ -557,7 +561,8 @@ class StatusBadge extends StatelessWidget {
   }
 }
 
-/// Bouton d'action compact optimisé pour le dark mode
+/// Bouton d'action compact avec icone et label.
+/// Supporte les variantes pleine et contouree (outlined).
 class ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;

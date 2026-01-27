@@ -229,6 +229,8 @@ class AIChatRemoteDataSourceImpl implements AIChatRemoteDataSource {
     }
   }
 
+  /// Convertit une DioException en exception applicative typée (Network/Server).
+  /// Gère les cas spécifiques : timeout, 503 (service indisponible), 429 (rate limit).
   Exception _handleDioError(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.receiveTimeout ||

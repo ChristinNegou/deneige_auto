@@ -7,6 +7,8 @@ import '../../domain/entities/refund.dart';
 import '../../domain/repositories/payment_repository.dart';
 import '../datasources/payment_remote_datasource.dart';
 
+/// Implémentation du repository de paiements.
+/// Encapsule les appels au datasource distant et convertit les exceptions en Failure (Either).
 class PaymentRepositoryImpl implements PaymentRepository {
   final PaymentRemoteDataSource remoteDataSource;
 

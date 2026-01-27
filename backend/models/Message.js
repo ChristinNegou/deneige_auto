@@ -1,4 +1,11 @@
+/**
+ * Modèle Mongoose pour les messages de chat entre client et déneigeur.
+ * Supporte les messages texte, images, localisation et messages système.
+ */
+
 const mongoose = require('mongoose');
+
+// --- Schéma principal ---
 
 const messageSchema = new mongoose.Schema({
     reservationId: {
@@ -48,13 +55,21 @@ const messageSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Index pour la récupération des messages par réservation
+// --- Index ---
+
 messageSchema.index({ reservationId: 1, createdAt: 1 });
 
 // Index pour les messages non lus
 messageSchema.index({ reservationId: 1, senderId: 1, isRead: 1 });
 
-// Méthode statique pour récupérer les messages d'une conversation
+// --- Méthodes statiques ---
+
+/**
+ * Récupère les messages d'une conversation liée à une réservation, avec pagination par curseur.
+ * @param {ObjectId} reservationId - Identifiant de la réservation
+ * @param {Object} [options] - Options de pagination { limit, before }
+ * @returns {Promise<Array>} Messages triés du plus récent au plus ancien
+ */
 messageSchema.statics.getConversation = async function(reservationId, options = {}) {
     const { limit = 50, before = null } = options;
 
@@ -70,7 +85,12 @@ messageSchema.statics.getConversation = async function(reservationId, options = 
         .lean();
 };
 
-// Méthode statique pour marquer les messages comme lus
+/**
+ * Marque tous les messages non lus d'un autre expéditeur comme lus.
+ * @param {ObjectId} reservationId - Identifiant de la réservation
+ * @param {ObjectId} readerId - Identifiant du lecteur (messages de l'autre partie)
+ * @returns {Promise<Object>} Résultat de la mise à jour
+ */
 messageSchema.statics.markAsRead = async function(reservationId, readerId) {
     return this.updateMany(
         {
@@ -85,7 +105,12 @@ messageSchema.statics.markAsRead = async function(reservationId, readerId) {
     );
 };
 
-// Méthode statique pour compter les messages non lus
+/**
+ * Compte les messages non lus envoyés par l'autre partie.
+ * @param {ObjectId} reservationId - Identifiant de la réservation
+ * @param {ObjectId} userId - Identifiant de l'utilisateur qui lit
+ * @returns {Promise<number>} Nombre de messages non lus
+ */
 messageSchema.statics.countUnread = async function(reservationId, userId) {
     return this.countDocuments({
         reservationId,

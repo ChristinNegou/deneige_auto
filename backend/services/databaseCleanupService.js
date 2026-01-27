@@ -1,6 +1,7 @@
 /**
- * Service de nettoyage automatique de la base de données
- * Supprime les données obsolètes pour optimiser les performances
+ * Service de nettoyage automatique de la base de données MongoDB.
+ * Supprime les données obsolètes (notifications, messages, photos) et les enregistrements
+ * orphelins pour optimiser les performances et respecter les politiques de rétention.
  */
 
 const mongoose = require('mongoose');
@@ -8,7 +9,9 @@ const Notification = require('../models/Notification');
 const Message = require('../models/Message');
 const Reservation = require('../models/Reservation');
 
-// Configuration des délais de rétention (en jours)
+// --- Configuration de rétention ---
+
+/** Délais de rétention par type de données (en jours). */
 const RETENTION_CONFIG = {
     // Notifications
     readNotifications: 30,        // Notifications lues: 30 jours
@@ -22,10 +25,12 @@ const RETENTION_CONFIG = {
     cancelledReservationData: 90,  // Données des réservations annulées: 90 jours
 };
 
+// --- Fonctions utilitaires ---
+
 /**
- * Calcule une date dans le passé
+ * Calcule une date dans le passé.
  * @param {number} days - Nombre de jours à soustraire
- * @returns {Date}
+ * @returns {Date} Date résultante
  */
 const daysAgo = (days) => {
     const date = new Date();
@@ -33,8 +38,11 @@ const daysAgo = (days) => {
     return date;
 };
 
+// --- Tâches de nettoyage individuelles ---
+
 /**
- * Supprime les anciennes notifications lues
+ * Supprime les notifications lues datant de plus de 30 jours.
+ * @returns {Promise<Object>} Rapport { type, deleted, cutoffDate }
  */
 const cleanOldReadNotifications = async () => {
     const cutoffDate = daysAgo(RETENTION_CONFIG.readNotifications);
@@ -52,7 +60,8 @@ const cleanOldReadNotifications = async () => {
 };
 
 /**
- * Supprime les anciennes notifications non lues
+ * Supprime les notifications non lues datant de plus de 90 jours.
+ * @returns {Promise<Object>} Rapport { type, deleted, cutoffDate }
  */
 const cleanOldUnreadNotifications = async () => {
     const cutoffDate = daysAgo(RETENTION_CONFIG.unreadNotifications);
@@ -70,7 +79,8 @@ const cleanOldUnreadNotifications = async () => {
 };
 
 /**
- * Supprime les messages des réservations terminées depuis longtemps
+ * Supprime les messages des réservations terminées/annulées depuis plus de 90 jours.
+ * @returns {Promise<Object>} Rapport { type, deleted, reservationsProcessed, cutoffDate }
  */
 const cleanOldMessages = async () => {
     const cutoffDate = daysAgo(RETENTION_CONFIG.messagesAfterCompletion);
@@ -105,8 +115,9 @@ const cleanOldMessages = async () => {
 };
 
 /**
- * Nettoie les photos des anciennes réservations terminées
- * (Met à null les URLs des photos pour libérer les références)
+ * Nettoie les URLs de photos des réservations terminées depuis plus de 6 mois.
+ * Met les URLs à null pour libérer les références (les fichiers restent dans le stockage).
+ * @returns {Promise<Object>} Rapport { type, updated, cutoffDate }
  */
 const cleanOldReservationPhotos = async () => {
     const cutoffDate = daysAgo(RETENTION_CONFIG.completedReservationData);
@@ -135,8 +146,11 @@ const cleanOldReservationPhotos = async () => {
     };
 };
 
+// --- Nettoyage des enregistrements orphelins ---
+
 /**
- * Supprime les notifications orphelines (dont la réservation n'existe plus)
+ * Supprime les notifications dont la réservation associée n'existe plus en base.
+ * @returns {Promise<Object>} Rapport { type, deleted }
  */
 const cleanOrphanedNotifications = async () => {
     // Récupérer toutes les notifications avec un reservationId
@@ -182,7 +196,8 @@ const cleanOrphanedNotifications = async () => {
 };
 
 /**
- * Supprime les messages orphelins (dont la réservation n'existe plus)
+ * Supprime les messages dont la réservation associée n'existe plus en base.
+ * @returns {Promise<Object>} Rapport { type, deleted, orphanedReservations }
  */
 const cleanOrphanedMessages = async () => {
     // Récupérer tous les reservationIds uniques des messages
@@ -225,9 +240,11 @@ const cleanOrphanedMessages = async () => {
     };
 };
 
+// --- Exécution complète ---
+
 /**
- * Exécute toutes les tâches de nettoyage
- * @returns {Object} Rapport de nettoyage
+ * Exécute séquentiellement toutes les tâches de nettoyage et génère un rapport complet.
+ * @returns {Promise<Object>} Rapport { success, duration, totalDeleted, totalUpdated, results, errors }
  */
 const runFullCleanup = async () => {
     const startTime = Date.now();
@@ -281,9 +298,11 @@ const runFullCleanup = async () => {
     };
 };
 
+// --- Statistiques ---
+
 /**
- * Obtient les statistiques de la base de données
- * @returns {Object} Statistiques
+ * Récupère les statistiques de la base de données et estime les données à nettoyer.
+ * @returns {Promise<Object>} Compteurs par collection et données à nettoyer
  */
 const getDatabaseStats = async () => {
     const [

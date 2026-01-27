@@ -1,15 +1,25 @@
+/**
+ * Service d'intégration Firebase (FCM) pour les notifications push.
+ * Gère l'initialisation du SDK Admin et l'envoi de notifications vers Android/iOS.
+ */
+
 const admin = require('firebase-admin');
 
-// Initialize Firebase Admin SDK
+// --- Initialisation Firebase ---
+
 let firebaseApp = null;
 
+/**
+ * Initialise le SDK Firebase Admin (singleton). Supporte les credentials par compte de service
+ * ou par ID de projet. Retourne null si aucune configuration n'est disponible.
+ * @returns {Object|null} Instance Firebase ou null
+ */
 const initializeFirebase = () => {
     if (firebaseApp) {
         return firebaseApp;
     }
 
     try {
-        // Check if we have the service account credentials
         if (process.env.FIREBASE_SERVICE_ACCOUNT) {
             const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
             firebaseApp = admin.initializeApp({
@@ -34,13 +44,15 @@ const initializeFirebase = () => {
     return firebaseApp;
 };
 
+// --- Envoi de notifications ---
+
 /**
- * Send a push notification to a single device
- * @param {string} fcmToken - The device's FCM token
- * @param {string} title - Notification title
- * @param {string} body - Notification body
- * @param {object} data - Additional data payload
- * @returns {Promise<object>} - Firebase response
+ * Envoie une notification push à un appareil unique via FCM.
+ * @param {string} fcmToken - Token FCM de l'appareil cible
+ * @param {string} title - Titre de la notification
+ * @param {string} body - Corps du message
+ * @param {Object} [data={}] - Données supplémentaires (converties en strings)
+ * @returns {Promise<Object|null>} Résultat avec messageId ou null si échec
  */
 const sendPushNotification = async (fcmToken, title, body, data = {}) => {
     if (!firebaseApp) {
@@ -106,12 +118,13 @@ const sendPushNotification = async (fcmToken, title, body, data = {}) => {
 };
 
 /**
- * Send push notifications to multiple devices
- * @param {string[]} fcmTokens - Array of FCM tokens
- * @param {string} title - Notification title
- * @param {string} body - Notification body
- * @param {object} data - Additional data payload
- * @returns {Promise<object>} - Firebase response with success/failure counts
+ * Envoie des notifications push à plusieurs appareils en une seule requête (multicast FCM).
+ * Identifie les tokens invalides pour nettoyage ultérieur.
+ * @param {string[]} fcmTokens - Tableau de tokens FCM
+ * @param {string} title - Titre de la notification
+ * @param {string} body - Corps du message
+ * @param {Object} [data={}] - Données supplémentaires
+ * @returns {Promise<Object|null>} Résultat avec successCount, failureCount et invalidTokens
  */
 const sendMulticastNotification = async (fcmTokens, title, body, data = {}) => {
     if (!firebaseApp) {
@@ -188,11 +201,12 @@ const sendMulticastNotification = async (fcmTokens, title, body, data = {}) => {
 };
 
 /**
- * Send a notification by topic (all subscribed devices)
- * @param {string} topic - The topic name
- * @param {string} title - Notification title
- * @param {string} body - Notification body
- * @param {object} data - Additional data payload
+ * Envoie une notification push par topic (tous les appareils abonnés).
+ * @param {string} topic - Nom du topic (ex: 'weather_alerts')
+ * @param {string} title - Titre de la notification
+ * @param {string} body - Corps du message
+ * @param {Object} [data={}] - Données supplémentaires
+ * @returns {Promise<Object|null>} Résultat avec messageId ou null si échec
  */
 const sendTopicNotification = async (topic, title, body, data = {}) => {
     if (!firebaseApp) {

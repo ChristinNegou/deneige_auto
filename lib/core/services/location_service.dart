@@ -1,11 +1,15 @@
-// lib/core/services/location_service.dart
-
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+/// Service de géolocalisation GPS.
+/// Gère les permissions de localisation et fournit la position de l'appareil.
 class LocationService {
-  /// Obtient la position actuelle
+  // --- Position courante ---
+
+  /// Obtient la position actuelle de l'appareil.
+  /// Vérifie les permissions et l'activation du GPS avant la requête.
+  /// Retourne null si les permissions sont refusées ou le GPS désactivé.
   Future<Position?> getCurrentPosition() async {
     try {
       // Vérifier la permission
@@ -39,7 +43,9 @@ class LocationService {
     }
   }
 
-  /// Obtient la position ou retourne la position par défaut
+  // --- Position avec fallback ---
+
+  /// Obtient la position ou retourne la position par défaut (Trois-Rivières, QC).
   Future<Position> getPositionOrDefault() async {
     final position = await getCurrentPosition();
 

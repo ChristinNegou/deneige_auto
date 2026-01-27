@@ -7,6 +7,8 @@ import '../../domain/usecases/get_weather_usecase.dart';
 import 'home_event.dart';
 import 'home_state.dart';
 
+/// BLoC de la page d'accueil.
+/// Charge les données utilisateur, la météo et les prochaines réservations en parallèle.
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetCurrentUserUseCase getCurrentUser;
   final GetWeatherUseCase getWeather;
@@ -22,6 +24,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<RefreshReservations>(_onRefreshReservations);
   }
 
+  /// Charge toutes les données de la page d'accueil (utilisateur, météo, réservations).
+  /// Collecte les erreurs individuelles sans bloquer les autres chargements.
   Future<void> _onLoadHomeData(
     LoadHomeData event,
     Emitter<HomeState> emit,

@@ -1,3 +1,9 @@
+/**
+ * Routes Stripe Connect : gestion des comptes de paiement des déneigeurs.
+ * Inclut la création de compte, onboarding, comptes bancaires et administration.
+ * @module routes/stripeConnect
+ */
+
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
@@ -20,88 +26,106 @@ const {
     deleteOrphanConnectAccount,
 } = require('../controllers/stripeConnectController');
 
-// @route   POST /api/stripe-connect/create-account
-// @desc    Créer un compte Stripe Connect pour le déneigeur
-// @access  Private (snowWorker only)
+// --- Compte Connect du déneigeur ---
+
+/**
+ * POST /api/stripe-connect/create-account
+ * Crée un compte Stripe Connect Express pour le déneigeur et retourne le lien d'onboarding.
+ */
 router.post('/create-account', protect, authorize('snowWorker'), createConnectAccount);
 
-// @route   GET /api/stripe-connect/account-status
-// @desc    Vérifier le statut du compte Connect
-// @access  Private (snowWorker only)
+/**
+ * GET /api/stripe-connect/account-status
+ * Vérifie le statut du compte Connect (charges_enabled, payouts_enabled).
+ */
 router.get('/account-status', protect, authorize('snowWorker'), getConnectAccountStatus);
 
-// @route   GET /api/stripe-connect/dashboard-link
-// @desc    Obtenir le lien vers le dashboard Stripe Express
-// @access  Private (snowWorker only)
+/**
+ * GET /api/stripe-connect/dashboard-link
+ * Génère un lien temporaire vers le dashboard Stripe Express du déneigeur.
+ */
 router.get('/dashboard-link', protect, authorize('snowWorker'), getConnectDashboardLink);
 
-// @route   GET /api/stripe-connect/balance
-// @desc    Récupérer le solde du compte Connect
-// @access  Private (snowWorker only)
+/**
+ * GET /api/stripe-connect/balance
+ * Récupère le solde disponible et en attente du compte Connect.
+ */
 router.get('/balance', protect, authorize('snowWorker'), getConnectBalance);
 
-// @route   GET /api/stripe-connect/payout-history
-// @desc    Récupérer l'historique des paiements reçus
-// @access  Private (snowWorker only)
+/**
+ * GET /api/stripe-connect/payout-history
+ * Retourne l'historique des versements reçus par le déneigeur.
+ */
 router.get('/payout-history', protect, authorize('snowWorker'), getPayoutHistory);
 
-// @route   GET /api/stripe-connect/fee-config
-// @desc    Obtenir la configuration des commissions
-// @access  Private
+/**
+ * GET /api/stripe-connect/fee-config
+ * Retourne la configuration des commissions de la plateforme.
+ */
 router.get('/fee-config', protect, getPlatformFeeConfig);
 
-// @route   POST /api/stripe-connect/regenerate-onboarding
-// @desc    Régénérer le lien d'onboarding (si expiré)
-// @access  Private (snowWorker only)
+/**
+ * POST /api/stripe-connect/regenerate-onboarding
+ * Régénère le lien d'onboarding Stripe si le précédent a expiré.
+ */
 router.post('/regenerate-onboarding', protect, authorize('snowWorker'), regenerateOnboardingLink);
 
-// @route   GET /api/stripe-connect/requirements
-// @desc    Vérifier si des actions sont requises sur le compte
-// @access  Private (snowWorker only)
+/**
+ * GET /api/stripe-connect/requirements
+ * Vérifie si des actions sont requises sur le compte Connect (documents manquants, etc.).
+ */
 router.get('/requirements', protect, authorize('snowWorker'), checkAccountRequirements);
 
-// ============== GESTION DES COMPTES BANCAIRES ==============
+// --- Gestion des comptes bancaires ---
 
-// @route   GET /api/stripe-connect/bank-accounts
-// @desc    Récupérer la liste de tous les comptes bancaires
-// @access  Private (snowWorker only)
+/**
+ * GET /api/stripe-connect/bank-accounts
+ * Liste tous les comptes bancaires liés au compte Connect.
+ */
 router.get('/bank-accounts', protect, authorize('snowWorker'), listBankAccounts);
 
-// @route   POST /api/stripe-connect/bank-accounts
-// @desc    Ajouter un nouveau compte bancaire
-// @access  Private (snowWorker only)
+/**
+ * POST /api/stripe-connect/bank-accounts
+ * Ajoute un nouveau compte bancaire au compte Connect.
+ */
 router.post('/bank-accounts', protect, authorize('snowWorker'), addBankAccount);
 
-// @route   DELETE /api/stripe-connect/bank-accounts/:bankAccountId
-// @desc    Supprimer un compte bancaire
-// @access  Private (snowWorker only)
+/**
+ * DELETE /api/stripe-connect/bank-accounts/:bankAccountId
+ * Supprime un compte bancaire du compte Connect.
+ */
 router.delete('/bank-accounts/:bankAccountId', protect, authorize('snowWorker'), deleteBankAccount);
 
-// @route   PUT /api/stripe-connect/bank-accounts/:bankAccountId/set-default
-// @desc    Définir un compte bancaire comme compte par défaut
-// @access  Private (snowWorker only)
+/**
+ * PUT /api/stripe-connect/bank-accounts/:bankAccountId/set-default
+ * Définit un compte bancaire comme compte par défaut pour les versements.
+ */
 router.put('/bank-accounts/:bankAccountId/set-default', protect, authorize('snowWorker'), setDefaultBankAccount);
 
-// @route   GET /api/stripe-connect/canadian-banks
-// @desc    Obtenir la liste des institutions bancaires canadiennes
-// @access  Private (snowWorker only)
+/**
+ * GET /api/stripe-connect/canadian-banks
+ * Retourne la liste des institutions bancaires canadiennes reconnues.
+ */
 router.get('/canadian-banks', protect, authorize('snowWorker'), getCanadianBanks);
 
-// ============== ADMIN: GESTION DES COMPTES CONNECT ==============
+// --- Administration des comptes Connect ---
 
-// @route   GET /api/stripe-connect/admin/accounts
-// @desc    Lister tous les comptes Connect de la plateforme
-// @access  Private (admin only)
+/**
+ * GET /api/stripe-connect/admin/accounts
+ * Liste tous les comptes Connect de la plateforme (admin).
+ */
 router.get('/admin/accounts', protect, authorize('admin'), listAllConnectAccounts);
 
-// @route   DELETE /api/stripe-connect/admin/accounts/:workerId
-// @desc    Supprimer le compte Connect d'un déneigeur
-// @access  Private (admin only)
+/**
+ * DELETE /api/stripe-connect/admin/accounts/:workerId
+ * Supprime le compte Connect d'un déneigeur (admin).
+ */
 router.delete('/admin/accounts/:workerId', protect, authorize('admin'), deleteConnectAccount);
 
-// @route   DELETE /api/stripe-connect/admin/orphan-accounts/:stripeAccountId
-// @desc    Supprimer un compte Connect orphelin (non lié à un worker)
-// @access  Private (admin only)
+/**
+ * DELETE /api/stripe-connect/admin/orphan-accounts/:stripeAccountId
+ * Supprime un compte Connect orphelin non lié à un déneigeur (admin).
+ */
 router.delete('/admin/orphan-accounts/:stripeAccountId', protect, authorize('admin'), deleteOrphanConnectAccount);
 
 module.exports = router;

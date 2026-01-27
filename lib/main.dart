@@ -1,4 +1,8 @@
-// Imports nécessaires pour Flutter
+/// Point d'entree de l'application Deneige Auto.
+/// Initialise Firebase, Stripe, l'injection de dependances, le cache offline
+/// et les notifications push avant de lancer le widget racine.
+library;
+
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -7,7 +11,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
-// Import du widget racine de l'application
 import 'core/config/app_config.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/services/push_notification_service.dart';
@@ -16,11 +19,10 @@ import 'core/cache/sync_queue.dart';
 import 'core/cache/network_status.dart';
 import 'deneigeauto_app.dart';
 
-// Import de l'injection de dépendances
 import 'core/di/injection_container.dart';
 
-/// Point d'entrée principal de l'application Deneige Auto
-/// Cette fonction est appelée au démarrage de l'application
+/// Fonction main enveloppee dans [runZonedGuarded] pour capturer
+/// toutes les erreurs non gerees et les envoyer a Crashlytics.
 void main() {
   runZonedGuarded(
     () async {
@@ -100,7 +102,8 @@ void main() {
   );
 }
 
-/// Initialise Firebase Crashlytics
+/// Configure Firebase Crashlytics.
+/// Desactive la collecte en mode debug pour eviter le bruit dans les rapports.
 Future<void> _initializeCrashlytics() async {
   // Désactiver en mode debug pour éviter le bruit
   if (kDebugMode) {
@@ -112,7 +115,8 @@ Future<void> _initializeCrashlytics() async {
   }
 }
 
-/// Initialise Firebase Analytics
+/// Configure Firebase Analytics et enregistre l'ouverture de l'application.
+/// La collecte est desactivee en mode debug.
 Future<void> _initializeAnalytics() async {
   final analytics = FirebaseAnalytics.instance;
 

@@ -1,3 +1,8 @@
+/**
+ * Routes d'administration : tableau de bord, gestion utilisateurs/réservations, nettoyage BD et vérification d'identité.
+ * @module routes/admin
+ */
+
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -11,12 +16,9 @@ const Transaction = require('../models/Transaction');
 const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../services/databaseCleanupService');
 const identityVerificationService = require('../services/identityVerificationService');
 
-// Middleware pour vérifier le rôle admin
 const adminOnly = authorize('admin');
 
-// ============================================================================
-// SECURITY UTILITIES
-// ============================================================================
+// --- Utilitaires de sécurité ---
 
 // Whitelist des champs de tri autorisés pour éviter NoSQL injection
 const ALLOWED_USER_SORT_FIELDS = ['createdAt', 'firstName', 'lastName', 'email', 'role', 'isActive'];
@@ -43,14 +45,12 @@ const getErrorMessage = (error) => {
     return error.message;
 };
 
-// ============================================================================
-// DASHBOARD STATS
-// ============================================================================
+// --- Tableau de bord ---
 
 /**
- * @route   GET /api/admin/dashboard
- * @desc    Obtenir les statistiques du dashboard
- * @access  Private (Admin)
+ * GET /api/admin/dashboard
+ * Retourne les statistiques globales : utilisateurs, réservations, revenus et support.
+ * Inclut les totaux, les données du mois en cours et les tendances.
  */
 router.get('/dashboard', protect, adminOnly, async (req, res) => {
     try {
@@ -242,14 +242,14 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
     }
 });
 
-// ============================================================================
-// USER MANAGEMENT
-// ============================================================================
+// --- Gestion des utilisateurs ---
 
 /**
- * @route   GET /api/admin/users
- * @desc    Lister tous les utilisateurs avec pagination
- * @access  Private (Admin)
+ * GET /api/admin/users
+ * Liste tous les utilisateurs avec pagination, filtre par rôle et recherche textuelle.
+ * @param {string} [req.query.role] - Filtrer par rôle (client, snowWorker, admin)
+ * @param {string} [req.query.search] - Recherche par nom ou courriel
+ * @param {string} [req.query.sortBy='createdAt'] - Champ de tri (whitelist sécurisée)
  */
 router.get('/users', protect, adminOnly, async (req, res) => {
     try {
@@ -304,9 +304,8 @@ router.get('/users', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/users/:id
- * @desc    Détails d'un utilisateur
- * @access  Private (Admin)
+ * GET /api/admin/users/:id
+ * Retourne les détails complets d'un utilisateur (profil, véhicules, réservations récentes).
  */
 router.get('/users/:id', protect, adminOnly, async (req, res) => {
     try {
@@ -363,9 +362,8 @@ router.get('/users/:id', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   PATCH /api/admin/users/:id
- * @desc    Modifier un utilisateur
- * @access  Private (Admin)
+ * PATCH /api/admin/users/:id
+ * Modifie les champs autorisés d'un utilisateur (whitelist sécurisée).
  */
 router.patch('/users/:id', protect, adminOnly, async (req, res) => {
     try {
@@ -406,9 +404,10 @@ router.patch('/users/:id', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/users/:id/suspend
- * @desc    Suspendre un utilisateur
- * @access  Private (Admin)
+ * POST /api/admin/users/:id/suspend
+ * Suspend un utilisateur avec raison et durée optionnelle. Notifie l'utilisateur.
+ * @param {string} req.body.reason - Raison de la suspension
+ * @param {number} [req.body.durationDays] - Durée en jours (null = indéterminée)
  */
 router.post('/users/:id/suspend', protect, adminOnly, async (req, res) => {
     try {
@@ -464,9 +463,8 @@ router.post('/users/:id/suspend', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/users/:id/unsuspend
- * @desc    Lever la suspension d'un utilisateur
- * @access  Private (Admin)
+ * POST /api/admin/users/:id/unsuspend
+ * Lève la suspension d'un utilisateur et le notifie.
  */
 router.post('/users/:id/unsuspend', protect, adminOnly, async (req, res) => {
     try {
@@ -515,14 +513,14 @@ router.post('/users/:id/unsuspend', protect, adminOnly, async (req, res) => {
     }
 });
 
-// ============================================================================
-// RESERVATION MANAGEMENT
-// ============================================================================
+// --- Gestion des réservations ---
 
 /**
- * @route   GET /api/admin/reservations
- * @desc    Lister toutes les réservations avec pagination
- * @access  Private (Admin)
+ * GET /api/admin/reservations
+ * Liste toutes les réservations avec pagination, filtres et recherche.
+ * @param {string} [req.query.status] - Filtrer par statut
+ * @param {string} [req.query.paymentStatus] - Filtrer par statut de paiement
+ * @param {string} [req.query.search] - Recherche par nom de client/déneigeur
  */
 router.get('/reservations', protect, adminOnly, async (req, res) => {
     try {
@@ -584,9 +582,8 @@ router.get('/reservations', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/reservations/:id
- * @desc    Détails d'une réservation
- * @access  Private (Admin)
+ * GET /api/admin/reservations/:id
+ * Retourne les détails complets d'une réservation (client, déneigeur, véhicule, paiement).
  */
 router.get('/reservations/:id', protect, adminOnly, async (req, res) => {
     try {
@@ -617,9 +614,8 @@ router.get('/reservations/:id', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   PATCH /api/admin/reservations/:id
- * @desc    Modifier une réservation (admin override)
- * @access  Private (Admin)
+ * PATCH /api/admin/reservations/:id
+ * Modifie une réservation (surcharge admin : statut, paiement, déneigeur, etc.).
  */
 router.patch('/reservations/:id', protect, adminOnly, async (req, res) => {
     try {
@@ -663,9 +659,10 @@ router.patch('/reservations/:id', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/reservations/:id/refund
- * @desc    Rembourser manuellement une réservation
- * @access  Private (Admin)
+ * POST /api/admin/reservations/:id/refund
+ * Rembourse manuellement une réservation via Stripe (complet ou partiel).
+ * @param {number} [req.body.amount] - Montant du remboursement (partiel). Omis = remboursement total.
+ * @param {string} [req.body.reason] - Raison du remboursement
  */
 router.post('/reservations/:id/refund', protect, adminOnly, async (req, res) => {
     try {
@@ -757,14 +754,11 @@ router.post('/reservations/:id/refund', protect, adminOnly, async (req, res) => 
     }
 });
 
-// ============================================================================
-// WORKER MANAGEMENT
-// ============================================================================
+// --- Gestion des déneigeurs ---
 
 /**
- * @route   GET /api/admin/workers
- * @desc    Lister tous les déneigeurs
- * @access  Private (Admin)
+ * GET /api/admin/workers
+ * Liste tous les déneigeurs avec filtres de disponibilité et suspension.
  */
 router.get('/workers', protect, adminOnly, async (req, res) => {
     try {
@@ -795,9 +789,8 @@ router.get('/workers', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/workers/:id/jobs
- * @desc    Historique des jobs d'un déneigeur
- * @access  Private (Admin)
+ * GET /api/admin/workers/:id/jobs
+ * Retourne l'historique des jobs d'un déneigeur avec pagination.
  */
 router.get('/workers/:id/jobs', protect, adminOnly, async (req, res) => {
     try {
@@ -833,14 +826,14 @@ router.get('/workers/:id/jobs', protect, adminOnly, async (req, res) => {
     }
 });
 
-// ============================================================================
-// NOTIFICATIONS
-// ============================================================================
+// --- Notifications administrateur ---
 
 /**
- * @route   POST /api/admin/notifications/broadcast
- * @desc    Envoyer une notification à tous les utilisateurs ou un groupe
- * @access  Private (Admin)
+ * POST /api/admin/notifications/broadcast
+ * Diffuse une notification à tous les utilisateurs ou à un groupe ciblé par rôle.
+ * @param {string} req.body.title - Titre de la notification
+ * @param {string} req.body.message - Contenu du message
+ * @param {string} [req.body.targetRole] - Rôle cible (client, snowWorker)
  */
 router.post('/notifications/broadcast', protect, adminOnly, async (req, res) => {
     try {
@@ -881,9 +874,11 @@ router.post('/notifications/broadcast', protect, adminOnly, async (req, res) => 
 });
 
 /**
- * @route   POST /api/admin/notifications/test
- * @desc    Envoyer une notification test à un utilisateur (avec FCM)
- * @access  Private (Admin)
+ * POST /api/admin/notifications/test
+ * Envoie une notification test à un utilisateur via FCM et base de données.
+ * @param {string} req.body.userId - ID de l'utilisateur cible
+ * @param {string} [req.body.title] - Titre de la notification
+ * @param {string} [req.body.message] - Contenu du message
  */
 router.post('/notifications/test', protect, adminOnly, async (req, res) => {
     const { sendPushNotification, initializeFirebase } = require('../services/firebaseService');
@@ -967,9 +962,8 @@ router.post('/notifications/test', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/notifications/fcm-status
- * @desc    Obtenir le statut FCM de tous les utilisateurs
- * @access  Private (Admin)
+ * GET /api/admin/notifications/fcm-status
+ * Retourne le statut FCM de tous les utilisateurs (tokens enregistrés, actifs).
  */
 router.get('/notifications/fcm-status', protect, adminOnly, async (req, res) => {
     try {
@@ -1032,14 +1026,15 @@ router.get('/notifications/fcm-status', protect, adminOnly, async (req, res) => 
     }
 });
 
-// ============================================================================
-// REPORTS
-// ============================================================================
+// --- Rapports ---
 
 /**
- * @route   GET /api/admin/reports/revenue
- * @desc    Rapport de revenus par période
- * @access  Private (Admin)
+ * GET /api/admin/reports/revenue
+ * Génère un rapport de revenus par période (jour, semaine, mois, année).
+ * Inclut les revenus totaux, la commission plateforme et les gains déneigeurs.
+ * @param {string} [req.query.period='month'] - Période d'agrégation
+ * @param {string} [req.query.startDate] - Date de début (ISO 8601)
+ * @param {string} [req.query.endDate] - Date de fin (ISO 8601)
  */
 router.get('/reports/revenue', protect, adminOnly, async (req, res) => {
     try {
@@ -1094,14 +1089,11 @@ router.get('/reports/revenue', protect, adminOnly, async (req, res) => {
     }
 });
 
-// ============================================================================
-// DATABASE MANAGEMENT
-// ============================================================================
+// --- Gestion de la base de données ---
 
 /**
- * @route   GET /api/admin/database/stats
- * @desc    Obtenir les statistiques de la base de données
- * @access  Private (Admin)
+ * GET /api/admin/database/stats
+ * Retourne les statistiques de la base de données (nombre de documents par collection).
  */
 router.get('/database/stats', protect, adminOnly, async (req, res) => {
     try {
@@ -1122,9 +1114,8 @@ router.get('/database/stats', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/database/cleanup
- * @desc    Lancer un nettoyage manuel de la base de données
- * @access  Private (Admin)
+ * POST /api/admin/database/cleanup
+ * Lance un nettoyage manuel de la base de données selon la configuration de rétention.
  */
 router.post('/database/cleanup', protect, adminOnly, async (req, res) => {
     try {
@@ -1147,9 +1138,8 @@ router.post('/database/cleanup', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/database/retention-config
- * @desc    Obtenir la configuration de rétention des données
- * @access  Private (Admin)
+ * GET /api/admin/database/retention-config
+ * Retourne la configuration de rétention des données (durées par type de document).
  */
 router.get('/database/retention-config', protect, adminOnly, async (req, res) => {
     res.json({
@@ -1165,16 +1155,13 @@ router.get('/database/retention-config', protect, adminOnly, async (req, res) =>
     });
 });
 
-// ============================================================================
-// GESTION DES JOBS EXPIRES
-// ============================================================================
+// --- Gestion des jobs expirés ---
 
 const { processExpiredJobs, getExpiredJobsStats, findExpiredJobs, CONFIG: EXPIRED_JOBS_CONFIG } = require('../services/expiredJobsService');
 
 /**
- * @route   GET /api/admin/expired-jobs/stats
- * @desc    Obtenir les statistiques des jobs expires
- * @access  Private (Admin)
+ * GET /api/admin/expired-jobs/stats
+ * Retourne les statistiques des jobs expirés (compteurs, dernier traitement).
  */
 router.get('/expired-jobs/stats', protect, adminOnly, async (req, res) => {
     try {
@@ -1194,9 +1181,8 @@ router.get('/expired-jobs/stats', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/expired-jobs/list
- * @desc    Lister les jobs actuellement expires
- * @access  Private (Admin)
+ * GET /api/admin/expired-jobs/list
+ * Liste les jobs actuellement expirés (dépassement de deadline).
  */
 router.get('/expired-jobs/list', protect, adminOnly, async (req, res) => {
     try {
@@ -1237,9 +1223,8 @@ router.get('/expired-jobs/list', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/expired-jobs/process
- * @desc    Declencher manuellement le traitement des jobs expires
- * @access  Private (Admin)
+ * POST /api/admin/expired-jobs/process
+ * Déclenche manuellement le traitement des jobs expirés (annulation et notification).
  */
 router.post('/expired-jobs/process', protect, adminOnly, async (req, res) => {
     try {
@@ -1261,9 +1246,8 @@ router.post('/expired-jobs/process', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/workers/warnings
- * @desc    Lister les workers avec des avertissements
- * @access  Private (Admin)
+ * GET /api/admin/workers/warnings
+ * Liste les déneigeurs ayant des avertissements actifs (annulations excessives).
  */
 router.get('/workers/warnings', protect, adminOnly, async (req, res) => {
     try {
@@ -1294,9 +1278,8 @@ router.get('/workers/warnings', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/workers/:id/reset-warnings
- * @desc    Reinitialiser les avertissements d'un worker
- * @access  Private (Admin)
+ * POST /api/admin/workers/:id/reset-warnings
+ * Réinitialise les avertissements d'un déneigeur et le notifie.
  */
 router.post('/workers/:id/reset-warnings', protect, adminOnly, async (req, res) => {
     try {
@@ -1336,14 +1319,13 @@ router.post('/workers/:id/reset-warnings', protect, adminOnly, async (req, res) 
     }
 });
 
-// ============================================================================
-// RECONCILIATION STRIPE
-// ============================================================================
+// --- Réconciliation financière Stripe ---
 
 /**
- * @route   GET /api/admin/finance/reconciliation
- * @desc    Comparer les donnees locales avec Stripe pour detecter les ecarts
- * @access  Private (Admin)
+ * GET /api/admin/finance/reconciliation
+ * Compare les données locales avec Stripe pour détecter les écarts de paiement.
+ * @param {string} [req.query.startDate] - Date de début
+ * @param {string} [req.query.endDate] - Date de fin
  */
 router.get('/finance/reconciliation', protect, adminOnly, async (req, res) => {
     try {
@@ -1589,9 +1571,8 @@ function generateReconciliationRecommendations(discrepancies, problematicCount) 
 }
 
 /**
- * @route   POST /api/admin/finance/sync-stripe
- * @desc    Synchroniser les donnees locales avec Stripe
- * @access  Private (Admin)
+ * POST /api/admin/finance/sync-stripe
+ * Synchronise les données locales avec Stripe (statuts de paiement, transferts).
  */
 router.post('/finance/sync-stripe', protect, adminOnly, async (req, res) => {
     try {
@@ -1785,9 +1766,8 @@ router.post('/finance/sync-stripe', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/finance/cleanup-test-reservations
- * @desc    Supprimer les reservations de test (completed sans paiement)
- * @access  Private (Admin)
+ * POST /api/admin/finance/cleanup-test-reservations
+ * Supprime les réservations de test (complétées sans paiement réel).
  */
 router.post('/finance/cleanup-test-reservations', protect, adminOnly, async (req, res) => {
     try {
@@ -1844,9 +1824,8 @@ router.post('/finance/cleanup-test-reservations', protect, adminOnly, async (req
 });
 
 /**
- * @route   POST /api/admin/finance/fix-payouts
- * @desc    Calculer et remplir les champs payout manquants pour les réservations payées
- * @access  Private (Admin)
+ * POST /api/admin/finance/fix-payouts
+ * Calcule et remplit les champs payout manquants pour les réservations payées.
  */
 router.post('/finance/fix-payouts', protect, adminOnly, async (req, res) => {
     try {
@@ -1933,9 +1912,9 @@ router.post('/finance/fix-payouts', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/finance/process-pending-payouts
- * @desc    Traiter les payouts en attente pour les réservations complétées et payées
- * @access  Private (Admin)
+ * POST /api/admin/finance/process-pending-payouts
+ * Traite les versements en attente pour les réservations complétées et payées.
+ * Crée les transferts Stripe Connect et met à jour les statistiques.
  */
 router.post('/finance/process-pending-payouts', protect, adminOnly, async (req, res) => {
     try {
@@ -2049,14 +2028,13 @@ router.post('/finance/process-pending-payouts', protect, adminOnly, async (req, 
     }
 });
 
-// ============================================================================
-// IDENTITY VERIFICATION MANAGEMENT
-// ============================================================================
+// --- Gestion de la vérification d'identité ---
 
 /**
- * @route   GET /api/admin/verifications
- * @desc    Get list of identity verifications
- * @access  Private (Admin only)
+ * GET /api/admin/verifications
+ * Liste les vérifications d'identité des déneigeurs avec filtres et pagination.
+ * @param {string} [req.query.status] - Filtrer par statut (pending, approved, rejected)
+ * @param {string} [req.query.search] - Recherche par nom
  */
 router.get('/verifications', protect, adminOnly, async (req, res) => {
     try {
@@ -2145,9 +2123,8 @@ router.get('/verifications', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/verifications/stats
- * @desc    Get verification statistics
- * @access  Private (Admin only)
+ * GET /api/admin/verifications/stats
+ * Retourne les statistiques de vérification d'identité (compteurs par statut).
  */
 router.get('/verifications/stats', protect, adminOnly, async (req, res) => {
     try {
@@ -2167,9 +2144,8 @@ router.get('/verifications/stats', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   GET /api/admin/verifications/:userId
- * @desc    Get verification details for a specific user
- * @access  Private (Admin only)
+ * GET /api/admin/verifications/:userId
+ * Retourne les détails de vérification d'identité d'un déneigeur (photos, résultats IA).
  */
 router.get('/verifications/:userId', protect, adminOnly, async (req, res) => {
     try {
@@ -2229,9 +2205,10 @@ router.get('/verifications/:userId', protect, adminOnly, async (req, res) => {
 });
 
 /**
- * @route   POST /api/admin/verifications/:userId/decision
- * @desc    Make a decision on a verification
- * @access  Private (Admin only)
+ * POST /api/admin/verifications/:userId/decision
+ * Rend une décision sur une vérification d'identité (approuver ou rejeter).
+ * @param {string} req.body.decision - Décision ('approved' ou 'rejected')
+ * @param {string} [req.body.rejectionReason] - Raison du rejet
  */
 router.post('/verifications/:userId/decision', protect, adminOnly, async (req, res) => {
     try {
@@ -2284,9 +2261,8 @@ router.post('/verifications/:userId/decision', protect, adminOnly, async (req, r
 });
 
 /**
- * @route   POST /api/admin/verifications/:userId/reanalyze
- * @desc    Re-trigger AI analysis for a pending verification
- * @access  Private (Admin only)
+ * POST /api/admin/verifications/:userId/reanalyze
+ * Relance l'analyse IA pour une vérification en attente.
  */
 router.post('/verifications/:userId/reanalyze', protect, adminOnly, async (req, res) => {
     try {

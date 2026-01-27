@@ -7,7 +7,9 @@ import '../../domain/entities/worker_profile.dart';
 import '../../domain/repositories/worker_repository.dart';
 import '../../domain/usecases/toggle_availability_usecase.dart';
 
-// Events
+// --- Événements ---
+
+/// Classe de base des événements de disponibilité du déneigeur.
 abstract class WorkerAvailabilityEvent extends Equatable {
   const WorkerAvailabilityEvent();
 
@@ -74,7 +76,9 @@ class UploadProfilePhoto extends WorkerAvailabilityEvent {
   List<Object?> get props => [photo];
 }
 
-// States
+// --- États ---
+
+/// Classe de base des états de disponibilité du déneigeur.
 abstract class WorkerAvailabilityState extends Equatable {
   const WorkerAvailabilityState();
 
@@ -148,7 +152,10 @@ class WorkerPhotoUploaded extends WorkerAvailabilityState {
   List<Object?> get props => [photoUrl];
 }
 
-// BLoC
+// --- BLoC ---
+
+/// BLoC de gestion de la disponibilité et du profil du déneigeur.
+/// Gère le basculement en ligne/hors ligne, la géolocalisation et la mise à jour du profil.
 class WorkerAvailabilityBloc
     extends Bloc<WorkerAvailabilityEvent, WorkerAvailabilityState> {
   final ToggleAvailabilityUseCase toggleAvailabilityUseCase;
@@ -254,6 +261,7 @@ class WorkerAvailabilityBloc
     );
   }
 
+  /// Met à jour le profil du déneigeur (zones préférées, équipement, véhicule, etc.).
   Future<void> _onUpdateProfile(
     UpdateProfile event,
     Emitter<WorkerAvailabilityState> emit,

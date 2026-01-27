@@ -1,4 +1,11 @@
+/**
+ * Modèle Mongoose pour les véhicules des clients.
+ * Stocke les informations du véhicule (marque, modèle, plaque) et le véhicule par défaut.
+ */
+
 const mongoose = require('mongoose');
+
+// --- Schéma principal ---
 
 const vehicleSchema = new mongoose.Schema({
     userId: {
@@ -55,11 +62,13 @@ const vehicleSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Index pour recherche rapide
+// --- Index ---
+
 vehicleSchema.index({ userId: 1, isActive: 1 });
 vehicleSchema.index({ licensePlate: 1 });
 
-// Méthode virtuelle pour le nom complet
+// --- Propriétés virtuelles ---
+
 vehicleSchema.virtual('displayName').get(function() {
     return `${this.make} ${this.model} (${this.year})`;
 });
@@ -79,7 +88,9 @@ vehicleSchema.virtual('icon').get(function() {
     return icons[this.type] || '🚗';
 });
 
-// S'assurer qu'un seul véhicule par défaut par utilisateur
+// --- Middleware pre-save ---
+
+// S'assure qu'un seul véhicule par défaut existe par utilisateur
 vehicleSchema.pre('save', async function(next) {
     if (this.isDefault && this.isModified('isDefault')) {
         await this.constructor.updateMany(

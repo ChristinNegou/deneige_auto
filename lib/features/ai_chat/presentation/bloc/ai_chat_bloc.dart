@@ -8,7 +8,8 @@ import '../../domain/usecases/send_ai_message_usecase.dart';
 part 'ai_chat_event.dart';
 part 'ai_chat_state.dart';
 
-/// BLoC pour gérer le chat avec l'assistant IA
+/// BLoC de gestion du chat avec l'assistant IA.
+/// Orchestre les conversations, l'envoi de messages, les actions rapides et la disponibilité du service.
 class AIChatBloc extends Bloc<AIChatEvent, AIChatState> {
   final AIChatRepository repository;
   final SendAIMessageUseCase sendAIMessage;
@@ -124,6 +125,8 @@ class AIChatBloc extends Bloc<AIChatEvent, AIChatState> {
     );
   }
 
+  /// Envoie un message dans la conversation courante.
+  /// Ajoute un message temporaire pour l'UX immédiate, puis le remplace par la réponse API.
   Future<void> _onSendMessage(
     SendMessage event,
     Emitter<AIChatState> emit,

@@ -1,6 +1,7 @@
 /**
- * Service de prédiction de demande basé sur la météo
- * Analyse l'historique et les prévisions pour prédire les pics de demande
+ * Service de prédiction de demande de déneigement basé sur la météo.
+ * Combine les prévisions météo (OpenWeather), l'historique des réservations
+ * et l'analyse IA (Claude) pour prédire les pics de demande par zone au Québec.
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
@@ -8,7 +9,8 @@ const axios = require('axios');
 const Reservation = require('../models/Reservation');
 const DemandForecast = require('../models/DemandForecast');
 
-// Client Anthropic (lazy init)
+// --- Initialisation du client Anthropic ---
+
 let anthropicClient = null;
 
 function getAnthropicClient() {
@@ -20,8 +22,10 @@ function getAnthropicClient() {
   return anthropicClient;
 }
 
+// --- Configuration des zones ---
+
 /**
- * Zones de service au Québec
+ * Zones de service au Québec avec leurs coordonnées géographiques.
  */
 const SERVICE_ZONES = {
   montreal: { lat: 45.5017, lon: -73.5673, name: 'Montréal' },
@@ -31,8 +35,13 @@ const SERVICE_ZONES = {
   gatineau: { lat: 45.4765, lon: -75.7013, name: 'Gatineau' },
 };
 
+// --- Données météo ---
+
 /**
- * Récupère les prévisions météo depuis OpenWeather
+ * Récupère les prévisions météo sur 5 jours depuis l'API OpenWeather.
+ * @param {number} lat - Latitude
+ * @param {number} lon - Longitude
+ * @returns {Promise<Object[]|null>} Prévisions formatées ou null en cas d'erreur
  */
 async function getWeatherForecast(lat, lon) {
   const apiKey = process.env.OPENWEATHER_API_KEY;
@@ -61,8 +70,13 @@ async function getWeatherForecast(lat, lon) {
   }
 }
 
+// --- Analyse historique ---
+
 /**
- * Récupère l'historique des réservations pour une période
+ * Récupère l'historique agrégé des réservations par jour et par heure pour une zone.
+ * @param {string} zone - Nom de la zone
+ * @param {number} [daysBack=30] - Nombre de jours à analyser
+ * @returns {Promise<Array>} Données agrégées { date, heure, count, avgPrice }
  */
 async function getHistoricalData(zone, daysBack = 30) {
   const startDate = new Date();
@@ -93,7 +107,9 @@ async function getHistoricalData(zone, daysBack = 30) {
 }
 
 /**
- * Analyse les patterns historiques
+ * Analyse les patterns historiques pour dégager les tendances (moyenne quotidienne, heures de pointe).
+ * @param {Array} historicalData - Données agrégées de getHistoricalData
+ * @returns {Object} Patterns avec avgDaily, peakHours, totalReservations, daysAnalyzed
  */
 function analyzeHistoricalPatterns(historicalData) {
   if (!historicalData || historicalData.length === 0) {
@@ -137,8 +153,14 @@ function analyzeHistoricalPatterns(historicalData) {
   };
 }
 
+// --- Calcul de la demande ---
+
 /**
- * Calcule le niveau de demande prévu
+ * Calcule le niveau de demande prévu selon la neige, l'historique et les conditions météo.
+ * @param {number} snowForecast - Neige prévue en cm sur 24h
+ * @param {Object} historicalPatterns - Résultat de analyzeHistoricalPatterns
+ * @param {string} weatherConditions - Description météo courante
+ * @returns {Object} { level: 'low'|'medium'|'high'|'urgent', multiplier: number }
  */
 function calculateDemandLevel(snowForecast, historicalPatterns, weatherConditions) {
   let demandScore = 0;
@@ -182,8 +204,15 @@ function calculateDemandLevel(snowForecast, historicalPatterns, weatherCondition
   return { level: 'low', multiplier: 1.0 };
 }
 
+// --- Intégration IA ---
+
 /**
- * Obtient le raisonnement IA pour la prédiction
+ * Obtient un raisonnement IA (Claude) expliquant la prédiction de demande.
+ * @param {string} zone - Nom de la zone
+ * @param {Object[]} weatherForecast - Prévisions météo
+ * @param {Object} historicalPatterns - Patterns historiques
+ * @param {Object} demand - Niveau de demande calculé
+ * @returns {Promise<string|null>} Texte d'analyse ou null si IA désactivée
  */
 async function getAIPredictionReasoning(zone, weatherForecast, historicalPatterns, demand) {
   const client = getAnthropicClient();
@@ -227,8 +256,13 @@ Fournis une brève analyse (3-4 phrases) expliquant cette prédiction et les fac
   }
 }
 
+// --- Fonctions principales ---
+
 /**
- * Prédit la demande pour une zone donnée
+ * Prédit la demande pour une zone donnée en combinant météo, historique et IA.
+ * Sauvegarde la prédiction dans la collection DemandForecast.
+ * @param {string} zoneName - Nom de la zone (ex: 'montreal')
+ * @returns {Promise<Object>} Prédiction complète avec contexte et raisonnement
  */
 async function predictDemand(zoneName) {
   const zone = SERVICE_ZONES[zoneName.toLowerCase()];
@@ -301,7 +335,8 @@ async function predictDemand(zoneName) {
 }
 
 /**
- * Prédit la demande pour toutes les zones
+ * Prédit la demande pour toutes les zones de service du Québec.
+ * @returns {Promise<Object>} Prédictions par zone { zoneName: prediction }
  */
 async function predictAllZones() {
   const results = {};
@@ -319,7 +354,9 @@ async function predictAllZones() {
 }
 
 /**
- * Récupère les prédictions récentes
+ * Récupère les prédictions récentes des dernières heures.
+ * @param {number} [hoursBack=24] - Nombre d'heures à remonter
+ * @returns {Promise<Array>} Prédictions triées par date décroissante
  */
 async function getRecentPredictions(hoursBack = 24) {
   const since = new Date();
@@ -333,7 +370,9 @@ async function getRecentPredictions(hoursBack = 24) {
 }
 
 /**
- * Calcule la précision des prédictions passées
+ * Calcule la précision des prédictions passées en comparant avec les réservations réelles.
+ * @param {number} [daysBack=7] - Nombre de jours à évaluer
+ * @returns {Promise<Array>} Résultats de précision par prédiction
  */
 async function calculatePredictionAccuracy(daysBack = 7) {
   const startDate = new Date();

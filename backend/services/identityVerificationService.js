@@ -1,6 +1,7 @@
 /**
- * Service de vérification d'identité (KYC) avec Claude Vision
- * Analyse les documents d'identité et compare avec le selfie
+ * Service de vérification d'identité (KYC) avec Claude Vision.
+ * Analyse les documents d'identité québécois (permis, RAMQ, passeport), compare avec le selfie,
+ * et prend une décision automatique ou demande une révision manuelle.
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
@@ -8,7 +9,8 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const axios = require('axios');
 
-// Client Anthropic (lazy init)
+// --- Initialisation du client Anthropic ---
+
 let anthropicClient = null;
 
 function getAnthropicClient() {
@@ -20,8 +22,12 @@ function getAnthropicClient() {
   return anthropicClient;
 }
 
+// --- Fonctions utilitaires ---
+
 /**
- * Convertit une URL d'image en base64
+ * Convertit une URL d'image en base64 pour l'envoi à l'API Claude Vision.
+ * @param {string} url - URL de l'image
+ * @returns {Promise<Object|null>} { base64, contentType } ou null en cas d'erreur
  */
 async function imageUrlToBase64(url) {
   try {
@@ -38,9 +44,9 @@ async function imageUrlToBase64(url) {
   }
 }
 
-/**
- * Prompt d'analyse pour la vérification d'identité
- */
+// --- Prompt IA ---
+
+/** Prompt Claude Vision pour l'analyse de documents d'identité et la comparaison faciale. */
 const VERIFICATION_PROMPT = `Tu es un expert en vérification d'identité (KYC) pour une application de services au Québec.
 
 Analyse ces documents d'identité et ce selfie pour vérifier l'identité d'un utilisateur.
@@ -89,8 +95,13 @@ CRITÈRES DE DÉCISION:
 - reject: Document invalide/illisible, visages différents, photo fake
 - manual_review: Cas ambigus, score entre 50-80, doutes sur l'authenticité`;
 
+// --- Analyse IA principale ---
+
 /**
- * Analyse les documents de vérification d'identité d'un utilisateur
+ * Analyse les documents de vérification d'identité d'un déneigeur avec Claude Vision.
+ * Compare le document avec le selfie, extrait les informations et prend une décision.
+ * @param {ObjectId} userId - Identifiant du déneigeur
+ * @returns {Promise<Object>} Résultat { status, aiAnalysis, decision, recommendation }
  */
 async function analyzeIdentityDocuments(userId) {
   const client = getAnthropicClient();
@@ -291,8 +302,13 @@ async function analyzeIdentityDocuments(userId) {
   }
 }
 
+// --- Notifications ---
+
 /**
- * Envoie une notification au worker concernant sa vérification
+ * Envoie une notification au déneigeur concernant le résultat de sa vérification d'identité.
+ * @param {ObjectId} userId - Identifiant du déneigeur
+ * @param {string} status - Statut de vérification ('approved', 'rejected', 'pending')
+ * @param {string} [reason] - Raison du refus (si applicable)
  */
 async function sendVerificationNotification(userId, status, reason) {
   try {
@@ -331,8 +347,16 @@ async function sendVerificationNotification(userId, status, reason) {
   }
 }
 
+// --- Gestion administrative ---
+
 /**
- * Traite une décision admin sur une vérification
+ * Traite la décision d'un administrateur sur une vérification d'identité en attente.
+ * @param {ObjectId} userId - Identifiant du déneigeur
+ * @param {ObjectId} adminId - Identifiant de l'administrateur
+ * @param {string} decision - Décision ('approved' ou 'rejected')
+ * @param {string} [reason] - Raison de la décision
+ * @param {string} [notes] - Notes internes de l'administrateur
+ * @returns {Promise<Object>} { success, status }
  */
 async function processAdminDecision(userId, adminId, decision, reason, notes) {
   const user = await User.findById(userId);
@@ -373,7 +397,9 @@ async function processAdminDecision(userId, adminId, decision, reason, notes) {
 }
 
 /**
- * Vérifie si un worker peut resoumettre ses documents
+ * Vérifie si un déneigeur peut resoumettre ses documents d'identité (max 3 tentatives).
+ * @param {ObjectId} userId - Identifiant du déneigeur
+ * @returns {Promise<Object>} { canResubmit, reason, attemptsRemaining }
  */
 async function canResubmit(userId) {
   const user = await User.findById(userId);
@@ -407,8 +433,11 @@ async function canResubmit(userId) {
   };
 }
 
+// --- Statistiques ---
+
 /**
- * Récupère les statistiques de vérification pour l'admin
+ * Récupère les statistiques de vérification d'identité pour le tableau de bord admin.
+ * @returns {Promise<Object>} Compteurs par statut (not_submitted, pending, approved, rejected, expired)
  */
 async function getVerificationStats() {
   const stats = await User.aggregate([

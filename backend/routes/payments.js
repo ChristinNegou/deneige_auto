@@ -1,3 +1,8 @@
+/**
+ * Routes de paiement Stripe : création d'intentions, confirmation, méthodes de paiement, remboursements et versements.
+ * @module routes/payments
+ */
+
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -23,9 +28,16 @@ const { validatePaymentMethodId, validateCreatePaymentIntent, validateConfirmPay
 const { PLATFORM_FEE_PERCENT } = require('../config/constants');
 const { handleError, safeNotify } = require('../utils/errorHandler');
 
-// @route   POST /api/payments/create-intent
-// @desc    Créer un Payment Intent Stripe avec transfert automatique au déneigeur
-// @access  Private
+// --- Création et confirmation de paiement ---
+
+/**
+ * POST /api/payments/create-intent
+ * Crée un Payment Intent Stripe avec transfert automatique au déneigeur via Connect.
+ * Inclut une clé d'idempotence pour éviter les doubles charges.
+ * @param {number} req.body.amount - Montant en dollars CAD
+ * @param {string} [req.body.reservationId] - ID de la réservation liée
+ * @returns {Object} clientSecret, paymentIntentId et ventilation des montants
+ */
 router.post('/create-intent', protect, paymentLimiter, validateCreatePaymentIntent, async (req, res) => {
     try {
         const { amount, reservationId } = req.body;
@@ -123,9 +135,13 @@ router.post('/create-intent', protect, paymentLimiter, validateCreatePaymentInte
     }
 });
 
-// @route   POST /api/payments/confirm
-// @desc    Confirmer un paiement et mettre à jour la réservation + payout
-// @access  Private
+/**
+ * POST /api/payments/confirm
+ * Confirme un paiement Stripe, met à jour la réservation et les statistiques du déneigeur.
+ * Enregistre les transactions et notifie le client.
+ * @param {string} req.body.paymentIntentId - ID du Payment Intent Stripe
+ * @param {string} req.body.reservationId - ID de la réservation
+ */
 router.post('/confirm', protect, paymentLimiter, validateConfirmPayment, async (req, res) => {
     try {
         const { paymentIntentId, reservationId } = req.body;
@@ -259,70 +275,80 @@ router.post('/confirm', protect, paymentLimiter, validateConfirmPayment, async (
     }
 });
 
-// Payment Methods Management Routes
-// @route   GET /api/payments/payment-methods
-// @desc    Récupérer les méthodes de paiement du client
-// @access  Private
+// --- Gestion des méthodes de paiement ---
+
+/**
+ * GET /api/payments/payment-methods
+ * Récupère les méthodes de paiement enregistrées du client.
+ */
 router.get('/payment-methods', protect, getPaymentMethods);
 
-// @route   POST /api/payments/payment-methods
-// @desc    Ajouter une nouvelle méthode de paiement
-// @access  Private
+/**
+ * POST /api/payments/payment-methods
+ * Ajoute une nouvelle méthode de paiement au client.
+ */
 router.post('/payment-methods', protect, savePaymentMethod);
 
-// @route   DELETE /api/payments/payment-methods/:id
-// @desc    Supprimer une méthode de paiement
-// @access  Private
+/**
+ * DELETE /api/payments/payment-methods/:id
+ * Supprime une méthode de paiement.
+ */
 router.delete('/payment-methods/:id', protect, deletePaymentMethod);
 
-// @route   PATCH /api/payments/payment-methods/:id/default
-// @desc    Définir une méthode de paiement par défaut
-// @access  Private
+/**
+ * PATCH /api/payments/payment-methods/:id/default
+ * Définit une méthode de paiement comme méthode par défaut.
+ */
 router.patch('/payment-methods/:id/default', protect, setDefaultPaymentMethod);
 
-// Refund Routes
-// @route   POST /api/payments/refunds
-// @desc    Créer un remboursement
-// @access  Private
+// --- Remboursements ---
+
+/**
+ * POST /api/payments/refunds
+ * Crée un remboursement Stripe pour une réservation.
+ */
 router.post('/refunds', protect, paymentLimiter, validateRefund, createRefund);
 
-// @route   GET /api/payments/refunds/:id
-// @desc    Récupérer le statut d'un remboursement
-// @access  Private
+/**
+ * GET /api/payments/refunds/:id
+ * Récupère le statut d'un remboursement par son ID.
+ */
 router.get('/refunds/:id', protect, getRefundStatus);
 
-// ============================================
-// Payout Routes (Versements aux déneigeurs)
-// ============================================
+// --- Versements aux déneigeurs ---
 
-// @route   POST /api/payments/payouts
-// @desc    Créer un versement manuel au déneigeur
-// @access  Private (Admin)
+/**
+ * POST /api/payments/payouts
+ * Crée un versement manuel au déneigeur (admin uniquement).
+ */
 router.post('/payouts', protect, createWorkerPayout);
 
-// @route   GET /api/payments/payouts/pending
-// @desc    Récupérer les versements en attente (pour un déneigeur)
-// @access  Private (snowWorker)
+/**
+ * GET /api/payments/payouts/pending
+ * Récupère les versements en attente du déneigeur.
+ */
 router.get('/payouts/pending', protect, getPendingPayouts);
 
-// @route   GET /api/payments/payouts/history
-// @desc    Récupérer l'historique des versements reçus
-// @access  Private (snowWorker)
+/**
+ * GET /api/payments/payouts/history
+ * Retourne l'historique des versements reçus par le déneigeur.
+ */
 router.get('/payouts/history', protect, getWorkerPayoutHistory);
 
-// @route   GET /api/payments/payouts/summary
-// @desc    Récupérer le résumé des gains
-// @access  Private (snowWorker)
+/**
+ * GET /api/payments/payouts/summary
+ * Retourne le résumé des gains du déneigeur (total, en attente, transféré).
+ */
 router.get('/payouts/summary', protect, getWorkerEarningsSummary);
 
-// ============================================
-// Stripe Webhook pour les chargebacks/disputes
-// ============================================
+// --- Webhook Stripe (chargebacks/disputes) ---
 
-// @route   POST /api/payments/webhook
-// @desc    Gérer les webhooks Stripe (chargebacks, disputes)
-// @access  Public (vérifié par signature Stripe)
-// Note: Ce endpoint doit recevoir le raw body, configuré dans server.js
+/**
+ * POST /api/payments/webhook
+ * Gère les webhooks Stripe (chargebacks, remboursements, échecs de paiement).
+ * La signature est vérifiée via STRIPE_WEBHOOK_SECRET.
+ * Ce endpoint reçoit le raw body, configuré dans server.js.
+ */
 router.post('/webhook', async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;

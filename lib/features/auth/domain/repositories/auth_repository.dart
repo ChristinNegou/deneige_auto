@@ -3,6 +3,10 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/user.dart';
 
+/// Contrat du repository d'authentification (couche domaine).
+/// Définit les opérations disponibles pour l'auth, le profil,
+/// la vérification téléphonique et la gestion de la photo de profil.
+/// Retourne [Either<Failure, T>] pour une gestion fonctionnelle des erreurs.
 abstract class AuthRepository {
   Future<Either<Failure, User>> login(String email, String password);
   Future<Either<Failure, User>> register(
@@ -21,7 +25,7 @@ abstract class AuthRepository {
     String? photoUrl,
   });
 
-  // Phone verification methods
+  // --- Vérification téléphonique ---
   Future<Either<Failure, Map<String, dynamic>>> sendPhoneVerificationCode({
     required String phoneNumber,
     required String email,
@@ -39,12 +43,12 @@ abstract class AuthRepository {
   Future<Either<Failure, Map<String, dynamic>>> resendPhoneVerificationCode(
       String phoneNumber);
 
-  // Profile photo methods
+  // --- Photo de profil ---
   Future<Either<Failure, User>> uploadProfilePhoto(File photoFile);
   Future<Either<Failure, User>> deleteProfilePhoto();
   Future<Either<Failure, bool>> checkPhoneAvailability(String phoneNumber);
 
-  // Phone change verification methods
+  // --- Changement de numéro de téléphone ---
   Future<Either<Failure, Map<String, dynamic>>> sendPhoneChangeCode(
       String phoneNumber);
   Future<Either<Failure, User>> verifyPhoneChangeCode({

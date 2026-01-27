@@ -1,4 +1,11 @@
+/**
+ * Modèle Mongoose pour les demandes de support utilisateur.
+ * Permet aux utilisateurs de signaler des bugs, poser des questions ou faire des suggestions.
+ */
+
 const mongoose = require('mongoose');
+
+// --- Schéma principal ---
 
 const supportRequestSchema = new mongoose.Schema({
     userId: {
@@ -48,13 +55,19 @@ const supportRequestSchema = new mongoose.Schema({
     },
 });
 
-// Index pour rechercher par utilisateur
+// --- Index ---
+
 supportRequestSchema.index({ userId: 1, createdAt: -1 });
 
 // Index pour l'admin (recherche par status)
 supportRequestSchema.index({ status: 1, createdAt: -1 });
 
-// Méthode pour obtenir le label du sujet en français
+// --- Méthodes d'instance ---
+
+/**
+ * Retourne le libellé français du sujet de la demande.
+ * @returns {string} Libellé du sujet
+ */
 supportRequestSchema.methods.getSubjectLabel = function () {
     const labels = {
         bug: 'Signalement de bug',
@@ -65,7 +78,10 @@ supportRequestSchema.methods.getSubjectLabel = function () {
     return labels[this.subject] || this.subject;
 };
 
-// Méthode pour obtenir le label du status en français
+/**
+ * Retourne le libellé français du statut de la demande.
+ * @returns {string} Libellé du statut
+ */
 supportRequestSchema.methods.getStatusLabel = function () {
     const labels = {
         pending: 'En attente',

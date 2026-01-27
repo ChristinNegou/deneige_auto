@@ -1,4 +1,11 @@
+/**
+ * Modèle Mongoose pour les litiges entre clients et déneigeurs.
+ * Gère le cycle complet : ouverture, preuves, réponse, résolution, appel et analyse IA.
+ */
+
 const mongoose = require('mongoose');
+
+// --- Schéma principal ---
 
 const disputeSchema = new mongoose.Schema({
     // Type de litige
@@ -361,14 +368,22 @@ const disputeSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Index pour recherche rapide
+// --- Index ---
+
 disputeSchema.index({ status: 1, priority: -1, createdAt: -1 });
 disputeSchema.index({ 'claimant.user': 1, status: 1 });
 disputeSchema.index({ 'respondent.user': 1, status: 1 });
 disputeSchema.index({ reservation: 1 });
 disputeSchema.index({ type: 1, status: 1 });
 
-// Méthode pour ajouter à l'historique
+// --- Méthodes d'instance ---
+
+/**
+ * Ajoute une entrée à l'historique des actions du litige.
+ * @param {string} action - Type d'action (ex: 'status_changed', 'evidence_added')
+ * @param {string} details - Description de l'action
+ * @param {ObjectId} userId - Identifiant de l'utilisateur ayant effectué l'action
+ */
 disputeSchema.methods.addHistory = function(action, details, userId) {
     this.history.push({
         action,
@@ -378,7 +393,11 @@ disputeSchema.methods.addHistory = function(action, details, userId) {
     });
 };
 
-// Méthode pour ajouter une note admin
+/**
+ * Ajoute une note interne d'administrateur au litige.
+ * @param {string} note - Contenu de la note
+ * @param {ObjectId} adminId - Identifiant de l'administrateur
+ */
 disputeSchema.methods.addAdminNote = function(note, adminId) {
     this.adminNotes.push({
         note,
@@ -388,7 +407,10 @@ disputeSchema.methods.addAdminNote = function(note, adminId) {
     this.addHistory('admin_note_added', note.substring(0, 100), adminId);
 };
 
-// Méthode pour vérifier si le litige peut être résolu automatiquement
+/**
+ * Vérifie si le litige est éligible à une résolution automatique.
+ * @returns {boolean} true si la résolution automatique est possible
+ */
 disputeSchema.methods.checkAutoResolution = function() {
     // No-show automatique si le worker n'a jamais marqué "en route"
     if (this.type === 'no_show') {
@@ -402,7 +424,12 @@ disputeSchema.methods.checkAutoResolution = function() {
     return false;
 };
 
-// Méthode statique pour obtenir les statistiques des litiges
+// --- Méthodes statiques ---
+
+/**
+ * Agrège les statistiques des litiges par statut et par type.
+ * @returns {Promise<Object>} Statistiques { byStatus, byType }
+ */
 disputeSchema.statics.getStats = async function() {
     const stats = await this.aggregate([
         {
@@ -425,7 +452,8 @@ disputeSchema.statics.getStats = async function() {
     return { byStatus: stats, byType: typeStats };
 };
 
-// Virtuals
+// --- Propriétés virtuelles ---
+
 disputeSchema.virtual('isOverdue').get(function() {
     if (this.deadlines?.resolutionDeadline) {
         return new Date() > this.deadlines.resolutionDeadline &&

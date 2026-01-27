@@ -1,3 +1,8 @@
+/**
+ * Routes de support client : création de demandes, suivi, réponse admin et gestion.
+ * @module routes/support
+ */
+
 const express = require('express');
 const router = express.Router();
 const SupportRequest = require('../models/SupportRequest');
@@ -6,7 +11,11 @@ const Notification = require('../models/Notification');
 const { protect, authorize } = require('../middleware/auth');
 const { sendEmail } = require('../config/email');
 
-// Fonction pour échapper les caractères HTML (évite XSS)
+/**
+ * Échappe les caractères HTML pour éviter les attaques XSS dans les courriels.
+ * @param {string} text - Texte brut à échapper
+ * @returns {string} Texte avec les entités HTML échappées
+ */
 const escapeHtml = (text) => {
     if (!text) return '';
     const htmlEntities = {
@@ -19,9 +28,15 @@ const escapeHtml = (text) => {
     return text.replace(/[&<>"']/g, (char) => htmlEntities[char]);
 };
 
-// @route   POST /api/support/request
-// @desc    Créer une nouvelle demande de support
-// @access  Private
+// --- Création de demande ---
+
+/**
+ * POST /api/support/request
+ * Crée une nouvelle demande de support.
+ * @param {string} req.body.subject - Sujet de la demande
+ * @param {string} req.body.message - Description du problème
+ * @returns {Object} Détails de la demande créée
+ */
 router.post('/request', protect, async (req, res) => {
     try {
         const { subject, message } = req.body;
@@ -74,9 +89,12 @@ router.post('/request', protect, async (req, res) => {
     }
 });
 
-// @route   GET /api/support/my-requests
-// @desc    Obtenir les demandes de support de l'utilisateur
-// @access  Private
+// --- Consultation ---
+
+/**
+ * GET /api/support/my-requests
+ * Retourne les demandes de support de l'utilisateur (20 dernières).
+ */
 router.get('/my-requests', protect, async (req, res) => {
     try {
         const requests = await SupportRequest.find({ userId: req.user.id })
@@ -109,9 +127,15 @@ router.get('/my-requests', protect, async (req, res) => {
     }
 });
 
-// @route   GET /api/support/requests
-// @desc    Obtenir toutes les demandes de support (Admin)
-// @access  Private/Admin
+// --- Administration ---
+
+/**
+ * GET /api/support/requests
+ * Liste toutes les demandes de support avec pagination et filtre par statut (admin).
+ * @param {string} [req.query.status] - Filtrer par statut
+ * @param {number} [req.query.page=1] - Page
+ * @param {number} [req.query.limit=20] - Limite par page
+ */
 router.get('/requests', protect, authorize('admin'), async (req, res) => {
     try {
         const { status, page = 1, limit = 20 } = req.query;
@@ -162,9 +186,12 @@ router.get('/requests', protect, authorize('admin'), async (req, res) => {
     }
 });
 
-// @route   PUT /api/support/requests/:id
-// @desc    Mettre à jour le statut d'une demande (Admin)
-// @access  Private/Admin
+/**
+ * PUT /api/support/requests/:id
+ * Met à jour le statut et les notes d'une demande de support (admin).
+ * @param {string} [req.body.status] - Nouveau statut
+ * @param {string} [req.body.adminNotes] - Notes internes
+ */
 router.put('/requests/:id', protect, authorize('admin'), async (req, res) => {
     try {
         const { status, adminNotes } = req.body;
@@ -210,9 +237,13 @@ router.put('/requests/:id', protect, authorize('admin'), async (req, res) => {
     }
 });
 
-// @route   POST /api/support/requests/:id/respond
-// @desc    Répondre à une demande de support (Admin)
-// @access  Private/Admin
+/**
+ * POST /api/support/requests/:id/respond
+ * Envoie une réponse admin à une demande de support (avec courriel et notification optionnels).
+ * @param {string} req.body.message - Contenu de la réponse
+ * @param {boolean} [req.body.sendEmail] - Envoyer un courriel au client
+ * @param {boolean} [req.body.sendNotification] - Créer une notification in-app
+ */
 router.post('/requests/:id/respond', protect, authorize('admin'), async (req, res) => {
     try {
         const { message, sendEmail: shouldSendEmail, sendNotification } = req.body;
@@ -339,9 +370,10 @@ router.post('/requests/:id/respond', protect, authorize('admin'), async (req, re
     }
 });
 
-// @route   DELETE /api/support/requests/:id
-// @desc    Supprimer une demande de support (Admin)
-// @access  Private/Admin
+/**
+ * DELETE /api/support/requests/:id
+ * Supprime définitivement une demande de support (admin).
+ */
 router.delete('/requests/:id', protect, authorize('admin'), async (req, res) => {
     try {
         const request = await SupportRequest.findById(req.params.id);

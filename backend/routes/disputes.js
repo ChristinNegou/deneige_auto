@@ -1,3 +1,8 @@
+/**
+ * Routes de gestion des litiges (création, signalement no-show, réponse, appel, résolution admin).
+ * @module routes/disputes
+ */
+
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
@@ -28,85 +33,105 @@ const {
     getDisputeTypes,
 } = require('../controllers/disputeController');
 
-// ============== PUBLIC ==============
+// --- Routes publiques ---
 
-// @route   GET /api/disputes/types
-// @desc    Obtenir les types de litiges disponibles
-// @access  Public
+/**
+ * GET /api/disputes/types
+ * Retourne les types de litiges disponibles.
+ */
 router.get('/types', getDisputeTypes);
 
-// ============== CLIENT & WORKER ROUTES ==============
+// --- Routes client et déneigeur ---
 
-// @route   POST /api/disputes/report-no-show/:reservationId
-// @desc    Signaler un no-show (déneigeur pas venu)
-// @access  Private (client only)
+/**
+ * POST /api/disputes/report-no-show/:reservationId
+ * Signale un no-show (déneigeur absent) pour une réservation.
+ */
 router.post('/report-no-show/:reservationId', protect, authorize('client'), validateReportNoShow, reportNoShow);
 
-// @route   POST /api/disputes
-// @desc    Créer un litige général
-// @access  Private
+/**
+ * POST /api/disputes
+ * Crée un nouveau litige lié à une réservation.
+ * @param {string} req.body.reservationId - ID de la réservation
+ * @param {string} req.body.type - Type de litige
+ * @param {string} req.body.description - Description du problème
+ */
 router.post('/', protect, validateCreateDispute, createDispute);
 
-// @route   GET /api/disputes/my-disputes
-// @desc    Obtenir mes litiges
-// @access  Private
+/**
+ * GET /api/disputes/my-disputes
+ * Retourne les litiges de l'utilisateur (plaignant ou mis en cause).
+ */
 router.get('/my-disputes', protect, validateDisputePagination, getMyDisputes);
 
-// @route   GET /api/disputes/:id
-// @desc    Obtenir les détails d'un litige
-// @access  Private
+/**
+ * GET /api/disputes/:id
+ * Retourne les détails complets d'un litige.
+ */
 router.get('/:id', protect, validateMongoId(), getDisputeDetails);
 
-// @route   POST /api/disputes/:id/respond
-// @desc    Répondre à un litige (défendeur)
-// @access  Private
+/**
+ * POST /api/disputes/:id/respond
+ * Permet au mis en cause de répondre à un litige.
+ */
 router.post('/:id/respond', protect, validateDisputeResponse, respondToDispute);
 
-// @route   POST /api/disputes/:id/evidence
-// @desc    Ajouter des preuves à un litige
-// @access  Private
+/**
+ * POST /api/disputes/:id/evidence
+ * Ajoute des preuves (photos, documents) à un litige existant.
+ */
 router.post('/:id/evidence', protect, validateMongoId(), addEvidence);
 
-// @route   POST /api/disputes/:id/appeal
-// @desc    Faire appel d'une décision
-// @access  Private
+/**
+ * POST /api/disputes/:id/appeal
+ * Fait appel d'une décision de litige résolu.
+ */
 router.post('/:id/appeal', protect, validateDisputeAppeal, appealDispute);
 
-// @route   POST /api/disputes/confirm-satisfaction/:reservationId
-// @desc    Client confirme que le travail est satisfaisant
-// @access  Private (client only)
+/**
+ * POST /api/disputes/confirm-satisfaction/:reservationId
+ * Le client confirme que le travail est satisfaisant (clôture le litige potentiel).
+ */
 router.post('/confirm-satisfaction/:reservationId', protect, authorize('client'), validateMongoId('reservationId'), confirmSatisfaction);
 
-// ============== ADMIN ROUTES ==============
+// --- Routes administrateur ---
 
-// @route   GET /api/disputes/admin/all
-// @desc    Obtenir tous les litiges (admin)
-// @access  Private (admin only)
+/**
+ * GET /api/disputes/admin/all
+ * Liste tous les litiges avec filtres et pagination (admin).
+ */
 router.get('/admin/all', protect, authorize('admin'), validateDisputePagination, getAllDisputes);
 
-// @route   GET /api/disputes/admin/stats
-// @desc    Obtenir les statistiques des litiges (admin)
-// @access  Private (admin only)
+/**
+ * GET /api/disputes/admin/stats
+ * Retourne les statistiques globales des litiges (admin).
+ */
 router.get('/admin/stats', protect, authorize('admin'), getDisputeStats);
 
-// @route   POST /api/disputes/:id/resolve
-// @desc    Résoudre un litige (admin)
-// @access  Private (admin only)
+/**
+ * POST /api/disputes/:id/resolve
+ * Résout un litige avec décision admin (remboursement, pénalité, etc.).
+ * @param {string} req.body.decision - Décision (favor_claimant, partial_refund, etc.)
+ * @param {number} [req.body.refundAmount] - Montant du remboursement
+ */
 router.post('/:id/resolve', protect, authorize('admin'), validateResolveDispute, resolveDispute);
 
-// @route   POST /api/disputes/:id/admin-note
-// @desc    Ajouter une note admin
-// @access  Private (admin only)
+/**
+ * POST /api/disputes/:id/admin-note
+ * Ajoute une note administrative interne à un litige.
+ */
 router.post('/:id/admin-note', protect, authorize('admin'), validateMongoId(), addAdminNote);
 
-// @route   POST /api/disputes/:id/resolve-appeal
-// @desc    Résoudre un appel (admin)
-// @access  Private (admin only)
+/**
+ * POST /api/disputes/:id/resolve-appeal
+ * Résout un appel de litige (admin).
+ */
 router.post('/:id/resolve-appeal', protect, authorize('admin'), validateMongoId(), resolveAppeal);
 
-// @route   POST /api/disputes/verify-quality/:reservationId
-// @desc    Vérifier la qualité d'un travail complété
-// @access  Private (admin only)
+/**
+ * POST /api/disputes/verify-quality/:reservationId
+ * Vérifie la qualité d'un travail complété via les photos avant/après (admin).
+ */
 router.post('/verify-quality/:reservationId', protect, authorize('admin'), validateMongoId('reservationId'), verifyWorkQuality);
 
 module.exports = router;

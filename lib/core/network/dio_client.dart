@@ -4,7 +4,9 @@ import '../../service/secure_storage_service.dart';
 import '../config/app_config.dart';
 import '../services/locale_service.dart';
 
-/// Client Dio configuré pour l'application
+/// Client HTTP centralise base sur Dio.
+/// Configure l'URL de base, les timeouts, les headers par defaut
+/// et enchaine les intercepteurs (locale, auth, retry, logging).
 class DioClient {
   // URL de base dynamique depuis AppConfig
   static String get _baseUrl => AppConfig.apiBaseUrl;
@@ -45,7 +47,9 @@ class DioClient {
   Dio get dio => _dio;
 }
 
-/// Intercepteur pour réessayer les requêtes échouées
+/// Intercepteur de retry automatique avec backoff exponentiel.
+/// Reessaie les requetes echouees (erreurs serveur, timeout) jusqu'a
+/// [maxRetries] fois, sauf pour les erreurs client (4xx) et les annulations.
 class RetryInterceptor extends Interceptor {
   final Dio dio;
   final int maxRetries;
@@ -91,6 +95,7 @@ class RetryInterceptor extends Interceptor {
     return handler.next(err);
   }
 
+  /// Determine si l'erreur ne doit pas etre retentee (erreurs client, annulation, certificat).
   bool _shouldNotRetry(DioException err) {
     // Ne pas réessayer les erreurs client (4xx)
     final statusCode = err.response?.statusCode;
@@ -112,7 +117,8 @@ class RetryInterceptor extends Interceptor {
   }
 }
 
-/// Intercepteur pour ajouter le header Accept-Language aux requêtes
+/// Intercepteur de localisation.
+/// Ajoute le header Accept-Language a chaque requete selon la langue active.
 class LocaleInterceptor extends Interceptor {
   final LocaleService localeService;
 

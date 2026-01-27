@@ -10,23 +10,30 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../di/injection_container.dart';
 
-/// Handler pour les messages en arrière-plan (doit être une fonction top-level)
+/// Handler pour les messages en arrière-plan (doit être une fonction top-level).
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   debugPrint('Background message received: ${message.messageId}');
 }
 
-/// Service pour gérer les notifications push Firebase
+/// Service de notifications push via Firebase Cloud Messaging (FCM).
+/// Gère les permissions, l'affichage local, les tokens et les topics.
 class PushNotificationService {
+  // --- Singleton ---
+
   static final PushNotificationService _instance =
       PushNotificationService._internal();
   factory PushNotificationService() => _instance;
   PushNotificationService._internal();
 
+  // --- Dépendances ---
+
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
+
+  // --- État interne ---
 
   bool _isInitialized = false;
   String? _fcmToken;
@@ -42,7 +49,10 @@ class PushNotificationService {
   /// Callback pour gérer les clics sur les notifications
   void Function(Map<String, dynamic> data)? onNotificationTap;
 
-  /// Initialiser le service de notifications
+  // --- Initialisation ---
+
+  /// Initialise le service de notifications.
+  /// Configure Firebase, les permissions, les notifications locales et les handlers.
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -79,7 +89,9 @@ class PushNotificationService {
     }
   }
 
-  /// Demander les permissions de notification
+  // --- Permissions ---
+
+  /// Demande les permissions de notification à l'utilisateur.
   Future<void> _requestPermissions() async {
     final settings = await _messaging.requestPermission(
       alert: true,
@@ -99,7 +111,10 @@ class PushNotificationService {
     }
   }
 
-  /// Initialiser les notifications locales
+  // --- Notifications locales ---
+
+  /// Initialise les notifications locales (Android et iOS).
+  /// Crée le canal de notification Android avec son, vibration et haute priorité.
   Future<void> _initializeLocalNotifications() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -137,7 +152,10 @@ class PushNotificationService {
     }
   }
 
-  /// Configurer les handlers de messages Firebase
+  // --- Handlers de messages ---
+
+  /// Configure les handlers de messages Firebase.
+  /// Gère les messages au premier plan, en arrière-plan et au lancement.
   void _setupMessageHandlers() {
     // Message reçu quand l'app est au premier plan
     _foregroundMessageSubscription =
@@ -190,7 +208,7 @@ class PushNotificationService {
     }
   }
 
-  /// Afficher une notification locale
+  /// Affiche une notification locale à partir d'un message Firebase.
   Future<void> _showLocalNotification(RemoteMessage message) async {
     final notification = message.notification;
     if (notification == null) return;
@@ -227,7 +245,9 @@ class PushNotificationService {
     );
   }
 
-  /// Obtenir le token FCM
+  // --- Gestion du token FCM ---
+
+  /// Obtient le token FCM de l'appareil.
   Future<String?> _getToken() async {
     try {
       _fcmToken = await _messaging.getToken();
@@ -247,7 +267,8 @@ class PushNotificationService {
     registerTokenOnServer(token);
   }
 
-  /// Enregistrer le token FCM sur le serveur
+  /// Enregistre le token FCM sur le serveur backend.
+  /// Utilisé lors de l'initialisation et du rafraîchissement automatique.
   Future<bool> registerTokenOnServer([String? token]) async {
     final tokenToRegister = token ?? _fcmToken;
     if (tokenToRegister == null) {
@@ -281,7 +302,9 @@ class PushNotificationService {
     }
   }
 
-  /// S'abonner à un topic
+  // --- Gestion des topics ---
+
+  /// S'abonne à un topic FCM pour recevoir des notifications groupées.
   Future<void> subscribeToTopic(String topic) async {
     await _messaging.subscribeToTopic(topic);
     debugPrint('Subscribed to topic: $topic');
@@ -293,13 +316,17 @@ class PushNotificationService {
     debugPrint('Unsubscribed from topic: $topic');
   }
 
-  /// Obtenir le statut des permissions
+  // --- Utilitaires ---
+
+  /// Retourne le statut actuel des permissions de notification.
   Future<AuthorizationStatus> getPermissionStatus() async {
     final settings = await _messaging.getNotificationSettings();
     return settings.authorizationStatus;
   }
 
-  /// Libérer les ressources du service
+  // --- Nettoyage ---
+
+  /// Libère les ressources du service (subscriptions et état).
   void dispose() {
     _tokenRefreshSubscription?.cancel();
     _foregroundMessageSubscription?.cancel();

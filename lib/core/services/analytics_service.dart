@@ -2,22 +2,26 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
-/// Service centralisé pour Firebase Analytics et Crashlytics
-/// Utilisation: AnalyticsService.instance.logEvent(...)
+/// Service centralisé pour Firebase Analytics et Crashlytics.
+/// Fournit le tracking des événements métier (réservations, paiements, jobs) et la gestion des erreurs.
 class AnalyticsService {
+  // --- Singleton ---
+
   static final AnalyticsService _instance = AnalyticsService._internal();
   static AnalyticsService get instance => _instance;
 
   AnalyticsService._internal();
 
+  // --- Dépendances Firebase ---
+
   final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
   final FirebaseCrashlytics _crashlytics = FirebaseCrashlytics.instance;
 
-  /// Observer pour la navigation (à utiliser avec MaterialApp)
+  /// Observer pour la navigation (à passer au MaterialApp.navigatorObservers)
   FirebaseAnalyticsObserver get observer =>
       FirebaseAnalyticsObserver(analytics: _analytics);
 
-  // ==================== USER IDENTIFICATION ====================
+  // --- Identification utilisateur ---
 
   /// Définir l'ID utilisateur pour le tracking
   Future<void> setUserId(String? userId) async {
@@ -41,7 +45,7 @@ class AnalyticsService {
     await _crashlytics.setCustomKey('user_role', role);
   }
 
-  // ==================== AUTHENTICATION EVENTS ====================
+  // --- Événements d'authentification ---
 
   /// Connexion réussie
   Future<void> logLogin({String? method}) async {
@@ -59,7 +63,7 @@ class AnalyticsService {
     await setUserId(null);
   }
 
-  // ==================== RESERVATION EVENTS ====================
+  // --- Événements de réservation ---
 
   /// Nouvelle réservation créée
   Future<void> logReservationCreated({
@@ -116,7 +120,7 @@ class AnalyticsService {
     );
   }
 
-  // ==================== WORKER EVENTS ====================
+  // --- Événements déneigeur ---
 
   /// Déneigeur accepte un job
   Future<void> logJobAccepted({required String jobId}) async {
@@ -150,7 +154,7 @@ class AnalyticsService {
     );
   }
 
-  // ==================== PAYMENT EVENTS ====================
+  // --- Événements de paiement ---
 
   /// Méthode de paiement ajoutée
   Future<void> logPaymentMethodAdded({String? type}) async {
@@ -186,7 +190,7 @@ class AnalyticsService {
     );
   }
 
-  // ==================== NAVIGATION EVENTS ====================
+  // --- Événements de navigation ---
 
   /// Écran affiché
   Future<void> logScreenView({
@@ -199,9 +203,10 @@ class AnalyticsService {
     );
   }
 
-  // ==================== GENERIC EVENTS ====================
+  // --- Événements génériques ---
 
-  /// Logger un événement personnalisé
+  /// Enregistre un événement personnalisé dans Firebase Analytics.
+  /// Les paramètres sont convertis en String pour compatibilité Firebase.
   Future<void> logEvent({
     required String name,
     Map<String, dynamic>? parameters,
@@ -218,7 +223,7 @@ class AnalyticsService {
     debugPrint('Analytics: Event logged - $name');
   }
 
-  // ==================== ERROR TRACKING ====================
+  // --- Suivi des erreurs (Crashlytics) ---
 
   /// Enregistrer une erreur non fatale
   Future<void> recordError(

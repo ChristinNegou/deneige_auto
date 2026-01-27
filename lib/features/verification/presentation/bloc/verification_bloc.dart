@@ -4,6 +4,8 @@ import '../../domain/repositories/verification_repository.dart';
 import 'verification_event.dart';
 import 'verification_state.dart';
 
+/// BLoC de vérification d'identité du déneigeur.
+/// Gère le chargement du statut de vérification et la soumission des documents (pièce d'identité, selfie).
 class VerificationBloc extends Bloc<VerificationEvent, VerificationState> {
   final VerificationRepository repository;
 
@@ -27,6 +29,8 @@ class VerificationBloc extends Bloc<VerificationEvent, VerificationState> {
     );
   }
 
+  /// Soumet les documents de vérification (recto/verso de la pièce d'identité et selfie).
+  /// Recharge automatiquement le statut après soumission.
   Future<void> _onSubmitVerification(
     SubmitVerification event,
     Emitter<VerificationState> emit,

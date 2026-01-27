@@ -6,11 +6,17 @@ import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
 
+/// Implémentation du repository d'authentification.
+/// Fait le pont entre la couche domaine et la source de données distante.
+/// Convertit les exceptions en objets [Failure] via le pattern Either (dartz).
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
 
   AuthRepositoryImpl({required this.remoteDataSource});
 
+  // --- Connexion / Inscription ---
+
+  /// Connecte l'utilisateur. Gère spécifiquement le cas de suspension de compte.
   @override
   Future<Either<Failure, User>> login(String email, String password) async {
     try {
@@ -34,6 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Inscrit un nouvel utilisateur. Sépare le nom complet en prénom/nom de famille.
   @override
   Future<Either<Failure, User>> register(
     String email,
@@ -68,10 +75,11 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  // --- Mot de passe ---
+
   @override
   Future<Either<Failure, void>> forgotPassword(String email) async {
     try {
-      // ✅ Utiliser remoteDataSource au lieu de _dioClient
       await remoteDataSource.forgotPassword(email);
       return const Right(null);
     } on NetworkException catch (e) {
@@ -82,6 +90,8 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
     }
   }
+
+  // --- Session utilisateur ---
 
   @override
   Future<Either<Failure, User>> getCurrentUser() async {
@@ -113,6 +123,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Vérifie si l'utilisateur est connecté en tentant de récupérer son profil.
   @override
   Future<Either<Failure, bool>> isLoggedIn() async {
     try {
@@ -163,7 +174,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // ============ PHONE VERIFICATION ============
+  // --- Vérification téléphonique ---
 
   @override
   Future<Either<Failure, Map<String, dynamic>>> sendPhoneVerificationCode({
@@ -233,7 +244,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // ============ PROFILE PHOTO METHODS ============
+  // --- Photo de profil ---
 
   @override
   Future<Either<Failure, User>> uploadProfilePhoto(File photoFile) async {
@@ -280,7 +291,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // ============ PHONE CHANGE VERIFICATION METHODS ============
+  // --- Changement de numéro de téléphone ---
 
   @override
   Future<Either<Failure, Map<String, dynamic>>> sendPhoneChangeCode(

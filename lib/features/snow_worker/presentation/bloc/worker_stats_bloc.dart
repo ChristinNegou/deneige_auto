@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/worker_stats.dart';
 import '../../domain/usecases/get_worker_stats_usecase.dart';
 
-// Events
+// --- Événements ---
+
+/// Classe de base des événements de statistiques déneigeur.
 abstract class WorkerStatsEvent extends Equatable {
   const WorkerStatsEvent();
 
@@ -29,7 +31,9 @@ class RefreshStats extends WorkerStatsEvent {
   const RefreshStats();
 }
 
-// States
+// --- États ---
+
+/// Classe de base des états de statistiques déneigeur.
 abstract class WorkerStatsState extends Equatable {
   const WorkerStatsState();
 
@@ -81,7 +85,10 @@ class WorkerStatsError extends WorkerStatsState {
   List<Object?> get props => [message];
 }
 
-// BLoC
+// --- BLoC ---
+
+/// BLoC de gestion des statistiques du déneigeur.
+/// Charge les statistiques globales et la ventilation des revenus par période.
 class WorkerStatsBloc extends Bloc<WorkerStatsEvent, WorkerStatsState> {
   final GetWorkerStatsUseCase getWorkerStatsUseCase;
   final GetEarningsUseCase getEarningsUseCase;
@@ -109,6 +116,8 @@ class WorkerStatsBloc extends Bloc<WorkerStatsEvent, WorkerStatsState> {
     );
   }
 
+  /// Charge la ventilation des revenus pour la période demandée.
+  /// Si les stats sont déjà chargées, rafraîchit uniquement les revenus.
   Future<void> _onLoadEarnings(
     LoadEarnings event,
     Emitter<WorkerStatsState> emit,

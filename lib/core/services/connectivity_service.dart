@@ -3,17 +3,23 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 
-/// Service de gestion de la connectivité réseau
-/// Permet de surveiller l'état de la connexion et de mettre en cache les requêtes hors-ligne
+/// Service de surveillance de l'état réseau.
+/// Écoute les changements de connectivité et gère une file d'attente d'opérations hors-ligne.
 class ConnectivityService {
+  // --- Singleton ---
+
   static final ConnectivityService _instance = ConnectivityService._internal();
   factory ConnectivityService() => _instance;
   ConnectivityService._internal();
 
+  // --- Dépendances ---
+
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<List<ConnectivityResult>>? _subscription;
 
-  /// Stream de l'état de connexion
+  // --- État réseau ---
+
+  /// Stream de l'état de connexion (true = en ligne, false = hors-ligne)
   final _connectionStatusController = StreamController<bool>.broadcast();
   Stream<bool> get connectionStatus => _connectionStatusController.stream;
 
@@ -21,12 +27,16 @@ class ConnectivityService {
   bool _isConnected = true;
   bool get isConnected => _isConnected;
 
+  // --- File d'attente hors-ligne ---
+
   /// File d'attente des opérations hors-ligne
   final List<PendingOperation> _pendingOperations = [];
   List<PendingOperation> get pendingOperations =>
       List.unmodifiable(_pendingOperations);
 
-  /// Initialise le service de connectivité
+  // --- Initialisation ---
+
+  /// Initialise le service : vérifie l'état initial et écoute les changements.
   Future<void> initialize() async {
     // Vérifier l'état initial
     final result = await _connectivity.checkConnectivity();
@@ -37,6 +47,7 @@ class ConnectivityService {
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
 
+  /// Met à jour l'état de connexion et relance les opérations en attente si la connexion revient.
   void _updateConnectionStatus(List<ConnectivityResult> results) {
     final wasConnected = _isConnected;
     _isConnected =
@@ -72,7 +83,8 @@ class ConnectivityService {
     }
   }
 
-  /// Traite les opérations en attente
+  /// Traite les opérations en attente avec mécanisme de retry.
+  /// Les opérations échouées sont remises en file si le nombre max de tentatives n'est pas atteint.
   Future<void> _processPendingOperations() async {
     if (_pendingOperations.isEmpty) return;
 
@@ -118,14 +130,17 @@ class ConnectivityService {
     _pendingOperations.clear();
   }
 
-  /// Dispose du service
+  // --- Nettoyage ---
+
+  /// Libère les ressources (subscription et stream controller).
   void dispose() {
     _subscription?.cancel();
     _connectionStatusController.close();
   }
 }
 
-/// Représente une opération en attente de synchronisation
+/// Représente une opération en attente de synchronisation.
+/// Contient les données, la logique d'exécution et la politique de retry.
 class PendingOperation {
   final String id;
   final String type;
@@ -151,9 +166,10 @@ class PendingOperation {
       'PendingOperation($type, retries: $retryCount/$maxRetries)';
 }
 
-/// Extension pour faciliter l'ajout d'opérations
+/// Extension utilitaire pour exécuter ou mettre en file d'attente les opérations réseau.
 extension ConnectivityServiceExtension on ConnectivityService {
-  /// Exécute une opération ou la met en file d'attente si hors-ligne
+  /// Exécute l'opération immédiatement si en ligne, sinon la met en file d'attente.
+  /// Retourne [offlineValue] si l'appareil est hors-ligne.
   Future<T?> executeOrQueue<T>({
     required String operationId,
     required String operationType,

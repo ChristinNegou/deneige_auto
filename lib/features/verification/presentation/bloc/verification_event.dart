@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 
+/// Classe de base des événements de vérification d'identité.
 abstract class VerificationEvent extends Equatable {
   const VerificationEvent();
 
@@ -13,6 +14,7 @@ class LoadVerificationStatus extends VerificationEvent {
   const LoadVerificationStatus();
 }
 
+/// Événement de soumission des documents de vérification (pièce d'identité + selfie).
 class SubmitVerification extends VerificationEvent {
   final File idFront;
   final File? idBack;

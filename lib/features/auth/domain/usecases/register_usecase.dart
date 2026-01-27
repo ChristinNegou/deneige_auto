@@ -3,6 +3,8 @@ import '../../../../core/errors/failures.dart';
 import '../entities/user.dart';
 import '../repositories/auth_repository.dart';
 
+/// Cas d'utilisation pour l'inscription d'un nouvel utilisateur.
+/// Concatène prénom et nom de famille avant de déléguer au repository.
 class RegisterUseCase {
   final AuthRepository repository;
 

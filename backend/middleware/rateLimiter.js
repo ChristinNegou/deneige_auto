@@ -1,12 +1,18 @@
 /**
- * Rate Limiting Middleware
- * Protection contre les attaques par force brute et DDoS
+ * Middleware de limitation de débit (rate limiting).
+ * Protection contre les attaques par force brute et DDoS.
+ * Désactivé automatiquement en environnement de test.
+ * @module middleware/rateLimiter
  */
 
 const rateLimit = require('express-rate-limit');
 const { RATE_LIMITS } = require('../config/constants');
 
-// Helper pour générer une clé à partir de l'IP (compatible IPv6)
+/**
+ * Extrait l'adresse IP du client en tenant compte des proxies (x-forwarded-for).
+ * @param {Object} req - Requête Express
+ * @returns {string} Adresse IP du client
+ */
 const getClientIp = (req) => {
     // Utiliser x-forwarded-for pour les proxies (Railway, etc.)
     const forwarded = req.headers['x-forwarded-for'];

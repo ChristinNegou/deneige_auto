@@ -1,8 +1,11 @@
 /**
- * Modèle MongoDB pour les conversations IA
+ * Modèle Mongoose pour les conversations IA avec l'assistant Claude.
+ * Gère l'historique des messages, le comptage de tokens et l'archivage automatique.
  */
 
 const mongoose = require('mongoose');
+
+// --- Sous-schéma pour les messages individuels ---
 
 const aiMessageSchema = new mongoose.Schema({
     role: {
@@ -28,6 +31,8 @@ const aiMessageSchema = new mongoose.Schema({
         simulated: { type: Boolean, default: false }
     }
 }, { _id: true });
+
+// --- Schéma principal ---
 
 const aiChatConversationSchema = new mongoose.Schema({
     userId: {
@@ -70,7 +75,8 @@ const aiChatConversationSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Index pour la recherche par utilisateur et date
+// --- Index ---
+
 aiChatConversationSchema.index({ userId: 1, lastMessageAt: -1 });
 
 // TTL: Supprimer les conversations inactives après 30 jours
@@ -79,8 +85,11 @@ aiChatConversationSchema.index(
     { expireAfterSeconds: 30 * 24 * 60 * 60 } // 30 jours
 );
 
+// --- Méthodes d'instance ---
+
 /**
- * Génère un titre basé sur le premier message
+ * Génère un titre automatique basé sur le premier message utilisateur (max 50 caractères).
+ * @returns {string} Le titre généré
  */
 aiChatConversationSchema.methods.generateTitle = function() {
     if (this.messages.length > 0) {
@@ -98,7 +107,11 @@ aiChatConversationSchema.methods.generateTitle = function() {
 };
 
 /**
- * Ajoute un message à la conversation
+ * Ajoute un message à la conversation et met à jour les compteurs de tokens.
+ * @param {string} role - Rôle de l'expéditeur ('user' ou 'assistant')
+ * @param {string} content - Contenu du message
+ * @param {Object} [metadata] - Métadonnées optionnelles (tokens, modèle)
+ * @returns {Document} La conversation mise à jour
  */
 aiChatConversationSchema.methods.addMessage = function(role, content, metadata = {}) {
     this.messages.push({
@@ -139,8 +152,13 @@ aiChatConversationSchema.methods.getMessagesForClaude = function(limit = 20) {
     }));
 };
 
+// --- Méthodes statiques ---
+
 /**
- * Récupère les conversations d'un utilisateur
+ * Récupère les conversations d'un utilisateur avec pagination.
+ * @param {ObjectId} userId - Identifiant de l'utilisateur
+ * @param {Object} [options] - Options { page, limit, status }
+ * @returns {Query} Conversations triées par date du dernier message
  */
 aiChatConversationSchema.statics.getUserConversations = function(userId, options = {}) {
     const { page = 1, limit = 20, status = 'active' } = options;
@@ -154,14 +172,19 @@ aiChatConversationSchema.statics.getUserConversations = function(userId, options
 };
 
 /**
- * Compte les conversations d'un utilisateur
+ * Compte les conversations d'un utilisateur filtrées par statut.
+ * @param {ObjectId} userId - Identifiant de l'utilisateur
+ * @param {string} [status='active'] - Statut des conversations à compter
+ * @returns {Promise<number>} Nombre de conversations
  */
 aiChatConversationSchema.statics.countUserConversations = function(userId, status = 'active') {
     return this.countDocuments({ userId, status });
 };
 
 /**
- * Archive les vieilles conversations
+ * Archive automatiquement les conversations inactives depuis un nombre de jours donné.
+ * @param {number} [daysOld=7] - Nombre de jours d'inactivité avant archivage
+ * @returns {Promise<number>} Nombre de conversations archivées
  */
 aiChatConversationSchema.statics.archiveOldConversations = async function(daysOld = 7) {
     const cutoffDate = new Date();

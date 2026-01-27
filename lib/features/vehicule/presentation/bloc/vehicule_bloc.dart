@@ -8,7 +8,9 @@ import '../../../reservation/domain/entities/vehicle.dart';
 import '../../../reservation/domain/repositories/reservation_repository.dart';
 import '../../../reservation/domain/usecases/get_vehicules_usecase.dart';
 
-// ==================== EVENTS ====================
+// --- Événements ---
+
+/// Classe de base des événements de gestion des véhicules.
 abstract class VehicleEvent extends Equatable {
   const VehicleEvent();
 
@@ -46,7 +48,9 @@ class UploadVehiclePhoto extends VehicleEvent {
   List<Object?> get props => [vehicleId, photo];
 }
 
-// ==================== STATES ====================
+// --- États ---
+
+/// État du BLoC véhicule, contenant la liste des véhicules et les indicateurs de chargement.
 class VehicleState extends Equatable {
   final List<Vehicle> vehicles;
   final bool isLoading;
@@ -91,7 +95,10 @@ class VehicleState extends Equatable {
       ];
 }
 
-// ==================== BLOC ====================
+// --- BLoC ---
+
+/// BLoC de gestion des véhicules de l'utilisateur.
+/// Permet le chargement, l'ajout, la suppression et l'upload de photo des véhicules.
 class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
   final GetVehiclesUseCase getVehicles;
   final AddVehicleUseCase addVehicle;

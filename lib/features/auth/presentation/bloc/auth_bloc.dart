@@ -21,6 +21,10 @@ import 'auth_event.dart';
 import 'auth_interceptor.dart';
 import 'auth_state.dart';
 
+/// BLoC central d'authentification.
+/// Gère l'ensemble du cycle de vie auth : connexion, inscription, déconnexion,
+/// vérification téléphonique, gestion du profil et photo de profil.
+/// Orchestre aussi les notifications push, le socket temps réel et les analytics.
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase login;
   final RegisterUseCase register;
@@ -33,7 +37,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   StreamSubscription<Map<String, dynamic>>? _suspensionSubscription;
 
-  // Stocke l'utilisateur courant pour pouvoir réémettre AuthAuthenticated après des erreurs temporaires
+  /// Stocke l'utilisateur courant pour pouvoir réémettre AuthAuthenticated
+  /// après des erreurs temporaires (ex: échec de mise à jour du profil).
   User? _currentUser;
 
   AuthBloc({
@@ -84,6 +89,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     return super.close();
   }
 
+  // --- Mise à jour du profil ---
+
   Future<void> _onUpdateProfile(
     UpdateProfile event,
     Emitter<AuthState> emit,
@@ -114,6 +121,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
+  // --- Connexion / Inscription / Déconnexion ---
+
+  /// Gère la connexion. Traite spécifiquement les comptes suspendus
+  /// via [SuspendedFailure] pour afficher un dialogue dédié.
   Future<void> _onLoginRequested(
     LoginRequested event,
     Emitter<AuthState> emit,
@@ -145,6 +156,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
+  /// Déconnexion forcée (ex: compte suspendu détecté par l'intercepteur).
+  /// Nettoie toutes les ressources avant d'émettre [UserSuspended].
   Future<void> _onForcedLogout(
     ForcedLogout event,
     Emitter<AuthState> emit,
@@ -208,6 +221,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
+  // --- Mot de passe ---
+
   Future<void> _onForgotPassword(
     ForgotPasswordEvent event,
     Emitter<AuthState> emit,
@@ -222,6 +237,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
+  // --- Vérification de session ---
+
+  /// Vérifie le statut d'authentification au démarrage de l'app.
+  /// Contrôle d'abord la présence d'un token local, puis valide auprès du serveur.
   Future<void> _onCheckAuthStatus(
     CheckAuthStatus event,
     Emitter<AuthState> emit,
@@ -274,7 +293,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  // ============ PHONE VERIFICATION HANDLERS ============
+  // --- Vérification téléphonique (inscription) ---
 
   Future<void> _onSendPhoneVerificationCode(
     SendPhoneVerificationCode event,
@@ -341,7 +360,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  // ============ PROFILE PHOTO HANDLERS ============
+  // --- Photo de profil ---
 
   Future<void> _onUploadProfilePhoto(
     UploadProfilePhoto event,
@@ -411,7 +430,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  // ============ PHONE CHANGE VERIFICATION HANDLERS ============
+  // --- Changement de numéro de téléphone ---
 
   Future<void> _onSendPhoneChangeCode(
     SendPhoneChangeCode event,
@@ -465,7 +484,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  // ============ RESTORE AUTH STATE ============
+  // --- Restauration d'état ---
 
   Future<void> _onRestoreAuthState(
     RestoreAuthState event,
@@ -476,7 +495,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  // ============ NOTIFICATION HELPERS ============
+  // --- Helpers : notifications, socket et analytics ---
 
   /// Configure les notifications push et le socket pour l'utilisateur connecté
   Future<void> _setupNotificationsForUser(User user) async {

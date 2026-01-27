@@ -1,3 +1,8 @@
+/**
+ * Routes de gestion des réservations de déneigement.
+ * Inclut la création, modification, annulation, notation, pourboire et paiement.
+ * @module routes/reservations
+ */
 
 const express = require('express');
 const router = express.Router();
@@ -9,10 +14,17 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, CANCELLATION_POLICY } = require('../config/constants');
 const { safeNotify } = require('../utils/errorHandler');
 
+// --- Liste et détails des réservations ---
 
-// @route   GET /api/reservations
-// @desc    Obtenir toutes les réservations de l'utilisateur (paginé)
-// @access  Private
+/**
+ * GET /api/reservations
+ * Retourne les réservations de l'utilisateur avec pagination et filtres optionnels.
+ * @param {string} [req.query.upcoming] - Filtrer les réservations à venir ('true')
+ * @param {string} [req.query.status] - Filtrer par statut
+ * @param {number} [req.query.page=1] - Numéro de page
+ * @param {number} [req.query.limit=20] - Nombre par page (max 100)
+ * @returns {Object} Liste paginée de réservations
+ */
 router.get('/', protect, async (req, res) => {
     try {
         const { upcoming, status, page = 1, limit = 20 } = req.query;
@@ -60,9 +72,10 @@ router.get('/', protect, async (req, res) => {
     }
 });
 
-// @route   GET /api/reservations/:id
-// @desc    Obtenir une réservation par ID
-// @access  Private
+/**
+ * GET /api/reservations/:id
+ * Retourne le détail d'une réservation par son ID (avec véhicule, place et déneigeur).
+ */
 router.get('/:id', protect, async (req, res) => {
     try {
         const reservation = await Reservation.findOne({
@@ -94,9 +107,20 @@ router.get('/:id', protect, async (req, res) => {
     }
 });
 
-// @route   POST /api/reservations
-// @desc    Créer une nouvelle réservation
-// @access  Private
+// --- Création de réservation ---
+
+/**
+ * POST /api/reservations
+ * Crée une nouvelle réservation de déneigement avec localisation GPS obligatoire.
+ * Gère les places de parking manuelles, personnalisées et par référence.
+ * @param {string} req.body.vehicleId - ID du véhicule
+ * @param {string} req.body.departureTime - Heure de départ (ISO 8601)
+ * @param {string} req.body.deadlineTime - Heure limite (ISO 8601)
+ * @param {number} req.body.latitude - Latitude GPS (obligatoire)
+ * @param {number} req.body.longitude - Longitude GPS (obligatoire)
+ * @param {number} req.body.totalPrice - Prix total
+ * @returns {Object} Réservation créée avec détails
+ */
 router.post('/', protect, async (req, res) => {
     try {
         const {
@@ -247,9 +271,13 @@ router.post('/', protect, async (req, res) => {
     }
 });
 
-// @route   PUT /api/reservations/:id
-// @desc    Mettre à jour une réservation
-// @access  Private
+// --- Modification de réservation ---
+
+/**
+ * PUT /api/reservations/:id
+ * Met à jour une réservation existante (véhicule, place de parking, localisation).
+ * Mappe les champs du frontend vers le schéma backend.
+ */
 router.put('/:id', protect, async (req, res) => {
     try {
         // Mapper les champs du frontend vers le schéma backend
@@ -353,9 +381,13 @@ router.put('/:id', protect, async (req, res) => {
     }
 });
 
-// @route   DELETE /api/reservations/:id
-// @desc    Annuler une réservation
-// @access  Private
+// --- Annulation simple ---
+
+/**
+ * DELETE /api/reservations/:id
+ * Annule une réservation (statut pending ou assigned uniquement).
+ * @param {string} [req.body.reason] - Raison de l'annulation
+ */
 router.delete('/:id', protect, async (req, res) => {
     try {
         const { reason } = req.body;
@@ -401,9 +433,13 @@ router.delete('/:id', protect, async (req, res) => {
     }
 });
 
-// @route   PATCH /api/reservations/:id/assign
-// @desc    Assigner un déneigeur à une réservation
-// @access  Private (Worker)
+// --- Assignation et progression du travail ---
+
+/**
+ * PATCH /api/reservations/:id/assign
+ * Assigne le déneigeur authentifié à une réservation (mise à jour atomique).
+ * Vérifie la limite de jobs actifs du déneigeur.
+ */
 router.patch('/:id/assign', protect, async (req, res) => {
     try {
         // Vérifier que le worker n'a pas trop de jobs actifs
@@ -469,9 +505,10 @@ router.patch('/:id/assign', protect, async (req, res) => {
     }
 });
 
-// @route   PATCH /api/reservations/:id/en-route
-// @desc    Indiquer que le déneigeur est en route
-// @access  Private (Worker)
+/**
+ * PATCH /api/reservations/:id/en-route
+ * Notifie le client que le déneigeur est en route.
+ */
 router.patch('/:id/en-route', protect, async (req, res) => {
     try {
         const reservation = await Reservation.findOne({
@@ -502,9 +539,10 @@ router.patch('/:id/en-route', protect, async (req, res) => {
     }
 });
 
-// @route   PATCH /api/reservations/:id/start
-// @desc    Démarrer le travail
-// @access  Private (Worker)
+/**
+ * PATCH /api/reservations/:id/start
+ * Passe la réservation au statut 'inProgress' et notifie le client.
+ */
 router.patch('/:id/start', protect, async (req, res) => {
     try {
         const reservation = await Reservation.findOneAndUpdate(
@@ -542,11 +580,13 @@ router.patch('/:id/start', protect, async (req, res) => {
     }
 });
 
-// Configuration des commissions (importée de config/constants.js)
+// --- Complétion et paiement ---
 
-// @route   PATCH /api/reservations/:id/complete
-// @desc    Marquer le travail comme terminé et payer le déneigeur
-// @access  Private (Worker)
+/**
+ * PATCH /api/reservations/:id/complete
+ * Marque le travail comme terminé, calcule la commission et transfère le paiement
+ * au déneigeur via Stripe Connect (avec clé d'idempotence).
+ */
 router.patch('/:id/complete', protect, async (req, res) => {
     try {
         const reservation = await Reservation.findOne({
@@ -691,9 +731,12 @@ router.patch('/:id/complete', protect, async (req, res) => {
     }
 });
 
-// @route   POST /api/payments/create-intent
-// @desc    Créer un Payment Intent Stripe
-// @access  Private
+/**
+ * POST /api/reservations/create-intent
+ * Crée un Payment Intent Stripe pour le paiement d'une réservation.
+ * @param {number} req.body.amount - Montant en dollars CAD
+ * @returns {Object} clientSecret et paymentIntentId
+ */
 router.post('/create-intent', protect, async (req, res) => {
     try {
         const { amount } = req.body; // Montant en dollars
@@ -720,11 +763,7 @@ router.post('/create-intent', protect, async (req, res) => {
     }
 });
 
-// ============================================================================
-// LOGIQUE MÉTIER D'ANNULATION
-// ============================================================================
-
-// Configuration d'annulation importée de config/constants.js
+// --- Logique métier d'annulation ---
 
 // Raisons valables d'annulation pour les déneigeurs
 const VALID_WORKER_CANCELLATION_REASONS = [
@@ -738,9 +777,11 @@ const VALID_WORKER_CANCELLATION_REASONS = [
 ];
 
 /**
- * @route   PATCH /api/reservations/:id/cancel-by-worker
- * @desc    Annulation par le déneigeur - avec suivi et conséquences
- * @access  Private (Worker)
+ * PATCH /api/reservations/:id/cancel-by-worker
+ * Annulation par le déneigeur avec suivi des avertissements et pénalités.
+ * Requiert une raison valable. Limite de 3 annulations avant suspension.
+ * @param {string} req.body.reason - Code de raison (ex: vehicle_breakdown, medical_emergency)
+ * @param {string} [req.body.details] - Détails supplémentaires
  */
 router.patch('/:id/cancel-by-worker', protect, async (req, res) => {
     try {
@@ -906,9 +947,10 @@ router.patch('/:id/cancel-by-worker', protect, async (req, res) => {
 });
 
 /**
- * @route   PATCH /api/reservations/:id/cancel-by-client
- * @desc    Annulation par le client - avec pénalités selon le statut
- * @access  Private (Client)
+ * PATCH /api/reservations/:id/cancel-by-client
+ * Annulation par le client avec pénalités graduelles selon l'avancement du travail.
+ * Gratuit si pending, pénalité croissante si assigned/enRoute/inProgress.
+ * @param {string} [req.body.reason] - Raison de l'annulation
  */
 router.patch('/:id/cancel-by-client', protect, async (req, res) => {
     try {
@@ -1142,9 +1184,8 @@ router.patch('/:id/cancel-by-client', protect, async (req, res) => {
 });
 
 /**
- * @route   GET /api/reservations/worker/cancellation-reasons
- * @desc    Obtenir la liste des raisons valables d'annulation pour les déneigeurs
- * @access  Private (Worker)
+ * GET /api/reservations/worker/cancellation-reasons
+ * Retourne la liste des raisons valables d'annulation pour les déneigeurs.
  */
 router.get('/worker/cancellation-reasons', protect, (req, res) => {
     const reasons = {
@@ -1199,9 +1240,8 @@ router.get('/worker/cancellation-reasons', protect, (req, res) => {
 });
 
 /**
- * @route   GET /api/reservations/client/cancellation-policy
- * @desc    Obtenir la politique d'annulation pour les clients
- * @access  Private
+ * GET /api/reservations/client/cancellation-policy
+ * Retourne la politique d'annulation et les pénalités par statut.
  */
 router.get('/client/cancellation-policy', protect, (req, res) => {
     res.json({
@@ -1235,14 +1275,14 @@ router.get('/client/cancellation-policy', protect, (req, res) => {
     });
 });
 
-// ============================================================================
-// RATING SYSTEM
-// ============================================================================
+// --- Système de notation ---
 
 /**
- * @route   POST /api/reservations/:id/rate
- * @desc    Noter un déneigeur après un job complété
- * @access  Private (Client only)
+ * POST /api/reservations/:id/rate
+ * Permet au client de noter un déneigeur (1-5) après un job complété.
+ * Met à jour la moyenne du déneigeur et envoie une notification.
+ * @param {number} req.body.rating - Note de 1 à 5
+ * @param {string} [req.body.review] - Commentaire optionnel
  */
 router.post('/:id/rate', protect, async (req, res) => {
     try {
@@ -1367,9 +1407,8 @@ router.post('/:id/rate', protect, async (req, res) => {
 });
 
 /**
- * @route   GET /api/reservations/:id/rating
- * @desc    Récupérer la note d'une réservation
- * @access  Private
+ * GET /api/reservations/:id/rating
+ * Récupère la note et l'avis laissés pour une réservation.
  */
 router.get('/:id/rating', protect, async (req, res) => {
     try {
@@ -1420,9 +1459,8 @@ router.get('/:id/rating', protect, async (req, res) => {
 });
 
 /**
- * @route   GET /api/reservations/worker/:workerId/reviews
- * @desc    Récupérer tous les avis d'un déneigeur
- * @access  Public
+ * GET /api/reservations/worker/:workerId/reviews
+ * Retourne tous les avis publics d'un déneigeur avec pagination.
  */
 router.get('/worker/:workerId/reviews', async (req, res) => {
     try {
@@ -1482,9 +1520,14 @@ router.get('/worker/:workerId/reviews', async (req, res) => {
     }
 });
 
-// @route   POST /api/reservations/:id/tip
-// @desc    Ajouter un pourboire à une réservation complétée
-// @access  Private (Client owner only)
+// --- Pourboire ---
+
+/**
+ * POST /api/reservations/:id/tip
+ * Ajoute un pourboire à une réservation complétée (100% au déneigeur).
+ * Transfère via Stripe Connect si le compte est configuré.
+ * @param {number} req.body.amount - Montant du pourboire (1$ - 500$)
+ */
 router.post('/:id/tip', protect, async (req, res) => {
     try {
         const { amount } = req.body;

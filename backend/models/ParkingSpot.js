@@ -1,4 +1,11 @@
+/**
+ * Modèle Mongoose pour les places de stationnement.
+ * Décrit l'emplacement, le niveau, les dimensions et l'assignation des places.
+ */
+
 const mongoose = require('mongoose');
+
+// --- Schéma principal ---
 
 const parkingSpotSchema = new mongoose.Schema({
     spotNumber: {
@@ -52,11 +59,13 @@ const parkingSpotSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Index pour recherche rapide (spotNumber a déjà un index via unique: true)
+// --- Index ---
+
 parkingSpotSchema.index({ assignedTo: 1 });
 parkingSpotSchema.index({ isAvailable: 1, level: 1 });
 
-// Méthode virtuelle pour le nom d'affichage
+// --- Propriétés virtuelles ---
+
 parkingSpotSchema.virtual('displayName').get(function() {
     return `Place ${this.spotNumber}${this.section ? ` - ${this.section}` : ''}`;
 });

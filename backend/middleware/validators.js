@@ -1,12 +1,14 @@
 /**
- * Validation Middleware
- * Validation des entrées utilisateur avec express-validator
+ * Middleware de validation des entrées utilisateur avec express-validator.
+ * Regroupe les validateurs par domaine : auth, téléphone, réservations, véhicules, paiements, litiges, etc.
+ * @module middleware/validators
  */
 
 const { body, param, query, validationResult } = require('express-validator');
 
 /**
- * Middleware pour gérer les erreurs de validation
+ * Middleware qui intercepte les erreurs de validation express-validator.
+ * Retourne un tableau d'erreurs formatées (champ + message) avec statut 400.
  */
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);

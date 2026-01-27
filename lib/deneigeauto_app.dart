@@ -14,9 +14,13 @@ import 'features/auth/domain/entities/user.dart';
 import 'features/home/presentation/bloc/home_bloc.dart';
 import 'l10n/app_localizations.dart';
 
-/// Cle globale pour le navigator afin de pouvoir naviguer depuis n'importe ou
+/// Cle globale du navigateur pour permettre la navigation depuis n'importe
+/// quel endroit de l'application (ex. : services, callbacks).
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+/// Widget racine de l'application Deneige Auto.
+/// Configure le MaterialApp avec le theme, les routes, la localisation
+/// et l'ecoute de l'etat d'authentification via BLoC.
 class DeneigeAutoApp extends StatefulWidget {
   const DeneigeAutoApp({super.key});
 
@@ -78,6 +82,8 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
     );
   }
 
+  /// Redirige vers l'ecran d'accueil apres authentification reussie.
+  /// Utilise [addPostFrameCallback] pour eviter de naviguer pendant le build.
   void _navigateToHome(UserRole role) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final navigator = navigatorKey.currentState;
@@ -90,6 +96,8 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
     });
   }
 
+  /// Affiche le dialogue de suspension de compte et redirige vers
+  /// la selection de type de compte apres fermeture.
   void _showSuspensionDialog(UserSuspended state) {
     final context = navigatorKey.currentContext;
     if (context == null) return;
@@ -109,7 +117,9 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
   }
 }
 
-/// Widget qui gere la navigation initiale selon l'etat d'authentification
+/// Widget qui gere la navigation initiale selon l'etat d'authentification.
+/// Affiche un indicateur de chargement pendant la verification, puis redirige
+/// vers l'ecran approprie selon le role de l'utilisateur.
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -148,6 +158,7 @@ class AuthWrapper extends StatelessWidget {
     );
   }
 
+  /// Navigue vers l'ecran d'accueil en fonction du role utilisateur.
   void _navigateBasedOnRole(BuildContext context, UserRole role) {
     const String route = AppRoutes.home;
 
@@ -157,6 +168,7 @@ class AuthWrapper extends StatelessWidget {
     );
   }
 
+  /// Retourne le widget d'ecran d'accueil adapte au role (client, worker, admin).
   Widget _getHomeScreenForRole(UserRole role) {
     switch (role) {
       case UserRole.client:

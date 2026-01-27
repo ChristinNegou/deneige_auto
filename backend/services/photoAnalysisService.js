@@ -1,13 +1,15 @@
 /**
- * Service d'analyse de photos avec Claude Vision
- * Analyse la qualité du travail de déneigement via les photos avant/après
+ * Service d'analyse de photos avec Claude Vision.
+ * Évalue la qualité du déneigement via les photos avant/après, détecte le type de véhicule,
+ * estime la profondeur de neige et vérifie la cohérence entre les photos.
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
 const Reservation = require('../models/Reservation');
 const axios = require('axios');
 
-// Client Anthropic (lazy init)
+// --- Initialisation du client Anthropic ---
+
 let anthropicClient = null;
 
 function getAnthropicClient() {
@@ -19,8 +21,12 @@ function getAnthropicClient() {
   return anthropicClient;
 }
 
+// --- Fonctions utilitaires ---
+
 /**
- * Convertit une URL d'image en base64
+ * Convertit une URL d'image en base64 pour l'envoi à l'API Claude Vision.
+ * @param {string} url - URL de l'image
+ * @returns {Promise<Object|null>} { base64, contentType } ou null en cas d'erreur
  */
 async function imageUrlToBase64(url) {
   try {
@@ -37,9 +43,9 @@ async function imageUrlToBase64(url) {
   }
 }
 
-/**
- * Types de véhicules supportés
- */
+// --- Constantes ---
+
+/** Types de véhicules reconnus par l'analyse IA. */
 const VEHICLE_TYPES = {
   SEDAN: 'sedan',
   SUV: 'suv',
@@ -49,8 +55,13 @@ const VEHICLE_TYPES = {
   UNKNOWN: 'unknown',
 };
 
+// --- Construction des prompts ---
+
 /**
- * Construit le prompt d'analyse pour Claude Vision
+ * Construit le prompt d'analyse pour Claude Vision selon le type de photo.
+ * @param {string} photoType - Type de photo ('before' ou 'after')
+ * @param {boolean} hasBeforeAfter - true si les photos avant ET après sont disponibles
+ * @returns {string} Le prompt formaté pour Claude
  */
 function buildAnalysisPrompt(photoType, hasBeforeAfter) {
   if (hasBeforeAfter) {
@@ -136,8 +147,13 @@ Réponds en JSON:
 }`;
 }
 
+// --- Analyse IA principale ---
+
 /**
- * Analyse les photos d'une réservation avec Claude Vision
+ * Analyse les photos avant/après d'une réservation avec Claude Vision.
+ * Évalue la qualité du déneigement, détecte le véhicule et les problèmes.
+ * @param {ObjectId} reservationId - Identifiant de la réservation
+ * @returns {Promise<Object>} Résultat complet de l'analyse (scores, issues, véhicule)
  */
 async function analyzeJobPhotos(reservationId) {
   const client = getAnthropicClient();
@@ -287,8 +303,14 @@ async function analyzeJobPhotos(reservationId) {
   }
 }
 
+// --- Analyse rapide ---
+
 /**
- * Analyse rapide d'une seule photo (pour validation en temps réel)
+ * Analyse rapide d'une seule photo pour validation en temps réel.
+ * Utilisée lors du téléversement pour vérifier la qualité et la présence d'un véhicule.
+ * @param {string} photoUrl - URL de la photo à analyser
+ * @param {string} [photoType='after'] - Type de photo ('before' ou 'after')
+ * @returns {Promise<Object>} { valid, quality, issues, isVehicle }
  */
 async function analyzePhoto(photoUrl, photoType = 'after') {
   const client = getAnthropicClient();
@@ -348,8 +370,14 @@ Réponds en JSON:
   }
 }
 
+// --- Vérification de cohérence ---
+
 /**
- * Vérifie si les photos avant/après montrent le même véhicule
+ * Vérifie si les photos avant/après montrent le même véhicule.
+ * Utilisée pour détecter les fraudes potentielles.
+ * @param {string} beforePhotoUrl - URL de la photo avant déneigement
+ * @param {string} afterPhotoUrl - URL de la photo après déneigement
+ * @returns {Promise<Object>} { consistent, confidence, reason }
  */
 async function verifyVehicleConsistency(beforePhotoUrl, afterPhotoUrl) {
   const client = getAnthropicClient();

@@ -6,8 +6,10 @@ import '../models/payment_model.dart';
 import '../models/payment_method_model.dart';
 import '../models/refund_model.dart';
 
+/// Contrat du datasource distant pour les opérations de paiement.
+/// Gère l'historique des paiements, les méthodes Stripe et les remboursements.
 abstract class PaymentRemoteDataSource {
-  /// Fetches payment history by getting reservations with payment data
+  /// Récupère l'historique des paiements à partir des réservations
   Future<List<PaymentModel>> getPaymentHistory();
 
   Future<List<PaymentMethodModel>> getPaymentMethods();
@@ -27,12 +29,17 @@ abstract class PaymentRemoteDataSource {
   Future<RefundModel> getRefundStatus(String refundId);
 }
 
+/// Implémentation du datasource distant pour les paiements via l'API REST.
+/// Convertit les réservations en historique de paiements et gère les méthodes Stripe.
 class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
   final Dio dio;
 
   PaymentRemoteDataSourceImpl({required this.dio});
 
   @override
+
+  /// Récupère l'historique via l'endpoint réservations et filtre les paiements effectués.
+  /// Inclut les réservations payées, remboursées ou ayant un paymentIntentId Stripe.
   Future<List<PaymentModel>> getPaymentHistory() async {
     try {
       // Use existing reservations endpoint
@@ -237,6 +244,7 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
     }
   }
 
+  /// Convertit l'enum RefundReason en chaîne attendue par l'API Stripe.
   String _refundReasonToString(RefundReason reason) {
     switch (reason) {
       case RefundReason.requestedByCustomer:

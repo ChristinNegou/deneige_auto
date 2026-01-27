@@ -1,6 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
-/// Service de cache generique pour le stockage local
+/// Interface abstraite de cache local générique.
+/// Définit les opérations CRUD pour le stockage clé-valeur offline.
 abstract class CacheService {
   Future<void> init();
   Future<T?> get<T>(String key);
@@ -12,13 +13,16 @@ abstract class CacheService {
   Future<void> putAll<T>(String key, List<T> values);
 }
 
-/// Implementation Hive du service de cache
+/// Implémentation Hive du service de cache.
+/// Utilise une Hive Box pour le stockage local persistant sur l'appareil.
 class HiveCacheService implements CacheService {
   final String boxName;
   late Box<dynamic> _box;
   bool _isInitialized = false;
 
   HiveCacheService({required this.boxName});
+
+  // --- Initialisation ---
 
   @override
   Future<void> init() async {
@@ -29,11 +33,14 @@ class HiveCacheService implements CacheService {
     _isInitialized = true;
   }
 
+  /// Vérifie que le service est initialisé avant toute opération.
   void _ensureInitialized() {
     if (!_isInitialized) {
       throw StateError('CacheService not initialized. Call init() first.');
     }
   }
+
+  // --- Opérations CRUD ---
 
   @override
   Future<T?> get<T>(String key) async {
@@ -78,7 +85,8 @@ class HiveCacheService implements CacheService {
   }
 }
 
-/// Cache avec expiration automatique
+/// Cache avec expiration automatique (TTL).
+/// Enveloppe un [HiveCacheService] et ajoute une date d'expiration à chaque entrée.
 class ExpiringCacheService implements CacheService {
   final HiveCacheService _cache;
   final Duration defaultExpiration;
@@ -92,6 +100,7 @@ class ExpiringCacheService implements CacheService {
   @override
   Future<void> init() => _cache.init();
 
+  /// Récupère une valeur du cache, ou null si expirée ou absente.
   @override
   Future<T?> get<T>(String key) async {
     final expirationKey = '$key$_expirationSuffix';
@@ -108,6 +117,7 @@ class ExpiringCacheService implements CacheService {
     return _cache.get<T>(key);
   }
 
+  /// Stocke une valeur avec une durée d'expiration personnalisée.
   Future<void> putWithExpiration<T>(String key, T value,
       {Duration? expiration}) async {
     final exp = expiration ?? defaultExpiration;

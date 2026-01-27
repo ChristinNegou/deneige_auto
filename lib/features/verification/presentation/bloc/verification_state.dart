@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../domain/entities/verification_status.dart';
 
+/// Classe de base des états de vérification d'identité du déneigeur.
 abstract class VerificationState extends Equatable {
   const VerificationState();
 

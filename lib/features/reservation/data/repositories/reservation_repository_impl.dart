@@ -10,6 +10,8 @@ import '../datasources/reservation_remote_datasource.dart';
 export '../datasources/reservation_remote_datasource.dart'
     show CancellationResult, CancellationPolicy, CancellationPolicyItem;
 
+/// Implémentation du repository de réservations.
+/// Encapsule les appels au datasource distant et convertit les exceptions en Failure (Either).
 class ReservationRepositoryImpl implements ReservationRepository {
   final ReservationRemoteDataSource remoteDataSource;
 

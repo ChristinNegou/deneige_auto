@@ -1,4 +1,11 @@
+/**
+ * Modèle Mongoose pour les réservations de déneigement.
+ * Gère le cycle de vie complet : création, assignation, suivi GPS, paiement, litiges et analyse IA.
+ */
+
 const mongoose = require('mongoose');
+
+// --- Schéma principal ---
 
 const reservationSchema = new mongoose.Schema({
     userId: {
@@ -293,7 +300,7 @@ const reservationSchema = new mongoose.Schema({
         enum: ['shovel', 'brush', 'ice_scraper', 'salt_spreader', 'snow_blower'],
     }],
 
-    // ============== DISPUTE & VERIFICATION TRACKING ==============
+    // --- Litige et vérification ---
 
     // Litige associé
     dispute: {
@@ -433,9 +440,7 @@ const reservationSchema = new mongoose.Schema({
         reviewNotes: String,
     },
 
-    // ============================================
-    // CHAMPS IA
-    // ============================================
+    // --- Champs IA ---
 
     // Analyse IA des photos
     aiPhotoAnalysis: {
@@ -517,9 +522,7 @@ const reservationSchema = new mongoose.Schema({
 
 
 
-// ============================================
-// INDEX OPTIMIZATIONS
-// ============================================
+// --- Index ---
 
 // Index composés pour les requêtes fréquentes
 reservationSchema.index({ userId: 1, status: 1, departureTime: -1 });
@@ -551,7 +554,9 @@ reservationSchema.index({ workerId: 1, rating: 1, ratedAt: -1 });     // Worker 
 reservationSchema.index({ status: 1, createdAt: 1 });                  // Admin stats and fallback queries
 reservationSchema.index({ cancelledBy: 1, cancelledAt: -1 });          // Cancellation tracking
 
-// Méthode virtuelle pour savoir si c'est urgent
+// --- Propriétés virtuelles ---
+
+// Méthode virtuelle pour savoir si c'est urgent (moins de 4 heures avant le départ)
 reservationSchema.virtual('isUrgent').get(function() {
     const now = new Date();
     const hoursUntilDeparture = (this.departureTime - now) / (1000 * 60 * 60);
@@ -584,7 +589,9 @@ reservationSchema.virtual('statusDisplayName').get(function() {
     return names[this.status] || 'Inconnu';
 });
 
-// Middleware pour calculer le prix en fonction de l'urgence
+// --- Middleware pre-save ---
+
+// Recalcule le prix total si la priorité ou le prix de base change
 reservationSchema.pre('save', function(next) {
     if (this.isModified('isPriority') || this.isModified('basePrice')) {
         if (this.isPriority) {
@@ -619,7 +626,13 @@ reservationSchema.pre('save', function(next) {
     next();
 });
 
-// Méthode statique pour obtenir les réservations à venir
+// --- Méthodes statiques ---
+
+/**
+ * Récupère les réservations à venir d'un utilisateur (non terminées, non annulées).
+ * @param {ObjectId} userId - Identifiant de l'utilisateur
+ * @returns {Query} Réservations triées par date de départ croissante
+ */
 reservationSchema.statics.getUpcoming = function(userId) {
     return this.find({
         userId,

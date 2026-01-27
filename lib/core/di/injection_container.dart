@@ -1,3 +1,8 @@
+/// Conteneur d'injection de dependances (Service Locator) via GetIt.
+/// Enregistre toutes les couches de l'architecture : services, data sources,
+/// repositories, use cases et BLoCs pour chaque feature de l'application.
+library;
+
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -151,11 +156,13 @@ import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/reservation/presentation/bloc/new_reservation_bloc.dart';
 
-final sl = GetIt.instance; // sl = Service Locator
+/// Instance globale du Service Locator (GetIt).
+final sl = GetIt.instance;
 
-/// Initialise toutes les dépendances de l'application
+/// Initialise et enregistre toutes les dependances de l'application.
+/// Doit etre appelee une seule fois au demarrage, avant [runApp].
 Future<void> initializeDependencies() async {
-  //! Core
+  // --- Core : services transversaux ---
   sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
   sl.registerLazySingleton<LocationService>(() => LocationService());
   sl.registerLazySingleton<DioClient>(
@@ -169,13 +176,13 @@ Future<void> initializeDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
-  //! Cache & Offline
+  // --- Cache & Offline ---
   sl.registerLazySingleton<NetworkStatus>(() => NetworkStatus());
   sl.registerLazySingleton<ReservationCache>(() => ReservationCache());
   sl.registerLazySingleton<SyncQueue>(() => SyncQueue());
   sl.registerLazySingleton<SyncService>(() => SyncService());
 
-  //! Services
+  // --- Services metier ---
   sl.registerLazySingleton<TaxService>(() => TaxService());
   sl.registerLazySingleton<DisputeService>(
     () => DisputeService(dioClient: sl()),
@@ -184,7 +191,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<ApiCacheService>(() => ApiCacheService());
   sl.registerLazySingleton<LocaleService>(() => LocaleService());
 
-  //! Data sources
+  // --- Data Sources ---
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(dio: sl(), secureStorage: sl()),
   );
@@ -213,7 +220,7 @@ Future<void> initializeDependencies() async {
     () => VerificationRemoteDatasourceImpl(dio: sl()),
   );
 
-  //! Repositories
+  // --- Repositories ---
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
   );
@@ -242,7 +249,7 @@ Future<void> initializeDependencies() async {
     () => VerificationRepositoryImpl(remoteDatasource: sl()),
   );
 
-  //! Use cases
+  // --- Use Cases : Auth ---
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl()));
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
@@ -250,6 +257,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => ForgotPasswordUseCase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
   sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
+  // --- Use Cases : Reservation & Vehicules ---
   sl.registerLazySingleton(() => GetVehiclesUseCase(sl()));
   sl.registerLazySingleton(() => GetParkingSpotsUseCase(sl()));
   sl.registerLazySingleton(() => CreateReservationUseCase(sl()));
@@ -259,16 +267,19 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => DeleteVehicleUseCase(sl()));
   sl.registerLazySingleton(() => CancelReservationUseCase(sl()));
   sl.registerLazySingleton(() => UpdateReservationUseCase(sl()));
+  // --- Use Cases : Meteo ---
   sl.registerLazySingleton(() => GetWeatherUseCase(
         repository: sl(),
         locationService: sl(),
       ));
+  // --- Use Cases : Paiement ---
   sl.registerLazySingleton(() => GetPaymentHistoryUseCase(sl()));
   sl.registerLazySingleton(() => GetPaymentMethodsUseCase(sl()));
   sl.registerLazySingleton(() => SavePaymentMethodUseCase(sl()));
   sl.registerLazySingleton(() => DeletePaymentMethodUseCase(sl()));
   sl.registerLazySingleton(() => SetDefaultPaymentMethodUseCase(sl()));
   sl.registerLazySingleton(() => ProcessRefundUseCase(sl()));
+  // --- Use Cases : Notifications ---
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => GetUnreadCountUseCase(sl()));
   sl.registerLazySingleton(() => MarkAsReadUseCase(sl()));
@@ -276,7 +287,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => DeleteNotificationUseCase(sl()));
   sl.registerLazySingleton(() => ClearAllNotificationsUseCase(sl()));
 
-  // Worker use cases
+  // --- Use Cases : Deneigeur (Snow Worker) ---
   sl.registerLazySingleton(() => GetAvailableJobsUseCase(sl()));
   sl.registerLazySingleton(() => GetMyJobsUseCase(sl()));
   sl.registerLazySingleton(() => GetJobHistoryUseCase(sl()));
@@ -292,12 +303,12 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton(() => CancelJobUseCase(sl()));
   sl.registerLazySingleton(() => GetCancellationReasonsUseCase(sl()));
 
-  // Weather forecast
+  // --- Use Cases : Previsions meteo ---
   sl.registerLazySingleton(() => GetWeatherForecastUseCase(sl()));
 
-  //! BLoCs
-  // AuthBloc doit être un singleton pour maintenir l'état d'authentification
-  // cohérent dans toute l'application
+  // --- BLoCs : Auth ---
+  // AuthBloc est un singleton pour maintenir l'etat d'authentification
+  // coherent dans toute l'application.
   sl.registerLazySingleton(() => AuthBloc(
         login: sl(),
         register: sl(),
@@ -309,6 +320,7 @@ Future<void> initializeDependencies() async {
         authRepository: sl(),
       ));
 
+  // --- BLoCs : Reservation ---
   sl.registerFactory(() => NewReservationBloc(
         getVehicles: sl(),
         getParkingSpots: sl(),
@@ -336,12 +348,14 @@ Future<void> initializeDependencies() async {
         updateReservation: sl(),
       ));
 
+  // --- BLoCs : Accueil & Meteo ---
   sl.registerFactory(() => HomeBloc(
         getCurrentUser: sl(),
         getWeather: sl(),
         getReservations: sl(),
       ));
 
+  // --- BLoCs : Paiement ---
   sl.registerFactory(() => PaymentHistoryBloc(
         getPaymentHistory: sl(),
       ));
@@ -357,6 +371,7 @@ Future<void> initializeDependencies() async {
         processRefund: sl(),
       ));
 
+  // --- BLoCs : Notifications ---
   sl.registerFactory(() => NotificationBloc(
         getNotifications: sl(),
         getUnreadCount: sl(),
@@ -366,7 +381,7 @@ Future<void> initializeDependencies() async {
         clearAllNotifications: sl(),
       ));
 
-  // Worker BLoCs
+  // --- BLoCs : Deneigeur (Snow Worker) ---
   sl.registerFactory(() => WorkerJobsBloc(
         getAvailableJobsUseCase: sl(),
         getMyJobsUseCase: sl(),
@@ -389,22 +404,23 @@ Future<void> initializeDependencies() async {
         repository: sl(),
       ));
 
-  // Admin BLoC
+  // --- BLoCs : Administration ---
   sl.registerFactory(() => AdminBloc(
         repository: sl(),
       ));
 
-  // Verification BLoC
+  // --- BLoCs : Verification d'identite ---
   sl.registerFactory(() => VerificationBloc(
         repository: sl(),
       ));
 
+  // --- BLoCs : Chat ---
   sl.registerFactory(() => ChatBloc(
         repository: sl(),
         socketService: sl(),
       ));
 
-  //! Settings Feature
+  // --- Feature : Parametres utilisateur ---
   sl.registerLazySingleton<SettingsRemoteDataSource>(
     () => SettingsRemoteDataSourceImpl(dio: sl()),
   );
@@ -420,7 +436,7 @@ Future<void> initializeDependencies() async {
         deleteAccount: sl(),
       ));
 
-  //! Support Feature
+  // --- Feature : Support client ---
   sl.registerLazySingleton<SupportRemoteDataSource>(
     () => SupportRemoteDataSourceImpl(dio: sl()),
   );
@@ -432,7 +448,7 @@ Future<void> initializeDependencies() async {
         submitSupportRequest: sl(),
       ));
 
-  // =============== AI CHAT ===============
+  // --- Feature : Chat IA (assistant intelligent) ---
   sl.registerLazySingleton<AIChatRemoteDataSource>(
     () => AIChatRemoteDataSourceImpl(dio: sl()),
   );
@@ -452,7 +468,7 @@ Future<void> initializeDependencies() async {
         getAIStatus: sl(),
       ));
 
-  // =============== AI FEATURES ===============
+  // --- Feature : Fonctionnalites IA (predictions, suggestions) ---
   sl.registerLazySingleton<AIFeaturesRemoteDataSource>(
     () => AIFeaturesRemoteDataSource(dio: sl()),
   );

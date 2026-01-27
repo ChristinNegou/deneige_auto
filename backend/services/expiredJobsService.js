@@ -1,6 +1,7 @@
 /**
- * Service de gestion des jobs expires
- * Detecte et traite automatiquement les reservations non completees apres leur deadline
+ * Service de gestion des réservations expirées.
+ * Détecte et traite automatiquement les réservations non complétées après leur deadline :
+ * annulation, remboursement Stripe, pénalisation du déneigeur et notifications.
  */
 
 const Reservation = require('../models/Reservation');
@@ -8,7 +9,9 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { sendPushNotification } = require('./firebaseService');
 
-// Configuration des delais (en minutes)
+// --- Configuration ---
+
+/** Délais et seuils pour la gestion des jobs expirés (en minutes). */
 const CONFIG = {
     // Delai apres deadline avant annulation automatique
     AUTO_CANCEL_DELAY_MINUTES: 30,
@@ -18,8 +21,11 @@ const CONFIG = {
     MAX_WARNINGS_BEFORE_SUSPENSION: 3,
 };
 
+// --- Détection des jobs expirés ---
+
 /**
- * Trouve tous les jobs expires (deadline depassee)
+ * Recherche tous les jobs actifs dont la deadline est dépassée.
+ * @returns {Promise<Array>} Réservations expirées avec leurs relations peuplées
  */
 async function findExpiredJobs() {
     const now = new Date();
@@ -37,7 +43,8 @@ async function findExpiredJobs() {
 }
 
 /**
- * Trouve les jobs qui approchent de leur deadline (pour rappels)
+ * Recherche les jobs assignés/en route dont la deadline est dans les X prochaines minutes.
+ * @returns {Promise<Array>} Réservations approchant de leur deadline
  */
 async function findJobsApproachingDeadline() {
     const now = new Date();
@@ -55,9 +62,13 @@ async function findJobsApproachingDeadline() {
     return approachingJobs;
 }
 
+// --- Annulation et conséquences ---
+
 /**
- * Annule un job expire et gere les consequences
- * Utilise une approche transactionnelle pour éviter les incohérences
+ * Annule un job expiré : met à jour le statut, initie le remboursement Stripe,
+ * pénalise le déneigeur et notifie les deux parties. Approche transactionnelle.
+ * @param {Document} reservation - La réservation expirée (peuplée)
+ * @returns {Promise<Object>} Résultat { action: 'cancelled'|'waiting'|'error', ... }
  */
 async function cancelExpiredJob(reservation) {
     const now = new Date();
@@ -150,8 +161,13 @@ async function cancelExpiredJob(reservation) {
     }
 }
 
+// --- Pénalisation ---
+
 /**
- * Penalise le worker pour job non complete
+ * Pénalise le déneigeur pour un job non complété : avertissement, historique, et suspension
+ * automatique après 3 avertissements.
+ * @param {ObjectId} workerId - Identifiant du déneigeur
+ * @param {Document} reservation - La réservation expirée
  */
 async function penalizeWorker(workerId, reservation) {
     try {
@@ -197,8 +213,11 @@ async function penalizeWorker(workerId, reservation) {
     }
 }
 
+// --- Notifications ---
+
 /**
- * Notifie le client que son job a ete annule
+ * Notifie le client que sa réservation a été annulée et qu'un remboursement est prévu.
+ * @param {Document} reservation - La réservation annulée (peuplée avec userId et vehicle)
  */
 async function notifyClientJobExpired(reservation) {
     try {
@@ -237,7 +256,8 @@ async function notifyClientJobExpired(reservation) {
 }
 
 /**
- * Notifie le worker que le job a ete annule
+ * Notifie le déneigeur que le job a été annulé et qu'un avertissement a été ajouté.
+ * @param {Document} reservation - La réservation annulée (peuplée avec workerId)
  */
 async function notifyWorkerJobExpired(reservation) {
     try {
@@ -276,9 +296,12 @@ async function notifyWorkerJobExpired(reservation) {
     }
 }
 
+// --- Rappels ---
+
 /**
- * Envoie des rappels aux workers pour les jobs qui approchent de leur deadline
- * Optimisé pour utiliser des opérations batch au lieu de N+1 queries
+ * Envoie des rappels aux déneigeurs pour les jobs approchant de leur deadline.
+ * Utilise des insertions batch (insertMany) pour optimiser les performances.
+ * @returns {Promise<number>} Nombre de rappels envoyés
  */
 async function sendDeadlineReminders() {
     const approachingJobs = await findJobsApproachingDeadline();
@@ -345,9 +368,12 @@ async function sendDeadlineReminders() {
     return jobsWithWorkers.length;
 }
 
+// --- Traitement principal (CRON) ---
+
 /**
- * Traite tous les jobs expires
- * Cette fonction est appelee par le cron job
+ * Traite tous les jobs expirés : envoie les rappels puis annule les jobs en retard.
+ * Appelée périodiquement par le cron job.
+ * @returns {Promise<Object>} Résultat { expired, waiting, reminders, errors }
  */
 async function processExpiredJobs() {
     console.log('\n' + '='.repeat(50));
@@ -398,8 +424,11 @@ async function processExpiredJobs() {
     return results;
 }
 
+// --- Statistiques ---
+
 /**
- * Obtient les statistiques des jobs expires
+ * Récupère les statistiques des jobs expirés pour le tableau de bord admin.
+ * @returns {Promise<Object>} { totalExpiredToday, currentlyOverdue, workersWithWarnings, suspendedWorkers }
  */
 async function getExpiredJobsStats() {
     const now = new Date();

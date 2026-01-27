@@ -6,7 +6,8 @@ import '../../domain/entities/ai_conversation.dart';
 import '../../domain/repositories/ai_chat_repository.dart';
 import '../datasources/ai_chat_remote_datasource.dart';
 
-/// Implémentation du repository pour le chat IA
+/// Implémentation du repository pour le chat IA.
+/// Encapsule les appels au datasource distant et convertit les exceptions en Failure (Either).
 class AIChatRepositoryImpl implements AIChatRepository {
   final AIChatRemoteDataSource remoteDataSource;
 
@@ -101,6 +102,8 @@ class AIChatRepositoryImpl implements AIChatRepository {
     }
   }
 
+  /// Envoie un message en mode streaming (fallback non-streaming pour l'instant).
+  /// Le streaming SSE pourra être implémenté ultérieurement.
   @override
   Stream<Either<Failure, String>> sendMessageStreaming(
     String conversationId,

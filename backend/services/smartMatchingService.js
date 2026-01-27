@@ -1,13 +1,15 @@
 /**
- * Service de matching intelligent worker-job
- * Utilise un algorithme de scoring multi-critères avec validation IA
+ * Service de matching intelligent déneigeur-réservation.
+ * Attribue le meilleur déneigeur selon un scoring multi-critères (distance, note, équipement)
+ * avec validation optionnelle par IA (Claude).
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
 
-// Client Anthropic (lazy init)
+// --- Initialisation du client Anthropic ---
+
 let anthropicClient = null;
 
 function getAnthropicClient() {
@@ -19,8 +21,10 @@ function getAnthropicClient() {
   return anthropicClient;
 }
 
+// --- Configuration des poids de scoring ---
+
 /**
- * Poids des critères de scoring
+ * Poids des critères de scoring (total = 1.0).
  */
 const SCORING_WEIGHTS = {
   distance: 0.20,
@@ -31,8 +35,12 @@ const SCORING_WEIGHTS = {
   specialization: 0.10,
 };
 
+// --- Fonctions utilitaires ---
+
 /**
- * Équipement requis selon les options de service
+ * Détermine l'équipement requis selon les options de service et la profondeur de neige.
+ * @param {Object} reservation - Réservation avec serviceOptions et snowDepthCm
+ * @returns {string[]} Liste des équipements requis
  */
 function getRequiredEquipment(reservation) {
   const required = ['shovel', 'brush'];
@@ -49,14 +57,22 @@ function getRequiredEquipment(reservation) {
 }
 
 /**
- * Vérifie si le worker a l'équipement requis
+ * Vérifie si le déneigeur possède tout l'équipement requis.
+ * @param {string[]} workerEquipment - Équipement du déneigeur
+ * @param {string[]} requiredEquipment - Équipement requis
+ * @returns {boolean} true si tout l'équipement est disponible
  */
 function hasRequiredEquipment(workerEquipment, requiredEquipment) {
   return requiredEquipment.every((eq) => workerEquipment.includes(eq));
 }
 
 /**
- * Calcule la distance entre deux points (Haversine)
+ * Calcule la distance entre deux points géographiques (formule de Haversine).
+ * @param {number} lat1 - Latitude du point 1
+ * @param {number} lon1 - Longitude du point 1
+ * @param {number} lat2 - Latitude du point 2
+ * @param {number} lon2 - Longitude du point 2
+ * @returns {number} Distance en kilomètres
  */
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Rayon de la Terre en km
@@ -72,8 +88,13 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+// --- Fonctions de scoring ---
+
 /**
- * Score de distance (0-100, plus proche = meilleur)
+ * Score de distance (0-100). Plus le déneigeur est proche, plus le score est élevé.
+ * @param {number} distanceKm - Distance en km
+ * @param {number} [maxDistance=50] - Distance maximale considérée
+ * @returns {number} Score entre 0 et 100
  */
 function scoreDistance(distanceKm, maxDistance = 50) {
   if (distanceKm > maxDistance) return 0;
@@ -131,8 +152,13 @@ async function scoreSpecialization(workerId, zone) {
   }
 }
 
+// --- Calcul du score global ---
+
 /**
- * Calcule le score global d'un worker pour une réservation
+ * Calcule le score global de compatibilité d'un déneigeur pour une réservation.
+ * @param {Document} worker - Profil complet du déneigeur
+ * @param {Document} reservation - Réservation à assigner
+ * @returns {Promise<Object>} Résultat avec score, facteurs détaillés et distance
  */
 async function calculateWorkerScore(worker, reservation) {
   const workerProfile = worker.workerProfile || {};
@@ -195,8 +221,13 @@ async function calculateWorkerScore(worker, reservation) {
   };
 }
 
+// --- Intégration IA ---
+
 /**
- * Obtient le raisonnement IA pour les recommandations
+ * Obtient un raisonnement IA (Claude) pour justifier les recommandations de matching.
+ * @param {Object[]} topCandidates - Top candidats avec leurs scores
+ * @param {Document} reservation - Réservation concernée
+ * @returns {Promise<string|null>} Texte de raisonnement ou null si IA désactivée
  */
 async function getAIReasoning(topCandidates, reservation) {
   const client = getAnthropicClient();
@@ -242,8 +273,13 @@ Fournis une brève recommandation (3-4 phrases) expliquant pourquoi le candidat 
   }
 }
 
+// --- Fonctions principales ---
+
 /**
- * Trouve les meilleurs workers pour une réservation
+ * Trouve les meilleurs déneigeurs disponibles pour une réservation et sauvegarde le résultat.
+ * @param {ObjectId} reservationId - Identifiant de la réservation
+ * @param {number} [limit=3] - Nombre maximum de candidats à retourner
+ * @returns {Promise<Object>} Résultat avec suggestedWorkers, reasoning et statistiques
  */
 async function findBestMatches(reservationId, limit = 3) {
   // Récupérer la réservation
@@ -321,7 +357,9 @@ async function findBestMatches(reservationId, limit = 3) {
 }
 
 /**
- * Auto-assigne le meilleur worker à une réservation
+ * Auto-assigne le meilleur déneigeur disponible à une réservation.
+ * @param {ObjectId} reservationId - Identifiant de la réservation
+ * @returns {Promise<Object>} Résultat avec le déneigeur assigné ou message d'erreur
  */
 async function autoAssignBestWorker(reservationId) {
   const matchResult = await findBestMatches(reservationId, 1);
@@ -356,7 +394,8 @@ async function autoAssignBestWorker(reservationId) {
 }
 
 /**
- * Récupère les statistiques de matching
+ * Récupère les statistiques agrégées du matching (total, auto-assignés, score moyen).
+ * @returns {Promise<Object>} Statistiques de matching
  */
 async function getMatchingStats() {
   const stats = await Reservation.aggregate([

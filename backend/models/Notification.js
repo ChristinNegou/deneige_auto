@@ -1,5 +1,12 @@
+/**
+ * Modèle Mongoose pour les notifications utilisateur.
+ * Gère la création, l'envoi push (FCM) et les helpers de notification par type d'événement.
+ */
+
 const mongoose = require('mongoose');
 const { sendPushNotification } = require('../services/firebaseService');
+
+// --- Schéma principal ---
 
 const notificationSchema = new mongoose.Schema({
     userId: {
@@ -69,14 +76,21 @@ const notificationSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Index composé pour optimiser les requêtes
+// --- Index ---
+
 notificationSchema.index({ userId: 1, createdAt: -1 });
 notificationSchema.index({ userId: 1, isRead: 1 });
 notificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 }); // Pour liste filtrée
 notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 }); // TTL 90 jours
 notificationSchema.index({ type: 1, createdAt: -1 }); // Pour stats par type
 
-// Méthode pour créer une notification
+// --- Méthodes statiques ---
+
+/**
+ * Crée une notification et envoie une push notification FCM si l'utilisateur a un token valide.
+ * @param {Object} data - Données de la notification (userId, type, title, message, etc.)
+ * @returns {Promise<Document>} La notification créée
+ */
 notificationSchema.statics.createNotification = async function(data) {
     const notification = new this(data);
     await notification.save();
@@ -143,7 +157,13 @@ notificationSchema.statics.createNotification = async function(data) {
     return notification;
 };
 
-// Méthode helper pour créer des notifications spécifiques
+// --- Helpers de notification par événement ---
+
+/**
+ * Notifie le client qu'un déneigeur a été assigné à sa réservation.
+ * @param {Document} reservation - La réservation concernée
+ * @param {Document} worker - Le déneigeur assigné
+ */
 notificationSchema.statics.notifyReservationAssigned = async function(reservation, worker) {
     return await this.createNotification({
         userId: reservation.userId,

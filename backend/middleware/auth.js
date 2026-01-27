@@ -1,7 +1,16 @@
+/**
+ * Middleware d'authentification et d'autorisation JWT.
+ * Vérifie le token Bearer, attache l'utilisateur à req.user et gère les suspensions.
+ * @module middleware/auth
+ */
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Middleware pour protéger les routes
+/**
+ * Protège une route en vérifiant le token JWT Bearer.
+ * Attache l'utilisateur décodé à req.user. Rejette les comptes suspendus.
+ */
 exports.protect = async (req, res, next) => {
     let token;
 
@@ -59,7 +68,12 @@ exports.protect = async (req, res, next) => {
     }
 };
 
-// Middleware pour autoriser certains rôles
+/**
+ * Restreint l'accès à certains rôles utilisateur.
+ * Doit être utilisé après le middleware protect.
+ * @param {...string} roles - Rôles autorisés (ex: 'admin', 'snowWorker')
+ * @returns {Function} Middleware Express
+ */
 exports.authorize = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {

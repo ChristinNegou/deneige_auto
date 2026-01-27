@@ -1,5 +1,15 @@
+/**
+ * Configuration de la connexion MongoDB.
+ * Gère la connexion initiale, les événements de déconnexion et les erreurs.
+ * @module config/database
+ */
+
 const mongoose = require('mongoose');
 
+/**
+ * Connecte l'application à MongoDB via la variable d'environnement MONGODB_URI.
+ * Quitte le processus en cas d'échec de connexion.
+ */
 const connectDB = async () => {
     try {
         console.log('[*] Connexion a MongoDB...');

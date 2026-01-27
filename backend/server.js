@@ -1,3 +1,9 @@
+/**
+ * Point d'entrée du serveur Deneige Auto.
+ * Configure Express, les middlewares de sécurité, les routes API, Socket.IO et les tâches cron.
+ * @module server
+ */
+
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -14,6 +20,8 @@ const { initializeFirebase } = require('./services/firebaseService');
 const { runFullCleanup, getDatabaseStats } = require('./services/databaseCleanupService');
 const { processExpiredJobs } = require('./services/expiredJobsService');
 const { generalLimiter } = require('./middleware/rateLimiter');
+
+// --- Initialisation ---
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -38,7 +46,8 @@ app.set('trust proxy', 1);
 // Créer le serveur HTTP pour Socket.IO
 const httpServer = http.createServer(app);
 
-// Configuration CORS sécurisée
+// --- Configuration CORS ---
+
 const corsOptions = {
     origin: function (origin, callback) {
         // Permettre les requêtes sans origin (apps mobiles, Postman)
@@ -90,7 +99,8 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-// Security middleware
+// --- Sécurité et compression ---
+
 app.use(helmet({
     contentSecurityPolicy: false, // Désactivé pour les apps mobiles
     crossOriginEmbedderPolicy: false,
@@ -132,7 +142,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-// Logging middleware amélioré avec filtrage des données sensibles
+// --- Journalisation (développement uniquement) ---
+
 const sensitiveFields = ['password', 'token', 'refreshToken', 'secret', 'apiKey', 'cardNumber', 'cvv'];
 const filterSensitiveData = (obj) => {
     if (!obj || typeof obj !== 'object') return obj;
@@ -165,7 +176,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// Routes API
+// --- Routes API ---
+
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/vehicles', require('./routes/vehicles'));
@@ -239,7 +251,11 @@ app.get('/health', async (req, res) => {
     res.json(healthCheck);
 });
 
-// Helper pour formater l'uptime
+/**
+ * Formate une durée en secondes vers une chaîne lisible (ex: "2j 3h 15m 42s").
+ * @param {number} seconds - Nombre de secondes
+ * @returns {string} Durée formatée
+ */
 function formatUptime(seconds) {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
@@ -312,7 +328,8 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Initialiser Socket.IO pour les mises à jour en temps réel
+// --- Socket.IO (temps réel) ---
+
 const io = new Server(httpServer, {
     cors: {
         origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
@@ -325,10 +342,19 @@ const io = new Server(httpServer, {
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
 
-// Helper pour valider les ObjectId MongoDB
+/**
+ * Valide un identifiant MongoDB ObjectId.
+ * @param {string} id - Identifiant à valider
+ * @returns {boolean}
+ */
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-// Helper pour valider les coordonnées
+/**
+ * Valide des coordonnées GPS (latitude et longitude).
+ * @param {number} lat - Latitude (-90 à 90)
+ * @param {number} lng - Longitude (-180 à 180)
+ * @returns {boolean}
+ */
 const isValidCoordinate = (lat, lng) => {
     return typeof lat === 'number' && typeof lng === 'number' &&
            lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 &&
@@ -473,9 +499,7 @@ io.on('connection', (socket) => {
 // Exporter io pour l'utiliser dans d'autres modules
 app.set('io', io);
 
-// ============================================
-// TÂCHES CRON - Nettoyage automatique de la BD
-// ============================================
+// --- Tâches cron ---
 
 // Nettoyage quotidien à 3h du matin
 cron.schedule('0 3 * * *', async () => {
@@ -542,7 +566,8 @@ const server = httpServer.listen(PORT, HOST, () => {
     console.log('\n' + '='.repeat(50) + '\n');
 });
 
-// Gestion de l'arrêt gracieux
+// --- Arrêt gracieux ---
+
 process.on('SIGTERM', () => {
     console.log('\n⚠️  SIGTERM reçu. Arrêt du serveur...');
     server.close(() => {

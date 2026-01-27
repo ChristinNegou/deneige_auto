@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/support_request.dart';
 import '../../domain/usecases/submit_support_request_usecase.dart';
 
-// Events
+// --- Événements ---
+
+/// Classe de base des événements de support client.
 abstract class SupportEvent extends Equatable {
   @override
   List<Object?> get props => [];
@@ -26,7 +28,9 @@ class ClearSupportMessages extends SupportEvent {}
 
 class ResetSupportForm extends SupportEvent {}
 
-// States
+// --- États ---
+
+/// État du BLoC de support, incluant le statut de soumission et les messages de retour.
 class SupportState extends Equatable {
   final bool isSubmitting;
   final bool isSubmitted;
@@ -65,7 +69,10 @@ class SupportState extends Equatable {
       ];
 }
 
-// BLoC
+// --- BLoC ---
+
+/// BLoC de gestion des demandes de support client.
+/// Orchestre la soumission d'une demande et la réinitialisation du formulaire.
 class SupportBloc extends Bloc<SupportEvent, SupportState> {
   final SubmitSupportRequestUseCase submitSupportRequest;
 

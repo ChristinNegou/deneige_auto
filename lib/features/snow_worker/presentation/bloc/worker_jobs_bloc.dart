@@ -10,7 +10,9 @@ import '../../domain/usecases/job_actions_usecase.dart';
 import '../../data/datasources/worker_remote_datasource.dart'
     show WorkerCancellationResult;
 
-// Events
+// --- Événements ---
+
+/// Classe de base des événements de gestion des travaux du déneigeur.
 abstract class WorkerJobsEvent extends Equatable {
   const WorkerJobsEvent();
 
@@ -135,7 +137,9 @@ class CancelJob extends WorkerJobsEvent {
   List<Object?> get props => [jobId, reasonCode, reason, description];
 }
 
-// States
+// --- États ---
+
+/// Classe de base des états de gestion des travaux du déneigeur.
 abstract class WorkerJobsState extends Equatable {
   const WorkerJobsState();
 
@@ -281,7 +285,11 @@ class JobCancellationSuccess extends WorkerJobsState {
   List<Object?> get props => [result, previousState];
 }
 
-// BLoC
+// --- BLoC ---
+
+/// BLoC de gestion des travaux de déneigement pour le déneigeur.
+/// Orchestre le chargement des travaux disponibles/assignés, l'acceptation,
+/// le suivi du statut (en route, en cours, terminé) et l'historique paginé.
 class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
   final GetAvailableJobsUseCase getAvailableJobsUseCase;
   final GetMyJobsUseCase getMyJobsUseCase;
@@ -320,6 +328,8 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     on<CancelJob>(_onCancelJob);
   }
 
+  /// Charge les travaux disponibles à proximité et les travaux assignés.
+  /// Détecte si la vérification du profil est requise.
   Future<void> _onLoadAvailableJobs(
     LoadAvailableJobs event,
     Emitter<WorkerJobsState> emit,
@@ -472,6 +482,7 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     );
   }
 
+  /// Accepte un travail et met à jour les listes (retire des disponibles, ajoute aux assignés).
   Future<void> _onAcceptJob(
     AcceptJob event,
     Emitter<WorkerJobsState> emit,
@@ -681,6 +692,7 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     );
   }
 
+  /// Charge la page suivante de l'historique des travaux (pagination incrémentale).
   Future<void> _onLoadMoreHistory(
     LoadMoreHistory event,
     Emitter<WorkerJobsState> emit,
@@ -713,6 +725,7 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
     );
   }
 
+  /// Annule un travail avec un code de motif et retire le job des listes actives.
   Future<void> _onCancelJob(
     CancelJob event,
     Emitter<WorkerJobsState> emit,

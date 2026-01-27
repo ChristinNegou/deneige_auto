@@ -1,6 +1,7 @@
 /**
- * Service d'analyse de litiges avec IA
- * Analyse les preuves et recommande des décisions équitables
+ * Service d'analyse de litiges avec IA (Claude).
+ * Évalue la force des preuves, l'historique des parties et recommande des décisions
+ * équitables (remboursement, pénalité) pour la résolution des litiges.
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
@@ -8,7 +9,8 @@ const Dispute = require('../models/Dispute');
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 
-// Client Anthropic (lazy init)
+// --- Initialisation du client Anthropic ---
+
 let anthropicClient = null;
 
 function getAnthropicClient() {
@@ -20,8 +22,10 @@ function getAnthropicClient() {
   return anthropicClient;
 }
 
+// --- Configuration des types de litiges ---
+
 /**
- * Types de litiges et leurs caractéristiques
+ * Types de litiges avec leurs caractéristiques (preuves requises, résolution typique).
  */
 const DISPUTE_TYPES = {
   no_show: {
@@ -71,9 +75,9 @@ const DISPUTE_TYPES = {
   },
 };
 
-/**
- * Décisions possibles
- */
+// --- Constantes de décision ---
+
+/** Décisions possibles pour la résolution d'un litige. */
 const POSSIBLE_DECISIONS = [
   'favor_claimant',
   'favor_respondent',
@@ -84,9 +88,7 @@ const POSSIBLE_DECISIONS = [
   'investigation_required',
 ];
 
-/**
- * Pénalités possibles
- */
+/** Pénalités possibles à appliquer suite à un litige. */
 const POSSIBLE_PENALTIES = [
   'none',
   'warning',
@@ -97,8 +99,13 @@ const POSSIBLE_PENALTIES = [
   'fee_deduction',
 ];
 
+// --- Analyse des preuves ---
+
 /**
- * Analyse la force des preuves
+ * Analyse la force des preuves d'un litige (photos, GPS, timestamps, réponse).
+ * @param {Document} dispute - Le litige avec ses preuves
+ * @param {Document} reservation - La réservation associée
+ * @returns {Object} { score: number (0-100), factors: Array }
  */
 function analyzeEvidenceStrength(dispute, reservation) {
   let score = 0;
@@ -210,7 +217,10 @@ function analyzeEvidenceStrength(dispute, reservation) {
 }
 
 /**
- * Calcule la distance GPS
+ * Calcule la distance GPS entre deux coordonnées (Haversine).
+ * @param {Object|Array} coords1 - Premières coordonnées [lon, lat] ou { lat, lng }
+ * @param {Object|Array} coords2 - Secondes coordonnées
+ * @returns {number|null} Distance en km ou null si données manquantes
  */
 function calculateGpsDistance(coords1, coords2) {
   if (!coords1 || !coords2) return null;
@@ -235,8 +245,13 @@ function calculateGpsDistance(coords1, coords2) {
   return R * c;
 }
 
+// --- Historique des parties ---
+
 /**
- * Récupère l'historique des parties
+ * Récupère l'historique d'un utilisateur impliqué dans un litige (litiges passés, ancienneté, etc.).
+ * @param {ObjectId} userId - Identifiant de l'utilisateur
+ * @param {string} role - Rôle ('client' ou 'worker')
+ * @returns {Promise<Object|null>} Historique de l'utilisateur ou null
  */
 async function getPartyHistory(userId, role) {
   const user = await User.findById(userId);
@@ -265,8 +280,13 @@ async function getPartyHistory(userId, role) {
   };
 }
 
+// --- Recommandation initiale ---
+
 /**
- * Détermine la recommandation initiale
+ * Détermine la recommandation de résolution initiale basée sur le type de litige et la force des preuves.
+ * @param {Document} dispute - Le litige
+ * @param {Object} evidenceAnalysis - Résultat de analyzeEvidenceStrength
+ * @returns {string} Décision recommandée (ex: 'partial_refund', 'investigation_required')
  */
 function getInitialRecommendation(dispute, evidenceAnalysis) {
   const disputeType = DISPUTE_TYPES[dispute.type];
@@ -285,8 +305,13 @@ function getInitialRecommendation(dispute, evidenceAnalysis) {
   }
 }
 
+// --- Analyse IA principale ---
+
 /**
- * Analyse un litige avec Claude
+ * Analyse un litige complet avec Claude : évalue les preuves, l'historique des parties,
+ * et fournit une recommandation détaillée (décision, remboursement, pénalité).
+ * @param {ObjectId} disputeId - Identifiant du litige à analyser
+ * @returns {Promise<Object>} Résultat de l'analyse IA avec recommandations
  */
 async function analyzeDispute(disputeId) {
   const client = getAnthropicClient();
@@ -431,8 +456,11 @@ Réponds en JSON:
   }
 }
 
+// --- Fonctions de gestion ---
+
 /**
- * Récupère les litiges en attente d'analyse
+ * Récupère les litiges non résolus et non encore analysés par l'IA ou non revus par un admin.
+ * @returns {Promise<Array>} Litiges en attente, triés par date de création
  */
 async function getPendingDisputes() {
   return Dispute.find({
@@ -448,7 +476,11 @@ async function getPendingDisputes() {
 }
 
 /**
- * Marque une analyse comme revue par un admin
+ * Marque l'analyse IA d'un litige comme revue par un administrateur.
+ * @param {ObjectId} disputeId - Identifiant du litige
+ * @param {ObjectId} adminId - Identifiant de l'administrateur
+ * @param {string} decision - Décision finale de l'admin
+ * @returns {Promise<Document>} Le litige mis à jour
  */
 async function markAsReviewed(disputeId, adminId, decision) {
   return Dispute.findByIdAndUpdate(

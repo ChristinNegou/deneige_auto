@@ -1,3 +1,9 @@
+/**
+ * Webhooks Stripe : paiements, Connect, transferts, litiges et remboursements.
+ * Endpoint public authentifié par signature Stripe.
+ * @module routes/webhooks
+ */
+
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -7,15 +13,14 @@ const Transaction = require('../models/Transaction');
 const Notification = require('../models/Notification');
 const { PLATFORM_FEE_PERCENT } = require('../config/constants');
 
-// ============================================
-// PAYOUT HELPER FUNCTION
-// ============================================
+// --- Fonction utilitaire de versement ---
 
 /**
- * Process worker payout for a completed reservation
- * @param {Object} reservation - The reservation document
- * @param {Object} worker - The worker document (optional, will be fetched if not provided)
- * @returns {Object} Result of the payout attempt
+ * Traite le versement au déneigeur pour une réservation complétée via Stripe Connect.
+ * Calcule la commission, crée le transfert Stripe et met à jour les statistiques.
+ * @param {Object} reservation - Document de réservation Mongoose
+ * @param {Object} [worker=null] - Document utilisateur du déneigeur (récupéré si non fourni)
+ * @returns {Object} Résultat du versement { success, transferId, amount } ou { success: false, error }
  */
 async function processWorkerPayout(reservation, worker = null) {
     // Fetch worker if not provided
@@ -116,10 +121,12 @@ async function processWorkerPayout(reservation, worker = null) {
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const WEBHOOK_SECRET_CONNECT = process.env.STRIPE_WEBHOOK_SECRET_CONNECT;
 
+// --- Endpoint principal du webhook ---
+
 /**
- * @route   POST /api/webhooks/stripe
- * @desc    Handle Stripe webhook events
- * @access  Public (verified by Stripe signature)
+ * POST /api/webhooks/stripe
+ * Point d'entrée pour tous les événements Stripe (paiements, Connect, transferts, litiges).
+ * La signature est vérifiée via STRIPE_WEBHOOK_SECRET et STRIPE_WEBHOOK_SECRET_CONNECT.
  */
 router.post('/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -235,9 +242,7 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
     }
 });
 
-// ============================================
-// PAYMENT HANDLERS
-// ============================================
+// --- Gestionnaires d'événements de paiement ---
 
 async function handlePaymentIntentSucceeded(paymentIntent) {
     console.log(`✅ PaymentIntent succeeded: ${paymentIntent.id}`);
@@ -315,9 +320,7 @@ async function handlePaymentIntentFailed(paymentIntent) {
     }
 }
 
-// ============================================
-// STRIPE CONNECT HANDLERS
-// ============================================
+// --- Gestionnaires d'événements Stripe Connect ---
 
 async function handleAccountUpdated(account) {
     console.log(`📝 Stripe Connect account updated: ${account.id}`);
@@ -375,9 +378,7 @@ async function handleExternalAccountCreated(externalAccount) {
     // Log pour audit, pas d'action nécessaire
 }
 
-// ============================================
-// TRANSFER HANDLERS
-// ============================================
+// --- Gestionnaires d'événements de transfert ---
 
 async function handleTransferCreated(transfer) {
     console.log(`💸 Transfer created: ${transfer.id}`);
@@ -431,9 +432,7 @@ async function handleTransferFailed(transfer) {
     }
 }
 
-// ============================================
-// DISPUTE HANDLERS
-// ============================================
+// --- Gestionnaires d'événements de litige Stripe ---
 
 async function handleDisputeCreated(dispute) {
     console.log(`⚠️ Dispute created: ${dispute.id}`);
@@ -529,9 +528,7 @@ async function handleDisputeClosed(dispute) {
     await reservation.save();
 }
 
-// ============================================
-// REFUND HANDLERS
-// ============================================
+// --- Gestionnaires d'événements de remboursement ---
 
 async function handleChargeRefunded(charge) {
     console.log(`💰 Charge refunded: ${charge.id}`);

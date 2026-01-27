@@ -1,9 +1,11 @@
 /**
- * Modèle pour les prédictions de demande
- * Stocke les prévisions météo et de demande par zone
+ * Modèle Mongoose pour les prédictions de demande de déneigement.
+ * Stocke les prévisions météo, le niveau de demande par zone et la précision des prédictions.
  */
 
 const mongoose = require('mongoose');
+
+// --- Schéma principal ---
 
 const demandForecastSchema = new mongoose.Schema(
   {
@@ -93,7 +95,8 @@ const demandForecastSchema = new mongoose.Schema(
   }
 );
 
-// Index géospatial pour les requêtes de proximité
+// --- Index ---
+
 demandForecastSchema.index({ location: '2dsphere' });
 
 // Index composé pour recherches par date et zone
@@ -102,14 +105,23 @@ demandForecastSchema.index({ date: 1, zone: 1 });
 // TTL: supprimer après 30 jours
 demandForecastSchema.index({ createdAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
 
-// Méthode statique pour obtenir la dernière prédiction d'une zone
+// --- Méthodes statiques ---
+
+/**
+ * Récupère la prédiction la plus récente pour une zone donnée.
+ * @param {string} zone - Nom de la zone (ex: 'montreal', 'laval')
+ * @returns {Promise<Document|null>} Dernière prédiction ou null
+ */
 demandForecastSchema.statics.getLatestForZone = async function (zone) {
   return this.findOne({ zone })
     .sort({ createdAt: -1 })
     .limit(1);
 };
 
-// Méthode statique pour obtenir les prédictions d'aujourd'hui
+/**
+ * Récupère toutes les prédictions de la journée courante.
+ * @returns {Promise<Array>} Prédictions triées par zone
+ */
 demandForecastSchema.statics.getTodayForecasts = async function () {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -121,7 +133,12 @@ demandForecastSchema.statics.getTodayForecasts = async function () {
   }).sort({ zone: 1 });
 };
 
-// Méthode pour calculer la précision après coup
+// --- Méthodes d'instance ---
+
+/**
+ * Calcule la précision de la prédiction en comparant avec les réservations réelles.
+ * @returns {number|null} Précision entre 0 et 1, ou null si pas de données réelles
+ */
 demandForecastSchema.methods.calculateAccuracy = function () {
   if (this.actualReservations === null) return null;
 

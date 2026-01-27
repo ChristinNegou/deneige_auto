@@ -1,6 +1,8 @@
 /**
- * Enums centralisés pour l'application Deneige-Auto
- * Utiliser ces constantes au lieu de strings hardcodées
+ * Enums centralisés pour l'application Deneige Auto.
+ * Définit les statuts, rôles, types et valeurs autorisées pour la validation Mongoose.
+ * Utiliser ces constantes au lieu de chaînes codées en dur.
+ * @module config/enums
  */
 
 const RESERVATION_STATUS = {

@@ -3,14 +3,17 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../../../service/secure_storage_service.dart';
 
-/// Callback pour notifier la suspension d'un utilisateur
+/// Callback pour notifier la suspension d'un utilisateur.
 typedef SuspensionCallback = void Function(
     Map<String, dynamic> suspensionDetails);
 
-/// Callback pour notifier la déconnexion forcée
+/// Callback pour notifier la déconnexion forcée.
 typedef LogoutCallback = void Function();
 
-/// Intercepteur pour ajouter le token d'authentification aux requêtes
+/// Intercepteur Dio pour la gestion des tokens JWT.
+/// Ajoute automatiquement le Bearer token aux requêtes sortantes,
+/// gère le rafraichissement transparent du token expiré (401),
+/// la détection de comptes suspendus (403) et le rate limiting (429).
 class AuthInterceptor extends Interceptor {
   final SecureStorageService secureStorage;
 
@@ -43,6 +46,8 @@ class AuthInterceptor extends Interceptor {
 
   AuthInterceptor({required this.secureStorage});
 
+  // --- Injection du token dans les requêtes ---
+
   @override
   Future<void> onRequest(
     RequestOptions options,
@@ -72,6 +77,11 @@ class AuthInterceptor extends Interceptor {
     handler.next(options);
   }
 
+  // --- Gestion des erreurs HTTP ---
+
+  /// Intercepte les erreurs pour gérer : suspension (403), rate limiting (429),
+  /// expiration du token (401) avec tentative de refresh transparent,
+  /// et les erreurs de connexion réseau.
   @override
   Future<void> onError(
       DioException err, ErrorInterceptorHandler handler) async {
@@ -165,7 +175,11 @@ class AuthInterceptor extends Interceptor {
     return handler.next(err);
   }
 
-  /// Gère le rafraîchissement du token de manière thread-safe
+  // --- Rafraîchissement du token ---
+
+  /// Gère le rafraîchissement du token de manière thread-safe.
+  /// Si un refresh est déjà en cours, les requêtes suivantes attendent son résultat
+  /// via un [Completer] partagé pour éviter les appels multiples simultanés.
   Future<String?> _handleTokenRefresh(String baseUrl) async {
     // Si un refresh est déjà en cours, attendre son résultat
     if (_isRefreshing) {
@@ -228,10 +242,11 @@ class AuthInterceptor extends Interceptor {
   }
 }
 
-/// Intercepteur pour logger les requêtes et réponses
-/// Note: Ne log que en mode debug et filtre les données sensibles
+/// Intercepteur de journalisation des requêtes et réponses HTTP.
+/// Actif uniquement en mode debug. Filtre automatiquement les données
+/// sensibles (mots de passe, tokens, clés API) dans les logs.
 class LoggingInterceptor extends Interceptor {
-  // Clés sensibles à masquer dans les logs
+  /// Clés sensibles à masquer dans les logs.
   static const _sensitiveKeys = [
     'password',
     'token',
@@ -246,7 +261,8 @@ class LoggingInterceptor extends Interceptor {
     'cardNumber',
   ];
 
-  /// Filtre les données sensibles d'un objet
+  /// Filtre récursivement les données sensibles d'un objet Map.
+  /// Remplace les valeurs des clés sensibles par '***FILTERED***'.
   dynamic _filterSensitiveData(dynamic data) {
     if (data == null) return null;
     if (data is! Map) return '[DATA]';

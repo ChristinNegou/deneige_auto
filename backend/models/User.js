@@ -1,6 +1,13 @@
+/**
+ * Modèle Mongoose pour les utilisateurs (clients, déneigeurs et admins).
+ * Gère le profil, les rôles, la vérification d'identité, les statistiques et les préférences.
+ */
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+
+// --- Schéma principal ---
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -196,7 +203,7 @@ const userSchema = new mongoose.Schema({
         }],
     },
 
-    // Worker-specific profile (only used when role === 'snowWorker')
+    // --- Profil déneigeur (utilisé uniquement si role === 'snowWorker') ---
     workerProfile: {
         isAvailable: {
             type: Boolean,
@@ -505,16 +512,20 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-// Geospatial index for worker location queries
+// --- Index ---
+
+// Index géospatial pour les requêtes de localisation des déneigeurs
 userSchema.index({ 'workerProfile.currentLocation': '2dsphere' });
 
-// Performance indexes for common queries
-// Note: email index is auto-created by unique: true in schema
+// Index de performance pour les requêtes courantes
+// Note : l'index email est auto-créé par unique: true dans le schéma
 userSchema.index({ role: 1 });                                         // Role-based queries
 userSchema.index({ role: 1, 'workerProfile.isAvailable': 1 });         // Admin: available workers
 userSchema.index({ role: 1, 'workerProfile.totalJobsCompleted': -1 }); // Admin: top workers ranking
 userSchema.index({ role: 1, isActive: 1 });                            // Active users by role
 userSchema.index({ role: 1, 'workerProfile.identityVerification.status': 1 }); // Admin: verification status
+
+// --- Middleware pre-save ---
 
 // Hash le mot de passe avant de sauvegarder
 userSchema.pre('save', async function (next) {
@@ -539,12 +550,21 @@ userSchema.pre('save', async function (next) {
     }
 });
 
-// Méthode pour comparer les mots de passe
+// --- Méthodes d'instance ---
+
+/**
+ * Vérifie si le mot de passe fourni correspond au hash stocké.
+ * @param {string} candidatePassword - Mot de passe en clair à vérifier
+ * @returns {Promise<boolean>} true si le mot de passe correspond
+ */
 userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Générer et hasher le token de réinitialisation de mot de passe
+/**
+ * Génère un token de réinitialisation de mot de passe, le hash et le stocke.
+ * @returns {string} Le token en clair (à envoyer par email)
+ */
 userSchema.methods.getResetPasswordToken = function () {
     // Générer un token aléatoire
     const resetToken = crypto.randomBytes(32).toString('hex');
@@ -564,7 +584,10 @@ userSchema.methods.getResetPasswordToken = function () {
     return resetToken;
 };
 
-// Générer un refresh token
+/**
+ * Génère un refresh token, le hash et le stocke avec une expiration de 30 jours.
+ * @returns {string} Le refresh token en clair (à retourner au client)
+ */
 userSchema.methods.generateRefreshToken = function () {
     const refreshToken = crypto.randomBytes(40).toString('hex');
 
@@ -580,7 +603,11 @@ userSchema.methods.generateRefreshToken = function () {
     return refreshToken;
 };
 
-// Vérifier un refresh token
+/**
+ * Vérifie si un refresh token est valide et non expiré.
+ * @param {string} candidateToken - Le refresh token en clair à vérifier
+ * @returns {boolean} true si le token est valide et non expiré
+ */
 userSchema.methods.verifyRefreshToken = function (candidateToken) {
     const hashedToken = crypto
         .createHash('sha256')
@@ -590,13 +617,18 @@ userSchema.methods.verifyRefreshToken = function (candidateToken) {
     return this.refreshToken === hashedToken && this.refreshTokenExpire > Date.now();
 };
 
-// Invalider le refresh token (logout)
+/**
+ * Invalide le refresh token (déconnexion).
+ */
 userSchema.methods.invalidateRefreshToken = function () {
     this.refreshToken = undefined;
     this.refreshTokenExpire = undefined;
 };
 
-// Méthode pour obtenir l'objet utilisateur sans le mot de passe
+/**
+ * Sérialise l'utilisateur en JSON en excluant les champs sensibles.
+ * @returns {Object} Objet utilisateur sans mot de passe ni tokens
+ */
 userSchema.methods.toJSON = function () {
     const user = this.toObject();
     delete user.password;

@@ -1,3 +1,8 @@
+/**
+ * Routes de gestion des notifications (lecture, marquage, suppression, push FCM, diffusion par zone).
+ * @module routes/notifications
+ */
+
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
@@ -17,69 +22,88 @@ const {
     updateNotificationSettings,
 } = require('../controllers/notificationController');
 
-// @route   POST /api/notifications/register-token
-// @desc    Register FCM token for push notifications
-// @access  Private
+// --- Tokens FCM (push notifications) ---
+
+/**
+ * POST /api/notifications/register-token
+ * Enregistre un token FCM pour les notifications push.
+ */
 router.post('/register-token', protect, registerFcmToken);
 
-// @route   DELETE /api/notifications/unregister-token
-// @desc    Unregister FCM token (logout)
-// @access  Private
+/**
+ * DELETE /api/notifications/unregister-token
+ * Désenregistre un token FCM (à la déconnexion).
+ */
 router.delete('/unregister-token', protect, unregisterFcmToken);
 
-// @route   PATCH /api/notifications/settings
-// @desc    Update notification settings
-// @access  Private
+/**
+ * PATCH /api/notifications/settings
+ * Met à jour les paramètres de notification de l'utilisateur.
+ */
 router.patch('/settings', protect, updateNotificationSettings);
 
-// @route   GET /api/notifications
-// @desc    Get all notifications for current user
-// @access  Private
+// --- Lecture et gestion ---
+
+/**
+ * GET /api/notifications
+ * Retourne toutes les notifications de l'utilisateur.
+ */
 router.get('/', protect, getNotifications);
 
-// @route   GET /api/notifications/unread-count
-// @desc    Get unread notifications count
-// @access  Private
+/**
+ * GET /api/notifications/unread-count
+ * Retourne le nombre de notifications non lues.
+ */
 router.get('/unread-count', protect, getUnreadCount);
 
-// @route   GET /api/notifications/worker
-// @desc    Get worker-specific notifications
-// @access  Private (Workers only)
+/**
+ * GET /api/notifications/worker
+ * Retourne les notifications spécifiques aux déneigeurs.
+ */
 router.get('/worker', protect, getWorkerNotifications);
 
-// @route   PATCH /api/notifications/mark-all-read
-// @desc    Mark all notifications as read
-// @access  Private
+/**
+ * PATCH /api/notifications/mark-all-read
+ * Marque toutes les notifications comme lues.
+ */
 router.patch('/mark-all-read', protect, markAllAsRead);
 
-// @route   DELETE /api/notifications/clear-all
-// @desc    Clear all notifications
-// @access  Private
+/**
+ * DELETE /api/notifications/clear-all
+ * Supprime toutes les notifications de l'utilisateur.
+ */
 router.delete('/clear-all', protect, clearAllNotifications);
 
-// @route   POST /api/notifications/send-to-client
-// @desc    Send notification to client (for workers)
-// @access  Private (Workers only)
+// --- Envoi de notifications ---
+
+/**
+ * POST /api/notifications/send-to-client
+ * Envoie une notification à un client (utilisé par les déneigeurs).
+ */
 router.post('/send-to-client', protect, sendNotificationToClient);
 
-// @route   POST /api/notifications/worker/:workerId
-// @desc    Create notification for a specific worker (admin)
-// @access  Private (Admin only)
+/**
+ * POST /api/notifications/worker/:workerId
+ * Crée une notification pour un déneigeur spécifique (admin).
+ */
 router.post('/worker/:workerId', protect, createWorkerNotification);
 
-// @route   POST /api/notifications/broadcast-zone
-// @desc    Broadcast notification to all workers in a zone
-// @access  Private (Admin only)
+/**
+ * POST /api/notifications/broadcast-zone
+ * Diffuse une notification à tous les déneigeurs d'une zone (admin).
+ */
 router.post('/broadcast-zone', protect, broadcastZoneNotification);
 
-// @route   PATCH /api/notifications/:id/read
-// @desc    Mark notification as read
-// @access  Private
+/**
+ * PATCH /api/notifications/:id/read
+ * Marque une notification comme lue.
+ */
 router.patch('/:id/read', protect, markAsRead);
 
-// @route   DELETE /api/notifications/:id
-// @desc    Delete notification
-// @access  Private
+/**
+ * DELETE /api/notifications/:id
+ * Supprime une notification.
+ */
 router.delete('/:id', protect, deleteNotification);
 
 module.exports = router;

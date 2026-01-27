@@ -9,7 +9,9 @@ import '../../domain/usecases/mark_all_as_read_usecase.dart';
 import '../../domain/usecases/delete_notification_usecase.dart';
 import '../../domain/usecases/clear_all_notifications_usecase.dart';
 
-// Events
+// --- Événements ---
+
+/// Classe de base des événements de notification.
 abstract class NotificationEvent extends Equatable {
   @override
   List<Object?> get props => [];
@@ -55,7 +57,9 @@ class UpdateAutoDeleteSetting extends NotificationEvent {
   List<Object?> get props => [enabled, delaySeconds];
 }
 
-// States
+// --- États ---
+
+/// État du BLoC de notifications, incluant la liste, le compteur non-lu et la suppression auto.
 class NotificationState extends Equatable {
   final List<AppNotification> notifications;
   final int unreadCount;
@@ -134,7 +138,10 @@ class NotificationState extends Equatable {
       ];
 }
 
-// BLoC
+// --- BLoC ---
+
+/// BLoC de gestion des notifications utilisateur.
+/// Orchestre le chargement, le marquage comme lu, la suppression et la suppression automatique différée.
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final GetNotificationsUseCase getNotifications;
   final GetUnreadCountUseCase getUnreadCount;
@@ -269,6 +276,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     );
   }
 
+  /// Planifie la suppression automatique d'une notification après un délai configurable.
   void _scheduleAutoDelete(String notificationId) {
     // Annuler le timer existant si présent
     _autoDeleteTimers[notificationId]?.cancel();
@@ -366,6 +374,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     );
   }
 
+  /// Supprime individuellement chaque notification lue via l'API.
+  /// Rafraîchit l'état en cas d'erreur partielle.
   Future<void> _onClearReadNotifications(
     ClearReadNotifications event,
     Emitter<NotificationState> emit,

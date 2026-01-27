@@ -1,11 +1,15 @@
-/// Service de calcul des taxes selon la province canadienne
+/// Service de calcul des taxes canadiennes par province.
+/// Supporte les régimes HST (harmonisée), GST+PST (séparées) et GST seule.
 class TaxService {
-  /// Singleton
+  // --- Singleton ---
+
   static final TaxService _instance = TaxService._internal();
   factory TaxService() => _instance;
   TaxService._internal();
 
-  /// Données des taxes par province (2024)
+  // --- Données fiscales par province ---
+
+  /// Taux de taxation par province (2024)
   static const Map<String, ProvinceTaxInfo> _provinceTaxes = {
     // Provinces avec HST (taxe harmonisée)
     'ON': ProvinceTaxInfo(
@@ -112,16 +116,22 @@ class TaxService {
     ),
   };
 
+  // --- Accès aux données ---
+
   /// Province par défaut (Québec)
   static const String defaultProvinceCode = 'QC';
 
-  /// Obtenir les infos de taxe pour une province
+  /// Retourne les informations fiscales pour une province donnée.
+  /// Utilise le Québec par défaut si le code est inconnu.
   ProvinceTaxInfo getTaxInfo(String provinceCode) {
     return _provinceTaxes[provinceCode.toUpperCase()] ??
         _provinceTaxes[defaultProvinceCode]!;
   }
 
-  /// Détecter la province à partir d'une adresse
+  // --- Détection de province ---
+
+  /// Détecte la province à partir d'une adresse textuelle.
+  /// Analyse le code postal, les abréviations et les noms de provinces (FR/EN).
   String detectProvinceFromAddress(String? address) {
     if (address == null || address.isEmpty) {
       return defaultProvinceCode;
@@ -188,7 +198,7 @@ class TaxService {
     return defaultProvinceCode;
   }
 
-  /// Obtenir la province à partir de la première lettre du code postal
+  /// Résout la province à partir de la première lettre du code postal canadien.
   String? _getProvinceFromPostalCode(String firstLetter) {
     // Mapping première lettre code postal -> province
     const postalCodeMap = {
@@ -215,7 +225,10 @@ class TaxService {
     return postalCodeMap[firstLetter];
   }
 
-  /// Calculer les taxes pour un montant donné
+  // --- Calcul des taxes ---
+
+  /// Calcule les taxes pour un montant donné selon la province.
+  /// Retourne un objet [TaxCalculation] avec le détail HST ou GST+PST.
   TaxCalculation calculateTaxes(double subtotal, String provinceCode) {
     final taxInfo = getTaxInfo(provinceCode);
 
@@ -257,7 +270,8 @@ class TaxService {
   }
 }
 
-/// Informations sur les taxes d'une province
+/// Informations fiscales d'une province canadienne.
+/// Contient les taux fédéral (GST/TPS), provincial (PST/TVQ) et harmonisé (HST).
 class ProvinceTaxInfo {
   final String code;
   final String name;
@@ -282,7 +296,8 @@ class ProvinceTaxInfo {
   double get totalTaxRate => isHST ? hstRate : (gstRate + pstRate);
 }
 
-/// Résultat du calcul des taxes
+/// Résultat détaillé du calcul des taxes pour une transaction.
+/// Fournit le sous-total, les taxes ventilées et le total final.
 class TaxCalculation {
   final double subtotal;
   final double federalTax;

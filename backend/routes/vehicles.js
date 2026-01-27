@@ -1,3 +1,7 @@
+/**
+ * Routes CRUD pour les véhicules des clients (ajout, modification, suppression, photo).
+ * @module routes/vehicles
+ */
 
 const express = require('express');
 const router = express.Router();
@@ -21,9 +25,12 @@ const vehiclePhotoUpload = multer({
     }
 });
 
-// @route   GET /api/vehicles
-// @desc    Obtenir tous les véhicules de l'utilisateur
-// @access  Private
+// --- Liste et détails ---
+
+/**
+ * GET /api/vehicles
+ * Retourne tous les véhicules actifs de l'utilisateur, triés par défaut en premier.
+ */
 router.get('/', protect, async (req, res) => {
     try {
         const vehicles = await Vehicle.find({
@@ -45,9 +52,10 @@ router.get('/', protect, async (req, res) => {
     }
 });
 
-// @route   GET /api/vehicles/:id
-// @desc    Obtenir un véhicule par ID
-// @access  Private
+/**
+ * GET /api/vehicles/:id
+ * Retourne un véhicule par son ID (appartenant à l'utilisateur).
+ */
 router.get('/:id', protect, async (req, res) => {
     try {
         const vehicle = await Vehicle.findOne({
@@ -75,9 +83,16 @@ router.get('/:id', protect, async (req, res) => {
     }
 });
 
-// @route   POST /api/vehicles
-// @desc    Ajouter un nouveau véhicule
-// @access  Private
+// --- Création ---
+
+/**
+ * POST /api/vehicles
+ * Ajoute un nouveau véhicule. Vérifie l'unicité de la plaque d'immatriculation.
+ * @param {string} req.body.make - Marque
+ * @param {string} req.body.model - Modèle
+ * @param {string} req.body.color - Couleur
+ * @param {string} req.body.licensePlate - Plaque d'immatriculation (unique)
+ */
 router.post('/', protect, async (req, res) => {
     try {
         const { make, model, year, color, licensePlate, type, photoUrl, isDefault } = req.body;
@@ -117,9 +132,12 @@ router.post('/', protect, async (req, res) => {
     }
 });
 
-// @route   PUT /api/vehicles/:id
-// @desc    Mettre à jour un véhicule
-// @access  Private
+// --- Modification et suppression ---
+
+/**
+ * PUT /api/vehicles/:id
+ * Met à jour les informations d'un véhicule.
+ */
 router.put('/:id', protect, async (req, res) => {
     try {
         const vehicle = await Vehicle.findOneAndUpdate(
@@ -149,9 +167,10 @@ router.put('/:id', protect, async (req, res) => {
     }
 });
 
-// @route   DELETE /api/vehicles/:id
-// @desc    Supprimer un véhicule (soft delete)
-// @access  Private
+/**
+ * DELETE /api/vehicles/:id
+ * Supprime un véhicule (suppression douce via isActive=false).
+ */
 router.delete('/:id', protect, async (req, res) => {
     try {
         const vehicle = await Vehicle.findOneAndUpdate(
@@ -180,9 +199,13 @@ router.delete('/:id', protect, async (req, res) => {
     }
 });
 
-// @route   POST /api/vehicles/:id/photo
-// @desc    Upload vehicle photo
-// @access  Private
+// --- Photo du véhicule ---
+
+/**
+ * POST /api/vehicles/:id/photo
+ * Téléverse une photo du véhicule vers Cloudinary.
+ * @param {File} req.file - Fichier image (champ 'photo', max 5 Mo)
+ */
 router.post('/:id/photo', protect, vehiclePhotoUpload.single('photo'), async (req, res) => {
     try {
         if (!req.file) {

@@ -1,4 +1,11 @@
+/**
+ * Modèle Mongoose pour les transactions financières.
+ * Enregistre les paiements, versements, remboursements, pourboires et commissions via Stripe.
+ */
+
 const mongoose = require('mongoose');
+
+// --- Schéma principal ---
 
 const transactionSchema = new mongoose.Schema({
     // Type de transaction
@@ -95,14 +102,21 @@ const transactionSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Index pour recherche rapide
+// --- Index ---
+
 transactionSchema.index({ reservationId: 1, type: 1 });
 transactionSchema.index({ fromUserId: 1, createdAt: -1 });
 transactionSchema.index({ toUserId: 1, createdAt: -1 });
 transactionSchema.index({ status: 1, type: 1 });
 transactionSchema.index({ stripePaymentIntentId: 1 });
 
-// Méthode statique pour créer une transaction de paiement complète
+// --- Méthodes statiques ---
+
+/**
+ * Crée un ensemble de transactions pour un paiement complet (paiement client, commission, versement déneigeur).
+ * @param {Object} data - Données du paiement (reservationId, clientId, workerId, montants, IDs Stripe)
+ * @returns {Promise<Document>} La transaction de paiement principale
+ */
 transactionSchema.statics.createPaymentTransaction = async function(data) {
     const {
         reservationId,
@@ -172,7 +186,13 @@ transactionSchema.statics.createPaymentTransaction = async function(data) {
     return paymentTransaction;
 };
 
-// Méthode pour obtenir le résumé des gains d'un déneigeur
+/**
+ * Calcule le résumé des gains d'un déneigeur sur une période donnée.
+ * @param {ObjectId} workerId - Identifiant du déneigeur
+ * @param {Date} [startDate] - Date de début de la période
+ * @param {Date} [endDate] - Date de fin de la période
+ * @returns {Promise<Object>} Résumé avec totalPayouts, totalTips et totalEarnings
+ */
 transactionSchema.statics.getWorkerEarningsSummary = async function(workerId, startDate, endDate) {
     const match = {
         toUserId: new mongoose.Types.ObjectId(workerId),

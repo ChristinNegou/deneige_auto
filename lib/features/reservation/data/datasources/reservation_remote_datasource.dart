@@ -6,6 +6,8 @@ import '../models/parking_spot_model.dart';
 import '../models/reservation_model.dart';
 import '../models/vehicule_model.dart';
 
+/// Contrat du datasource distant pour les opérations de réservation.
+/// Définit les appels API pour les véhicules, places de stationnement et réservations.
 abstract class ReservationRemoteDataSource {
   Future<List<VehicleModel>> getVehicles();
   Future<List<ParkingSpotModel>> getParkingSpots({bool availableOnly});
@@ -35,7 +37,8 @@ abstract class ReservationRemoteDataSource {
   });
 }
 
-/// Résultat d'une annulation de réservation
+/// Résultat d'une annulation de réservation.
+/// Contient les détails de facturation (frais, remboursement) et le statut précédent.
 class CancellationResult {
   final bool success;
   final String message;
@@ -76,7 +79,7 @@ class CancellationResult {
   }
 }
 
-/// Politique d'annulation
+/// Politique d'annulation regroupant les règles par statut de réservation.
 class CancellationPolicy {
   final Map<String, CancellationPolicyItem> policies;
 
@@ -96,6 +99,7 @@ class CancellationPolicy {
   }
 }
 
+/// Élément de politique d'annulation pour un statut donné (frais en pourcentage).
 class CancellationPolicyItem {
   final String status;
   final String label;
@@ -119,6 +123,8 @@ class CancellationPolicyItem {
   }
 }
 
+/// Implémentation du datasource distant pour les réservations via l'API REST.
+/// Gère les appels HTTP (Dio) pour le CRUD des réservations, véhicules et évaluations.
 class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
   final Dio dio;
 

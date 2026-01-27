@@ -1,3 +1,8 @@
+/**
+ * Routes d'authentification (inscription, connexion, refresh token, mot de passe, profil).
+ * @module routes/auth
+ */
+
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -21,6 +26,8 @@ const { profilePhotoUpload, handleMulterError } = require('../middleware/fileUpl
 const { uploadFromBuffer } = require('../config/cloudinary');
 const { formatPhoneNumber } = require('../services/twilioService');
 
+// --- Génération de tokens ---
+
 // Fonction pour générer un token JWT (access token)
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, process.env.JWT_SECRET, {
@@ -35,9 +42,19 @@ const generateLongLivedToken = (id, role) => {
     });
 };
 
-// @route   POST /api/auth/register
-// @desc    Enregistrer un nouvel utilisateur
-// @access  Public
+// --- Inscription ---
+
+/**
+ * POST /api/auth/register
+ * Crée un nouveau compte utilisateur (client ou déneigeur).
+ * @param {string} req.body.email - Adresse courriel
+ * @param {string} req.body.password - Mot de passe (min 6 caractères)
+ * @param {string} req.body.firstName - Prénom
+ * @param {string} req.body.lastName - Nom de famille
+ * @param {string} req.body.phoneNumber - Numéro de téléphone
+ * @param {string} [req.body.role='client'] - Rôle (client ou snowWorker)
+ * @returns {Object} Token JWT et profil utilisateur
+ */
 router.post('/register', registrationLimiter, validateRegister, async (req, res) => {
     try {
         const { email, password, firstName, lastName, phoneNumber, role } = req.body;
@@ -108,9 +125,15 @@ router.post('/register', registrationLimiter, validateRegister, async (req, res)
     }
 });
 
-// @route   POST /api/auth/login
-// @desc    Connecter un utilisateur
-// @access  Public
+// --- Connexion ---
+
+/**
+ * POST /api/auth/login
+ * Authentifie un utilisateur et retourne les tokens JWT (access + refresh).
+ * @param {string} req.body.email - Adresse courriel
+ * @param {string} req.body.password - Mot de passe
+ * @returns {Object} Tokens JWT, profil utilisateur et durée d'expiration
+ */
 router.post('/login', authLimiter, validateLogin, async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -189,9 +212,14 @@ router.post('/login', authLimiter, validateLogin, async (req, res) => {
     }
 });
 
-// @route   POST /api/auth/refresh-token
-// @desc    Rafraîchir le token d'accès
-// @access  Public
+// --- Rafraîchissement de token ---
+
+/**
+ * POST /api/auth/refresh-token
+ * Rafraîchit le token d'accès via le refresh token (rotation automatique).
+ * @param {string} req.body.refreshToken - Refresh token actuel
+ * @returns {Object} Nouveau access token et nouveau refresh token
+ */
 router.post('/refresh-token', authLimiter, async (req, res) => {
     try {
         const { refreshToken } = req.body;
@@ -253,9 +281,14 @@ router.post('/refresh-token', authLimiter, async (req, res) => {
     }
 });
 
-// @route   POST /api/auth/forgot-password
-// @desc    Envoyer un email de réinitialisation de mot de passe
-// @access  Public
+// --- Mot de passe oublié ---
+
+/**
+ * POST /api/auth/forgot-password
+ * Envoie un courriel de réinitialisation de mot de passe.
+ * Retourne toujours 200 pour ne pas révéler l'existence d'un compte.
+ * @param {string} req.body.email - Adresse courriel
+ */
 router.post('/forgot-password', forgotPasswordLimiter, validateForgotPassword, async (req, res) => {
     // Note: Ne pas logger d'informations sensibles (email, tokens) en production
     const isProduction = process.env.NODE_ENV === 'production';
@@ -332,9 +365,15 @@ router.post('/forgot-password', forgotPasswordLimiter, validateForgotPassword, a
     }
 });
 
-// @route   PUT /api/auth/reset-password/:resetToken
-// @desc    Réinitialiser le mot de passe
-// @access  Public
+// --- Réinitialisation du mot de passe ---
+
+/**
+ * PUT /api/auth/reset-password/:resetToken
+ * Réinitialise le mot de passe à l'aide d'un token à usage unique.
+ * @param {string} req.params.resetToken - Token de réinitialisation (hex)
+ * @param {string} req.body.password - Nouveau mot de passe (min 6 caractères)
+ * @returns {Object} Nouveau token JWT
+ */
 router.put('/reset-password/:resetToken', authLimiter, validateResetPassword, async (req, res) => {
     try {
         const { password } = req.body;
@@ -389,9 +428,13 @@ router.put('/reset-password/:resetToken', authLimiter, validateResetPassword, as
     }
 });
 
-// @route   GET /api/auth/me
-// @desc    Obtenir l'utilisateur actuel
-// @access  Private
+// --- Profil utilisateur ---
+
+/**
+ * GET /api/auth/me
+ * Retourne le profil de l'utilisateur authentifié.
+ * @returns {Object} Profil utilisateur (id, email, nom, rôle, etc.)
+ */
 router.get('/me', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -417,9 +460,12 @@ router.get('/me', protect, async (req, res) => {
     }
 });
 
-// @route   POST /api/auth/logout
-// @desc    Déconnecter l'utilisateur et invalider le refresh token
-// @access  Private
+// --- Déconnexion ---
+
+/**
+ * POST /api/auth/logout
+ * Déconnecte l'utilisateur et invalide son refresh token.
+ */
 router.post('/logout', protect, async (req, res) => {
     try {
         // Invalider le refresh token
@@ -442,9 +488,18 @@ router.post('/logout', protect, async (req, res) => {
     }
 });
 
-// @route   PUT /api/auth/update-profile
-// @desc    Mettre à jour le profil utilisateur
-// @access  Private
+// --- Mise à jour du profil ---
+
+/**
+ * PUT /api/auth/update-profile
+ * Met à jour le profil utilisateur (nom, téléphone, photo).
+ * Vérifie l'unicité du numéro de téléphone.
+ * @param {string} [req.body.firstName] - Prénom
+ * @param {string} [req.body.lastName] - Nom de famille
+ * @param {string} [req.body.phoneNumber] - Numéro de téléphone
+ * @param {string} [req.body.photoUrl] - URL de la photo de profil
+ * @returns {Object} Profil utilisateur mis à jour
+ */
 router.put('/update-profile', protect, validateUpdateProfile, async (req, res) => {
     try {
         const { firstName, lastName, phoneNumber, photoUrl } = req.body;
@@ -503,9 +558,14 @@ router.put('/update-profile', protect, validateUpdateProfile, async (req, res) =
     }
 });
 
-// @route   POST /api/auth/check-phone
-// @desc    Vérifier si un numéro de téléphone est disponible
-// @access  Private
+// --- Vérification de téléphone ---
+
+/**
+ * POST /api/auth/check-phone
+ * Vérifie si un numéro de téléphone est disponible (non associé à un autre compte).
+ * @param {string} req.body.phoneNumber - Numéro de téléphone à vérifier
+ * @returns {Object} { available: boolean }
+ */
 router.post('/check-phone', protect, async (req, res) => {
     try {
         const { phoneNumber } = req.body;
@@ -541,9 +601,14 @@ router.post('/check-phone', protect, async (req, res) => {
     }
 });
 
-// @route   POST /api/auth/upload-profile-photo
-// @desc    Téléverser une photo de profil
-// @access  Private
+// --- Photo de profil ---
+
+/**
+ * POST /api/auth/upload-profile-photo
+ * Téléverse une photo de profil vers Cloudinary (400x400, recadrage visage).
+ * @param {File} req.file - Fichier image (multipart/form-data, champ 'photo')
+ * @returns {Object} URL de la photo et profil utilisateur mis à jour
+ */
 router.post('/upload-profile-photo', protect, profilePhotoUpload.single('photo'), handleMulterError, async (req, res) => {
     try {
         if (!req.file) {
@@ -595,9 +660,10 @@ router.post('/upload-profile-photo', protect, profilePhotoUpload.single('photo')
     }
 });
 
-// @route   DELETE /api/auth/delete-profile-photo
-// @desc    Supprimer la photo de profil
-// @access  Private
+/**
+ * DELETE /api/auth/delete-profile-photo
+ * Supprime la photo de profil de l'utilisateur (met photoUrl à null).
+ */
 router.delete('/delete-profile-photo', protect, async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(
@@ -630,9 +696,12 @@ router.delete('/delete-profile-photo', protect, async (req, res) => {
     }
 });
 
-// @route   GET /api/auth/preferences
-// @desc    Obtenir les préférences utilisateur
-// @access  Private
+// --- Préférences ---
+
+/**
+ * GET /api/auth/preferences
+ * Retourne les préférences de notification et d'affichage de l'utilisateur.
+ */
 router.get('/preferences', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -660,9 +729,13 @@ router.get('/preferences', protect, async (req, res) => {
     }
 });
 
-// @route   PUT /api/auth/preferences
-// @desc    Mettre à jour les préférences utilisateur
-// @access  Private
+/**
+ * PUT /api/auth/preferences
+ * Met à jour les préférences de notification et d'affichage.
+ * @param {boolean} [req.body.pushEnabled] - Activer/désactiver les notifications push
+ * @param {boolean} [req.body.soundEnabled] - Activer/désactiver les sons
+ * @param {boolean} [req.body.darkThemeEnabled] - Activer/désactiver le thème sombre
+ */
 router.put('/preferences', protect, async (req, res) => {
     try {
         const { pushEnabled, soundEnabled, darkThemeEnabled } = req.body;
@@ -706,9 +779,14 @@ router.put('/preferences', protect, async (req, res) => {
     }
 });
 
-// @route   DELETE /api/auth/account
-// @desc    Supprimer le compte utilisateur
-// @access  Private
+// --- Suppression de compte ---
+
+/**
+ * DELETE /api/auth/account
+ * Supprime définitivement le compte utilisateur et toutes ses données associées.
+ * Requiert la confirmation par mot de passe.
+ * @param {string} req.body.password - Mot de passe pour confirmer la suppression
+ */
 router.delete('/account', protect, async (req, res) => {
     try {
         const { password } = req.body;

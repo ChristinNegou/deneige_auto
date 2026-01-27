@@ -3,6 +3,8 @@ import '../../../../core/config/app_config.dart';
 import 'vehicle.dart';
 import 'parking_spot.dart';
 
+/// Entité métier représentant une réservation de déneigement.
+/// Contient les informations du véhicule, de la place, du déneigeur et du statut.
 class Reservation extends Equatable {
   final String id;
   final String userId;
@@ -32,7 +34,7 @@ class Reservation extends Equatable {
   final int? snowDepthCm;
   final int? estimatedArrivalMinutes;
 
-  // Location fields
+  // --- Champs de localisation ---
   final double? locationLatitude;
   final double? locationLongitude;
   final String? locationAddress;
@@ -133,6 +135,8 @@ class Reservation extends Equatable {
             status == ReservationStatus.assigned);
   }
 
+  /// Calcule la durée estimée du déneigement en minutes.
+  /// Prend en compte les options de service et la profondeur de neige.
   int get estimatedDurationMinutes {
     int base = 15;
     if (serviceOptions.contains(ServiceOption.windowScraping)) base += 5;
@@ -251,6 +255,7 @@ class Reservation extends Equatable {
       ];
 }
 
+/// Extension fournissant le libellé d'affichage et l'icône pour chaque statut de réservation.
 extension ReservationStatusExtension on ReservationStatus {
   String get displayName {
     switch (this) {

@@ -5,7 +5,9 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 
 import '../config/app_config.dart';
 
-/// Service pour gérer les connexions WebSocket en temps réel
+/// Service WebSocket temps reel base sur Socket.IO.
+/// Gere la connexion authentifiee, la reconnexion automatique et diffuse
+/// les evenements de reservation, jobs, notifications et chat via des Streams.
 class SocketService {
   static final SocketService _instance = SocketService._internal();
   factory SocketService() => _instance;
@@ -15,10 +17,12 @@ class SocketService {
   String? _authToken;
   bool _isConnecting = false;
 
-  // Track dynamic stream controllers created by on() method
+  // --- Controllers de streams dynamiques ---
+
+  /// Controllers crees dynamiquement par [on], fermes lors du [dispose].
   final List<StreamController<dynamic>> _dynamicControllers = [];
 
-  // Stream controllers pour les différents événements
+  // --- Controllers de streams par type d'evenement ---
   final _reservationUpdatesController =
       StreamController<Map<String, dynamic>>.broadcast();
   final _jobUpdatesController =
@@ -27,7 +31,7 @@ class SocketService {
       StreamController<Map<String, dynamic>>.broadcast();
   final _connectionStatusController = StreamController<bool>.broadcast();
 
-  // Stream controllers pour le chat
+  // --- Controllers de streams pour le chat ---
   final _chatMessageController =
       StreamController<Map<String, dynamic>>.broadcast();
   final _chatTypingController =
@@ -57,7 +61,9 @@ class SocketService {
   /// Vérifier si connecté
   bool get isConnected => _socket?.connected ?? false;
 
-  /// Initialiser la connexion Socket
+  /// Etablit la connexion Socket.IO avec le serveur.
+  /// Configure la reconnexion automatique et les handlers d'evenements.
+  /// Ne fait rien si une connexion est deja en cours ou active avec le meme token.
   Future<void> connect(String authToken) async {
     if (_isConnecting) return;
     if (_socket?.connected == true && _authToken == authToken) return;
@@ -98,7 +104,8 @@ class SocketService {
     }
   }
 
-  /// Configurer les handlers d'événements
+  /// Configure tous les handlers d'evenements Socket.IO.
+  /// Ecoute les evenements de connexion, reservation, jobs, notifications et chat.
   void _setupEventHandlers() {
     if (_socket == null) return;
 
@@ -259,8 +266,8 @@ class SocketService {
     _socket!.emit(event, data);
   }
 
-  /// Écouter un événement générique et retourner un Stream
-  /// Note: Les controllers créés sont trackés et fermés lors du dispose()
+  /// Ecoute un evenement Socket.IO generique et retourne un Stream.
+  /// Les controllers crees sont automatiquement fermes lors du [dispose].
   Stream<dynamic> on(String event) {
     final controller = StreamController<dynamic>.broadcast();
     _dynamicControllers.add(controller);

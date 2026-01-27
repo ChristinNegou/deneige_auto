@@ -1,3 +1,8 @@
+/**
+ * Routes pour les déneigeurs : disponibilité, localisation, jobs, statistiques, profil et vérification d'identité.
+ * @module routes/workers
+ */
+
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -48,13 +53,13 @@ const profileUpload = multer({
     }
 });
 
-// ============================================
-// WORKER AVAILABILITY & LOCATION
-// ============================================
+// --- Disponibilité et localisation ---
 
-// @route   PATCH /api/workers/availability
-// @desc    Toggle worker availability
-// @access  Private (Worker only)
+/**
+ * PATCH /api/workers/availability
+ * Active ou désactive la disponibilité du déneigeur.
+ * @param {boolean} req.body.isAvailable - Statut de disponibilité
+ */
 router.patch('/availability', protect, authorize('snowWorker'), verificationRequired, async (req, res) => {
     try {
         const { isAvailable } = req.body;
@@ -81,9 +86,12 @@ router.patch('/availability', protect, authorize('snowWorker'), verificationRequ
     }
 });
 
-// @route   PUT /api/workers/location
-// @desc    Update worker current location
-// @access  Private (Worker only)
+/**
+ * PUT /api/workers/location
+ * Met à jour la position GPS du déneigeur (format GeoJSON).
+ * @param {number} req.body.latitude - Latitude
+ * @param {number} req.body.longitude - Longitude
+ */
 router.put('/location', protect, authorize('snowWorker'), locationLimiter, async (req, res) => {
     try {
         const { latitude, longitude } = req.body;
@@ -120,11 +128,13 @@ router.put('/location', protect, authorize('snowWorker'), locationLimiter, async
     }
 });
 
-// ============================================
-// JOBS DISCOVERY & MANAGEMENT
-// ============================================
+// --- Découverte et gestion des jobs ---
 
-// Helper function to compute required equipment for a reservation
+/**
+ * Calcule l'équipement requis pour une réservation selon ses options de service.
+ * @param {Object} reservation - Document de réservation
+ * @returns {string[]} Liste d'équipement requis (sans doublons)
+ */
 const computeRequiredEquipment = (reservation) => {
     const required = ['shovel', 'brush']; // Base equipment always required
 
@@ -162,16 +172,27 @@ const computeRequiredEquipment = (reservation) => {
     return [...new Set(required)];
 };
 
-// Helper function to check if worker has required equipment
+/**
+ * Vérifie si le déneigeur possède tout l'équipement requis.
+ * @param {string[]} workerEquipment - Équipement du déneigeur
+ * @param {string[]} requiredEquipment - Équipement requis
+ * @returns {boolean} true si le déneigeur a tout l'équipement
+ */
 const workerHasRequiredEquipment = (workerEquipment, requiredEquipment) => {
     if (!requiredEquipment || requiredEquipment.length === 0) return true;
     if (!workerEquipment || workerEquipment.length === 0) return false;
     return requiredEquipment.every(eq => workerEquipment.includes(eq));
 };
 
-// @route   GET /api/workers/available-jobs
-// @desc    Get available jobs near worker location (filtered by worker's equipment)
-// @access  Private (Worker only)
+/**
+ * GET /api/workers/available-jobs
+ * Retourne les jobs disponibles proches du déneigeur, filtrés par équipement.
+ * Utilise la recherche géospatiale ($geoNear) avec repli sur recherche globale.
+ * @param {number} req.query.lat - Latitude du déneigeur
+ * @param {number} req.query.lng - Longitude du déneigeur
+ * @param {number} [req.query.radiusKm=50] - Rayon de recherche en km
+ * @param {string} [req.query.filterByEquipment='true'] - Filtrer par équipement
+ */
 router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequired, async (req, res) => {
     try {
         const { lat, lng, radiusKm = GEOLOCATION.DEFAULT_SEARCH_RADIUS_KM, filterByEquipment = 'true' } = req.query;
@@ -374,9 +395,10 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
     }
 });
 
-// @route   GET /api/workers/my-jobs
-// @desc    Get worker's assigned and in-progress jobs
-// @access  Private (Worker only)
+/**
+ * GET /api/workers/my-jobs
+ * Retourne les jobs actifs du déneigeur (assigned, enRoute, inProgress).
+ */
 router.get('/my-jobs', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const reservations = await Reservation.find({
@@ -402,9 +424,12 @@ router.get('/my-jobs', protect, authorize('snowWorker'), async (req, res) => {
     }
 });
 
-// @route   GET /api/workers/history
-// @desc    Get worker's completed jobs history
-// @access  Private (Worker only)
+/**
+ * GET /api/workers/history
+ * Retourne l'historique des jobs terminés/annulés du déneigeur avec pagination.
+ * @param {string} [req.query.startDate] - Date de début (ISO 8601)
+ * @param {string} [req.query.endDate] - Date de fin (ISO 8601)
+ */
 router.get('/history', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const { page = 1, limit = 20, startDate, endDate } = req.query;
@@ -448,13 +473,13 @@ router.get('/history', protect, authorize('snowWorker'), async (req, res) => {
     }
 });
 
-// ============================================
-// WORKER STATISTICS & EARNINGS
-// ============================================
+// --- Statistiques et revenus ---
 
-// @route   GET /api/workers/stats
-// @desc    Get worker statistics (today, week, month, all-time)
-// @access  Private (Worker only)
+/**
+ * GET /api/workers/stats
+ * Retourne les statistiques du déneigeur (aujourd'hui, semaine, mois, global).
+ * Inclut les jobs complétés, revenus, pourboires et note moyenne.
+ */
 router.get('/stats', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const now = new Date();
@@ -575,9 +600,11 @@ router.get('/stats', protect, authorize('snowWorker'), async (req, res) => {
     }
 });
 
-// @route   GET /api/workers/earnings
-// @desc    Get detailed earnings breakdown
-// @access  Private (Worker only)
+/**
+ * GET /api/workers/earnings
+ * Retourne le détail des revenus avec ventilation quotidienne.
+ * @param {string} [req.query.period='week'] - Période (day, week, month, year)
+ */
 router.get('/earnings', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const { period = 'week' } = req.query;
@@ -669,13 +696,12 @@ router.get('/earnings', protect, authorize('snowWorker'), async (req, res) => {
     }
 });
 
-// ============================================
-// WORKER PROFILE
-// ============================================
+// --- Profil du déneigeur ---
 
-// @route   GET /api/workers/profile
-// @desc    Get worker profile
-// @access  Private (Worker only)
+/**
+ * GET /api/workers/profile
+ * Retourne le profil complet du déneigeur (infos personnelles + workerProfile).
+ */
 router.get('/profile', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const worker = await User.findById(req.user.id);
@@ -701,9 +727,14 @@ router.get('/profile', protect, authorize('snowWorker'), async (req, res) => {
     }
 });
 
-// @route   PUT /api/workers/profile
-// @desc    Update worker profile (zones, equipment, settings)
-// @access  Private (Worker only)
+/**
+ * PUT /api/workers/profile
+ * Met à jour le profil du déneigeur (zones, équipement, préférences).
+ * @param {string[]} [req.body.preferredZones] - Zones de travail préférées
+ * @param {string[]} [req.body.equipmentList] - Liste d'équipement
+ * @param {string} [req.body.vehicleType] - Type de véhicule
+ * @param {number} [req.body.maxActiveJobs] - Nombre max de jobs actifs
+ */
 router.put('/profile', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const { preferredZones, equipmentList, vehicleType, maxActiveJobs, notificationPreferences } = req.body;
@@ -754,9 +785,11 @@ router.put('/profile', protect, authorize('snowWorker'), async (req, res) => {
     }
 });
 
-// @route   POST /api/workers/profile/photo
-// @desc    Upload worker profile photo
-// @access  Private (Worker only)
+/**
+ * POST /api/workers/profile/photo
+ * Téléverse une photo de profil du déneigeur vers Cloudinary.
+ * @param {File} req.file - Fichier image (champ 'photo', max 5 Mo)
+ */
 router.post('/profile/photo', protect, authorize('snowWorker'), uploadLimiter, profileUpload.single('photo'), async (req, res) => {
     try {
         if (!req.file) {
@@ -799,13 +832,13 @@ router.post('/profile/photo', protect, authorize('snowWorker'), uploadLimiter, p
     }
 });
 
-// ============================================
-// JOB ACTIONS
-// ============================================
+// --- Actions sur les jobs ---
 
-// @route   POST /api/workers/jobs/:id/accept
-// @desc    Accept a job
-// @access  Private (Worker only)
+/**
+ * POST /api/workers/jobs/:id/accept
+ * Accepte un job et assigne le déneigeur. Notifie le client via push intelligent.
+ * Vérifie la limite de jobs actifs.
+ */
 router.post('/jobs/:id/accept', protect, authorize('snowWorker'), verificationRequired, async (req, res) => {
     try {
         const { id } = req.params;
@@ -886,9 +919,13 @@ router.post('/jobs/:id/accept', protect, authorize('snowWorker'), verificationRe
     }
 });
 
-// @route   PATCH /api/workers/jobs/:id/en-route
-// @desc    Mark worker as en route to job
-// @access  Private (Worker only)
+/**
+ * PATCH /api/workers/jobs/:id/en-route
+ * Indique que le déneigeur est en route vers le job. Met à jour sa position et l'ETA.
+ * @param {number} [req.body.latitude] - Latitude actuelle
+ * @param {number} [req.body.longitude] - Longitude actuelle
+ * @param {number} [req.body.estimatedMinutes] - Temps estimé d'arrivée en minutes
+ */
 router.patch('/jobs/:id/en-route', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -955,9 +992,10 @@ router.patch('/jobs/:id/en-route', protect, authorize('snowWorker'), async (req,
     }
 });
 
-// @route   PATCH /api/workers/jobs/:id/start
-// @desc    Start working on job
-// @access  Private (Worker only)
+/**
+ * PATCH /api/workers/jobs/:id/start
+ * Démarre le travail de déneigement. Passe le statut à 'inProgress'.
+ */
 router.patch('/jobs/:id/start', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -1013,9 +1051,11 @@ router.patch('/jobs/:id/start', protect, authorize('snowWorker'), async (req, re
     }
 });
 
-// @route   PATCH /api/workers/jobs/:id/complete
-// @desc    Complete job
-// @access  Private (Worker only)
+/**
+ * PATCH /api/workers/jobs/:id/complete
+ * Termine le job, exige une photo 'after', déclenche le paiement automatique via Stripe Connect.
+ * @param {string} [req.body.workerNotes] - Notes du déneigeur sur le travail
+ */
 router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -1185,9 +1225,14 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
     }
 });
 
-// @route   POST /api/workers/jobs/:id/photos/upload
-// @desc    Upload before/after photo to Cloudinary
-// @access  Private (Worker only)
+// --- Photos de jobs ---
+
+/**
+ * POST /api/workers/jobs/:id/photos/upload
+ * Téléverse une photo avant/après vers Cloudinary pour un job en cours.
+ * @param {string} req.body.type - Type de photo ('before' ou 'after')
+ * @param {File} req.file - Fichier image (champ 'photo')
+ */
 router.post('/jobs/:id/photos/upload', protect, authorize('snowWorker'), uploadLimiter, upload.single('photo'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -1256,9 +1301,12 @@ router.post('/jobs/:id/photos/upload', protect, authorize('snowWorker'), uploadL
     }
 });
 
-// @route   POST /api/workers/jobs/:id/photos
-// @desc    Upload before/after photo (URL version - legacy)
-// @access  Private (Worker only)
+/**
+ * POST /api/workers/jobs/:id/photos
+ * Ajoute une photo avant/après via URL (version héritée).
+ * @param {string} req.body.type - Type de photo ('before' ou 'after')
+ * @param {string} req.body.photoUrl - URL de la photo
+ */
 router.post('/jobs/:id/photos', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const { id } = req.params;
@@ -1312,9 +1360,7 @@ router.post('/jobs/:id/photos', protect, authorize('snowWorker'), async (req, re
     }
 });
 
-// ============================================
-// IDENTITY VERIFICATION
-// ============================================
+// --- Vérification d'identité ---
 
 // Configure multer for verification documents
 const verificationUpload = multer({
@@ -1331,9 +1377,11 @@ const verificationUpload = multer({
     }
 });
 
-// @route   GET /api/workers/verification/status
-// @desc    Get worker's identity verification status
-// @access  Private (Worker only)
+/**
+ * GET /api/workers/verification/status
+ * Retourne le statut de vérification d'identité du déneigeur.
+ * Inclut les résultats d'analyse IA et le nombre de tentatives restantes.
+ */
 router.get('/verification/status', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -1371,9 +1419,11 @@ router.get('/verification/status', protect, authorize('snowWorker'), async (req,
     }
 });
 
-// @route   POST /api/workers/verification/submit
-// @desc    Submit identity verification documents
-// @access  Private (Worker only)
+/**
+ * POST /api/workers/verification/submit
+ * Soumet les documents d'identité (recto, verso, selfie) pour vérification.
+ * Déclenche l'analyse IA en arrière-plan.
+ */
 router.post(
     '/verification/submit',
     protect,

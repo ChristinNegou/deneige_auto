@@ -1,6 +1,8 @@
 /**
- * Constantes de configuration métier
- * Centralise toutes les valeurs configurables de l'application
+ * Constantes de configuration métier de l'application Deneige Auto.
+ * Centralise les frais de plateforme, politiques d'annulation, limites de débit,
+ * tarification, géolocalisation et paramètres Stripe.
+ * @module config/constants
  */
 
 module.exports = {

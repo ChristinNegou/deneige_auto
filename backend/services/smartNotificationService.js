@@ -1,6 +1,6 @@
 /**
- * Service de notifications intelligentes
- * Génère des notifications contextuelles et personnalisées basées sur l'IA
+ * Service de notifications intelligentes pour le suivi en temps réel.
+ * Génère des messages contextuels (ETA, alertes météo, rappels) et les envoie via FCM.
  */
 
 const { sendPushNotification } = require('./firebaseService');
@@ -8,9 +8,9 @@ const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const axios = require('axios');
 
-/**
- * Temps de base par type de véhicule (en minutes)
- */
+// --- Configuration ---
+
+/** Temps de base estimé par type de véhicule (en minutes). */
 const BASE_TIME_BY_VEHICLE = {
   compact: 8,
   sedan: 10,
@@ -54,9 +54,7 @@ function calculateEstimatedTime({ vehicleType = 'sedan', snowDepthCm = 5, servic
   };
 }
 
-/**
- * Types de notifications intelligentes
- */
+/** Types de notifications intelligentes supportés. */
 const NOTIFICATION_TYPES = {
   ETA_UPDATE: 'eta_update',
   WORKER_ASSIGNED: 'worker_assigned',
@@ -69,11 +67,13 @@ const NOTIFICATION_TYPES = {
   REMINDER: 'reminder',
 };
 
+// --- Calculs utilitaires ---
+
 /**
- * Calcule l'ETA basé sur la position du worker et la destination
- * @param {Object} workerLocation - {lat, lng}
- * @param {Object} destinationLocation - {lat, lng}
- * @returns {Object} - {etaMinutes, distanceKm}
+ * Calcule l'ETA basé sur la position du déneigeur et la destination (Haversine, 30 km/h en hiver).
+ * @param {Object} workerLocation - Position du déneigeur { lat, lng }
+ * @param {Object} destinationLocation - Position de destination { lat, lng }
+ * @returns {Promise<Object>} { etaMinutes, distanceKm }
  */
 async function calculateETA(workerLocation, destinationLocation) {
   try {
@@ -104,8 +104,13 @@ async function calculateETA(workerLocation, destinationLocation) {
   }
 }
 
+// --- Génération de messages ---
+
 /**
- * Génère un message de notification intelligent
+ * Génère le titre et le corps d'une notification intelligente selon le type et le contexte.
+ * @param {string} type - Type de notification (voir NOTIFICATION_TYPES)
+ * @param {Object} context - Données contextuelles (workerName, etaMinutes, etc.)
+ * @returns {Object} { title, body }
  */
 function generateNotificationMessage(type, context) {
   const {
@@ -192,8 +197,14 @@ function generateNotificationMessage(type, context) {
   }
 }
 
+// --- Envoi de notifications ---
+
 /**
- * Envoie une notification intelligente à un client
+ * Envoie une notification intelligente push (FCM) à un utilisateur.
+ * @param {ObjectId} userId - Identifiant de l'utilisateur destinataire
+ * @param {string} type - Type de notification
+ * @param {Object} context - Données contextuelles pour le message
+ * @returns {Promise<Object>} Résultat de l'envoi
  */
 async function sendSmartNotification(userId, type, context) {
   try {
@@ -226,8 +237,12 @@ async function sendSmartNotification(userId, type, context) {
   }
 }
 
+// --- Notifications par événement ---
+
 /**
- * Notifie le client de l'ETA du worker
+ * Notifie le client de l'ETA du déneigeur en calculant la distance et le temps estimé.
+ * @param {ObjectId} reservationId - Identifiant de la réservation
+ * @returns {Promise<Object>} Résultat de l'envoi
  */
 async function notifyClientETA(reservationId) {
   try {
@@ -516,8 +531,12 @@ async function sendReminder(reservationId, minutesUntilService) {
   }
 }
 
+// --- Fonctions utilitaires ---
+
 /**
- * Convertit le type de véhicule en label français
+ * Convertit le type de véhicule en libellé français.
+ * @param {string} vehicleType - Type technique (ex: 'suv', 'truck')
+ * @returns {string} Libellé en français (ex: 'VUS', 'camion')
  */
 function getVehicleTypeLabel(vehicleType) {
   const labels = {
@@ -531,8 +550,13 @@ function getVehicleTypeLabel(vehicleType) {
   return labels[vehicleType] || labels.unknown;
 }
 
+// --- Vérification météo ---
+
 /**
- * Vérifie les conditions météo et envoie des alertes si nécessaire
+ * Vérifie les conditions météo actuelles et envoie des alertes aux réservations concernées.
+ * Peut être appelé par un CRON job pour surveillance continue.
+ * @param {ObjectId[]} reservationIds - Identifiants des réservations à vérifier
+ * @returns {Promise<Object>} { checked, alertsSent }
  */
 async function checkWeatherAndNotify(reservationIds) {
   // Cette fonction peut être appelée par un CRON job

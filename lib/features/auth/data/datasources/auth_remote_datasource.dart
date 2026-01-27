@@ -6,6 +6,9 @@ import '../../domain/entities/user.dart';
 import '../models/user_model.dart';
 import '../models/login_response_model.dart';
 
+/// Contrat de la source de données distante pour l'authentification.
+/// Définit toutes les opérations réseau liées à l'auth, la vérification
+/// téléphonique et la gestion du profil.
 abstract class AuthRemoteDataSource {
   Future<UserModel> login(String email, String password);
   Future<UserModel> register(
@@ -28,7 +31,7 @@ abstract class AuthRemoteDataSource {
   Future<void> forgotPassword(String email);
   Future<void> resetPassword(String token, String newPassword);
 
-  // Phone verification methods
+  // --- Vérification téléphonique ---
   Future<Map<String, dynamic>> sendPhoneVerificationCode({
     required String phoneNumber,
     required String email,
@@ -43,12 +46,12 @@ abstract class AuthRemoteDataSource {
   });
   Future<Map<String, dynamic>> resendPhoneVerificationCode(String phoneNumber);
 
-  // Profile photo methods
+  // --- Photo de profil ---
   Future<UserModel> uploadProfilePhoto(File photoFile);
   Future<UserModel> deleteProfilePhoto();
   Future<bool> checkPhoneAvailability(String phoneNumber);
 
-  // Phone change verification methods
+  // --- Changement de numéro de téléphone ---
   Future<Map<String, dynamic>> sendPhoneChangeCode(String phoneNumber);
   Future<UserModel> verifyPhoneChangeCode({
     required String phoneNumber,
@@ -56,6 +59,8 @@ abstract class AuthRemoteDataSource {
   });
 }
 
+/// Implémentation de la source de données distante pour l'authentification.
+/// Communique avec l'API backend via Dio pour toutes les opérations d'auth.
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio dio;
   final SecureStorageService secureStorage;
@@ -65,6 +70,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required this.secureStorage,
   });
 
+  // --- Connexion ---
+
+  /// Authentifie l'utilisateur avec email/mot de passe.
+  /// Sauvegarde les tokens JWT et les infos utilisateur dans le stockage sécurisé.
+  /// Lance une [AuthException] si les identifiants sont invalides,
+  /// une [SuspendedException] si le compte est suspendu.
   @override
   Future<UserModel> login(String email, String password) async {
     try {
@@ -111,6 +122,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  // --- Inscription ---
+
+  /// Inscrit un nouvel utilisateur et sauvegarde ses tokens.
+  /// Lance une [AuthException] (409) si l'email est déjà utilisé.
   @override
   Future<UserModel> register(
     String email,
@@ -163,6 +178,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  // --- Utilisateur courant ---
+
+  /// Récupère le profil de l'utilisateur connecté depuis le serveur.
   @override
   Future<UserModel> getCurrentUser() async {
     try {
@@ -187,6 +205,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  // --- Déconnexion ---
+
+  /// Déconnecte l'utilisateur côté serveur et supprime les tokens locaux.
+  /// Les tokens locaux sont supprimés même en cas d'erreur réseau.
   @override
   Future<void> logout() async {
     try {
@@ -200,7 +222,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  //  Méthode forgotPassword ajoutée
+  // --- Mot de passe oublié / Réinitialisation ---
+
+  /// Envoie un email de réinitialisation de mot de passe.
   @override
   Future<void> forgotPassword(String email) async {
     try {
@@ -227,6 +251,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  /// Réinitialise le mot de passe avec un token reçu par email.
   @override
   Future<void> resetPassword(String token, String newPassword) async {
     try {
@@ -254,7 +279,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  // méthode mise à jour du profil
+  // --- Mise à jour du profil ---
+
+  /// Met à jour les informations du profil utilisateur.
+  /// Seuls les champs non-null sont envoyés au serveur.
   @override
   Future<UserModel> updateProfile({
     String? firstName,
@@ -290,8 +318,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  // ============ PHONE VERIFICATION METHODS ============
+  // --- Vérification téléphonique (inscription) ---
 
+  /// Envoie un code de vérification SMS pour valider le numéro lors de l'inscription.
+  /// Retourne les détails incluant un devCode en environnement de développement.
   @override
   Future<Map<String, dynamic>> sendPhoneVerificationCode({
     required String phoneNumber,
@@ -347,6 +377,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  /// Vérifie le code SMS et finalise la création du compte.
+  /// Sauvegarde les tokens si le compte est créé avec succès.
   @override
   Future<UserModel> verifyPhoneCode({
     required String phoneNumber,
@@ -403,6 +435,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  /// Renvoie le code de vérification SMS (soumis au rate limiting 429).
   @override
   Future<Map<String, dynamic>> resendPhoneVerificationCode(
       String phoneNumber) async {
@@ -436,8 +469,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  // ============ PROFILE PHOTO METHODS ============
+  // --- Photo de profil ---
 
+  /// Téléverse une photo de profil en multipart/form-data.
   @override
   Future<UserModel> uploadProfilePhoto(File photoFile) async {
     try {
@@ -472,6 +506,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  /// Supprime la photo de profil de l'utilisateur.
   @override
   Future<UserModel> deleteProfilePhoto() async {
     try {
@@ -492,6 +527,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  /// Vérifie si un numéro de téléphone est disponible (non déjà associé à un compte).
   @override
   Future<bool> checkPhoneAvailability(String phoneNumber) async {
     try {
@@ -512,8 +548,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  // ============ PHONE CHANGE VERIFICATION METHODS ============
+  // --- Changement de numéro de téléphone ---
 
+  /// Envoie un code SMS pour valider un changement de numéro de téléphone.
   @override
   Future<Map<String, dynamic>> sendPhoneChangeCode(String phoneNumber) async {
     try {
@@ -554,6 +591,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  /// Vérifie le code SMS et applique le changement de numéro.
   @override
   Future<UserModel> verifyPhoneChangeCode({
     required String phoneNumber,

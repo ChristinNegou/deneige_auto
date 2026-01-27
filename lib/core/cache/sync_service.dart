@@ -2,20 +2,26 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'sync_queue.dart';
 
-/// Callback pour traiter une operation de synchronisation
+/// Callback pour traiter une opération de synchronisation.
 typedef SyncOperationHandler = Future<bool> Function(SyncQueueItem item);
 
-/// Service de synchronisation automatique
+/// Service de synchronisation automatique des opérations hors-ligne.
+/// Surveille la connectivité et traite périodiquement la file d'attente.
 class SyncService {
+  // --- Dépendances ---
+
   final SyncQueue _queue;
   final Connectivity _connectivity;
   final Map<SyncOperationType, SyncOperationHandler> _handlers = {};
+
+  // --- État interne ---
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   Timer? _syncTimer;
   bool _isSyncing = false;
 
-  // Configuration
+  // --- Configuration ---
+
   static const Duration syncInterval = Duration(minutes: 5);
   static const Duration retryDelay = Duration(seconds: 30);
 
@@ -25,19 +31,25 @@ class SyncService {
   })  : _queue = queue ?? SyncQueue(),
         _connectivity = connectivity ?? Connectivity();
 
-  /// Initialise le service de synchronisation
+  // --- Initialisation ---
+
+  /// Initialise la queue, l'écoute réseau et la synchronisation périodique.
   Future<void> init() async {
     await _queue.init();
     _startConnectivityListener();
     _startPeriodicSync();
   }
 
-  /// Enregistre un handler pour un type d'operation
+  // --- Enregistrement des handlers ---
+
+  /// Enregistre un handler pour un type d'opération donné.
   void registerHandler(SyncOperationType type, SyncOperationHandler handler) {
     _handlers[type] = handler;
   }
 
-  /// Ajoute une operation a la queue
+  // --- Ajout d'opérations ---
+
+  /// Ajoute une opération à la queue et tente une synchronisation immédiate si en ligne.
   Future<void> addOperation(
       SyncOperationType type, Map<String, dynamic> data) async {
     await _queue.addOperation(type, data);
@@ -48,7 +60,9 @@ class SyncService {
     }
   }
 
-  /// Demarre l'ecoute de la connectivite
+  // --- Écoute réseau et synchronisation périodique ---
+
+  /// Démarre l'écoute de la connectivité pour synchroniser au retour du réseau.
   void _startConnectivityListener() {
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (results) {
@@ -60,21 +74,24 @@ class SyncService {
     );
   }
 
-  /// Demarre la synchronisation periodique
+  /// Démarre la synchronisation périodique selon [syncInterval].
   void _startPeriodicSync() {
     _syncTimer = Timer.periodic(syncInterval, (_) {
       _triggerSync();
     });
   }
 
-  /// Declenche une synchronisation
+  /// Déclenche une synchronisation si aucune n'est en cours.
   void _triggerSync() {
     if (!_isSyncing) {
       _syncAll();
     }
   }
 
-  /// Synchronise toutes les operations en attente
+  // --- Logique de synchronisation ---
+
+  /// Synchronise toutes les opérations en attente une par une.
+  /// Gère les erreurs et les retries via la queue.
   Future<SyncResult> _syncAll() async {
     if (_isSyncing) {
       return SyncResult(
@@ -141,12 +158,14 @@ class SyncService {
     }
   }
 
-  /// Synchronise manuellement toutes les operations
+  // --- API publique ---
+
+  /// Lance manuellement la synchronisation de toutes les opérations en attente.
   Future<SyncResult> syncNow() async {
     return _syncAll();
   }
 
-  /// Verifie la connexion internet
+  /// Vérifie si l'appareil dispose d'une connexion internet.
   Future<bool> _isOnline() async {
     final result = await _connectivity.checkConnectivity();
     return !result.contains(ConnectivityResult.none);
@@ -158,14 +177,17 @@ class SyncService {
   /// Verifie s'il y a des operations en attente
   Future<bool> get hasPendingOperations => _queue.hasPending;
 
-  /// Arrete le service
+  // --- Nettoyage ---
+
+  /// Arrête le service (subscription réseau et timer périodique).
   void dispose() {
     _connectivitySubscription?.cancel();
     _syncTimer?.cancel();
   }
 }
 
-/// Resultat d'une synchronisation
+/// Résultat d'une synchronisation.
+/// Contient le nombre d'opérations traitées, échouées et le message de statut.
 class SyncResult {
   final bool success;
   final String message;
