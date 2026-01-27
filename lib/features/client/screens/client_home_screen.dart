@@ -7,6 +7,7 @@ import '../../../core/config/app_config.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/di/injection_container.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_state.dart';
 import '../../home/presentation/bloc/home_bloc.dart';
@@ -118,7 +119,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Erreur: ${failure.message}'),
+                content: Text(AppLocalizations.of(context)!
+                    .clientHome_errorPrefix(failure.message)),
                 backgroundColor: AppTheme.error,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -129,8 +131,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content:
-                    Text(data['message'] ?? 'Merci pour votre évaluation!'),
+                content: Text(data['message'] ??
+                    AppLocalizations.of(context)!.clientHome_ratingThanks),
                 backgroundColor: AppTheme.success,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -146,8 +148,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-                'Impossible d\'envoyer l\'évaluation. Veuillez réessayer.'),
+            content: Text(AppLocalizations.of(context)!.clientHome_ratingError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -169,7 +170,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Erreur pourboire: ${failure.message}'),
+                content: Text(AppLocalizations.of(context)!
+                    .clientHome_tipErrorPrefix(failure.message)),
                 backgroundColor: AppTheme.error,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -178,11 +180,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         },
         (data) {
           if (mounted) {
-            final workerName = data['workerName'] ?? 'le déneigeur';
+            final workerName = data['workerName'] ??
+                AppLocalizations.of(context)!.clientHome_theWorker;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                    'Pourboire de ${amount.toStringAsFixed(0)}\$ envoyé à $workerName'),
+                content: Text(AppLocalizations.of(context)!
+                    .clientHome_tipSent(amount.toStringAsFixed(0), workerName)),
                 backgroundColor: AppTheme.success,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -194,8 +197,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-                'Impossible d\'envoyer le pourboire. Veuillez réessayer.'),
+            content: Text(AppLocalizations.of(context)!.clientHome_tipError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -293,7 +295,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Bonjour,',
+                      AppLocalizations.of(context)!.clientHome_greetingLabel,
                       style: TextStyle(
                         fontSize: 13,
                         color: AppTheme.textSecondary,
@@ -446,17 +448,18 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     String statusText;
     IconData statusIcon;
 
+    final l10n = AppLocalizations.of(context)!;
     if (isInProgress) {
       statusColor = AppTheme.success;
-      statusText = 'En cours';
+      statusText = l10n.reservation_shortInProgress;
       statusIcon = Icons.construction;
     } else if (isEnRoute) {
       statusColor = AppTheme.secondary;
-      statusText = 'En route';
+      statusText = l10n.reservation_shortEnRoute;
       statusIcon = Icons.directions_car;
     } else {
       statusColor = AppTheme.primary;
-      statusText = 'Assigné';
+      statusText = l10n.reservation_shortAssigned;
       statusIcon = Icons.person;
     }
 
@@ -533,7 +536,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        reservation.workerName ?? 'Déneigeur en approche',
+                        reservation.workerName ??
+                            l10n.clientHome_workerApproaching,
                         style: TextStyle(
                           color: AppTheme.background.withValues(alpha: 0.9),
                           fontSize: 13,
@@ -576,11 +580,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   }
 
   Widget _buildQuickActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Actions rapides',
+        Text(
+          l10n.clientHome_quickActions,
           style: AppTheme.headlineMedium,
         ),
         const SizedBox(height: 12),
@@ -589,7 +594,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             Expanded(
               child: _buildActionCard(
                 icon: Icons.add_circle_outline,
-                label: 'Réserver',
+                label: l10n.clientHome_book,
                 color: AppTheme.primary2,
                 onTap: () =>
                     Navigator.pushNamed(context, AppRoutes.newReservation),
@@ -599,7 +604,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             Expanded(
               child: _buildActionCard(
                 icon: Icons.calendar_today_outlined,
-                label: 'Mes RDV',
+                label: l10n.clientHome_myAppointments,
                 color: AppTheme.success,
                 onTap: () =>
                     Navigator.pushNamed(context, AppRoutes.reservations),
@@ -609,7 +614,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             Expanded(
               child: _buildActionCard(
                 icon: Icons.credit_card_outlined,
-                label: 'Paiements',
+                label: l10n.profile_payments,
                 color: AppTheme.primary3,
                 onTap: () => Navigator.pushNamed(context, AppRoutes.payments),
               ),
@@ -662,20 +667,21 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   }
 
   Widget _buildUpcomingSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Prochaines réservations',
+            Text(
+              l10n.clientHome_upcomingReservations,
               style: AppTheme.headlineMedium,
             ),
             TextButton(
               onPressed: () =>
                   Navigator.pushNamed(context, AppRoutes.reservations),
-              child: const Text('Voir tout'),
+              child: Text(l10n.clientHome_viewAll),
             ),
           ],
         ),
@@ -715,9 +721,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             color: AppTheme.textTertiary,
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Aucune réservation',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.reservation_empty,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppTheme.textPrimary,
@@ -725,7 +731,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Réservez votre premier déneigement',
+            AppLocalizations.of(context)!.clientHome_bookFirstSnowRemoval,
             style: TextStyle(
               fontSize: 14,
               color: AppTheme.textSecondary,
@@ -736,7 +742,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             onPressed: () =>
                 Navigator.pushNamed(context, AppRoutes.newReservation),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Réserver'),
+            label: Text(AppLocalizations.of(context)!.clientHome_book),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
@@ -848,19 +854,20 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   String _formatDay(DateTime date) => date.day.toString();
 
   String _formatMonth(DateTime date) {
-    const months = [
-      'JAN',
-      'FÉV',
-      'MAR',
-      'AVR',
-      'MAI',
-      'JUN',
-      'JUL',
-      'AOÛ',
-      'SEP',
-      'OCT',
-      'NOV',
-      'DÉC'
+    final l10n = AppLocalizations.of(context)!;
+    final months = [
+      l10n.month_jan,
+      l10n.month_feb,
+      l10n.month_mar,
+      l10n.month_apr,
+      l10n.month_may,
+      l10n.month_jun,
+      l10n.month_jul,
+      l10n.month_aug,
+      l10n.month_sep,
+      l10n.month_oct,
+      l10n.month_nov,
+      l10n.month_dec
     ];
     return months[date.month - 1];
   }
@@ -870,21 +877,22 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   }
 
   String _getStatusLabel(ReservationStatus status) {
+    final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case ReservationStatus.pending:
-        return 'En attente';
+        return l10n.reservation_shortPending;
       case ReservationStatus.assigned:
-        return 'Assigné';
+        return l10n.reservation_shortAssigned;
       case ReservationStatus.enRoute:
-        return 'En route';
+        return l10n.reservation_shortEnRoute;
       case ReservationStatus.inProgress:
-        return 'En cours';
+        return l10n.reservation_shortInProgress;
       case ReservationStatus.completed:
-        return 'Terminé';
+        return l10n.reservation_shortCompleted;
       case ReservationStatus.cancelled:
-        return 'Annulé';
+        return l10n.reservation_shortCancelled;
       default:
-        return 'Inconnu';
+        return l10n.clientHome_unknown;
     }
   }
 
@@ -925,10 +933,14 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.home_filled, 'Accueil', true, () {}),
+              _buildNavItem(
+                  Icons.home_filled,
+                  AppLocalizations.of(context)!.clientHome_navHome,
+                  true,
+                  () {}),
               _buildNavItem(
                 Icons.event_note_outlined,
-                'Mes RDV',
+                AppLocalizations.of(context)!.clientHome_myAppointments,
                 false,
                 () => Navigator.pushNamed(context, AppRoutes.reservations),
               ),
@@ -956,13 +968,13 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               ),
               _buildNavItem(
                 Icons.history_outlined,
-                'Activités',
+                AppLocalizations.of(context)!.clientHome_navActivities,
                 false,
                 () => Navigator.pushNamed(context, AppRoutes.activities),
               ),
               _buildNavItem(
                 Icons.person_outline,
-                'Profil',
+                AppLocalizations.of(context)!.clientHome_navProfile,
                 false,
                 () => Navigator.pushNamed(context, AppRoutes.profile),
               ),
@@ -1005,7 +1017,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     if (authState is! AuthAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Erreur: utilisateur non authentifié'),
+          content: Text(AppLocalizations.of(context)!.clientHome_userNotAuth),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -1023,7 +1035,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           create: (_) => sl<ChatBloc>()..add(LoadMessages(reservation.id)),
           child: ChatScreen(
             reservationId: reservation.id,
-            otherUserName: reservation.workerName ?? 'Déneigeur',
+            otherUserName: reservation.workerName ??
+                AppLocalizations.of(context)!.worker_badge,
             otherUserPhoto: null,
             currentUserId: authState.user.id,
           ),

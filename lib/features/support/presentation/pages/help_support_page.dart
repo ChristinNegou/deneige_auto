@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../data/faq_data.dart';
 import '../../domain/entities/faq_item.dart';
@@ -37,16 +38,20 @@ class _HelpSupportPageState extends State<HelpSupportPage>
       child: Scaffold(
         backgroundColor: AppTheme.background,
         appBar: AppBar(
-          title: const Text('Aide et Support'),
+          title: Text(AppLocalizations.of(context)!.support_helpAndSupport),
           backgroundColor: AppTheme.surface,
           bottom: TabBar(
             controller: _tabController,
             indicatorColor: AppTheme.primary,
             labelColor: AppTheme.textPrimary,
             unselectedLabelColor: AppTheme.textTertiary,
-            tabs: const [
-              Tab(text: 'FAQ', icon: Icon(Icons.help_outline)),
-              Tab(text: 'Contact', icon: Icon(Icons.mail_outline)),
+            tabs: [
+              Tab(
+                  text: AppLocalizations.of(context)!.support_faqTab,
+                  icon: const Icon(Icons.help_outline)),
+              Tab(
+                  text: AppLocalizations.of(context)!.support_contactTab,
+                  icon: const Icon(Icons.mail_outline)),
             ],
           ),
         ),
@@ -74,9 +79,10 @@ class _FaqTabState extends State<_FaqTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final faqItems = _selectedCategory != null
-        ? FaqData.getByCategory(_selectedCategory!)
-        : FaqData.faqItems;
+        ? FaqData.getLocalizedByCategory(l10n, _selectedCategory!)
+        : FaqData.getLocalizedFaqItems(l10n);
 
     return Column(
       children: [
@@ -88,9 +94,10 @@ class _FaqTabState extends State<_FaqTab> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              _buildCategoryChip(null, 'Tout'),
+              _buildCategoryChip(null, l10n.support_all),
               ...FaqCategory.values.map(
-                (category) => _buildCategoryChip(category, category.label),
+                (category) =>
+                    _buildCategoryChip(category, category.localizedLabel(l10n)),
               ),
             ],
           ),
@@ -217,8 +224,8 @@ class _ContactTabState extends State<_ContactTab> {
             _selectedSubject = SupportSubject.question;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Votre message a été envoyé avec succès'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.support_messageSent),
               backgroundColor: AppTheme.success,
             ),
           );
@@ -256,7 +263,7 @@ class _ContactTabState extends State<_ContactTab> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Besoin d\'aide?',
+                              AppLocalizations.of(context)!.support_needHelp,
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontWeight: FontWeight.bold,
@@ -264,7 +271,8 @@ class _ContactTabState extends State<_ContactTab> {
                               ),
                             ),
                             Text(
-                              'Notre équipe vous répondra dans les 24-48h',
+                              AppLocalizations.of(context)!
+                                  .support_teamResponse,
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: 13,
@@ -280,9 +288,9 @@ class _ContactTabState extends State<_ContactTab> {
                 const SizedBox(height: 24),
 
                 // Subject dropdown
-                const Text(
-                  'Sujet',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.support_subject,
+                  style: const TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -305,7 +313,8 @@ class _ContactTabState extends State<_ContactTab> {
                         return DropdownMenuItem(
                           value: subject,
                           child: Text(
-                            subject.label,
+                            subject
+                                .localizedLabel(AppLocalizations.of(context)!),
                             style: const TextStyle(color: AppTheme.textPrimary),
                           ),
                         );
@@ -324,9 +333,9 @@ class _ContactTabState extends State<_ContactTab> {
                 const SizedBox(height: 20),
 
                 // Message field
-                const Text(
-                  'Message',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.support_message,
+                  style: const TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -339,8 +348,7 @@ class _ContactTabState extends State<_ContactTab> {
                   maxLength: 2000,
                   style: const TextStyle(color: AppTheme.textPrimary),
                   decoration: InputDecoration(
-                    hintText:
-                        'Décrivez votre problème ou question en détail...',
+                    hintText: AppLocalizations.of(context)!.support_messageHint,
                     hintStyle: const TextStyle(color: AppTheme.textTertiary),
                     filled: true,
                     fillColor: AppTheme.surfaceContainer,
@@ -360,10 +368,12 @@ class _ContactTabState extends State<_ContactTab> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Veuillez entrer un message';
+                      return AppLocalizations.of(context)!
+                          .support_messageRequired;
                     }
                     if (value.trim().length < 10) {
-                      return 'Le message doit contenir au moins 10 caractères';
+                      return AppLocalizations.of(context)!
+                          .support_messageMinLength;
                     }
                     return null;
                   },
@@ -405,14 +415,14 @@ class _ContactTabState extends State<_ContactTab> {
                               color: AppTheme.background,
                             ),
                           )
-                        : const Row(
+                        : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.send),
-                              SizedBox(width: 8),
+                              const Icon(Icons.send),
+                              const SizedBox(width: 8),
                               Text(
-                                'Envoyer',
-                                style: TextStyle(
+                                AppLocalizations.of(context)!.support_send,
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -429,7 +439,7 @@ class _ContactTabState extends State<_ContactTab> {
                   child: Column(
                     children: [
                       Text(
-                        'Ou contactez-nous directement:',
+                        AppLocalizations.of(context)!.support_contactDirectly,
                         style: TextStyle(
                           color: AppTheme.textTertiary,
                           fontSize: 13,

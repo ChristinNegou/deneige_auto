@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../domain/entities/price_estimation.dart';
 
 /// Widget pour afficher l'estimation de prix IA
@@ -63,8 +64,8 @@ class PriceEstimationCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Estimation IA',
+                      Text(
+                        AppLocalizations.of(context)!.ai_estimation,
                         style: TextStyle(
                           fontSize: 12,
                           color: AppTheme.textSecondary,
@@ -85,7 +86,7 @@ class PriceEstimationCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'taxes incluses',
+                            AppLocalizations.of(context)!.ai_taxIncluded,
                             style: TextStyle(
                               fontSize: 12,
                               color: AppTheme.textTertiary,
@@ -100,8 +101,8 @@ class PriceEstimationCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text(
-                      'Fourchette',
+                    Text(
+                      AppLocalizations.of(context)!.ai_priceRange,
                       style: TextStyle(
                         fontSize: 10,
                         color: AppTheme.textTertiary,
@@ -152,8 +153,8 @@ class PriceEstimationCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Durée estimée',
+                        Text(
+                          AppLocalizations.of(context)!.ai_estimatedDuration,
                           style: TextStyle(
                             fontSize: 11,
                             color: AppTheme.textSecondary,
@@ -215,7 +216,7 @@ class PriceEstimationCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                 child: Text(
-                  'Majorations appliquées',
+                  AppLocalizations.of(context)!.ai_surchargesApplied,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -234,32 +235,32 @@ class PriceEstimationCard extends StatelessWidget {
               child: Column(
                 children: [
                   _buildDetailRow(
-                    'Prix de base',
+                    AppLocalizations.of(context)!.ai_basePrice,
                     '${estimation.basePrice.toStringAsFixed(2)}\$',
                   ),
                   if (estimation.multipliers.total > 1)
                     _buildDetailRow(
-                      'Multiplicateur',
+                      AppLocalizations.of(context)!.ai_multiplier,
                       'x${estimation.multipliers.total.toStringAsFixed(2)}',
                       isHighlight: true,
                     ),
                   _buildDetailRow(
-                    'Sous-total',
+                    AppLocalizations.of(context)!.ai_subtotal,
                     '${estimation.priceBeforeTax.toStringAsFixed(2)}\$',
                   ),
                   _buildDetailRow(
-                    'TPS (5%)',
+                    AppLocalizations.of(context)!.ai_tps,
                     '${estimation.taxes.tps.toStringAsFixed(2)}\$',
                     isSmall: true,
                   ),
                   _buildDetailRow(
-                    'TVQ (9.975%)',
+                    AppLocalizations.of(context)!.ai_tvq,
                     '${estimation.taxes.tvq.toStringAsFixed(2)}\$',
                     isSmall: true,
                   ),
                   const Divider(height: 16),
                   _buildDetailRow(
-                    'Total',
+                    AppLocalizations.of(context)!.ai_total,
                     '${estimation.suggestedPrice.toStringAsFixed(2)}\$',
                     isBold: true,
                   ),

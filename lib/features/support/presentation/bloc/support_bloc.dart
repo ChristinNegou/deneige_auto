@@ -98,7 +98,7 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
       (_) => emit(state.copyWith(
         isSubmitting: false,
         isSubmitted: true,
-        successMessage: 'Votre message a été envoyé avec succès',
+        successMessage: 'support_messageSentSuccess',
       )),
     );
   }

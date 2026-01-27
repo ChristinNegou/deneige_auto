@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../domain/entities/chat_message.dart';
 import '../bloc/chat_bloc.dart';
 
@@ -148,9 +149,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 BlocBuilder<ChatBloc, ChatState>(
                   builder: (context, state) {
                     if (state.isOtherTyping) {
-                      return const Text(
-                        'En train d\'écrire...',
-                        style: TextStyle(
+                      return Text(
+                        AppLocalizations.of(context)!.chat_typing,
+                        style: const TextStyle(
                           color: AppTheme.primary,
                           fontSize: 12,
                         ),
@@ -196,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Aucun message',
+                  AppLocalizations.of(context)!.chat_noMessages,
                   style: TextStyle(
                     color: AppTheme.textTertiary,
                     fontSize: 16,
@@ -204,7 +205,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Commencez la conversation!',
+                  AppLocalizations.of(context)!.chat_startConversation,
                   style: TextStyle(
                     color: AppTheme.textTertiary,
                     fontSize: 14,
@@ -268,9 +269,9 @@ class _ChatScreenState extends State<ChatScreen> {
     String text;
 
     if (_isSameDay(date, now)) {
-      text = 'Aujourd\'hui';
+      text = AppLocalizations.of(context)!.chat_today;
     } else if (_isSameDay(date, now.subtract(const Duration(days: 1)))) {
-      text = 'Hier';
+      text = AppLocalizations.of(context)!.chat_yesterday;
     } else {
       text = DateFormat('d MMMM yyyy', 'fr_FR').format(date);
     }
@@ -393,10 +394,10 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               child: TextField(
                 controller: _messageController,
-                decoration: const InputDecoration(
-                  hintText: 'Écrire un message...',
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.chat_inputHint,
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,
                   ),

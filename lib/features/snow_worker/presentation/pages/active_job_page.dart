@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../ai_features/presentation/widgets/ai_photo_feedback_dialog.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -94,7 +95,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           _statusCheckTimer?.cancel();
 
           final cancelReason = data['cancelReason'] as String? ??
-              'Le client a annulé la réservation';
+              AppLocalizations.of(context)!.worker_clientCancelled;
           final cancelledBy = data['cancelledBy'] as String? ?? 'client';
 
           _showJobCancelledDialog(cancelReason, cancelledBy);
@@ -132,9 +133,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               size: 48,
             ),
           ),
-          title: const Text(
-            'Job annulé',
-            style: TextStyle(
+          title: Text(
+            AppLocalizations.of(context)!.worker_jobCancelled,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
@@ -157,8 +158,10 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                     Expanded(
                       child: Text(
                         cancelledBy == 'client'
-                            ? 'Le client a annulé cette réservation.'
-                            : 'Cette réservation a été annulée.',
+                            ? AppLocalizations.of(context)!
+                                .worker_clientCancelledMessage
+                            : AppLocalizations.of(context)!
+                                .worker_cancelledMessage,
                         style: const TextStyle(
                           color: AppTheme.error,
                           fontWeight: FontWeight.w500,
@@ -170,13 +173,13 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Raison: $reason',
+                AppLocalizations.of(context)!.worker_cancelReason(reason),
                 style: AppTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'Vous ne serez pas facturé pour ce job.',
+                AppLocalizations.of(context)!.worker_notChargedForJob,
                 style:
                     AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
@@ -199,9 +202,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
                 ),
-                child: const Text(
-                  'Retour au tableau de bord',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.worker_backToDashboard,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -343,7 +346,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           ),
           const SizedBox(width: 16),
           Text(
-            'Job actif',
+            AppLocalizations.of(context)!.worker_activeJob,
             style: AppTheme.headlineMedium,
           ),
           const Spacer(),
@@ -444,7 +447,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   color: AppTheme.background.withValues(alpha: 0.7), size: 18),
               const SizedBox(width: 8),
               Text(
-                'Temps écoulé',
+                AppLocalizations.of(context)!.worker_timeElapsed,
                 style: TextStyle(
                   fontSize: 14,
                   color: AppTheme.background.withValues(alpha: 0.7),
@@ -611,7 +614,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Appeler',
+                          AppLocalizations.of(context)!.common_call,
                           style: TextStyle(
                             color: _currentJob.client.phoneNumber != null
                                 ? AppTheme.success
@@ -653,9 +656,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                         const Icon(Icons.chat_bubble_rounded,
                             size: 20, color: AppTheme.background),
                         const SizedBox(width: 6),
-                        const Text(
-                          'Chat',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.reservation_chat,
+                          style: const TextStyle(
                             color: AppTheme.background,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
@@ -844,7 +847,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                           Icon(Icons.broken_image_rounded,
                               color: AppTheme.textTertiary, size: 40),
                           const SizedBox(height: 8),
-                          Text('Photo non disponible',
+                          Text(
+                              AppLocalizations.of(context)!
+                                  .reservation_photoUnavailable,
                               style: AppTheme.bodySmall
                                   .copyWith(color: AppTheme.textTertiary)),
                         ],
@@ -866,7 +871,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                             Icon(Icons.zoom_in, color: Colors.white, size: 14),
                             const SizedBox(width: 4),
                             Text(
-                              'Agrandir',
+                              AppLocalizations.of(context)!.worker_enlarge,
                               style:
                                   TextStyle(color: Colors.white, fontSize: 11),
                             ),
@@ -1003,7 +1008,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   Icon(Icons.map_rounded, size: 20, color: AppTheme.primary),
                   const SizedBox(width: 8),
                   Text(
-                    'Google Maps',
+                    AppLocalizations.of(context)!.worker_googleMaps,
                     style: TextStyle(
                       color: AppTheme.primary,
                       fontWeight: FontWeight.w600,
@@ -1036,7 +1041,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                       size: 20, color: AppTheme.info),
                   const SizedBox(width: 8),
                   Text(
-                    'Waze',
+                    AppLocalizations.of(context)!.worker_waze,
                     style: TextStyle(
                       color: AppTheme.info,
                       fontWeight: FontWeight.w600,
@@ -1080,13 +1085,14 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                         color: AppTheme.primary, size: 20),
                   ),
                   const SizedBox(width: 12),
-                  Text('Actions', style: AppTheme.headlineSmall),
+                  Text(AppLocalizations.of(context)!.worker_actions,
+                      style: AppTheme.headlineSmall),
                 ],
               ),
               const SizedBox(height: 16),
               if (_currentJob.status == JobStatus.assigned)
                 _buildGradientActionButton(
-                  label: 'En route',
+                  label: AppLocalizations.of(context)!.worker_enRoute,
                   icon: Icons.directions_car_rounded,
                   gradientColors: [AppTheme.primary, AppTheme.secondary],
                   isLoading: isLoading,
@@ -1108,9 +1114,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                                 const Icon(Icons.warning,
                                     color: AppTheme.background, size: 20),
                                 const SizedBox(width: 12),
-                                const Expanded(
-                                    child: Text(
-                                        'Coordonnées GPS non disponibles')),
+                                Expanded(
+                                    child: Text(AppLocalizations.of(context)!
+                                        .worker_coordinatesUnavailable)),
                               ],
                             ),
                             backgroundColor: AppTheme.warning,
@@ -1127,7 +1133,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 ),
               if (_currentJob.status == JobStatus.enRoute) ...[
                 _buildGradientActionButton(
-                  label: 'Je suis arrivé',
+                  label: AppLocalizations.of(context)!.worker_iArrived,
                   icon: Icons.location_on_rounded,
                   gradientColors: [AppTheme.secondary, const Color(0xFF7C3AED)],
                   isLoading: isLoading,
@@ -1167,7 +1173,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 _buildPhotoSection(),
                 const SizedBox(height: 16),
                 _buildGradientActionButton(
-                  label: _photoUploaded ? 'Terminer le job' : 'Photo requise',
+                  label: _photoUploaded
+                      ? AppLocalizations.of(context)!.worker_finishJob
+                      : AppLocalizations.of(context)!.worker_photoRequired,
                   icon: _photoUploaded
                       ? Icons.check_circle_rounded
                       : Icons.camera_alt_rounded,
@@ -1327,8 +1335,10 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                   children: [
                     Text(
                       _photoUploaded
-                          ? 'Photo envoyée!'
-                          : 'Photo du travail terminé',
+                          ? AppLocalizations.of(context)!
+                              .worker_photoSentSuccess
+                          : AppLocalizations.of(context)!
+                              .worker_photoOfCompletedWork,
                       style: AppTheme.labelLarge.copyWith(
                         fontWeight: FontWeight.w600,
                         color: _photoUploaded
@@ -1339,8 +1349,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                     const SizedBox(height: 2),
                     Text(
                       _photoUploaded
-                          ? 'Vous pouvez maintenant terminer'
-                          : 'Prenez une photo avant de terminer',
+                          ? AppLocalizations.of(context)!.worker_canNowFinish
+                          : AppLocalizations.of(context)!
+                              .worker_takePhotoBeforeFinish,
                       style: AppTheme.bodySmall,
                     ),
                   ],
@@ -1365,7 +1376,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 Expanded(
                   child: _buildOutlinedButton(
                     icon: Icons.refresh_rounded,
-                    label: 'Reprendre',
+                    label: AppLocalizations.of(context)!.worker_retakePhoto,
                     color: AppTheme.textSecondary,
                     onPressed: _isUploadingPhoto ? () {} : _takePhoto,
                   ),
@@ -1397,7 +1408,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                                 color: AppTheme.background, size: 18),
                           const SizedBox(width: 6),
                           Text(
-                            _isUploadingPhoto ? 'Envoi...' : 'Envoyer',
+                            _isUploadingPhoto
+                                ? AppLocalizations.of(context)!.worker_sending
+                                : AppLocalizations.of(context)!.common_send,
                             style: const TextStyle(
                               color: AppTheme.background,
                               fontWeight: FontWeight.w600,
@@ -1463,9 +1476,9 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                     const Icon(Icons.camera_alt_rounded,
                         color: AppTheme.background, size: 22),
                     const SizedBox(width: 10),
-                    const Text(
-                      'Prendre une photo',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.worker_takePhoto,
+                      style: const TextStyle(
                         color: AppTheme.background,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -1501,8 +1514,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-                'Impossible de prendre la photo. Vérifiez les permissions de la caméra.'),
+            content: Text(
+                AppLocalizations.of(context)!.worker_cameraPermissionError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1534,7 +1547,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Erreur: ${failure.message}'),
+                content: Text(AppLocalizations.of(context)!
+                    .clientHome_errorPrefix(failure.message)),
                 backgroundColor: AppTheme.error,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
@@ -1556,7 +1570,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                     const Icon(Icons.check_circle,
                         color: AppTheme.background, size: 20),
                     const SizedBox(width: 12),
-                    const Text('Photo envoyée avec succès!'),
+                    Text(AppLocalizations.of(context)!.worker_photoSentSuccess),
                   ],
                 ),
                 backgroundColor: AppTheme.success,
@@ -1585,8 +1599,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-                'Impossible d\'envoyer la photo. Vérifiez votre connexion.'),
+            content:
+                Text(AppLocalizations.of(context)!.worker_photoUploadError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1623,7 +1637,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               const CircularProgressIndicator(color: AppTheme.primary),
               const SizedBox(height: 20),
               Text(
-                'Vérification de votre position...',
+                AppLocalizations.of(context)!.worker_verifyingPosition,
                 style: AppTheme.bodyMedium,
               ),
             ],
@@ -1639,7 +1653,8 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         if (permission == LocationPermission.denied) {
           if (!context.mounted) return;
           Navigator.pop(context);
-          _showLocationError(context, 'Permission de localisation refusée');
+          _showLocationError(context,
+              AppLocalizations.of(context)!.worker_locationPermissionDenied);
           return;
         }
       }
@@ -1649,7 +1664,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
         Navigator.pop(context);
         _showLocationError(
           context,
-          'Permission de localisation refusée définitivement. Activez-la dans les paramètres.',
+          AppLocalizations.of(context)!.worker_locationPermissionDeniedForever,
         );
         return;
       }
@@ -1693,7 +1708,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
       if (!context.mounted) return;
       Navigator.pop(context);
       _showLocationError(context,
-          'Impossible de déterminer votre position. Activez la localisation et réessayez.');
+          AppLocalizations.of(context)!.worker_cannotDeterminePosition);
     }
   }
 
@@ -1714,14 +1729,15 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           child: Icon(Icons.check_circle_rounded,
               color: AppTheme.success, size: 40),
         ),
-        title: const Text('Position confirmée!'),
+        title: Text(AppLocalizations.of(context)!.worker_positionConfirmed),
         content: Text(
-          'Vous êtes à ${distanceMeters}m du véhicule.\n\nVous pouvez maintenant commencer le travail.',
+          AppLocalizations.of(context)!
+              .worker_arrivedConfirmedMessage(distanceMeters),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Annuler',
+            child: Text(AppLocalizations.of(context)!.common_cancel,
                 style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton.icon(
@@ -1730,7 +1746,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               context.read<WorkerJobsBloc>().add(StartJob(_currentJob.id));
             },
             icon: const Icon(Icons.play_arrow_rounded),
-            label: const Text('Commencer'),
+            label: Text(AppLocalizations.of(context)!.worker_startJob),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.success,
               shape: RoundedRectangleBorder(
@@ -1759,14 +1775,16 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           ),
           child: Icon(Icons.warning_rounded, color: AppTheme.warning, size: 40),
         ),
-        title: const Text('Coordonnées non disponibles'),
-        content: const Text(
-          'Ce job n\'a pas de coordonnées GPS enregistrées.\n\nConfirmez-vous être arrivé à l\'emplacement indiqué?',
+        title:
+            Text(AppLocalizations.of(context)!.worker_coordinatesUnavailable),
+        content: Text(
+          AppLocalizations.of(context)!.worker_noGpsConfirmArrival,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Non', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(AppLocalizations.of(context)!.common_no,
+                style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -1774,7 +1792,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               context.read<WorkerJobsBloc>().add(StartJob(_currentJob.id));
             },
             icon: const Icon(Icons.play_arrow_rounded),
-            label: const Text('Oui, commencer'),
+            label: Text(AppLocalizations.of(context)!.worker_yesStart),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.warning,
               shape: RoundedRectangleBorder(
@@ -1804,9 +1822,10 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           child:
               Icon(Icons.location_off_rounded, color: AppTheme.error, size: 40),
         ),
-        title: const Text('Trop loin'),
+        title: Text(AppLocalizations.of(context)!.worker_tooFar),
         content: Text(
-          'Vous êtes à ${distanceMeters}m du véhicule.\n\nVous devez être à moins de ${_arrivalRadiusMeters.round()}m pour confirmer votre arrivée.\n\nContinuez à vous rapprocher.',
+          AppLocalizations.of(context)!.worker_tooFarMessage(
+              distanceMeters, _arrivalRadiusMeters.round()),
         ),
         actions: [
           TextButton(
@@ -1824,7 +1843,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
               }
             },
             icon: const Icon(Icons.navigation_rounded),
-            label: const Text('Ouvrir GPS'),
+            label: Text(AppLocalizations.of(context)!.worker_openGps),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               shape: RoundedRectangleBorder(
@@ -1853,7 +1872,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           ),
           child: Icon(Icons.error_rounded, color: AppTheme.error, size: 40),
         ),
-        title: const Text('Erreur de localisation'),
+        title: Text(AppLocalizations.of(context)!.worker_locationError),
         content: Text(message),
         actions: [
           TextButton(
@@ -1882,13 +1901,12 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           child:
               Icon(Icons.task_alt_rounded, color: AppTheme.success, size: 40),
         ),
-        title: const Text('Terminer le job'),
-        content: const Text(
-            'Êtes-vous sûr de vouloir marquer ce job comme terminé?'),
+        title: Text(AppLocalizations.of(context)!.worker_finishJob),
+        content: Text(AppLocalizations.of(context)!.worker_confirmCompleteJob),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Annuler',
+            child: Text(AppLocalizations.of(context)!.common_cancel,
                 style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton(
@@ -1902,7 +1920,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
             ),
-            child: const Text('Confirmer'),
+            child: Text(AppLocalizations.of(context)!.common_confirm),
           ),
         ],
       ),
@@ -1940,45 +1958,48 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
   }
 
   String _getStatusLabel(JobStatus status) {
+    final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case JobStatus.assigned:
-        return 'Assigné';
+        return l10n.worker_earningsAssigned;
       case JobStatus.enRoute:
-        return 'En route';
+        return l10n.worker_enRoute;
       case JobStatus.inProgress:
-        return 'En cours';
+        return l10n.activities_inProgress;
       case JobStatus.completed:
-        return 'Terminé';
+        return l10n.worker_earningsCompleted;
       default:
-        return 'Inconnu';
+        return l10n.worker_statusUnknown;
     }
   }
 
   String _getStatusSubtitle(JobStatus status) {
+    final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case JobStatus.assigned:
-        return 'Appuyez sur "En route" pour commencer';
+        return l10n.worker_pressEnRouteToStart;
       case JobStatus.enRoute:
-        return 'Dirigez-vous vers le client';
+        return l10n.worker_headToClient;
       case JobStatus.inProgress:
-        return 'Travail en cours...';
+        return l10n.worker_workInProgress;
       case JobStatus.completed:
-        return 'Bon travail!';
+        return l10n.worker_goodJob;
       default:
         return '';
     }
   }
 
   String _getSuccessMessage(String action) {
+    final l10n = AppLocalizations.of(context)!;
     switch (action) {
       case 'en-route':
-        return 'Statut mis à jour: En route';
+        return l10n.worker_statusUpdatedEnRoute;
       case 'start':
-        return 'Job démarré!';
+        return l10n.worker_jobStarted;
       case 'complete':
-        return 'Job terminé avec succès!';
+        return l10n.worker_jobCompletedSuccess;
       default:
-        return 'Action réussie';
+        return l10n.worker_actionSuccess;
     }
   }
 
@@ -1990,7 +2011,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Numéro de téléphone non disponible'),
+          content: Text(AppLocalizations.of(context)!.worker_phoneUnavailable),
           backgroundColor: AppTheme.warning,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -2016,7 +2037,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Numéro de téléphone non disponible'),
+          content: Text(AppLocalizations.of(context)!.worker_phoneUnavailable),
           backgroundColor: AppTheme.warning,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -2041,7 +2062,7 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     if (authState is! AuthAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Erreur: utilisateur non authentifié'),
+          content: Text(AppLocalizations.of(context)!.worker_userNotAuth),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(

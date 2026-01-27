@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../../features/auth/presentation/bloc/auth_interceptor.dart';
 import '../../service/secure_storage_service.dart';
 import '../config/app_config.dart';
+import '../services/locale_service.dart';
 
 /// Client Dio configuré pour l'application
 class DioClient {
@@ -10,7 +11,10 @@ class DioClient {
 
   late final Dio _dio;
 
-  DioClient({required SecureStorageService secureStorage}) {
+  DioClient({
+    required SecureStorageService secureStorage,
+    required LocaleService localeService,
+  }) {
     _dio = Dio(
       BaseOptions(
         baseUrl: _baseUrl,
@@ -31,6 +35,7 @@ class DioClient {
 
     // Ajout des intercepteurs
     _dio.interceptors.addAll([
+      LocaleInterceptor(localeService: localeService),
       AuthInterceptor(secureStorage: secureStorage),
       RetryInterceptor(dio: _dio),
       LoggingInterceptor(),
@@ -104,5 +109,18 @@ class RetryInterceptor extends Interceptor {
     }
 
     return false;
+  }
+}
+
+/// Intercepteur pour ajouter le header Accept-Language aux requêtes
+class LocaleInterceptor extends Interceptor {
+  final LocaleService localeService;
+
+  LocaleInterceptor({required this.localeService});
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    options.headers['Accept-Language'] = localeService.locale.languageCode;
+    handler.next(options);
   }
 }

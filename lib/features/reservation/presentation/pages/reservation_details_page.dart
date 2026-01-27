@@ -840,7 +840,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           create: (_) => sl<ChatBloc>()..add(LoadMessages(reservation.id)),
           child: ChatScreen(
             reservationId: reservation.id,
-            otherUserName: reservation.workerName ?? 'Déneigeur',
+            otherUserName:
+                reservation.workerName ?? l10n.reservation_workerAssigned,
             otherUserPhoto: null,
             currentUserId: authState.user.id,
           ),
@@ -1540,7 +1541,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             HapticFeedback.mediumImpact();
             RatingTipDialog.show(
               context,
-              workerName: reservation.workerName ?? 'Déneigeur',
+              workerName:
+                  reservation.workerName ?? l10n.reservation_workerAssigned,
               servicePrice: reservation.totalPrice,
               onSubmit: (rating, tip, comment) async {
                 // Submit rating to backend
@@ -1562,7 +1564,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                             Icon(Icons.error, color: AppTheme.textPrimary),
                             const SizedBox(width: 12),
                             Text(
-                              'Erreur: ${failure.message}',
+                              l10n.resDetail_errorPrefix(failure.message),
                               style: TextStyle(color: AppTheme.textPrimary),
                             ),
                           ],
@@ -1593,7 +1595,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                                       color: AppTheme.textPrimary),
                                   const SizedBox(width: 12),
                                   Text(
-                                    'Évaluation envoyée, mais erreur pourboire: ${failure.message}',
+                                    l10n.resDetail_ratingSuccessTipError(
+                                        failure.message),
                                     style:
                                         TextStyle(color: AppTheme.textPrimary),
                                   ),
@@ -1616,7 +1619,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                                       color: AppTheme.textPrimary),
                                   const SizedBox(width: 12),
                                   Text(
-                                    'Merci! Pourboire de ${tip.toStringAsFixed(0)}\$ envoyé',
+                                    l10n.resDetail_tipSent(
+                                        tip.toStringAsFixed(0)),
                                     style:
                                         TextStyle(color: AppTheme.textPrimary),
                                   ),
@@ -1640,7 +1644,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                                   color: AppTheme.textPrimary),
                               const SizedBox(width: 12),
                               Text(
-                                'Merci pour votre évaluation!',
+                                l10n.resDetail_ratingSuccess,
                                 style: TextStyle(color: AppTheme.textPrimary),
                               ),
                             ],

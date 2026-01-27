@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ServiceOptionTile extends StatelessWidget {
   final ServiceOption option;
@@ -21,12 +22,12 @@ class ServiceOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (compact) {
-      return _buildCompactTile();
+      return _buildCompactTile(context);
     }
-    return _buildFullTile();
+    return _buildFullTile(context);
   }
 
-  Widget _buildCompactTile() {
+  Widget _buildCompactTile(BuildContext context) {
     return InkWell(
       onTap: onToggle,
       borderRadius: BorderRadius.circular(10),
@@ -66,7 +67,7 @@ class ServiceOptionTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _getCompactTitle(option),
+                    _getCompactTitle(context, option),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -111,28 +112,29 @@ class ServiceOptionTile extends StatelessWidget {
     );
   }
 
-  String _getCompactTitle(ServiceOption option) {
+  String _getCompactTitle(BuildContext context, ServiceOption option) {
+    final l10n = AppLocalizations.of(context)!;
     switch (option) {
       case ServiceOption.windowScraping:
-        return 'Grattage vitres';
+        return l10n.option_windowScraping;
       case ServiceOption.doorDeicing:
-        return 'Deglacage portes';
+        return l10n.option_doorDeicing;
       case ServiceOption.wheelClearance:
-        return 'Degagement roues';
+        return l10n.option_wheelClearance;
       case ServiceOption.roofClearing:
-        return 'Deneigement toit';
+        return l10n.option_roofClearing;
       case ServiceOption.saltSpreading:
-        return 'Epandage sel';
+        return l10n.option_saltSpreading;
       case ServiceOption.lightsCleaning:
-        return 'Nettoyage phares';
+        return l10n.option_lightsCleaning;
       case ServiceOption.perimeterClearance:
-        return 'Degagement perimetre';
+        return l10n.option_perimeterClearance;
       case ServiceOption.exhaustCheck:
-        return 'Verif. echappement';
+        return l10n.option_exhaustCheck;
     }
   }
 
-  Widget _buildFullTile() {
+  Widget _buildFullTile(BuildContext context) {
     return InkWell(
       onTap: onToggle,
       borderRadius: BorderRadius.circular(12),
@@ -170,7 +172,7 @@ class ServiceOptionTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _getOptionTitle(option),
+                    _getOptionTitle(context, option),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -179,7 +181,7 @@ class ServiceOptionTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _getOptionDescription(option),
+                    _getOptionDescription(context, option),
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.textSecondary,
@@ -249,45 +251,47 @@ class ServiceOptionTile extends StatelessWidget {
     }
   }
 
-  String _getOptionTitle(ServiceOption option) {
+  String _getOptionTitle(BuildContext context, ServiceOption option) {
+    final l10n = AppLocalizations.of(context)!;
     switch (option) {
       case ServiceOption.windowScraping:
-        return 'Grattage des vitres';
+        return l10n.option_windowScraping;
       case ServiceOption.doorDeicing:
-        return 'Déglaçage des portes';
+        return l10n.option_doorDeicing;
       case ServiceOption.wheelClearance:
-        return 'Dégagement des roues';
+        return l10n.option_wheelClearance;
       case ServiceOption.roofClearing:
-        return 'Déneigement du toit';
+        return l10n.option_roofClearing;
       case ServiceOption.saltSpreading:
-        return 'Épandage de sel';
+        return l10n.option_saltSpreading;
       case ServiceOption.lightsCleaning:
-        return 'Nettoyage phares/feux';
+        return l10n.option_lightsCleaning;
       case ServiceOption.perimeterClearance:
-        return 'Dégagement périmètre';
+        return l10n.option_perimeterClearance;
       case ServiceOption.exhaustCheck:
-        return 'Vérif. échappement';
+        return l10n.option_exhaustCheck;
     }
   }
 
-  String _getOptionDescription(ServiceOption option) {
+  String _getOptionDescription(BuildContext context, ServiceOption option) {
+    final l10n = AppLocalizations.of(context)!;
     switch (option) {
       case ServiceOption.windowScraping:
-        return 'Grattage complet de toutes les vitres';
+        return l10n.option_windowScrapingDesc;
       case ServiceOption.doorDeicing:
-        return 'Dégivrage des poignées et serrures';
+        return l10n.option_doorDeicingDesc;
       case ServiceOption.wheelClearance:
-        return 'Dégagement de la neige autour des roues';
+        return l10n.option_wheelClearanceDesc;
       case ServiceOption.roofClearing:
-        return 'Enlever la neige accumulée sur le toit';
+        return l10n.option_roofClearingDesc;
       case ServiceOption.saltSpreading:
-        return 'Application de sel autour du véhicule';
+        return l10n.option_saltSpreadingDesc;
       case ServiceOption.lightsCleaning:
-        return 'Nettoyage des phares et feux arrière';
+        return l10n.option_lightsCleaningDesc;
       case ServiceOption.perimeterClearance:
-        return 'Déneigement complet autour du véhicule';
+        return l10n.option_perimeterClearanceDesc;
       case ServiceOption.exhaustCheck:
-        return 'Vérifier que l\'échappement est dégagé';
+        return l10n.option_exhaustCheckDesc;
     }
   }
 }

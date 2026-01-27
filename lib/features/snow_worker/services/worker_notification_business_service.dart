@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import '../domain/entities/worker_job.dart';
 import 'worker_notification_service.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Types de notifications spécifiques aux snowworkers
 enum WorkerNotificationType {
@@ -58,7 +59,8 @@ class WorkerNotificationBusinessService {
   // ===== Notifications de Jobs =====
 
   /// Notifie d'un nouveau job disponible
-  Future<void> notifyNewJobAvailable(WorkerJob job) async {
+  Future<void> notifyNewJobAvailable(WorkerJob job,
+      {AppLocalizations? l10n}) async {
     // Éviter les doublons
     if (_notifiedJobIds.contains(job.id)) return;
     _addToCache(job.id);
@@ -67,7 +69,9 @@ class WorkerNotificationBusinessService {
 
     _emitEvent(
       WorkerNotificationType.newJobAvailable,
-      title: job.isPriority ? 'Job Urgent!' : 'Nouveau job',
+      title: job.isPriority
+          ? (l10n?.worker_notifUrgentJob ?? 'Job Urgent!')
+          : (l10n?.worker_newJob ?? 'Nouveau job'),
       message: '${job.displayAddress} - ${job.totalPrice.toStringAsFixed(2)}\$',
       data: {'jobId': job.id, 'isPriority': job.isPriority},
     );
@@ -79,6 +83,7 @@ class WorkerNotificationBusinessService {
   Future<void> notifyMultipleJobsAvailable(
     List<WorkerJob> jobs, {
     bool hasUrgent = false,
+    AppLocalizations? l10n,
   }) async {
     final newJobs = jobs.where((j) => !_notifiedJobIds.contains(j.id)).toList();
     if (newJobs.isEmpty) return;
@@ -94,53 +99,68 @@ class WorkerNotificationBusinessService {
 
     _emitEvent(
       WorkerNotificationType.newJobAvailable,
-      title: '${newJobs.length} nouveaux jobs',
-      message:
-          hasUrgent ? 'Dont des jobs urgents!' : 'Disponibles près de vous',
+      title: l10n?.worker_businessNewJobsCount(newJobs.length) ??
+          '${newJobs.length} nouveaux jobs',
+      message: hasUrgent
+          ? (l10n?.worker_businessIncludingUrgent ?? 'Dont des jobs urgents!')
+          : (l10n?.worker_businessNearYou ?? 'Disponibles près de vous'),
       data: {'count': newJobs.length, 'hasUrgent': hasUrgent},
     );
   }
 
   /// Notifie quand un job est assigné au worker
-  Future<void> notifyJobAssigned(WorkerJob job) async {
+  Future<void> notifyJobAssigned(WorkerJob job,
+      {AppLocalizations? l10n}) async {
     await _localNotificationService.notifyJobAccepted(job);
 
     _emitEvent(
       WorkerNotificationType.jobAssigned,
-      title: 'Job confirmé!',
-      message: 'Rendez-vous à ${job.displayAddress}',
+      title: l10n?.worker_businessJobConfirmed ?? 'Job confirmé!',
+      message: l10n?.worker_notifGoTo(job.displayAddress) ??
+          'Rendez-vous à ${job.displayAddress}',
       data: {'jobId': job.id},
     );
   }
 
   /// Notifie quand un job est annulé par le client
-  Future<void> notifyJobCancelled(WorkerJob job, String? reason) async {
+  Future<void> notifyJobCancelled(WorkerJob job, String? reason,
+      {AppLocalizations? l10n}) async {
+    final notifTitle = l10n?.worker_businessJobCancelled ?? 'Job annulé';
+    final notifBody = reason != null
+        ? (l10n?.worker_businessJobCancelledReason(
+                job.displayAddress, reason) ??
+            'Le job à ${job.displayAddress} a été annulé: $reason')
+        : (l10n?.worker_businessJobCancelledBody(job.displayAddress) ??
+            'Le job à ${job.displayAddress} a été annulé');
+
     await _showLocalNotification(
-      title: 'Job annulé',
-      body:
-          'Le job à ${job.displayAddress} a été annulé${reason != null ? ': $reason' : ''}',
+      title: notifTitle,
+      body: notifBody,
       isUrgent: false,
     );
 
     _emitEvent(
       WorkerNotificationType.jobCancelled,
-      title: 'Job annulé',
+      title: notifTitle,
       message: job.displayAddress,
       data: {'jobId': job.id, 'reason': reason},
     );
   }
 
   /// Notifie quand un job est modifié
-  Future<void> notifyJobModified(WorkerJob job, String modification) async {
+  Future<void> notifyJobModified(WorkerJob job, String modification,
+      {AppLocalizations? l10n}) async {
+    final notifTitle = l10n?.worker_businessJobModified ?? 'Job modifié';
+
     await _showLocalNotification(
-      title: 'Job modifié',
+      title: notifTitle,
       body: '$modification - ${job.displayAddress}',
       isUrgent: false,
     );
 
     _emitEvent(
       WorkerNotificationType.jobModified,
-      title: 'Job modifié',
+      title: notifTitle,
       message: modification,
       data: {'jobId': job.id, 'modification': modification},
     );
@@ -149,45 +169,51 @@ class WorkerNotificationBusinessService {
   // ===== Notifications de Revenus =====
 
   /// Notifie d'un paiement reçu
-  Future<void> notifyPaymentReceived(
-      double amount, String jobDescription) async {
+  Future<void> notifyPaymentReceived(double amount, String jobDescription,
+      {AppLocalizations? l10n}) async {
     await _localNotificationService.notifyJobCompleted(amount);
 
     _emitEvent(
       WorkerNotificationType.paymentReceived,
-      title: 'Paiement reçu!',
-      message: '${amount.toStringAsFixed(2)}\$ pour $jobDescription',
+      title: l10n?.worker_businessPaymentReceived ?? 'Paiement reçu!',
+      message: l10n?.worker_businessPaymentAmount(
+              amount.toStringAsFixed(2), jobDescription) ??
+          '${amount.toStringAsFixed(2)}\$ pour $jobDescription',
       data: {'amount': amount},
     );
   }
 
   /// Notifie d'un bonus gagné
-  Future<void> notifyBonusEarned(double amount, String reason) async {
+  Future<void> notifyBonusEarned(double amount, String reason,
+      {AppLocalizations? l10n}) async {
     await _showLocalNotification(
-      title: '🎁 Bonus gagné!',
-      body: '+${amount.toStringAsFixed(2)}\$ - $reason',
+      title: l10n?.worker_businessBonusEarned ?? '🎁 Bonus gagné!',
+      body: l10n?.worker_businessBonusBody(amount.toStringAsFixed(2), reason) ??
+          '+${amount.toStringAsFixed(2)}\$ - $reason',
       isUrgent: false,
     );
 
     _emitEvent(
       WorkerNotificationType.bonusEarned,
-      title: 'Bonus gagné!',
+      title: l10n?.worker_businessBonusTitle ?? 'Bonus gagné!',
       message: reason,
       data: {'amount': amount, 'reason': reason},
     );
   }
 
   /// Notifie que le paiement hebdomadaire est prêt
-  Future<void> notifyWeeklyPayoutReady(double amount) async {
+  Future<void> notifyWeeklyPayoutReady(double amount,
+      {AppLocalizations? l10n}) async {
     await _showLocalNotification(
-      title: '💰 Paiement prêt!',
-      body: 'Votre paiement de ${amount.toStringAsFixed(2)}\$ est disponible',
+      title: l10n?.worker_businessWeeklyPayout ?? '💰 Paiement prêt!',
+      body: l10n?.worker_businessWeeklyPayoutBody(amount.toStringAsFixed(2)) ??
+          'Votre paiement de ${amount.toStringAsFixed(2)}\$ est disponible',
       isUrgent: false,
     );
 
     _emitEvent(
       WorkerNotificationType.weeklyPayoutReady,
-      title: 'Paiement disponible',
+      title: l10n?.worker_businessPayoutAvailable ?? 'Paiement disponible',
       message: '${amount.toStringAsFixed(2)}\$',
       data: {'amount': amount},
     );
@@ -196,42 +222,45 @@ class WorkerNotificationBusinessService {
   // ===== Notifications de Performance =====
 
   /// Notifie d'une nouvelle évaluation
-  Future<void> notifyRatingReceived(int rating, String? comment) async {
+  Future<void> notifyRatingReceived(int rating, String? comment,
+      {AppLocalizations? l10n}) async {
     final stars = '⭐' * rating;
     await _showLocalNotification(
-      title: 'Nouvelle évaluation!',
+      title: l10n?.worker_businessNewRating ?? 'Nouvelle évaluation!',
       body: '$stars${comment != null ? ' - "$comment"' : ''}',
       isUrgent: false,
     );
 
     _emitEvent(
       WorkerNotificationType.ratingReceived,
-      title: 'Évaluation reçue',
-      message: '$rating étoiles',
+      title: l10n?.worker_businessRatingReceived ?? 'Évaluation reçue',
+      message: l10n?.worker_businessRatingStars(rating) ?? '$rating étoiles',
       data: {'rating': rating, 'comment': comment},
     );
   }
 
   /// Notifie d'une alerte de performance
-  Future<void> notifyPerformanceAlert(String issue, String suggestion) async {
+  Future<void> notifyPerformanceAlert(String issue, String suggestion,
+      {AppLocalizations? l10n}) async {
     await _showLocalNotification(
-      title: '⚠️ Attention!',
+      title: l10n?.worker_businessPerformanceAlert ?? '⚠️ Attention!',
       body: '$issue\n$suggestion',
       isUrgent: true,
     );
 
     _emitEvent(
       WorkerNotificationType.performanceAlert,
-      title: 'Alerte performance',
+      title: l10n?.worker_businessPerformanceTitle ?? 'Alerte performance',
       message: issue,
       data: {'issue': issue, 'suggestion': suggestion},
     );
   }
 
   /// Notifie d'un jalon atteint
-  Future<void> notifyMilestoneReached(String milestone, String? reward) async {
+  Future<void> notifyMilestoneReached(String milestone, String? reward,
+      {AppLocalizations? l10n}) async {
     await _showLocalNotification(
-      title: '🏆 Félicitations!',
+      title: l10n?.worker_businessMilestone ?? '🏆 Félicitations!',
       body: '$milestone${reward != null ? '\nRécompense: $reward' : ''}',
       isUrgent: false,
     );
@@ -239,7 +268,8 @@ class WorkerNotificationBusinessService {
     _emitEvent(
       WorkerNotificationType.milestoneReached,
       title: milestone,
-      message: reward ?? 'Continuez comme ça!',
+      message:
+          reward ?? (l10n?.worker_businessKeepGoing ?? 'Continuez comme ça!'),
       data: {'milestone': milestone, 'reward': reward},
     );
   }
@@ -247,33 +277,40 @@ class WorkerNotificationBusinessService {
   // ===== Notifications Système =====
 
   /// Notifie qu'un document expire bientôt
-  Future<void> notifyDocumentExpiring(String documentType, int daysLeft) async {
+  Future<void> notifyDocumentExpiring(String documentType, int daysLeft,
+      {AppLocalizations? l10n}) async {
     await _showLocalNotification(
-      title: '📄 Document expirant',
-      body: 'Votre $documentType expire dans $daysLeft jours',
+      title: l10n?.worker_businessDocExpiring ?? '📄 Document expirant',
+      body: l10n?.worker_businessDocExpiringBody(documentType, daysLeft) ??
+          'Votre $documentType expire dans $daysLeft jours',
       isUrgent: daysLeft <= 7,
     );
 
     _emitEvent(
       WorkerNotificationType.documentExpiring,
-      title: 'Document expirant',
-      message: '$documentType - $daysLeft jours',
+      title: l10n?.worker_businessDocExpiringTitle ?? 'Document expirant',
+      message: l10n?.worker_businessDocExpiringShort(documentType, daysLeft) ??
+          '$documentType - $daysLeft jours',
       data: {'documentType': documentType, 'daysLeft': daysLeft},
     );
   }
 
   /// Notifie d'une zone à forte demande
-  Future<void> notifyHighDemandZone(String zoneName, double multiplier) async {
+  Future<void> notifyHighDemandZone(String zoneName, double multiplier,
+      {AppLocalizations? l10n}) async {
+    final multiplierStr = multiplier.toString();
     await _showLocalNotification(
-      title: '📈 Zone en demande!',
-      body: '$zoneName - ${multiplier}x les gains!',
+      title: l10n?.worker_businessHighDemand ?? '📈 Zone en demande!',
+      body: l10n?.worker_businessHighDemandBody(zoneName, multiplierStr) ??
+          '$zoneName - ${multiplier}x les gains!',
       isUrgent: false,
     );
 
     _emitEvent(
       WorkerNotificationType.zoneHighDemand,
-      title: 'Zone en demande',
-      message: '$zoneName - ${multiplier}x',
+      title: l10n?.worker_businessHighDemandTitle ?? 'Zone en demande',
+      message: l10n?.worker_businessHighDemandShort(zoneName, multiplierStr) ??
+          '$zoneName - ${multiplier}x',
       data: {'zone': zoneName, 'multiplier': multiplier},
     );
   }
@@ -282,17 +319,19 @@ class WorkerNotificationBusinessService {
   Future<void> notifyWeatherOpportunity(
     String forecast,
     int expectedJobs,
-    DateTime date,
-  ) async {
+    DateTime date, {
+    AppLocalizations? l10n,
+  }) async {
     await _showLocalNotification(
-      title: '❄️ Tempête prévue!',
-      body: '$forecast - Environ $expectedJobs jobs attendus',
+      title: l10n?.worker_businessWeatherAlert ?? '❄️ Tempête prévue!',
+      body: l10n?.worker_businessWeatherBody(forecast, expectedJobs) ??
+          '$forecast - Environ $expectedJobs jobs attendus',
       isUrgent: true,
     );
 
     _emitEvent(
       WorkerNotificationType.weatherOpportunity,
-      title: 'Opportunité météo',
+      title: l10n?.worker_businessWeatherTitle ?? 'Opportunité météo',
       message: forecast,
       data: {
         'forecast': forecast,
@@ -337,23 +376,27 @@ class WorkerNotificationBusinessService {
   }
 
   /// Notifie le client que le worker est en route
-  Future<bool> notifyClientEnRoute(String reservationId, int etaMinutes) async {
+  Future<bool> notifyClientEnRoute(String reservationId, int etaMinutes,
+      {AppLocalizations? l10n}) async {
     return sendNotificationToClient(
       reservationId: reservationId,
       type: 'workerEnRoute',
-      title: 'Déneigeur en route!',
-      message: 'Arrivée estimée dans $etaMinutes minutes',
+      title: l10n?.worker_businessClientEnRoute ?? 'Déneigeur en route!',
+      message: l10n?.worker_businessClientEta(etaMinutes) ??
+          'Arrivée estimée dans $etaMinutes minutes',
       metadata: {'etaMinutes': etaMinutes},
     );
   }
 
   /// Notifie le client que le travail a commencé
-  Future<bool> notifyClientWorkStarted(String reservationId) async {
+  Future<bool> notifyClientWorkStarted(String reservationId,
+      {AppLocalizations? l10n}) async {
     return sendNotificationToClient(
       reservationId: reservationId,
       type: 'workStarted',
-      title: 'Déneigement commencé',
-      message: 'Le déneigement de votre véhicule a commencé',
+      title: l10n?.worker_businessWorkStarted ?? 'Déneigement commencé',
+      message: l10n?.worker_businessWorkStartedBody ??
+          'Le déneigement de votre véhicule a commencé',
     );
   }
 
@@ -361,12 +404,14 @@ class WorkerNotificationBusinessService {
   Future<bool> notifyClientWorkCompleted(
     String reservationId, {
     String? photoUrl,
+    AppLocalizations? l10n,
   }) async {
     return sendNotificationToClient(
       reservationId: reservationId,
       type: 'workCompleted',
-      title: 'Déneigement terminé!',
-      message: 'Votre véhicule est prêt',
+      title: l10n?.worker_businessWorkCompleted ?? 'Déneigement terminé!',
+      message:
+          l10n?.worker_businessWorkCompletedBody ?? 'Votre véhicule est prêt',
       metadata: photoUrl != null ? {'photoUrl': photoUrl} : null,
     );
   }
@@ -374,12 +419,13 @@ class WorkerNotificationBusinessService {
   /// Envoie un message au client
   Future<bool> sendMessageToClient(
     String reservationId,
-    String message,
-  ) async {
+    String message, {
+    AppLocalizations? l10n,
+  }) async {
     return sendNotificationToClient(
       reservationId: reservationId,
       type: 'workerMessage',
-      title: 'Message du déneigeur',
+      title: l10n?.worker_businessWorkerMessage ?? 'Message du déneigeur',
       message: message,
     );
   }

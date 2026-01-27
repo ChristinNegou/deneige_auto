@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../bloc/verification_bloc.dart';
 import '../bloc/verification_event.dart';
 import '../bloc/verification_state.dart';
@@ -47,7 +48,8 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: ${e.toString()}'),
+            content: Text(
+                '${AppLocalizations.of(context)!.common_error}: ${e.toString()}'),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -58,8 +60,9 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
   void _submitVerification() {
     if (_selfie == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez prendre un selfie'),
+        SnackBar(
+          content:
+              Text(AppLocalizations.of(context)!.verification_selfieRequired),
           backgroundColor: AppTheme.error,
         ),
       );
@@ -80,7 +83,7 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Selfie'),
+        title: Text(AppLocalizations.of(context)!.verification_selfie),
         backgroundColor: AppTheme.surface,
         foregroundColor: AppTheme.textPrimary,
         elevation: 0,
@@ -123,19 +126,18 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Prenez un selfie',
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context)!
+                                .verification_takeSelfie,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '• Regardez directement la caméra\n'
-                            '• Gardez un visage neutre\n'
-                            '• Assurez-vous d\'avoir un bon éclairage\n'
-                            '• Retirez lunettes de soleil et chapeau',
+                            AppLocalizations.of(context)!
+                                .verification_selfieInstructions,
                             style: TextStyle(
                               fontSize: 13,
                               color: AppTheme.textSecondary,
@@ -164,21 +166,23 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Votre selfie',
-                                  style: TextStyle(
+                                  AppLocalizations.of(context)!
+                                      .verification_yourSelfie,
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
                                   ),
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Text(
-                                  'Nous comparerons votre visage avec votre pièce d\'identité',
-                                  style: TextStyle(
+                                  AppLocalizations.of(context)!
+                                      .verification_selfieFaceComparison,
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     color: AppTheme.textSecondary,
                                   ),
@@ -218,20 +222,21 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                                 child: InkWell(
                                   onTap: _captureSelfie,
                                   borderRadius: BorderRadius.circular(8),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(8),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.refresh,
                                           color: Colors.white,
                                           size: 18,
                                         ),
-                                        SizedBox(width: 4),
+                                        const SizedBox(width: 4),
                                         Text(
-                                          'Reprendre',
-                                          style: TextStyle(
+                                          AppLocalizations.of(context)!
+                                              .verification_retake,
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 13,
                                           ),
@@ -303,7 +308,8 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      'Prendre le selfie',
+                                      AppLocalizations.of(context)!
+                                          .verification_takeSelfieBtn,
                                       style: TextStyle(
                                         color: AppTheme.background,
                                         fontWeight: FontWeight.w600,
@@ -334,9 +340,9 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Récapitulatif',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.verification_summary,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -344,18 +350,19 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                     const SizedBox(height: 12),
                     _buildSummaryItem(
                       icon: Icons.badge,
-                      label: 'Pièce d\'identité (recto)',
+                      label: AppLocalizations.of(context)!.verification_idFront,
                       isComplete: true,
                     ),
                     if (widget.idBack != null)
                       _buildSummaryItem(
                         icon: Icons.badge_outlined,
-                        label: 'Pièce d\'identité (verso)',
+                        label:
+                            AppLocalizations.of(context)!.verification_idBack,
                         isComplete: true,
                       ),
                     _buildSummaryItem(
                       icon: Icons.face,
-                      label: 'Selfie',
+                      label: AppLocalizations.of(context)!.verification_selfie,
                       isComplete: _selfie != null,
                     ),
                   ],
@@ -393,14 +400,15 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                               color: Colors.white,
                             ),
                           )
-                        : const Row(
+                        : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.send, size: 20),
-                              SizedBox(width: 8),
+                              const Icon(Icons.send, size: 20),
+                              const SizedBox(width: 8),
                               Text(
-                                'Soumettre pour vérification',
-                                style: TextStyle(
+                                AppLocalizations.of(context)!
+                                    .verification_submitForVerification,
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -415,7 +423,7 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
 
               // Privacy note
               Text(
-                'Vos documents seront analysés de manière sécurisée et supprimés après vérification conformément à la Loi 25.',
+                AppLocalizations.of(context)!.verification_privacyNote,
                 style: TextStyle(
                   fontSize: 12,
                   color: AppTheme.textTertiary,

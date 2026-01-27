@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class SnowDepthInput extends StatefulWidget {
   final int? initialValue;
@@ -53,7 +54,7 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Profondeur de neige estimée',
+                AppLocalizations.of(context)!.snow_estimatedDepth,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -64,7 +65,7 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Optionnel - Aide à estimer le temps requis',
+            AppLocalizations.of(context)!.snow_optionalHelper,
             style: TextStyle(
               fontSize: 13,
               color: AppTheme.info.withValues(alpha: 0.8),

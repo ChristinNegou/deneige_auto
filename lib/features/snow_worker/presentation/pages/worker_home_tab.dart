@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -91,10 +92,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           currentJobs.where((j) => newJobIds.contains(j.id)).toList();
       final hasUrgent = newJobs.any((j) => j.isPriority);
 
-      _notificationService.notifyNewJob(newJobs.first);
+      final l10nNotif = mounted ? AppLocalizations.of(context) : null;
+      _notificationService.notifyNewJob(newJobs.first, l10n: l10nNotif);
       HapticFeedback.heavyImpact();
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -119,8 +122,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     children: [
                       Text(
                         newJobs.length == 1
-                            ? 'Nouveau job!'
-                            : '${newJobs.length} nouveaux jobs!',
+                            ? l10n.worker_newJob
+                            : l10n.worker_newJobs(newJobs.length),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -310,6 +313,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildHeader(String userName) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
@@ -383,7 +387,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bonjour, ${userName.split(' ').first}',
+                  l10n.worker_greetingName(userName.split(' ').first),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -411,7 +415,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          isAvailable ? 'Disponible' : 'Hors ligne',
+                          isAvailable
+                              ? l10n.worker_headerAvailable
+                              : l10n.worker_headerOffline,
                           style: TextStyle(
                             fontSize: 13,
                             color: AppTheme.textTertiary,
@@ -506,6 +512,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildVerificationBanner() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<VerificationBloc, VerificationState>(
       bloc: _verificationBloc,
       builder: (context, state) {
@@ -538,32 +545,29 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           case 'pending':
             icon = Icons.hourglass_empty;
             color = AppTheme.warning;
-            title = 'Verification en cours';
-            subtitle =
-                'Vos documents sont en cours d\'analyse. Vous serez notifie une fois la verification terminee.';
+            title = l10n.worker_verificationOngoing;
+            subtitle = l10n.worker_verificationOngoingSubtitle;
             break;
           case 'rejected':
             icon = Icons.cancel_outlined;
             color = AppTheme.error;
-            title = 'Verification refusee';
-            subtitle = rejectionReason ??
-                'Vos documents n\'ont pas ete approuves. Veuillez resoumettre des documents valides.';
+            title = l10n.worker_verificationRejected;
+            subtitle =
+                rejectionReason ?? l10n.worker_verificationRejectedSubtitle;
             showButton = true;
             break;
           case 'expired':
             icon = Icons.timer_off_outlined;
             color = AppTheme.warning;
-            title = 'Verification expiree';
-            subtitle =
-                'Votre verification a expire. Veuillez resoumettre vos documents.';
+            title = l10n.worker_verificationExpired;
+            subtitle = l10n.worker_verificationExpiredSubtitle;
             showButton = true;
             break;
           default: // not_submitted
             icon = Icons.verified_user_outlined;
             color = AppTheme.primary;
-            title = 'Verification requise';
-            subtitle =
-                'Verifiez votre identite pour pouvoir accepter des jobs de deneigement.';
+            title = l10n.worker_verificationRequired;
+            subtitle = l10n.worker_verificationRequiredSubtitle;
             showButton = true;
         }
 
@@ -633,6 +637,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildAvailabilityCard() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
       builder: (context, state) {
         bool isAvailable = false;
@@ -705,8 +710,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     children: [
                       Text(
                         isAvailable
-                            ? 'Vous etes disponible'
-                            : 'Vous etes hors ligne',
+                            ? l10n.worker_youAreAvailable
+                            : l10n.worker_youAreOffline,
                         style: const TextStyle(
                           color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w600,
@@ -716,8 +721,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                       const SizedBox(height: 2),
                       Text(
                         isAvailable
-                            ? 'Vous recevez les nouveaux jobs'
-                            : 'Activez pour recevoir des jobs',
+                            ? l10n.worker_receivingJobs
+                            : l10n.worker_activateToReceive,
                         style: TextStyle(
                           color: AppTheme.textTertiary,
                           fontSize: 13,
@@ -761,6 +766,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildQuickStats() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<WorkerStatsBloc, WorkerStatsState>(
       builder: (context, state) {
         if (state is WorkerStatsLoading) {
@@ -790,7 +796,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 icon: Icons.check_circle_rounded,
                 iconColor: AppTheme.success,
                 value: completed.toString(),
-                label: 'Jobs termines',
+                label: l10n.worker_jobsCompleted,
               ),
             ),
             const SizedBox(width: 12),
@@ -799,7 +805,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 icon: Icons.attach_money_rounded,
                 iconColor: AppTheme.primary,
                 value: '${earnings.toStringAsFixed(0)}\$',
-                label: "Aujourd'hui",
+                label: l10n.worker_todayLabel,
               ),
             ),
             const SizedBox(width: 12),
@@ -808,7 +814,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 icon: Icons.star_rounded,
                 iconColor: AppTheme.warning,
                 value: rating > 0 ? rating.toStringAsFixed(1) : '-',
-                label: 'Note',
+                label: l10n.worker_ratingLabel,
               ),
             ),
           ],
@@ -857,6 +863,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildMyJobsSection() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
       builder: (context, state) {
         List<WorkerJob> myJobs = [];
@@ -876,7 +883,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Mes jobs actifs',
+                  l10n.worker_myActiveJobs,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -892,7 +899,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    '${myJobs.length} actif${myJobs.length > 1 ? 's' : ''}',
+                    l10n.worker_activeCount(myJobs.length),
                     style: TextStyle(
                       color: AppTheme.primary,
                       fontWeight: FontWeight.w600,
@@ -927,6 +934,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildAvailableJobsSection() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
       builder: (context, availabilityState) {
         // Vérifier si l'équipement est configuré
@@ -942,7 +950,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               _checkForNewJobs(state.availableJobs);
             }
             if (state is JobActionSuccess && state.action == 'accept') {
-              _notificationService.notifyJobAccepted(state.job);
+              _notificationService.notifyJobAccepted(state.job,
+                  l10n: AppLocalizations.of(context));
               HapticFeedback.heavyImpact();
             }
           },
@@ -952,7 +961,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Jobs disponibles',
+                    l10n.worker_availableJobs,
                     style: AppTheme.headlineSmall.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -998,7 +1007,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     Row(
                       children: [
                         Text(
-                          'Jobs disponibles',
+                          l10n.worker_availableJobs,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -1027,7 +1036,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                                 ),
                                 const SizedBox(width: 3),
                                 Text(
-                                  '${availableJobs.where((j) => j.isPriority).length} urgent',
+                                  l10n.worker_urgentCount(availableJobs
+                                      .where((j) => j.isPriority)
+                                      .length),
                                   style: TextStyle(
                                     color: AppTheme.warning,
                                     fontSize: 11,
@@ -1042,7 +1053,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     ),
                     if (availableJobs.isNotEmpty)
                       Text(
-                        '${availableJobs.length} job${availableJobs.length > 1 ? 's' : ''}',
+                        l10n.worker_jobCount(availableJobs.length),
                         style: TextStyle(
                           color: AppTheme.textTertiary,
                           fontWeight: FontWeight.w500,
@@ -1091,6 +1102,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildNoEquipmentWarning() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1106,8 +1118,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             color: AppTheme.warning,
           ),
           const SizedBox(height: 14),
-          const Text(
-            'Configurez votre equipement',
+          Text(
+            l10n.worker_configureEquipment,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 15,
@@ -1117,7 +1129,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           ),
           const SizedBox(height: 6),
           Text(
-            'Indiquez vos equipements pour voir les jobs disponibles.',
+            l10n.worker_configureEquipmentMessage,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppTheme.textSecondary,
@@ -1140,8 +1152,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 color: AppTheme.warning,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'Configurer',
+              child: Text(
+                l10n.worker_configure,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -1156,6 +1168,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
       builder: (context, state) {
         int equipmentCount = 0;
@@ -1181,8 +1194,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 color: AppTheme.textTertiary,
               ),
               const SizedBox(height: 14),
-              const Text(
-                'En attente de jobs...',
+              Text(
+                l10n.worker_waitingForJobs,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
@@ -1191,7 +1204,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               ),
               const SizedBox(height: 6),
               Text(
-                'Les nouveaux jobs apparaitront ici automatiquement',
+                l10n.worker_waitingSubtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppTheme.textTertiary,
@@ -1217,7 +1230,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Ajoutez plus d\'equipements pour recevoir plus de jobs.',
+                          l10n.worker_addMoreEquipment,
                           style: TextStyle(
                             fontSize: 12,
                             color: AppTheme.textSecondary,
@@ -1230,7 +1243,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               ],
               const SizedBox(height: 14),
               Text(
-                'Actualisation auto. toutes les 15s',
+                l10n.worker_autoRefresh,
                 style: TextStyle(
                   color: AppTheme.textTertiary,
                   fontSize: 11,
@@ -1244,6 +1257,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildErrorState(String message) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -1259,8 +1273,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             color: AppTheme.error,
           ),
           const SizedBox(height: 14),
-          const Text(
-            'Oups!',
+          Text(
+            l10n.worker_oops,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 15,
@@ -1285,11 +1299,11 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: AppTheme.textPrimary,
+                color: AppTheme.success,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'Reessayer',
+              child: Text(
+                l10n.worker_retryLabel,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -1304,6 +1318,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildVerificationRequiredState() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -1319,8 +1334,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             color: AppTheme.warning,
           ),
           const SizedBox(height: 14),
-          const Text(
-            'Verification requise',
+          Text(
+            l10n.worker_verificationRequired,
             style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 15,
@@ -1329,7 +1344,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           ),
           const SizedBox(height: 6),
           Text(
-            'Verifiez votre identite pour accepter des jobs.',
+            l10n.worker_verificationRequiredForJobs,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppTheme.textTertiary,
@@ -1348,8 +1363,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 color: AppTheme.warning,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'Verifier',
+              child: Text(
+                l10n.worker_verify,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,

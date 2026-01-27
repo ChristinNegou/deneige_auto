@@ -6,6 +6,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class DisputeDetailsPage extends StatefulWidget {
   final String disputeId;
@@ -57,6 +58,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Future<void> _showAppealDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController();
     final result = await showDialog<String>(
       context: context,
@@ -66,7 +68,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           borderRadius: BorderRadius.circular(20),
         ),
         title: Text(
-          'Faire appel',
+          l10n.dispute_appeal,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         content: Column(
@@ -74,7 +76,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Expliquez pourquoi vous contestez cette decision (minimum 50 caracteres):',
+              l10n.dispute_appealExplanation,
               style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
             ),
             const SizedBox(height: 16),
@@ -83,7 +85,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               maxLines: 4,
               style: TextStyle(color: AppTheme.textPrimary),
               decoration: InputDecoration(
-                hintText: 'Votre justification...',
+                hintText: l10n.dispute_appealJustificationHint,
                 hintStyle: TextStyle(color: AppTheme.textTertiary),
                 filled: true,
                 fillColor: AppTheme.surfaceContainer,
@@ -99,7 +101,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Annuler',
+              l10n.common_cancel,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
           ),
@@ -110,7 +112,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Minimum 50 caracteres requis'),
+                    content: Text(l10n.dispute_minCharsRequired),
                     backgroundColor: AppTheme.warning,
                   ),
                 );
@@ -120,7 +122,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               backgroundColor: AppTheme.primary,
               foregroundColor: AppTheme.background,
             ),
-            child: const Text('Soumettre l\'appel'),
+            child: Text(l10n.dispute_submitAppeal),
           ),
         ],
       ),
@@ -132,6 +134,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Future<void> _submitAppeal(String reason) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isLoading = true);
 
     try {
@@ -143,7 +146,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Appel soumis avec succes'),
+            content: Text(l10n.dispute_appealSubmitted),
             backgroundColor: AppTheme.success,
           ),
         );
@@ -153,8 +156,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-                'Impossible d\'envoyer la réponse. Veuillez réessayer.'),
+            content: Text(l10n.dispute_cannotSendResponseRetry),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -248,11 +250,12 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
-          'Détails du litige',
+          l10n.dispute_details,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         backgroundColor: AppTheme.surface,
@@ -407,7 +410,8 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Montant reclame: ${dispute.claimedAmount.toStringAsFixed(2)} \$',
+                    AppLocalizations.of(context)!.dispute_claimedAmountValue(
+                        dispute.claimedAmount.toStringAsFixed(2)),
                     style: TextStyle(
                       color: AppTheme.background,
                       fontWeight: FontWeight.w600,
@@ -423,6 +427,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildDetailsCard() {
+    final l10n = AppLocalizations.of(context)!;
     final dispute = _dispute!;
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
 
@@ -441,7 +446,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               Icon(Icons.description, color: AppTheme.info),
               const SizedBox(width: 8),
               Text(
-                'Description',
+                l10n.common_description,
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.bold,
@@ -461,14 +466,14 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           Divider(height: 32, color: AppTheme.border),
           _buildInfoRow(
             Icons.calendar_today,
-            'Date d\'ouverture',
+            l10n.dispute_openDate,
             dateFormat.format(dispute.createdAt),
           ),
           const SizedBox(height: 12),
           _buildInfoRow(
             Icons.priority_high,
-            'Priorite',
-            _getPriorityLabel(dispute.priority),
+            l10n.dispute_priority,
+            _getPriorityLabel(dispute.priority, context),
           ),
         ],
       ),
@@ -476,6 +481,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildDeadlinesCard() {
+    final l10n = AppLocalizations.of(context)!;
     final dispute = _dispute!;
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
 
@@ -495,7 +501,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               Icon(Icons.schedule, color: AppTheme.warning),
               const SizedBox(width: 8),
               Text(
-                'Delais',
+                l10n.dispute_deadlines,
                 style: TextStyle(
                   color: AppTheme.warning,
                   fontWeight: FontWeight.bold,
@@ -507,7 +513,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           const SizedBox(height: 12),
           if (dispute.responseDeadline != null) ...[
             _buildDeadlineRow(
-              'Reponse attendue avant',
+              l10n.dispute_responseExpectedBefore,
               dateFormat.format(dispute.responseDeadline!),
               dispute.responseDeadline!.isBefore(DateTime.now()),
             ),
@@ -515,7 +521,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           ],
           if (dispute.resolutionDeadline != null)
             _buildDeadlineRow(
-              'Résolution attendue avant',
+              l10n.dispute_resolutionExpectedBefore,
               dateFormat.format(dispute.resolutionDeadline!),
               dispute.resolutionDeadline!.isBefore(DateTime.now()),
             ),
@@ -525,6 +531,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildResolutionCard() {
+    final l10n = AppLocalizations.of(context)!;
     final dispute = _dispute!;
     final resolution = dispute.resolution!;
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
@@ -544,7 +551,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               Icon(Icons.gavel, color: AppTheme.success),
               const SizedBox(width: 8),
               Text(
-                'Résolution',
+                l10n.dispute_resolution,
                 style: TextStyle(
                   color: AppTheme.success,
                   fontWeight: FontWeight.bold,
@@ -572,14 +579,14 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Décision',
+                        l10n.dispute_decision,
                         style: TextStyle(
                           color: AppTheme.success.withValues(alpha: 0.7),
                           fontSize: 12,
                         ),
                       ),
                       Text(
-                        _getDecisionLabel(resolution['decision']),
+                        _getDecisionLabel(resolution['decision'], context),
                         style: TextStyle(
                           color: AppTheme.success,
                           fontWeight: FontWeight.bold,
@@ -600,7 +607,8 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                 Icon(Icons.payments, color: AppTheme.success, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Remboursement: ${(resolution['refundAmount'] as num).toStringAsFixed(2)} \$',
+                  l10n.dispute_refundAmount(
+                      (resolution['refundAmount'] as num).toStringAsFixed(2)),
                   style: TextStyle(
                     color: AppTheme.success,
                     fontWeight: FontWeight.w600,
@@ -622,7 +630,8 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           if (resolution['resolvedAt'] != null) ...[
             const SizedBox(height: 12),
             Text(
-              'Résolu le ${dateFormat.format(DateTime.parse(resolution['resolvedAt']))}',
+              l10n.dispute_resolvedOn(
+                  dateFormat.format(DateTime.parse(resolution['resolvedAt']))),
               style: TextStyle(
                 color: AppTheme.success.withValues(alpha: 0.6),
                 fontSize: 12,
@@ -635,6 +644,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildEvidenceCard() {
+    final l10n = AppLocalizations.of(context)!;
     final dispute = _dispute!;
     return Container(
       padding: const EdgeInsets.all(20),
@@ -651,7 +661,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               Icon(Icons.photo_library, color: AppTheme.primary),
               const SizedBox(width: 8),
               Text(
-                'Preuves (${dispute.evidencePhotos.length})',
+                l10n.dispute_evidenceCount(dispute.evidencePhotos.length),
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.bold,
@@ -711,6 +721,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildResponseCard() {
+    final l10n = AppLocalizations.of(context)!;
     final dispute = _dispute!;
     final response = dispute.response!;
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
@@ -730,7 +741,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               Icon(Icons.reply, color: AppTheme.info),
               const SizedBox(width: 8),
               Text(
-                'Réponse du défendeur',
+                l10n.dispute_respondentResponse,
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.bold,
@@ -747,7 +758,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              response['text'] ?? 'Aucune réponse',
+              response['text'] ?? l10n.dispute_noResponse,
               style: TextStyle(
                 color: AppTheme.textSecondary,
                 height: 1.5,
@@ -757,7 +768,8 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           if (response['submittedAt'] != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Soumis le ${dateFormat.format(DateTime.parse(response['submittedAt']))}',
+              l10n.dispute_submittedOn(
+                  dateFormat.format(DateTime.parse(response['submittedAt']))),
               style: TextStyle(
                 color: AppTheme.textTertiary,
                 fontSize: 12,
@@ -767,7 +779,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           if (dispute.responsePhotos.isNotEmpty) ...[
             const SizedBox(height: 16),
             Text(
-              'Photos jointes:',
+              l10n.dispute_attachedPhotos,
               style: TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 13,
@@ -808,6 +820,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildAIAnalysisCard() {
+    final l10n = AppLocalizations.of(context)!;
     final analysis = _dispute!.aiAnalysis!;
     final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
 
@@ -843,7 +856,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Analyse IA',
+                      l10n.dispute_aiAnalysis,
                       style: TextStyle(
                         color: AppTheme.textPrimary,
                         fontWeight: FontWeight.bold,
@@ -870,7 +883,8 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Confiance: ${(analysis.confidence! * 100).toInt()}%',
+                    l10n.dispute_confidencePercent(
+                        (analysis.confidence! * 100).toInt()),
                     style: TextStyle(
                       color: AppTheme.primary,
                       fontSize: 12,
@@ -885,7 +899,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           // Evidence Strength
           if (analysis.evidenceStrength != null) ...[
             _buildAnalysisRow(
-              'Force des preuves',
+              l10n.dispute_evidenceStrength,
               '${analysis.evidenceStrength}%',
               _getStrengthColor(analysis.evidenceStrength!),
             ),
@@ -895,8 +909,8 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           // Recommended Decision
           if (analysis.recommendedDecision != null) ...[
             _buildAnalysisRow(
-              'Décision recommandée',
-              _getDecisionLabel(analysis.recommendedDecision),
+              l10n.dispute_recommendedDecision,
+              _getDecisionLabel(analysis.recommendedDecision, context),
               AppTheme.info,
             ),
             const SizedBox(height: 8),
@@ -906,7 +920,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           if (analysis.suggestedRefundPercent != null &&
               analysis.suggestedRefundPercent! > 0) ...[
             _buildAnalysisRow(
-              'Remboursement suggéré',
+              l10n.dispute_suggestedRefund,
               '${analysis.suggestedRefundPercent}%',
               AppTheme.success,
             ),
@@ -917,7 +931,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           if (analysis.reasoning != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Raisonnement:',
+              l10n.dispute_reasoning,
               style: TextStyle(
                 color: AppTheme.textSecondary,
                 fontWeight: FontWeight.w600,
@@ -939,7 +953,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           if (analysis.riskFactors.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
-              'Facteurs de risque:',
+              l10n.dispute_riskFactors,
               style: TextStyle(
                 color: AppTheme.warning,
                 fontWeight: FontWeight.w600,
@@ -974,7 +988,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           if (analysis.keyFindings.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
-              'Constats clés:',
+              l10n.dispute_keyFindings,
               style: TextStyle(
                 color: AppTheme.textSecondary,
                 fontWeight: FontWeight.w600,
@@ -1078,6 +1092,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
     final dispute = _dispute!;
     final List<Widget> buttons = [];
 
@@ -1088,7 +1103,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           child: OutlinedButton.icon(
             onPressed: _navigateToAddEvidence,
             icon: const Icon(Icons.add_photo_alternate),
-            label: const Text('Ajouter preuves'),
+            label: Text(l10n.dispute_addEvidence),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppTheme.primary,
               side: BorderSide(color: AppTheme.primary),
@@ -1112,7 +1127,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           child: ElevatedButton.icon(
             onPressed: _navigateToRespond,
             icon: Icon(Icons.reply, color: AppTheme.background),
-            label: const Text('Répondre'),
+            label: Text(l10n.dispute_respond),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: AppTheme.background,
@@ -1139,7 +1154,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               _showAppealDialog();
             },
             icon: Icon(Icons.gavel, color: AppTheme.background),
-            label: const Text('Faire appel'),
+            label: Text(l10n.dispute_appeal),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.warning,
               foregroundColor: AppTheme.background,
@@ -1197,6 +1212,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildDeadlineRow(String label, String value, bool isOverdue) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Icon(
@@ -1235,7 +1251,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              'EXPIRE',
+              l10n.dispute_expired,
               style: TextStyle(
                 color: AppTheme.error,
                 fontSize: 10,
@@ -1289,16 +1305,17 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
     }
   }
 
-  String _getPriorityLabel(String priority) {
+  String _getPriorityLabel(String priority, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (priority) {
       case 'low':
-        return 'Basse';
+        return l10n.dispute_priorityLow;
       case 'medium':
-        return 'Moyenne';
+        return l10n.dispute_priorityMedium;
       case 'high':
-        return 'Haute';
+        return l10n.dispute_priorityHigh;
       case 'urgent':
-        return 'Urgente';
+        return l10n.dispute_priorityUrgent;
       default:
         return priority;
     }
@@ -1320,26 +1337,28 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
     }
   }
 
-  String _getDecisionLabel(String? decision) {
+  String _getDecisionLabel(String? decision, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (decision) {
       case 'favor_claimant':
-        return 'En votre faveur';
+        return l10n.dispute_decisionFavorClaimant;
       case 'favor_respondent':
-        return 'En faveur du defenseur';
+        return l10n.dispute_decisionFavorRespondent;
       case 'partial_refund':
-        return 'Remboursement partiel';
+        return l10n.dispute_decisionPartialRefund;
       case 'full_refund':
-        return 'Remboursement complet';
+        return l10n.dispute_decisionFullRefund;
       case 'no_action':
-        return 'Aucune action';
+        return l10n.dispute_decisionNoAction;
       case 'mutual_agreement':
-        return 'Accord mutuel';
+        return l10n.dispute_decisionMutualAgreement;
       default:
-        return decision ?? 'Non specifie';
+        return decision ?? l10n.common_notSpecified;
     }
   }
 
   Widget _buildErrorState() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -1349,7 +1368,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
             Icon(Icons.error_outline, color: AppTheme.error, size: 64),
             const SizedBox(height: 16),
             Text(
-              'Erreur',
+              l10n.common_error,
               style: TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 18,
@@ -1358,7 +1377,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              _errorMessage ?? 'Une erreur est survenue',
+              _errorMessage ?? l10n.common_errorOccurred,
               style: TextStyle(color: AppTheme.textSecondary),
               textAlign: TextAlign.center,
             ),
@@ -1366,7 +1385,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
             ElevatedButton.icon(
               onPressed: _loadDispute,
               icon: const Icon(Icons.refresh),
-              label: const Text('Reessayer'),
+              label: Text(l10n.common_retry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 foregroundColor: AppTheme.background,
@@ -1379,6 +1398,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
   }
 
   Widget _buildNotFoundState() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -1388,7 +1408,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
             Icon(Icons.search_off, color: AppTheme.textTertiary, size: 64),
             const SizedBox(height: 16),
             Text(
-              'Litige introuvable',
+              l10n.dispute_notFound,
               style: TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 18,
@@ -1397,7 +1417,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Ce litige n\'existe pas ou a ete supprime.',
+              l10n.dispute_notFoundMessage,
               style: TextStyle(color: AppTheme.textSecondary),
               textAlign: TextAlign.center,
             ),

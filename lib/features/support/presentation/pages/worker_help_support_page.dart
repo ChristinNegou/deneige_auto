@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../data/worker_faq_data.dart';
 import '../../domain/entities/faq_item.dart';
@@ -37,7 +38,7 @@ class _WorkerHelpSupportPageState extends State<WorkerHelpSupportPage>
       child: Scaffold(
         backgroundColor: AppTheme.background,
         appBar: AppBar(
-          title: const Text('Aide et Support'),
+          title: Text(AppLocalizations.of(context)!.support_helpAndSupport),
           backgroundColor: AppTheme.surface,
           actions: [
             Container(
@@ -53,7 +54,7 @@ class _WorkerHelpSupportPageState extends State<WorkerHelpSupportPage>
                   Icon(Icons.ac_unit, size: 14, color: AppTheme.warning),
                   const SizedBox(width: 4),
                   Text(
-                    'Déneigeur',
+                    AppLocalizations.of(context)!.support_workerBadge,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -69,9 +70,13 @@ class _WorkerHelpSupportPageState extends State<WorkerHelpSupportPage>
             indicatorColor: AppTheme.primary,
             labelColor: AppTheme.textPrimary,
             unselectedLabelColor: AppTheme.textTertiary,
-            tabs: const [
-              Tab(text: 'FAQ', icon: Icon(Icons.help_outline)),
-              Tab(text: 'Contact', icon: Icon(Icons.mail_outline)),
+            tabs: [
+              Tab(
+                  text: AppLocalizations.of(context)!.support_faqTab,
+                  icon: const Icon(Icons.help_outline)),
+              Tab(
+                  text: AppLocalizations.of(context)!.support_contactTab,
+                  icon: const Icon(Icons.mail_outline)),
             ],
           ),
         ),
@@ -100,8 +105,9 @@ class _WorkerFaqTabState extends State<_WorkerFaqTab> {
   @override
   Widget build(BuildContext context) {
     final faqItems = _selectedCategory != null
-        ? WorkerFaqData.getByCategory(_selectedCategory!)
-        : WorkerFaqData.faqItems;
+        ? WorkerFaqData.getLocalizedByCategory(
+            AppLocalizations.of(context)!, _selectedCategory!)
+        : WorkerFaqData.getLocalizedFaqItems(AppLocalizations.of(context)!);
 
     return Column(
       children: [
@@ -113,11 +119,16 @@ class _WorkerFaqTabState extends State<_WorkerFaqTab> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              _buildCategoryChip(null, 'Tout'),
-              _buildCategoryChip(FaqCategory.general, 'Général'),
-              _buildCategoryChip(FaqCategory.reservations, 'Jobs'),
-              _buildCategoryChip(FaqCategory.payments, 'Paiements'),
-              _buildCategoryChip(FaqCategory.account, 'Compte'),
+              _buildCategoryChip(
+                  null, AppLocalizations.of(context)!.support_all),
+              _buildCategoryChip(FaqCategory.general,
+                  AppLocalizations.of(context)!.support_workerGeneral),
+              _buildCategoryChip(FaqCategory.reservations,
+                  AppLocalizations.of(context)!.support_workerJobs),
+              _buildCategoryChip(FaqCategory.payments,
+                  AppLocalizations.of(context)!.support_workerPayments),
+              _buildCategoryChip(FaqCategory.account,
+                  AppLocalizations.of(context)!.support_workerAccount),
             ],
           ),
         ),
@@ -243,8 +254,8 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
             _selectedSubject = SupportSubject.question;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Votre message a été envoyé avec succès'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.support_messageSent),
               backgroundColor: AppTheme.success,
             ),
           );
@@ -282,7 +293,8 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Support Déneigeurs',
+                              AppLocalizations.of(context)!
+                                  .support_workerSupport,
                               style: TextStyle(
                                 color: AppTheme.textPrimary,
                                 fontWeight: FontWeight.bold,
@@ -290,7 +302,8 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                               ),
                             ),
                             Text(
-                              'Notre équipe répond sous 24-48h',
+                              AppLocalizations.of(context)!
+                                  .support_workerTeamResponse,
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: 13,
@@ -306,9 +319,9 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                 const SizedBox(height: 24),
 
                 // Subject dropdown
-                const Text(
-                  'Sujet',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.support_subject,
+                  style: const TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -350,9 +363,9 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                 const SizedBox(height: 20),
 
                 // Message field
-                const Text(
-                  'Message',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.support_message,
+                  style: const TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -365,8 +378,7 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                   maxLength: 2000,
                   style: const TextStyle(color: AppTheme.textPrimary),
                   decoration: InputDecoration(
-                    hintText:
-                        'Décrivez votre problème ou question en détail...',
+                    hintText: AppLocalizations.of(context)!.support_messageHint,
                     hintStyle: const TextStyle(color: AppTheme.textTertiary),
                     filled: true,
                     fillColor: AppTheme.surfaceContainer,
@@ -386,10 +398,12 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Veuillez entrer un message';
+                      return AppLocalizations.of(context)!
+                          .support_messageRequired;
                     }
                     if (value.trim().length < 10) {
-                      return 'Le message doit contenir au moins 10 caractères';
+                      return AppLocalizations.of(context)!
+                          .support_messageMinLength;
                     }
                     return null;
                   },
@@ -431,14 +445,14 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                               color: AppTheme.background,
                             ),
                           )
-                        : const Row(
+                        : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.send),
-                              SizedBox(width: 8),
+                              const Icon(Icons.send),
+                              const SizedBox(width: 8),
                               Text(
-                                'Envoyer',
-                                style: TextStyle(
+                                AppLocalizations.of(context)!.support_send,
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -455,7 +469,7 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                   child: Column(
                     children: [
                       Text(
-                        'Ou contactez-nous directement:',
+                        AppLocalizations.of(context)!.support_contactDirectly,
                         style: TextStyle(
                           color: AppTheme.textTertiary,
                           fontSize: 13,
@@ -484,13 +498,13 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
   String _getWorkerSubjectLabel(SupportSubject subject) {
     switch (subject) {
       case SupportSubject.bug:
-        return 'Problème technique';
+        return AppLocalizations.of(context)!.support_workerSubjectBug;
       case SupportSubject.question:
-        return 'Question générale';
+        return AppLocalizations.of(context)!.support_workerSubjectQuestion;
       case SupportSubject.suggestion:
-        return 'Suggestion d\'amélioration';
+        return AppLocalizations.of(context)!.support_workerSubjectSuggestion;
       case SupportSubject.other:
-        return 'Problème de paiement / Autre';
+        return AppLocalizations.of(context)!.support_workerSubjectOther;
     }
   }
 }

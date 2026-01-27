@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../ai_features/presentation/bloc/ai_features_bloc.dart';
 import '../../../ai_features/presentation/bloc/ai_features_state.dart';
 
@@ -14,12 +15,12 @@ class AIPriceEstimationWidget extends StatelessWidget {
       builder: (context, state) {
         // Loading state
         if (state.isEstimatingPrice) {
-          return _buildLoadingCard();
+          return _buildLoadingCard(context);
         }
 
         // Error state
         if (state.priceEstimationError != null) {
-          return _buildErrorCard(state.priceEstimationError!);
+          return _buildErrorCard(context, state.priceEstimationError!);
         }
 
         // No estimation yet
@@ -69,7 +70,7 @@ class AIPriceEstimationWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Estimation IA',
+                            AppLocalizations.of(context)!.ai_estimationTitle,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -77,7 +78,7 @@ class AIPriceEstimationWidget extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Prix suggere base sur la demande',
+                            AppLocalizations.of(context)!.ai_estimationSubtitle,
                             style: TextStyle(
                               fontSize: 11,
                               color: AppTheme.textTertiary,
@@ -121,7 +122,7 @@ class AIPriceEstimationWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Facteurs de prix',
+                        AppLocalizations.of(context)!.ai_priceFactors,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -135,28 +136,28 @@ class AIPriceEstimationWidget extends StatelessWidget {
                         children: [
                           if (estimation.multipliers.urgency > 1)
                             _buildMultiplierChip(
-                              'Urgence',
+                              AppLocalizations.of(context)!.ai_urgency,
                               estimation.multipliers.urgency,
                               Icons.bolt,
                               AppTheme.warning,
                             ),
                           if (estimation.multipliers.weather > 1)
                             _buildMultiplierChip(
-                              'Meteo',
+                              AppLocalizations.of(context)!.ai_weather,
                               estimation.multipliers.weather,
                               Icons.cloud,
                               AppTheme.info,
                             ),
                           if (estimation.multipliers.demand > 1)
                             _buildMultiplierChip(
-                              'Demande',
+                              AppLocalizations.of(context)!.ai_demand,
                               estimation.multipliers.demand,
                               Icons.trending_up,
                               AppTheme.error,
                             ),
                           if (estimation.multipliers.location > 1)
                             _buildMultiplierChip(
-                              'Zone',
+                              AppLocalizations.of(context)!.ai_zone,
                               estimation.multipliers.location,
                               Icons.location_on,
                               AppTheme.secondary,
@@ -205,7 +206,7 @@ class AIPriceEstimationWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingCard() {
+  Widget _buildLoadingCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -227,7 +228,7 @@ class AIPriceEstimationWidget extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            'Estimation IA en cours...',
+            AppLocalizations.of(context)!.ai_estimationLoading,
             style: TextStyle(
               fontSize: 13,
               color: AppTheme.textSecondary,
@@ -238,7 +239,7 @@ class AIPriceEstimationWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorCard(String error) {
+  Widget _buildErrorCard(BuildContext context, String error) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -254,7 +255,7 @@ class AIPriceEstimationWidget extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Estimation IA non disponible',
+              AppLocalizations.of(context)!.ai_estimationUnavailable,
               style: TextStyle(
                 fontSize: 12,
                 color: AppTheme.textSecondary,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_illustration.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ReservationSuccessScreen extends StatefulWidget {
   final String? reservationId;
@@ -36,6 +37,7 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Stack(
@@ -65,7 +67,7 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                     const SizedBox(height: 24),
 
                     Text(
-                      'Réservation confirmée !',
+                      l10n.reservationSuccess_title,
                       style: AppTheme.headlineLarge.copyWith(
                         color: AppTheme.success,
                       ),
@@ -75,7 +77,7 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                     const SizedBox(height: 12),
 
                     Text(
-                      'Votre demande de déneigement a été enregistrée avec succès.',
+                      l10n.reservationSuccess_subtitle,
                       style: AppTheme.bodyLarge.copyWith(
                         color: AppTheme.textSecondary,
                       ),
@@ -95,7 +97,7 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                         child: Column(
                           children: [
                             Text(
-                              'Numéro de réservation',
+                              l10n.reservationSuccess_reservationNumber,
                               style: AppTheme.labelSmall,
                             ),
                             const SizedBox(height: 4),
@@ -132,7 +134,7 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Prochaines étapes',
+                                l10n.reservationSuccess_nextSteps,
                                 style: AppTheme.labelLarge.copyWith(
                                   color: AppTheme.primary,
                                 ),
@@ -140,11 +142,9 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          _buildInfoRow(
-                              '1. Un déneigeur sera assigné sous peu'),
-                          _buildInfoRow('2. Vous recevrez une notification'),
-                          _buildInfoRow(
-                              '3. Suivez l\'avancement en temps réel'),
+                          _buildInfoRow(l10n.reservationSuccess_step1),
+                          _buildInfoRow(l10n.reservationSuccess_step2),
+                          _buildInfoRow(l10n.reservationSuccess_step3),
                         ],
                       ),
                     ),
@@ -165,7 +165,7 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                           backgroundColor: AppTheme.success,
                           padding: const EdgeInsets.all(16),
                         ),
-                        child: const Text('Retour à l\'accueil'),
+                        child: Text(l10n.reservationSuccess_backToHome),
                       ),
                     ),
 
@@ -183,7 +183,7 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.all(16),
                         ),
-                        child: const Text('Voir mes réservations'),
+                        child: Text(l10n.reservationSuccess_viewReservations),
                       ),
                     ),
 

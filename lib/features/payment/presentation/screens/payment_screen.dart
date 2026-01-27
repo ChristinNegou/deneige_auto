@@ -477,7 +477,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (_useNewCard) {
         await _paymentService.initPaymentSheet(
           clientSecret: paymentData['clientSecret'],
-          merchantDisplayName: 'Déneige Auto',
+          merchantDisplayName: l10n.appTitle,
         );
         success = await _paymentService.confirmPayment(
           clientSecret: paymentData['clientSecret'],

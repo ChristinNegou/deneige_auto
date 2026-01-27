@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
 import '../bloc/worker_availability_bloc.dart';
 import '../bloc/worker_jobs_bloc.dart';
@@ -195,6 +196,7 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
   }
 
   Widget _buildBottomNavBar() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.surface,
@@ -218,25 +220,25 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
                 index: 0,
                 icon: Icons.home_rounded,
                 activeIcon: Icons.home_rounded,
-                label: 'Accueil',
+                label: l10n.worker_navHome,
               ),
               _buildNavItem(
                 index: 1,
                 icon: Icons.trending_up_rounded,
                 activeIcon: Icons.trending_up_rounded,
-                label: 'Revenus',
+                label: l10n.worker_navEarnings,
               ),
               _buildNavItem(
                 index: 2,
                 icon: Icons.account_balance_wallet_outlined,
                 activeIcon: Icons.account_balance_wallet_rounded,
-                label: 'Paiements',
+                label: l10n.worker_navPayments,
               ),
               _buildNavItem(
                 index: 3,
                 icon: Icons.person_outline_rounded,
                 activeIcon: Icons.person_rounded,
-                label: 'Profil',
+                label: l10n.worker_navProfile,
               ),
             ],
           ),

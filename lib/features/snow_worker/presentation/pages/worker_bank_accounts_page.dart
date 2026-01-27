@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/services/worker_stripe_service.dart';
 
 class WorkerBankAccountsPage extends StatefulWidget {
@@ -61,7 +62,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Compte defini comme principal'),
+            content:
+                Text(AppLocalizations.of(context)!.worker_accountSetAsPrimary),
             backgroundColor: AppTheme.success,
           ),
         );
@@ -71,7 +73,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: $e'),
+            content: Text(AppLocalizations.of(context)!
+                .clientHome_errorPrefix(e.toString())),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -86,17 +89,17 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
         backgroundColor: AppTheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'Supprimer ce compte?',
+          AppLocalizations.of(context)!.worker_deleteAccountQuestion,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         content: Text(
-          'Voulez-vous vraiment supprimer le compte se terminant par $last4?',
+          AppLocalizations.of(context)!.worker_deleteAccountConfirm(last4),
           style: TextStyle(color: AppTheme.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Annuler',
+            child: Text(AppLocalizations.of(context)!.common_cancel,
                 style: TextStyle(color: AppTheme.textSecondary)),
           ),
           ElevatedButton(
@@ -105,7 +108,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
               backgroundColor: AppTheme.error,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Supprimer'),
+            child: Text(AppLocalizations.of(context)!.common_delete),
           ),
         ],
       ),
@@ -121,7 +124,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Compte supprime'),
+            content: Text(AppLocalizations.of(context)!.worker_accountDeleted),
             backgroundColor: AppTheme.success,
           ),
         );
@@ -131,7 +134,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: $e'),
+            content: Text(AppLocalizations.of(context)!
+                .clientHome_errorPrefix(e.toString())),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -160,7 +164,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Comptes bancaires'),
+        title: Text(AppLocalizations.of(context)!.worker_bankAccounts),
         backgroundColor: AppTheme.surface,
         elevation: 0,
         actions: [
@@ -175,7 +179,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
         backgroundColor: AppTheme.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
+        label: Text(AppLocalizations.of(context)!.common_add),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -246,7 +250,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Compte principal',
+                  AppLocalizations.of(context)!.worker_primaryAccount,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -255,7 +259,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Vos gains seront deposes sur le compte marque comme principal. Vous pouvez changer de compte a tout moment.',
+                  AppLocalizations.of(context)!.worker_primaryAccountInfo,
                   style: TextStyle(
                     fontSize: 12,
                     color: AppTheme.info.withValues(alpha: 0.9),
@@ -290,7 +294,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
           ),
           const SizedBox(height: 20),
           Text(
-            'Aucun compte bancaire',
+            AppLocalizations.of(context)!.worker_noBankAccount,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -299,7 +303,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Ajoutez un compte bancaire pour recevoir vos gains',
+            AppLocalizations.of(context)!.worker_addBankAccountToReceive,
             style: TextStyle(
               fontSize: 14,
               color: AppTheme.textSecondary,
@@ -310,7 +314,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
           ElevatedButton.icon(
             onPressed: _showAddAccountModal,
             icon: const Icon(Icons.add),
-            label: const Text('Ajouter un compte'),
+            label: Text(AppLocalizations.of(context)!.worker_addAccount),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
@@ -393,9 +397,9 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                               color: AppTheme.primary,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Text(
-                              'Principal',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.worker_primary,
+                              style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
@@ -471,8 +475,8 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      'Definir comme principal',
+                    child: Text(
+                      AppLocalizations.of(context)!.worker_setAsPrimary,
                       style:
                           TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                     ),
@@ -499,7 +503,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                       ),
                     ),
                     child: Text(
-                      'Supprimer',
+                      AppLocalizations.of(context)!.common_delete,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,

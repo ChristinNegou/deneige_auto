@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/config/app_config.dart';
 import '../../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
@@ -23,7 +24,8 @@ class Step4OptionsScreen extends StatelessWidget {
             children: [
               // Section Options
               _buildSectionHeader(
-                  'Options supplementaires', Icons.add_circle_outline_rounded),
+                  AppLocalizations.of(context)!.step4_additionalOptions,
+                  Icons.add_circle_outline_rounded),
               const SizedBox(height: 12),
 
               // Grid of compact options (2 columns)
@@ -145,7 +147,8 @@ class Step4OptionsScreen extends StatelessWidget {
               const SizedBox(height: 28),
 
               // Section Neige
-              _buildSectionHeader('Profondeur de neige', Icons.ac_unit_rounded),
+              _buildSectionHeader(AppLocalizations.of(context)!.step4_snowDepth,
+                  Icons.ac_unit_rounded),
               const SizedBox(height: 12),
 
               SnowDepthInput(
@@ -160,7 +163,8 @@ class Step4OptionsScreen extends StatelessWidget {
               const SizedBox(height: 28),
 
               // Recapitulatif prix
-              _buildSectionHeader('Recapitulatif', Icons.receipt_long_rounded),
+              _buildSectionHeader(AppLocalizations.of(context)!.step4_summary,
+                  Icons.receipt_long_rounded),
               const SizedBox(height: 12),
 
               const PriceSummaryCard(showBreakdown: true),

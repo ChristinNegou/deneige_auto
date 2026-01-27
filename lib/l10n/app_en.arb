@@ -1,8 +1,6 @@
 {
   "@@locale": "en",
-
   "appTitle": "Deneige Auto",
-
   "common_retry": "Retry",
   "common_cancel": "Cancel",
   "common_confirm": "Confirm",
@@ -42,7 +40,6 @@
   "common_logout": "Log out",
   "common_logoutConfirm": "Are you sure you want to log out?",
   "common_logoutConfirmAccount": "Are you sure you want to log out of your account?",
-
   "onboarding_title1": "Welcome to Deneige Auto",
   "onboarding_desc1": "The modern solution to manage snow removal from your vehicle with ease",
   "onboarding_title2": "Book in a few clicks",
@@ -52,7 +49,6 @@
   "onboarding_title4": "Secure payment",
   "onboarding_desc4": "Pay securely and manage your invoices easily",
   "onboarding_start": "Get started",
-
   "login_welcome": "Welcome",
   "login_subtitle": "Sign in to your account",
   "login_emailHint": "example@email.com",
@@ -64,7 +60,6 @@
   "login_submit": "Sign in",
   "login_noAccount": "Don't have an account? ",
   "login_register": "Sign up",
-
   "register_title": "Sign up",
   "register_subtitle": "Create your account to get started",
   "register_firstNameHint": "John",
@@ -83,7 +78,6 @@
   "register_snowWorker": "Snow worker",
   "register_submit": "Sign up",
   "register_hasAccount": "Already have an account? ",
-
   "forgotPassword_title": "Forgot password?",
   "forgotPassword_subtitle": "Enter your email address and we'll send you a link to reset your password",
   "forgotPassword_emailSent": "Password reset email sent!",
@@ -94,7 +88,6 @@
   "forgotPassword_backToLogin": "Back to sign in",
   "forgotPassword_resend": "Resend email",
   "forgotPassword_rememberPassword": "Remember your password? ",
-
   "phoneVerification_title": "Verification",
   "phoneVerification_subtitle": "Phone verification",
   "phoneVerification_enterCode": "Enter the 6-digit code sent to",
@@ -106,12 +99,10 @@
   "phoneVerification_resendIn": "Resend in {seconds}s",
   "phoneVerification_changeNumber": "Change number",
   "phoneVerification_devCode": "Dev mode - Code: {code}",
-
   "home_greeting": "Hello, {name}",
   "home_clientHome": "Client Home",
   "home_snowWorkerDashboard": "Snow Worker Dashboard",
   "home_adminDashboard": "Admin Dashboard",
-
   "weather_title": "Weather",
   "weather_unavailable": "Weather data unavailable",
   "weather_humidity": "Humidity",
@@ -119,7 +110,6 @@
   "weather_snowDepth": "Snow depth",
   "weather_snowAlert": "Snow alert",
   "weather_snowAlertDefault": "Significant snowfall forecast",
-
   "notifications_title": "Notifications",
   "notifications_readAll": "Read all",
   "notifications_empty": "No notifications",
@@ -127,7 +117,6 @@
   "notifications_unreadSingular": "unread notification",
   "notifications_unreadPlural": "unread notifications",
   "notifications_settings": "Notification settings",
-
   "reservation_myReservations": "My reservations",
   "reservation_empty": "No reservations",
   "reservation_emptySubtitle": "Start by creating your first reservation",
@@ -233,11 +222,9 @@
   "reservation_creditCardSubtitle": "Visa, Mastercard, Amex",
   "reservation_creatingReservation": "Creating reservation...",
   "reservation_securePayment": "Secure payment by Stripe",
-
   "service_windowScraping5": "+$5",
   "service_doorDeicing3": "+$3",
   "service_wheelClearing4": "+$4",
-
   "vehicle_myVehicles": "My vehicles",
   "vehicle_empty": "No vehicles registered",
   "vehicle_emptySubtitle": "Add your first vehicle to\nstart using the service",
@@ -279,7 +266,6 @@
   "vehicle_colorSilver": "Silver",
   "vehicle_colorBrown": "Brown",
   "vehicle_colorBeige": "Beige",
-
   "profile_title": "My profile",
   "profile_defaultName": "User",
   "profile_defaultEmail": "email@example.com",
@@ -294,19 +280,16 @@
   "profile_settingsSubtitle": "App preferences",
   "profile_helpSupport": "Help & Support",
   "profile_helpSubtitle": "FAQ and contact",
-
   "chat_typing": "Typing...",
   "chat_noMessages": "No messages",
   "chat_startConversation": "Start the conversation!",
   "chat_inputHint": "Write a message...",
-
   "aiChat_title": "AI Assistant",
   "aiChat_newConversation": "New conversation",
   "aiChat_unavailable": "The AI assistant is temporarily unavailable",
   "aiChat_startConversation": "Start a conversation",
   "aiChat_subtitle": "Ask your questions about Deneige Auto",
   "aiChat_inputHint": "Write your message...",
-
   "settings_title": "Settings",
   "settings_notifications": "Notifications",
   "settings_pushNotifications": "Push notifications",
@@ -334,7 +317,6 @@
   "settings_deleteAccountConfirm": "Are you sure you want to delete your account? This action is irreversible.",
   "settings_passwordRequired": "Password required",
   "settings_enterPassword": "Enter your password to confirm:",
-
   "support_title": "Help & Support",
   "support_faq": "FAQ",
   "support_contact": "Contact",
@@ -344,7 +326,6 @@
   "support_writeResponse": "Please write a response",
   "support_respond": "Respond",
   "support_respondToRequest": "Respond to request",
-
   "rating_question": "How was the snow removal?",
   "rating_subtitle": "Your feedback helps improve the service",
   "rating_1star": "Very unsatisfied",
@@ -358,12 +339,10 @@
   "rating_submit": "Submit my review",
   "rating_later": "Maybe later",
   "rating_workerTitle": "Snow worker",
-
   "suspension_title": "Account Suspended",
   "suspension_reason": "Reason:",
   "suspension_until": "Until: {date}",
-  "suspension_contactSupport": "Contact support at \"deneigeauto@yahoo.com\" if you think this is a mistake.",
-
+  "suspension_contactSupport": "Contact support at \"deneigeauto@yahoo.com\" if you believe this is an error.",
   "worker_available": "Available",
   "worker_offline": "Offline",
   "worker_verificationPending": "Verification in progress",
@@ -413,7 +392,6 @@
   "worker_notifUrgentJobs": "Urgent jobs",
   "worker_notifTipsReceived": "Tips received",
   "worker_helpSupport": "Help & support",
-
   "worker_jobDetails": "Job details",
   "worker_clientCancelled": "The client cancelled the reservation",
   "worker_jobCancelled": "Job cancelled",
@@ -432,7 +410,6 @@
   "worker_clientNotes": "Client notes",
   "worker_jobAccepted": "Job accepted successfully!",
   "worker_acceptJob": "Accept this job",
-
   "worker_cancelJobTitle": "Cancel job?",
   "worker_cancelJobWarning": "You will not be paid for this job.\nFrequent cancellations may result in suspension.",
   "worker_cancelReason_label": "Cancellation reason:",
@@ -450,7 +427,6 @@
   "worker_cancelFamilyEmergencyDesc": "I have a family emergency",
   "worker_cancelEquipmentFailure": "Equipment failure",
   "worker_cancelEquipmentFailureDesc": "My snow removal equipment has failed",
-
   "worker_settingsTitle": "Settings",
   "worker_myEquipment": "My equipment",
   "worker_snowShovel": "Snow shovel",
@@ -461,16 +437,13 @@
   "worker_preferredZones": "Preferred zones",
   "worker_notifReception": "Notification reception",
   "worker_otherVehicleType": "Other vehicle type",
-
   "worker_earningsCompleted": "Completed",
   "worker_earningsAssigned": "Assigned",
-
   "worker_noJobs": "No jobs available",
   "worker_noJobsSubtitle": "New jobs will appear here",
   "worker_noAssignedJobs": "No assigned jobs",
   "worker_noAssignedSubtitle": "Accept available jobs to see them here",
   "worker_jobs": "Jobs",
-
   "verification_title": "Identity verification",
   "verification_verifyIdentity": "Verify your identity",
   "verification_idDocument": "ID document",
@@ -494,7 +467,6 @@
   "verification_summary": "Summary",
   "verification_submitForVerification": "Submit for verification",
   "verification_submitted": "Documents submitted successfully. Verification in progress...",
-
   "dispute_myDisputes": "My disputes",
   "dispute_all": "All",
   "dispute_open": "Open",
@@ -534,7 +506,6 @@
   "dispute_tipsPhotos": "Clear, well-lit photos",
   "dispute_tipsScreenshots": "Screenshots of communications",
   "dispute_tipsTimestamp": "Timestamped photos if possible",
-
   "admin_dashboard": "Dashboard",
   "admin_reservations": "Reservations",
   "admin_reservationsManagement": "Reservation management",
@@ -626,16 +597,19 @@
   "admin_nonCompliant": "Non-compliant verification",
   "admin_resolved": "Resolved",
   "admin_closed": "Closed",
-
   "accountType_welcome": "Welcome! Select your account type",
   "accountType_client": "Client",
   "accountType_clientSubtitle": "I'm looking for a snow removal service",
   "accountType_snowWorker": "Snow worker",
   "accountType_snowWorkerSubtitle": "I offer my snow removal services",
-
   "register_accountLabel": "{role} account",
-  "@register_accountLabel": { "placeholders": { "role": { "type": "String" } } },
-
+  "@register_accountLabel": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
   "resetPassword_title": "New password",
   "resetPassword_successTitle": "Success!",
   "resetPassword_description": "Enter your new password",
@@ -650,12 +624,10 @@
   "resetPassword_strengthWeak": "Weak",
   "resetPassword_strengthMedium": "Medium",
   "resetPassword_strengthStrong": "Strong",
-
   "privacy_title": "Privacy policy",
   "terms_title": "Terms of service",
   "privacy_lastUpdate": "Last updated: January 2025",
   "terms_lastUpdate": "Last updated: January 2025",
-
   "clientHome_greetingLabel": "Hello,",
   "clientHome_quickActions": "Quick actions",
   "clientHome_book": "Book",
@@ -672,20 +644,39 @@
   "clientHome_ratingError": "Unable to send the rating. Please try again.",
   "clientHome_tipError": "Unable to send the tip. Please try again.",
   "clientHome_tipSent": "Tip of {amount}$ sent to {name}",
-  "@clientHome_tipSent": { "placeholders": { "amount": { "type": "String" }, "name": { "type": "String" } } },
+  "@clientHome_tipSent": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "clientHome_tipErrorPrefix": "Tip error: {message}",
-  "@clientHome_tipErrorPrefix": { "placeholders": { "message": { "type": "String" } } },
+  "@clientHome_tipErrorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "clientHome_errorPrefix": "Error: {message}",
-  "@clientHome_errorPrefix": { "placeholders": { "message": { "type": "String" } } },
+  "@clientHome_errorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "clientHome_theWorker": "the worker",
   "clientHome_mySubscription": "My\nsubscription",
-
+  "clientHome_userNotAuth": "Error: user not authenticated",
   "weather_snowDepthValue": "{depth} cm on ground",
-
   "worker_jobsAvailable": "Available",
   "worker_jobsMyJobs": "My jobs",
   "worker_accept": "Accept",
-
   "admin_loadError": "Loading error",
   "admin_administration": "Administration",
   "admin_sendNotification": "Send notification",
@@ -715,10 +706,8 @@
   "admin_pendingCountLabel": "{count} pending",
   "admin_reservationsCount": "{count} reservations",
   "admin_newRequestsToday": "{count} new request(s) today",
-
   "common_add": "Add",
   "common_description": "Description",
-
   "dispute_imageLoadError": "Unable to load image",
   "dispute_addPhoto": "Add a photo",
   "dispute_chooseFromGallery": "Choose from gallery",
@@ -734,7 +723,6 @@
   "dispute_addPhotos": "Add photos",
   "dispute_addAnotherPhoto": "Add another photo",
   "dispute_maxPhotosHint": "Maximum 5 photos. Photos help process your request faster.",
-
   "worker_myPayments": "My payments",
   "worker_configureBankAccount": "Configure my bank account",
   "worker_saltSpreaderLabel": "Salt spreader",
@@ -771,7 +759,6 @@
   "worker_photoSelectionError": "Error selecting photo",
   "worker_notifications": "Notifications",
   "worker_tipsReceived": "Tips received",
-
   "admin_userManagement": "User management",
   "admin_searchUser": "Search for a user...",
   "admin_clientsLabel": "Clients",
@@ -796,7 +783,6 @@
   "admin_suspend": "Suspend",
   "admin_reason": "Reason: {reason}",
   "admin_suspendedUntil": "Until: {date}",
-
   "payment_title": "Payment",
   "payment_amountToPay": "Amount to pay",
   "payment_useNewCard": "Use a new card",
@@ -820,7 +806,6 @@
   "payment_deleteCardTitle": "Delete card",
   "payment_deleteCardConfirm": "Are you sure you want to delete card {number}?",
   "payment_addCard": "Add a card",
-
   "notifSettings_enabled": "Notifications are enabled",
   "notifSettings_disabled": "Notifications are disabled",
   "notifSettings_sounds": "Sounds",
@@ -835,7 +820,16 @@
   "notifSettings_quietModeDesc": "No notifications during defined hours",
   "notifSettings_hours": "Hours",
   "notifSettings_hoursRange": "From {start} to {end}",
-  "@notifSettings_hoursRange": { "placeholders": { "start": { "type": "String" }, "end": { "type": "String" } } },
+  "@notifSettings_hoursRange": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
   "notifSettings_quietModeActive": "Quiet mode currently active",
   "notifSettings_urgentAlways": "Urgent notifications will always be sent",
   "notifSettings_notifTypes": "Notification types",
@@ -850,19 +844,41 @@
   "notifSettings_resetConfirmMessage": "All notification settings will be reset to their default values.",
   "notifSettings_resetDone": "Settings reset",
   "notifSettings_reset": "Reset",
-
   "notif_justNow": "Just now",
   "notif_minutesAgo": "{minutes} min ago",
-  "@notif_minutesAgo": { "placeholders": { "minutes": { "type": "int" } } },
+  "@notif_minutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "notif_hoursAgo": "{hours} h ago",
-  "@notif_hoursAgo": { "placeholders": { "hours": { "type": "int" } } },
+  "@notif_hoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
   "notif_daysAgo": "{days} d ago",
-  "@notif_daysAgo": { "placeholders": { "days": { "type": "int" } } },
+  "@notif_daysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "notif_weeksAgo": "{weeks} w ago",
-  "@notif_weeksAgo": { "placeholders": { "weeks": { "type": "int" } } },
+  "@notif_weeksAgo": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
   "notif_now": "now",
   "notif_urgent": "Urgent",
-
   "notifType_reservationAssigned": "Task accepted",
   "notifType_workerEnRoute": "Worker en route",
   "notifType_workStarted": "Work started",
@@ -878,12 +894,10 @@
   "notifType_tipReceived": "Tip received",
   "notifType_rating": "Rating",
   "notifType_systemNotification": "System",
-
   "notifCategory_reservations": "Reservations",
   "notifCategory_payments": "Payments",
   "notifCategory_alerts": "Alerts",
   "notifCategory_communications": "Communications",
-
   "notifDesc_reservationAssigned": "When a snow worker accepts your request",
   "notifDesc_workerEnRoute": "When the snow worker is on the way",
   "notifDesc_workStarted": "When snow removal starts",
@@ -899,7 +913,6 @@
   "notifDesc_tipReceived": "Tips received",
   "notifDesc_rating": "Ratings received",
   "notifDesc_systemNotification": "System updates",
-
   "notifAction_viewDetails": "View details",
   "notifAction_trackReservation": "Track reservation",
   "notifAction_viewProgress": "View progress",
@@ -914,19 +927,29 @@
   "notifAction_viewMessage": "View message",
   "notifAction_userNotAuthenticated": "Error: user not authenticated",
   "notifAction_defaultUser": "User",
-
   "notif_allMarkedRead": "All notifications marked as read",
   "notif_allDeleted": "All notifications deleted",
   "notif_noReadToDelete": "No read notifications to delete",
   "notif_someNotDeleted": "Some notifications could not be deleted",
   "notif_deletedCount": "{count} notification(s) deleted",
-  "@notif_deletedCount": { "placeholders": { "count": { "type": "int" } } },
+  "@notif_deletedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "notif_autoDeleteEnabled": "Auto-delete enabled ({seconds}s)",
-  "@notif_autoDeleteEnabled": { "placeholders": { "seconds": { "type": "int" } } },
+  "@notif_autoDeleteEnabled": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "notif_autoDeleteDisabled": "Auto-delete disabled",
   "notif_errorLoading": "Error loading",
   "notif_errorRefreshing": "Error refreshing",
-
   "notif_errorLoadingNotifications": "Error loading notifications",
   "notif_errorCountingUnread": "Error counting unread notifications",
   "notif_errorMarkingRead": "Error marking notification as read",
@@ -935,5 +958,1474 @@
   "notif_errorDeletingAll": "Error deleting notifications",
   "notif_connectionTimeout": "Connection timed out. Check your connection.",
   "notif_cannotConnect": "Unable to connect to the server.",
-  "notif_serverError": "A server error occurred."
+  "notif_serverError": "A server error occurred.",
+  "suspension_accountSuspended": "Account Suspended",
+  "@suspension_until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "suspension_understood": "Understood",
+  "support_helpAndSupport": "Help & Support",
+  "support_faqTab": "FAQ",
+  "support_contactTab": "Contact",
+  "support_needHelp": "Need help?",
+  "support_teamResponse": "Our team will respond within 24-48h",
+  "support_subject": "Subject",
+  "support_message": "Message",
+  "support_messageHint": "Describe your problem or question in detail...",
+  "support_messageRequired": "Please enter a message",
+  "support_messageMinLength": "Message must be at least 10 characters",
+  "support_send": "Send",
+  "support_contactDirectly": "Or contact us directly:",
+  "support_messageSent": "Your message was sent successfully",
+  "support_workerBadge": "Snow Worker",
+  "support_workerGeneral": "General",
+  "support_workerJobs": "Jobs",
+  "support_workerPayments": "Payments",
+  "support_workerAccount": "Account",
+  "support_workerSupport": "Worker Support",
+  "support_workerTeamResponse": "Our team responds within 24-48h",
+  "support_workerSubjectBug": "Technical issue",
+  "support_workerSubjectQuestion": "General question",
+  "support_workerSubjectSuggestion": "Improvement suggestion",
+  "support_workerSubjectOther": "Payment issue / Other",
+  "support_subjectBug": "Bug Report",
+  "support_subjectQuestion": "Question",
+  "support_subjectSuggestion": "Suggestion",
+  "support_subjectOther": "Other",
+  "support_statusPending": "Pending",
+  "support_statusInProgress": "In Progress",
+  "support_statusResolved": "Resolved",
+  "support_statusClosed": "Closed",
+  "faqCat_general": "General",
+  "faqCat_reservations": "Reservations",
+  "faqCat_payments": "Payments",
+  "faqCat_disputes": "Disputes",
+  "faqCat_account": "Account",
+  "faq_q1": "How does Deneige Auto work?",
+  "faq_a1": "Deneige Auto lets you book a snow removal service for your vehicle. Create a reservation by selecting your vehicle, its location, and your preferred date and time. An available snow worker in your area will be assigned to clear your vehicle.",
+  "faq_q2": "In which areas is the service available?",
+  "faq_a2": "Currently, our service is available in the greater Montreal area and surroundings. We are continuously expanding our coverage. Check the map in the app to see if your location is covered.",
+  "faq_q3": "What are the service hours?",
+  "faq_a3": "Our service is available 7 days a week, from 5:00 AM to 10:00 PM. Hours may vary during intense storm periods.",
+  "faq_q4": "What is the AI Assistant?",
+  "faq_a4": "The AI Assistant is your virtual helper available 24/7 in the app. It can answer your questions about the service, help you solve problems, give advice and inform you about current and forecast weather conditions in your area.",
+  "faq_q5": "How do I use the AI Assistant?",
+  "faq_a5": "Access the AI Assistant from the main menu or by tapping the chat icon. Ask your questions in natural language and the assistant will respond instantly. It can help with reservations, disputes, payments and more.",
+  "faq_q6": "Can the AI Assistant give me the weather?",
+  "faq_a6": "Yes! The AI Assistant has access to real-time weather data. Simply ask \"What's the weather?\" or \"Will it snow tomorrow?\" to get current and upcoming forecasts in your area.",
+  "faq_q7": "How do I make a reservation?",
+  "faq_a7": "1. Open the app and tap \"New reservation\"\n2. Select your vehicle or add a new one\n3. Enter the vehicle location\n4. Choose the date and time\n5. Select desired options\n6. Confirm and pay",
+  "faq_q8": "Can I cancel my reservation?",
+  "faq_a8": "Yes, you can cancel your reservation under the following conditions:\n• More than 24h before: full refund\n• Between 12h and 24h before: 50% refund\n• Less than 12h before: no refund",
+  "faq_q9": "How do I know when the snow worker arrives?",
+  "faq_a9": "You will receive a push notification when the snow worker is on the way to your vehicle. You can also track their position in real time on the map in the app.",
+  "faq_q10": "What if the snow worker can't find my vehicle?",
+  "faq_a10": "Make sure you've described your vehicle's location well. The snow worker will contact you through the app's messaging if they have difficulty. You can also add a photo of your vehicle to make identification easier.",
+  "faq_q11": "What payment methods are accepted?",
+  "faq_a11": "We accept Visa, Mastercard and American Express credit cards. Payment is processed securely via Stripe.",
+  "faq_q12": "How do I get a refund?",
+  "faq_a12": "Refunds are automatically processed according to our cancellation policy. For special cases (unsatisfactory service, etc.), contact our support via the \"Help & Support\" section.",
+  "faq_q13": "Can I add a tip?",
+  "faq_a13": "Yes! After the service is completed, you can add a tip for the snow worker. This option appears on the service rating screen.",
+  "faq_q14": "How do I manage my payment cards?",
+  "faq_a14": "Go to Profile > Payments > Payment methods. You can add, delete or set a default card.",
+  "faq_q15": "What if the snow worker didn't show up?",
+  "faq_a15": "If the assigned snow worker didn't show up at the scheduled time, you can report a \"no-show\" directly from the reservation details. The \"Report no-show\" button appears 30 minutes after the scheduled start time. If the no-show is confirmed, you will be fully refunded.",
+  "faq_q16": "How do I create a dispute?",
+  "faq_a16": "To create a dispute:\n1. Go to Profile > My disputes > Create a dispute\n2. Select the reservation in question\n3. Choose the type of problem (incomplete work, insufficient quality, damage, etc.)\n4. Describe the situation in detail\n5. Add photos as evidence\n6. Indicate the amount claimed if applicable\n7. Submit your dispute",
+  "faq_q17": "What types of disputes can I report?",
+  "faq_a17": "You can report several types of problems:\n• Snow worker no-show\n• Incomplete work\n• Insufficient quality\n• Significant delay\n• Damage to your vehicle\n• Wrong location cleared\n• Overcharge\n• Inappropriate behavior\n• Other problem",
+  "faq_q18": "How do I add evidence to my dispute?",
+  "faq_a18": "Evidence strengthens your case. In the dispute details, tap \"Add evidence\" to:\n• Take photos or choose from your gallery (up to 10 photos)\n• Add a detailed description\n\nTips: take clear, well-lit photos, timestamped if possible.",
+  "faq_q19": "What is AI dispute analysis?",
+  "faq_a19": "Our system uses artificial intelligence to objectively analyze disputes. The AI examines evidence (photos, descriptions, GPS data, history), evaluates the strength of arguments and proposes a recommendation. This analysis helps our team make fair and quick decisions.",
+  "faq_q20": "How long do I have to report a problem?",
+  "faq_a20": "You have 24 hours after the service ends to report a problem or no-show. After this deadline, you can still contact support, but processing may take longer.",
+  "faq_q21": "How do I track my dispute status?",
+  "faq_a21": "Go to Profile > My disputes to see all your disputes and their status: Open, Under review, Awaiting response, Resolved. You will receive a notification as soon as a decision is made.",
+  "faq_q22": "Can I appeal a decision?",
+  "faq_a22": "Yes, if you are not satisfied with the decision, you can appeal within 7 days of the resolution. Go to the dispute details and tap \"Appeal\". Explain why you are contesting the decision.",
+  "faq_q23": "How are refunds processed after a dispute?",
+  "faq_a23": "If the dispute is resolved in your favor, the refund is automatically processed to your original payment method. The timeframe is generally 3-5 business days depending on your bank.",
+  "faq_q24": "How do I change my personal information?",
+  "faq_a24": "Go to Profile > Edit profile to change your name, phone number or profile photo.",
+  "faq_q25": "How do I add or remove a vehicle?",
+  "faq_a25": "Go to Profile > My vehicles. Tap \"+\" to add a new vehicle or swipe left on an existing vehicle to delete it.",
+  "faq_q26": "How do I delete my account?",
+  "faq_a26": "Go to Settings > Delete my account. This action is irreversible and will delete all your data.",
+  "faq_q27": "I forgot my password, what do I do?",
+  "faq_a27": "On the login screen, tap \"Forgot password?\". Enter your email and you will receive a link to reset your password.",
+  "wfaq_q1": "How do I become a snow worker on Deneige Auto?",
+  "wfaq_a1": "To become a snow worker, you need to create a snow worker account, complete your profile with personal information, add your available equipment and set up your bank account to receive payments.",
+  "wfaq_q2": "What are the requirements to be a snow worker?",
+  "wfaq_a2": "You must be at least 18 years old, have basic snow removal equipment (shovel, broom, scraper), be available during snow periods and have a Canadian bank account to receive your payments.",
+  "wfaq_q3": "Can I choose my work areas?",
+  "wfaq_a3": "Yes! In your settings, you can define your preferred zones. You'll receive priority notifications for jobs in these zones, but you can also accept jobs elsewhere.",
+  "wfaq_q4": "What is the AI Assistant?",
+  "wfaq_a4": "The AI Assistant is your virtual helper available 24/7 in the app. It can answer your questions about jobs, help you solve problems, give advice to improve your service and inform you about weather conditions to plan your day.",
+  "wfaq_q5": "How do I use the AI Assistant?",
+  "wfaq_a5": "Access the AI Assistant from the main menu. Ask your questions in natural language:\n• \"What jobs are available near me?\"\n• \"How to respond to a dispute?\"\n• \"What weather is expected tomorrow?\"\n• \"How to improve my score?\"\nThe assistant will respond instantly.",
+  "wfaq_q6": "Can the AI Assistant help me with the weather?",
+  "wfaq_a6": "Yes! The AI Assistant has access to real-time weather forecasts. Ask about current conditions or forecasts to plan your availability. You can anticipate high-demand days during snowstorms.",
+  "wfaq_q7": "How do I receive jobs?",
+  "wfaq_a7": "Activate your availability in the app. You'll receive push notifications for new jobs available in your zone. You can then accept or decline each job.",
+  "wfaq_q8": "Can I accept multiple jobs at the same time?",
+  "wfaq_a8": "Yes, you can manage up to 5 jobs simultaneously. In your settings, set the maximum number of active jobs you want at the same time. We recommend 2-3 jobs for optimal service.",
+  "wfaq_q9": "How do I cancel an accepted job?",
+  "wfaq_a9": "You can cancel a job before starting the work. Go to the job details and tap \"Cancel\". Note: frequent cancellations may affect your score and visibility.",
+  "wfaq_q10": "What if I can't find the vehicle?",
+  "wfaq_a10": "Use the built-in messaging to contact the client. If the vehicle is not found after 15 minutes and the client doesn't respond, you can report the issue and cancel the job without penalty.",
+  "wfaq_q11": "How do I report a problem with a job?",
+  "wfaq_a11": "In the job details, tap \"Report a problem\". Describe the situation and add photos if needed. Our team will review your report quickly.",
+  "wfaq_q12": "How do I get paid?",
+  "wfaq_a12": "Payments are made automatically via Stripe Connect. After each completed job, the amount is transferred to your bank account within 2-7 business days.",
+  "wfaq_q13": "How do I set up my bank account?",
+  "wfaq_a13": "Go to Settings > My payments > Stripe Setup. Follow the steps to verify your identity and add your banking details. This process is secure and required to receive your payments.",
+  "wfaq_q14": "How are my earnings calculated?",
+  "wfaq_a14": "Your earnings depend on the type of service (standard snow removal, with options), vehicle size and distance. You see the exact amount before accepting each job. Deneige Auto takes a 15% commission.",
+  "wfaq_q15": "How do tips work?",
+  "wfaq_a15": "Clients can leave a tip after the service. Tips are 100% yours, no commission. You receive a notification and the amount is added to your next payment.",
+  "wfaq_q16": "Where can I see my earnings history?",
+  "wfaq_a16": "Go to the \"Earnings\" tab to see your daily, weekly and monthly income. You can also see the details of each job and tips received.",
+  "wfaq_q17": "What happens if a client reports me as a no-show?",
+  "wfaq_a17": "If a client reports that you didn't show up, you'll receive a notification and have the opportunity to respond. If you marked \"On the way\" in the app, this will be taken into account. False client reports are also penalized.",
+  "wfaq_q18": "How do I respond to a dispute?",
+  "wfaq_a18": "To respond to a dispute:\n1. Go to Profile > My disputes\n2. Open the dispute in question\n3. Tap \"Respond to dispute\"\n4. Explain your side in detail\n5. Add photos as evidence (before/after, screenshots, etc.)\n6. Submit your response\n\nYou generally have 48 hours to respond.",
+  "wfaq_q19": "How do I add evidence to my defense?",
+  "wfaq_a19": "Evidence is essential to defend your position. In the dispute details, use \"Add evidence\" for:\n• Before/after snow removal photos\n• Communication screenshots\n• Timestamped photos on site\n• Any relevant document\n\nYou can add up to 10 photos and a detailed description.",
+  "wfaq_q20": "What is AI dispute analysis?",
+  "wfaq_a20": "Our system uses artificial intelligence to objectively analyze each dispute. The AI examines:\n• Photos and evidence from both parties\n• GPS data and timestamps\n• Client and worker history\n• Consistency of statements\n\nThis analysis helps make fair decisions. If the AI detects a false report, it works in your favor.",
+  "wfaq_q21": "Why is taking before/after photos important?",
+  "wfaq_a21": "Before/after photos are your best evidence:\n• They document the initial state and work done\n• The AI can analyze the quality of snow removal\n• In case of dispute, they prove your work\n• They are automatically timestamped\n\nMake it a habit to photograph each job!",
+  "wfaq_q22": "What are the consequences of a dispute against me?",
+  "wfaq_a22": "The consequences depend on the decision and your history:\n• First warning: notification\n• Repeat offense: temporary suspension (3-7 days)\n• Repeated problems: extended suspension (30 days)\n• Serious cases: permanent exclusion\n\nMaintain good service to avoid disputes.",
+  "wfaq_q23": "How do I contest an unfavorable decision?",
+  "wfaq_a23": "If you disagree with a dispute decision, you can appeal within 7 days. Provide additional evidence (photos, messages, etc.) to support your contestation.",
+  "wfaq_q24": "How do I report a problematic client?",
+  "wfaq_a24": "If a client is abusive, cannot be found despite your efforts, or makes false claims, you can report them in the job details. Our team will review the situation and may penalize the client if necessary.",
+  "wfaq_q25": "Is my payment affected during a dispute?",
+  "wfaq_a25": "During the review of a dispute, the corresponding payment may be temporarily held. Once the decision is made:\n• Dispute in your favor: full payment released\n• Dispute against you: refund to client (partial or total depending on the decision)",
+  "wfaq_q26": "How do I protect my reliability score?",
+  "wfaq_a26": "To maintain a good score:\n• Arrive on time (mark \"On the way\" in the app)\n• Take before/after photos for each job\n• Communicate with the client if there's a problem\n• Complete work to the requested standards\n• Avoid last-minute cancellations",
+  "wfaq_q27": "How do I change my available equipment?",
+  "wfaq_a27": "In Settings or your Profile, you can check/uncheck the equipment you own: shovel, broom, scraper, salt spreader, snow blower. This helps assign you appropriate jobs.",
+  "wfaq_q28": "How do I change my notifications?",
+  "wfaq_a28": "In Settings > Notifications, you can enable/disable alerts for: new jobs, urgent jobs and tips received.",
+  "wfaq_q29": "How do I improve my snow worker score?",
+  "wfaq_a29": "Your score is based on: service quality (client ratings), job acceptance rate, punctuality and completion rate. Provide quality service and be reliable to improve your score.",
+  "wfaq_q30": "Can I take a break from the app?",
+  "wfaq_a30": "Yes! Simply deactivate your availability in the app. You will no longer receive job notifications. Reactivate when you're ready to work.",
+  "adminDash_quickActions": "Quick Actions",
+  "adminDash_users": "Users",
+  "adminDash_reservations": "Reservations",
+  "adminDash_notify": "Notify",
+  "adminDash_support": "Support",
+  "adminDash_clientsWorkers": "{clients} clients, {workers} workers",
+  "@adminDash_clientsWorkers": {
+    "placeholders": {
+      "clients": {
+        "type": "int"
+      },
+      "workers": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_todayCount": "{count} today",
+  "@adminDash_todayCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_pending": "Pending",
+  "adminDash_toProcess": "To process",
+  "adminDash_completionRate": "Completion Rate",
+  "adminDash_completedCount": "{count} completed",
+  "@adminDash_completedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_pendingCount": "{count} pending",
+  "@adminDash_pendingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_total": "Total",
+  "adminDash_inProgress": "In Progress",
+  "adminDash_resolved": "Resolved",
+  "adminDash_newRequestsToday": "{count} new request(s) today",
+  "@adminDash_newRequestsToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_revenue": "Revenue",
+  "adminDash_reservationCount": "{count} reservations",
+  "@adminDash_reservationCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_thisMonth": "This Month",
+  "adminDash_grossCommission": "Gross Commission (25%)",
+  "adminDash_stripeFees": "Stripe Fees",
+  "adminDash_netCommission": "Net Commission",
+  "adminDash_tips": "Tips",
+  "adminDash_topWorkers": "Top Workers",
+  "adminDash_viewAll": "View all",
+  "adminDash_noWorkers": "No workers at the moment",
+  "adminDash_sendNotification": "Send a notification",
+  "adminDash_title": "Title",
+  "adminDash_messageLabel": "Message",
+  "adminDash_recipients": "Recipients",
+  "adminDash_allUsers": "All users",
+  "adminDash_clientsOnly": "Clients only",
+  "adminDash_workersOnly": "Workers only",
+  "adminDash_cancel": "Cancel",
+  "adminDash_sendBtn": "Send",
+  "adminDash_fillAllFields": "Please fill all fields",
+  "adminDash_adminLogout": "Admin Logout",
+  "adminDash_logoutConfirm": "Do you really want to log out of the admin panel?",
+  "adminDash_logout": "Logout",
+  "addVehicle_title": "Add a Vehicle",
+  "addVehicle_tapAddPhoto": "Tap to add a photo",
+  "addVehicle_newVehicle": "New Vehicle",
+  "addVehicle_photoTitle": "Vehicle Photo",
+  "addVehicle_photoVisibleWorker": "This photo will be visible to the snow worker",
+  "addVehicle_takePhoto": "Take a photo",
+  "addVehicle_useCamera": "Use the camera",
+  "addVehicle_choosePhoto": "Choose a photo",
+  "addVehicle_fromGallery": "From gallery",
+  "addVehicle_deletePhoto": "Delete photo",
+  "addVehicle_removeSelected": "Remove selected photo",
+  "addVehicle_make": "Make",
+  "addVehicle_model": "Model",
+  "addVehicle_year": "Year",
+  "addVehicle_plate": "License Plate",
+  "addVehicle_required": "Required",
+  "addVehicle_invalid": "Invalid",
+  "addVehicle_vehicleType": "Vehicle Type",
+  "addVehicle_color": "Color",
+  "addVehicle_setDefault": "Set as default vehicle",
+  "addVehicle_addBtn": "Add Vehicle",
+  "addVehicle_colorWhite": "White",
+  "addVehicle_colorBlack": "Black",
+  "addVehicle_colorGray": "Gray",
+  "addVehicle_colorSilver": "Silver",
+  "addVehicle_colorRed": "Red",
+  "addVehicle_colorBlue": "Blue",
+  "addVehicle_colorGreen": "Green",
+  "addVehicle_colorBrown": "Brown",
+  "addVehicle_colorBeige": "Beige",
+  "addCard_title": "Add a Card",
+  "addCard_securePayment": "Secure Payment",
+  "addCard_protectedByStripe": "Your information is protected by Stripe",
+  "addCard_cardInfo": "Card Information",
+  "addCard_cardNumber": "Card Number",
+  "addCard_setDefault": "Set as default method",
+  "addCard_usedForFuture": "Used for your future payments",
+  "addCard_encryptedSecure": "Encrypted and secure data. Card number never stored.",
+  "addCard_addBtn": "Add Card",
+  "addCard_errorAdding": "Unable to add this card. Check the information and try again.",
+  "verify_title": "Identity Verification",
+  "verify_heading": "Verify your identity",
+  "verify_description": "For everyone's safety, we need to verify your identity before you can accept jobs.",
+  "verify_step1Title": "ID Document",
+  "verify_step1Desc": "Photograph the front (and back if available) of your ID document",
+  "verify_step2Title": "Selfie",
+  "verify_step2Desc": "Take a selfie to confirm you are the person on the ID document",
+  "verify_step3Title": "Automatic verification",
+  "verify_step3Desc": "Our system verifies your documents in a few minutes",
+  "verify_acceptedDocs": "Accepted documents",
+  "verify_driverLicense": "Driver's license",
+  "verify_healthCard": "Health insurance card",
+  "verify_passport": "Passport",
+  "verify_permanentResident": "Permanent resident card",
+  "verify_startBtn": "Start verification",
+  "verify_approved": "Identity verified",
+  "verify_approvedDesc": "You can now accept snow removal jobs",
+  "verify_expiresOn": "Expires on {date}",
+  "@verify_expiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "verify_pendingTitle": "Verification in progress",
+  "verify_pendingDesc": "We are analyzing your documents. This may take a few minutes.",
+  "verify_refresh": "Refresh",
+  "verify_rejectedTitle": "Verification rejected",
+  "verify_attemptsRemaining": "Attempts remaining: {count}",
+  "@verify_attemptsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "verify_resubmit": "Resubmit my documents",
+  "verify_maxAttempts": "Maximum number of attempts reached",
+  "verify_contactSupport": "Please contact support for assistance.",
+  "verify_expiredTitle": "Verification expired",
+  "verify_expiredDesc": "Your identity verification has expired. Please resubmit your documents.",
+  "verify_renewBtn": "Renew my verification",
+  "worker_revenue": "Revenue",
+  "worker_urgentCount": "{count} urgent",
+  "@worker_urgentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "worker_myRevenue": "My revenue",
+  "resDetail_errorPrefix": "Error: {message}",
+  "@resDetail_errorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "resDetail_ratingSuccessTipError": "Rating sent, but tip error: {message}",
+  "@resDetail_ratingSuccessTipError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "resDetail_tipSent": "Thank you! Tip of {amount}$ sent",
+  "@resDetail_tipSent": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "resDetail_ratingSuccess": "Thank you for your rating!",
+  "activities_title": "Activities",
+  "activities_inProgress": "In progress",
+  "activities_completed": "Completed",
+  "activities_emptyCompleted": "No completed activities",
+  "activities_emptyInProgress": "No activities in progress",
+  "activities_emptyCompletedSubtitle": "Your completed snow removals will appear here",
+  "activities_emptyInProgressSubtitle": "Your ongoing snow removals will appear here",
+  "activities_total": "Total",
+  "reservationSuccess_title": "Reservation confirmed!",
+  "reservationSuccess_subtitle": "Your snow removal request has been successfully registered.",
+  "reservationSuccess_reservationNumber": "Reservation number",
+  "reservationSuccess_nextSteps": "Next steps",
+  "reservationSuccess_step1": "1. A snow worker will be assigned shortly",
+  "reservationSuccess_step2": "2. You will receive a notification",
+  "reservationSuccess_step3": "3. Track the progress in real time",
+  "reservationSuccess_backToHome": "Back to home",
+  "reservationSuccess_viewReservations": "View my reservations",
+  "step1_vehicle": "Vehicle",
+  "step1_location": "Location",
+  "step1_assignedSpot": "Assigned spot",
+  "step1_haveSpotNumber": "I have a spot number",
+  "step1_freeLocation": "Free location",
+  "step1_describeLocation": "Describe where the vehicle is located",
+  "step1_noVehicle": "No vehicle",
+  "step1_addFirstVehicle": "Add your first vehicle",
+  "step1_addVehicle": "Add a vehicle",
+  "step1_chipFrontBuilding": "In front of the building",
+  "step1_chipNearEntrance": "Near the entrance",
+  "step1_chipVisitorZone": "Visitor zone",
+  "step1_chipRearParking": "Rear parking",
+  "step2_gpsPosition": "GPS Position",
+  "step2_address": "Address",
+  "step2_searching": "Searching...",
+  "step2_positionDetected": "Position detected",
+  "step2_positionUnavailable": "Position unavailable, enable your GPS",
+  "step2_pleaseWait": "Please wait",
+  "step2_checkAddress": "Check the address below",
+  "step2_enterManually": "Enter the address manually",
+  "step2_refresh": "Refresh",
+  "step2_retry": "Retry",
+  "step2_addressValidated": "Address validated",
+  "step2_validateAddress": "Validate address",
+  "step2_addressTip": "The address helps our snow workers locate your vehicle",
+  "step3_departureDate": "Departure date",
+  "step3_departureTime": "Departure time",
+  "step3_selectDate": "Select a date",
+  "step3_selectTime": "Select a time",
+  "step3_urgentReservation": "Urgent reservation",
+  "step3_urgencyFee": "40% urgency fee applied",
+  "step4_additionalOptions": "Additional options",
+  "step4_snowDepth": "Snow depth",
+  "step4_summary": "Summary",
+  "step5_location": "Location",
+  "step5_yourReservation": "Your reservation",
+  "step5_total": "Total",
+  "step5_ourGuarantees": "Our guarantees",
+  "step5_freeCancellation": "Free cancellation",
+  "step5_upTo2hBefore": "Up to 2h before",
+  "step5_qualityGuarantee": "Quality guarantee",
+  "step5_satisfiedOrRefunded": "Satisfied or refunded",
+  "step5_photosAfter": "After photos",
+  "step5_proofOfService": "Proof of service",
+  "step5_punctuality": "Punctuality",
+  "step5_discountIfLate": "Discount if late",
+  "month_jan": "JAN",
+  "month_feb": "FEB",
+  "month_mar": "MAR",
+  "month_apr": "APR",
+  "month_may": "MAY",
+  "month_jun": "JUN",
+  "month_jul": "JUL",
+  "month_aug": "AUG",
+  "month_sep": "SEP",
+  "month_oct": "OCT",
+  "month_nov": "NOV",
+  "month_dec": "DEC",
+  "profile_photoUpdated": "Profile photo updated",
+  "profile_phoneVerified": "Phone number verified and updated",
+  "profile_verify": "Verify",
+  "subscription_selectedPlan": "You have selected the {planName} plan",
+  "@subscription_selectedPlan": {
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "subscription_comingSoon": "This feature will be available soon.",
+  "subscription_planSelected": "{planName} plan selected",
+  "@subscription_planSelected": {
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_legalNotices": "Legal notices",
+  "legal_appUsageRules": "App usage rules",
+  "worker_photoSentSuccess": "Photo sent successfully!",
+  "worker_positionConfirmed": "Position confirmed!",
+  "worker_coordinatesUnavailable": "Coordinates unavailable",
+  "worker_phoneUnavailable": "Phone number unavailable",
+  "worker_userNotAuth": "Error: user not authenticated",
+  "worker_iArrived": "I have arrived",
+  "worker_startJob": "Start",
+  "worker_openGps": "Open GPS",
+  "worker_finishJob": "Finish the job",
+  "worker_inFavorOfComplainant": "In favor of complainant",
+  "worker_inFavorOfDefendant": "In favor of defendant",
+  "worker_fullRefund": "Full refund",
+  "worker_partialRefund": "Partial refund",
+  "worker_noAction": "No action",
+  "worker_mutualAgreement": "Mutual agreement",
+  "worker_warningAction": "Warning",
+  "worker_permanentBan": "Permanent ban",
+  "worker_selectDecision": "Select a decision",
+  "worker_disputeResolvedSuccess": "Dispute resolved successfully",
+  "summary_reservationSummary": "Reservation summary",
+  "summary_spot": "Spot",
+  "summary_departure": "Departure",
+  "summary_options": "Options",
+  "summary_snow": "Snow",
+  "summary_place": "Spot {number}",
+  "@summary_place": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "option_windowScraping": "Window scraping",
+  "option_doorDeicing": "Door deicing",
+  "option_wheelClearance": "Wheel clearance",
+  "option_roofClearing": "Roof clearing",
+  "option_saltSpreading": "Salt spreading",
+  "option_lightsCleaning": "Lights cleaning",
+  "option_perimeterClearance": "Perimeter clearance",
+  "option_exhaustCheck": "Exhaust check",
+  "option_windowScrapingShort": "Windows",
+  "option_doorDeicingShort": "Doors",
+  "option_wheelClearanceShort": "Wheels",
+  "option_roofClearingShort": "Roof",
+  "option_saltSpreadingShort": "Salt",
+  "option_lightsCleaningShort": "Lights",
+  "option_perimeterClearanceShort": "Perimeter",
+  "option_exhaustCheckShort": "Exhaust",
+  "option_windowScrapingDesc": "Complete scraping of all windows",
+  "option_doorDeicingDesc": "Handle and lock deicing",
+  "option_wheelClearanceDesc": "Clearing snow around the wheels",
+  "option_roofClearingDesc": "Remove accumulated snow from the roof",
+  "option_saltSpreadingDesc": "Salt application around the vehicle",
+  "option_lightsCleaningDesc": "Cleaning headlights and taillights",
+  "option_perimeterClearanceDesc": "Complete snow removal around the vehicle",
+  "option_exhaustCheckDesc": "Check that the exhaust is clear",
+  "price_baseSnowRemoval": "Base snow removal",
+  "price_vehicleAdjustment": "Vehicle adjustment",
+  "price_parkingAdjustment": "Spot adjustment",
+  "price_snowSurcharge": "Snow surcharge",
+  "price_additionalOptions": "Additional options",
+  "price_urgencyFee": "Urgency fee (40%)",
+  "price_subtotal": "Subtotal",
+  "price_serviceFee": "Service fee",
+  "price_insuranceFee": "Insurance fee",
+  "price_taxesCalculatedFor": "Taxes calculated for: {province}",
+  "@price_taxesCalculatedFor": {
+    "placeholders": {
+      "province": {
+        "type": "String"
+      }
+    }
+  },
+  "price_totalToPay": "Total to pay",
+  "price_taxesIncluded": "Taxes included",
+  "price_urgentBanner": "Urgent reservation - Increased fees",
+  "snow_estimatedDepth": "Estimated snow depth",
+  "snow_optionalHelper": "Optional - Helps estimate the required time",
+  "ai_estimationTitle": "AI Estimation",
+  "ai_estimationSubtitle": "Suggested price based on demand",
+  "ai_priceFactors": "Price factors",
+  "ai_urgency": "Urgency",
+  "ai_weather": "Weather",
+  "ai_demand": "Demand",
+  "ai_zone": "Zone",
+  "ai_estimationLoading": "AI estimation in progress...",
+  "ai_estimationUnavailable": "AI estimation unavailable",
+  "worker_yesStart": "Yes, start",
+  "dispute_addEvidenceButton": "Add evidence",
+  "dispute_addEvidenceError": "Error adding evidence",
+  "dispute_addEvidenceTitle": "Add evidence",
+  "dispute_additionalDetailsOptional": "Additional details (optional)",
+  "dispute_addMorePhotos": "Add more photos",
+  "dispute_addPhotoOrDescription": "Add at least one photo or a description",
+  "dispute_addPhotosInstruction": "Add photos to support your response (photos of work done, conversation screenshots, etc.)",
+  "dispute_aiAnalysis": "AI Analysis",
+  "dispute_amount": "Amount",
+  "dispute_appeal": "Appeal",
+  "dispute_appealExplanation": "Explain why you are contesting this decision (minimum 50 characters):",
+  "dispute_appealJustificationHint": "Your justification...",
+  "dispute_appealSubmitted": "Appeal submitted successfully",
+  "dispute_attachedPhotos": "Attached photos",
+  "dispute_cannotSendReportRetry": "Unable to send the report. Please try again.",
+  "dispute_cannotSendResponseRetry": "Unable to send the response. Please try again.",
+  "dispute_claimedAmountValue": "Claimed amount: {amount} $",
+  "@dispute_claimedAmountValue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_confidencePercent": "{percent}%",
+  "@dispute_confidencePercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_confirmNoShowRequired": "Please confirm the worker's absence before submitting",
+  "dispute_confirmNoShowStatement": "I confirm that the snow worker did not show up for the scheduled service.",
+  "dispute_deadlines": "Deadlines",
+  "dispute_decisionFavorClaimant": "In your favor",
+  "dispute_decisionFavorRespondent": "In favor of the respondent",
+  "dispute_decisionFullRefund": "Full refund",
+  "dispute_decisionLabel": "Decision: {decision}",
+  "@dispute_decisionLabel": {
+    "placeholders": {
+      "decision": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_decisionMutualAgreement": "Mutual agreement",
+  "dispute_decisionNoAction": "No action",
+  "dispute_decisionPartialRefund": "Partial refund",
+  "dispute_describeEvidenceHint": "Describe the evidence provided...",
+  "dispute_describeSituationHint": "Describe the situation...",
+  "dispute_descriptionOptional": "Description (optional)",
+  "dispute_evidenceAddedMessage": "Your evidence has been added to the dispute file.",
+  "dispute_evidenceCount": "Evidence ({count})",
+  "@dispute_evidenceCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_evidenceStrength": "Evidence strength",
+  "dispute_evidenceTips": "Tips for good evidence",
+  "dispute_expired": "Expired",
+  "dispute_falseReportWarning": "False reports may result in penalties on your account.",
+  "dispute_filterAll": "All",
+  "dispute_filterOpen": "Open",
+  "dispute_filterResolved": "Resolved",
+  "dispute_filterUnderReview": "Under review",
+  "dispute_imagesLoadError": "Unable to load images",
+  "dispute_keyFindings": "Key findings:",
+  "dispute_maxPhotos": "Maximum 10 photos",
+  "dispute_minCharsRequired": "Minimum 50 characters required",
+  "dispute_noDisputes": "No disputes",
+  "dispute_noDisputesMessage": "You have no ongoing disputes. That's good news!",
+  "dispute_notAssigned": "Not assigned",
+  "dispute_notFound": "Dispute not found",
+  "dispute_notFoundMessage": "This dispute could not be found or has been deleted.",
+  "dispute_notifiedOfDecision": "You will be notified of the final decision.",
+  "dispute_notifiedWhenResolved": "You will be notified when the case is resolved.",
+  "dispute_openDate": "Open date",
+  "dispute_photoCount": "{count}/10 photos",
+  "@dispute_photoCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_photosLabel": "Photos",
+  "dispute_priority": "Priority",
+  "dispute_priorityHigh": "High",
+  "dispute_priorityLow": "Low",
+  "dispute_priorityMedium": "Medium",
+  "dispute_priorityUrgent": "Urgent",
+  "dispute_reasoning": "Reasoning",
+  "dispute_refund": "Refund",
+  "dispute_refundAmount": "Refund: {amount} $",
+  "@dispute_refundAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_refundIfConfirmed": "If the absence is confirmed, you will receive a refund of {amount} $.",
+  "@dispute_refundIfConfirmed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_remainingTimeDaysHours": "{days}d {hours}h remaining",
+  "@dispute_remainingTimeDaysHours": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_remainingTimeHoursMin": "{hours}h {minutes}min remaining",
+  "@dispute_remainingTimeHoursMin": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_remainingTimeMin": "{minutes}min remaining",
+  "@dispute_remainingTimeMin": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_reportAutoConfirmed": "Your report has been automatically confirmed. A refund will be processed.",
+  "dispute_reportNoShow": "Report no-show",
+  "dispute_reportNoShowButton": "Report the absence",
+  "dispute_reportSent": "Report sent",
+  "dispute_reportUnderReview": "Your report has been submitted and will be reviewed by our team.",
+  "dispute_reservationDetails": "Reservation details",
+  "dispute_resolvedCannotAddEvidence": "This dispute is resolved or closed. You cannot add evidence.",
+  "dispute_resolvedOn": "Resolved on {date}",
+  "@dispute_resolvedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_responseDeadlinePassed": "Response deadline passed",
+  "dispute_responseExpectedBefore": "Response expected before",
+  "dispute_responseHint": "Write your response here...",
+  "dispute_responseInstruction": "Explain your version of the facts. Be precise and factual.",
+  "dispute_responseSentMessage": "Your response has been recorded. The administrator will review the dispute and make a decision.",
+  "dispute_responseTooShort": "Your response is too short (minimum 50 characters)",
+  "dispute_riskFactors": "Risk factors",
+  "dispute_scheduledTime": "Scheduled time",
+  "dispute_snowWorkerLabel": "Snow worker",
+  "dispute_submitAppeal": "Submit appeal",
+  "dispute_submitEvidence": "Submit evidence",
+  "dispute_submittedOn": "Submitted on {date}",
+  "@dispute_submittedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_takePhoto": "Take a photo",
+  "dispute_tipsRelevantDocs": "Any relevant documents",
+  "dispute_viewDetails": "View details",
+  "dispute_workerDidNotCome": "Worker did not show up",
+  "dispute_workerDidNotComeDesc": "Report that the worker {name} did not come for the scheduled service.",
+  "@dispute_workerDidNotComeDesc": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "worker_accountAlreadyConfigured": "Your account is already configured!",
+  "worker_accountConfigured": "Account configured",
+  "worker_accountDeleted": "Account deleted",
+  "worker_accountsConfiguredCount": "{count} account(s) configured",
+  "@worker_accountsConfiguredCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "worker_accountSetAsPrimary": "Account set as primary",
+  "worker_accountVerified": "Account verified",
+  "worker_actions": "Actions",
+  "worker_actionSuccess": "Action successful",
+  "worker_activeJob": "Active job",
+  "worker_addAccount": "Add an account",
+  "worker_addBankAccountToReceive": "Add a bank account to receive your earnings",
+  "worker_additionalDetailsOptional": "Additional details (optional)",
+  "worker_arrivedConfirmedMessage": "You are {distanceMeters}m from the vehicle.\n\nYou can now start the work.",
+  "@worker_arrivedConfirmedMessage": {
+    "placeholders": {
+      "distanceMeters": {
+        "type": "int"
+      }
+    }
+  },
+  "worker_automaticTransfers": "Automatic transfers",
+  "worker_balance": "Balance",
+  "worker_bankAccounts": "Bank accounts",
+  "worker_basicInfo": "Basic information",
+  "worker_cameraPermissionError": "Unable to take photo. Check camera permissions.",
+  "worker_cancelJobQuestion": "Cancel the job?",
+  "worker_cancelReasonEquipmentFailure": "Equipment failure",
+  "worker_cancelReasonEquipmentFailureDesc": "My snow removal equipment has failed",
+  "worker_cancelReasonFamilyEmergency": "Family emergency",
+  "worker_cancelReasonFamilyEmergencyDesc": "I have a family emergency",
+  "worker_cancelReasonLabel": "Cancellation reason:",
+  "worker_cancelReasonMedicalEmergency": "Medical emergency",
+  "worker_cancelReasonMedicalEmergencyDesc": "I have a personal medical emergency",
+  "worker_cancelReasonRoadBlocked": "Road blocked",
+  "worker_cancelReasonRoadBlockedDesc": "The road to the client is blocked or inaccessible",
+  "worker_cancelReasonSevereWeather": "Dangerous weather conditions",
+  "worker_cancelReasonSevereWeatherDesc": "Weather conditions make the trip dangerous",
+  "worker_cancelReasonVehicleBreakdown": "Vehicle breakdown",
+  "worker_cancelReasonVehicleBreakdownDesc": "My vehicle has broken down or has a mechanical issue",
+  "worker_cancelThisJob": "Cancel this job",
+  "worker_cancelWarning": "You will not be paid for this job.\nFrequent cancellations may result in suspension.",
+  "worker_cannotDeterminePosition": "Unable to determine your position. Enable location and try again.",
+  "worker_cannotOpenStripeLink": "Unable to open the Stripe link",
+  "worker_canNowFinish": "You can now finish",
+  "worker_configureNow": "Configure now",
+  "worker_configurePayments": "Configure your payments",
+  "worker_confirmCancellation": "Confirm cancellation",
+  "worker_confirmCompleteJob": "Are you sure you want to mark this job as completed?",
+  "worker_connectingToStripe": "Connecting to Stripe...",
+  "worker_continueSetup": "Continue setup",
+  "worker_deleteAccountConfirm": "Are you sure you want to delete the account ending in {last4}?",
+  "@worker_deleteAccountConfirm": {
+    "placeholders": {
+      "last4": {
+        "type": "String"
+      }
+    }
+  },
+  "worker_deleteAccountQuestion": "Delete this account?",
+  "worker_depositsIn23Days": "Deposits within 2-3 business days",
+  "worker_documentsRequired": "Required documents",
+  "worker_documentsSubmitted": "Documents submitted",
+  "worker_documentsVerified": "Documents verified",
+  "worker_enlarge": "Enlarge",
+  "worker_enRoute": "En route",
+  "worker_fundsDepositedInfo": "Funds are deposited to your bank account within 2-3 business days.",
+  "worker_goodJob": "Good job!",
+  "worker_headToClient": "Head to the client",
+  "worker_howItWorks": "How it works",
+  "worker_identityVerificationInfo": "To receive your payments, Stripe must verify your identity. Prepare the following documents:",
+  "worker_jobCompletedSuccess": "Job completed successfully!",
+  "worker_jobStarted": "Job started!",
+  "worker_locationError": "Location error",
+  "worker_locationPermissionDenied": "Location permission denied",
+  "worker_locationPermissionDeniedForever": "Location permission permanently denied. Enable it in settings.",
+  "worker_manageBankAccounts": "Manage my bank accounts",
+  "worker_noBankAccount": "No bank account",
+  "worker_noBankAccountWarning": "No bank account configured. Add one to receive your earnings.",
+  "worker_noGpsConfirmArrival": "This job has no GPS coordinates recorded.\n\nDo you confirm you have arrived at the indicated location?",
+  "worker_notChargedForJob": "You will not be charged for this job.",
+  "worker_paymentDistribution": "Payment distribution",
+  "worker_paymentExample": "Example: For a $50 job, you receive {amount}$",
+  "@worker_paymentExample": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "worker_payments": "Payments",
+  "worker_paymentsActive": "Payments active",
+  "worker_payoutsActive": "Payouts active",
+  "worker_photoId": "Photo ID",
+  "worker_photoIdDesc": "Driver's license, passport or ID card",
+  "worker_photoOfCompletedWork": "Photo of completed work",
+  "worker_photoRequired": "Photo required",
+  "worker_photoRequirements": "Photo requirements",
+  "worker_photoUploadError": "Unable to upload the photo. Check your connection.",
+  "worker_platformCommission": "Platform commission",
+  "worker_poweredByStripe": "Powered by Stripe",
+  "worker_poweredByStripeLeader": "Powered by Stripe, the world leader in payments",
+  "worker_pressEnRouteToStart": "Press \"En route\" to start",
+  "worker_primary": "Primary",
+  "worker_primaryAccount": "Primary account",
+  "worker_primaryAccountInfo": "Your earnings will be deposited to the account marked as primary.",
+  "worker_proofOfAddress": "Proof of address",
+  "worker_proofOfAddressDesc": "Recent utility bill or bank statement",
+  "worker_readyToReceive": "Ready to receive payments",
+  "worker_receiveEarningsDirectly": "Receive your earnings directly",
+  "worker_reqColorPhoto": "Color photo (JPG or PNG format)",
+  "worker_reqNameDobVisible": "Name and date of birth visible",
+  "worker_reqNotExpired": "Document not expired",
+  "worker_reqOriginalDoc": "Original document, not a photocopy",
+  "worker_retakePhoto": "Retake",
+  "worker_securePayments": "Secure payments",
+  "worker_sendDocumentsToActivate": "Send your identity documents to activate payouts.",
+  "worker_sending": "Sending...",
+  "worker_sendMyDocuments": "Send my documents",
+  "worker_setAsPrimary": "Set as primary",
+  "worker_statusUnknown": "Unknown",
+  "worker_statusUpdatedEnRoute": "Status updated: En route",
+  "worker_step1ClientPays": "The client pays",
+  "worker_step1Subtitle": "Payment is processed by Stripe",
+  "worker_step1SubtitleShort": "Payment processed by Stripe",
+  "worker_step2AutoDistribution": "Automatic distribution",
+  "worker_step2Distribution": "Distribution",
+  "worker_step2Subtitle": "Your share is calculated instantly",
+  "worker_step2SubtitleShort": "Your share is calculated",
+  "worker_step3Deposit": "Deposit",
+  "worker_step3DepositToAccount": "Deposit to your account",
+  "worker_step3Subtitle": "Within 2-3 business days",
+  "worker_stripeResponse": "Stripe response: {response}",
+  "@worker_stripeResponse": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "worker_stripeVerifying": "Stripe is verifying your information",
+  "worker_takePhoto": "Take a photo",
+  "worker_takePhotoBeforeFinish": "Take a photo before finishing",
+  "worker_timeElapsed": "Time elapsed",
+  "worker_tooFar": "Too far",
+  "worker_tooFarMessage": "You are {distanceMeters}m from the vehicle.\n\nYou must be within {maxRadius}m to confirm your arrival.\n\nContinue approaching.",
+  "@worker_tooFarMessage": {
+    "placeholders": {
+      "distanceMeters": {
+        "type": "int"
+      },
+      "maxRadius": {
+        "type": "int"
+      }
+    }
+  },
+  "worker_verificationInProgress": "Verification in progress",
+  "worker_verificationTimeInfo": "Verification may take a few minutes to 24 hours.",
+  "worker_verifyingPosition": "Verifying your position...",
+  "worker_viewStatusOnStripe": "View status on Stripe",
+  "worker_viewStripeDashboard": "View my Stripe dashboard",
+  "worker_workInProgress": "Work in progress...",
+  "worker_youReceive": "You receive",
+  "verification_addPhoto": "Add a photo",
+  "verification_backOptional": "Back (optional)",
+  "verification_backSubtitle": "If your document has a back side",
+  "verification_captureBack": "Photograph the back",
+  "verification_captureFront": "Photograph the front",
+  "verification_choosePhoto": "Choose a photo",
+  "verification_continueToSelfie": "Continue to selfie",
+  "verification_fromGallery": "From gallery",
+  "verification_frontRequired": "Front (required)",
+  "verification_frontSubtitle": "Side with your photo",
+  "verification_idBack": "ID document (back)",
+  "verification_idFront": "ID document (front)",
+  "verification_photoTips": "Place the document on a flat surface, ensure good lighting, avoid reflections and shadows, capture the entire document.",
+  "verification_photoTipsTitle": "Tips for a good photo",
+  "verification_privacyNote": "Your documents will be securely analyzed and deleted after verification.",
+  "verification_retake": "Retake",
+  "verification_selfieInstructions": "Look directly at the camera, keep a neutral face, ensure good lighting, remove sunglasses and hat.",
+  "verification_selfieRequired": "Please take a selfie",
+  "verification_takeSelfie": "Take a selfie",
+  "verification_takeSelfieBtn": "Take the selfie",
+  "verification_yourSelfie": "Your selfie",
+  "profile_changePhoto": "Change profile photo",
+  "profile_chooseFromGallery": "Choose from gallery",
+  "profile_deletePhoto": "Delete photo",
+  "profile_deletePhotoConfirm": "Are you sure you want to delete your profile photo?",
+  "profile_editTitle": "Edit profile",
+  "profile_emailNotEditable": "Email cannot be modified",
+  "profile_firstNameRequired": "First name is required",
+  "profile_lastNameRequired": "Last name is required",
+  "profile_personalInfo": "Personal information",
+  "profile_phoneInvalid": "Invalid phone format",
+  "profile_photoSelectionError": "Error during selection: {error}",
+  "@profile_photoSelectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_saveChanges": "Save changes",
+  "profile_smsVerification": "SMS Verification",
+  "profile_smsVerificationNote": "An SMS code will be sent to verify the new number",
+  "profile_takePhoto": "Take a photo",
+  "profile_verificationCodeSentTo": "A verification code has been sent to:",
+  "subscription_basic": "Basic",
+  "subscription_basicFeature1": "Up to 5 snow removals/month",
+  "subscription_basicFeature2": "Normal priority",
+  "subscription_basicFeature3": "Email support",
+  "subscription_choosePlan": "Choose your plan",
+  "subscription_choosePlanBtn": "Choose this plan",
+  "subscription_month": "month",
+  "subscription_planTitle": "{planName} plan",
+  "@subscription_planTitle": {
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "subscription_premium": "Premium",
+  "subscription_premiumFeature1": "Unlimited snow removals",
+  "subscription_premiumFeature2": "High priority",
+  "subscription_premiumFeature3": "24/7 support",
+  "subscription_premiumFeature4": "SMS notifications",
+  "subscription_priceLabel": "{price}/{period}",
+  "@subscription_priceLabel": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "subscription_recommended": "RECOMMENDED",
+  "subscription_saveWith": "Save with our seasonal plans",
+  "subscription_season": "season",
+  "subscription_seasonal": "Seasonal",
+  "subscription_seasonalFeature1": "Everything in Premium",
+  "subscription_seasonalFeature2": "Multiple vehicles",
+  "subscription_seasonalFeature3": "Dedicated manager",
+  "subscription_seasonalFeature4": "Detailed reports",
+  "subscription_seasonalFeature5": "Satisfaction guarantee",
+  "subscription_title": "Subscriptions",
+  "legal_andThe": " and the ",
+  "legal_contactEmail": "Contact: privacy@deneige-auto.com",
+  "legal_iAccept": "I accept the ",
+  "legal_lastUpdated": "Last updated: {date}",
+  "@legal_lastUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_privacyPolicy": "Privacy policy",
+  "legal_privacyPolicySubtitle": "How we protect your data",
+  "legal_rightsDescription": "In accordance with Quebec's Law 25, you may request access, rectification or deletion of your personal data.",
+  "legal_termsOfService": "Terms of service",
+  "legal_yourRights": "Your rights",
+  "ai_alert": "Alert",
+  "ai_analysisInProgress": "AI analysis in progress...",
+  "ai_analysisLabel": "AI Analysis",
+  "ai_analysisUnavailable": "Analysis unavailable",
+  "ai_analyzedOn": "Analyzed on {date}",
+  "@ai_analyzedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_basePrice": "Base price",
+  "ai_completeness": "Completeness",
+  "ai_criticalIssue": "Critical issue detected",
+  "ai_estimatedDuration": "Estimated duration",
+  "ai_estimatedSnow": "Estimated snow",
+  "ai_estimation": "AI Estimation",
+  "ai_improvementPoints": "Points to improve",
+  "ai_issuesDetected": "Issues detected",
+  "ai_multiplier": "Multiplier",
+  "ai_notDetected": "Not detected",
+  "ai_noVehicleDetected": "No vehicle detected in the photo",
+  "ai_noVehicleDetectedBullet": "No vehicle detected",
+  "ai_perfect": "Perfect!",
+  "ai_photoAlert": "Photo Alert",
+  "ai_photosAnalyzed": "{count} photos analyzed",
+  "@ai_photosAnalyzed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ai_priceRange": "Range",
+  "ai_quality": "Quality",
+  "ai_qualityVerification": "Work quality verification",
+  "ai_retakePhoto": "Retake photo",
+  "ai_snowDepth": "~{depth} cm snow",
+  "@ai_snowDepth": {
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_subtotal": "Subtotal",
+  "ai_summary": "Summary",
+  "ai_surchargesApplied": "Surcharges applied",
+  "ai_suspiciousPhoto": "Suspicious photo detected - Please retake an authentic photo",
+  "ai_suspiciousPhotoFraud": "Suspicious photo (possible fraud)",
+  "ai_taxIncluded": "tax included",
+  "ai_total": "Total",
+  "ai_tps": "GST (5%)",
+  "ai_tvq": "QST (9.975%)",
+  "ai_vehicle": "Vehicle",
+  "ai_verificationLater": "AI verification will be performed later",
+  "chat_today": "Today",
+  "chat_yesterday": "Yesterday",
+  "step1_freeLocationHint": "E.g.: In front of building A...",
+  "step1_spotNumberHint": "E.g.: P32, A-15, 205...",
+
+  "worker_greetingName": "Hello, {name}",
+  "@worker_greetingName": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "worker_headerAvailable": "Available",
+  "worker_headerOffline": "Offline",
+
+  "worker_statsCompleted": "Completed",
+  "worker_statsInProgress": "In progress",
+  "worker_statsRevenue": "Revenue",
+  "worker_statsRating": "Rating",
+  "worker_statsToday": "today",
+
+  "worker_youAreOnline": "You are online",
+  "worker_receivingSnowRequests": "You are receiving snow removal requests",
+  "worker_activateToReceiveRequests": "Activate to receive requests",
+
+  "worker_activeCount": "{count} active",
+  "@worker_activeCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "worker_jobCount": "{count} job{count, plural, =1{} other{s}}",
+  "@worker_jobCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "worker_statusAvailable": "Available",
+  "worker_statusAssigned": "Assigned",
+  "worker_statusEnRoute": "En route",
+  "worker_statusInProgress": "In progress",
+  "worker_statusCompleted": "Completed",
+  "worker_statusCancelled": "Cancelled",
+
+  "worker_serviceWindowScraping": "Window scraping",
+  "worker_serviceDoorDeicing": "Door de-icing",
+  "worker_serviceWheelClearance": "Wheel clearance",
+  "worker_serviceRoofClearing": "Roof clearing",
+  "worker_serviceSaltSpreading": "Salt spreading",
+  "worker_serviceLightsCleaning": "Lights cleaning",
+  "worker_servicePerimeterClearance": "Perimeter clearance",
+  "worker_serviceExhaustCheck": "Exhaust check",
+
+  "worker_serviceWindows": "Windows",
+  "worker_serviceDoors": "Doors",
+  "worker_serviceWheels": "Wheels",
+  "worker_serviceRoof": "Roof",
+  "worker_serviceSalt": "Salt",
+  "worker_serviceLights": "Lights",
+  "worker_servicePerimeter": "Perimeter",
+  "worker_serviceExhaustShort": "Exhaust",
+
+  "worker_acceptLabel": "ACCEPT",
+  "worker_passLabel": "PASS",
+  "worker_accepting": "Accepting...",
+  "worker_acceptThisJob": "Accept this job",
+  "worker_swipeHint": "Swipe → accept  |  ← pass",
+  "worker_exceeded": "EXCEEDED",
+  "worker_urgent": "URGENT",
+  "worker_equipmentCompatible": "Equipment compatible",
+  "worker_equipmentRequiredLabel": "Equipment required",
+  "worker_distanceAndTime": "{km} km • ~{min} min",
+  "@worker_distanceAndTime": {
+    "placeholders": {
+      "km": { "type": "String" },
+      "min": { "type": "String" }
+    }
+  },
+  "worker_dateAtTime": "{date} at {time}",
+  "@worker_dateAtTime": {
+    "placeholders": {
+      "date": { "type": "String" },
+      "time": { "type": "String" }
+    }
+  },
+
+  "worker_verificationOngoing": "Verification in progress",
+  "worker_verificationOngoingSubtitle": "Your documents are being reviewed. You will be notified once the verification is complete.",
+  "worker_verificationRejectedSubtitle": "Your documents were not approved. Please resubmit valid documents.",
+  "worker_verificationExpiredSubtitle": "Your verification has expired. Please resubmit your documents.",
+  "worker_verificationRequiredSubtitle": "Verify your identity to be able to accept snow removal jobs.",
+  "worker_verificationRequiredForJobs": "Verify your identity to accept jobs.",
+
+  "worker_retryLabel": "Retry",
+
+  "worker_notifUrgentJob": "🚨 URGENT JOB!",
+  "worker_notifNewJobAvailable": "📍 New job available",
+  "worker_notifNewJobBody": "{address} - {price}$ - {distance} km",
+  "@worker_notifNewJobBody": {
+    "placeholders": {
+      "address": { "type": "String" },
+      "price": { "type": "String" },
+      "distance": { "type": "String" }
+    }
+  },
+  "worker_notifUrgentJobsAvailable": "🚨 New urgent jobs!",
+  "worker_notifNewJobsAvailable": "📍 New jobs available",
+  "worker_notifNewJobsNearby": "{count} new job{count, plural, =1{} other{s}} near you!",
+  "@worker_notifNewJobsNearby": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "worker_notifJobAccepted": "✅ Job accepted!",
+  "worker_notifGoTo": "Head to {address}",
+  "@worker_notifGoTo": {
+    "placeholders": {
+      "address": { "type": "String" }
+    }
+  },
+  "worker_notifJobDone": "🎉 Work completed!",
+  "worker_notifEarned": "You earned {amount}$",
+  "@worker_notifEarned": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "worker_notifChannelUrgent": "Urgent Jobs",
+  "worker_notifChannelNew": "New Jobs",
+  "worker_notifChannelUrgentDesc": "Notifications for urgent jobs",
+  "worker_notifChannelNewDesc": "Notifications for new jobs",
+
+  "worker_businessNewJobsCount": "{count} new jobs",
+  "@worker_businessNewJobsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "worker_businessIncludingUrgent": "Including urgent jobs!",
+  "worker_businessNearYou": "Available near you",
+  "worker_businessJobConfirmed": "Job confirmed!",
+  "worker_businessJobCancelled": "Job cancelled",
+  "worker_businessJobCancelledBody": "The job at {address} has been cancelled",
+  "@worker_businessJobCancelledBody": {
+    "placeholders": {
+      "address": { "type": "String" }
+    }
+  },
+  "worker_businessJobCancelledReason": "The job at {address} has been cancelled: {reason}",
+  "@worker_businessJobCancelledReason": {
+    "placeholders": {
+      "address": { "type": "String" },
+      "reason": { "type": "String" }
+    }
+  },
+  "worker_businessJobModified": "Job modified",
+  "worker_businessPaymentReceived": "Payment received!",
+  "worker_businessPaymentAmount": "{amount}$ for {description}",
+  "@worker_businessPaymentAmount": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "description": { "type": "String" }
+    }
+  },
+  "worker_businessBonusEarned": "🎁 Bonus earned!",
+  "worker_businessBonusTitle": "Bonus earned!",
+  "worker_businessBonusBody": "+{amount}$ - {reason}",
+  "@worker_businessBonusBody": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "reason": { "type": "String" }
+    }
+  },
+  "worker_businessWeeklyPayout": "💰 Payout ready!",
+  "worker_businessWeeklyPayoutBody": "Your payout of {amount}$ is available",
+  "@worker_businessWeeklyPayoutBody": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "worker_businessPayoutAvailable": "Payout available",
+  "worker_businessNewRating": "New rating!",
+  "worker_businessRatingReceived": "Rating received",
+  "worker_businessRatingStars": "{rating} stars",
+  "@worker_businessRatingStars": {
+    "placeholders": {
+      "rating": { "type": "int" }
+    }
+  },
+  "worker_businessPerformanceAlert": "⚠️ Warning!",
+  "worker_businessPerformanceTitle": "Performance alert",
+  "worker_businessMilestone": "🏆 Congratulations!",
+  "worker_businessKeepGoing": "Keep it up!",
+  "worker_businessDocExpiring": "📄 Document expiring",
+  "worker_businessDocExpiringBody": "Your {docType} expires in {days} days",
+  "@worker_businessDocExpiringBody": {
+    "placeholders": {
+      "docType": { "type": "String" },
+      "days": { "type": "int" }
+    }
+  },
+  "worker_businessDocExpiringTitle": "Document expiring",
+  "worker_businessDocExpiringShort": "{docType} - {days} days",
+  "@worker_businessDocExpiringShort": {
+    "placeholders": {
+      "docType": { "type": "String" },
+      "days": { "type": "int" }
+    }
+  },
+  "worker_businessHighDemand": "📈 High demand zone!",
+  "worker_businessHighDemandBody": "{zone} - {multiplier}x earnings!",
+  "@worker_businessHighDemandBody": {
+    "placeholders": {
+      "zone": { "type": "String" },
+      "multiplier": { "type": "String" }
+    }
+  },
+  "worker_businessHighDemandTitle": "High demand zone",
+  "worker_businessHighDemandShort": "{zone} - {multiplier}x",
+  "@worker_businessHighDemandShort": {
+    "placeholders": {
+      "zone": { "type": "String" },
+      "multiplier": { "type": "String" }
+    }
+  },
+  "worker_businessWeatherAlert": "❄️ Storm forecast!",
+  "worker_businessWeatherBody": "{forecast} - About {count} jobs expected",
+  "@worker_businessWeatherBody": {
+    "placeholders": {
+      "forecast": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "worker_businessWeatherTitle": "Weather opportunity",
+  "worker_businessClientEnRoute": "Snow worker on the way!",
+  "worker_businessClientEta": "Estimated arrival in {minutes} minutes",
+  "@worker_businessClientEta": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "worker_businessWorkStarted": "Snow removal started",
+  "worker_businessWorkStartedBody": "The snow removal on your vehicle has started",
+  "worker_businessWorkCompleted": "Snow removal complete!",
+  "worker_businessWorkCompletedBody": "Your vehicle is ready",
+  "worker_businessWorkerMessage": "Message from snow worker",
+
+  "privacy_introTitle": "Introduction",
+  "privacy_introBody": "Welcome to Deneige Auto. We are committed to protecting your privacy and personal data. This policy explains how we collect, use and protect your information.",
+  "privacy_dataCollectedTitle": "Data collected",
+  "privacy_dataCollectedBody": "We collect the following data:\n• Identification information (name, email, phone)\n• Location information for snow removal service\n• Vehicle information\n• Payment data (securely processed by Stripe)\n• Your reservation history",
+  "privacy_dataUsageTitle": "Data usage",
+  "privacy_dataUsageBody": "Your data is used to:\n• Provide our snow removal services\n• Communicate with you about your reservations\n• Improve our services\n• Process your payments securely\n• Send you relevant notifications",
+  "privacy_dataSharingTitle": "Data sharing",
+  "privacy_dataSharingBody": "We only share your data with:\n• Snow workers assigned to your reservations (information needed for service)\n• Stripe for payment processing\n• Authorities if required by law",
+  "privacy_securityTitle": "Security",
+  "privacy_securityBody": "We use industry-standard security measures to protect your data, including encryption of sensitive data and secure connections (HTTPS).",
+  "privacy_retentionTitle": "Data retention",
+  "privacy_retentionBody": "Your data is retained as long as your account is active. After deleting your account, your data is erased within 30 days.",
+  "privacy_rightsTitle": "Your rights",
+  "privacy_rightsBody": "You have the right to:\n• Access your personal data\n• Correct inaccurate data\n• Delete your account and data\n• Export your data\n• Withdraw your consent at any time",
+  "privacy_cookiesTitle": "Cookies and similar technologies",
+  "privacy_cookiesBody": "Our mobile application does not use cookies. We use device identifiers only for push notifications.",
+  "privacy_contactTitle": "Contact",
+  "privacy_contactBody": "For any questions about this privacy policy, contact us via the \"Help & Support\" section of the app or by email at support@deneige-auto.ca",
+
+  "terms_section1Title": "1. Acceptance of terms",
+  "terms_section1Body": "By using the Deneige Auto application, you agree to be bound by these terms of use. If you do not accept these terms, please do not use the application.",
+  "terms_section2Title": "2. Service description",
+  "terms_section2Body": "Deneige Auto is a platform connecting clients who need snow removal services with independent service providers (snow workers). We are not the employer of the snow workers.",
+  "terms_section3Title": "3. Registration and account",
+  "terms_section3Body": "To use our services, you must:\n• Be at least 18 years old\n• Provide accurate and up-to-date information\n• Maintain the confidentiality of your credentials\n• Inform us of any unauthorized use of your account",
+  "terms_section4Title": "4. Reservations and payments",
+  "terms_section4Body": "• Displayed prices include applicable taxes\n• Payment is made at the time of reservation\n• Cancellations are subject to our cancellation policy\n• A refund may be requested under applicable conditions",
+  "terms_section5Title": "5. Cancellation policy",
+  "terms_section5Body": "• Cancellation more than 24h before: full refund\n• Cancellation between 12h and 24h before: 50% refund\n• Cancellation less than 12h before: no refund\n• Cancellation by snow worker: full refund and reassignment priority",
+  "terms_section6Title": "6. User responsibilities",
+  "terms_section6Body": "You agree to:\n• Provide safe access to the vehicle\n• Accurately describe the vehicle location\n• Be available for urgent communication\n• Respect the snow workers and their work",
+  "terms_section7Title": "7. Snow worker responsibilities",
+  "terms_section7Body": "Snow workers agree to:\n• Perform the service professionally\n• Respect agreed schedules\n• Take care of clients' vehicles\n• Report any problems or damage",
+  "terms_section8Title": "8. Limitation of liability",
+  "terms_section8Body": "Deneige Auto acts as an intermediary and cannot be held liable for direct or indirect damages resulting from the execution of services by snow workers. Any dispute must be reported within 24 hours of service.",
+  "terms_section9Title": "9. Intellectual property",
+  "terms_section9Body": "All application content (logos, text, images, code) is the property of Deneige Auto and is protected by intellectual property laws.",
+  "terms_section10Title": "10. Changes to terms",
+  "terms_section10Body": "We reserve the right to modify these terms at any time. Users will be notified of significant changes by notification in the application.",
+  "terms_section11Title": "11. Termination",
+  "terms_section11Body": "We may suspend or terminate your account in case of violation of these terms. You may delete your account at any time from the application settings.",
+  "terms_section12Title": "12. Applicable law",
+  "terms_section12Body": "These terms are governed by the laws of the province of Quebec, Canada. Any dispute shall be submitted to the competent courts of Montreal.",
+  "terms_section13Title": "13. Contact",
+  "terms_section13Body": "For any questions about these terms, contact us via the \"Help & Support\" section of the application.",
+
+  "faq_catGeneral": "General",
+  "faq_catReservations": "Reservations",
+  "faq_catPayments": "Payments",
+  "faq_catDisputes": "Disputes",
+  "faq_catAccount": "Account",
+
+  "aiChat_suggestions": "Suggestions",
+
+  "worker_navHome": "Home",
+  "worker_navEarnings": "Earnings",
+  "worker_navPayments": "Payments",
+  "worker_navProfile": "Profile",
+
+  "earnings_myEarnings": "My earnings",
+  "earnings_day": "Day",
+  "earnings_week": "Week",
+  "earnings_month": "Month",
+  "earnings_retry": "Retry",
+  "earnings_today": "Today",
+  "earnings_thisWeek": "This week",
+  "earnings_thisMonth": "This month",
+  "earnings_jobs": "Jobs",
+  "earnings_tips": "Tips",
+  "earnings_average": "Average",
+  "earnings_goalAmount": "Goal: {amount}$",
+  "@earnings_goalAmount": {
+    "placeholders": {
+      "amount": { "type": "int" }
+    }
+  },
+  "earnings_goalReached": "Goal reached!",
+  "earnings_completed": "Completed",
+  "earnings_inProgress": "In progress",
+  "earnings_assigned": "Assigned",
+  "earnings_earnings": "Earnings",
+  "earnings_tipsShort": "Tips",
+  "earnings_jobHistory": "Job history",
+  "earnings_viewAllJobs": "View all your completed jobs",
+  "earnings_earningsPerDay": "Earnings per day",
+  "earnings_dayMon": "Mon",
+  "earnings_dayTue": "Tue",
+  "earnings_dayWed": "Wed",
+  "earnings_dayThu": "Thu",
+  "earnings_dayFri": "Fri",
+  "earnings_daySat": "Sat",
+  "earnings_daySun": "Sun",
+  "earnings_overallStats": "Overall statistics",
+  "earnings_totalJobs": "Total jobs",
+  "earnings_totalEarnings": "Total earnings",
+  "earnings_totalTips": "Total tips",
+  "earnings_averageRating": "Average rating",
+
+  "workerFaq_q1": "How do I become a snow worker on Deneige Auto?",
+  "workerFaq_a1": "To become a snow worker, you need to create an account as a snow worker, complete your profile with your personal information, add your available equipment, and configure your bank account to receive payments.",
+  "workerFaq_q2": "What are the requirements to be a snow worker?",
+  "workerFaq_a2": "You must be at least 18 years old, own basic snow removal equipment (shovel, broom, scraper), be available during snow periods, and have a Canadian bank account to receive payments.",
+  "workerFaq_q3": "Can I choose my work zones?",
+  "workerFaq_a3": "Yes! In your settings, you can define your preferred zones. You will receive priority notifications for jobs in these zones, but you can also accept jobs elsewhere.",
+  "workerFaq_q4": "What is the AI Assistant?",
+  "workerFaq_a4": "The AI Assistant is your virtual helper available 24/7 in the app. It can answer your questions about jobs, help you solve problems, give advice to improve your service, and inform you about weather conditions to plan your day.",
+  "workerFaq_q5": "How do I use the AI Assistant?",
+  "workerFaq_a5": "Access the AI Assistant from the main menu. Ask your questions in natural language:\n- \"What jobs are available near me?\"\n- \"How do I respond to a dispute?\"\n- \"What weather is expected tomorrow?\"\n- \"How can I improve my score?\"\nThe assistant will respond instantly.",
+  "workerFaq_q6": "Can the AI Assistant help me with the weather?",
+  "workerFaq_a6": "Yes! The AI Assistant has access to real-time weather forecasts. Ask it for current conditions or forecasts to plan your availability. This way, you can anticipate high-demand days during snowstorms.",
+  "workerFaq_q7": "How do I receive jobs?",
+  "workerFaq_a7": "Activate your availability in the app. You will receive push notifications for new jobs available in your zone. You can then accept or decline each job.",
+  "workerFaq_q8": "Can I accept multiple jobs at the same time?",
+  "workerFaq_a8": "Yes, you can manage up to 5 jobs simultaneously. In your settings, define the maximum number of active jobs you want at a time. We recommend 2-3 jobs for optimal service.",
+  "workerFaq_q9": "How do I cancel an accepted job?",
+  "workerFaq_a9": "You can cancel a job before starting the work. Go to the job details and tap \"Cancel\". Warning: frequent cancellations may affect your score and visibility.",
+  "workerFaq_q10": "What if I can't find the vehicle?",
+  "workerFaq_a10": "Use the built-in messaging to contact the client. If the vehicle is not found after 15 minutes and the client doesn't respond, you can report the issue and cancel the job without penalty.",
+  "workerFaq_q11": "How do I report a problem with a job?",
+  "workerFaq_a11": "In the job details, tap \"Report a problem\". Describe the situation and add photos if needed. Our team will review your report promptly.",
+  "workerFaq_q12": "How do I get paid?",
+  "workerFaq_a12": "Payments are made automatically via Stripe Connect. After each completed job, the amount is transferred to your bank account within 2-7 business days.",
+  "workerFaq_q13": "How do I set up my bank account?",
+  "workerFaq_a13": "Go to Settings > My Payments > Stripe Setup. Follow the steps to verify your identity and add your banking information. This process is secure and required to receive payments.",
+  "workerFaq_q14": "How are my earnings calculated?",
+  "workerFaq_a14": "Your earnings depend on the type of service (standard snow removal, with options), vehicle size, and distance. You see the exact amount before accepting each job. Deneige Auto charges a 15% commission.",
+  "workerFaq_q15": "How do tips work?",
+  "workerFaq_a15": "Clients can leave a tip after the service. Tips are 100% yours, with no commission. You receive a notification and the amount is added to your next payment.",
+  "workerFaq_q16": "Where can I see my earnings history?",
+  "workerFaq_a16": "Go to the \"Earnings\" tab to see your daily, weekly, and monthly earnings. You can also see the details of each job and tips received.",
+  "workerFaq_q17": "What happens if a client reports a no-show?",
+  "workerFaq_a17": "If a client reports that you didn't show up, you will receive a notification and have the opportunity to respond. If you marked \"On my way\" in the app, this will be taken into account. False reports by clients are also sanctioned.",
+  "workerFaq_q18": "How do I respond to a dispute?",
+  "workerFaq_a18": "To respond to a dispute:\n1. Go to Profile > My Disputes\n2. Open the relevant dispute\n3. Tap \"Respond to dispute\"\n4. Explain your version of events in detail\n5. Add photos as evidence (before/after, screenshots, etc.)\n6. Submit your response\n\nYou generally have 48 hours to respond.",
+  "workerFaq_q19": "How do I add evidence to my defense?",
+  "workerFaq_a19": "Evidence is essential to defend your position. In the dispute details, use \"Add evidence\" to:\n- Before/after snow removal photos\n- Communication screenshots\n- Timestamped photos on site\n- Any relevant document\n\nYou can add up to 10 photos and a detailed description.",
+  "workerFaq_q20": "What is AI dispute analysis?",
+  "workerFaq_a20": "Our system uses artificial intelligence to objectively analyze each dispute. The AI examines:\n- Photos and evidence from both parties\n- GPS data and timestamps\n- Client and worker history\n- Statement consistency\n\nThis analysis helps make fair decisions. If the AI detects a false report, it works in your favor.",
+  "workerFaq_q21": "Why is taking before/after photos important?",
+  "workerFaq_a21": "Before/after photos are your best evidence:\n- They document the initial state and work completed\n- The AI can analyze the quality of snow removal\n- In case of dispute, they prove your work\n- They are automatically timestamped\n\nMake it a habit to photograph every job!",
+  "workerFaq_q22": "What are the consequences of a dispute against me?",
+  "workerFaq_a22": "Consequences depend on the decision and your history:\n- First warning: notification\n- Repeat offense: temporary suspension (3-7 days)\n- Repeated issues: extended suspension (30 days)\n- Serious cases: permanent ban\n\nMaintain good service to avoid disputes.",
+  "workerFaq_q23": "How do I contest an unfavorable decision?",
+  "workerFaq_a23": "If you disagree with the decision on a dispute, you can appeal within 7 days. Provide additional evidence (photos, messages, etc.) to support your case.",
+  "workerFaq_q24": "How do I report a problematic client?",
+  "workerFaq_a24": "If a client is abusive, unreachable despite your efforts, or makes false claims, you can report them in the job details. Our team will review the situation and may sanction the client if necessary.",
+  "workerFaq_q25": "Is my payment affected during a dispute?",
+  "workerFaq_a25": "During a dispute review, the corresponding payment may be temporarily held. Once the decision is made:\n- Dispute in your favor: full payment released\n- Dispute against you: refund to client (partial or full depending on the decision)",
+  "workerFaq_q26": "How do I protect my reliability score?",
+  "workerFaq_a26": "To maintain a good score:\n- Arrive on time (mark \"On my way\" in the app)\n- Take before/after photos for every job\n- Communicate with the client if there's an issue\n- Complete the work according to requested standards\n- Avoid last-minute cancellations",
+  "workerFaq_q27": "How do I change my available equipment?",
+  "workerFaq_a27": "In Settings or your Profile, you can check/uncheck the equipment you own: shovel, broom, scraper, salt spreader, snow blower. This helps assign you appropriate jobs.",
+  "workerFaq_q28": "How do I change my notifications?",
+  "workerFaq_a28": "In Settings > Notifications, you can enable/disable alerts for: new jobs, urgent jobs, and tips received.",
+  "workerFaq_q29": "How do I improve my worker score?",
+  "workerFaq_a29": "Your score is based on: service quality (client ratings), job acceptance rate, punctuality, and completion rate. Provide quality service and be reliable to improve your score.",
+  "workerFaq_q30": "Can I take a break from the app?",
+  "workerFaq_a30": "Yes! Simply deactivate your availability in the app. You will stop receiving job notifications. Reactivate when you're ready to work."
 }

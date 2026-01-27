@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/services/worker_stripe_service.dart';
 
 class WorkerPaymentsTab extends StatefulWidget {
@@ -110,7 +111,10 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $e'), backgroundColor: AppTheme.error),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)!
+                .clientHome_errorPrefix(e.toString())),
+            backgroundColor: AppTheme.error),
       );
     } finally {
       if (mounted) {
@@ -169,9 +173,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
         children: [
-          const Text(
-            'Paiements',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.worker_payments,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppTheme.textPrimary,
@@ -270,10 +274,13 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   children: [
                     Text(
                       isConfigured
-                          ? 'Compte configure'
+                          ? AppLocalizations.of(context)!
+                              .worker_accountConfigured
                           : isPendingVerification
-                              ? 'Verification en cours'
-                              : 'Configurez vos paiements',
+                              ? AppLocalizations.of(context)!
+                                  .worker_verificationInProgress
+                              : AppLocalizations.of(context)!
+                                  .worker_configurePayments,
                       style: const TextStyle(
                         color: AppTheme.textPrimary,
                         fontSize: 15,
@@ -283,10 +290,12 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                     const SizedBox(height: 2),
                     Text(
                       isConfigured
-                          ? 'Pret a recevoir des paiements'
+                          ? AppLocalizations.of(context)!.worker_readyToReceive
                           : isPendingVerification
-                              ? 'Stripe verifie vos informations'
-                              : 'Recevez vos gains directement',
+                              ? AppLocalizations.of(context)!
+                                  .worker_stripeVerifying
+                              : AppLocalizations.of(context)!
+                                  .worker_receiveEarningsDirectly,
                       style: TextStyle(
                         color: AppTheme.textTertiary,
                         fontSize: 13,
@@ -299,11 +308,15 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
           ),
           const SizedBox(height: 16),
           if (isConfigured) ...[
-            _buildStatusRow('Compte verifie', _isComplete),
+            _buildStatusRow(
+                AppLocalizations.of(context)!.worker_accountVerified,
+                _isComplete),
             const SizedBox(height: 6),
-            _buildStatusRow('Paiements actifs', _chargesEnabled),
+            _buildStatusRow(AppLocalizations.of(context)!.worker_paymentsActive,
+                _chargesEnabled),
             const SizedBox(height: 6),
-            _buildStatusRow('Virements actifs', _payoutsEnabled),
+            _buildStatusRow(AppLocalizations.of(context)!.worker_payoutsActive,
+                _payoutsEnabled),
             const SizedBox(height: 14),
             SizedBox(
               width: double.infinity,
@@ -323,7 +336,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                           size: 16, color: AppTheme.textSecondary),
                       const SizedBox(width: 8),
                       Text(
-                        'Voir mon dashboard Stripe',
+                        AppLocalizations.of(context)!
+                            .worker_viewStripeDashboard,
                         style: TextStyle(
                           color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w600,
@@ -336,11 +350,15 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               ),
             ),
           ] else if (isPendingVerification) ...[
-            _buildStatusRow('Informations de base', _isComplete),
+            _buildStatusRow(
+                AppLocalizations.of(context)!.worker_basicInfo, _isComplete),
             const SizedBox(height: 6),
-            _buildStatusRow('Paiements actifs', _chargesEnabled),
+            _buildStatusRow(AppLocalizations.of(context)!.worker_paymentsActive,
+                _chargesEnabled),
             const SizedBox(height: 6),
-            _buildStatusRow('Documents verifies', _payoutsEnabled),
+            _buildStatusRow(
+                AppLocalizations.of(context)!.worker_documentsVerified,
+                _payoutsEnabled),
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(12),
@@ -355,7 +373,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Envoyez vos documents d\'identite pour activer les virements.',
+                      AppLocalizations.of(context)!
+                          .worker_sendDocumentsToActivate,
                       style: TextStyle(
                         color: AppTheme.textSecondary,
                         fontSize: 12,
@@ -376,8 +395,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                     color: AppTheme.warning,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    'Envoyer mes documents',
+                  child: Text(
+                    AppLocalizations.of(context)!.worker_sendMyDocuments,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -396,13 +415,13 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.success,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     _hasAccount
-                        ? 'Continuer la configuration'
-                        : 'Configurer maintenant',
+                        ? AppLocalizations.of(context)!.worker_continueSetup
+                        : AppLocalizations.of(context)!.worker_configureNow,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
@@ -454,7 +473,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Solde',
+            AppLocalizations.of(context)!.worker_balance,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -470,7 +489,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Disponible',
+                      AppLocalizations.of(context)!.worker_available,
                       style: TextStyle(
                         fontSize: 12,
                         color: AppTheme.textTertiary,
@@ -500,7 +519,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'En attente',
+                        AppLocalizations.of(context)!.reservation_shortPending,
                         style: TextStyle(
                           fontSize: 12,
                           color: AppTheme.textTertiary,
@@ -542,9 +561,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Virements automatiques',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.worker_automaticTransfers,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                     color: AppTheme.textPrimary,
@@ -552,7 +571,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Depots sous 2-3 jours ouvrables',
+                  AppLocalizations.of(context)!.worker_depositsIn23Days,
                   style: TextStyle(
                     fontSize: 12,
                     color: AppTheme.textTertiary,
@@ -582,7 +601,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Repartition des paiements',
+            AppLocalizations.of(context)!.worker_paymentDistribution,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -592,14 +611,14 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
           ),
           const SizedBox(height: 14),
           _buildCommissionRow(
-            'Vous recevez',
+            AppLocalizations.of(context)!.worker_youReceive,
             '$workerPercent%',
             AppTheme.success,
             workerPercent / 100,
           ),
           const SizedBox(height: 10),
           _buildCommissionRow(
-            'Commission plateforme',
+            AppLocalizations.of(context)!.worker_platformCommission,
             '$platformPercent%',
             AppTheme.textTertiary,
             platformPercent / 100,
@@ -619,7 +638,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Ex: Job a 50\$ = ${(50 * workerPercent / 100).toStringAsFixed(2)}\$ pour vous',
+                    AppLocalizations.of(context)!.worker_paymentExample(
+                        (50 * workerPercent / 100).toStringAsFixed(2)),
                     style: TextStyle(
                       fontSize: 12,
                       color: AppTheme.textSecondary,
@@ -685,7 +705,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Comment ca fonctionne',
+            AppLocalizations.of(context)!.worker_howItWorks,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -694,9 +714,12 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             ),
           ),
           const SizedBox(height: 14),
-          _buildStep(1, 'Le client paie', 'Paiement traite par Stripe'),
-          _buildStep(2, 'Repartition', 'Votre part est calculee'),
-          _buildStep(3, 'Depot', 'Sous 2-3 jours ouvrables'),
+          _buildStep(1, AppLocalizations.of(context)!.worker_step1ClientPays,
+              AppLocalizations.of(context)!.worker_step1SubtitleShort),
+          _buildStep(2, AppLocalizations.of(context)!.worker_step2Distribution,
+              AppLocalizations.of(context)!.worker_step2SubtitleShort),
+          _buildStep(3, AppLocalizations.of(context)!.worker_step3Deposit,
+              AppLocalizations.of(context)!.worker_step3Subtitle),
         ],
       ),
     );
@@ -770,9 +793,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Paiements securises',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.worker_securePayments,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                     color: AppTheme.textPrimary,
@@ -780,7 +803,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Propulse par Stripe',
+                  AppLocalizations.of(context)!.worker_poweredByStripe,
                   style: TextStyle(
                     fontSize: 12,
                     color: AppTheme.textTertiary,

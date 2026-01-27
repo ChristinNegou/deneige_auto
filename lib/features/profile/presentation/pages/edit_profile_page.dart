@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -106,8 +107,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 true; // Marquer pour ignorer le prochain AuthAuthenticated
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Photo de profil mise à jour'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.profile_photoUpdated),
               backgroundColor: AppTheme.success,
               behavior: SnackBarBehavior.floating,
             ),
@@ -126,8 +127,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         if (state is PhoneChangeSuccess) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Numéro de téléphone vérifié et mis à jour'),
+            SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.profile_phoneVerified),
               backgroundColor: AppTheme.success,
               behavior: SnackBarBehavior.floating,
             ),
@@ -213,7 +215,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
           const SizedBox(width: 16),
           Text(
-            'Éditer le profil',
+            AppLocalizations.of(context)!.profile_editTitle,
             style: AppTheme.headlineMedium,
           ),
         ],
@@ -321,17 +323,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Informations personnelles',
+            AppLocalizations.of(context)!.profile_personalInfo,
             style: AppTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
           _buildTextField(
             controller: _firstNameController,
-            label: 'Prénom',
+            label: AppLocalizations.of(context)!.common_firstName,
             icon: Icons.person_outline_rounded,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Le prénom est requis';
+                return AppLocalizations.of(context)!.profile_firstNameRequired;
               }
               return null;
             },
@@ -339,11 +341,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: _lastNameController,
-            label: 'Nom',
+            label: AppLocalizations.of(context)!.common_name,
             icon: Icons.person_outline_rounded,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Le nom est requis';
+                return AppLocalizations.of(context)!.profile_lastNameRequired;
               }
               return null;
             },
@@ -360,7 +362,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           Padding(
             padding: const EdgeInsets.only(left: 4),
             child: Text(
-              'L\'email ne peut pas être modifié',
+              AppLocalizations.of(context)!.profile_emailNotEditable,
               style: AppTheme.labelSmall.copyWith(
                 fontStyle: FontStyle.italic,
               ),
@@ -369,7 +371,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: _phoneController,
-            label: 'Téléphone',
+            label: AppLocalizations.of(context)!.common_phone,
             hint: '+1 (514) 123-4567',
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
@@ -377,7 +379,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               if (value != null && value.isNotEmpty) {
                 if (!RegExp(r'^\+?1?\d{10,}$')
                     .hasMatch(value.replaceAll(RegExp(r'[\s\-\(\)]'), ''))) {
-                  return 'Format de téléphone invalide';
+                  return AppLocalizations.of(context)!.profile_phoneInvalid;
                 }
               }
               return null;
@@ -396,7 +398,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    'Un code SMS sera envoyé pour vérifier le nouveau numéro',
+                    AppLocalizations.of(context)!.profile_smsVerificationNote,
                     style: AppTheme.labelSmall.copyWith(
                       fontStyle: FontStyle.italic,
                       color: AppTheme.textTertiary,
@@ -482,9 +484,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       AlwaysStoppedAnimation<Color>(AppTheme.background),
                 ),
               )
-            : const Text(
-                'Enregistrer les modifications',
-                style: TextStyle(
+            : Text(
+                AppLocalizations.of(context)!.profile_saveChanges,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -516,14 +518,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Changer la photo de profil',
+              AppLocalizations.of(context)!.profile_changePhoto,
               style: AppTheme.headlineSmall,
             ),
             const SizedBox(height: 24),
             _buildPhotoOption(
               icon: Icons.camera_alt_rounded,
               iconColor: AppTheme.primary,
-              title: 'Prendre une photo',
+              title: AppLocalizations.of(context)!.profile_takePhoto,
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
@@ -533,7 +535,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _buildPhotoOption(
               icon: Icons.photo_library_rounded,
               iconColor: AppTheme.secondary,
-              title: 'Choisir depuis la galerie',
+              title: AppLocalizations.of(context)!.profile_chooseFromGallery,
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -543,7 +545,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _buildPhotoOption(
               icon: Icons.delete_rounded,
               iconColor: AppTheme.error,
-              title: 'Supprimer la photo',
+              title: AppLocalizations.of(context)!.profile_deletePhoto,
               onTap: () {
                 Navigator.pop(context);
                 _deletePhoto();
@@ -577,7 +579,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur lors de la sélection: $e'),
+            content: Text(AppLocalizations.of(context)!
+                .profile_photoSelectionError(e.toString())),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -589,22 +592,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void _deletePhoto() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Supprimer la photo'),
-        content: const Text(
-            'Êtes-vous sûr de vouloir supprimer votre photo de profil ?'),
+      builder: (dialogCtx) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.profile_deletePhoto),
+        content: Text(AppLocalizations.of(context)!.profile_deletePhotoConfirm),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: Text(AppLocalizations.of(context)!.common_cancel),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogCtx);
               context.read<AuthBloc>().add(DeleteProfilePhoto());
             },
             style: TextButton.styleFrom(foregroundColor: AppTheme.error),
-            child: const Text('Supprimer'),
+            child: Text(AppLocalizations.of(context)!.common_delete),
           ),
         ],
       ),
@@ -722,10 +724,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Vérification SMS',
-                      style: TextStyle(fontSize: 18),
+                      AppLocalizations.of(context)!.profile_smsVerification,
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ),
                 ],
@@ -735,7 +737,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Un code de vérification a été envoyé au:',
+                    AppLocalizations.of(context)!
+                        .profile_verificationCodeSentTo,
                     style: AppTheme.bodyMedium.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -835,7 +838,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     .read<AuthBloc>()
                                     .add(RestoreAuthState());
                               },
-                        child: const Text('Annuler'),
+                        child:
+                            Text(AppLocalizations.of(context)!.common_cancel),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -868,7 +872,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text('Vérifier'),
+                            : Text(
+                                AppLocalizations.of(context)!.profile_verify),
                       ),
                     ),
                   ],

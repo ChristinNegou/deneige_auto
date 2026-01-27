@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import '../domain/entities/faq_item.dart';
 
 /// FAQ spécifique pour les déneigeurs
@@ -196,5 +197,142 @@ class WorkerFaqData {
 
   static List<FaqItem> getByCategory(FaqCategory category) {
     return faqItems.where((item) => item.category == category).toList();
+  }
+
+  static List<FaqItem> getLocalizedFaqItems(AppLocalizations l10n) {
+    return [
+      // General
+      FaqItem(
+          question: l10n.workerFaq_q1,
+          answer: l10n.workerFaq_a1,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.workerFaq_q2,
+          answer: l10n.workerFaq_a2,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.workerFaq_q3,
+          answer: l10n.workerFaq_a3,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.workerFaq_q4,
+          answer: l10n.workerFaq_a4,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.workerFaq_q5,
+          answer: l10n.workerFaq_a5,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.workerFaq_q6,
+          answer: l10n.workerFaq_a6,
+          category: FaqCategory.general),
+      // Jobs
+      FaqItem(
+          question: l10n.workerFaq_q7,
+          answer: l10n.workerFaq_a7,
+          category: FaqCategory.reservations),
+      FaqItem(
+          question: l10n.workerFaq_q8,
+          answer: l10n.workerFaq_a8,
+          category: FaqCategory.reservations),
+      FaqItem(
+          question: l10n.workerFaq_q9,
+          answer: l10n.workerFaq_a9,
+          category: FaqCategory.reservations),
+      FaqItem(
+          question: l10n.workerFaq_q10,
+          answer: l10n.workerFaq_a10,
+          category: FaqCategory.reservations),
+      FaqItem(
+          question: l10n.workerFaq_q11,
+          answer: l10n.workerFaq_a11,
+          category: FaqCategory.reservations),
+      // Payments
+      FaqItem(
+          question: l10n.workerFaq_q12,
+          answer: l10n.workerFaq_a12,
+          category: FaqCategory.payments),
+      FaqItem(
+          question: l10n.workerFaq_q13,
+          answer: l10n.workerFaq_a13,
+          category: FaqCategory.payments),
+      FaqItem(
+          question: l10n.workerFaq_q14,
+          answer: l10n.workerFaq_a14,
+          category: FaqCategory.payments),
+      FaqItem(
+          question: l10n.workerFaq_q15,
+          answer: l10n.workerFaq_a15,
+          category: FaqCategory.payments),
+      FaqItem(
+          question: l10n.workerFaq_q16,
+          answer: l10n.workerFaq_a16,
+          category: FaqCategory.payments),
+      // Disputes
+      FaqItem(
+          question: l10n.workerFaq_q17,
+          answer: l10n.workerFaq_a17,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q18,
+          answer: l10n.workerFaq_a18,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q19,
+          answer: l10n.workerFaq_a19,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q20,
+          answer: l10n.workerFaq_a20,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q21,
+          answer: l10n.workerFaq_a21,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q22,
+          answer: l10n.workerFaq_a22,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q23,
+          answer: l10n.workerFaq_a23,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q24,
+          answer: l10n.workerFaq_a24,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q25,
+          answer: l10n.workerFaq_a25,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.workerFaq_q26,
+          answer: l10n.workerFaq_a26,
+          category: FaqCategory.disputes),
+      // Account
+      FaqItem(
+          question: l10n.workerFaq_q27,
+          answer: l10n.workerFaq_a27,
+          category: FaqCategory.account),
+      FaqItem(
+          question: l10n.workerFaq_q28,
+          answer: l10n.workerFaq_a28,
+          category: FaqCategory.account),
+      FaqItem(
+          question: l10n.workerFaq_q29,
+          answer: l10n.workerFaq_a29,
+          category: FaqCategory.account),
+      FaqItem(
+          question: l10n.workerFaq_q30,
+          answer: l10n.workerFaq_a30,
+          category: FaqCategory.account),
+    ];
+  }
+
+  static List<FaqItem> getLocalizedByCategory(
+      AppLocalizations l10n, FaqCategory category) {
+    return getLocalizedFaqItems(l10n)
+        .where((item) => item.category == category)
+        .toList();
   }
 }

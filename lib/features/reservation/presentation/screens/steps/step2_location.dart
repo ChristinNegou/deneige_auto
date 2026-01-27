@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
@@ -57,14 +58,17 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section GPS
-              _buildSectionHeader('Position GPS', Icons.gps_fixed_rounded),
+              _buildSectionHeader(
+                  AppLocalizations.of(context)!.step2_gpsPosition,
+                  Icons.gps_fixed_rounded),
               const SizedBox(height: 12),
               _buildGpsStatus(context, state),
 
               const SizedBox(height: 28),
 
               // Section Adresse
-              _buildSectionHeader('Adresse', Icons.location_on_rounded),
+              _buildSectionHeader(AppLocalizations.of(context)!.step2_address,
+                  Icons.location_on_rounded),
               const SizedBox(height: 12),
               _buildAddressInput(context, state),
 
@@ -152,10 +156,11 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
               children: [
                 Text(
                   isLoading
-                      ? 'Recherche en cours...'
+                      ? AppLocalizations.of(context)!.step2_searching
                       : hasLocation
-                          ? 'Position détectée'
-                          : 'Position non disponible, activez votre GPS',
+                          ? AppLocalizations.of(context)!.step2_positionDetected
+                          : AppLocalizations.of(context)!
+                              .step2_positionUnavailable,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -166,10 +171,10 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                 const SizedBox(height: 2),
                 Text(
                   isLoading
-                      ? 'Veuillez patienter'
+                      ? AppLocalizations.of(context)!.step2_pleaseWait
                       : hasLocation
-                          ? 'Vérifiez l\'adresse ci-dessous'
-                          : 'Entrez l\'adresse manuellement',
+                          ? AppLocalizations.of(context)!.step2_checkAddress
+                          : AppLocalizations.of(context)!.step2_enterManually,
                   style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                 ),
               ],
@@ -183,7 +188,9 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                   context.read<NewReservationBloc>().add(GetCurrentLocation()),
               icon: Icon(Icons.refresh, size: 18, color: AppTheme.textPrimary),
               label: Text(
-                hasLocation ? 'Actualiser' : 'Réessayer',
+                hasLocation
+                    ? AppLocalizations.of(context)!.step2_refresh
+                    : AppLocalizations.of(context)!.step2_retry,
                 style: TextStyle(fontSize: 13, color: AppTheme.textPrimary),
               ),
               style: TextButton.styleFrom(
@@ -208,7 +215,7 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
           controller: _addressController,
           style: TextStyle(color: AppTheme.textPrimary),
           decoration: InputDecoration(
-            hintText: 'Ex: 123 Rue Principale, Montréal',
+            hintText: AppLocalizations.of(context)!.reservation_addressHint,
             hintStyle: TextStyle(color: AppTheme.textTertiary),
             prefixIcon: Icon(Icons.search, color: AppTheme.textTertiary),
             suffixIcon: _addressController.text.isNotEmpty
@@ -254,8 +261,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
         // Message de succès
         if (state.hasValidLocation && error == null) ...[
           const SizedBox(height: 10),
-          _buildMessage(
-              'Adresse validée', AppTheme.success, Icons.check_circle_outline),
+          _buildMessage(AppLocalizations.of(context)!.step2_addressValidated,
+              AppTheme.success, Icons.check_circle_outline),
         ],
 
         const SizedBox(height: 14),
@@ -285,8 +292,8 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                     child: CircularProgressIndicator(
                         strokeWidth: 2, color: AppTheme.background),
                   )
-                : const Text('Valider l\'adresse',
-                    style: TextStyle(fontWeight: FontWeight.w600)),
+                : Text(AppLocalizations.of(context)!.step2_validateAddress,
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
         ),
 
@@ -299,7 +306,7 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
             const SizedBox(width: 6),
             Expanded(
               child: Text(
-                'L\'adresse aide nos déneigeurs à localiser votre véhicule',
+                AppLocalizations.of(context)!.step2_addressTip,
                 style: TextStyle(fontSize: 12, color: AppTheme.textTertiary),
               ),
             ),

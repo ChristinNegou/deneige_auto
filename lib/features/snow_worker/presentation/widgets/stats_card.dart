@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class StatsCard extends StatelessWidget {
   final String title;
@@ -101,23 +102,24 @@ class StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           Expanded(
             child: StatsCard(
-              title: 'Terminés',
+              title: l10n.worker_statsCompleted,
               value: completed.toString(),
               icon: Icons.check_circle,
               color: AppTheme.success,
-              subtitle: "aujourd'hui",
+              subtitle: l10n.worker_statsToday,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: StatsCard(
-              title: 'En cours',
+              title: l10n.worker_statsInProgress,
               value: inProgress.toString(),
               icon: Icons.engineering,
               color: AppTheme.warning,
@@ -126,17 +128,17 @@ class StatsRow extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: StatsCard(
-              title: 'Revenus',
+              title: l10n.worker_statsRevenue,
               value: '${earnings.toStringAsFixed(0)}\$',
               icon: Icons.attach_money,
               color: AppTheme.info,
-              subtitle: "aujourd'hui",
+              subtitle: l10n.worker_statsToday,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: StatsCard(
-              title: 'Note',
+              title: l10n.worker_statsRating,
               value: rating > 0 ? rating.toStringAsFixed(1) : '-',
               icon: Icons.star,
               color: AppTheme.statusEnRoute,

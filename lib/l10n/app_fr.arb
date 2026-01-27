@@ -1,8 +1,6 @@
 {
   "@@locale": "fr",
-
   "appTitle": "Deneige Auto",
-
   "common_retry": "Réessayer",
   "common_cancel": "Annuler",
   "common_confirm": "Confirmer",
@@ -42,7 +40,6 @@
   "common_logout": "Déconnexion",
   "common_logoutConfirm": "Voulez-vous vraiment vous déconnecter ?",
   "common_logoutConfirmAccount": "Voulez-vous vraiment vous déconnecter de votre compte ?",
-
   "onboarding_title1": "Bienvenue sur Déneige Auto",
   "onboarding_desc1": "La solution moderne pour gérer le déneigement de votre véhicule en toute simplicité",
   "onboarding_title2": "Réservez en quelques clics",
@@ -52,7 +49,6 @@
   "onboarding_title4": "Paiement sécurisé",
   "onboarding_desc4": "Payez en toute sécurité et gérez vos factures facilement",
   "onboarding_start": "Commencer",
-
   "login_welcome": "Bienvenue",
   "login_subtitle": "Connectez-vous à votre compte",
   "login_emailHint": "exemple@email.com",
@@ -64,7 +60,6 @@
   "login_submit": "Se connecter",
   "login_noAccount": "Pas encore de compte ? ",
   "login_register": "S'inscrire",
-
   "register_title": "Inscription",
   "register_subtitle": "Créez votre compte pour commencer",
   "register_firstNameHint": "Jean",
@@ -83,7 +78,6 @@
   "register_snowWorker": "Déneigeur",
   "register_submit": "S'inscrire",
   "register_hasAccount": "Vous avez déjà un compte ? ",
-
   "forgotPassword_title": "Mot de passe oublié ?",
   "forgotPassword_subtitle": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
   "forgotPassword_emailSent": "Email de réinitialisation envoyé !",
@@ -94,7 +88,6 @@
   "forgotPassword_backToLogin": "Retour à la connexion",
   "forgotPassword_resend": "Renvoyer l'email",
   "forgotPassword_rememberPassword": "Vous vous souvenez de votre mot de passe ? ",
-
   "phoneVerification_title": "Vérification",
   "phoneVerification_subtitle": "Vérification du téléphone",
   "phoneVerification_enterCode": "Entrez le code à 6 chiffres envoyé au",
@@ -104,17 +97,33 @@
   "phoneVerification_noCode": "Vous n'avez pas reçu le code? ",
   "phoneVerification_resend": "Renvoyer",
   "phoneVerification_resendIn": "Renvoyer dans {seconds}s",
-  "@phoneVerification_resendIn": { "placeholders": { "seconds": { "type": "int" } } },
+  "@phoneVerification_resendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "phoneVerification_changeNumber": "Modifier le numéro",
   "phoneVerification_devCode": "Mode dev - Code: {code}",
-  "@phoneVerification_devCode": { "placeholders": { "code": { "type": "String" } } },
-
+  "@phoneVerification_devCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "home_greeting": "Bonjour, {name}",
-  "@home_greeting": { "placeholders": { "name": { "type": "String" } } },
+  "@home_greeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "home_clientHome": "Client Home",
   "home_snowWorkerDashboard": "Snow Worker Dashboard",
   "home_adminDashboard": "Admin Dashboard",
-
   "weather_title": "Météo",
   "weather_unavailable": "Données météo non disponibles",
   "weather_humidity": "Humidité",
@@ -122,7 +131,6 @@
   "weather_snowDepth": "Neige au sol",
   "weather_snowAlert": "Alerte neige",
   "weather_snowAlertDefault": "Prévision de chutes de neige importantes",
-
   "notifications_title": "Notifications",
   "notifications_readAll": "Tout lire",
   "notifications_empty": "Aucune notification",
@@ -130,14 +138,19 @@
   "notifications_unreadSingular": "notification non lue",
   "notifications_unreadPlural": "notifications non lues",
   "notifications_settings": "Paramètres de notification",
-
   "reservation_myReservations": "Mes réservations",
   "reservation_empty": "Aucune réservation",
   "reservation_emptySubtitle": "Commencez par créer votre première réservation",
   "reservation_new": "Nouvelle réservation",
   "reservation_newShort": "Nouvelle",
   "reservation_parkingSpot": "Place {name}",
-  "@reservation_parkingSpot": { "placeholders": { "name": { "type": "String" } } },
+  "@reservation_parkingSpot": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "reservation_details": "Détails de la réservation",
   "reservation_notFound": "Réservation introuvable",
   "reservation_notFoundSubtitle": "Cette réservation n'existe plus ou a été supprimée",
@@ -146,7 +159,13 @@
   "reservation_statusPending": "En attente d'un déneigeur disponible",
   "reservation_statusAssigned": "Un déneigeur a été assigné à votre demande",
   "reservation_statusEnRoute": "{name} est en route vers vous",
-  "@reservation_statusEnRoute": { "placeholders": { "name": { "type": "String" } } },
+  "@reservation_statusEnRoute": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "reservation_statusInProgress": "Votre véhicule est en cours de déneigement",
   "reservation_statusCompleted": "Service terminé avec succès",
   "reservation_statusCancelled": "Cette réservation a été annulée",
@@ -175,7 +194,13 @@
   "reservation_servicesRequested": "Services demandés",
   "reservation_basicSnowRemoval": "Déneigement de base",
   "reservation_snowDepthCm": "Profondeur de neige: {depth} cm",
-  "@reservation_snowDepthCm": { "placeholders": { "depth": { "type": "String" } } },
+  "@reservation_snowDepthCm": {
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
   "reservation_photos": "Photos du service",
   "reservation_afterPhoto": "Résultat final",
   "reservation_photoUnavailable": "Photo non disponible",
@@ -183,7 +208,13 @@
   "reservation_beforePhoto": "Avant le service",
   "reservation_totalPrice": "Prix total",
   "reservation_tipAmount": "+{amount}$ pourboire",
-  "@reservation_tipAmount": { "placeholders": { "amount": { "type": "String" } } },
+  "@reservation_tipAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "reservation_urgent": "URGENT",
   "reservation_yourRating": "Votre évaluation",
   "reservation_rateService": "Évaluer le service",
@@ -192,7 +223,13 @@
   "reservation_cancelReservation": "Annuler la réservation",
   "reservation_cancelFullRefund": "Remboursement complet - Aucun frais",
   "reservation_cancelHalfRefund": "Le déneigeur est en route.\nFrais d'annulation: 50% ({amount}$)",
-  "@reservation_cancelHalfRefund": { "placeholders": { "amount": { "type": "String" } } },
+  "@reservation_cancelHalfRefund": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "reservation_cancelNoRefund": "Le travail a commencé.\nAucun remboursement (100% facturé)",
   "reservation_cancelConfirmTitle": "Annuler?",
   "reservation_cancelConfirmMessage": "Êtes-vous sûr de vouloir annuler cette réservation?",
@@ -241,11 +278,9 @@
   "reservation_creditCardSubtitle": "Visa, Mastercard, Amex",
   "reservation_creatingReservation": "Création de la réservation...",
   "reservation_securePayment": "Paiement sécurisé par Stripe",
-
   "service_windowScraping5": "+5$",
   "service_doorDeicing3": "+3$",
   "service_wheelClearing4": "+4$",
-
   "vehicle_myVehicles": "Mes véhicules",
   "vehicle_empty": "Aucun véhicule enregistré",
   "vehicle_emptySubtitle": "Ajoutez votre premier véhicule pour\ncommencer à utiliser le service",
@@ -287,7 +322,6 @@
   "vehicle_colorSilver": "Argent",
   "vehicle_colorBrown": "Brun",
   "vehicle_colorBeige": "Beige",
-
   "profile_title": "Mon profil",
   "profile_defaultName": "Utilisateur",
   "profile_defaultEmail": "email@example.com",
@@ -302,19 +336,16 @@
   "profile_settingsSubtitle": "Préférences de l'app",
   "profile_helpSupport": "Aide et support",
   "profile_helpSubtitle": "FAQ et contact",
-
   "chat_typing": "En train d'écrire...",
   "chat_noMessages": "Aucun message",
   "chat_startConversation": "Commencez la conversation!",
   "chat_inputHint": "Écrire un message...",
-
   "aiChat_title": "Assistant IA",
   "aiChat_newConversation": "Nouvelle conversation",
   "aiChat_unavailable": "L'assistant IA est temporairement indisponible",
   "aiChat_startConversation": "Commencez une conversation",
   "aiChat_subtitle": "Posez vos questions sur Déneige Auto",
   "aiChat_inputHint": "Écrivez votre message...",
-
   "settings_title": "Paramètres",
   "settings_notifications": "Notifications",
   "settings_pushNotifications": "Notifications push",
@@ -342,7 +373,6 @@
   "settings_deleteAccountConfirm": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
   "settings_passwordRequired": "Mot de passe requis",
   "settings_enterPassword": "Entrez votre mot de passe pour confirmer:",
-
   "support_title": "Aide et Support",
   "support_faq": "FAQ",
   "support_contact": "Contact",
@@ -352,7 +382,6 @@
   "support_writeResponse": "Veuillez écrire une réponse",
   "support_respond": "Répondre",
   "support_respondToRequest": "Répondre à la demande",
-
   "rating_question": "Comment s'est passé le déneigement ?",
   "rating_subtitle": "Votre avis aide à améliorer le service",
   "rating_1star": "Très insatisfait",
@@ -366,13 +395,17 @@
   "rating_submit": "Envoyer mon avis",
   "rating_later": "Peut-être plus tard",
   "rating_workerTitle": "Déneigeur",
-
   "suspension_title": "Compte Suspendu",
   "suspension_reason": "Raison:",
   "suspension_until": "Jusqu'au: {date}",
-  "@suspension_until": { "placeholders": { "date": { "type": "String" } } },
+  "@suspension_until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "suspension_contactSupport": "Contactez le support au \"deneigeauto@yahoo.com\" si vous pensez qu'il s'agit d'une erreur.",
-
   "worker_available": "Disponible",
   "worker_offline": "Hors ligne",
   "worker_verificationPending": "Vérification en cours",
@@ -397,7 +430,13 @@
   "worker_availableJobs": "Jobs disponibles",
   "worker_newJob": "Nouveau job!",
   "worker_newJobs": "{count} nouveaux jobs!",
-  "@worker_newJobs": { "placeholders": { "count": { "type": "int" } } },
+  "@worker_newJobs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "worker_configureEquipment": "Configurez votre équipement",
   "worker_configureEquipmentMessage": "Indiquez vos équipements pour voir les jobs disponibles.",
   "worker_configure": "Configurer",
@@ -423,14 +462,19 @@
   "worker_notifUrgentJobs": "Jobs urgents",
   "worker_notifTipsReceived": "Pourboires reçus",
   "worker_helpSupport": "Aide et support",
-
   "worker_jobDetails": "Détails du job",
   "worker_clientCancelled": "Le client a annulé la réservation",
   "worker_jobCancelled": "Job annulé",
   "worker_clientCancelledMessage": "Le client a annulé cette réservation.",
   "worker_cancelledMessage": "Cette réservation a été annulée.",
   "worker_cancelReason": "Raison: {reason}",
-  "@worker_cancelReason": { "placeholders": { "reason": { "type": "String" } } },
+  "@worker_cancelReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "worker_backToDashboard": "Retour au tableau de bord",
   "worker_client": "Client",
   "worker_googleMaps": "Google Maps",
@@ -443,7 +487,6 @@
   "worker_clientNotes": "Notes du client",
   "worker_jobAccepted": "Job accepté avec succès!",
   "worker_acceptJob": "Accepter ce job",
-
   "worker_cancelJobTitle": "Annuler le job?",
   "worker_cancelJobWarning": "Vous ne serez pas payé pour ce job.\nLes annulations fréquentes peuvent entraîner une suspension.",
   "worker_cancelReason_label": "Raison de l'annulation:",
@@ -461,7 +504,6 @@
   "worker_cancelFamilyEmergencyDesc": "J'ai une urgence familiale",
   "worker_cancelEquipmentFailure": "Équipement défaillant",
   "worker_cancelEquipmentFailureDesc": "Mon équipement de déneigement est défaillant",
-
   "worker_settingsTitle": "Paramètres",
   "worker_myEquipment": "Mon équipement",
   "worker_snowShovel": "Pelle à neige",
@@ -472,16 +514,13 @@
   "worker_preferredZones": "Zones préférées",
   "worker_notifReception": "Notification de réception",
   "worker_otherVehicleType": "Autre type de véhicule",
-
   "worker_earningsCompleted": "Terminés",
   "worker_earningsAssigned": "Assignés",
-
   "worker_noJobs": "Aucun job disponible",
   "worker_noJobsSubtitle": "Les nouveaux jobs apparaîtront ici",
   "worker_noAssignedJobs": "Aucun job assigné",
   "worker_noAssignedSubtitle": "Acceptez des jobs disponibles pour les voir ici",
   "worker_jobs": "Jobs",
-
   "verification_title": "Vérification d'identité",
   "verification_verifyIdentity": "Vérifiez votre identité",
   "verification_idDocument": "Pièce d'identité",
@@ -505,7 +544,6 @@
   "verification_summary": "Récapitulatif",
   "verification_submitForVerification": "Soumettre pour vérification",
   "verification_submitted": "Documents soumis avec succès. Vérification en cours...",
-
   "dispute_myDisputes": "Mes litiges",
   "dispute_all": "Tous",
   "dispute_open": "Ouverts",
@@ -545,7 +583,6 @@
   "dispute_tipsPhotos": "Photos claires et bien éclairées",
   "dispute_tipsScreenshots": "Captures d'écran de communications",
   "dispute_tipsTimestamp": "Photos horodatées si possible",
-
   "admin_dashboard": "Dashboard",
   "admin_reservations": "Réservations",
   "admin_reservationsManagement": "Gestion des réservations",
@@ -567,7 +604,16 @@
   "admin_noReservations": "Aucune réservation trouvée",
   "admin_refund": "Rembourser",
   "admin_pageOf": "Page {current} / {total}",
-  "@admin_pageOf": { "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } } },
+  "@admin_pageOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "admin_reservationInfo": "Informations de la réservation",
   "admin_id": "ID",
   "admin_plannedDate": "Date prévue",
@@ -638,16 +684,19 @@
   "admin_nonCompliant": "Vérification non conforme",
   "admin_resolved": "Résolu",
   "admin_closed": "Fermé",
-
   "accountType_welcome": "Bienvenue ! Sélectionnez votre type de compte",
   "accountType_client": "Client",
   "accountType_clientSubtitle": "Je cherche un service de déneigement",
   "accountType_snowWorker": "Déneigeur",
   "accountType_snowWorkerSubtitle": "Je propose mes services de déneigement",
-
   "register_accountLabel": "Compte {role}",
-  "@register_accountLabel": { "placeholders": { "role": { "type": "String" } } },
-
+  "@register_accountLabel": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
   "resetPassword_title": "Nouveau mot de passe",
   "resetPassword_successTitle": "Succès !",
   "resetPassword_description": "Entrez votre nouveau mot de passe",
@@ -662,12 +711,10 @@
   "resetPassword_strengthWeak": "Faible",
   "resetPassword_strengthMedium": "Moyen",
   "resetPassword_strengthStrong": "Fort",
-
   "privacy_title": "Politique de confidentialité",
   "terms_title": "Conditions d'utilisation",
   "privacy_lastUpdate": "Dernière mise à jour: Janvier 2025",
   "terms_lastUpdate": "Dernière mise à jour: Janvier 2025",
-
   "clientHome_greetingLabel": "Bonjour,",
   "clientHome_quickActions": "Actions rapides",
   "clientHome_book": "Réserver",
@@ -684,21 +731,46 @@
   "clientHome_ratingError": "Impossible d'envoyer l'évaluation. Veuillez réessayer.",
   "clientHome_tipError": "Impossible d'envoyer le pourboire. Veuillez réessayer.",
   "clientHome_tipSent": "Pourboire de {amount}$ envoyé à {name}",
-  "@clientHome_tipSent": { "placeholders": { "amount": { "type": "String" }, "name": { "type": "String" } } },
+  "@clientHome_tipSent": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "clientHome_tipErrorPrefix": "Erreur pourboire: {message}",
-  "@clientHome_tipErrorPrefix": { "placeholders": { "message": { "type": "String" } } },
+  "@clientHome_tipErrorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "clientHome_errorPrefix": "Erreur: {message}",
-  "@clientHome_errorPrefix": { "placeholders": { "message": { "type": "String" } } },
+  "@clientHome_errorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "clientHome_theWorker": "le déneigeur",
   "clientHome_mySubscription": "Mon\nabonnement",
-
+  "clientHome_userNotAuth": "Erreur: utilisateur non authentifié",
   "weather_snowDepthValue": "{depth} cm au sol",
-  "@weather_snowDepthValue": { "placeholders": { "depth": { "type": "String" } } },
-
+  "@weather_snowDepthValue": {
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
   "worker_jobsAvailable": "Disponibles",
   "worker_jobsMyJobs": "Mes jobs",
   "worker_accept": "Accepter",
-
   "admin_loadError": "Erreur de chargement",
   "admin_administration": "Administration",
   "admin_sendNotification": "Envoyer notification",
@@ -723,28 +795,71 @@
   "admin_fillAllFields": "Veuillez remplir tous les champs",
   "admin_logoutConfirm": "Voulez-vous vraiment vous déconnecter du panneau d'administration ?",
   "admin_clientsAndWorkers": "{clients} clients, {workers} déneigeurs",
-  "@admin_clientsAndWorkers": { "placeholders": { "clients": { "type": "int" }, "workers": { "type": "int" } } },
+  "@admin_clientsAndWorkers": {
+    "placeholders": {
+      "clients": {
+        "type": "int"
+      },
+      "workers": {
+        "type": "int"
+      }
+    }
+  },
   "admin_todayCount": "{count} aujourd'hui",
-  "@admin_todayCount": { "placeholders": { "count": { "type": "int" } } },
+  "@admin_todayCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "admin_completedCount": "{count} terminées",
-  "@admin_completedCount": { "placeholders": { "count": { "type": "int" } } },
+  "@admin_completedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "admin_pendingCountLabel": "{count} en attente",
-  "@admin_pendingCountLabel": { "placeholders": { "count": { "type": "int" } } },
+  "@admin_pendingCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "admin_reservationsCount": "{count} réservations",
-  "@admin_reservationsCount": { "placeholders": { "count": { "type": "int" } } },
+  "@admin_reservationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "admin_newRequestsToday": "{count} nouvelle(s) demande(s) aujourd'hui",
-  "@admin_newRequestsToday": { "placeholders": { "count": { "type": "int" } } },
-
+  "@admin_newRequestsToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "common_add": "Ajouter",
   "common_description": "Description",
-
   "dispute_imageLoadError": "Impossible de charger l'image",
   "dispute_addPhoto": "Ajouter une photo",
   "dispute_chooseFromGallery": "Choisir depuis la galerie",
   "dispute_claimedAmountOptional": "Montant réclamé (optionnel)",
   "dispute_photosEvidence": "Photos (preuves)",
   "dispute_workerNameLabel": "Déneigeur: {name}",
-  "@dispute_workerNameLabel": { "placeholders": { "name": { "type": "String" } } },
+  "@dispute_workerNameLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "dispute_describeInDetail": "Décrivez le problème en détail...",
   "dispute_descriptionTooShort": "Description trop courte (minimum 20 caractères)",
   "dispute_invalidAmount": "Montant invalide",
@@ -754,7 +869,6 @@
   "dispute_addPhotos": "Ajouter des photos",
   "dispute_addAnotherPhoto": "Ajouter une autre photo",
   "dispute_maxPhotosHint": "Maximum 5 photos. Les photos aident à traiter votre demande plus rapidement.",
-
   "worker_myPayments": "Mes paiements",
   "worker_configureBankAccount": "Configurer mon compte bancaire",
   "worker_saltSpreaderLabel": "Épandeur de sel",
@@ -791,7 +905,6 @@
   "worker_photoSelectionError": "Erreur lors de la sélection de la photo",
   "worker_notifications": "Notifications",
   "worker_tipsReceived": "Pourboires reçus",
-
   "admin_userManagement": "Gestion des utilisateurs",
   "admin_searchUser": "Rechercher un utilisateur...",
   "admin_clientsLabel": "Clients",
@@ -807,7 +920,13 @@
   "admin_suspendUser": "Suspendre l'utilisateur",
   "admin_liftSuspension": "Lever la suspension",
   "admin_aboutToSuspend": "Vous allez suspendre {name}",
-  "@admin_aboutToSuspend": { "placeholders": { "name": { "type": "String" } } },
+  "@admin_aboutToSuspend": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "admin_1day": "1 jour",
   "admin_3days": "3 jours",
   "admin_7days": "7 jours",
@@ -816,19 +935,42 @@
   "admin_1year": "1 an",
   "admin_suspend": "Suspendre",
   "admin_reason": "Raison: {reason}",
-  "@admin_reason": { "placeholders": { "reason": { "type": "String" } } },
+  "@admin_reason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "admin_suspendedUntil": "Jusqu'au: {date}",
-  "@admin_suspendedUntil": { "placeholders": { "date": { "type": "String" } } },
-
+  "@admin_suspendedUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "payment_title": "Paiement",
   "payment_amountToPay": "Montant à payer",
   "payment_useNewCard": "Utiliser une nouvelle carte",
   "payment_expires": "Expire {date}",
-  "@payment_expires": { "placeholders": { "date": { "type": "String" } } },
+  "@payment_expires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "payment_securePayment": "Paiement sécurisé",
   "payment_securePaymentDetails": "SSL 256-bit · PCI DSS · Propulsé par Stripe",
   "payment_payAmount": "Payer {amount} $",
-  "@payment_payAmount": { "placeholders": { "amount": { "type": "String" } } },
+  "@payment_payAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "payment_success": "Paiement réussi !",
   "payment_cancelled": "Paiement annulé",
   "payment_failedRetry": "Le paiement a échoué. Vérifiez votre carte et réessayez.",
@@ -844,9 +986,14 @@
   "payment_setDefault": "Définir par défaut",
   "payment_deleteCardTitle": "Supprimer la carte",
   "payment_deleteCardConfirm": "Voulez-vous vraiment supprimer la carte {number} ?",
-  "@payment_deleteCardConfirm": { "placeholders": { "number": { "type": "String" } } },
+  "@payment_deleteCardConfirm": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "payment_addCard": "Ajouter une carte",
-
   "notifSettings_enabled": "Les notifications sont activées",
   "notifSettings_disabled": "Les notifications sont désactivées",
   "notifSettings_sounds": "Sons",
@@ -861,7 +1008,16 @@
   "notifSettings_quietModeDesc": "Pas de notifications pendant les heures définies",
   "notifSettings_hours": "Heures",
   "notifSettings_hoursRange": "De {start} à {end}",
-  "@notifSettings_hoursRange": { "placeholders": { "start": { "type": "String" }, "end": { "type": "String" } } },
+  "@notifSettings_hoursRange": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
   "notifSettings_quietModeActive": "Mode silencieux actuellement actif",
   "notifSettings_urgentAlways": "Les notifications urgentes seront toujours envoyées",
   "notifSettings_notifTypes": "Types de notifications",
@@ -876,19 +1032,41 @@
   "notifSettings_resetConfirmMessage": "Tous les paramètres de notification seront remis à leurs valeurs par défaut.",
   "notifSettings_resetDone": "Paramètres réinitialisés",
   "notifSettings_reset": "Réinitialiser",
-
   "notif_justNow": "À l'instant",
   "notif_minutesAgo": "Il y a {minutes} min",
-  "@notif_minutesAgo": { "placeholders": { "minutes": { "type": "int" } } },
+  "@notif_minutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "notif_hoursAgo": "Il y a {hours} h",
-  "@notif_hoursAgo": { "placeholders": { "hours": { "type": "int" } } },
+  "@notif_hoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
   "notif_daysAgo": "Il y a {days} j",
-  "@notif_daysAgo": { "placeholders": { "days": { "type": "int" } } },
+  "@notif_daysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "notif_weeksAgo": "Il y a {weeks} sem",
-  "@notif_weeksAgo": { "placeholders": { "weeks": { "type": "int" } } },
+  "@notif_weeksAgo": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
   "notif_now": "maintenant",
   "notif_urgent": "Urgent",
-
   "notifType_reservationAssigned": "Tâche acceptée",
   "notifType_workerEnRoute": "Déneigeur en route",
   "notifType_workStarted": "Travail commencé",
@@ -904,12 +1082,10 @@
   "notifType_tipReceived": "Pourboire reçu",
   "notifType_rating": "Évaluation",
   "notifType_systemNotification": "Système",
-
   "notifCategory_reservations": "Réservations",
   "notifCategory_payments": "Paiements",
   "notifCategory_alerts": "Alertes",
   "notifCategory_communications": "Communications",
-
   "notifDesc_reservationAssigned": "Quand un déneigeur accepte votre demande",
   "notifDesc_workerEnRoute": "Quand le déneigeur est en route",
   "notifDesc_workStarted": "Quand le déneigement commence",
@@ -925,7 +1101,6 @@
   "notifDesc_tipReceived": "Pourboires reçus",
   "notifDesc_rating": "Évaluations reçues",
   "notifDesc_systemNotification": "Mises à jour système",
-
   "notifAction_viewDetails": "Voir les détails",
   "notifAction_trackReservation": "Suivre la réservation",
   "notifAction_viewProgress": "Voir la progression",
@@ -940,19 +1115,29 @@
   "notifAction_viewMessage": "Voir le message",
   "notifAction_userNotAuthenticated": "Erreur: utilisateur non authentifié",
   "notifAction_defaultUser": "Utilisateur",
-
   "notif_allMarkedRead": "Toutes les notifications marquées comme lues",
   "notif_allDeleted": "Toutes les notifications supprimées",
   "notif_noReadToDelete": "Aucune notification lue à supprimer",
   "notif_someNotDeleted": "Certaines notifications n'ont pas pu être supprimées",
   "notif_deletedCount": "{count} notification(s) supprimée(s)",
-  "@notif_deletedCount": { "placeholders": { "count": { "type": "int" } } },
+  "@notif_deletedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "notif_autoDeleteEnabled": "Suppression automatique activée ({seconds}s)",
-  "@notif_autoDeleteEnabled": { "placeholders": { "seconds": { "type": "int" } } },
+  "@notif_autoDeleteEnabled": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "notif_autoDeleteDisabled": "Suppression automatique désactivée",
   "notif_errorLoading": "Erreur lors du chargement",
   "notif_errorRefreshing": "Erreur lors du rafraîchissement",
-
   "notif_errorLoadingNotifications": "Erreur lors du chargement des notifications",
   "notif_errorCountingUnread": "Erreur lors du comptage des notifications non lues",
   "notif_errorMarkingRead": "Erreur lors du marquage de la notification",
@@ -961,5 +1146,1467 @@
   "notif_errorDeletingAll": "Erreur lors de la suppression des notifications",
   "notif_connectionTimeout": "Délai de connexion dépassé. Vérifiez votre connexion.",
   "notif_cannotConnect": "Impossible de se connecter au serveur.",
-  "notif_serverError": "Une erreur serveur est survenue."
+  "notif_serverError": "Une erreur serveur est survenue.",
+  "suspension_accountSuspended": "Compte Suspendu",
+  "suspension_understood": "Compris",
+  "support_helpAndSupport": "Aide et Support",
+  "support_faqTab": "FAQ",
+  "support_contactTab": "Contact",
+  "support_needHelp": "Besoin d'aide?",
+  "support_teamResponse": "Notre équipe vous répondra dans les 24-48h",
+  "support_subject": "Sujet",
+  "support_message": "Message",
+  "support_messageHint": "Décrivez votre problème ou question en détail...",
+  "support_messageRequired": "Veuillez entrer un message",
+  "support_messageMinLength": "Le message doit contenir au moins 10 caractères",
+  "support_send": "Envoyer",
+  "support_contactDirectly": "Ou contactez-nous directement:",
+  "support_messageSent": "Votre message a été envoyé avec succès",
+  "support_workerBadge": "Déneigeur",
+  "support_workerGeneral": "Général",
+  "support_workerJobs": "Jobs",
+  "support_workerPayments": "Paiements",
+  "support_workerAccount": "Compte",
+  "support_workerSupport": "Support Déneigeurs",
+  "support_workerTeamResponse": "Notre équipe répond sous 24-48h",
+  "support_workerSubjectBug": "Problème technique",
+  "support_workerSubjectQuestion": "Question générale",
+  "support_workerSubjectSuggestion": "Suggestion d'amélioration",
+  "support_workerSubjectOther": "Problème de paiement / Autre",
+  "support_subjectBug": "Signalement de bug",
+  "support_subjectQuestion": "Question",
+  "support_subjectSuggestion": "Suggestion",
+  "support_subjectOther": "Autre",
+  "support_statusPending": "En attente",
+  "support_statusInProgress": "En cours",
+  "support_statusResolved": "Résolu",
+  "support_statusClosed": "Fermé",
+  "faqCat_general": "Général",
+  "faqCat_reservations": "Réservations",
+  "faqCat_payments": "Paiements",
+  "faqCat_disputes": "Litiges",
+  "faqCat_account": "Compte",
+  "faq_q1": "Comment fonctionne Deneige Auto?",
+  "faq_a1": "Deneige Auto vous permet de réserver un service de déneigement pour votre véhicule. Créez une réservation en sélectionnant votre véhicule, son emplacement, la date et l'heure souhaitées. Un déneigeur disponible dans votre zone sera assigné et viendra déneiger votre véhicule.",
+  "faq_q2": "Dans quelles zones le service est-il disponible?",
+  "faq_a2": "Actuellement, notre service est disponible dans la grande région de Montréal et ses environs. Nous élargissons continuellement notre zone de couverture. Consultez la carte dans l'application pour voir si votre emplacement est couvert.",
+  "faq_q3": "Quelles sont les heures de service?",
+  "faq_a3": "Notre service est disponible 7 jours sur 7, de 5h00 à 22h00. Les horaires peuvent varier pendant les périodes de tempête intense.",
+  "faq_q4": "Qu'est-ce que l'Assistant IA?",
+  "faq_a4": "L'Assistant IA est votre aide virtuel disponible 24/7 dans l'application. Il peut répondre à vos questions sur le service, vous aider à résoudre des problèmes, donner des conseils et vous informer sur les conditions météo actuelles et prévues dans votre région.",
+  "faq_q5": "Comment utiliser l'Assistant IA?",
+  "faq_a5": "Accédez à l'Assistant IA depuis le menu principal ou en appuyant sur l'icône de chat. Posez vos questions en langage naturel et l'assistant vous répondra instantanément. Il peut vous aider avec les réservations, les litiges, les paiements et bien plus.",
+  "faq_q6": "L'Assistant IA peut-il me donner la météo?",
+  "faq_a6": "Oui! L'Assistant IA a accès aux données météo en temps réel. Demandez-lui simplement \"Quelle est la météo?\" ou \"Va-t-il neiger demain?\" pour obtenir les prévisions actuelles et à venir dans votre région.",
+  "faq_q7": "Comment faire une réservation?",
+  "faq_a7": "1. Ouvrez l'application et appuyez sur \"Nouvelle réservation\"\n2. Sélectionnez votre véhicule ou ajoutez-en un nouveau\n3. Indiquez l'emplacement du véhicule\n4. Choisissez la date et l'heure\n5. Sélectionnez les options souhaitées\n6. Confirmez et payez",
+  "faq_q8": "Puis-je annuler ma réservation?",
+  "faq_a8": "Oui, vous pouvez annuler votre réservation selon les conditions suivantes:\n• Plus de 24h avant: remboursement complet\n• Entre 12h et 24h avant: remboursement de 50%\n• Moins de 12h avant: aucun remboursement",
+  "faq_q9": "Comment savoir quand le déneigeur arrive?",
+  "faq_a9": "Vous recevrez une notification push lorsque le déneigeur sera en route vers votre véhicule. Vous pouvez également suivre sa position en temps réel sur la carte dans l'application.",
+  "faq_q10": "Que faire si le déneigeur ne trouve pas mon véhicule?",
+  "faq_a10": "Assurez-vous d'avoir bien décrit l'emplacement de votre véhicule. Le déneigeur vous contactera via la messagerie de l'application s'il a des difficultés. Vous pouvez aussi ajouter une photo de votre véhicule pour faciliter son identification.",
+  "faq_q11": "Quels modes de paiement sont acceptés?",
+  "faq_a11": "Nous acceptons les cartes de crédit Visa, Mastercard et American Express. Le paiement est traité de manière sécurisée via Stripe.",
+  "faq_q12": "Comment obtenir un remboursement?",
+  "faq_a12": "Les remboursements sont automatiquement traités selon notre politique d'annulation. Pour les cas spéciaux (service non satisfaisant, etc.), contactez notre support via la section \"Aide et Support\".",
+  "faq_q13": "Puis-je ajouter un pourboire?",
+  "faq_a13": "Oui! Après la fin du service, vous avez la possibilité d'ajouter un pourboire au déneigeur. Cette option apparaît sur l'écran de notation du service.",
+  "faq_q14": "Comment gérer mes cartes de paiement?",
+  "faq_a14": "Rendez-vous dans Profil > Paiements > Méthodes de paiement. Vous pouvez y ajouter, supprimer ou définir une carte par défaut.",
+  "faq_q15": "Que faire si le déneigeur n'est pas venu?",
+  "faq_a15": "Si le déneigeur assigné n'est pas venu à l'heure prévue, vous pouvez signaler un \"no-show\" directement depuis les détails de la réservation. Le bouton \"Signaler un no-show\" apparaît 30 minutes après l'heure de départ prévue. Si le no-show est confirmé, vous serez remboursé intégralement.",
+  "faq_q16": "Comment créer un litige?",
+  "faq_a16": "Pour créer un litige:\n1. Allez dans Profil > Mes litiges > Créer un litige\n2. Sélectionnez la réservation concernée\n3. Choisissez le type de problème (travail incomplet, qualité insuffisante, dommage, etc.)\n4. Décrivez la situation en détail\n5. Ajoutez des photos comme preuves\n6. Indiquez le montant réclamé si applicable\n7. Soumettez votre litige",
+  "faq_q17": "Quels types de litiges puis-je signaler?",
+  "faq_a17": "Vous pouvez signaler plusieurs types de problèmes:\n• Déneigeur non venu (no-show)\n• Travail incomplet\n• Qualité insuffisante\n• Retard important\n• Dommage causé à votre véhicule\n• Mauvais emplacement déneigé\n• Surfacturation\n• Comportement inapproprié\n• Autre problème",
+  "faq_q18": "Comment ajouter des preuves à mon litige?",
+  "faq_a18": "Les preuves renforcent votre dossier. Dans les détails du litige, appuyez sur \"Ajouter des preuves\" pour:\n• Prendre des photos ou les choisir depuis votre galerie (jusqu'à 10 photos)\n• Ajouter une description détaillée\n\nConseils: prenez des photos claires, bien éclairées et horodatées si possible.",
+  "faq_q19": "Qu'est-ce que l'analyse IA des litiges?",
+  "faq_a19": "Notre système utilise l'intelligence artificielle pour analyser objectivement les litiges. L'IA examine les preuves (photos, descriptions, données GPS, historique), évalue la force des arguments et propose une recommandation. Cette analyse aide notre équipe à prendre des décisions justes et rapides.",
+  "faq_q20": "Combien de temps ai-je pour signaler un problème?",
+  "faq_a20": "Vous avez 24 heures après la fin du service pour signaler un problème ou un no-show. Passé ce délai, vous pouvez toujours contacter le support, mais le traitement pourrait être plus long.",
+  "faq_q21": "Comment suivre l'état de mon litige?",
+  "faq_a21": "Rendez-vous dans Profil > Mes litiges pour voir tous vos litiges et leur statut: Ouvert, En examen, En attente de réponse, Résolu. Vous recevrez une notification dès qu'une décision sera prise.",
+  "faq_q22": "Puis-je faire appel d'une décision?",
+  "faq_a22": "Oui, si vous n'êtes pas satisfait de la décision prise, vous pouvez faire appel dans les 7 jours suivant la résolution. Allez dans les détails du litige et appuyez sur \"Faire appel\". Expliquez pourquoi vous contestez la décision.",
+  "faq_q23": "Comment sont traités les remboursements suite à un litige?",
+  "faq_a23": "Si le litige est résolu en votre faveur, le remboursement est automatiquement traité sur votre méthode de paiement originale. Le délai est généralement de 3-5 jours ouvrables selon votre banque.",
+  "faq_q24": "Comment modifier mes informations personnelles?",
+  "faq_a24": "Allez dans Profil > Modifier le profil pour changer votre nom, numéro de téléphone ou photo de profil.",
+  "faq_q25": "Comment ajouter ou supprimer un véhicule?",
+  "faq_a25": "Rendez-vous dans Profil > Mes véhicules. Appuyez sur \"+\" pour ajouter un nouveau véhicule ou faites glisser vers la gauche sur un véhicule existant pour le supprimer.",
+  "faq_q26": "Comment supprimer mon compte?",
+  "faq_a26": "Allez dans Paramètres > Supprimer mon compte. Cette action est irréversible et supprimera toutes vos données.",
+  "faq_q27": "J'ai oublié mon mot de passe, que faire?",
+  "faq_a27": "Sur l'écran de connexion, appuyez sur \"Mot de passe oublié?\". Entrez votre email et vous recevrez un lien pour réinitialiser votre mot de passe.",
+  "wfaq_q1": "Comment devenir déneigeur sur Deneige Auto?",
+  "wfaq_a1": "Pour devenir déneigeur, vous devez créer un compte en tant que déneigeur, compléter votre profil avec vos informations personnelles, ajouter votre équipement disponible et configurer votre compte bancaire pour recevoir vos paiements.",
+  "wfaq_q2": "Quelles sont les conditions pour être déneigeur?",
+  "wfaq_a2": "Vous devez avoir au moins 18 ans, posséder un équipement de déneigement de base (pelle, balai, grattoir), être disponible pendant les périodes de neige et avoir un compte bancaire canadien pour recevoir vos paiements.",
+  "wfaq_q3": "Puis-je choisir mes zones de travail?",
+  "wfaq_a3": "Oui! Dans vos paramètres, vous pouvez définir vos zones préférées. Vous recevrez des notifications prioritaires pour les jobs dans ces zones, mais vous pouvez aussi accepter des jobs ailleurs.",
+  "wfaq_q4": "Qu'est-ce que l'Assistant IA?",
+  "wfaq_a4": "L'Assistant IA est votre aide virtuel disponible 24/7 dans l'application. Il peut répondre à vos questions sur les jobs, vous aider à résoudre des problèmes, donner des conseils pour améliorer votre service et vous informer sur les conditions météo pour planifier votre journée.",
+  "wfaq_q5": "Comment utiliser l'Assistant IA?",
+  "wfaq_a5": "Accédez à l'Assistant IA depuis le menu principal. Posez vos questions en langage naturel:\n• \"Quels jobs sont disponibles près de moi?\"\n• \"Comment répondre à un litige?\"\n• \"Quelle météo est prévue demain?\"\n• \"Comment améliorer mon score?\"\nL'assistant vous répondra instantanément.",
+  "wfaq_q6": "L'Assistant IA peut-il m'aider avec la météo?",
+  "wfaq_a6": "Oui! L'Assistant IA a accès aux prévisions météo en temps réel. Demandez-lui les conditions actuelles ou les prévisions pour planifier vos disponibilités. Vous pouvez ainsi anticiper les journées de forte demande lors des tempêtes de neige.",
+  "wfaq_q7": "Comment recevoir des jobs?",
+  "wfaq_a7": "Activez votre disponibilité dans l'application. Vous recevrez des notifications push pour les nouveaux jobs disponibles dans votre zone. Vous pouvez alors accepter ou refuser chaque job.",
+  "wfaq_q8": "Puis-je accepter plusieurs jobs en même temps?",
+  "wfaq_a8": "Oui, vous pouvez gérer jusqu'à 5 jobs simultanément. Dans vos paramètres, définissez le nombre maximum de jobs actifs que vous souhaitez avoir en même temps. Nous recommandons 2-3 jobs pour un service optimal.",
+  "wfaq_q9": "Comment annuler un job accepté?",
+  "wfaq_a9": "Vous pouvez annuler un job avant de commencer le travail. Allez dans les détails du job et appuyez sur \"Annuler\". Attention: des annulations fréquentes peuvent affecter votre score et votre visibilité.",
+  "wfaq_q10": "Que faire si je ne trouve pas le véhicule?",
+  "wfaq_a10": "Utilisez la messagerie intégrée pour contacter le client. Si le véhicule est introuvable après 15 minutes et sans réponse du client, vous pouvez signaler le problème et annuler le job sans pénalité.",
+  "wfaq_q11": "Comment signaler un problème avec un job?",
+  "wfaq_a11": "Dans les détails du job, appuyez sur \"Signaler un problème\". Décrivez la situation et ajoutez des photos si nécessaire. Notre équipe examinera votre signalement rapidement.",
+  "wfaq_q12": "Comment suis-je payé?",
+  "wfaq_a12": "Les paiements sont effectués automatiquement via Stripe Connect. Après chaque job complété, le montant est transféré sur votre compte bancaire dans un délai de 2-7 jours ouvrables.",
+  "wfaq_q13": "Comment configurer mon compte bancaire?",
+  "wfaq_a13": "Allez dans Paramètres > Mes paiements > Configuration Stripe. Suivez les étapes pour vérifier votre identité et ajouter vos coordonnées bancaires. Ce processus est sécurisé et obligatoire pour recevoir vos paiements.",
+  "wfaq_q14": "Comment sont calculés mes gains?",
+  "wfaq_a14": "Vos gains dépendent du type de service (déneigement standard, avec options), de la taille du véhicule et de la distance. Vous voyez le montant exact avant d'accepter chaque job. Deneige Auto prélève une commission de 15%.",
+  "wfaq_q15": "Comment fonctionnent les pourboires?",
+  "wfaq_a15": "Les clients peuvent laisser un pourboire après le service. Les pourboires sont 100% pour vous, sans commission. Vous recevez une notification et le montant est ajouté à votre prochain paiement.",
+  "wfaq_q16": "Où voir mon historique de gains?",
+  "wfaq_a16": "Allez dans l'onglet \"Gains\" pour voir vos revenus quotidiens, hebdomadaires et mensuels. Vous pouvez aussi voir le détail de chaque job et les pourboires reçus.",
+  "wfaq_q17": "Que se passe-t-il si un client me signale un no-show?",
+  "wfaq_a17": "Si un client signale que vous n'êtes pas venu, vous recevrez une notification et aurez l'opportunité de répondre. Si vous avez marqué \"En route\" dans l'application, cela sera pris en compte. Les faux signalements de clients sont aussi sanctionnés.",
+  "wfaq_q18": "Comment répondre à un litige?",
+  "wfaq_a18": "Pour répondre à un litige:\n1. Allez dans Profil > Mes litiges\n2. Ouvrez le litige concerné\n3. Appuyez sur \"Répondre au litige\"\n4. Expliquez votre version des faits en détail\n5. Ajoutez des photos comme preuves (avant/après, captures d'écran, etc.)\n6. Soumettez votre réponse\n\nVous avez généralement 48 heures pour répondre.",
+  "wfaq_q19": "Comment ajouter des preuves à ma défense?",
+  "wfaq_a19": "Les preuves sont essentielles pour défendre votre position. Dans les détails du litige, utilisez \"Ajouter des preuves\" pour:\n• Photos avant/après le déneigement\n• Captures d'écran de communications\n• Photos horodatées sur le site\n• Tout document pertinent\n\nVous pouvez ajouter jusqu'à 10 photos et une description détaillée.",
+  "wfaq_q20": "Qu'est-ce que l'analyse IA des litiges?",
+  "wfaq_a20": "Notre système utilise l'intelligence artificielle pour analyser objectivement chaque litige. L'IA examine:\n• Les photos et preuves des deux parties\n• Les données GPS et timestamps\n• L'historique du client et du déneigeur\n• La cohérence des déclarations\n\nCette analyse aide à prendre des décisions justes. Si l'IA détecte un faux signalement, cela joue en votre faveur.",
+  "wfaq_q21": "Pourquoi prendre des photos avant/après est important?",
+  "wfaq_a21": "Les photos avant/après sont vos meilleures preuves:\n• Elles documentent l'état initial et le travail accompli\n• L'IA peut analyser la qualité du déneigement\n• En cas de litige, elles prouvent votre travail\n• Elles sont horodatées automatiquement\n\nPrenez l'habitude de photographier chaque job!",
+  "wfaq_q22": "Quelles sont les conséquences d'un litige contre moi?",
+  "wfaq_a22": "Les conséquences dépendent de la décision et de votre historique:\n• Premier avertissement: notification\n• Récidive: suspension temporaire (3-7 jours)\n• Problèmes répétés: suspension prolongée (30 jours)\n• Cas graves: exclusion permanente\n\nMaintenez un bon service pour éviter les litiges.",
+  "wfaq_q23": "Comment contester une décision défavorable?",
+  "wfaq_a23": "Si vous n'êtes pas d'accord avec la décision prise sur un litige, vous pouvez faire appel dans les 7 jours. Fournissez des preuves supplémentaires (photos, messages, etc.) pour appuyer votre contestation.",
+  "wfaq_q24": "Comment signaler un client problématique?",
+  "wfaq_a24": "Si un client est abusif, introuvable malgré vos efforts, ou fait de fausses réclamations, vous pouvez le signaler dans les détails du job. Notre équipe examinera la situation et pourra sanctionner le client si nécessaire.",
+  "wfaq_q25": "Mon paiement est-il affecté pendant un litige?",
+  "wfaq_a25": "Pendant l'examen d'un litige, le paiement correspondant peut être temporairement retenu. Une fois la décision prise:\n• Litige en votre faveur: paiement complet versé\n• Litige contre vous: remboursement au client (partiel ou total selon la décision)",
+  "wfaq_q26": "Comment protéger mon score de fiabilité?",
+  "wfaq_a26": "Pour maintenir un bon score:\n• Arrivez à l'heure (marquez \"En route\" dans l'app)\n• Prenez des photos avant/après chaque job\n• Communiquez avec le client en cas de problème\n• Complétez le travail selon les standards demandés\n• Évitez les annulations de dernière minute",
+  "wfaq_q27": "Comment modifier mon équipement disponible?",
+  "wfaq_a27": "Dans Paramètres ou dans votre Profil, vous pouvez cocher/décocher les équipements que vous possédez: pelle, balai, grattoir, épandeur de sel, souffleuse. Cela aide à vous assigner les jobs appropriés.",
+  "wfaq_q28": "Comment changer mes notifications?",
+  "wfaq_a28": "Dans Paramètres > Notifications, vous pouvez activer/désactiver les alertes pour: nouveaux jobs, jobs urgents et pourboires reçus.",
+  "wfaq_q29": "Comment améliorer mon score déneigeur?",
+  "wfaq_a29": "Votre score est basé sur: la qualité du service (évaluations clients), le taux d'acceptation des jobs, la ponctualité et le taux de complétion. Offrez un service de qualité et soyez fiable pour améliorer votre score.",
+  "wfaq_q30": "Puis-je prendre une pause de l'application?",
+  "wfaq_a30": "Oui! Désactivez simplement votre disponibilité dans l'application. Vous ne recevrez plus de notifications de jobs. Réactivez quand vous êtes prêt à travailler.",
+  "adminDash_quickActions": "Actions rapides",
+  "adminDash_users": "Utilisateurs",
+  "adminDash_reservations": "Réservations",
+  "adminDash_notify": "Notifier",
+  "adminDash_support": "Support",
+  "adminDash_clientsWorkers": "{clients} clients, {workers} déneigeurs",
+  "@adminDash_clientsWorkers": {
+    "placeholders": {
+      "clients": {
+        "type": "int"
+      },
+      "workers": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_todayCount": "{count} aujourd'hui",
+  "@adminDash_todayCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_pending": "En attente",
+  "adminDash_toProcess": "À traiter",
+  "adminDash_completionRate": "Taux de complétion",
+  "adminDash_completedCount": "{count} terminées",
+  "@adminDash_completedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_pendingCount": "{count} en attente",
+  "@adminDash_pendingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_total": "Total",
+  "adminDash_inProgress": "En cours",
+  "adminDash_resolved": "Résolues",
+  "adminDash_newRequestsToday": "{count} nouvelle(s) demande(s) aujourd'hui",
+  "@adminDash_newRequestsToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_revenue": "Revenus",
+  "adminDash_reservationCount": "{count} réservations",
+  "@adminDash_reservationCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDash_thisMonth": "Ce mois",
+  "adminDash_grossCommission": "Commission brute (25%)",
+  "adminDash_stripeFees": "Frais Stripe",
+  "adminDash_netCommission": "Commission nette",
+  "adminDash_tips": "Pourboires",
+  "adminDash_topWorkers": "Top Déneigeurs",
+  "adminDash_viewAll": "Voir tous",
+  "adminDash_noWorkers": "Aucun déneigeur pour le moment",
+  "adminDash_sendNotification": "Envoyer une notification",
+  "adminDash_title": "Titre",
+  "adminDash_messageLabel": "Message",
+  "adminDash_recipients": "Destinataires",
+  "adminDash_allUsers": "Tous les utilisateurs",
+  "adminDash_clientsOnly": "Clients uniquement",
+  "adminDash_workersOnly": "Déneigeurs uniquement",
+  "adminDash_cancel": "Annuler",
+  "adminDash_sendBtn": "Envoyer",
+  "adminDash_fillAllFields": "Veuillez remplir tous les champs",
+  "adminDash_adminLogout": "Déconnexion Admin",
+  "adminDash_logoutConfirm": "Voulez-vous vraiment vous déconnecter du panneau d'administration ?",
+  "adminDash_logout": "Déconnexion",
+  "addVehicle_title": "Ajouter un véhicule",
+  "addVehicle_tapAddPhoto": "Touchez pour ajouter une photo",
+  "addVehicle_newVehicle": "Nouveau véhicule",
+  "addVehicle_photoTitle": "Photo du véhicule",
+  "addVehicle_photoVisibleWorker": "Cette photo sera visible par le déneigeur",
+  "addVehicle_takePhoto": "Prendre une photo",
+  "addVehicle_useCamera": "Utiliser l'appareil photo",
+  "addVehicle_choosePhoto": "Choisir une photo",
+  "addVehicle_fromGallery": "Depuis la galerie",
+  "addVehicle_deletePhoto": "Supprimer la photo",
+  "addVehicle_removeSelected": "Retirer la photo sélectionnée",
+  "addVehicle_make": "Marque",
+  "addVehicle_model": "Modèle",
+  "addVehicle_year": "Année",
+  "addVehicle_plate": "Plaque",
+  "addVehicle_required": "Requis",
+  "addVehicle_invalid": "Invalide",
+  "addVehicle_vehicleType": "Type de véhicule",
+  "addVehicle_color": "Couleur",
+  "addVehicle_setDefault": "Définir comme véhicule par défaut",
+  "addVehicle_addBtn": "Ajouter le véhicule",
+  "addVehicle_colorWhite": "Blanc",
+  "addVehicle_colorBlack": "Noir",
+  "addVehicle_colorGray": "Gris",
+  "addVehicle_colorSilver": "Argent",
+  "addVehicle_colorRed": "Rouge",
+  "addVehicle_colorBlue": "Bleu",
+  "addVehicle_colorGreen": "Vert",
+  "addVehicle_colorBrown": "Brun",
+  "addVehicle_colorBeige": "Beige",
+  "addCard_title": "Ajouter une carte",
+  "addCard_securePayment": "Paiement sécurisé",
+  "addCard_protectedByStripe": "Vos informations sont protégées par Stripe",
+  "addCard_cardInfo": "Informations de la carte",
+  "addCard_cardNumber": "Numéro de carte",
+  "addCard_setDefault": "Définir comme méthode par défaut",
+  "addCard_usedForFuture": "Utilisée pour vos futurs paiements",
+  "addCard_encryptedSecure": "Données cryptées et sécurisées. Numéro de carte jamais stocké.",
+  "addCard_addBtn": "Ajouter la carte",
+  "addCard_errorAdding": "Impossible d'ajouter cette carte. Vérifiez les informations et réessayez.",
+  "verify_title": "Vérification d'identité",
+  "verify_heading": "Vérifiez votre identité",
+  "verify_description": "Pour la sécurité de tous, nous devons vérifier votre identité avant que vous puissiez accepter des jobs.",
+  "verify_step1Title": "Pièce d'identité",
+  "verify_step1Desc": "Photographiez le recto (et verso si disponible) de votre pièce d'identité",
+  "verify_step2Title": "Selfie",
+  "verify_step2Desc": "Prenez un selfie pour confirmer que vous êtes bien la personne sur la pièce d'identité",
+  "verify_step3Title": "Vérification automatique",
+  "verify_step3Desc": "Notre système vérifie vos documents en quelques minutes",
+  "verify_acceptedDocs": "Documents acceptés",
+  "verify_driverLicense": "Permis de conduire",
+  "verify_healthCard": "Carte d'assurance maladie",
+  "verify_passport": "Passeport",
+  "verify_permanentResident": "Carte de résident permanent",
+  "verify_startBtn": "Commencer la vérification",
+  "verify_approved": "Identité vérifiée",
+  "verify_approvedDesc": "Vous pouvez maintenant accepter des jobs de déneigement",
+  "verify_expiresOn": "Expire le {date}",
+  "@verify_expiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "verify_pendingTitle": "Vérification en cours",
+  "verify_pendingDesc": "Nous analysons vos documents. Cela peut prendre quelques minutes.",
+  "verify_refresh": "Actualiser",
+  "verify_rejectedTitle": "Vérification refusée",
+  "verify_attemptsRemaining": "Tentatives restantes: {count}",
+  "@verify_attemptsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "verify_resubmit": "Resoumettre mes documents",
+  "verify_maxAttempts": "Nombre maximum de tentatives atteint",
+  "verify_contactSupport": "Veuillez contacter le support pour assistance.",
+  "verify_expiredTitle": "Vérification expirée",
+  "verify_expiredDesc": "Votre vérification d'identité a expiré. Veuillez resoumettre vos documents.",
+  "verify_renewBtn": "Renouveler ma vérification",
+  "worker_revenue": "Revenus",
+  "worker_urgentCount": "{count} urgent",
+  "@worker_urgentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "worker_myRevenue": "Mes revenus",
+  "resDetail_errorPrefix": "Erreur: {message}",
+  "@resDetail_errorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "resDetail_ratingSuccessTipError": "Évaluation envoyée, mais erreur pourboire: {message}",
+  "@resDetail_ratingSuccessTipError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "resDetail_tipSent": "Merci! Pourboire de {amount}$ envoyé",
+  "@resDetail_tipSent": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "resDetail_ratingSuccess": "Merci pour votre évaluation!",
+  "activities_title": "Activités",
+  "activities_inProgress": "En cours",
+  "activities_completed": "Terminées",
+  "activities_emptyCompleted": "Aucune activité terminée",
+  "activities_emptyInProgress": "Aucune activité en cours",
+  "activities_emptyCompletedSubtitle": "Vos déneigements terminés apparaîtront ici",
+  "activities_emptyInProgressSubtitle": "Vos déneigements en cours apparaîtront ici",
+  "activities_total": "Total",
+  "reservationSuccess_title": "Réservation confirmée !",
+  "reservationSuccess_subtitle": "Votre demande de déneigement a été enregistrée avec succès.",
+  "reservationSuccess_reservationNumber": "Numéro de réservation",
+  "reservationSuccess_nextSteps": "Prochaines étapes",
+  "reservationSuccess_step1": "1. Un déneigeur sera assigné sous peu",
+  "reservationSuccess_step2": "2. Vous recevrez une notification",
+  "reservationSuccess_step3": "3. Suivez l'avancement en temps réel",
+  "reservationSuccess_backToHome": "Retour à l'accueil",
+  "reservationSuccess_viewReservations": "Voir mes réservations",
+  "step1_vehicle": "Véhicule",
+  "step1_location": "Emplacement",
+  "step1_assignedSpot": "Place assignée",
+  "step1_haveSpotNumber": "J'ai un numéro de place",
+  "step1_freeLocation": "Emplacement libre",
+  "step1_describeLocation": "Décrivez où se trouve le véhicule",
+  "step1_noVehicle": "Aucun véhicule",
+  "step1_addFirstVehicle": "Ajoutez votre premier véhicule",
+  "step1_addVehicle": "Ajouter un véhicule",
+  "step1_chipFrontBuilding": "Devant le bâtiment",
+  "step1_chipNearEntrance": "Près de l'entrée",
+  "step1_chipVisitorZone": "Zone visiteurs",
+  "step1_chipRearParking": "Stationnement arrière",
+  "step2_gpsPosition": "Position GPS",
+  "step2_address": "Adresse",
+  "step2_searching": "Recherche en cours...",
+  "step2_positionDetected": "Position détectée",
+  "step2_positionUnavailable": "Position non disponible, activez votre GPS",
+  "step2_pleaseWait": "Veuillez patienter",
+  "step2_checkAddress": "Vérifiez l'adresse ci-dessous",
+  "step2_enterManually": "Entrez l'adresse manuellement",
+  "step2_refresh": "Actualiser",
+  "step2_retry": "Réessayer",
+  "step2_addressValidated": "Adresse validée",
+  "step2_validateAddress": "Valider l'adresse",
+  "step2_addressTip": "L'adresse aide nos déneigeurs à localiser votre véhicule",
+  "step3_departureDate": "Date de départ",
+  "step3_departureTime": "Heure de départ",
+  "step3_selectDate": "Sélectionner une date",
+  "step3_selectTime": "Sélectionner une heure",
+  "step3_urgentReservation": "Réservation urgente",
+  "step3_urgencyFee": "Frais d'urgence de 40% appliqués",
+  "step4_additionalOptions": "Options supplementaires",
+  "step4_snowDepth": "Profondeur de neige",
+  "step4_summary": "Recapitulatif",
+  "step5_location": "Localisation",
+  "step5_yourReservation": "Votre réservation",
+  "step5_total": "Total",
+  "step5_ourGuarantees": "Nos garanties",
+  "step5_freeCancellation": "Annulation gratuite",
+  "step5_upTo2hBefore": "Jusqu'à 2h avant",
+  "step5_qualityGuarantee": "Garantie qualité",
+  "step5_satisfiedOrRefunded": "Satisfait ou remboursé",
+  "step5_photosAfter": "Photos après",
+  "step5_proofOfService": "Preuve de service",
+  "step5_punctuality": "Ponctualité",
+  "step5_discountIfLate": "Remise si retard",
+  "month_jan": "JAN",
+  "month_feb": "FÉV",
+  "month_mar": "MAR",
+  "month_apr": "AVR",
+  "month_may": "MAI",
+  "month_jun": "JUIN",
+  "month_jul": "JUIL",
+  "month_aug": "AOÛ",
+  "month_sep": "SEP",
+  "month_oct": "OCT",
+  "month_nov": "NOV",
+  "month_dec": "DÉC",
+  "profile_photoUpdated": "Photo de profil mise à jour",
+  "profile_phoneVerified": "Numéro de téléphone vérifié et mis à jour",
+  "profile_verify": "Vérifier",
+  "subscription_selectedPlan": "Vous avez sélectionné le plan {planName}",
+  "@subscription_selectedPlan": {
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "subscription_comingSoon": "Cette fonctionnalité sera bientôt disponible.",
+  "subscription_planSelected": "Plan {planName} sélectionné",
+  "@subscription_planSelected": {
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_legalNotices": "Mentions légales",
+  "legal_appUsageRules": "Règles d'utilisation de l'application",
+  "worker_photoSentSuccess": "Photo envoyée avec succès!",
+  "worker_positionConfirmed": "Position confirmée!",
+  "worker_coordinatesUnavailable": "Coordonnées non disponibles",
+  "worker_phoneUnavailable": "Numéro de téléphone non disponible",
+  "worker_userNotAuth": "Erreur: utilisateur non authentifié",
+  "worker_iArrived": "Je suis arrivé",
+  "worker_startJob": "Commencer",
+  "worker_openGps": "Ouvrir GPS",
+  "worker_finishJob": "Terminer le job",
+  "worker_inFavorOfComplainant": "En faveur du plaignant",
+  "worker_inFavorOfDefendant": "En faveur du defenseur",
+  "worker_fullRefund": "Remboursement complet",
+  "worker_partialRefund": "Remboursement partiel",
+  "worker_noAction": "Aucune action",
+  "worker_mutualAgreement": "Accord mutuel",
+  "worker_warningAction": "Avertissement",
+  "worker_permanentBan": "Bannissement permanent",
+  "worker_selectDecision": "Sélectionnez une décision",
+  "worker_disputeResolvedSuccess": "Litige résolu avec succès",
+  "summary_reservationSummary": "Résumé de la réservation",
+  "summary_spot": "Place",
+  "summary_departure": "Départ",
+  "summary_options": "Options",
+  "summary_snow": "Neige",
+  "summary_place": "Place {number}",
+  "@summary_place": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "option_windowScraping": "Grattage des vitres",
+  "option_doorDeicing": "Déglaçage des portes",
+  "option_wheelClearance": "Dégagement des roues",
+  "option_roofClearing": "Déneigement du toit",
+  "option_saltSpreading": "Épandage de sel",
+  "option_lightsCleaning": "Nettoyage phares/feux",
+  "option_perimeterClearance": "Dégagement périmètre",
+  "option_exhaustCheck": "Vérif. échappement",
+  "option_windowScrapingShort": "Vitres",
+  "option_doorDeicingShort": "Portes",
+  "option_wheelClearanceShort": "Roues",
+  "option_roofClearingShort": "Toit",
+  "option_saltSpreadingShort": "Sel",
+  "option_lightsCleaningShort": "Phares",
+  "option_perimeterClearanceShort": "Périmètre",
+  "option_exhaustCheckShort": "Échapp.",
+  "option_windowScrapingDesc": "Grattage complet de toutes les vitres",
+  "option_doorDeicingDesc": "Dégivrage des poignées et serrures",
+  "option_wheelClearanceDesc": "Dégagement de la neige autour des roues",
+  "option_roofClearingDesc": "Enlever la neige accumulée sur le toit",
+  "option_saltSpreadingDesc": "Application de sel autour du véhicule",
+  "option_lightsCleaningDesc": "Nettoyage des phares et feux arrière",
+  "option_perimeterClearanceDesc": "Déneigement complet autour du véhicule",
+  "option_exhaustCheckDesc": "Vérifier que l'échappement est dégagé",
+  "price_baseSnowRemoval": "Déneigement de base",
+  "price_vehicleAdjustment": "Ajustement véhicule",
+  "price_parkingAdjustment": "Ajustement place",
+  "price_snowSurcharge": "Supplément neige",
+  "price_additionalOptions": "Options supplémentaires",
+  "price_urgencyFee": "Frais d'urgence (40%)",
+  "price_subtotal": "Sous-total",
+  "price_serviceFee": "Frais de service",
+  "price_insuranceFee": "Frais d'assurance",
+  "price_taxesCalculatedFor": "Taxes calculées pour: {province}",
+  "@price_taxesCalculatedFor": {
+    "placeholders": {
+      "province": {
+        "type": "String"
+      }
+    }
+  },
+  "price_totalToPay": "Total à payer",
+  "price_taxesIncluded": "Taxes incluses",
+  "price_urgentBanner": "Réservation urgente - Frais majorés",
+  "snow_estimatedDepth": "Profondeur de neige estimée",
+  "snow_optionalHelper": "Optionnel - Aide à estimer le temps requis",
+  "ai_estimationTitle": "Estimation IA",
+  "ai_estimationSubtitle": "Prix suggéré basé sur la demande",
+  "ai_priceFactors": "Facteurs de prix",
+  "ai_urgency": "Urgence",
+  "ai_weather": "Météo",
+  "ai_demand": "Demande",
+  "ai_zone": "Zone",
+  "ai_estimationLoading": "Estimation IA en cours...",
+  "ai_estimationUnavailable": "Estimation IA non disponible",
+  "worker_yesStart": "Oui, commencer",
+  "dispute_addEvidenceButton": "Ajouter des preuves",
+  "dispute_addEvidenceError": "Erreur lors de l'ajout des preuves",
+  "dispute_addEvidenceTitle": "Ajouter une preuve",
+  "dispute_additionalDetailsOptional": "Détails supplémentaires (optionnel)",
+  "dispute_addMorePhotos": "Ajouter plus de photos",
+  "dispute_addPhotoOrDescription": "Ajoutez au moins une photo ou une description",
+  "dispute_addPhotosInstruction": "Ajoutez des photos pour appuyer votre réponse (photos du travail effectué, captures d'écran de conversation, etc.)",
+  "dispute_aiAnalysis": "Analyse IA",
+  "dispute_amount": "Montant",
+  "dispute_appeal": "Faire appel",
+  "dispute_appealExplanation": "Expliquez pourquoi vous contestez cette décision (minimum 50 caractères):",
+  "dispute_appealJustificationHint": "Votre justification...",
+  "dispute_appealSubmitted": "Appel soumis avec succès",
+  "dispute_attachedPhotos": "Photos jointes",
+  "dispute_cannotSendReportRetry": "Impossible d'envoyer le signalement. Veuillez réessayer.",
+  "dispute_cannotSendResponseRetry": "Impossible d'envoyer la réponse. Veuillez réessayer.",
+  "dispute_claimedAmountValue": "Montant réclamé: {amount} $",
+  "@dispute_claimedAmountValue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_confidencePercent": "{percent}%",
+  "@dispute_confidencePercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_confirmNoShowRequired": "Veuillez confirmer l'absence du déneigeur avant de soumettre",
+  "dispute_confirmNoShowStatement": "Je confirme que le déneigeur ne s'est pas présenté pour le service prévu.",
+  "dispute_deadlines": "Délais",
+  "dispute_decisionFavorClaimant": "En votre faveur",
+  "dispute_decisionFavorRespondent": "En faveur du défenseur",
+  "dispute_decisionFullRefund": "Remboursement complet",
+  "dispute_decisionLabel": "Décision: {decision}",
+  "@dispute_decisionLabel": {
+    "placeholders": {
+      "decision": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_decisionMutualAgreement": "Accord mutuel",
+  "dispute_decisionNoAction": "Aucune action",
+  "dispute_decisionPartialRefund": "Remboursement partiel",
+  "dispute_describeEvidenceHint": "Décrivez les preuves fournies...",
+  "dispute_describeSituationHint": "Décrivez la situation...",
+  "dispute_descriptionOptional": "Description (optionnelle)",
+  "dispute_evidenceAddedMessage": "Vos preuves ont été ajoutées au dossier du litige.",
+  "dispute_evidenceCount": "Preuves ({count})",
+  "@dispute_evidenceCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_evidenceStrength": "Force des preuves",
+  "dispute_evidenceTips": "Conseils pour de bonnes preuves",
+  "dispute_expired": "Expiré",
+  "dispute_falseReportWarning": "Les faux signalements peuvent entraîner des sanctions sur votre compte.",
+  "dispute_filterAll": "Tous",
+  "dispute_filterOpen": "Ouverts",
+  "dispute_filterResolved": "Résolus",
+  "dispute_filterUnderReview": "En examen",
+  "dispute_imagesLoadError": "Impossible de charger les images",
+  "dispute_keyFindings": "Constats clés:",
+  "dispute_maxPhotos": "Maximum 10 photos",
+  "dispute_minCharsRequired": "Minimum 50 caractères requis",
+  "dispute_noDisputes": "Aucun litige",
+  "dispute_noDisputesMessage": "Vous n'avez aucun litige en cours. C'est une bonne nouvelle!",
+  "dispute_notAssigned": "Non assigné",
+  "dispute_notFound": "Litige introuvable",
+  "dispute_notFoundMessage": "Ce litige est introuvable ou a été supprimé.",
+  "dispute_notifiedOfDecision": "Vous serez notifié de la décision finale.",
+  "dispute_notifiedWhenResolved": "Vous serez notifié lorsque le dossier sera résolu.",
+  "dispute_openDate": "Date d'ouverture",
+  "dispute_photoCount": "{count}/10 photos",
+  "@dispute_photoCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_photosLabel": "Photos",
+  "dispute_priority": "Priorité",
+  "dispute_priorityHigh": "Haute",
+  "dispute_priorityLow": "Basse",
+  "dispute_priorityMedium": "Moyenne",
+  "dispute_priorityUrgent": "Urgente",
+  "dispute_reasoning": "Raisonnement",
+  "dispute_refund": "Remboursement",
+  "dispute_refundAmount": "Remboursement: {amount} $",
+  "@dispute_refundAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_refundIfConfirmed": "Si l'absence est confirmée, vous recevrez un remboursement de {amount} $.",
+  "@dispute_refundIfConfirmed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_remainingTimeDaysHours": "{days}j {hours}h restantes",
+  "@dispute_remainingTimeDaysHours": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_remainingTimeHoursMin": "{hours}h {minutes}min restantes",
+  "@dispute_remainingTimeHoursMin": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_remainingTimeMin": "{minutes}min restantes",
+  "@dispute_remainingTimeMin": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "dispute_reportAutoConfirmed": "Votre signalement a été automatiquement confirmé. Un remboursement sera effectué.",
+  "dispute_reportNoShow": "Signaler une absence",
+  "dispute_reportNoShowButton": "Signaler l'absence",
+  "dispute_reportSent": "Signalement envoyé",
+  "dispute_reportUnderReview": "Votre signalement a été soumis et sera examiné par notre équipe.",
+  "dispute_reservationDetails": "Détails de la réservation",
+  "dispute_resolvedCannotAddEvidence": "Ce litige est résolu ou fermé. Vous ne pouvez plus ajouter de preuves.",
+  "dispute_resolvedOn": "Résolu le {date}",
+  "@dispute_resolvedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_responseDeadlinePassed": "Délai de réponse dépassé",
+  "dispute_responseExpectedBefore": "Réponse attendue avant",
+  "dispute_responseHint": "Écrivez votre réponse ici...",
+  "dispute_responseInstruction": "Expliquez votre version des faits. Soyez précis et factuel.",
+  "dispute_responseSentMessage": "Votre réponse a été enregistrée. L'administrateur va examiner le litige et prendra une décision.",
+  "dispute_responseTooShort": "Votre réponse est trop courte (minimum 50 caractères)",
+  "dispute_riskFactors": "Facteurs de risque",
+  "dispute_scheduledTime": "Heure prévue",
+  "dispute_snowWorkerLabel": "Déneigeur",
+  "dispute_submitAppeal": "Soumettre l'appel",
+  "dispute_submitEvidence": "Soumettre les preuves",
+  "dispute_submittedOn": "Soumis le {date}",
+  "@dispute_submittedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dispute_takePhoto": "Prendre une photo",
+  "dispute_tipsRelevantDocs": "Tout document pertinent",
+  "dispute_viewDetails": "Voir les détails",
+  "dispute_workerDidNotCome": "Le déneigeur ne s'est pas présenté",
+  "dispute_workerDidNotComeDesc": "Signalez que le déneigeur {name} ne s'est pas présenté pour le service prévu.",
+  "@dispute_workerDidNotComeDesc": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "worker_accountAlreadyConfigured": "Votre compte est déjà configuré!",
+  "worker_accountConfigured": "Compte configuré",
+  "worker_accountDeleted": "Compte supprimé",
+  "worker_accountsConfiguredCount": "{count} compte(s) configuré(s)",
+  "@worker_accountsConfiguredCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "worker_accountSetAsPrimary": "Compte défini comme principal",
+  "worker_accountVerified": "Compte vérifié",
+  "worker_actions": "Actions",
+  "worker_actionSuccess": "Action réussie",
+  "worker_activeJob": "Job actif",
+  "worker_addAccount": "Ajouter un compte",
+  "worker_addBankAccountToReceive": "Ajoutez un compte bancaire pour recevoir vos gains",
+  "worker_additionalDetailsOptional": "Détails supplémentaires (optionnel)",
+  "worker_arrivedConfirmedMessage": "Vous êtes à {distanceMeters}m du véhicule.\n\nVous pouvez maintenant commencer le travail.",
+  "@worker_arrivedConfirmedMessage": {
+    "placeholders": {
+      "distanceMeters": {
+        "type": "int"
+      }
+    }
+  },
+  "worker_automaticTransfers": "Virements automatiques",
+  "worker_balance": "Solde",
+  "worker_bankAccounts": "Comptes bancaires",
+  "worker_basicInfo": "Informations de base",
+  "worker_cameraPermissionError": "Impossible de prendre la photo. Vérifiez les permissions de la caméra.",
+  "worker_cancelJobQuestion": "Annuler le job?",
+  "worker_cancelReasonEquipmentFailure": "Équipement défaillant",
+  "worker_cancelReasonEquipmentFailureDesc": "Mon équipement de déneigement est défaillant",
+  "worker_cancelReasonFamilyEmergency": "Urgence familiale",
+  "worker_cancelReasonFamilyEmergencyDesc": "J'ai une urgence familiale",
+  "worker_cancelReasonLabel": "Raison de l'annulation:",
+  "worker_cancelReasonMedicalEmergency": "Urgence médicale",
+  "worker_cancelReasonMedicalEmergencyDesc": "J'ai une urgence médicale personnelle",
+  "worker_cancelReasonRoadBlocked": "Route bloquée",
+  "worker_cancelReasonRoadBlockedDesc": "La route vers le client est bloquée ou inaccessible",
+  "worker_cancelReasonSevereWeather": "Conditions météo dangereuses",
+  "worker_cancelReasonSevereWeatherDesc": "Les conditions météo rendent le trajet dangereux",
+  "worker_cancelReasonVehicleBreakdown": "Panne de véhicule",
+  "worker_cancelReasonVehicleBreakdownDesc": "Mon véhicule est en panne ou a un problème mécanique",
+  "worker_cancelThisJob": "Annuler ce job",
+  "worker_cancelWarning": "Vous ne serez pas payé pour ce job.\nLes annulations fréquentes peuvent entraîner une suspension.",
+  "worker_cannotDeterminePosition": "Impossible de déterminer votre position. Activez la localisation et réessayez.",
+  "worker_cannotOpenStripeLink": "Impossible d'ouvrir le lien Stripe",
+  "worker_canNowFinish": "Vous pouvez maintenant terminer",
+  "worker_configureNow": "Configurer maintenant",
+  "worker_configurePayments": "Configurez vos paiements",
+  "worker_confirmCancellation": "Confirmer l'annulation",
+  "worker_confirmCompleteJob": "Êtes-vous sûr de vouloir marquer ce job comme terminé?",
+  "worker_connectingToStripe": "Connexion à Stripe...",
+  "worker_continueSetup": "Continuer la configuration",
+  "worker_deleteAccountConfirm": "Voulez-vous vraiment supprimer le compte se terminant par {last4}?",
+  "@worker_deleteAccountConfirm": {
+    "placeholders": {
+      "last4": {
+        "type": "String"
+      }
+    }
+  },
+  "worker_deleteAccountQuestion": "Supprimer ce compte?",
+  "worker_depositsIn23Days": "Dépôts sous 2-3 jours ouvrables",
+  "worker_documentsRequired": "Documents requis",
+  "worker_documentsSubmitted": "Documents soumis",
+  "worker_documentsVerified": "Documents vérifiés",
+  "worker_enlarge": "Agrandir",
+  "worker_enRoute": "En route",
+  "worker_fundsDepositedInfo": "Les fonds sont déposés sur votre compte bancaire sous 2-3 jours ouvrables.",
+  "worker_goodJob": "Bon travail!",
+  "worker_headToClient": "Dirigez-vous vers le client",
+  "worker_howItWorks": "Comment ça fonctionne",
+  "worker_identityVerificationInfo": "Pour recevoir vos paiements, Stripe doit vérifier votre identité. Préparez les documents suivants:",
+  "worker_jobCompletedSuccess": "Job terminé avec succès!",
+  "worker_jobStarted": "Job démarré!",
+  "worker_locationError": "Erreur de localisation",
+  "worker_locationPermissionDenied": "Permission de localisation refusée",
+  "worker_locationPermissionDeniedForever": "Permission de localisation refusée définitivement. Activez-la dans les paramètres.",
+  "worker_manageBankAccounts": "Gérer mes comptes bancaires",
+  "worker_noBankAccount": "Aucun compte bancaire",
+  "worker_noBankAccountWarning": "Aucun compte bancaire configuré. Ajoutez-en un pour recevoir vos gains.",
+  "worker_noGpsConfirmArrival": "Ce job n'a pas de coordonnées GPS enregistrées.\n\nConfirmez-vous être arrivé à l'emplacement indiqué?",
+  "worker_notChargedForJob": "Vous ne serez pas facturé pour ce job.",
+  "worker_paymentDistribution": "Répartition des paiements",
+  "worker_paymentExample": "Exemple: Pour un job à 50$, vous recevez {amount}$",
+  "@worker_paymentExample": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "worker_payments": "Paiements",
+  "worker_paymentsActive": "Paiements actifs",
+  "worker_payoutsActive": "Virements actifs",
+  "worker_photoId": "Pièce d'identité avec photo",
+  "worker_photoIdDesc": "Permis de conduire, passeport ou carte d'identité",
+  "worker_photoOfCompletedWork": "Photo du travail terminé",
+  "worker_photoRequired": "Photo requise",
+  "worker_photoRequirements": "Exigences pour les photos",
+  "worker_photoUploadError": "Impossible d'envoyer la photo. Vérifiez votre connexion.",
+  "worker_platformCommission": "Commission plateforme",
+  "worker_poweredByStripe": "Propulsé par Stripe",
+  "worker_poweredByStripeLeader": "Propulsé par Stripe, leader mondial des paiements",
+  "worker_pressEnRouteToStart": "Appuyez sur \"En route\" pour commencer",
+  "worker_primary": "Principal",
+  "worker_primaryAccount": "Compte principal",
+  "worker_primaryAccountInfo": "Vos gains seront déposés sur le compte marqué comme principal.",
+  "worker_proofOfAddress": "Preuve d'adresse",
+  "worker_proofOfAddressDesc": "Facture de services publics ou relevé bancaire récent",
+  "worker_readyToReceive": "Prêt à recevoir des paiements",
+  "worker_receiveEarningsDirectly": "Recevez vos gains directement",
+  "worker_reqColorPhoto": "Photo en couleur (format JPG ou PNG)",
+  "worker_reqNameDobVisible": "Nom et date de naissance lisibles",
+  "worker_reqNotExpired": "Document non expiré",
+  "worker_reqOriginalDoc": "Document original, pas une photocopie",
+  "worker_retakePhoto": "Reprendre",
+  "worker_securePayments": "Paiements sécurisés",
+  "worker_sendDocumentsToActivate": "Envoyez vos documents d'identité pour activer les virements.",
+  "worker_sending": "Envoi...",
+  "worker_sendMyDocuments": "Envoyer mes documents",
+  "worker_setAsPrimary": "Définir comme principal",
+  "worker_statusUnknown": "Inconnu",
+  "worker_statusUpdatedEnRoute": "Statut mis à jour: En route",
+  "worker_step1ClientPays": "Le client paie",
+  "worker_step1Subtitle": "Le paiement est traité par Stripe",
+  "worker_step1SubtitleShort": "Paiement traité par Stripe",
+  "worker_step2AutoDistribution": "Répartition automatique",
+  "worker_step2Distribution": "Répartition",
+  "worker_step2Subtitle": "Votre part est calculée instantanément",
+  "worker_step2SubtitleShort": "Votre part est calculée",
+  "worker_step3Deposit": "Dépôt",
+  "worker_step3DepositToAccount": "Dépôt sur votre compte",
+  "worker_step3Subtitle": "Sous 2-3 jours ouvrables",
+  "worker_stripeResponse": "Réponse Stripe: {response}",
+  "@worker_stripeResponse": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "worker_stripeVerifying": "Stripe vérifie vos informations",
+  "worker_takePhoto": "Prendre une photo",
+  "worker_takePhotoBeforeFinish": "Prenez une photo avant de terminer",
+  "worker_timeElapsed": "Temps écoulé",
+  "worker_tooFar": "Trop loin",
+  "worker_tooFarMessage": "Vous êtes à {distanceMeters}m du véhicule.\n\nVous devez être à moins de {maxRadius}m pour confirmer votre arrivée.\n\nContinuez à vous rapprocher.",
+  "@worker_tooFarMessage": {
+    "placeholders": {
+      "distanceMeters": {
+        "type": "int"
+      },
+      "maxRadius": {
+        "type": "int"
+      }
+    }
+  },
+  "worker_verificationInProgress": "Vérification en cours",
+  "worker_verificationTimeInfo": "La vérification peut prendre quelques minutes à 24 heures.",
+  "worker_verifyingPosition": "Vérification de votre position...",
+  "worker_viewStatusOnStripe": "Voir le statut sur Stripe",
+  "worker_viewStripeDashboard": "Voir mon dashboard Stripe",
+  "worker_workInProgress": "Travail en cours...",
+  "worker_youReceive": "Vous recevez",
+  "verification_addPhoto": "Ajouter une photo",
+  "verification_backOptional": "Verso (optionnel)",
+  "verification_backSubtitle": "Si votre document a un verso",
+  "verification_captureBack": "Photographier le verso",
+  "verification_captureFront": "Photographier le recto",
+  "verification_choosePhoto": "Choisir une photo",
+  "verification_continueToSelfie": "Continuer vers le selfie",
+  "verification_fromGallery": "Depuis la galerie",
+  "verification_frontRequired": "Recto (obligatoire)",
+  "verification_frontSubtitle": "Face avec votre photo",
+  "verification_idBack": "Pièce d'identité (verso)",
+  "verification_idFront": "Pièce d'identité (recto)",
+  "verification_photoTips": "Placez le document sur une surface plane, assurez-vous d'avoir un bon éclairage, évitez les reflets et les ombres, capturez tout le document.",
+  "verification_photoTipsTitle": "Conseils pour une bonne photo",
+  "verification_privacyNote": "Vos documents seront analysés de manière sécurisée et supprimés après vérification.",
+  "verification_retake": "Reprendre",
+  "verification_selfieInstructions": "Regardez directement la caméra, gardez un visage neutre, assurez-vous d'avoir un bon éclairage, retirez lunettes de soleil et chapeau.",
+  "verification_selfieRequired": "Veuillez prendre un selfie",
+  "verification_takeSelfie": "Prenez un selfie",
+  "verification_takeSelfieBtn": "Prendre le selfie",
+  "verification_yourSelfie": "Votre selfie",
+  "profile_changePhoto": "Changer la photo de profil",
+  "profile_chooseFromGallery": "Choisir depuis la galerie",
+  "profile_deletePhoto": "Supprimer la photo",
+  "profile_deletePhotoConfirm": "Êtes-vous sûr de vouloir supprimer votre photo de profil?",
+  "profile_editTitle": "Modifier le profil",
+  "profile_emailNotEditable": "L'email ne peut pas être modifié",
+  "profile_firstNameRequired": "Le prénom est requis",
+  "profile_lastNameRequired": "Le nom est requis",
+  "profile_personalInfo": "Informations personnelles",
+  "profile_phoneInvalid": "Format de téléphone invalide",
+  "profile_photoSelectionError": "Erreur lors de la sélection: {error}",
+  "@profile_photoSelectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_saveChanges": "Enregistrer les modifications",
+  "profile_smsVerification": "Vérification SMS",
+  "profile_smsVerificationNote": "Un code SMS sera envoyé pour vérifier le nouveau numéro",
+  "profile_takePhoto": "Prendre une photo",
+  "profile_verificationCodeSentTo": "Un code de vérification a été envoyé au:",
+  "subscription_basic": "Basique",
+  "subscription_basicFeature1": "Jusqu'à 5 déneigements/mois",
+  "subscription_basicFeature2": "Priorité normale",
+  "subscription_basicFeature3": "Support par email",
+  "subscription_choosePlan": "Choisissez votre plan",
+  "subscription_choosePlanBtn": "Choisir ce plan",
+  "subscription_month": "mois",
+  "subscription_planTitle": "Plan {planName}",
+  "@subscription_planTitle": {
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "subscription_premium": "Premium",
+  "subscription_premiumFeature1": "Déneigements illimités",
+  "subscription_premiumFeature2": "Priorité haute",
+  "subscription_premiumFeature3": "Support 24/7",
+  "subscription_premiumFeature4": "Notifications SMS",
+  "subscription_priceLabel": "{price}$/{period}",
+  "@subscription_priceLabel": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "subscription_recommended": "RECOMMANDÉ",
+  "subscription_saveWith": "Économisez avec nos forfaits saisonniers",
+  "subscription_season": "saison",
+  "subscription_seasonal": "Saisonnier",
+  "subscription_seasonalFeature1": "Tout du Premium",
+  "subscription_seasonalFeature2": "Plusieurs véhicules",
+  "subscription_seasonalFeature3": "Gestionnaire dédié",
+  "subscription_seasonalFeature4": "Rapports détaillés",
+  "subscription_seasonalFeature5": "Garantie satisfaction",
+  "subscription_title": "Abonnements",
+  "legal_andThe": " et la ",
+  "legal_contactEmail": "Contact: privacy@deneige-auto.com",
+  "legal_iAccept": "J'accepte les ",
+  "legal_lastUpdated": "Dernière mise à jour: {date}",
+  "@legal_lastUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_privacyPolicy": "Politique de confidentialité",
+  "legal_privacyPolicySubtitle": "Comment nous protégeons vos données",
+  "legal_rightsDescription": "Conformément à la Loi 25 du Québec, vous pouvez demander l'accès, la rectification ou la suppression de vos données personnelles.",
+  "legal_termsOfService": "Conditions d'utilisation",
+  "legal_yourRights": "Vos droits",
+  "ai_alert": "Alerte",
+  "ai_analysisInProgress": "Analyse IA en cours...",
+  "ai_analysisLabel": "Analyse IA",
+  "ai_analysisUnavailable": "Analyse non disponible",
+  "ai_analyzedOn": "Analysé le {date}",
+  "@ai_analyzedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_basePrice": "Prix de base",
+  "ai_completeness": "Complétude",
+  "ai_criticalIssue": "Problème critique détecté",
+  "ai_estimatedDuration": "Durée estimée",
+  "ai_estimatedSnow": "Neige estimée",
+  "ai_estimation": "Estimation IA",
+  "ai_improvementPoints": "Points à améliorer",
+  "ai_issuesDetected": "Problèmes détectés",
+  "ai_multiplier": "Multiplicateur",
+  "ai_notDetected": "Non détecté",
+  "ai_noVehicleDetected": "Aucun véhicule détecté sur la photo",
+  "ai_noVehicleDetectedBullet": "Aucun véhicule détecté",
+  "ai_perfect": "Parfait!",
+  "ai_photoAlert": "Alerte Photo",
+  "ai_photosAnalyzed": "{count} photos analysées",
+  "@ai_photosAnalyzed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ai_priceRange": "Fourchette",
+  "ai_quality": "Qualité",
+  "ai_qualityVerification": "Vérification de la qualité du travail",
+  "ai_retakePhoto": "Reprendre photo",
+  "ai_snowDepth": "~{depth} cm neige",
+  "@ai_snowDepth": {
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
+  "ai_subtotal": "Sous-total",
+  "ai_summary": "Résumé",
+  "ai_surchargesApplied": "Majorations appliquées",
+  "ai_suspiciousPhoto": "Photo suspecte détectée - Veuillez reprendre une photo authentique",
+  "ai_suspiciousPhotoFraud": "Photo suspecte (possible fraude)",
+  "ai_taxIncluded": "taxes incluses",
+  "ai_total": "Total",
+  "ai_tps": "TPS (5%)",
+  "ai_tvq": "TVQ (9.975%)",
+  "ai_vehicle": "Véhicule",
+  "ai_verificationLater": "La vérification IA sera effectuée ultérieurement",
+  "chat_today": "Aujourd'hui",
+  "chat_yesterday": "Hier",
+  "step1_freeLocationHint": "Ex: Devant le bâtiment A...",
+  "step1_spotNumberHint": "Ex: P32, A-15, 205...",
+
+  "worker_greetingName": "Bonjour, {name}",
+  "@worker_greetingName": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "worker_headerAvailable": "Disponible",
+  "worker_headerOffline": "Hors ligne",
+
+  "worker_statsCompleted": "Terminés",
+  "worker_statsInProgress": "En cours",
+  "worker_statsRevenue": "Revenus",
+  "worker_statsRating": "Note",
+  "worker_statsToday": "aujourd'hui",
+
+  "worker_youAreOnline": "Vous êtes en ligne",
+  "worker_receivingSnowRequests": "Vous recevez les demandes de déneigement",
+  "worker_activateToReceiveRequests": "Activez pour recevoir des demandes",
+
+  "worker_activeCount": "{count} actif{count, plural, =1{} other{s}}",
+  "@worker_activeCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "worker_jobCount": "{count} job{count, plural, =1{} other{s}}",
+  "@worker_jobCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "worker_statusAvailable": "Disponible",
+  "worker_statusAssigned": "Assigné",
+  "worker_statusEnRoute": "En route",
+  "worker_statusInProgress": "En cours",
+  "worker_statusCompleted": "Terminé",
+  "worker_statusCancelled": "Annulé",
+
+  "worker_serviceWindowScraping": "Grattage vitres",
+  "worker_serviceDoorDeicing": "Déglaçage portes",
+  "worker_serviceWheelClearance": "Dégagement roues",
+  "worker_serviceRoofClearing": "Déneigement toit",
+  "worker_serviceSaltSpreading": "Épandage sel",
+  "worker_serviceLightsCleaning": "Nettoyage phares",
+  "worker_servicePerimeterClearance": "Dégagement périmètre",
+  "worker_serviceExhaustCheck": "Vérif. échappement",
+
+  "worker_serviceWindows": "Vitres",
+  "worker_serviceDoors": "Portes",
+  "worker_serviceWheels": "Roues",
+  "worker_serviceRoof": "Toit",
+  "worker_serviceSalt": "Sel",
+  "worker_serviceLights": "Phares",
+  "worker_servicePerimeter": "Périmètre",
+  "worker_serviceExhaustShort": "Échapp.",
+
+  "worker_acceptLabel": "ACCEPTER",
+  "worker_passLabel": "PASSER",
+  "worker_accepting": "Acceptation...",
+  "worker_acceptThisJob": "Accepter ce job",
+  "worker_swipeHint": "Glisser → accepter  |  ← passer",
+  "worker_exceeded": "DÉPASSÉ",
+  "worker_urgent": "URGENT",
+  "worker_equipmentCompatible": "Équipement compatible",
+  "worker_equipmentRequiredLabel": "Équipement requis",
+  "worker_distanceAndTime": "{km} km • ~{min} min",
+  "@worker_distanceAndTime": {
+    "placeholders": {
+      "km": { "type": "String" },
+      "min": { "type": "String" }
+    }
+  },
+  "worker_dateAtTime": "{date} à {time}",
+  "@worker_dateAtTime": {
+    "placeholders": {
+      "date": { "type": "String" },
+      "time": { "type": "String" }
+    }
+  },
+
+  "worker_verificationOngoing": "Verification en cours",
+  "worker_verificationOngoingSubtitle": "Vos documents sont en cours d'analyse. Vous serez notifié une fois la vérification terminée.",
+  "worker_verificationRejectedSubtitle": "Vos documents n'ont pas été approuvés. Veuillez resoumettre des documents valides.",
+  "worker_verificationExpiredSubtitle": "Votre vérification a expiré. Veuillez resoumettre vos documents.",
+  "worker_verificationRequiredSubtitle": "Vérifiez votre identité pour pouvoir accepter des jobs de déneigement.",
+  "worker_verificationRequiredForJobs": "Vérifiez votre identité pour accepter des jobs.",
+
+  "worker_retryLabel": "Réessayer",
+
+  "worker_notifUrgentJob": "🚨 JOB URGENT!",
+  "worker_notifNewJobAvailable": "📍 Nouveau job disponible",
+  "worker_notifNewJobBody": "{address} - {price}$ - {distance} km",
+  "@worker_notifNewJobBody": {
+    "placeholders": {
+      "address": { "type": "String" },
+      "price": { "type": "String" },
+      "distance": { "type": "String" }
+    }
+  },
+  "worker_notifUrgentJobsAvailable": "🚨 Nouveaux jobs urgents!",
+  "worker_notifNewJobsAvailable": "📍 Nouveaux jobs disponibles",
+  "worker_notifNewJobsNearby": "{count} nouveau{count, plural, =1{} other{x}} job{count, plural, =1{} other{s}} près de vous!",
+  "@worker_notifNewJobsNearby": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "worker_notifJobAccepted": "✅ Job accepté!",
+  "worker_notifGoTo": "Rendez-vous à {address}",
+  "@worker_notifGoTo": {
+    "placeholders": {
+      "address": { "type": "String" }
+    }
+  },
+  "worker_notifJobDone": "🎉 Travail terminé!",
+  "worker_notifEarned": "Vous avez gagné {amount}$",
+  "@worker_notifEarned": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "worker_notifChannelUrgent": "Jobs Urgents",
+  "worker_notifChannelNew": "Nouveaux Jobs",
+  "worker_notifChannelUrgentDesc": "Notifications pour les jobs urgents",
+  "worker_notifChannelNewDesc": "Notifications pour les nouveaux jobs",
+
+  "worker_businessNewJobsCount": "{count} nouveaux jobs",
+  "@worker_businessNewJobsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "worker_businessIncludingUrgent": "Dont des jobs urgents!",
+  "worker_businessNearYou": "Disponibles près de vous",
+  "worker_businessJobConfirmed": "Job confirmé!",
+  "worker_businessJobCancelled": "Job annulé",
+  "worker_businessJobCancelledBody": "Le job à {address} a été annulé",
+  "@worker_businessJobCancelledBody": {
+    "placeholders": {
+      "address": { "type": "String" }
+    }
+  },
+  "worker_businessJobCancelledReason": "Le job à {address} a été annulé: {reason}",
+  "@worker_businessJobCancelledReason": {
+    "placeholders": {
+      "address": { "type": "String" },
+      "reason": { "type": "String" }
+    }
+  },
+  "worker_businessJobModified": "Job modifié",
+  "worker_businessPaymentReceived": "Paiement reçu!",
+  "worker_businessPaymentAmount": "{amount}$ pour {description}",
+  "@worker_businessPaymentAmount": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "description": { "type": "String" }
+    }
+  },
+  "worker_businessBonusEarned": "🎁 Bonus gagné!",
+  "worker_businessBonusTitle": "Bonus gagné!",
+  "worker_businessBonusBody": "+{amount}$ - {reason}",
+  "@worker_businessBonusBody": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "reason": { "type": "String" }
+    }
+  },
+  "worker_businessWeeklyPayout": "💰 Paiement prêt!",
+  "worker_businessWeeklyPayoutBody": "Votre paiement de {amount}$ est disponible",
+  "@worker_businessWeeklyPayoutBody": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "worker_businessPayoutAvailable": "Paiement disponible",
+  "worker_businessNewRating": "Nouvelle évaluation!",
+  "worker_businessRatingReceived": "Évaluation reçue",
+  "worker_businessRatingStars": "{rating} étoiles",
+  "@worker_businessRatingStars": {
+    "placeholders": {
+      "rating": { "type": "int" }
+    }
+  },
+  "worker_businessPerformanceAlert": "⚠️ Attention!",
+  "worker_businessPerformanceTitle": "Alerte performance",
+  "worker_businessMilestone": "🏆 Félicitations!",
+  "worker_businessKeepGoing": "Continuez comme ça!",
+  "worker_businessDocExpiring": "📄 Document expirant",
+  "worker_businessDocExpiringBody": "Votre {docType} expire dans {days} jours",
+  "@worker_businessDocExpiringBody": {
+    "placeholders": {
+      "docType": { "type": "String" },
+      "days": { "type": "int" }
+    }
+  },
+  "worker_businessDocExpiringTitle": "Document expirant",
+  "worker_businessDocExpiringShort": "{docType} - {days} jours",
+  "@worker_businessDocExpiringShort": {
+    "placeholders": {
+      "docType": { "type": "String" },
+      "days": { "type": "int" }
+    }
+  },
+  "worker_businessHighDemand": "📈 Zone en demande!",
+  "worker_businessHighDemandBody": "{zone} - {multiplier}x les gains!",
+  "@worker_businessHighDemandBody": {
+    "placeholders": {
+      "zone": { "type": "String" },
+      "multiplier": { "type": "String" }
+    }
+  },
+  "worker_businessHighDemandTitle": "Zone en demande",
+  "worker_businessHighDemandShort": "{zone} - {multiplier}x",
+  "@worker_businessHighDemandShort": {
+    "placeholders": {
+      "zone": { "type": "String" },
+      "multiplier": { "type": "String" }
+    }
+  },
+  "worker_businessWeatherAlert": "❄️ Tempête prévue!",
+  "worker_businessWeatherBody": "{forecast} - Environ {count} jobs attendus",
+  "@worker_businessWeatherBody": {
+    "placeholders": {
+      "forecast": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "worker_businessWeatherTitle": "Opportunité météo",
+  "worker_businessClientEnRoute": "Déneigeur en route!",
+  "worker_businessClientEta": "Arrivée estimée dans {minutes} minutes",
+  "@worker_businessClientEta": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "worker_businessWorkStarted": "Déneigement commencé",
+  "worker_businessWorkStartedBody": "Le déneigement de votre véhicule a commencé",
+  "worker_businessWorkCompleted": "Déneigement terminé!",
+  "worker_businessWorkCompletedBody": "Votre véhicule est prêt",
+  "worker_businessWorkerMessage": "Message du déneigeur",
+
+  "privacy_introTitle": "Introduction",
+  "privacy_introBody": "Bienvenue sur Deneige Auto. Nous nous engageons à protéger votre vie privée et vos données personnelles. Cette politique explique comment nous collectons, utilisons et protégeons vos informations.",
+  "privacy_dataCollectedTitle": "Données collectées",
+  "privacy_dataCollectedBody": "Nous collectons les données suivantes:\n• Informations d'identification (nom, prénom, email, téléphone)\n• Informations de localisation pour le service de déneigement\n• Informations sur vos véhicules\n• Données de paiement (traitées de manière sécurisée par Stripe)\n• Historique de vos réservations",
+  "privacy_dataUsageTitle": "Utilisation des données",
+  "privacy_dataUsageBody": "Vos données sont utilisées pour:\n• Fournir nos services de déneigement\n• Communiquer avec vous concernant vos réservations\n• Améliorer nos services\n• Traiter vos paiements de manière sécurisée\n• Vous envoyer des notifications pertinentes",
+  "privacy_dataSharingTitle": "Partage des données",
+  "privacy_dataSharingBody": "Nous partageons vos données uniquement avec:\n• Les déneigeurs assignés à vos réservations (informations nécessaires au service)\n• Stripe pour le traitement des paiements\n• Les autorités si requis par la loi",
+  "privacy_securityTitle": "Sécurité",
+  "privacy_securityBody": "Nous utilisons des mesures de sécurité conformes aux normes de l'industrie pour protéger vos données, incluant le chiffrement des données sensibles et des connexions sécurisées (HTTPS).",
+  "privacy_retentionTitle": "Conservation des données",
+  "privacy_retentionBody": "Vos données sont conservées aussi longtemps que votre compte est actif. Après suppression de votre compte, vos données sont effacées dans un délai de 30 jours.",
+  "privacy_rightsTitle": "Vos droits",
+  "privacy_rightsBody": "Vous avez le droit de:\n• Accéder à vos données personnelles\n• Corriger vos données inexactes\n• Supprimer votre compte et vos données\n• Exporter vos données\n• Retirer votre consentement à tout moment",
+  "privacy_cookiesTitle": "Cookies et technologies similaires",
+  "privacy_cookiesBody": "Notre application mobile n'utilise pas de cookies. Nous utilisons des identifiants d'appareil uniquement pour les notifications push.",
+  "privacy_contactTitle": "Contact",
+  "privacy_contactBody": "Pour toute question concernant cette politique de confidentialité, contactez-nous via la section \"Aide et Support\" de l'application ou par email à support@deneige-auto.ca",
+
+  "terms_section1Title": "1. Acceptation des conditions",
+  "terms_section1Body": "En utilisant l'application Deneige Auto, vous acceptez d'être lié par les présentes conditions d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser l'application.",
+  "terms_section2Title": "2. Description du service",
+  "terms_section2Body": "Deneige Auto est une plateforme mettant en relation des clients ayant besoin de services de déneigement avec des prestataires de services (déneigeurs) indépendants. Nous ne sommes pas l'employeur des déneigeurs.",
+  "terms_section3Title": "3. Inscription et compte",
+  "terms_section3Body": "Pour utiliser nos services, vous devez:\n• Être âgé d'au moins 18 ans\n• Fournir des informations exactes et à jour\n• Maintenir la confidentialité de vos identifiants\n• Nous informer de toute utilisation non autorisée de votre compte",
+  "terms_section4Title": "4. Réservations et paiements",
+  "terms_section4Body": "• Les prix affichés incluent les taxes applicables\n• Le paiement est effectué au moment de la réservation\n• Les annulations sont soumises à notre politique d'annulation\n• Un remboursement peut être demandé selon les conditions applicables",
+  "terms_section5Title": "5. Politique d'annulation",
+  "terms_section5Body": "• Annulation plus de 24h avant: remboursement complet\n• Annulation entre 12h et 24h avant: remboursement de 50%\n• Annulation moins de 12h avant: aucun remboursement\n• Annulation par le déneigeur: remboursement complet et priorité de réassignation",
+  "terms_section6Title": "6. Responsabilités de l'utilisateur",
+  "terms_section6Body": "Vous vous engagez à:\n• Fournir un accès sécuritaire au véhicule\n• Décrire précisément l'emplacement du véhicule\n• Être disponible pour toute communication urgente\n• Respecter les déneigeurs et leur travail",
+  "terms_section7Title": "7. Responsabilités des déneigeurs",
+  "terms_section7Body": "Les déneigeurs s'engagent à:\n• Effectuer le service avec professionnalisme\n• Respecter les horaires convenus\n• Prendre soin des véhicules des clients\n• Signaler tout problème ou dommage",
+  "terms_section8Title": "8. Limitation de responsabilité",
+  "terms_section8Body": "Deneige Auto agit comme intermédiaire et ne peut être tenu responsable des dommages directs ou indirects résultant de l'exécution des services par les déneigeurs. Tout litige doit être signalé dans les 24h suivant le service.",
+  "terms_section9Title": "9. Propriété intellectuelle",
+  "terms_section9Body": "Tous les contenus de l'application (logos, textes, images, code) sont la propriété de Deneige Auto et sont protégés par les lois sur la propriété intellectuelle.",
+  "terms_section10Title": "10. Modification des conditions",
+  "terms_section10Body": "Nous nous réservons le droit de modifier ces conditions à tout moment. Les utilisateurs seront informés des changements significatifs par notification dans l'application.",
+  "terms_section11Title": "11. Résiliation",
+  "terms_section11Body": "Nous pouvons suspendre ou résilier votre compte en cas de violation de ces conditions. Vous pouvez supprimer votre compte à tout moment depuis les paramètres de l'application.",
+  "terms_section12Title": "12. Droit applicable",
+  "terms_section12Body": "Ces conditions sont régies par les lois de la province de Québec, Canada. Tout litige sera soumis aux tribunaux compétents de Montréal.",
+  "terms_section13Title": "13. Contact",
+  "terms_section13Body": "Pour toute question concernant ces conditions, contactez-nous via la section \"Aide et Support\" de l'application.",
+
+  "faq_catGeneral": "Général",
+  "faq_catReservations": "Réservations",
+  "faq_catPayments": "Paiements",
+  "faq_catDisputes": "Litiges",
+  "faq_catAccount": "Compte",
+
+  "aiChat_suggestions": "Suggestions",
+
+  "worker_navHome": "Accueil",
+  "worker_navEarnings": "Revenus",
+  "worker_navPayments": "Paiements",
+  "worker_navProfile": "Profil",
+
+  "earnings_myEarnings": "Mes revenus",
+  "earnings_day": "Jour",
+  "earnings_week": "Semaine",
+  "earnings_month": "Mois",
+  "earnings_retry": "Réessayer",
+  "earnings_today": "Aujourd'hui",
+  "earnings_thisWeek": "Cette semaine",
+  "earnings_thisMonth": "Ce mois",
+  "earnings_jobs": "Jobs",
+  "earnings_tips": "Pourboires",
+  "earnings_average": "Moyenne",
+  "earnings_goalAmount": "Objectif: {amount}$",
+  "@earnings_goalAmount": {
+    "placeholders": {
+      "amount": { "type": "int" }
+    }
+  },
+  "earnings_goalReached": "Objectif atteint!",
+  "earnings_completed": "Terminés",
+  "earnings_inProgress": "En cours",
+  "earnings_assigned": "Assignés",
+  "earnings_earnings": "Revenus",
+  "earnings_tipsShort": "Tips",
+  "earnings_jobHistory": "Historique des jobs",
+  "earnings_viewAllJobs": "Voir tous vos jobs terminés",
+  "earnings_earningsPerDay": "Revenus par jour",
+  "earnings_dayMon": "Lun",
+  "earnings_dayTue": "Mar",
+  "earnings_dayWed": "Mer",
+  "earnings_dayThu": "Jeu",
+  "earnings_dayFri": "Ven",
+  "earnings_daySat": "Sam",
+  "earnings_daySun": "Dim",
+  "earnings_overallStats": "Statistiques globales",
+  "earnings_totalJobs": "Total jobs",
+  "earnings_totalEarnings": "Revenus totaux",
+  "earnings_totalTips": "Pourboires totaux",
+  "earnings_averageRating": "Note moyenne",
+
+  "workerFaq_q1": "Comment devenir déneigeur sur Deneige Auto?",
+  "workerFaq_a1": "Pour devenir déneigeur, vous devez créer un compte en tant que déneigeur, compléter votre profil avec vos informations personnelles, ajouter votre équipement disponible et configurer votre compte bancaire pour recevoir vos paiements.",
+  "workerFaq_q2": "Quelles sont les conditions pour être déneigeur?",
+  "workerFaq_a2": "Vous devez avoir au moins 18 ans, posséder un équipement de déneigement de base (pelle, balai, grattoir), être disponible pendant les périodes de neige et avoir un compte bancaire canadien pour recevoir vos paiements.",
+  "workerFaq_q3": "Puis-je choisir mes zones de travail?",
+  "workerFaq_a3": "Oui! Dans vos paramètres, vous pouvez définir vos zones préférées. Vous recevrez des notifications prioritaires pour les jobs dans ces zones, mais vous pouvez aussi accepter des jobs ailleurs.",
+  "workerFaq_q4": "Qu'est-ce que l'Assistant IA?",
+  "workerFaq_a4": "L'Assistant IA est votre aide virtuel disponible 24/7 dans l'application. Il peut répondre à vos questions sur les jobs, vous aider à résoudre des problèmes, donner des conseils pour améliorer votre service et vous informer sur les conditions météo pour planifier votre journée.",
+  "workerFaq_q5": "Comment utiliser l'Assistant IA?",
+  "workerFaq_a5": "Accédez à l'Assistant IA depuis le menu principal. Posez vos questions en langage naturel:\n- \"Quels jobs sont disponibles près de moi?\"\n- \"Comment répondre à un litige?\"\n- \"Quelle météo est prévue demain?\"\n- \"Comment améliorer mon score?\"\nL'assistant vous répondra instantanément.",
+  "workerFaq_q6": "L'Assistant IA peut-il m'aider avec la météo?",
+  "workerFaq_a6": "Oui! L'Assistant IA a accès aux prévisions météo en temps réel. Demandez-lui les conditions actuelles ou les prévisions pour planifier vos disponibilités. Vous pouvez ainsi anticiper les journées de forte demande lors des tempêtes de neige.",
+  "workerFaq_q7": "Comment recevoir des jobs?",
+  "workerFaq_a7": "Activez votre disponibilité dans l'application. Vous recevrez des notifications push pour les nouveaux jobs disponibles dans votre zone. Vous pouvez alors accepter ou refuser chaque job.",
+  "workerFaq_q8": "Puis-je accepter plusieurs jobs en même temps?",
+  "workerFaq_a8": "Oui, vous pouvez gérer jusqu'à 5 jobs simultanément. Dans vos paramètres, définissez le nombre maximum de jobs actifs que vous souhaitez avoir en même temps. Nous recommandons 2-3 jobs pour un service optimal.",
+  "workerFaq_q9": "Comment annuler un job accepté?",
+  "workerFaq_a9": "Vous pouvez annuler un job avant de commencer le travail. Allez dans les détails du job et appuyez sur \"Annuler\". Attention: des annulations fréquentes peuvent affecter votre score et votre visibilité.",
+  "workerFaq_q10": "Que faire si je ne trouve pas le véhicule?",
+  "workerFaq_a10": "Utilisez la messagerie intégrée pour contacter le client. Si le véhicule est introuvable après 15 minutes et sans réponse du client, vous pouvez signaler le problème et annuler le job sans pénalité.",
+  "workerFaq_q11": "Comment signaler un problème avec un job?",
+  "workerFaq_a11": "Dans les détails du job, appuyez sur \"Signaler un problème\". Décrivez la situation et ajoutez des photos si nécessaire. Notre équipe examinera votre signalement rapidement.",
+  "workerFaq_q12": "Comment suis-je payé?",
+  "workerFaq_a12": "Les paiements sont effectués automatiquement via Stripe Connect. Après chaque job complété, le montant est transféré sur votre compte bancaire dans un délai de 2-7 jours ouvrables.",
+  "workerFaq_q13": "Comment configurer mon compte bancaire?",
+  "workerFaq_a13": "Allez dans Paramètres > Mes paiements > Configuration Stripe. Suivez les étapes pour vérifier votre identité et ajouter vos coordonnées bancaires. Ce processus est sécurisé et obligatoire pour recevoir vos paiements.",
+  "workerFaq_q14": "Comment sont calculés mes gains?",
+  "workerFaq_a14": "Vos gains dépendent du type de service (déneigement standard, avec options), de la taille du véhicule et de la distance. Vous voyez le montant exact avant d'accepter chaque job. Deneige Auto prélève une commission de 15%.",
+  "workerFaq_q15": "Comment fonctionnent les pourboires?",
+  "workerFaq_a15": "Les clients peuvent laisser un pourboire après le service. Les pourboires sont 100% pour vous, sans commission. Vous recevez une notification et le montant est ajouté à votre prochain paiement.",
+  "workerFaq_q16": "Où voir mon historique de gains?",
+  "workerFaq_a16": "Allez dans l'onglet \"Gains\" pour voir vos revenus quotidiens, hebdomadaires et mensuels. Vous pouvez aussi voir le détail de chaque job et les pourboires reçus.",
+  "workerFaq_q17": "Que se passe-t-il si un client me signale un no-show?",
+  "workerFaq_a17": "Si un client signale que vous n'êtes pas venu, vous recevrez une notification et aurez l'opportunité de répondre. Si vous avez marqué \"En route\" dans l'application, cela sera pris en compte. Les faux signalements de clients sont aussi sanctionnés.",
+  "workerFaq_q18": "Comment répondre à un litige?",
+  "workerFaq_a18": "Pour répondre à un litige:\n1. Allez dans Profil > Mes litiges\n2. Ouvrez le litige concerné\n3. Appuyez sur \"Répondre au litige\"\n4. Expliquez votre version des faits en détail\n5. Ajoutez des photos comme preuves (avant/après, captures d'écran, etc.)\n6. Soumettez votre réponse\n\nVous avez généralement 48 heures pour répondre.",
+  "workerFaq_q19": "Comment ajouter des preuves à ma défense?",
+  "workerFaq_a19": "Les preuves sont essentielles pour défendre votre position. Dans les détails du litige, utilisez \"Ajouter des preuves\" pour:\n- Photos avant/après le déneigement\n- Captures d'écran de communications\n- Photos horodatées sur le site\n- Tout document pertinent\n\nVous pouvez ajouter jusqu'à 10 photos et une description détaillée.",
+  "workerFaq_q20": "Qu'est-ce que l'analyse IA des litiges?",
+  "workerFaq_a20": "Notre système utilise l'intelligence artificielle pour analyser objectivement chaque litige. L'IA examine:\n- Les photos et preuves des deux parties\n- Les données GPS et timestamps\n- L'historique du client et du déneigeur\n- La cohérence des déclarations\n\nCette analyse aide à prendre des décisions justes. Si l'IA détecte un faux signalement, cela joue en votre faveur.",
+  "workerFaq_q21": "Pourquoi prendre des photos avant/après est important?",
+  "workerFaq_a21": "Les photos avant/après sont vos meilleures preuves:\n- Elles documentent l'état initial et le travail accompli\n- L'IA peut analyser la qualité du déneigement\n- En cas de litige, elles prouvent votre travail\n- Elles sont horodatées automatiquement\n\nPrenez l'habitude de photographier chaque job!",
+  "workerFaq_q22": "Quelles sont les conséquences d'un litige contre moi?",
+  "workerFaq_a22": "Les conséquences dépendent de la décision et de votre historique:\n- Premier avertissement: notification\n- Récidive: suspension temporaire (3-7 jours)\n- Problèmes répétés: suspension prolongée (30 jours)\n- Cas graves: exclusion permanente\n\nMaintenez un bon service pour éviter les litiges.",
+  "workerFaq_q23": "Comment contester une décision défavorable?",
+  "workerFaq_a23": "Si vous n'êtes pas d'accord avec la décision prise sur un litige, vous pouvez faire appel dans les 7 jours. Fournissez des preuves supplémentaires (photos, messages, etc.) pour appuyer votre contestation.",
+  "workerFaq_q24": "Comment signaler un client problématique?",
+  "workerFaq_a24": "Si un client est abusif, introuvable malgré vos efforts, ou fait de fausses réclamations, vous pouvez le signaler dans les détails du job. Notre équipe examinera la situation et pourra sanctionner le client si nécessaire.",
+  "workerFaq_q25": "Mon paiement est-il affecté pendant un litige?",
+  "workerFaq_a25": "Pendant l'examen d'un litige, le paiement correspondant peut être temporairement retenu. Une fois la décision prise:\n- Litige en votre faveur: paiement complet versé\n- Litige contre vous: remboursement au client (partiel ou total selon la décision)",
+  "workerFaq_q26": "Comment protéger mon score de fiabilité?",
+  "workerFaq_a26": "Pour maintenir un bon score:\n- Arrivez à l'heure (marquez \"En route\" dans l'app)\n- Prenez des photos avant/après chaque job\n- Communiquez avec le client en cas de problème\n- Complétez le travail selon les standards demandés\n- Évitez les annulations de dernière minute",
+  "workerFaq_q27": "Comment modifier mon équipement disponible?",
+  "workerFaq_a27": "Dans Paramètres ou dans votre Profil, vous pouvez cocher/décocher les équipements que vous possédez: pelle, balai, grattoir, épandeur de sel, souffleuse. Cela aide à vous assigner les jobs appropriés.",
+  "workerFaq_q28": "Comment changer mes notifications?",
+  "workerFaq_a28": "Dans Paramètres > Notifications, vous pouvez activer/désactiver les alertes pour: nouveaux jobs, jobs urgents et pourboires reçus.",
+  "workerFaq_q29": "Comment améliorer mon score déneigeur?",
+  "workerFaq_a29": "Votre score est basé sur: la qualité du service (évaluations clients), le taux d'acceptation des jobs, la ponctualité et le taux de complétion. Offrez un service de qualité et soyez fiable pour améliorer votre score.",
+  "workerFaq_q30": "Puis-je prendre une pause de l'application?",
+  "workerFaq_a30": "Oui! Désactivez simplement votre disponibilité dans l'application. Vous ne recevrez plus de notifications de jobs. Réactivez quand vous êtes prêt à travailler."
 }

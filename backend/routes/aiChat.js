@@ -11,7 +11,7 @@ const AIChatConversation = require('../models/AIChatConversation');
 const Vehicle = require('../models/Vehicle');
 const Reservation = require('../models/Reservation');
 const { generateResponse, generateStreamingResponse, isClaudeConfigured, isAIEnabled } = require('../services/claudeService');
-const { buildUserContext, welcomeMessages, getQuickActionsForRole } = require('../config/aiPrompts');
+const { buildUserContext, getWelcomeMessages, getQuickActionsForRole, normalizeLang } = require('../config/aiPrompts');
 
 /**
  * Récupère la météo actuelle pour une localisation
@@ -19,23 +19,25 @@ const { buildUserContext, welcomeMessages, getQuickActionsForRole } = require('.
  * @param {number} lon - Longitude
  * @returns {Object|null} Données météo ou null si erreur
  */
-async function getCurrentWeather(lat = 46.3432, lon = -72.5476) {
+async function getCurrentWeather(lat = 46.3432, lon = -72.5476, lang = 'fr') {
     const apiKey = process.env.OPENWEATHER_API_KEY;
     if (!apiKey) {
         return null;
     }
 
     try {
+        const weatherLang = normalizeLang(lang);
         const response = await axios.get(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=fr`,
+            `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=${weatherLang}`,
             { timeout: 5000 }
         );
 
+        const unknownLabel = weatherLang === 'en' ? 'Unknown' : 'Inconnu';
         const data = response.data;
         return {
             temperature: Math.round(data.main.temp),
             feelsLike: Math.round(data.main.feels_like),
-            description: data.weather[0]?.description || 'Inconnu',
+            description: data.weather[0]?.description || unknownLabel,
             snowDepth: data.snow?.['1h'] || data.snow?.['3h'] || 0,
             humidity: data.main.humidity,
             windSpeed: Math.round(data.wind.speed * 3.6), // m/s -> km/h
@@ -76,11 +78,12 @@ const checkAIEnabled = (req, res, next) => {
 // @desc    Vérifier le statut du service IA
 // @access  Private
 router.get('/status', protect, (req, res) => {
+    const lang = req.headers['accept-language'] || 'fr';
     res.json({
         success: true,
         enabled: isAIEnabled(),
         configured: isClaudeConfigured(),
-        quickActions: getQuickActionsForRole(req.user.role)
+        quickActions: getQuickActionsForRole(req.user.role, lang)
     });
 });
 
@@ -123,6 +126,7 @@ router.get('/conversations', protect, async (req, res) => {
 router.post('/conversations', protect, checkAIEnabled, async (req, res) => {
     try {
         const { context = {} } = req.body;
+        const lang = req.headers['accept-language'] || 'fr';
 
         // Créer la conversation
         const conversation = await AIChatConversation.create({
@@ -133,8 +137,9 @@ router.post('/conversations', protect, checkAIEnabled, async (req, res) => {
             }
         });
 
-        // Ajouter un message de bienvenue de l'assistant
-        const welcomeMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+        // Ajouter un message de bienvenue de l'assistant (localisé)
+        const localizedWelcomeMessages = getWelcomeMessages(lang);
+        const welcomeMessage = localizedWelcomeMessages[Math.floor(Math.random() * localizedWelcomeMessages.length)];
         conversation.addMessage('assistant', welcomeMessage, {
             simulated: true,
             model: 'system'
@@ -150,7 +155,7 @@ router.post('/conversations', protect, checkAIEnabled, async (req, res) => {
                 messages: conversation.messages,
                 createdAt: conversation.createdAt
             },
-            quickActions: getQuickActionsForRole(req.user.role)
+            quickActions: getQuickActionsForRole(req.user.role, lang)
         });
     } catch (error) {
         console.error('Erreur création conversation IA:', error);
@@ -205,6 +210,7 @@ router.get('/conversations/:id', protect, async (req, res) => {
 router.post('/conversations/:id/messages', protect, checkAIEnabled, aiChatLimiter, async (req, res) => {
     try {
         const { content } = req.body;
+        const lang = req.headers['accept-language'] || 'fr';
 
         // Validation du contenu
         if (!content || typeof content !== 'string') {
@@ -244,7 +250,7 @@ router.post('/conversations/:id/messages', protect, checkAIEnabled, aiChatLimite
                 userId: req.user.id,
                 status: { $in: ['pending', 'assigned', 'enRoute', 'inProgress'] }
             }).lean(),
-            getCurrentWeather() // Météo de Trois-Rivières par défaut
+            getCurrentWeather(46.3432, -72.5476, lang)
         ]);
 
         const userContext = buildUserContext(
@@ -257,8 +263,8 @@ router.post('/conversations/:id/messages', protect, checkAIEnabled, aiChatLimite
         // Préparer les messages pour Claude
         const messagesForClaude = conversation.getMessagesForClaude(20);
 
-        // Générer la réponse IA
-        const result = await generateResponse(messagesForClaude, userContext);
+        // Générer la réponse IA (avec la langue de l'utilisateur)
+        const result = await generateResponse(messagesForClaude, userContext, { lang });
 
         if (!result.success) {
             // En cas d'erreur, ne pas perdre le message utilisateur
@@ -319,6 +325,7 @@ router.post('/conversations/:id/messages', protect, checkAIEnabled, aiChatLimite
 router.post('/conversations/:id/messages/stream', protect, checkAIEnabled, aiChatLimiter, async (req, res) => {
     try {
         const { content } = req.body;
+        const lang = req.headers['accept-language'] || 'fr';
 
         // Validation
         if (!content || typeof content !== 'string' || content.length > 2000) {
@@ -351,7 +358,7 @@ router.post('/conversations/:id/messages/stream', protect, checkAIEnabled, aiCha
                 userId: req.user.id,
                 status: { $in: ['pending', 'assigned', 'enRoute', 'inProgress'] }
             }).lean(),
-            getCurrentWeather()
+            getCurrentWeather(46.3432, -72.5476, lang)
         ]);
 
         const userContext = buildUserContext(req.user, vehicles, reservations, weather);
@@ -368,8 +375,8 @@ router.post('/conversations/:id/messages/stream', protect, checkAIEnabled, aiCha
             res.write(`data: ${JSON.stringify({ type: 'chunk', text })}\n\n`);
         };
 
-        // Générer la réponse en streaming
-        const result = await generateStreamingResponse(messagesForClaude, userContext, onChunk);
+        // Générer la réponse en streaming (avec la langue de l'utilisateur)
+        const result = await generateStreamingResponse(messagesForClaude, userContext, onChunk, { lang });
 
         if (!result.success) {
             res.write(`data: ${JSON.stringify({ type: 'error', error: result.error })}\n\n`);

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/config/app_config.dart' hide ServiceOption;
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/worker_job.dart';
 
 class SwipeableJobCard extends StatefulWidget {
@@ -80,6 +81,8 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
 
     if (widget.enableSwipe && widget.job.status == JobStatus.pending) {
       return Dismissible(
@@ -101,20 +104,20 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         background: _buildSwipeBackground(
           color: AppTheme.success,
           icon: Icons.check_circle,
-          label: 'ACCEPTER',
+          label: l10n.worker_acceptLabel,
           alignment: Alignment.centerLeft,
         ),
         secondaryBackground: _buildSwipeBackground(
           color: AppTheme.textTertiary,
           icon: Icons.skip_next,
-          label: 'PASSER',
+          label: l10n.worker_passLabel,
           alignment: Alignment.centerRight,
         ),
-        child: _buildCard(theme),
+        child: _buildCard(theme, l10n, locale),
       );
     }
 
-    return _buildCard(theme);
+    return _buildCard(theme, l10n, locale);
   }
 
   Widget _buildSwipeBackground({
@@ -162,9 +165,9 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     );
   }
 
-  Widget _buildCard(ThemeData theme) {
+  Widget _buildCard(ThemeData theme, AppLocalizations l10n, String locale) {
     final timeFormatter = DateFormat('HH:mm');
-    final dateFormatter = DateFormat('dd MMM', 'fr_CA');
+    final dateFormatter = DateFormat('dd MMM', locale == 'fr' ? 'fr_CA' : 'en');
     final isUrgent = widget.job.isPriority || _timeRemaining.inMinutes < 60;
 
     return AnimatedContainer(
@@ -232,14 +235,14 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                           child: Row(
                             children: [
                               if (widget.job.status != JobStatus.pending) ...[
-                                _buildStatusChip(widget.job.status),
+                                _buildStatusChip(widget.job.status, l10n),
                                 const SizedBox(width: 8),
                               ] else ...[
                                 if (widget.job.isPriority) ...[
-                                  _buildUrgentBadge(),
+                                  _buildUrgentBadge(l10n),
                                   const SizedBox(width: 8),
                                 ],
-                                _buildCountdownBadge(isUrgent),
+                                _buildCountdownBadge(isUrgent, l10n),
                               ],
                             ],
                           ),
@@ -280,7 +283,11 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                               ),
                               if (widget.job.distanceKm != null)
                                 Text(
-                                  '${widget.job.distanceKm!.toStringAsFixed(1)} km • ~${_estimateTravelTime(widget.job.distanceKm!)} min',
+                                  l10n.worker_distanceAndTime(
+                                    widget.job.distanceKm!.toStringAsFixed(1),
+                                    _estimateTravelTime(widget.job.distanceKm!)
+                                        .toString(),
+                                  ),
                                   style: TextStyle(
                                     color: AppTheme.textSecondary,
                                     fontSize: 12,
@@ -310,7 +317,12 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                '${dateFormatter.format(widget.job.departureTime)} à ${timeFormatter.format(widget.job.departureTime)}',
+                                l10n.worker_dateAtTime(
+                                  dateFormatter
+                                      .format(widget.job.departureTime),
+                                  timeFormatter
+                                      .format(widget.job.departureTime),
+                                ),
                                 style: TextStyle(
                                   color: isUrgent
                                       ? AppTheme.error
@@ -370,13 +382,13 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                     // Service options
                     if (widget.job.serviceOptions.isNotEmpty) ...[
                       const SizedBox(height: 10),
-                      _buildServiceOptions(),
+                      _buildServiceOptions(l10n),
                     ],
 
                     // Required equipment
                     if (widget.job.requiredEquipment.isNotEmpty) ...[
                       const SizedBox(height: 10),
-                      _buildRequiredEquipment(),
+                      _buildRequiredEquipment(l10n),
                     ],
 
                     // Accept button (non-swipe mode)
@@ -384,7 +396,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                         widget.job.status == JobStatus.pending &&
                         !widget.enableSwipe) ...[
                       const SizedBox(height: 12),
-                      _buildAcceptButton(),
+                      _buildAcceptButton(l10n),
                     ],
 
                     // Swipe hint for swipe mode
@@ -392,7 +404,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                         widget.job.status == JobStatus.pending &&
                         widget.enableSwipe) ...[
                       const SizedBox(height: 8),
-                      _buildSwipeHint(),
+                      _buildSwipeHint(l10n),
                     ],
                   ],
                 ),
@@ -404,7 +416,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     );
   }
 
-  Widget _buildUrgentBadge() {
+  Widget _buildUrgentBadge(AppLocalizations l10n) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.9, end: 1.1),
       duration: const Duration(milliseconds: 500),
@@ -430,14 +442,14 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                 ),
               ],
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.bolt, color: AppTheme.background, size: 16),
-                SizedBox(width: 4),
+                const Icon(Icons.bolt, color: AppTheme.background, size: 16),
+                const SizedBox(width: 4),
                 Text(
-                  'URGENT',
-                  style: TextStyle(
+                  l10n.worker_urgent,
+                  style: const TextStyle(
                     color: AppTheme.background,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -456,7 +468,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     );
   }
 
-  Widget _buildCountdownBadge(bool isUrgent) {
+  Widget _buildCountdownBadge(bool isUrgent, AppLocalizations l10n) {
     if (_timeRemaining.inSeconds <= 0) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -470,7 +482,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
             Icon(Icons.warning, color: AppTheme.error, size: 14),
             const SizedBox(width: 4),
             Text(
-              'DÉPASSÉ',
+              l10n.worker_exceeded,
               style: TextStyle(
                 color: AppTheme.error,
                 fontSize: 11,
@@ -554,12 +566,12 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     );
   }
 
-  Widget _buildServiceOptions() {
+  Widget _buildServiceOptions(AppLocalizations l10n) {
     return Wrap(
       spacing: 6,
       runSpacing: 6,
       children: widget.job.serviceOptions.map((option) {
-        final optionData = _getServiceOptionData(option);
+        final optionData = _getServiceOptionData(option, l10n);
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
@@ -587,7 +599,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     );
   }
 
-  Widget _buildRequiredEquipment() {
+  Widget _buildRequiredEquipment(AppLocalizations l10n) {
     final hasEquipment = widget.job.workerHasEquipment;
     final statusColor = hasEquipment ? AppTheme.success : AppTheme.warning;
 
@@ -604,7 +616,9 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
             ),
             const SizedBox(width: 4),
             Text(
-              hasEquipment ? 'Équipement compatible' : 'Équipement requis',
+              hasEquipment
+                  ? l10n.worker_equipmentCompatible
+                  : l10n.worker_equipmentRequiredLabel,
               style: TextStyle(
                 fontSize: 11,
                 color: statusColor,
@@ -651,7 +665,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     );
   }
 
-  Widget _buildAcceptButton() {
+  Widget _buildAcceptButton(AppLocalizations l10n) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -666,7 +680,9 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                 ),
               )
             : const Icon(Icons.check_circle),
-        label: Text(widget.isLoading ? 'Acceptation...' : 'Accepter ce job'),
+        label: Text(widget.isLoading
+            ? l10n.worker_accepting
+            : l10n.worker_acceptThisJob),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.success,
           foregroundColor: AppTheme.background,
@@ -680,14 +696,14 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     );
   }
 
-  Widget _buildSwipeHint() {
+  Widget _buildSwipeHint(AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(Icons.swipe, color: AppTheme.textTertiary, size: 16),
         const SizedBox(width: 6),
         Text(
-          'Glisser → accepter  |  ← passer',
+          l10n.worker_swipeHint,
           style: TextStyle(
             color: AppTheme.textTertiary,
             fontSize: 11,
@@ -697,7 +713,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     );
   }
 
-  Widget _buildStatusChip(JobStatus status) {
+  Widget _buildStatusChip(JobStatus status, AppLocalizations l10n) {
     Color color;
     String label;
     IconData icon;
@@ -705,32 +721,32 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     switch (status) {
       case JobStatus.pending:
         color = AppTheme.info;
-        label = 'Disponible';
+        label = l10n.worker_statusAvailable;
         icon = Icons.pending;
         break;
       case JobStatus.assigned:
         color = AppTheme.warning;
-        label = 'Assigné';
+        label = l10n.worker_statusAssigned;
         icon = Icons.assignment_ind;
         break;
       case JobStatus.enRoute:
         color = AppTheme.primary2;
-        label = 'En route';
+        label = l10n.worker_statusEnRoute;
         icon = Icons.directions_car;
         break;
       case JobStatus.inProgress:
         color = AppTheme.primary2;
-        label = 'En cours';
+        label = l10n.worker_statusInProgress;
         icon = Icons.engineering;
         break;
       case JobStatus.completed:
         color = AppTheme.success;
-        label = 'Terminé';
+        label = l10n.worker_statusCompleted;
         icon = Icons.check_circle;
         break;
       case JobStatus.cancelled:
         color = AppTheme.error;
-        label = 'Annulé';
+        label = l10n.worker_statusCancelled;
         icon = Icons.cancel;
         break;
     }
@@ -761,57 +777,58 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
   }
 
   int _estimateTravelTime(double distanceKm) {
-    // Estimation basée sur une vitesse moyenne de 30 km/h en ville
+    // Estimation based on average speed of 30 km/h in the city
     return (distanceKm / 30 * 60).ceil();
   }
 
-  _ServiceOptionData _getServiceOptionData(ServiceOption option) {
+  _ServiceOptionData _getServiceOptionData(
+      ServiceOption option, AppLocalizations l10n) {
     switch (option) {
       case ServiceOption.windowScraping:
         return _ServiceOptionData(
-          label: 'Vitres',
+          label: l10n.worker_serviceWindows,
           icon: Icons.visibility,
           color: AppTheme.info,
         );
       case ServiceOption.doorDeicing:
         return _ServiceOptionData(
-          label: 'Portes',
+          label: l10n.worker_serviceDoors,
           icon: Icons.door_front_door,
           color: AppTheme.secondary,
         );
       case ServiceOption.wheelClearance:
         return _ServiceOptionData(
-          label: 'Roues',
+          label: l10n.worker_serviceWheels,
           icon: Icons.trip_origin,
           color: AppTheme.primary2,
         );
       case ServiceOption.roofClearing:
         return _ServiceOptionData(
-          label: 'Toit',
+          label: l10n.worker_serviceRoof,
           icon: Icons.car_rental,
           color: AppTheme.warning,
         );
       case ServiceOption.saltSpreading:
         return _ServiceOptionData(
-          label: 'Sel',
+          label: l10n.worker_serviceSalt,
           icon: Icons.grain_rounded,
           color: AppTheme.info,
         );
       case ServiceOption.lightsCleaning:
         return _ServiceOptionData(
-          label: 'Phares',
+          label: l10n.worker_serviceLights,
           icon: Icons.highlight_rounded,
           color: AppTheme.secondary,
         );
       case ServiceOption.perimeterClearance:
         return _ServiceOptionData(
-          label: 'Périmètre',
+          label: l10n.worker_servicePerimeter,
           icon: Icons.crop_free_rounded,
           color: AppTheme.primary,
         );
       case ServiceOption.exhaustCheck:
         return _ServiceOptionData(
-          label: 'Échapp.',
+          label: l10n.worker_serviceExhaustShort,
           icon: Icons.air_rounded,
           color: AppTheme.textSecondary,
         );

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../reservation/domain/entities/vehicle.dart';
 import '../../../reservation/domain/usecases/add_vehicle_usecase.dart'
     show AddVehicleParams;
@@ -88,7 +89,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
 
             if (state.successMessage != null) {
               // Check if we have a photo to upload after vehicle creation
-              if (state.successMessage == 'Véhicule ajouté avec succès' &&
+              if (state.successMessage == 'vehicle_added_flag' &&
                   _selectedPhoto != null &&
                   state.vehicles.isNotEmpty) {
                 // Get the newly created vehicle ID
@@ -156,7 +157,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
           ),
           const SizedBox(width: 16),
           Text(
-            'Ajouter un véhicule',
+            AppLocalizations.of(context)!.addVehicle_title,
             style: AppTheme.headlineMedium,
           ),
         ],
@@ -226,7 +227,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Touchez pour ajouter une photo',
+            AppLocalizations.of(context)!.addVehicle_tapAddPhoto,
             style: AppTheme.bodySmall.copyWith(
               color: AppTheme.primary,
               fontWeight: FontWeight.w500,
@@ -236,7 +237,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
           Text(
             _makeController.text.isNotEmpty || _modelController.text.isNotEmpty
                 ? '${_makeController.text} ${_modelController.text}'.trim()
-                : 'Nouveau véhicule',
+                : AppLocalizations.of(context)!.addVehicle_newVehicle,
             style: AppTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
@@ -307,12 +308,12 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                   ),
                 ),
                 Text(
-                  'Photo du véhicule',
+                  AppLocalizations.of(context)!.addVehicle_photoTitle,
                   style: AppTheme.headlineSmall,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Cette photo sera visible par le déneigeur',
+                  AppLocalizations.of(context)!.addVehicle_photoVisibleWorker,
                   style: AppTheme.bodySmall
                       .copyWith(color: AppTheme.textSecondary),
                 ),
@@ -328,9 +329,10 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                     child: const Icon(Icons.camera_alt_rounded,
                         color: AppTheme.primary),
                   ),
-                  title: const Text('Prendre une photo'),
+                  title:
+                      Text(AppLocalizations.of(context)!.addVehicle_takePhoto),
                   subtitle: Text(
-                    'Utiliser l\'appareil photo',
+                    AppLocalizations.of(context)!.addVehicle_useCamera,
                     style: AppTheme.bodySmall
                         .copyWith(color: AppTheme.textSecondary),
                   ),
@@ -350,9 +352,10 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                     child: const Icon(Icons.photo_library_rounded,
                         color: AppTheme.info),
                   ),
-                  title: const Text('Choisir une photo'),
+                  title: Text(
+                      AppLocalizations.of(context)!.addVehicle_choosePhoto),
                   subtitle: Text(
-                    'Depuis la galerie',
+                    AppLocalizations.of(context)!.addVehicle_fromGallery,
                     style: AppTheme.bodySmall
                         .copyWith(color: AppTheme.textSecondary),
                   ),
@@ -373,9 +376,10 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                       child: const Icon(Icons.delete_rounded,
                           color: AppTheme.error),
                     ),
-                    title: const Text('Supprimer la photo'),
+                    title: Text(
+                        AppLocalizations.of(context)!.addVehicle_deletePhoto),
                     subtitle: Text(
-                      'Retirer la photo sélectionnée',
+                      AppLocalizations.of(context)!.addVehicle_removeSelected,
                       style: AppTheme.bodySmall
                           .copyWith(color: AppTheme.textSecondary),
                     ),
@@ -425,22 +429,24 @@ class _AddVehicleViewState extends State<AddVehicleView> {
               Expanded(
                 child: _buildTextField(
                   controller: _makeController,
-                  label: 'Marque',
+                  label: AppLocalizations.of(context)!.addVehicle_make,
                   hint: 'Toyota',
                   icon: Icons.directions_car_rounded,
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Requis' : null,
+                  validator: (value) => value?.isEmpty ?? true
+                      ? AppLocalizations.of(context)!.addVehicle_required
+                      : null,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildTextField(
                   controller: _modelController,
-                  label: 'Modèle',
+                  label: AppLocalizations.of(context)!.addVehicle_model,
                   hint: 'Camry',
                   icon: Icons.directions_car_outlined,
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Requis' : null,
+                  validator: (value) => value?.isEmpty ?? true
+                      ? AppLocalizations.of(context)!.addVehicle_required
+                      : null,
                 ),
               ),
             ],
@@ -453,17 +459,18 @@ class _AddVehicleViewState extends State<AddVehicleView> {
               Expanded(
                 child: _buildTextField(
                   controller: _yearController,
-                  label: 'Année',
+                  label: AppLocalizations.of(context)!.addVehicle_year,
                   hint: '2024',
                   icon: Icons.calendar_today_rounded,
                   keyboardType: TextInputType.number,
                   validator: (value) {
-                    if (value?.isEmpty ?? true) return 'Requis';
+                    if (value?.isEmpty ?? true)
+                      return AppLocalizations.of(context)!.addVehicle_required;
                     final year = int.tryParse(value!);
                     if (year == null ||
                         year < 1900 ||
                         year > DateTime.now().year + 1) {
-                      return 'Invalide';
+                      return AppLocalizations.of(context)!.addVehicle_invalid;
                     }
                     return null;
                   },
@@ -473,12 +480,13 @@ class _AddVehicleViewState extends State<AddVehicleView> {
               Expanded(
                 child: _buildTextField(
                   controller: _licensePlateController,
-                  label: 'Plaque',
+                  label: AppLocalizations.of(context)!.addVehicle_plate,
                   hint: 'ABC 123',
                   icon: Icons.badge_outlined,
                   textCapitalization: TextCapitalization.characters,
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Requis' : null,
+                  validator: (value) => value?.isEmpty ?? true
+                      ? AppLocalizations.of(context)!.addVehicle_required
+                      : null,
                 ),
               ),
             ],
@@ -487,7 +495,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
 
           // Type de véhicule
           Text(
-            'Type de véhicule',
+            AppLocalizations.of(context)!.addVehicle_vehicleType,
             style: AppTheme.labelSmall.copyWith(
               fontWeight: FontWeight.w600,
               color: AppTheme.textSecondary,
@@ -542,7 +550,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
 
           // Couleur
           Text(
-            'Couleur',
+            AppLocalizations.of(context)!.addVehicle_color,
             style: AppTheme.labelSmall.copyWith(
               fontWeight: FontWeight.w600,
               color: AppTheme.textSecondary,
@@ -607,7 +615,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
               title: Text(
-                'Définir comme véhicule par défaut',
+                AppLocalizations.of(context)!.addVehicle_setDefault,
                 style:
                     AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w500),
               ),
@@ -737,7 +745,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Ajouter le véhicule',
+                      AppLocalizations.of(context)!.addVehicle_addBtn,
                       style: TextStyle(
                         color: AppTheme.background,
                         fontSize: 16,

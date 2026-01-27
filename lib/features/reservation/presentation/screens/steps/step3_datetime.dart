@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
@@ -38,14 +39,17 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
             children: [
               // Section Date
               _buildSectionHeader(
-                  'Date de départ', Icons.calendar_today_rounded),
+                  AppLocalizations.of(context)!.step3_departureDate,
+                  Icons.calendar_today_rounded),
               const SizedBox(height: 12),
               _buildDateSelector(context),
 
               const SizedBox(height: 28),
 
               // Section Heure
-              _buildSectionHeader('Heure de départ', Icons.access_time_rounded),
+              _buildSectionHeader(
+                  AppLocalizations.of(context)!.step3_departureTime,
+                  Icons.access_time_rounded),
               const SizedBox(height: 12),
               _buildTimeSelector(context),
               const SizedBox(height: 12),
@@ -122,9 +126,14 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                 children: [
                   Text(
                     hasDate
-                        ? DateFormat('EEEE d MMMM', 'fr_CA')
+                        ? DateFormat(
+                                'EEEE d MMMM',
+                                Localizations.localeOf(context).languageCode ==
+                                        'en'
+                                    ? 'en_CA'
+                                    : 'fr_CA')
                             .format(selectedDate!)
-                        : 'Sélectionner une date',
+                        : AppLocalizations.of(context)!.step3_selectDate,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -182,7 +191,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
               child: Text(
                 hasTime
                     ? '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}'
-                    : 'Sélectionner une heure',
+                    : AppLocalizations.of(context)!.step3_selectTime,
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -250,7 +259,11 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              DateFormat('EEEE d MMMM à HH:mm', 'fr_CA')
+              DateFormat(
+                      'EEEE d MMMM – HH:mm',
+                      Localizations.localeOf(context).languageCode == 'en'
+                          ? 'en_CA'
+                          : 'fr_CA')
                   .format(state.departureDateTime!),
               style: TextStyle(
                 fontSize: 14,
@@ -280,7 +293,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Réservation urgente',
+                  AppLocalizations.of(context)!.step3_urgentReservation,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -288,7 +301,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
                   ),
                 ),
                 Text(
-                  'Frais d\'urgence de 40% appliqués',
+                  AppLocalizations.of(context)!.step3_urgencyFee,
                   style: TextStyle(
                     fontSize: 12,
                     color: AppTheme.warning.withValues(alpha: 0.8),
@@ -309,7 +322,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       initialDate: selectedDate ?? now.add(const Duration(days: 1)),
       firstDate: now,
       lastDate: now.add(const Duration(days: 30)),
-      locale: const Locale('fr', 'CA'),
+      locale: Localizations.localeOf(context),
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(

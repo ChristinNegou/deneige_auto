@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class AvailabilityToggle extends StatelessWidget {
   final bool isAvailable;
@@ -15,6 +16,7 @@ class AvailabilityToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
@@ -59,7 +61,9 @@ class AvailabilityToggle extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isAvailable ? 'Vous êtes en ligne' : 'Vous êtes hors ligne',
+                  isAvailable
+                      ? l10n.worker_youAreOnline
+                      : l10n.worker_youAreOffline,
                   style: TextStyle(
                     color: AppTheme.background,
                     fontSize: 18,
@@ -69,8 +73,8 @@ class AvailabilityToggle extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   isAvailable
-                      ? 'Vous recevez les demandes de déneigement'
-                      : 'Activez pour recevoir des demandes',
+                      ? l10n.worker_receivingSnowRequests
+                      : l10n.worker_activateToReceiveRequests,
                   style: TextStyle(
                     color: AppTheme.background.withValues(alpha: 0.8),
                     fontSize: 13,

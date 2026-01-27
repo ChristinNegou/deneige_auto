@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../reservation/domain/entities/reservation.dart';
 import '../../../reservation/presentation/bloc/reservation_list_bloc.dart';
 import '../../../reservation/domain/usecases/get_reservations_usecase.dart';
@@ -53,10 +54,11 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Activités'),
+        title: Text(l10n.activities_title),
         backgroundColor: AppTheme.surface,
         elevation: 0,
         bottom: TabBar(
@@ -64,9 +66,9 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
           labelColor: AppTheme.primary,
           unselectedLabelColor: AppTheme.textSecondary,
           indicatorColor: AppTheme.primary,
-          tabs: const [
-            Tab(text: 'En cours'),
-            Tab(text: 'Terminées'),
+          tabs: [
+            Tab(text: l10n.activities_inProgress),
+            Tab(text: l10n.activities_completed),
           ],
         ),
       ),
@@ -101,7 +103,7 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
                           .read<ReservationListBloc>()
                           .add(const LoadAllReservations());
                     },
-                    child: const Text('Réessayer'),
+                    child: Text(l10n.common_retry),
                   ),
                 ],
               ),
@@ -148,8 +150,8 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
             const SizedBox(height: 16),
             Text(
               isCompleted
-                  ? 'Aucune activité terminée'
-                  : 'Aucune activité en cours',
+                  ? AppLocalizations.of(context)!.activities_emptyCompleted
+                  : AppLocalizations.of(context)!.activities_emptyInProgress,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -159,8 +161,10 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
             const SizedBox(height: 8),
             Text(
               isCompleted
-                  ? 'Vos déneigements terminés apparaîtront ici'
-                  : 'Vos déneigements en cours apparaîtront ici',
+                  ? AppLocalizations.of(context)!
+                      .activities_emptyCompletedSubtitle
+                  : AppLocalizations.of(context)!
+                      .activities_emptyInProgressSubtitle,
               style: const TextStyle(
                 fontSize: 14,
                 color: AppTheme.textSecondary,
@@ -350,9 +354,9 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Total',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.activities_total,
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppTheme.textSecondary,
                     ),

@@ -1,21 +1,31 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Service pour gerer la locale de l'application
 class LocaleService extends ChangeNotifier {
   static const String _localeKey = 'app_locale';
-  Locale _locale = const Locale('fr', 'FR');
+  static const List<String> _supportedLanguages = ['fr', 'en'];
+
+  Locale _locale = const Locale('en');
 
   Locale get locale => _locale;
 
-  /// Charge la locale sauvegardee
+  /// Charge la locale sauvegardee, ou detecte la langue du systeme au premier lancement
   Future<void> loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
-    final languageCode = prefs.getString(_localeKey);
-    if (languageCode != null) {
-      _locale = Locale(languageCode);
-      notifyListeners();
+    final savedCode = prefs.getString(_localeKey);
+
+    if (savedCode != null) {
+      _locale = Locale(savedCode);
+    } else {
+      final systemLocale = ui.PlatformDispatcher.instance.locale;
+      final systemLang = systemLocale.languageCode;
+      _locale = _supportedLanguages.contains(systemLang)
+          ? Locale(systemLang)
+          : const Locale('en');
     }
+    notifyListeners();
   }
 
   /// Change la locale et la sauvegarde

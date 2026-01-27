@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/ai_conversation.dart';
 
 /// Widget pour afficher les actions rapides suggérées
@@ -26,7 +27,7 @@ class AIQuickActions extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              'Suggestions',
+              AppLocalizations.of(context)!.aiChat_suggestions,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),

@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 
 import '../bloc/worker_availability_bloc.dart';
 import '../../domain/entities/worker_profile.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../../core/services/locale_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -32,6 +34,7 @@ class WorkerProfileTab extends StatefulWidget {
 class _WorkerProfileTabState extends State<WorkerProfileTab>
     with AutomaticKeepAliveClientMixin {
   final _imagePicker = ImagePicker();
+  final LocaleService _localeService = sl<LocaleService>();
 
   // Loading state - managed locally
   bool _isLoading = true;
@@ -607,6 +610,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 Navigator.pushNamed(context, AppRoutes.workerHelpSupport),
           ),
           Divider(height: 1, color: AppTheme.border, indent: 50),
+          _buildLanguageItem(l10n),
+          Divider(height: 1, color: AppTheme.border, indent: 50),
           _buildActionItem(
             icon: Icons.logout,
             label: l10n.common_logout,
@@ -651,6 +656,49 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageItem(AppLocalizations l10n) {
+    final currentLanguage = _localeService.locale.languageCode;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      child: Row(
+        children: [
+          Icon(Icons.language, size: 20, color: AppTheme.textPrimary),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              l10n.settings_language,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+          ),
+          DropdownButton<String>(
+            value: currentLanguage,
+            underline: const SizedBox(),
+            dropdownColor: AppTheme.surface,
+            isDense: true,
+            items: [
+              DropdownMenuItem(
+                value: 'fr',
+                child: Text(l10n.settings_languageFrench),
+              ),
+              DropdownMenuItem(
+                value: 'en',
+                child: Text(l10n.settings_languageEnglish),
+              ),
+            ],
+            onChanged: (value) {
+              if (value != null) {
+                _localeService.setLocale(Locale(value));
+              }
+            },
+          ),
+        ],
       ),
     );
   }

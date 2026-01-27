@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 enum LegalDocumentType {
   privacyPolicy,
@@ -15,12 +16,12 @@ class LegalPage extends StatelessWidget {
     required this.documentType,
   });
 
-  String get _title {
+  String _title(BuildContext context) {
     switch (documentType) {
       case LegalDocumentType.privacyPolicy:
-        return 'Politique de confidentialité';
+        return AppLocalizations.of(context)!.legal_privacyPolicy;
       case LegalDocumentType.termsOfService:
-        return 'Conditions d\'utilisation';
+        return AppLocalizations.of(context)!.legal_termsOfService;
     }
   }
 
@@ -35,7 +36,7 @@ class LegalPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: Text(_title),
+        title: Text(_title(context)),
         backgroundColor: AppTheme.surface,
         foregroundColor: AppTheme.textPrimary,
         elevation: 0,
@@ -45,27 +46,27 @@ class LegalPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildContent(),
+            _buildContent(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     switch (documentType) {
       case LegalDocumentType.privacyPolicy:
-        return _buildPrivacyPolicyContent();
+        return _buildPrivacyPolicyContent(context);
       case LegalDocumentType.termsOfService:
-        return _buildTermsOfServiceContent();
+        return _buildTermsOfServiceContent(context);
     }
   }
 
-  Widget _buildPrivacyPolicyContent() {
+  Widget _buildPrivacyPolicyContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLastUpdated('19 janvier 2025'),
+        _buildLastUpdated(context, '19 janvier 2025'),
         const SizedBox(height: 24),
         _buildSection(
           '1. Introduction',
@@ -139,11 +140,11 @@ Commission d'accès à l'information du Québec : www.cai.gouv.qc.ca''',
     );
   }
 
-  Widget _buildTermsOfServiceContent() {
+  Widget _buildTermsOfServiceContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLastUpdated('19 janvier 2025'),
+        _buildLastUpdated(context, '19 janvier 2025'),
         const SizedBox(height: 24),
         _buildSection(
           '1. Acceptation des conditions',
@@ -208,7 +209,7 @@ Courriel : support@deneige-auto.com''',
     );
   }
 
-  Widget _buildLastUpdated(String date) {
+  Widget _buildLastUpdated(BuildContext context, String date) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -216,7 +217,7 @@ Courriel : support@deneige-auto.com''',
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        'Dernière mise à jour : $date',
+        AppLocalizations.of(context)!.legal_lastUpdated(date),
         style: TextStyle(
           fontSize: 12,
           color: AppTheme.info,
@@ -303,14 +304,14 @@ class LegalLinksWidget extends StatelessWidget {
             child: Wrap(
               children: [
                 Text(
-                  'J\'accepte les ',
+                  AppLocalizations.of(context)!.legal_iAccept,
                   style: TextStyle(fontSize: 13, color: color),
                 ),
                 GestureDetector(
                   onTap: () =>
                       _openLegalPage(context, LegalDocumentType.termsOfService),
                   child: Text(
-                    'Conditions d\'utilisation',
+                    AppLocalizations.of(context)!.legal_termsOfService,
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.primary,
@@ -320,14 +321,14 @@ class LegalLinksWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  ' et la ',
+                  AppLocalizations.of(context)!.legal_andThe,
                   style: TextStyle(fontSize: 13, color: color),
                 ),
                 GestureDetector(
                   onTap: () =>
                       _openLegalPage(context, LegalDocumentType.privacyPolicy),
                   child: Text(
-                    'Politique de confidentialité',
+                    AppLocalizations.of(context)!.legal_privacyPolicy,
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.primary,
@@ -351,7 +352,7 @@ class LegalLinksWidget extends StatelessWidget {
           onTap: () =>
               _openLegalPage(context, LegalDocumentType.termsOfService),
           child: Text(
-            'Conditions d\'utilisation',
+            AppLocalizations.of(context)!.legal_termsOfService,
             style: TextStyle(
               fontSize: 12,
               color: AppTheme.primary,
@@ -366,7 +367,7 @@ class LegalLinksWidget extends StatelessWidget {
         GestureDetector(
           onTap: () => _openLegalPage(context, LegalDocumentType.privacyPolicy),
           child: Text(
-            'Politique de confidentialité',
+            AppLocalizations.of(context)!.legal_privacyPolicy,
             style: TextStyle(
               fontSize: 12,
               color: AppTheme.primary,
@@ -388,7 +389,7 @@ class LegalDocumentsListPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Mentions légales'),
+        title: Text(AppLocalizations.of(context)!.legal_legalNotices),
         backgroundColor: AppTheme.surface,
         foregroundColor: AppTheme.textPrimary,
         elevation: 0,
@@ -399,20 +400,20 @@ class LegalDocumentsListPage extends StatelessWidget {
           _buildDocumentTile(
             context,
             icon: Icons.description_outlined,
-            title: 'Conditions d\'utilisation',
-            subtitle: 'Règles d\'utilisation de l\'application',
+            title: AppLocalizations.of(context)!.legal_termsOfService,
+            subtitle: AppLocalizations.of(context)!.legal_appUsageRules,
             documentType: LegalDocumentType.termsOfService,
           ),
           const SizedBox(height: 12),
           _buildDocumentTile(
             context,
             icon: Icons.privacy_tip_outlined,
-            title: 'Politique de confidentialité',
-            subtitle: 'Comment nous protégeons vos données',
+            title: AppLocalizations.of(context)!.legal_privacyPolicy,
+            subtitle: AppLocalizations.of(context)!.legal_privacyPolicySubtitle,
             documentType: LegalDocumentType.privacyPolicy,
           ),
           const SizedBox(height: 24),
-          _buildInfoCard(),
+          _buildInfoCard(context),
         ],
       ),
     );
@@ -471,7 +472,7 @@ class LegalDocumentsListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard() {
+  Widget _buildInfoCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -489,7 +490,7 @@ class LegalDocumentsListPage extends StatelessWidget {
               Icon(Icons.info_outline, color: AppTheme.info, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Vos droits',
+                AppLocalizations.of(context)!.legal_yourRights,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: AppTheme.info,
@@ -499,7 +500,7 @@ class LegalDocumentsListPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Conformément à la Loi 25 du Québec, vous pouvez demander l\'accès, la rectification ou la suppression de vos données personnelles.',
+            AppLocalizations.of(context)!.legal_rightsDescription,
             style: TextStyle(
               fontSize: 13,
               color: AppTheme.textSecondary,
@@ -508,7 +509,7 @@ class LegalDocumentsListPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Contact : privacy@deneige-auto.com',
+            AppLocalizations.of(context)!.legal_contactEmail,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,

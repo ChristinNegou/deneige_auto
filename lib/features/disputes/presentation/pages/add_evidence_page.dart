@@ -5,6 +5,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Écran pour ajouter des preuves supplémentaires à un litige
 class AddEvidencePage extends StatefulWidget {
@@ -62,9 +63,10 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Impossible de charger l\'image'),
+            content: Text(l10n.dispute_imageLoadError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -91,9 +93,10 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Impossible de charger les images'),
+            content: Text(l10n.dispute_imagesLoadError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -103,6 +106,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   }
 
   void _showImageSourceDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surface,
@@ -116,7 +120,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Ajouter des preuves',
+                l10n.dispute_addEvidence,
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 18,
@@ -134,7 +138,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
                   child: Icon(Icons.camera_alt, color: AppTheme.primary),
                 ),
                 title: Text(
-                  'Prendre une photo',
+                  l10n.dispute_takePhoto,
                   style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 onTap: () {
@@ -152,11 +156,11 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
                   child: Icon(Icons.photo_library, color: AppTheme.primary),
                 ),
                 title: Text(
-                  'Choisir depuis la galerie',
+                  l10n.dispute_chooseFromGallery,
                   style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 subtitle: Text(
-                  'Sélection multiple possible',
+                  l10n.dispute_multipleSelection,
                   style: TextStyle(color: AppTheme.textTertiary, fontSize: 12),
                 ),
                 onTap: () {
@@ -172,10 +176,11 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   }
 
   Future<void> _submitEvidence() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_photos.isEmpty && _descriptionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Ajoutez au moins une photo ou une description'),
+          content: Text(l10n.dispute_addPhotoOrDescription),
           backgroundColor: AppTheme.warning,
           behavior: SnackBarBehavior.floating,
         ),
@@ -205,12 +210,13 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
     } catch (e) {
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             e.toString().contains('Exception:')
                 ? e.toString().replaceFirst('Exception: ', '')
-                : 'Erreur lors de l\'ajout des preuves',
+                : l10n.dispute_addEvidenceError,
           ),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
@@ -224,6 +230,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   }
 
   void _showSuccessDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -245,7 +252,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Preuves ajoutées',
+                l10n.dispute_evidenceAdded,
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 18,
@@ -255,7 +262,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
           ],
         ),
         content: Text(
-          'Vos preuves ont été ajoutées au dossier du litige. L\'équipe de support les examinera dans les plus brefs délais.',
+          l10n.dispute_evidenceAddedMessage,
           style: TextStyle(color: AppTheme.textSecondary),
         ),
         actions: [
@@ -271,7 +278,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Compris'),
+            child: Text(l10n.common_understood),
           ),
         ],
       ),
@@ -281,12 +288,13 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   @override
   Widget build(BuildContext context) {
     final canAdd = _canAddEvidence();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
-          'Ajouter des preuves',
+          l10n.dispute_addEvidence,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         backgroundColor: AppTheme.surface,
@@ -310,13 +318,13 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
                 const SizedBox(height: 24),
 
                 // Photos Section
-                _buildSectionTitle('Photos'),
+                _buildSectionTitle(l10n.dispute_photosLabel),
                 const SizedBox(height: 12),
                 _buildPhotoSection(canAdd),
                 const SizedBox(height: 24),
 
                 // Description Section
-                _buildSectionTitle('Description (optionnel)'),
+                _buildSectionTitle(l10n.dispute_descriptionOptional),
                 const SizedBox(height: 12),
                 _buildDescriptionField(canAdd),
                 const SizedBox(height: 32),
@@ -333,6 +341,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   }
 
   Widget _buildStatusWarning() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -346,7 +355,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Ce litige est déjà résolu. Vous ne pouvez plus ajouter de preuves.',
+              l10n.dispute_resolvedCannotAddEvidence,
               style: TextStyle(
                 color: AppTheme.warning,
                 fontWeight: FontWeight.w500,
@@ -359,6 +368,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   }
 
   Widget _buildInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -373,7 +383,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
               Icon(Icons.lightbulb, color: AppTheme.info, size: 20),
               const SizedBox(width: 10),
               Text(
-                'Conseils pour vos preuves',
+                l10n.dispute_evidenceTips,
                 style: TextStyle(
                   color: AppTheme.info,
                   fontWeight: FontWeight.bold,
@@ -382,10 +392,10 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildTip('Photos claires et bien éclairées'),
-          _buildTip('Captures d\'écran de communications'),
-          _buildTip('Photos horodatées si possible'),
-          _buildTip('Tout document pertinent'),
+          _buildTip(l10n.dispute_tipsPhotos),
+          _buildTip(l10n.dispute_tipsScreenshots),
+          _buildTip(l10n.dispute_tipsTimestamp),
+          _buildTip(l10n.dispute_tipsRelevantDocs),
         ],
       ),
     );
@@ -425,6 +435,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   }
 
   Widget _buildPhotoSection(bool enabled) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Photo grid
@@ -501,8 +512,8 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
                   const SizedBox(height: 8),
                   Text(
                     _photos.isEmpty
-                        ? 'Ajouter des photos'
-                        : 'Ajouter plus de photos',
+                        ? l10n.dispute_addPhotos
+                        : l10n.dispute_addMorePhotos,
                     style: TextStyle(
                       color: AppTheme.primary,
                       fontWeight: FontWeight.w600,
@@ -510,7 +521,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${_photos.length}/10 photos',
+                    l10n.dispute_photoCount(_photos.length),
                     style: TextStyle(
                       color: AppTheme.textTertiary,
                       fontSize: 12,
@@ -525,6 +536,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   }
 
   Widget _buildDescriptionField(bool enabled) {
+    final l10n = AppLocalizations.of(context)!;
     return TextFormField(
       controller: _descriptionController,
       maxLines: 4,
@@ -532,7 +544,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
       enabled: enabled,
       style: TextStyle(color: AppTheme.textPrimary),
       decoration: InputDecoration(
-        hintText: 'Décrivez les preuves ajoutées...',
+        hintText: l10n.dispute_describeEvidenceHint,
         hintStyle: TextStyle(color: AppTheme.textTertiary),
         filled: true,
         fillColor: enabled
@@ -560,6 +572,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
   }
 
   Widget _buildSubmitButton() {
+    final l10n = AppLocalizations.of(context)!;
     final hasContent =
         _photos.isNotEmpty || _descriptionController.text.trim().isNotEmpty;
 
@@ -586,9 +599,9 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
                       AlwaysStoppedAnimation<Color>(AppTheme.background),
                 ),
               )
-            : const Text(
-                'Soumettre les preuves',
-                style: TextStyle(
+            : Text(
+                l10n.dispute_submitEvidence,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),

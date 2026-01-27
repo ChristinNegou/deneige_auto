@@ -4,6 +4,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ReportNoShowPage extends StatefulWidget {
   final String reservationId;
@@ -43,11 +44,11 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
   }
 
   Future<void> _submitReport() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_confirmed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              const Text('Veuillez confirmer que le deneigeur n\'est pas venu'),
+          content: Text(l10n.dispute_confirmNoShowRequired),
           backgroundColor: AppTheme.warning,
           behavior: SnackBarBehavior.floating,
         ),
@@ -90,7 +91,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Signalement envoyé',
+                  l10n.dispute_reportSent,
                   style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontSize: 18,
@@ -105,8 +106,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
             children: [
               Text(
                 autoResolved
-                    ? 'Votre signalement a été automatiquement confirmé. Le remboursement sera traité sous 3-5 jours ouvrables.'
-                    : 'Votre signalement a été envoyé. Notre équipe va l\'examiner et vous informera de la décision.',
+                    ? l10n.dispute_reportAutoConfirmed
+                    : l10n.dispute_reportUnderReview,
                 style: TextStyle(color: AppTheme.textSecondary),
               ),
               const SizedBox(height: 16),
@@ -122,7 +123,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Vous serez notifié dès que le litige sera résolu.',
+                        l10n.dispute_notifiedWhenResolved,
                         style: TextStyle(
                           color: AppTheme.info,
                           fontSize: 13,
@@ -148,7 +149,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Compris'),
+              child: Text(l10n.common_understood),
             ),
           ],
         ),
@@ -156,10 +157,10 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
     } catch (e) {
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-              'Impossible d\'envoyer le signalement. Veuillez réessayer.'),
+          content: Text(l10n.dispute_cannotSendReportRetry),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
         ),
@@ -173,11 +174,12 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
-          'Signaler un no-show',
+          l10n.dispute_reportNoShow,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         backgroundColor: AppTheme.surface,
@@ -222,7 +224,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Deneigeur non venu?',
+                              l10n.dispute_workerDidNotCome,
                               style: TextStyle(
                                 color: AppTheme.error,
                                 fontWeight: FontWeight.bold,
@@ -231,7 +233,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Si le deneigeur ${widget.workerName ?? ""} n\'est pas venu pour votre reservation, vous pouvez le signaler ici.',
+                              l10n.dispute_workerDidNotComeDesc(
+                                  widget.workerName ?? ""),
                               style: TextStyle(
                                 color: AppTheme.error.withValues(alpha: 0.8),
                                 fontSize: 14,
@@ -257,7 +260,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Details de la reservation',
+                        l10n.dispute_reservationDetails,
                         style: TextStyle(
                           color: AppTheme.textPrimary,
                           fontWeight: FontWeight.bold,
@@ -267,19 +270,19 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         Icons.person,
-                        'Deneigeur',
-                        widget.workerName ?? 'Non assigne',
+                        l10n.dispute_snowWorkerLabel,
+                        widget.workerName ?? l10n.dispute_notAssigned,
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
                         Icons.schedule,
-                        'Heure prevue',
+                        l10n.dispute_scheduledTime,
                         '${widget.departureTime.hour}:${widget.departureTime.minute.toString().padLeft(2, '0')}',
                       ),
                       const SizedBox(height: 12),
                       _buildInfoRow(
                         Icons.attach_money,
-                        'Montant',
+                        l10n.dispute_amount,
                         '${widget.totalPrice.toStringAsFixed(2)} \$',
                       ),
                     ],
@@ -289,7 +292,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
 
                 // Description Field
                 Text(
-                  'Details supplementaires (optionnel)',
+                  l10n.dispute_additionalDetailsOptional,
                   style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
@@ -302,7 +305,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                   maxLines: 4,
                   style: TextStyle(color: AppTheme.textPrimary),
                   decoration: InputDecoration(
-                    hintText: 'Decrivez la situation (optionnel)...',
+                    hintText: l10n.dispute_describeSituationHint,
                     hintStyle: TextStyle(color: AppTheme.textTertiary),
                     filled: true,
                     fillColor: AppTheme.surface,
@@ -340,7 +343,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Remboursement',
+                              l10n.dispute_refund,
                               style: TextStyle(
                                 color: AppTheme.success,
                                 fontWeight: FontWeight.bold,
@@ -349,7 +352,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Si le no-show est confirme, vous serez rembourse integralement (${widget.totalPrice.toStringAsFixed(2)} \$).',
+                              l10n.dispute_refundIfConfirmed(
+                                  widget.totalPrice.toStringAsFixed(2)),
                               style: TextStyle(
                                 color: AppTheme.success.withValues(alpha: 0.8),
                                 fontSize: 13,
@@ -409,7 +413,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Je confirme que le deneigeur n\'est pas venu et que cette information est veridique.',
+                            l10n.dispute_confirmNoShowStatement,
                             style: TextStyle(
                               color: AppTheme.textPrimary,
                               fontSize: 14,
@@ -446,9 +450,9 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text(
-                            'Signaler le no-show',
-                            style: TextStyle(
+                        : Text(
+                            l10n.dispute_reportNoShowButton,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -460,7 +464,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                 // Info text
                 Center(
                   child: Text(
-                    'Les fausses declarations peuvent entrainer une suspension de compte.',
+                    l10n.dispute_falseReportWarning,
                     style: TextStyle(
                       color: AppTheme.textTertiary,
                       fontSize: 12,

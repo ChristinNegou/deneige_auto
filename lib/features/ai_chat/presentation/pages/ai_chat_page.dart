@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../bloc/ai_chat_bloc.dart';
 import '../widgets/ai_chat_bubble.dart';
 import '../widgets/ai_typing_indicator.dart';
@@ -60,17 +61,17 @@ class _AIChatPageState extends State<AIChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.smart_toy, size: 24),
-            SizedBox(width: 8),
-            Text('Assistant IA'),
+            const Icon(Icons.smart_toy, size: 24),
+            const SizedBox(width: 8),
+            Text(AppLocalizations.of(context)!.aiChat_title),
           ],
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Nouvelle conversation',
+            tooltip: AppLocalizations.of(context)!.aiChat_newConversation,
             onPressed: () {
               context.read<AIChatBloc>().add(const CreateNewConversation());
             },
@@ -148,7 +149,7 @@ class _AIChatPageState extends State<AIChatPage> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'L\'assistant IA est temporairement indisponible',
+              AppLocalizations.of(context)!.aiChat_unavailable,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onErrorContainer,
               ),
@@ -172,14 +173,14 @@ class _AIChatPageState extends State<AIChatPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Commencez une conversation',
+              AppLocalizations.of(context)!.aiChat_startConversation,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Posez vos questions sur Déneige Auto',
+              AppLocalizations.of(context)!.aiChat_subtitle,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -241,7 +242,7 @@ class _AIChatPageState extends State<AIChatPage> {
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => _sendMessage(),
               decoration: InputDecoration(
-                hintText: 'Écrivez votre message...',
+                hintText: AppLocalizations.of(context)!.aiChat_inputHint,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,

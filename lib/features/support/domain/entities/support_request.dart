@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../../l10n/app_localizations.dart';
 
 enum SupportSubject {
   bug,
@@ -16,6 +17,19 @@ enum SupportSubject {
         return 'Suggestion';
       case SupportSubject.other:
         return 'Autre';
+    }
+  }
+
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case SupportSubject.bug:
+        return l10n.support_subjectBug;
+      case SupportSubject.question:
+        return l10n.support_subjectQuestion;
+      case SupportSubject.suggestion:
+        return l10n.support_subjectSuggestion;
+      case SupportSubject.other:
+        return l10n.support_subjectOther;
     }
   }
 
@@ -62,6 +76,19 @@ enum SupportStatus {
         return 'Résolu';
       case SupportStatus.closed:
         return 'Fermé';
+    }
+  }
+
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case SupportStatus.pending:
+        return l10n.support_statusPending;
+      case SupportStatus.inProgress:
+        return l10n.support_statusInProgress;
+      case SupportStatus.resolved:
+        return l10n.support_statusResolved;
+      case SupportStatus.closed:
+        return l10n.support_statusClosed;
     }
   }
 

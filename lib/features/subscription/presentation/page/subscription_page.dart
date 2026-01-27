@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 class SubscriptionPage extends StatelessWidget {
   const SubscriptionPage({super.key});
@@ -7,20 +8,20 @@ class SubscriptionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Abonnements'),
+        title: Text(AppLocalizations.of(context)!.subscription_title),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'Choisissez votre plan',
+            AppLocalizations.of(context)!.subscription_choosePlan,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Économisez avec nos forfaits saisonniers',
+            AppLocalizations.of(context)!.subscription_saveWith,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -28,27 +29,27 @@ class SubscriptionPage extends StatelessWidget {
           const SizedBox(height: 24),
           _buildSubscriptionCard(
             context,
-            title: 'Basique',
+            title: AppLocalizations.of(context)!.subscription_basic,
             price: '29.99',
-            period: 'mois',
+            period: AppLocalizations.of(context)!.subscription_month,
             features: [
-              'Jusqu\'à 5 déneigements/mois',
-              'Priorité normale',
-              'Support par email',
+              AppLocalizations.of(context)!.subscription_basicFeature1,
+              AppLocalizations.of(context)!.subscription_basicFeature2,
+              AppLocalizations.of(context)!.subscription_basicFeature3,
             ],
             color: Colors.blue,
           ),
           const SizedBox(height: 16),
           _buildSubscriptionCard(
             context,
-            title: 'Premium',
+            title: AppLocalizations.of(context)!.subscription_premium,
             price: '49.99',
-            period: 'mois',
+            period: AppLocalizations.of(context)!.subscription_month,
             features: [
-              'Déneigements illimités',
-              'Priorité haute',
-              'Support 24/7',
-              'Notifications SMS',
+              AppLocalizations.of(context)!.subscription_premiumFeature1,
+              AppLocalizations.of(context)!.subscription_premiumFeature2,
+              AppLocalizations.of(context)!.subscription_premiumFeature3,
+              AppLocalizations.of(context)!.subscription_premiumFeature4,
             ],
             color: Colors.purple,
             recommended: true,
@@ -56,15 +57,15 @@ class SubscriptionPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildSubscriptionCard(
             context,
-            title: 'Saisonnier',
+            title: AppLocalizations.of(context)!.subscription_seasonal,
             price: '299.99',
-            period: 'saison',
+            period: AppLocalizations.of(context)!.subscription_season,
             features: [
-              'Tout du Premium',
-              'Plusieurs véhicules',
-              'Gestionnaire dédié',
-              'Rapports détaillés',
-              'Garantie satisfaction',
+              AppLocalizations.of(context)!.subscription_seasonalFeature1,
+              AppLocalizations.of(context)!.subscription_seasonalFeature2,
+              AppLocalizations.of(context)!.subscription_seasonalFeature3,
+              AppLocalizations.of(context)!.subscription_seasonalFeature4,
+              AppLocalizations.of(context)!.subscription_seasonalFeature5,
             ],
             color: Colors.orange,
           ),
@@ -104,9 +105,9 @@ class SubscriptionPage extends StatelessWidget {
                     color: color,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
-                    'RECOMMANDÉ',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.subscription_recommended,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -169,7 +170,8 @@ class SubscriptionPage extends StatelessWidget {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text('Choisir ce plan'),
+                  child: Text(
+                      AppLocalizations.of(context)!.subscription_choosePlanBtn),
                 ),
               ),
             ],
@@ -188,37 +190,41 @@ class SubscriptionPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Plan $planName'),
+        title: Text(
+            AppLocalizations.of(context)!.subscription_planTitle(planName)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Vous avez sélectionné le plan $planName'),
+            Text(AppLocalizations.of(context)!
+                .subscription_selectedPlan(planName)),
             const SizedBox(height: 8),
             Text(
-              'Prix: \$$price/$period',
+              AppLocalizations.of(context)!
+                  .subscription_priceLabel(price, period),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            const Text('Cette fonctionnalité sera bientôt disponible.'),
+            Text(AppLocalizations.of(context)!.subscription_comingSoon),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Fermer'),
+            child: Text(AppLocalizations.of(context)!.common_close),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Plan $planName sélectionné'),
+                  content: Text(AppLocalizations.of(context)!
+                      .subscription_planSelected(planName)),
                   backgroundColor: Colors.green,
                 ),
               );
             },
-            child: const Text('Confirmer'),
+            child: Text(AppLocalizations.of(context)!.common_confirm),
           ),
         ],
       ),

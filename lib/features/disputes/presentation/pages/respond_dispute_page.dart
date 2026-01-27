@@ -5,6 +5,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Écran pour répondre à un litige (côté déneigeur)
 class RespondDisputePage extends StatefulWidget {
@@ -61,9 +62,10 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Impossible de charger l\'image'),
+            content: Text(l10n.dispute_imageLoadError),
             backgroundColor: AppTheme.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -73,6 +75,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   }
 
   void _showImageSourceDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surface,
@@ -86,7 +89,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Ajouter une preuve',
+                l10n.dispute_addEvidenceTitle,
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 18,
@@ -104,7 +107,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                   child: Icon(Icons.camera_alt, color: AppTheme.primary),
                 ),
                 title: Text(
-                  'Prendre une photo',
+                  l10n.dispute_takePhoto,
                   style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 onTap: () {
@@ -122,7 +125,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                   child: Icon(Icons.photo_library, color: AppTheme.primary),
                 ),
                 title: Text(
-                  'Choisir depuis la galerie',
+                  l10n.dispute_chooseFromGallery,
                   style: TextStyle(color: AppTheme.textPrimary),
                 ),
                 onTap: () {
@@ -137,22 +140,25 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
     );
   }
 
-  String _getRemainingTime() {
-    if (widget.responseDeadline == null) return 'Non spécifié';
+  String _getRemainingTime(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (widget.responseDeadline == null) return l10n.common_notSpecified;
 
     final now = DateTime.now();
     final diff = widget.responseDeadline!.difference(now);
 
     if (diff.isNegative) {
-      return 'Délai dépassé';
+      return l10n.dispute_deadlineExpired;
     }
 
     if (diff.inDays > 0) {
-      return '${diff.inDays}j ${diff.inHours % 24}h restantes';
+      return l10n.dispute_remainingTimeDaysHours(
+          diff.inDays, diff.inHours % 24);
     } else if (diff.inHours > 0) {
-      return '${diff.inHours}h ${diff.inMinutes % 60}min restantes';
+      return l10n.dispute_remainingTimeHoursMin(
+          diff.inHours, diff.inMinutes % 60);
     } else {
-      return '${diff.inMinutes}min restantes';
+      return l10n.dispute_remainingTimeMin(diff.inMinutes);
     }
   }
 
@@ -164,10 +170,12 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   Future<void> _submitResponse() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (_isDeadlinePassed()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Le délai de réponse est dépassé'),
+          content: Text(l10n.dispute_deadlineExpiredMessage),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
         ),
@@ -195,12 +203,13 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
     } catch (e) {
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             e.toString().contains('Exception:')
                 ? e.toString().replaceFirst('Exception: ', '')
-                : 'Erreur lors de l\'envoi de la réponse',
+                : l10n.dispute_responseError,
           ),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
@@ -214,6 +223,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   }
 
   void _showSuccessDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -235,7 +245,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Réponse envoyée',
+                l10n.dispute_responseSent,
                 style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 18,
@@ -249,7 +259,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Votre réponse a été enregistrée. L\'administrateur va examiner le litige et prendra une décision.',
+              l10n.dispute_responseSentMessage,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 16),
@@ -265,7 +275,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Vous serez notifié de la décision finale.',
+                      l10n.dispute_notifiedOfDecision,
                       style: TextStyle(
                         color: AppTheme.info,
                         fontSize: 13,
@@ -290,7 +300,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Compris'),
+            child: Text(l10n.common_understood),
           ),
         ],
       ),
@@ -300,12 +310,13 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   @override
   Widget build(BuildContext context) {
     final deadlinePassed = _isDeadlinePassed();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
-          'Répondre au litige',
+          l10n.dispute_respondTitle,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         backgroundColor: AppTheme.surface,
@@ -330,10 +341,10 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                 const SizedBox(height: 24),
 
                 // Response Section
-                _buildSectionTitle('Votre réponse'),
+                _buildSectionTitle(l10n.dispute_yourResponse),
                 const SizedBox(height: 8),
                 Text(
-                  'Expliquez votre version des faits. Soyez précis et factuel.',
+                  l10n.dispute_responseInstruction,
                   style: TextStyle(
                     color: AppTheme.textSecondary,
                     fontSize: 13,
@@ -344,7 +355,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                 const SizedBox(height: 24),
 
                 // Photos Section
-                _buildSectionTitle('Photos/Preuves'),
+                _buildSectionTitle(l10n.dispute_photosEvidence),
                 const SizedBox(height: 12),
                 _buildPhotoSection(),
                 const SizedBox(height: 32),
@@ -361,6 +372,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   }
 
   Widget _buildDeadlineCard(bool deadlinePassed) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -383,15 +395,15 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
               children: [
                 Text(
                   deadlinePassed
-                      ? 'Délai de réponse dépassé'
-                      : 'Délai de réponse',
+                      ? l10n.dispute_responseDeadlinePassed
+                      : l10n.dispute_responseDeadline,
                   style: TextStyle(
                     color: deadlinePassed ? AppTheme.error : AppTheme.warning,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  _getRemainingTime(),
+                  _getRemainingTime(context),
                   style: TextStyle(
                     color: deadlinePassed ? AppTheme.error : AppTheme.warning,
                     fontSize: 13,
@@ -406,6 +418,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   }
 
   Widget _buildComplaintCard() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -430,7 +443,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Plainte reçue',
+                  l10n.dispute_complaintReceived,
                   style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.bold,
@@ -481,14 +494,14 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   }
 
   Widget _buildResponseField() {
+    final l10n = AppLocalizations.of(context)!;
     return TextFormField(
       controller: _responseController,
       maxLines: 6,
       maxLength: 2000,
       style: TextStyle(color: AppTheme.textPrimary),
       decoration: InputDecoration(
-        hintText:
-            'Écrivez votre réponse ici...\n\n• Décrivez ce qui s\'est passé\n• Mentionnez les preuves que vous avez\n• Restez professionnel',
+        hintText: l10n.dispute_responseHint,
         hintStyle: TextStyle(color: AppTheme.textTertiary),
         filled: true,
         fillColor: AppTheme.surfaceContainer,
@@ -512,10 +525,10 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Veuillez écrire votre réponse';
+          return l10n.dispute_writeResponse;
         }
         if (value.trim().length < 50) {
-          return 'Votre réponse est trop courte (minimum 50 caractères)';
+          return l10n.dispute_responseTooShort;
         }
         return null;
       },
@@ -523,11 +536,12 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   }
 
   Widget _buildPhotoSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Ajoutez des photos pour appuyer votre réponse (photos du travail effectué, captures d\'écran de conversation, etc.)',
+          l10n.dispute_addPhotosInstruction,
           style: TextStyle(
             color: AppTheme.textSecondary,
             fontSize: 13,
@@ -606,8 +620,8 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                   const SizedBox(width: 12),
                   Text(
                     _photos.isEmpty
-                        ? 'Ajouter des preuves'
-                        : 'Ajouter une autre photo',
+                        ? l10n.dispute_addEvidenceButton
+                        : l10n.dispute_addAnotherPhoto,
                     style: TextStyle(
                       color: AppTheme.primary,
                       fontWeight: FontWeight.w600,
@@ -620,7 +634,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
 
         const SizedBox(height: 8),
         Text(
-          'Maximum 10 photos',
+          l10n.dispute_maxPhotos,
           style: TextStyle(
             color: AppTheme.textTertiary,
             fontSize: 12,
@@ -631,6 +645,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
   }
 
   Widget _buildSubmitButton(bool deadlinePassed) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 54,
@@ -655,7 +670,9 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                 ),
               )
             : Text(
-                deadlinePassed ? 'Délai dépassé' : 'Envoyer ma réponse',
+                deadlinePassed
+                    ? l10n.dispute_deadlineExpired
+                    : l10n.dispute_sendResponse,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

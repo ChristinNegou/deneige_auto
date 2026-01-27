@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 class TermsOfServicePage extends StatelessWidget {
   const TermsOfServicePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Conditions d\'utilisation'),
+        title: Text(l10n.settings_termsOfService),
         backgroundColor: AppTheme.surface,
       ),
       body: SingleChildScrollView(
@@ -18,78 +20,60 @@ class TermsOfServicePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSection(
-              '1. Acceptation des conditions',
-              'En utilisant l\'application Deneige Auto, vous acceptez d\'être lié par les présentes conditions d\'utilisation. Si vous n\'acceptez pas ces conditions, veuillez ne pas utiliser l\'application.',
+              l10n.terms_section1Title,
+              l10n.terms_section1Body,
             ),
             _buildSection(
-              '2. Description du service',
-              'Deneige Auto est une plateforme mettant en relation des clients ayant besoin de services de déneigement avec des prestataires de services (déneigeurs) indépendants. Nous ne sommes pas l\'employeur des déneigeurs.',
+              l10n.terms_section2Title,
+              l10n.terms_section2Body,
             ),
             _buildSection(
-              '3. Inscription et compte',
-              '''Pour utiliser nos services, vous devez:
-• Être âgé d'au moins 18 ans
-• Fournir des informations exactes et à jour
-• Maintenir la confidentialité de vos identifiants
-• Nous informer de toute utilisation non autorisée de votre compte''',
+              l10n.terms_section3Title,
+              l10n.terms_section3Body,
             ),
             _buildSection(
-              '4. Réservations et paiements',
-              '''• Les prix affichés incluent les taxes applicables
-• Le paiement est effectué au moment de la réservation
-• Les annulations sont soumises à notre politique d'annulation
-• Un remboursement peut être demandé selon les conditions applicables''',
+              l10n.terms_section4Title,
+              l10n.terms_section4Body,
             ),
             _buildSection(
-              '5. Politique d\'annulation',
-              '''• Annulation plus de 24h avant: remboursement complet
-• Annulation entre 12h et 24h avant: remboursement de 50%
-• Annulation moins de 12h avant: aucun remboursement
-• Annulation par le déneigeur: remboursement complet et priorité de réassignation''',
+              l10n.terms_section5Title,
+              l10n.terms_section5Body,
             ),
             _buildSection(
-              '6. Responsabilités de l\'utilisateur',
-              '''Vous vous engagez à:
-• Fournir un accès sécuritaire au véhicule
-• Décrire précisément l'emplacement du véhicule
-• Être disponible pour toute communication urgente
-• Respecter les déneigeurs et leur travail''',
+              l10n.terms_section6Title,
+              l10n.terms_section6Body,
             ),
             _buildSection(
-              '7. Responsabilités des déneigeurs',
-              '''Les déneigeurs s'engagent à:
-• Effectuer le service avec professionnalisme
-• Respecter les horaires convenus
-• Prendre soin des véhicules des clients
-• Signaler tout problème ou dommage''',
+              l10n.terms_section7Title,
+              l10n.terms_section7Body,
             ),
             _buildSection(
-              '8. Limitation de responsabilité',
-              'Deneige Auto agit comme intermédiaire et ne peut être tenu responsable des dommages directs ou indirects résultant de l\'exécution des services par les déneigeurs. Tout litige doit être signalé dans les 24h suivant le service.',
+              l10n.terms_section8Title,
+              l10n.terms_section8Body,
             ),
             _buildSection(
-              '9. Propriété intellectuelle',
-              'Tous les contenus de l\'application (logos, textes, images, code) sont la propriété de Deneige Auto et sont protégés par les lois sur la propriété intellectuelle.',
+              l10n.terms_section9Title,
+              l10n.terms_section9Body,
             ),
             _buildSection(
-              '10. Modification des conditions',
-              'Nous nous réservons le droit de modifier ces conditions à tout moment. Les utilisateurs seront informés des changements significatifs par notification dans l\'application.',
+              l10n.terms_section10Title,
+              l10n.terms_section10Body,
             ),
             _buildSection(
-              '11. Résiliation',
-              'Nous pouvons suspendre ou résilier votre compte en cas de violation de ces conditions. Vous pouvez supprimer votre compte à tout moment depuis les paramètres de l\'application.',
+              l10n.terms_section11Title,
+              l10n.terms_section11Body,
             ),
             _buildSection(
-              '12. Droit applicable',
-              'Ces conditions sont régies par les lois de la province de Québec, Canada. Tout litige sera soumis aux tribunaux compétents de Montréal.',
+              l10n.terms_section12Title,
+              l10n.terms_section12Body,
             ),
             _buildSection(
-              '13. Contact',
-              'Pour toute question concernant ces conditions, contactez-nous via la section "Aide et Support" de l\'application.',
+              l10n.terms_section13Title,
+              l10n.terms_section13Body,
             ),
             const SizedBox(height: 16),
             Text(
-              'Dernière mise à jour: Janvier 2025',
+              l10n.terms_lastUpdate,
               style: TextStyle(
                 color: AppTheme.textTertiary,
                 fontSize: 12,

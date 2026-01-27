@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../domain/entities/photo_analysis.dart';
 
 /// Widget pour afficher les résultats d'analyse de photos IA
@@ -64,9 +65,9 @@ class PhotoAnalysisCard extends StatelessWidget {
                               color: AppTheme.primary,
                             ),
                             const SizedBox(width: 6),
-                            const Text(
-                              'Analyse IA',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.ai_analysisLabel,
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.textPrimary,
@@ -142,7 +143,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 3),
                           Text(
-                            'Alerte',
+                            AppLocalizations.of(context)!.ai_alert,
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -232,7 +233,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Problème critique détecté',
+                                AppLocalizations.of(context)!.ai_criticalIssue,
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -244,7 +245,8 @@ class PhotoAnalysisCard extends StatelessWidget {
                           const SizedBox(height: 8),
                           if (analysis.isSuspiciousPhoto)
                             Text(
-                              '• Photo suspecte (possible fraude)',
+                              AppLocalizations.of(context)!
+                                  .ai_suspiciousPhotoFraud,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: AppTheme.error,
@@ -252,7 +254,8 @@ class PhotoAnalysisCard extends StatelessWidget {
                             ),
                           if (!analysis.vehicleDetected)
                             Text(
-                              '• Aucun véhicule détecté',
+                              AppLocalizations.of(context)!
+                                  .ai_noVehicleDetectedBullet,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: AppTheme.error,
@@ -285,7 +288,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                                       size: 16, color: AppTheme.primary),
                                   const SizedBox(width: 6),
                                   Text(
-                                    'Véhicule',
+                                    AppLocalizations.of(context)!.ai_vehicle,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: AppTheme.textSecondary,
@@ -297,7 +300,8 @@ class PhotoAnalysisCard extends StatelessWidget {
                               Text(
                                 analysis.vehicleDetected
                                     ? analysis.vehicleTypeLabel
-                                    : 'Non détecté',
+                                    : AppLocalizations.of(context)!
+                                        .ai_notDetected,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -329,7 +333,8 @@ class PhotoAnalysisCard extends StatelessWidget {
                                       size: 16, color: AppTheme.info),
                                   const SizedBox(width: 6),
                                   Text(
-                                    'Neige estimée',
+                                    AppLocalizations.of(context)!
+                                        .ai_estimatedSnow,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: AppTheme.textSecondary,
@@ -361,7 +366,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildScoreItem(
-                          'Qualité',
+                          AppLocalizations.of(context)!.ai_quality,
                           analysis.qualityScore,
                           Icons.high_quality,
                         ),
@@ -369,7 +374,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildScoreItem(
-                          'Complétude',
+                          AppLocalizations.of(context)!.ai_completeness,
                           analysis.completenessScore,
                           Icons.check_circle_outline,
                         ),
@@ -398,7 +403,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                'Résumé',
+                                AppLocalizations.of(context)!.ai_summary,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -425,7 +430,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                   if (analysis.hasIssues) ...[
                     const SizedBox(height: 16),
                     Text(
-                      'Problèmes détectés',
+                      AppLocalizations.of(context)!.ai_issuesDetected,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -473,7 +478,8 @@ class PhotoAnalysisCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '${analysis.photosAnalyzed.total} photos analysées',
+                        AppLocalizations.of(context)!
+                            .ai_photosAnalyzed(analysis.photosAnalyzed.total),
                         style: TextStyle(
                           fontSize: 11,
                           color: AppTheme.textTertiary,
@@ -481,7 +487,8 @@ class PhotoAnalysisCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        'Analysé le ${_formatDate(analysis.analyzedAt)}',
+                        AppLocalizations.of(context)!
+                            .ai_analyzedOn(_formatDate(analysis.analyzedAt)),
                         style: TextStyle(
                           fontSize: 11,
                           color: AppTheme.textTertiary,

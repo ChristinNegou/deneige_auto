@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/payment_methods_bloc.dart';
 
 class AddPaymentMethodScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
-          'Ajouter une carte',
+          AppLocalizations.of(context)!.addCard_title,
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         backgroundColor: AppTheme.surface,
@@ -94,7 +95,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Paiement sécurisé',
+                  AppLocalizations.of(context)!.addCard_securePayment,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -103,7 +104,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Vos informations sont protégées par Stripe',
+                  AppLocalizations.of(context)!.addCard_protectedByStripe,
                   style: TextStyle(
                       fontSize: 11,
                       color: AppTheme.info.withValues(alpha: 0.8)),
@@ -121,7 +122,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Informations de la carte',
+          AppLocalizations.of(context)!.addCard_cardInfo,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -146,7 +147,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
             enablePostalCode: true,
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Numéro de carte',
+              hintText: AppLocalizations.of(context)!.addCard_cardNumber,
               hintStyle: TextStyle(color: AppTheme.textTertiary),
             ),
           ),
@@ -189,7 +190,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Définir comme méthode par défaut',
+                    AppLocalizations.of(context)!.addCard_setDefault,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -198,7 +199,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Utilisée pour vos futurs paiements',
+                    AppLocalizations.of(context)!.addCard_usedForFuture,
                     style:
                         TextStyle(fontSize: 12, color: AppTheme.textTertiary),
                   ),
@@ -218,7 +219,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            'Données cryptées et sécurisées. Numéro de carte jamais stocké.',
+            AppLocalizations.of(context)!.addCard_encryptedSecure,
             style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
           ),
         ),
@@ -250,9 +251,10 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
                 child: CircularProgressIndicator(
                     strokeWidth: 2, color: AppTheme.background),
               )
-            : const Text(
-                'Ajouter la carte',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            : Text(
+                AppLocalizations.of(context)!.addCard_addBtn,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
       ),
     );
@@ -325,8 +327,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        _showSnackBar(
-            'Impossible d\'ajouter cette carte. Vérifiez les informations et réessayez.',
+        _showSnackBar(AppLocalizations.of(context)!.addCard_errorAdding,
             isError: true);
       }
     }

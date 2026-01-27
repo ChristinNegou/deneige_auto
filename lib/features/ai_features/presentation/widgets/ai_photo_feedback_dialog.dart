@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../domain/entities/photo_analysis.dart';
 import '../bloc/ai_features_bloc.dart';
 import '../bloc/ai_features_event.dart';
@@ -52,19 +53,19 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: state.isAnalyzingPhotos
-                ? _buildLoadingState()
+                ? _buildLoadingState(context)
                 : state.photoAnalysisError != null
                     ? _buildErrorState(context, state.photoAnalysisError!)
                     : state.photoAnalysis != null
                         ? _buildResultState(context, state.photoAnalysis!)
-                        : _buildLoadingState(),
+                        : _buildLoadingState(context),
           ),
         );
       },
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -81,7 +82,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          'Analyse IA en cours...',
+          AppLocalizations.of(context)!.ai_analysisInProgress,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -90,7 +91,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Verification de la qualite du travail',
+          AppLocalizations.of(context)!.ai_qualityVerification,
           style: TextStyle(
             fontSize: 14,
             color: AppTheme.textSecondary,
@@ -119,7 +120,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          'Analyse non disponible',
+          AppLocalizations.of(context)!.ai_analysisUnavailable,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -128,7 +129,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'La verification IA sera effectuee ulterieurement',
+          AppLocalizations.of(context)!.ai_verificationLater,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
@@ -150,7 +151,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
             ),
-            child: const Text('Continuer'),
+            child: Text(AppLocalizations.of(context)!.reservation_continue),
           ),
         ),
       ],
@@ -191,7 +192,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Alerte Photo',
+                      AppLocalizations.of(context)!.ai_photoAlert,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -203,7 +204,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
                 const SizedBox(height: 8),
                 if (analysis.isSuspiciousPhoto)
                   Text(
-                    'Photo suspecte détectée - Veuillez reprendre une photo authentique',
+                    AppLocalizations.of(context)!.ai_suspiciousPhoto,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -212,7 +213,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
                   ),
                 if (!analysis.vehicleDetected)
                   Text(
-                    'Aucun véhicule détecté sur la photo',
+                    AppLocalizations.of(context)!.ai_noVehicleDetected,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -355,7 +356,8 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '~${analysis.estimatedSnowDepthCm} cm neige',
+                        AppLocalizations.of(context)!.ai_snowDepth(
+                            analysis.estimatedSnowDepthCm!.toString()),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -422,7 +424,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
                         size: 16, color: AppTheme.warning),
                     const SizedBox(width: 8),
                     Text(
-                      'Points a ameliorer',
+                      AppLocalizations.of(context)!.ai_improvementPoints,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -482,7 +484,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Reprendre photo',
+                    AppLocalizations.of(context)!.ai_retakePhoto,
                     style: TextStyle(color: AppTheme.warning),
                   ),
                 ),
@@ -503,7 +505,9 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
                 ),
-                child: Text(isGoodScore ? 'Parfait!' : 'Continuer'),
+                child: Text(isGoodScore
+                    ? AppLocalizations.of(context)!.ai_perfect
+                    : AppLocalizations.of(context)!.reservation_continue),
               ),
             ),
           ],

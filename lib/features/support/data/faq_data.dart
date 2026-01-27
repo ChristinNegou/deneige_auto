@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import '../domain/entities/faq_item.dart';
 
 class FaqData {
@@ -177,5 +178,125 @@ class FaqData {
 
   static List<FaqItem> getByCategory(FaqCategory category) {
     return faqItems.where((item) => item.category == category).toList();
+  }
+
+  static List<FaqItem> getLocalizedFaqItems(AppLocalizations l10n) {
+    return [
+      FaqItem(
+          question: l10n.faq_q1,
+          answer: l10n.faq_a1,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.faq_q2,
+          answer: l10n.faq_a2,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.faq_q3,
+          answer: l10n.faq_a3,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.faq_q4,
+          answer: l10n.faq_a4,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.faq_q5,
+          answer: l10n.faq_a5,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.faq_q6,
+          answer: l10n.faq_a6,
+          category: FaqCategory.general),
+      FaqItem(
+          question: l10n.faq_q7,
+          answer: l10n.faq_a7,
+          category: FaqCategory.reservations),
+      FaqItem(
+          question: l10n.faq_q8,
+          answer: l10n.faq_a8,
+          category: FaqCategory.reservations),
+      FaqItem(
+          question: l10n.faq_q9,
+          answer: l10n.faq_a9,
+          category: FaqCategory.reservations),
+      FaqItem(
+          question: l10n.faq_q10,
+          answer: l10n.faq_a10,
+          category: FaqCategory.reservations),
+      FaqItem(
+          question: l10n.faq_q11,
+          answer: l10n.faq_a11,
+          category: FaqCategory.payments),
+      FaqItem(
+          question: l10n.faq_q12,
+          answer: l10n.faq_a12,
+          category: FaqCategory.payments),
+      FaqItem(
+          question: l10n.faq_q13,
+          answer: l10n.faq_a13,
+          category: FaqCategory.payments),
+      FaqItem(
+          question: l10n.faq_q14,
+          answer: l10n.faq_a14,
+          category: FaqCategory.payments),
+      FaqItem(
+          question: l10n.faq_q15,
+          answer: l10n.faq_a15,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q16,
+          answer: l10n.faq_a16,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q17,
+          answer: l10n.faq_a17,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q18,
+          answer: l10n.faq_a18,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q19,
+          answer: l10n.faq_a19,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q20,
+          answer: l10n.faq_a20,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q21,
+          answer: l10n.faq_a21,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q22,
+          answer: l10n.faq_a22,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q23,
+          answer: l10n.faq_a23,
+          category: FaqCategory.disputes),
+      FaqItem(
+          question: l10n.faq_q24,
+          answer: l10n.faq_a24,
+          category: FaqCategory.account),
+      FaqItem(
+          question: l10n.faq_q25,
+          answer: l10n.faq_a25,
+          category: FaqCategory.account),
+      FaqItem(
+          question: l10n.faq_q26,
+          answer: l10n.faq_a26,
+          category: FaqCategory.account),
+      FaqItem(
+          question: l10n.faq_q27,
+          answer: l10n.faq_a27,
+          category: FaqCategory.account),
+    ];
+  }
+
+  static List<FaqItem> getLocalizedByCategory(
+      AppLocalizations l10n, FaqCategory category) {
+    return getLocalizedFaqItems(l10n)
+        .where((item) => item.category == category)
+        .toList();
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../bloc/verification_bloc.dart';
 import 'selfie_capture_page.dart';
 
@@ -43,7 +44,8 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: ${e.toString()}'),
+            content: Text(
+                '${AppLocalizations.of(context)!.common_error}: ${e.toString()}'),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -75,8 +77,8 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
               const SizedBox(height: 20),
               Text(
                 _isCapturingFront
-                    ? 'Photographier le recto'
-                    : 'Photographier le verso',
+                    ? AppLocalizations.of(context)!.verification_captureFront
+                    : AppLocalizations.of(context)!.verification_captureBack,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -93,8 +95,9 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
                   ),
                   child: Icon(Icons.camera_alt, color: AppTheme.primary),
                 ),
-                title: const Text('Prendre une photo'),
-                subtitle: const Text('Utiliser la caméra'),
+                title: Text(AppLocalizations.of(context)!.profile_takePhoto),
+                subtitle:
+                    Text(AppLocalizations.of(context)!.verification_useCamera),
                 onTap: () {
                   Navigator.pop(context);
                   _captureImage(ImageSource.camera);
@@ -111,8 +114,10 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
                   ),
                   child: Icon(Icons.photo_library, color: AppTheme.secondary),
                 ),
-                title: const Text('Choisir une photo'),
-                subtitle: const Text('Depuis la galerie'),
+                title: Text(
+                    AppLocalizations.of(context)!.verification_choosePhoto),
+                subtitle: Text(
+                    AppLocalizations.of(context)!.verification_fromGallery),
                 onTap: () {
                   Navigator.pop(context);
                   _captureImage(ImageSource.gallery);
@@ -129,9 +134,9 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
   void _proceedToSelfie() {
     if (_idFront == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'Veuillez photographier le recto de votre pièce d\'identité'),
+        SnackBar(
+          content:
+              Text(AppLocalizations.of(context)!.verification_captureIdFront),
           backgroundColor: AppTheme.error,
         ),
       );
@@ -157,7 +162,7 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Pièce d\'identité'),
+        title: Text(AppLocalizations.of(context)!.verification_idDocument),
         backgroundColor: AppTheme.surface,
         foregroundColor: AppTheme.textPrimary,
         elevation: 0,
@@ -186,19 +191,17 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Conseils pour une bonne photo',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!
+                              .verification_photoTipsTitle,
+                          style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '• Placez le document sur une surface plane\n'
-                          '• Assurez-vous d\'avoir un bon éclairage\n'
-                          '• Évitez les reflets et les ombres\n'
-                          '• Capturez tout le document',
+                          AppLocalizations.of(context)!.verification_photoTips,
                           style: TextStyle(
                             fontSize: 13,
                             color: AppTheme.textSecondary,
@@ -216,8 +219,9 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
 
             // Front ID
             _buildDocumentSection(
-              title: 'Recto (obligatoire)',
-              subtitle: 'Face avec votre photo',
+              title: AppLocalizations.of(context)!.verification_frontRequired,
+              subtitle:
+                  AppLocalizations.of(context)!.verification_frontSubtitle,
               image: _idFront,
               isRequired: true,
               onCapture: () {
@@ -231,8 +235,8 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
 
             // Back ID
             _buildDocumentSection(
-              title: 'Verso (optionnel)',
-              subtitle: 'Si votre document a un verso',
+              title: AppLocalizations.of(context)!.verification_backOptional,
+              subtitle: AppLocalizations.of(context)!.verification_backSubtitle,
               image: _idBack,
               isRequired: false,
               onCapture: () {
@@ -261,9 +265,9 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Continuer vers le selfie',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.verification_continueToSelfie,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -325,7 +329,7 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                'Requis',
+                                AppLocalizations.of(context)!.common_required,
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: AppTheme.error,
@@ -378,13 +382,14 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
                         _buildImageActionButton(
                           icon: Icons.refresh,
                           onTap: onCapture,
-                          tooltip: 'Reprendre',
+                          tooltip:
+                              AppLocalizations.of(context)!.verification_retake,
                         ),
                         const SizedBox(width: 8),
                         _buildImageActionButton(
                           icon: Icons.delete_outline,
                           onTap: onRemove,
-                          tooltip: 'Supprimer',
+                          tooltip: AppLocalizations.of(context)!.common_delete,
                           isDestructive: true,
                         ),
                       ],
@@ -427,7 +432,7 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Ajouter une photo',
+                      AppLocalizations.of(context)!.verification_addPhoto,
                       style: TextStyle(
                         color: AppTheme.primary,
                         fontWeight: FontWeight.w600,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../domain/entities/verification_status.dart';
 import '../bloc/verification_bloc.dart';
 import '../bloc/verification_event.dart';
@@ -28,7 +29,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Vérification d\'identité'),
+        title: Text(AppLocalizations.of(context)!.verify_title),
         backgroundColor: AppTheme.surface,
         foregroundColor: AppTheme.textPrimary,
         elevation: 0,
@@ -102,9 +103,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                   color: AppTheme.primary,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Vérifiez votre identité',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.verify_heading,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.textPrimary,
@@ -113,7 +114,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Pour la sécurité de tous, nous devons vérifier votre identité avant que vous puissiez accepter des jobs.',
+                  AppLocalizations.of(context)!.verify_description,
                   style: TextStyle(
                     fontSize: 14,
                     color: AppTheme.textSecondary,
@@ -129,25 +130,22 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           // Steps
           _buildStepCard(
             number: '1',
-            title: 'Pièce d\'identité',
-            description:
-                'Photographiez le recto (et verso si disponible) de votre pièce d\'identité',
+            title: AppLocalizations.of(context)!.verify_step1Title,
+            description: AppLocalizations.of(context)!.verify_step1Desc,
             icon: Icons.badge_outlined,
           ),
           const SizedBox(height: 12),
           _buildStepCard(
             number: '2',
-            title: 'Selfie',
-            description:
-                'Prenez un selfie pour confirmer que vous êtes bien la personne sur la pièce d\'identité',
+            title: AppLocalizations.of(context)!.verify_step2Title,
+            description: AppLocalizations.of(context)!.verify_step2Desc,
             icon: Icons.face_outlined,
           ),
           const SizedBox(height: 12),
           _buildStepCard(
             number: '3',
-            title: 'Vérification automatique',
-            description:
-                'Notre système vérifie vos documents en quelques minutes',
+            title: AppLocalizations.of(context)!.verify_step3Title,
+            description: AppLocalizations.of(context)!.verify_step3Desc,
             icon: Icons.check_circle_outline,
           ),
 
@@ -168,9 +166,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                   children: [
                     Icon(Icons.info_outline, color: AppTheme.info, size: 20),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Documents acceptés',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.verify_acceptedDocs,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -178,10 +176,14 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _buildDocumentItem('Permis de conduire'),
-                _buildDocumentItem('Carte d\'assurance maladie'),
-                _buildDocumentItem('Passeport'),
-                _buildDocumentItem('Carte de résident permanent'),
+                _buildDocumentItem(
+                    AppLocalizations.of(context)!.verify_driverLicense),
+                _buildDocumentItem(
+                    AppLocalizations.of(context)!.verify_healthCard),
+                _buildDocumentItem(
+                    AppLocalizations.of(context)!.verify_passport),
+                _buildDocumentItem(
+                    AppLocalizations.of(context)!.verify_permanentResident),
               ],
             ),
           ),
@@ -199,9 +201,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
-              'Commencer la vérification',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.verify_startBtn,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -314,9 +316,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Identité vérifiée',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.verify_approved,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimary,
@@ -324,7 +326,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Vous pouvez maintenant accepter des jobs de déneigement',
+              AppLocalizations.of(context)!.verify_approvedDesc,
               style: TextStyle(
                 fontSize: 14,
                 color: AppTheme.textSecondary,
@@ -341,7 +343,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'Expire le ${_formatDate(status.expiresAt!)}',
+                  AppLocalizations.of(context)!
+                      .verify_expiresOn(_formatDate(status.expiresAt!)),
                   style: TextStyle(
                     fontSize: 13,
                     color: AppTheme.info,
@@ -374,9 +377,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Vérification en cours',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.verify_pendingTitle,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimary,
@@ -384,7 +387,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Nous analysons vos documents. Cela peut prendre quelques minutes.',
+              AppLocalizations.of(context)!.verify_pendingDesc,
               style: TextStyle(
                 fontSize: 14,
                 color: AppTheme.textSecondary,
@@ -399,7 +402,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                     .add(const LoadVerificationStatus());
               },
               icon: const Icon(Icons.refresh),
-              label: const Text('Actualiser'),
+              label: Text(AppLocalizations.of(context)!.verify_refresh),
             ),
           ],
         ),
@@ -426,9 +429,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Vérification refusée',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.verify_rejectedTitle,
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -463,7 +466,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           const SizedBox(height: 24),
           if (status.canResubmit) ...[
             Text(
-              'Tentatives restantes: ${status.attemptsRemaining}',
+              AppLocalizations.of(context)!
+                  .verify_attemptsRemaining(status.attemptsRemaining),
               style: TextStyle(
                 fontSize: 13,
                 color: AppTheme.textSecondary,
@@ -481,7 +485,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Resoumettre mes documents'),
+              child: Text(AppLocalizations.of(context)!.verify_resubmit),
             ),
           ] else ...[
             Container(
@@ -494,13 +498,13 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 children: [
                   Icon(Icons.warning_outlined, color: AppTheme.warning),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Nombre maximum de tentatives atteint',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                  Text(
+                    AppLocalizations.of(context)!.verify_maxAttempts,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Veuillez contacter le support pour assistance.',
+                    AppLocalizations.of(context)!.verify_contactSupport,
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.textSecondary,
@@ -537,9 +541,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Vérification expirée',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.verify_expiredTitle,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimary,
@@ -547,7 +551,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Votre vérification d\'identité a expiré. Veuillez resoumettre vos documents.',
+              AppLocalizations.of(context)!.verify_expiredDesc,
               style: TextStyle(
                 fontSize: 14,
                 color: AppTheme.textSecondary,
@@ -566,7 +570,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Renouveler ma vérification'),
+              child: Text(AppLocalizations.of(context)!.verify_renewBtn),
             ),
           ],
         ),

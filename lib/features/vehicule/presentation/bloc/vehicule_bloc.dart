@@ -150,7 +150,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
         emit(state.copyWith(
           isSubmitting: false,
           vehicles: updatedVehicles,
-          successMessage: 'Véhicule ajouté avec succès',
+          successMessage: 'vehicle_added_flag',
           clearError: true,
         ));
       },
@@ -176,7 +176,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
         emit(state.copyWith(
           isSubmitting: false,
           vehicles: updatedVehicles,
-          successMessage: 'Véhicule supprimé avec succès',
+          successMessage: 'vehicle_deleted_flag',
           clearError: true,
         ));
       },
@@ -211,7 +211,7 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
         emit(state.copyWith(
           isSubmitting: false,
           vehicles: updatedVehicles,
-          successMessage: 'Photo du véhicule mise à jour',
+          successMessage: 'vehicle_photo_updated_flag',
           clearError: true,
         ));
       },

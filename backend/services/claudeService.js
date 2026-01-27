@@ -46,6 +46,7 @@ const initAnthropicClient = () => {
  */
 const generateResponse = async (messages, userContext = {}, options = {}) => {
     const anthropicClient = initAnthropicClient();
+    const lang = options.lang || 'fr';
 
     // Mode développement: réponse simulée si Claude n'est pas configuré
     if (!anthropicClient) {
@@ -53,10 +54,15 @@ const generateResponse = async (messages, userContext = {}, options = {}) => {
         console.log('🤖 MODE DÉVELOPPEMENT - Réponse IA simulée');
         console.log('='.repeat(50));
 
+        const simulatedMessages = {
+            fr: "Je suis l'assistant Déneige Auto. Je suis actuellement en mode simulation car l'API Claude n'est pas configurée. Comment puis-je vous aider?",
+            en: "I'm the Deneige Auto assistant. I'm currently in simulation mode as the Claude API is not configured. How can I help you?"
+        };
+
         return {
             success: true,
             simulated: true,
-            response: "Je suis l'assistant Déneige Auto. Je suis actuellement en mode simulation car l'API Claude n'est pas configurée. Comment puis-je vous aider?",
+            response: simulatedMessages[lang] || simulatedMessages.fr,
             usage: { inputTokens: 0, outputTokens: 0 }
         };
     }
@@ -65,8 +71,8 @@ const generateResponse = async (messages, userContext = {}, options = {}) => {
         const model = options.model || process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514';
         const maxTokens = options.maxTokens || parseInt(process.env.AI_CHAT_MAX_TOKENS) || 1024;
 
-        // Construire le prompt système avec le contexte utilisateur
-        const systemPrompt = getSystemPrompt(userContext);
+        // Construire le prompt système avec le contexte utilisateur et la langue
+        const systemPrompt = getSystemPrompt(userContext, lang);
 
         const response = await anthropicClient.messages.create({
             model: model,
@@ -139,10 +145,15 @@ const generateResponse = async (messages, userContext = {}, options = {}) => {
  */
 const generateStreamingResponse = async (messages, userContext = {}, onChunk, options = {}) => {
     const anthropicClient = initAnthropicClient();
+    const lang = options.lang || 'fr';
 
     if (!anthropicClient) {
         // Mode simulation pour le streaming
-        const simulatedResponse = "Je suis l'assistant Déneige Auto en mode simulation.";
+        const simulatedResponses = {
+            fr: "Je suis l'assistant Déneige Auto en mode simulation.",
+            en: "I'm the Deneige Auto assistant in simulation mode."
+        };
+        const simulatedResponse = simulatedResponses[lang] || simulatedResponses.fr;
         for (const char of simulatedResponse) {
             onChunk(char);
             await new Promise(resolve => setTimeout(resolve, 20));
@@ -159,7 +170,7 @@ const generateStreamingResponse = async (messages, userContext = {}, onChunk, op
     try {
         const model = options.model || process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514';
         const maxTokens = options.maxTokens || parseInt(process.env.AI_CHAT_MAX_TOKENS) || 1024;
-        const systemPrompt = getSystemPrompt(userContext);
+        const systemPrompt = getSystemPrompt(userContext, lang);
 
         let fullResponse = '';
         let usage = { inputTokens: 0, outputTokens: 0 };

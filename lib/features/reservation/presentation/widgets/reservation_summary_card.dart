@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/new_reservation_bloc.dart';
 import '../bloc/new_reservation_state.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,10 @@ class ReservationSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<NewReservationBloc, NewReservationState>(
       builder: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
+        final locale = Localizations.localeOf(context).languageCode == 'en'
+            ? 'en_CA'
+            : 'fr_CA';
         return Container(
           decoration: BoxDecoration(
             color: AppTheme.surface,
@@ -40,7 +45,7 @@ class ReservationSummaryCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Résumé de la réservation',
+                      l10n.summary_reservationSummary,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -58,46 +63,39 @@ class ReservationSummaryCard extends StatelessWidget {
                   children: [
                     _SummaryRow(
                       icon: Icons.directions_car,
-                      label: 'Véhicule',
+                      label: l10n.step1_vehicle,
                       value: state.selectedVehicle?.displayName ?? '-',
                     ),
-
                     Divider(height: 24, color: AppTheme.border),
-
-                    // ✅ Logique corrigée pour afficher la place de parking
                     _SummaryRow(
                       icon: Icons.local_parking,
-                      label: 'Place',
-                      value: _getParkingSpotDisplay(state),
+                      label: l10n.summary_spot,
+                      value: _getParkingSpotDisplay(context, state),
                     ),
-
                     Divider(height: 24, color: AppTheme.border),
-
                     _SummaryRow(
                       icon: Icons.access_time,
-                      label: 'Départ',
+                      label: l10n.summary_departure,
                       value: state.departureDateTime != null
-                          ? DateFormat('d MMM yyyy, HH:mm', 'fr_CA')
+                          ? DateFormat('d MMM yyyy, HH:mm', locale)
                               .format(state.departureDateTime!)
                           : '-',
                     ),
-
                     if (state.selectedOptions.isNotEmpty) ...[
                       Divider(height: 24, color: AppTheme.border),
                       _SummaryRow(
                         icon: Icons.tune,
-                        label: 'Options',
+                        label: l10n.summary_options,
                         value: state.selectedOptions
-                            .map((o) => _getOptionShortName(o))
+                            .map((o) => _getOptionShortName(context, o))
                             .join(', '),
                       ),
                     ],
-
                     if (state.snowDepthCm != null) ...[
                       Divider(height: 24, color: AppTheme.border),
                       _SummaryRow(
                         icon: Icons.ac_unit,
-                        label: 'Neige',
+                        label: l10n.summary_snow,
                         value: '${state.snowDepthCm} cm',
                       ),
                     ],
@@ -112,7 +110,8 @@ class ReservationSummaryCard extends StatelessWidget {
   }
 
   // ✅ Nouvelle méthode pour déterminer l'affichage de la place
-  String _getParkingSpotDisplay(NewReservationState state) {
+  String _getParkingSpotDisplay(
+      BuildContext context, NewReservationState state) {
     // 1. Si une place de parking complète est sélectionnée
     if (state.selectedParkingSpot != null) {
       return state.selectedParkingSpot!.fullDisplayName;
@@ -121,7 +120,8 @@ class ReservationSummaryCard extends StatelessWidget {
     // 2. Si un numéro de place manuel est entré
     if (state.parkingSpotNumber != null &&
         state.parkingSpotNumber!.isNotEmpty) {
-      return 'Place ${state.parkingSpotNumber}';
+      return AppLocalizations.of(context)!
+          .summary_place(state.parkingSpotNumber!);
     }
 
     // 3. Si un emplacement personnalisé est entré
@@ -133,24 +133,25 @@ class ReservationSummaryCard extends StatelessWidget {
     return '-';
   }
 
-  String _getOptionShortName(ServiceOption option) {
+  String _getOptionShortName(BuildContext context, ServiceOption option) {
+    final l10n = AppLocalizations.of(context)!;
     switch (option) {
       case ServiceOption.windowScraping:
-        return 'Vitres';
+        return l10n.option_windowScrapingShort;
       case ServiceOption.doorDeicing:
-        return 'Portes';
+        return l10n.option_doorDeicingShort;
       case ServiceOption.wheelClearance:
-        return 'Roues';
+        return l10n.option_wheelClearanceShort;
       case ServiceOption.roofClearing:
-        return 'Toit';
+        return l10n.option_roofClearingShort;
       case ServiceOption.saltSpreading:
-        return 'Sel';
+        return l10n.option_saltSpreadingShort;
       case ServiceOption.lightsCleaning:
-        return 'Phares';
+        return l10n.option_lightsCleaningShort;
       case ServiceOption.perimeterClearance:
-        return 'Périmètre';
+        return l10n.option_perimeterClearanceShort;
       case ServiceOption.exhaustCheck:
-        return 'Échapp.';
+        return l10n.option_exhaustCheckShort;
     }
   }
 }

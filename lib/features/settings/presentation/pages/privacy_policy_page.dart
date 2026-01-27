@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Politique de confidentialité'),
+        title: Text(l10n.privacy_title),
         backgroundColor: AppTheme.surface,
       ),
       body: SingleChildScrollView(
@@ -18,62 +20,44 @@ class PrivacyPolicyPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSection(
-              'Introduction',
-              'Bienvenue sur Deneige Auto. Nous nous engageons à protéger votre vie privée et vos données personnelles. Cette politique explique comment nous collectons, utilisons et protégeons vos informations.',
+              l10n.privacy_introTitle,
+              l10n.privacy_introBody,
             ),
             _buildSection(
-              'Données collectées',
-              '''Nous collectons les données suivantes:
-• Informations d'identification (nom, prénom, email, téléphone)
-• Informations de localisation pour le service de déneigement
-• Informations sur vos véhicules
-• Données de paiement (traitées de manière sécurisée par Stripe)
-• Historique de vos réservations''',
+              l10n.privacy_dataCollectedTitle,
+              l10n.privacy_dataCollectedBody,
             ),
             _buildSection(
-              'Utilisation des données',
-              '''Vos données sont utilisées pour:
-• Fournir nos services de déneigement
-• Communiquer avec vous concernant vos réservations
-• Améliorer nos services
-• Traiter vos paiements de manière sécurisée
-• Vous envoyer des notifications pertinentes''',
+              l10n.privacy_dataUsageTitle,
+              l10n.privacy_dataUsageBody,
             ),
             _buildSection(
-              'Partage des données',
-              '''Nous partageons vos données uniquement avec:
-• Les déneigeurs assignés à vos réservations (informations nécessaires au service)
-• Stripe pour le traitement des paiements
-• Les autorités si requis par la loi''',
+              l10n.privacy_dataSharingTitle,
+              l10n.privacy_dataSharingBody,
             ),
             _buildSection(
-              'Sécurité',
-              'Nous utilisons des mesures de sécurité conformes aux normes de l\'industrie pour protéger vos données, incluant le chiffrement des données sensibles et des connexions sécurisées (HTTPS).',
+              l10n.privacy_securityTitle,
+              l10n.privacy_securityBody,
             ),
             _buildSection(
-              'Conservation des données',
-              'Vos données sont conservées aussi longtemps que votre compte est actif. Après suppression de votre compte, vos données sont effacées dans un délai de 30 jours.',
+              l10n.privacy_retentionTitle,
+              l10n.privacy_retentionBody,
             ),
             _buildSection(
-              'Vos droits',
-              '''Vous avez le droit de:
-• Accéder à vos données personnelles
-• Corriger vos données inexactes
-• Supprimer votre compte et vos données
-• Exporter vos données
-• Retirer votre consentement à tout moment''',
+              l10n.privacy_rightsTitle,
+              l10n.privacy_rightsBody,
             ),
             _buildSection(
-              'Cookies et technologies similaires',
-              'Notre application mobile n\'utilise pas de cookies. Nous utilisons des identifiants d\'appareil uniquement pour les notifications push.',
+              l10n.privacy_cookiesTitle,
+              l10n.privacy_cookiesBody,
             ),
             _buildSection(
-              'Contact',
-              'Pour toute question concernant cette politique de confidentialité, contactez-nous via la section "Aide et Support" de l\'application ou par email à support@deneige-auto.ca',
+              l10n.privacy_contactTitle,
+              l10n.privacy_contactBody,
             ),
             const SizedBox(height: 16),
             Text(
-              'Dernière mise à jour: Janvier 2025',
+              l10n.privacy_lastUpdate,
               style: TextStyle(
                 color: AppTheme.textTertiary,
                 fontSize: 12,

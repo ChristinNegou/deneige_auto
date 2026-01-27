@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/config/app_config.dart' hide ServiceOption;
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/worker_job.dart';
 
 class JobCard extends StatelessWidget {
@@ -25,8 +26,10 @@ class JobCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
     final timeFormatter = DateFormat('HH:mm');
-    final dateFormatter = DateFormat('dd MMM', 'fr_CA');
+    final dateFormatter = DateFormat('dd MMM', locale == 'fr' ? 'fr_CA' : 'en');
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -72,7 +75,7 @@ class JobCard extends StatelessWidget {
                               ),
                               SizedBox(width: 4),
                               Text(
-                                'URGENT',
+                                l10n.worker_urgent,
                                 style: TextStyle(
                                   color: AppTheme.background,
                                   fontSize: 10,
@@ -84,7 +87,7 @@ class JobCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      _buildStatusChip(job.status),
+                      _buildStatusChip(job.status, l10n),
                     ],
                   ),
                   Text(
@@ -139,7 +142,10 @@ class JobCard extends StatelessWidget {
                   Icon(Icons.schedule, color: AppTheme.textSecondary, size: 18),
                   const SizedBox(width: 4),
                   Text(
-                    '${dateFormatter.format(job.departureTime)} à ${timeFormatter.format(job.departureTime)}',
+                    l10n.worker_dateAtTime(
+                      dateFormatter.format(job.departureTime),
+                      timeFormatter.format(job.departureTime),
+                    ),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -217,7 +223,7 @@ class JobCard extends StatelessWidget {
                   children: job.serviceOptions.map((option) {
                     return Chip(
                       label: Text(
-                        _getServiceOptionLabel(option),
+                        _getServiceOptionLabel(option, l10n),
                         style: const TextStyle(fontSize: 11),
                       ),
                       padding: EdgeInsets.zero,
@@ -243,8 +249,9 @@ class JobCard extends StatelessWidget {
                                 strokeWidth: 2, color: AppTheme.background),
                           )
                         : Icon(Icons.check_circle, color: AppTheme.background),
-                    label:
-                        Text(isLoading ? 'Acceptation...' : 'Accepter ce job'),
+                    label: Text(isLoading
+                        ? l10n.worker_accepting
+                        : l10n.worker_acceptThisJob),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.success,
                       foregroundColor: AppTheme.background,
@@ -263,7 +270,7 @@ class JobCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(JobStatus status) {
+  Widget _buildStatusChip(JobStatus status, AppLocalizations l10n) {
     Color color;
     String label;
     IconData icon;
@@ -271,32 +278,32 @@ class JobCard extends StatelessWidget {
     switch (status) {
       case JobStatus.pending:
         color = AppTheme.info;
-        label = 'Disponible';
+        label = l10n.worker_statusAvailable;
         icon = Icons.pending;
         break;
       case JobStatus.assigned:
         color = AppTheme.warning;
-        label = 'Assigné';
+        label = l10n.worker_statusAssigned;
         icon = Icons.assignment_ind;
         break;
       case JobStatus.enRoute:
         color = AppTheme.statusEnRoute;
-        label = 'En route';
+        label = l10n.worker_statusEnRoute;
         icon = Icons.directions_car;
         break;
       case JobStatus.inProgress:
         color = AppTheme.primary2;
-        label = 'En cours';
+        label = l10n.worker_statusInProgress;
         icon = Icons.engineering;
         break;
       case JobStatus.completed:
         color = AppTheme.success;
-        label = 'Terminé';
+        label = l10n.worker_statusCompleted;
         icon = Icons.check_circle;
         break;
       case JobStatus.cancelled:
         color = AppTheme.error;
-        label = 'Annulé';
+        label = l10n.worker_statusCancelled;
         icon = Icons.cancel;
         break;
     }
@@ -326,24 +333,24 @@ class JobCard extends StatelessWidget {
     );
   }
 
-  String _getServiceOptionLabel(ServiceOption option) {
+  String _getServiceOptionLabel(ServiceOption option, AppLocalizations l10n) {
     switch (option) {
       case ServiceOption.windowScraping:
-        return 'Grattage vitres';
+        return l10n.worker_serviceWindowScraping;
       case ServiceOption.doorDeicing:
-        return 'Déglaçage portes';
+        return l10n.worker_serviceDoorDeicing;
       case ServiceOption.wheelClearance:
-        return 'Dégagement roues';
+        return l10n.worker_serviceWheelClearance;
       case ServiceOption.roofClearing:
-        return 'Déneigement toit';
+        return l10n.worker_serviceRoofClearing;
       case ServiceOption.saltSpreading:
-        return 'Épandage sel';
+        return l10n.worker_serviceSaltSpreading;
       case ServiceOption.lightsCleaning:
-        return 'Nettoyage phares';
+        return l10n.worker_serviceLightsCleaning;
       case ServiceOption.perimeterClearance:
-        return 'Dégagement périmètre';
+        return l10n.worker_servicePerimeterClearance;
       case ServiceOption.exhaustCheck:
-        return 'Vérif. échappement';
+        return l10n.worker_serviceExhaustCheck;
     }
   }
 

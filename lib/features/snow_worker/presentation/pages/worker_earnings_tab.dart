@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:confetti/confetti.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../bloc/worker_stats_bloc.dart';
@@ -138,13 +139,14 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       child: Row(
         children: [
-          const Text(
-            'Mes revenus',
-            style: TextStyle(
+          Text(
+            l10n.earnings_myEarnings,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppTheme.textPrimary,
@@ -179,6 +181,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }
 
   Widget _buildTabBar() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(4),
@@ -204,16 +207,17 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
-        tabs: const [
-          Tab(text: 'Jour'),
-          Tab(text: 'Semaine'),
-          Tab(text: 'Mois'),
+        tabs: [
+          Tab(text: l10n.earnings_day),
+          Tab(text: l10n.earnings_week),
+          Tab(text: l10n.earnings_month),
         ],
       ),
     );
   }
 
   Widget _buildErrorState(String message) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -225,7 +229,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
           ElevatedButton.icon(
             onPressed: _loadData,
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Reessayer'),
+            label: Text(l10n.earnings_retry),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.success,
               foregroundColor: AppTheme.background,
@@ -246,7 +250,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildEarningsSummaryCard(
-            title: "Aujourd'hui",
+            title: AppLocalizations.of(context)!.earnings_today,
             amount: stats.today.earnings,
             jobsCount: stats.today.completed,
             tips: stats.today.tips,
@@ -268,7 +272,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildEarningsSummaryCard(
-            title: 'Cette semaine',
+            title: AppLocalizations.of(context)!.earnings_thisWeek,
             amount: stats.week.earnings,
             jobsCount: stats.week.completed,
             tips: stats.week.tips,
@@ -289,7 +293,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildEarningsSummaryCard(
-            title: 'Ce mois',
+            title: AppLocalizations.of(context)!.earnings_thisMonth,
             amount: stats.month.earnings,
             jobsCount: stats.month.completed,
             tips: stats.month.tips,
@@ -313,6 +317,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
     return AnimatedBuilder(
       animation: _countAnimation,
       builder: (context, child) {
+        final l10n = AppLocalizations.of(context)!;
         final animatedAmount = amount * _countAnimation.value;
         final animatedTips = tips * _countAnimation.value;
         final animatedJobs = (jobsCount * _countAnimation.value).round();
@@ -372,7 +377,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                   Expanded(
                     child: _buildSummaryItem(
                       icon: Icons.check_circle_outline_rounded,
-                      label: 'Jobs',
+                      label: l10n.earnings_jobs,
                       value: animatedJobs.toString(),
                     ),
                   ),
@@ -384,7 +389,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                   Expanded(
                     child: _buildSummaryItem(
                       icon: Icons.volunteer_activism_rounded,
-                      label: 'Pourboires',
+                      label: l10n.earnings_tips,
                       value: '${animatedTips.toStringAsFixed(0)} \$',
                     ),
                   ),
@@ -396,7 +401,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                   Expanded(
                     child: _buildSummaryItem(
                       icon: Icons.trending_up_rounded,
-                      label: 'Moyenne',
+                      label: l10n.earnings_average,
                       value: jobsCount > 0
                           ? '${(amount / jobsCount).toStringAsFixed(0)} \$'
                           : '0 \$',
@@ -412,6 +417,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }
 
   Widget _buildDailyGoalProgress(double currentAmount) {
+    final l10n = AppLocalizations.of(context)!;
     const double dailyGoal = 100.0;
     final progress = (currentAmount / dailyGoal).clamp(0.0, 1.0);
 
@@ -428,7 +434,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Objectif: ${dailyGoal.toInt()}\$',
+                l10n.earnings_goalAmount(dailyGoal.toInt()),
                 style: TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 12,
@@ -466,7 +472,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                   Icon(Icons.check_circle, color: AppTheme.success, size: 14),
                   const SizedBox(width: 4),
                   Text(
-                    'Objectif atteint!',
+                    l10n.earnings_goalReached,
                     style: TextStyle(
                       color: AppTheme.success,
                       fontSize: 11,
@@ -509,11 +515,12 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }
 
   Widget _buildTodayStatsGrid(TodayStats stats) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: _buildStatCard(
-            title: 'Termines',
+            title: l10n.earnings_completed,
             value: stats.completed.toString(),
             icon: Icons.check_circle_rounded,
             color: AppTheme.success,
@@ -522,7 +529,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            title: 'En cours',
+            title: l10n.earnings_inProgress,
             value: stats.inProgress.toString(),
             icon: Icons.engineering_rounded,
             color: AppTheme.warning,
@@ -531,7 +538,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            title: 'Assignes',
+            title: l10n.earnings_assigned,
             value: stats.assigned.toString(),
             icon: Icons.assignment_rounded,
             color: AppTheme.primary,
@@ -542,11 +549,12 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }
 
   Widget _buildPeriodStatsRow(PeriodStats stats) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: _buildStatCard(
-            title: 'Jobs',
+            title: l10n.earnings_jobs,
             value: stats.completed.toString(),
             icon: Icons.check_circle_rounded,
             color: AppTheme.success,
@@ -555,7 +563,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            title: 'Revenus',
+            title: l10n.earnings_earnings,
             value: '${stats.earnings.toStringAsFixed(0)}\$',
             icon: Icons.attach_money_rounded,
             color: AppTheme.primary,
@@ -564,7 +572,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            title: 'Tips',
+            title: l10n.earnings_tipsShort,
             value: '${stats.tips.toStringAsFixed(0)}\$',
             icon: Icons.volunteer_activism_rounded,
             color: AppTheme.warning,
@@ -614,6 +622,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }
 
   Widget _buildHistoryButton() {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -635,9 +644,9 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Historique des jobs',
-                    style: TextStyle(
+                  Text(
+                    l10n.earnings_jobHistory,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textPrimary,
@@ -645,7 +654,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Voir tous vos jobs termines',
+                    l10n.earnings_viewAllJobs,
                     style: TextStyle(
                       fontSize: 12,
                       color: AppTheme.textTertiary,
@@ -664,7 +673,16 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   Widget _buildWeeklyChart(EarningsBreakdown earnings) {
     if (earnings.daily.isEmpty) return const SizedBox.shrink();
 
-    final days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    final l10n = AppLocalizations.of(context)!;
+    final days = [
+      l10n.earnings_dayMon,
+      l10n.earnings_dayTue,
+      l10n.earnings_dayWed,
+      l10n.earnings_dayThu,
+      l10n.earnings_dayFri,
+      l10n.earnings_daySat,
+      l10n.earnings_daySun
+    ];
     final maxEarning =
         earnings.daily.map((d) => d.total).reduce((a, b) => a > b ? a : b);
     final maxHeight = maxEarning > 0 ? maxEarning : 100.0;
@@ -680,7 +698,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Revenus par jour',
+            l10n.earnings_earningsPerDay,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -740,6 +758,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   }
 
   Widget _buildAllTimeStats(AllTimeStats allTime) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -751,7 +770,7 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Statistiques globales',
+            l10n.earnings_overallStats,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -760,13 +779,14 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
             ),
           ),
           const SizedBox(height: 14),
-          _buildAllTimeRow('Total jobs', allTime.completed.toString()),
           _buildAllTimeRow(
-              'Revenus totaux', '${allTime.earnings.toStringAsFixed(2)} \$'),
+              l10n.earnings_totalJobs, allTime.completed.toString()),
+          _buildAllTimeRow(l10n.earnings_totalEarnings,
+              '${allTime.earnings.toStringAsFixed(2)} \$'),
           _buildAllTimeRow(
-              'Pourboires totaux', '${allTime.tips.toStringAsFixed(2)} \$'),
+              l10n.earnings_totalTips, '${allTime.tips.toStringAsFixed(2)} \$'),
           _buildAllTimeRow(
-            'Note moyenne',
+            l10n.earnings_averageRating,
             allTime.averageRating > 0
                 ? '${allTime.averageRating.toStringAsFixed(1)} ★ (${allTime.totalRatings})'
                 : 'N/A',

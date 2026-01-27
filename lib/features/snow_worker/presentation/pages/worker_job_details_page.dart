@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/config/app_config.dart' hide ServiceOption;
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../chat/presentation/bloc/chat_bloc.dart';
@@ -75,7 +76,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           _statusCheckTimer?.cancel();
 
           final cancelReason = data['cancelReason'] as String? ??
-              'Le client a annulé la réservation';
+              AppLocalizations.of(context)!.worker_clientCancelled;
           final cancelledBy = data['cancelledBy'] as String? ?? 'client';
 
           _showJobCancelledDialog(cancelReason, cancelledBy);
@@ -111,9 +112,9 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               size: 48,
             ),
           ),
-          title: const Text(
-            'Job annulé',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          title: Text(
+            AppLocalizations.of(context)!.worker_jobCancelled,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -133,8 +134,10 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     Expanded(
                       child: Text(
                         cancelledBy == 'client'
-                            ? 'Le client a annulé cette réservation.'
-                            : 'Cette réservation a été annulée.',
+                            ? AppLocalizations.of(context)!
+                                .worker_clientCancelledMessage
+                            : AppLocalizations.of(context)!
+                                .worker_cancelledMessage,
                         style: const TextStyle(
                           color: AppTheme.error,
                           fontWeight: FontWeight.w500,
@@ -146,7 +149,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Raison: $reason',
+                AppLocalizations.of(context)!.worker_cancelReason(reason),
                 style: AppTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
@@ -167,9 +170,10 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
                 ),
-                child: const Text(
-                  'Retour au tableau de bord',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                child: Text(
+                  AppLocalizations.of(context)!.worker_backToDashboard,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -250,7 +254,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           ),
           const SizedBox(width: 16),
           Text(
-            'Détails du job',
+            AppLocalizations.of(context)!.worker_jobDetails,
             style: AppTheme.headlineMedium,
           ),
           const Spacer(),
@@ -287,13 +291,16 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     color: AppTheme.primary, size: 22),
               ),
               const SizedBox(width: 12),
-              Text('Client', style: AppTheme.headlineSmall),
+              Text(AppLocalizations.of(context)!.worker_client,
+                  style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
-          _buildInfoRow('Nom', job.client.fullName),
+          _buildInfoRow(
+              AppLocalizations.of(context)!.common_name, job.client.fullName),
           if (job.client.phoneNumber != null)
-            _buildInfoRow('Téléphone', job.client.phoneNumber!),
+            _buildInfoRow(AppLocalizations.of(context)!.common_phone,
+                job.client.phoneNumber!),
           const SizedBox(height: 12),
           // Boutons de contact - toujours visibles
           Row(
@@ -302,7 +309,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               Expanded(
                 child: _buildContactButton(
                   icon: Icons.phone_rounded,
-                  label: 'Appeler',
+                  label: AppLocalizations.of(context)!.common_call,
                   color: job.client.phoneNumber != null
                       ? AppTheme.success
                       : AppTheme.textTertiary,
@@ -319,7 +326,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               Expanded(
                 child: _buildContactButton(
                   icon: Icons.sms_rounded,
-                  label: 'SMS',
+                  label: AppLocalizations.of(context)!.common_sms,
                   color: job.client.phoneNumber != null
                       ? AppTheme.info
                       : AppTheme.textTertiary,
@@ -386,15 +393,15 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.chat_bubble_rounded,
+            const Icon(Icons.chat_bubble_rounded,
                 color: AppTheme.background, size: 18),
-            SizedBox(width: 6),
+            const SizedBox(width: 6),
             Text(
-              'Chat',
-              style: TextStyle(
+              AppLocalizations.of(context)!.reservation_chat,
+              style: const TextStyle(
                 color: AppTheme.background,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
@@ -411,7 +418,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
     if (authState is! AuthAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Erreur: utilisateur non authentifié'),
+          content: Text(AppLocalizations.of(context)!.worker_userNotAuth),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -462,7 +469,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     color: AppTheme.error, size: 22),
               ),
               const SizedBox(width: 12),
-              Text('Adresse', style: AppTheme.headlineSmall),
+              Text(AppLocalizations.of(context)!.common_address,
+                  style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
@@ -490,7 +498,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     onPressed: () => _openMaps(
                         job.location!.latitude, job.location!.longitude),
                     icon: const Icon(Icons.map_rounded, size: 18),
-                    label: const Text('Google Maps'),
+                    label:
+                        Text(AppLocalizations.of(context)!.worker_googleMaps),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppTheme.primary,
                       side: const BorderSide(color: AppTheme.primary),
@@ -506,7 +515,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     onPressed: () => _openWaze(
                         job.location!.latitude, job.location!.longitude),
                     icon: const Icon(Icons.navigation_rounded, size: 18),
-                    label: const Text('Waze'),
+                    label: Text(AppLocalizations.of(context)!.worker_waze),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppTheme.info,
                       side: const BorderSide(color: AppTheme.info),
@@ -553,7 +562,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     color: AppTheme.secondary, size: 22),
               ),
               const SizedBox(width: 12),
-              Text('Véhicule', style: AppTheme.headlineSmall),
+              Text(AppLocalizations.of(context)!.step1_vehicle,
+                  style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
@@ -581,7 +591,9 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                       Icon(Icons.directions_car_rounded,
                           color: AppTheme.textTertiary, size: 48),
                       const SizedBox(height: 8),
-                      Text('Photo non disponible',
+                      Text(
+                          AppLocalizations.of(context)!
+                              .reservation_photoUnavailable,
                           style: AppTheme.bodySmall
                               .copyWith(color: AppTheme.textTertiary)),
                     ],
@@ -591,11 +603,14 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             ),
             const SizedBox(height: 12),
           ],
-          _buildInfoRow('Véhicule', job.vehicle.displayName),
+          _buildInfoRow(AppLocalizations.of(context)!.step1_vehicle,
+              job.vehicle.displayName),
           if (job.vehicle.color != null)
-            _buildInfoRow('Couleur', job.vehicle.color!),
+            _buildInfoRow(AppLocalizations.of(context)!.addVehicle_color,
+                job.vehicle.color!),
           if (job.vehicle.licensePlate != null)
-            _buildInfoRow('Plaque', job.vehicle.licensePlate!),
+            _buildInfoRow(AppLocalizations.of(context)!.addVehicle_plate,
+                job.vehicle.licensePlate!),
         ],
       ),
     );
@@ -723,14 +738,16 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     color: AppTheme.info, size: 22),
               ),
               const SizedBox(width: 12),
-              Text('Service', style: AppTheme.headlineSmall),
+              Text(AppLocalizations.of(context)!.worker_service,
+                  style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
-          _buildInfoRow('Type', 'Déneigement'),
+          _buildInfoRow(AppLocalizations.of(context)!.addVehicle_vehicleType,
+              AppLocalizations.of(context)!.worker_snowRemoval),
           if (job.serviceOptions.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text('Options:',
+            Text(AppLocalizations.of(context)!.worker_options,
                 style:
                     AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
@@ -775,14 +792,16 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     color: AppTheme.success, size: 22),
               ),
               const SizedBox(width: 12),
-              Text('Tarification', style: AppTheme.headlineSmall),
+              Text(AppLocalizations.of(context)!.worker_pricing,
+                  style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Prix total', style: AppTheme.bodyMedium),
+              Text(AppLocalizations.of(context)!.reservation_totalPrice,
+                  style: AppTheme.bodyMedium),
               Text(
                 '${job.totalPrice.toStringAsFixed(2)} \$',
                 style:
@@ -795,7 +814,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Pourboire', style: AppTheme.bodyMedium),
+                Text(AppLocalizations.of(context)!.worker_tip,
+                    style: AppTheme.bodyMedium),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -843,7 +863,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     color: AppTheme.warning, size: 22),
               ),
               const SizedBox(width: 12),
-              Text('Notes du client', style: AppTheme.headlineSmall),
+              Text(AppLocalizations.of(context)!.worker_clientNotes,
+                  style: AppTheme.headlineSmall),
             ],
           ),
           const SizedBox(height: 16),
@@ -875,10 +896,10 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
-                children: const [
-                  Icon(Icons.check_circle, color: AppTheme.background),
-                  SizedBox(width: 12),
-                  Text('Job accepté avec succès!'),
+                children: [
+                  const Icon(Icons.check_circle, color: AppTheme.background),
+                  const SizedBox(width: 12),
+                  Text(AppLocalizations.of(context)!.worker_jobAccepted),
                 ],
               ),
               backgroundColor: AppTheme.success,
@@ -959,13 +980,13 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.check_circle_rounded,
+                          children: [
+                            const Icon(Icons.check_circle_rounded,
                                 color: AppTheme.background, size: 24),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
-                              'Accepter ce job',
-                              style: TextStyle(
+                              AppLocalizations.of(context)!.worker_acceptJob,
+                              style: const TextStyle(
                                 color: AppTheme.background,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -983,19 +1004,20 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
   }
 
   String _getStatusLabel(JobStatus status) {
+    final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case JobStatus.pending:
-        return 'En attente';
+        return l10n.reservation_shortPending;
       case JobStatus.assigned:
-        return 'Assigné';
+        return l10n.worker_earningsAssigned;
       case JobStatus.enRoute:
-        return 'En route';
+        return l10n.worker_enRoute;
       case JobStatus.inProgress:
-        return 'En cours';
+        return l10n.activities_inProgress;
       case JobStatus.completed:
-        return 'Terminé';
+        return l10n.worker_earningsCompleted;
       case JobStatus.cancelled:
-        return 'Annulé';
+        return l10n.reservation_shortCancelled;
     }
   }
 
@@ -1017,23 +1039,24 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
   }
 
   String _getOptionLabel(ServiceOption option) {
+    final l10n = AppLocalizations.of(context)!;
     switch (option) {
       case ServiceOption.windowScraping:
-        return 'Grattage vitres';
+        return l10n.option_windowScraping;
       case ServiceOption.doorDeicing:
-        return 'Déglaçage portes';
+        return l10n.option_doorDeicing;
       case ServiceOption.wheelClearance:
-        return 'Dégagement roues';
+        return l10n.option_wheelClearance;
       case ServiceOption.roofClearing:
-        return 'Déneigement toit';
+        return l10n.option_roofClearing;
       case ServiceOption.saltSpreading:
-        return 'Épandage sel';
+        return l10n.option_saltSpreading;
       case ServiceOption.lightsCleaning:
-        return 'Nettoyage phares';
+        return l10n.option_lightsCleaning;
       case ServiceOption.perimeterClearance:
-        return 'Dégagement périmètre';
+        return l10n.option_perimeterClearance;
       case ServiceOption.exhaustCheck:
-        return 'Vérif. échappement';
+        return l10n.option_exhaustCheck;
     }
   }
 
@@ -1044,7 +1067,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Numéro de téléphone non disponible'),
+          content: Text(AppLocalizations.of(context)!.worker_phoneUnavailable),
           backgroundColor: AppTheme.warning,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -1062,7 +1085,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Numéro de téléphone non disponible'),
+          content: Text(AppLocalizations.of(context)!.worker_phoneUnavailable),
           backgroundColor: AppTheme.warning,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -1243,13 +1266,14 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.cancel_rounded,
+                          children: [
+                            const Icon(Icons.cancel_rounded,
                                 color: AppTheme.error, size: 24),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
-                              'Annuler ce job',
-                              style: TextStyle(
+                              AppLocalizations.of(context)!
+                                  .worker_cancelThisJob,
+                              style: const TextStyle(
                                 color: AppTheme.error,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -1270,36 +1294,37 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
     HapticFeedback.mediumImpact();
 
     // Raisons valables d'annulation
+    final l10n = AppLocalizations.of(context)!;
     final reasons = <String, WorkerCancellationReason>{
       'vehicle_breakdown': WorkerCancellationReason(
         code: 'vehicle_breakdown',
-        label: 'Panne de véhicule',
-        description: 'Mon véhicule est en panne ou a un problème mécanique',
+        label: l10n.worker_cancelReasonVehicleBreakdown,
+        description: l10n.worker_cancelReasonVehicleBreakdownDesc,
       ),
       'medical_emergency': WorkerCancellationReason(
         code: 'medical_emergency',
-        label: 'Urgence médicale',
-        description: 'J\'ai une urgence médicale personnelle',
+        label: l10n.worker_cancelReasonMedicalEmergency,
+        description: l10n.worker_cancelReasonMedicalEmergencyDesc,
       ),
       'severe_weather': WorkerCancellationReason(
         code: 'severe_weather',
-        label: 'Conditions météo dangereuses',
-        description: 'Les conditions météo rendent le trajet dangereux',
+        label: l10n.worker_cancelReasonSevereWeather,
+        description: l10n.worker_cancelReasonSevereWeatherDesc,
       ),
       'road_blocked': WorkerCancellationReason(
         code: 'road_blocked',
-        label: 'Route bloquée',
-        description: 'La route vers le client est bloquée ou inaccessible',
+        label: l10n.worker_cancelReasonRoadBlocked,
+        description: l10n.worker_cancelReasonRoadBlockedDesc,
       ),
       'family_emergency': WorkerCancellationReason(
         code: 'family_emergency',
-        label: 'Urgence familiale',
-        description: 'J\'ai une urgence familiale',
+        label: l10n.worker_cancelReasonFamilyEmergency,
+        description: l10n.worker_cancelReasonFamilyEmergencyDesc,
       ),
       'equipment_failure': WorkerCancellationReason(
         code: 'equipment_failure',
-        label: 'Équipement défaillant',
-        description: 'Mon équipement de déneigement est défaillant',
+        label: l10n.worker_cancelReasonEquipmentFailure,
+        description: l10n.worker_cancelReasonEquipmentFailureDesc,
       ),
     };
 
@@ -1323,10 +1348,10 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 child: const Icon(Icons.warning, color: AppTheme.error),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Annuler le job?',
-                  style: TextStyle(fontSize: 18),
+                  AppLocalizations.of(context)!.worker_cancelJobQuestion,
+                  style: const TextStyle(fontSize: 18),
                 ),
               ),
             ],
@@ -1345,13 +1370,13 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                         color: AppTheme.warning.withValues(alpha: 0.3)),
                   ),
                   child: Row(
-                    children: const [
-                      Icon(Icons.info, color: AppTheme.warning, size: 20),
-                      SizedBox(width: 8),
+                    children: [
+                      const Icon(Icons.info, color: AppTheme.warning, size: 20),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Vous ne serez pas payé pour ce job.\nLes annulations fréquentes peuvent entraîner une suspension.',
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.worker_cancelWarning,
+                          style: const TextStyle(
                             color: AppTheme.warning,
                             fontSize: 12,
                           ),
@@ -1361,9 +1386,9 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Raison de l\'annulation:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  AppLocalizations.of(context)!.worker_cancelReasonLabel,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 RadioGroup<String>(
@@ -1389,7 +1414,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 TextField(
                   controller: descriptionController,
                   decoration: InputDecoration(
-                    hintText: 'Détails supplémentaires (optionnel)',
+                    hintText: AppLocalizations.of(context)!
+                        .worker_additionalDetailsOptional,
                     hintStyle: const TextStyle(fontSize: 13),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -1405,7 +1431,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Retour'),
+              child: Text(AppLocalizations.of(context)!.common_back),
             ),
             ElevatedButton(
               onPressed: selectedReasonCode == null
@@ -1427,7 +1453,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 backgroundColor: AppTheme.error,
                 foregroundColor: AppTheme.background,
               ),
-              child: const Text('Confirmer l\'annulation'),
+              child: Text(
+                  AppLocalizations.of(context)!.worker_confirmCancellation),
             ),
           ],
         ),

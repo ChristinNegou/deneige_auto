@@ -158,7 +158,8 @@ Future<void> initializeDependencies() async {
   //! Core
   sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
   sl.registerLazySingleton<LocationService>(() => LocationService());
-  sl.registerLazySingleton<DioClient>(() => DioClient(secureStorage: sl()));
+  sl.registerLazySingleton<DioClient>(
+      () => DioClient(secureStorage: sl(), localeService: sl()));
   sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);
   sl.registerLazySingleton<PushNotificationService>(
       () => PushNotificationService());

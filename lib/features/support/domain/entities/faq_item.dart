@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../../l10n/app_localizations.dart';
 
 enum FaqCategory {
   general,
@@ -19,6 +20,21 @@ enum FaqCategory {
         return 'Litiges';
       case FaqCategory.account:
         return 'Compte';
+    }
+  }
+
+  String localizedLabel(AppLocalizations l10n) {
+    switch (this) {
+      case FaqCategory.general:
+        return l10n.faq_catGeneral;
+      case FaqCategory.reservations:
+        return l10n.faq_catReservations;
+      case FaqCategory.payments:
+        return l10n.faq_catPayments;
+      case FaqCategory.disputes:
+        return l10n.faq_catDisputes;
+      case FaqCategory.account:
+        return l10n.faq_catAccount;
     }
   }
 }

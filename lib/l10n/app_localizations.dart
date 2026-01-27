@@ -3944,6 +3944,12 @@ abstract class AppLocalizations {
   /// **'Mon\nabonnement'**
   String get clientHome_mySubscription;
 
+  /// No description provided for @clientHome_userNotAuth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur: utilisateur non authentifié'**
+  String get clientHome_userNotAuth;
+
   /// No description provided for @weather_snowDepthValue.
   ///
   /// In fr, this message translates to:
@@ -5347,6 +5353,6048 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Une erreur serveur est survenue.'**
   String get notif_serverError;
+
+  /// No description provided for @suspension_accountSuspended.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte Suspendu'**
+  String get suspension_accountSuspended;
+
+  /// No description provided for @suspension_understood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compris'**
+  String get suspension_understood;
+
+  /// No description provided for @support_helpAndSupport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aide et Support'**
+  String get support_helpAndSupport;
+
+  /// No description provided for @support_faqTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'FAQ'**
+  String get support_faqTab;
+
+  /// No description provided for @support_contactTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contact'**
+  String get support_contactTab;
+
+  /// No description provided for @support_needHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Besoin d\'aide?'**
+  String get support_needHelp;
+
+  /// No description provided for @support_teamResponse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre équipe vous répondra dans les 24-48h'**
+  String get support_teamResponse;
+
+  /// No description provided for @support_subject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sujet'**
+  String get support_subject;
+
+  /// No description provided for @support_message.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message'**
+  String get support_message;
+
+  /// No description provided for @support_messageHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décrivez votre problème ou question en détail...'**
+  String get support_messageHint;
+
+  /// No description provided for @support_messageRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez entrer un message'**
+  String get support_messageRequired;
+
+  /// No description provided for @support_messageMinLength.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le message doit contenir au moins 10 caractères'**
+  String get support_messageMinLength;
+
+  /// No description provided for @support_send.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer'**
+  String get support_send;
+
+  /// No description provided for @support_contactDirectly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ou contactez-nous directement:'**
+  String get support_contactDirectly;
+
+  /// No description provided for @support_messageSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre message a été envoyé avec succès'**
+  String get support_messageSent;
+
+  /// No description provided for @support_workerBadge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigeur'**
+  String get support_workerBadge;
+
+  /// No description provided for @support_workerGeneral.
+  ///
+  /// In fr, this message translates to:
+  /// **'Général'**
+  String get support_workerGeneral;
+
+  /// No description provided for @support_workerJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jobs'**
+  String get support_workerJobs;
+
+  /// No description provided for @support_workerPayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements'**
+  String get support_workerPayments;
+
+  /// No description provided for @support_workerAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte'**
+  String get support_workerAccount;
+
+  /// No description provided for @support_workerSupport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Support Déneigeurs'**
+  String get support_workerSupport;
+
+  /// No description provided for @support_workerTeamResponse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre équipe répond sous 24-48h'**
+  String get support_workerTeamResponse;
+
+  /// No description provided for @support_workerSubjectBug.
+  ///
+  /// In fr, this message translates to:
+  /// **'Problème technique'**
+  String get support_workerSubjectBug;
+
+  /// No description provided for @support_workerSubjectQuestion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Question générale'**
+  String get support_workerSubjectQuestion;
+
+  /// No description provided for @support_workerSubjectSuggestion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suggestion d\'amélioration'**
+  String get support_workerSubjectSuggestion;
+
+  /// No description provided for @support_workerSubjectOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Problème de paiement / Autre'**
+  String get support_workerSubjectOther;
+
+  /// No description provided for @support_subjectBug.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signalement de bug'**
+  String get support_subjectBug;
+
+  /// No description provided for @support_subjectQuestion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Question'**
+  String get support_subjectQuestion;
+
+  /// No description provided for @support_subjectSuggestion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suggestion'**
+  String get support_subjectSuggestion;
+
+  /// No description provided for @support_subjectOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre'**
+  String get support_subjectOther;
+
+  /// No description provided for @support_statusPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente'**
+  String get support_statusPending;
+
+  /// No description provided for @support_statusInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get support_statusInProgress;
+
+  /// No description provided for @support_statusResolved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résolu'**
+  String get support_statusResolved;
+
+  /// No description provided for @support_statusClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fermé'**
+  String get support_statusClosed;
+
+  /// No description provided for @faqCat_general.
+  ///
+  /// In fr, this message translates to:
+  /// **'Général'**
+  String get faqCat_general;
+
+  /// No description provided for @faqCat_reservations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get faqCat_reservations;
+
+  /// No description provided for @faqCat_payments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements'**
+  String get faqCat_payments;
+
+  /// No description provided for @faqCat_disputes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Litiges'**
+  String get faqCat_disputes;
+
+  /// No description provided for @faqCat_account.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte'**
+  String get faqCat_account;
+
+  /// No description provided for @faq_q1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment fonctionne Deneige Auto?'**
+  String get faq_q1;
+
+  /// No description provided for @faq_a1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Deneige Auto vous permet de réserver un service de déneigement pour votre véhicule. Créez une réservation en sélectionnant votre véhicule, son emplacement, la date et l\'heure souhaitées. Un déneigeur disponible dans votre zone sera assigné et viendra déneiger votre véhicule.'**
+  String get faq_a1;
+
+  /// No description provided for @faq_q2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dans quelles zones le service est-il disponible?'**
+  String get faq_q2;
+
+  /// No description provided for @faq_a2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actuellement, notre service est disponible dans la grande région de Montréal et ses environs. Nous élargissons continuellement notre zone de couverture. Consultez la carte dans l\'application pour voir si votre emplacement est couvert.'**
+  String get faq_a2;
+
+  /// No description provided for @faq_q3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelles sont les heures de service?'**
+  String get faq_q3;
+
+  /// No description provided for @faq_a3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre service est disponible 7 jours sur 7, de 5h00 à 22h00. Les horaires peuvent varier pendant les périodes de tempête intense.'**
+  String get faq_a3;
+
+  /// No description provided for @faq_q4.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qu\'est-ce que l\'Assistant IA?'**
+  String get faq_q4;
+
+  /// No description provided for @faq_a4.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'Assistant IA est votre aide virtuel disponible 24/7 dans l\'application. Il peut répondre à vos questions sur le service, vous aider à résoudre des problèmes, donner des conseils et vous informer sur les conditions météo actuelles et prévues dans votre région.'**
+  String get faq_a4;
+
+  /// No description provided for @faq_q5.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment utiliser l\'Assistant IA?'**
+  String get faq_q5;
+
+  /// No description provided for @faq_a5.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accédez à l\'Assistant IA depuis le menu principal ou en appuyant sur l\'icône de chat. Posez vos questions en langage naturel et l\'assistant vous répondra instantanément. Il peut vous aider avec les réservations, les litiges, les paiements et bien plus.'**
+  String get faq_a5;
+
+  /// No description provided for @faq_q6.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'Assistant IA peut-il me donner la météo?'**
+  String get faq_q6;
+
+  /// No description provided for @faq_a6.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui! L\'Assistant IA a accès aux données météo en temps réel. Demandez-lui simplement \"Quelle est la météo?\" ou \"Va-t-il neiger demain?\" pour obtenir les prévisions actuelles et à venir dans votre région.'**
+  String get faq_a6;
+
+  /// No description provided for @faq_q7.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment faire une réservation?'**
+  String get faq_q7;
+
+  /// No description provided for @faq_a7.
+  ///
+  /// In fr, this message translates to:
+  /// **'1. Ouvrez l\'application et appuyez sur \"Nouvelle réservation\"\n2. Sélectionnez votre véhicule ou ajoutez-en un nouveau\n3. Indiquez l\'emplacement du véhicule\n4. Choisissez la date et l\'heure\n5. Sélectionnez les options souhaitées\n6. Confirmez et payez'**
+  String get faq_a7;
+
+  /// No description provided for @faq_q8.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je annuler ma réservation?'**
+  String get faq_q8;
+
+  /// No description provided for @faq_a8.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui, vous pouvez annuler votre réservation selon les conditions suivantes:\n• Plus de 24h avant: remboursement complet\n• Entre 12h et 24h avant: remboursement de 50%\n• Moins de 12h avant: aucun remboursement'**
+  String get faq_a8;
+
+  /// No description provided for @faq_q9.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment savoir quand le déneigeur arrive?'**
+  String get faq_q9;
+
+  /// No description provided for @faq_a9.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous recevrez une notification push lorsque le déneigeur sera en route vers votre véhicule. Vous pouvez également suivre sa position en temps réel sur la carte dans l\'application.'**
+  String get faq_a9;
+
+  /// No description provided for @faq_q10.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que faire si le déneigeur ne trouve pas mon véhicule?'**
+  String get faq_q10;
+
+  /// No description provided for @faq_a10.
+  ///
+  /// In fr, this message translates to:
+  /// **'Assurez-vous d\'avoir bien décrit l\'emplacement de votre véhicule. Le déneigeur vous contactera via la messagerie de l\'application s\'il a des difficultés. Vous pouvez aussi ajouter une photo de votre véhicule pour faciliter son identification.'**
+  String get faq_a10;
+
+  /// No description provided for @faq_q11.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quels modes de paiement sont acceptés?'**
+  String get faq_q11;
+
+  /// No description provided for @faq_a11.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous acceptons les cartes de crédit Visa, Mastercard et American Express. Le paiement est traité de manière sécurisée via Stripe.'**
+  String get faq_a11;
+
+  /// No description provided for @faq_q12.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment obtenir un remboursement?'**
+  String get faq_q12;
+
+  /// No description provided for @faq_a12.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les remboursements sont automatiquement traités selon notre politique d\'annulation. Pour les cas spéciaux (service non satisfaisant, etc.), contactez notre support via la section \"Aide et Support\".'**
+  String get faq_a12;
+
+  /// No description provided for @faq_q13.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je ajouter un pourboire?'**
+  String get faq_q13;
+
+  /// No description provided for @faq_a13.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui! Après la fin du service, vous avez la possibilité d\'ajouter un pourboire au déneigeur. Cette option apparaît sur l\'écran de notation du service.'**
+  String get faq_a13;
+
+  /// No description provided for @faq_q14.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment gérer mes cartes de paiement?'**
+  String get faq_q14;
+
+  /// No description provided for @faq_a14.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rendez-vous dans Profil > Paiements > Méthodes de paiement. Vous pouvez y ajouter, supprimer ou définir une carte par défaut.'**
+  String get faq_a14;
+
+  /// No description provided for @faq_q15.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que faire si le déneigeur n\'est pas venu?'**
+  String get faq_q15;
+
+  /// No description provided for @faq_a15.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si le déneigeur assigné n\'est pas venu à l\'heure prévue, vous pouvez signaler un \"no-show\" directement depuis les détails de la réservation. Le bouton \"Signaler un no-show\" apparaît 30 minutes après l\'heure de départ prévue. Si le no-show est confirmé, vous serez remboursé intégralement.'**
+  String get faq_a15;
+
+  /// No description provided for @faq_q16.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment créer un litige?'**
+  String get faq_q16;
+
+  /// No description provided for @faq_a16.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour créer un litige:\n1. Allez dans Profil > Mes litiges > Créer un litige\n2. Sélectionnez la réservation concernée\n3. Choisissez le type de problème (travail incomplet, qualité insuffisante, dommage, etc.)\n4. Décrivez la situation en détail\n5. Ajoutez des photos comme preuves\n6. Indiquez le montant réclamé si applicable\n7. Soumettez votre litige'**
+  String get faq_a16;
+
+  /// No description provided for @faq_q17.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quels types de litiges puis-je signaler?'**
+  String get faq_q17;
+
+  /// No description provided for @faq_a17.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez signaler plusieurs types de problèmes:\n• Déneigeur non venu (no-show)\n• Travail incomplet\n• Qualité insuffisante\n• Retard important\n• Dommage causé à votre véhicule\n• Mauvais emplacement déneigé\n• Surfacturation\n• Comportement inapproprié\n• Autre problème'**
+  String get faq_a17;
+
+  /// No description provided for @faq_q18.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment ajouter des preuves à mon litige?'**
+  String get faq_q18;
+
+  /// No description provided for @faq_a18.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les preuves renforcent votre dossier. Dans les détails du litige, appuyez sur \"Ajouter des preuves\" pour:\n• Prendre des photos ou les choisir depuis votre galerie (jusqu\'à 10 photos)\n• Ajouter une description détaillée\n\nConseils: prenez des photos claires, bien éclairées et horodatées si possible.'**
+  String get faq_a18;
+
+  /// No description provided for @faq_q19.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qu\'est-ce que l\'analyse IA des litiges?'**
+  String get faq_q19;
+
+  /// No description provided for @faq_a19.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre système utilise l\'intelligence artificielle pour analyser objectivement les litiges. L\'IA examine les preuves (photos, descriptions, données GPS, historique), évalue la force des arguments et propose une recommandation. Cette analyse aide notre équipe à prendre des décisions justes et rapides.'**
+  String get faq_a19;
+
+  /// No description provided for @faq_q20.
+  ///
+  /// In fr, this message translates to:
+  /// **'Combien de temps ai-je pour signaler un problème?'**
+  String get faq_q20;
+
+  /// No description provided for @faq_a20.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez 24 heures après la fin du service pour signaler un problème ou un no-show. Passé ce délai, vous pouvez toujours contacter le support, mais le traitement pourrait être plus long.'**
+  String get faq_a20;
+
+  /// No description provided for @faq_q21.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment suivre l\'état de mon litige?'**
+  String get faq_q21;
+
+  /// No description provided for @faq_a21.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rendez-vous dans Profil > Mes litiges pour voir tous vos litiges et leur statut: Ouvert, En examen, En attente de réponse, Résolu. Vous recevrez une notification dès qu\'une décision sera prise.'**
+  String get faq_a21;
+
+  /// No description provided for @faq_q22.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je faire appel d\'une décision?'**
+  String get faq_q22;
+
+  /// No description provided for @faq_a22.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui, si vous n\'êtes pas satisfait de la décision prise, vous pouvez faire appel dans les 7 jours suivant la résolution. Allez dans les détails du litige et appuyez sur \"Faire appel\". Expliquez pourquoi vous contestez la décision.'**
+  String get faq_a22;
+
+  /// No description provided for @faq_q23.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment sont traités les remboursements suite à un litige?'**
+  String get faq_q23;
+
+  /// No description provided for @faq_a23.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si le litige est résolu en votre faveur, le remboursement est automatiquement traité sur votre méthode de paiement originale. Le délai est généralement de 3-5 jours ouvrables selon votre banque.'**
+  String get faq_a23;
+
+  /// No description provided for @faq_q24.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment modifier mes informations personnelles?'**
+  String get faq_q24;
+
+  /// No description provided for @faq_a24.
+  ///
+  /// In fr, this message translates to:
+  /// **'Allez dans Profil > Modifier le profil pour changer votre nom, numéro de téléphone ou photo de profil.'**
+  String get faq_a24;
+
+  /// No description provided for @faq_q25.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment ajouter ou supprimer un véhicule?'**
+  String get faq_q25;
+
+  /// No description provided for @faq_a25.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rendez-vous dans Profil > Mes véhicules. Appuyez sur \"+\" pour ajouter un nouveau véhicule ou faites glisser vers la gauche sur un véhicule existant pour le supprimer.'**
+  String get faq_a25;
+
+  /// No description provided for @faq_q26.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment supprimer mon compte?'**
+  String get faq_q26;
+
+  /// No description provided for @faq_a26.
+  ///
+  /// In fr, this message translates to:
+  /// **'Allez dans Paramètres > Supprimer mon compte. Cette action est irréversible et supprimera toutes vos données.'**
+  String get faq_a26;
+
+  /// No description provided for @faq_q27.
+  ///
+  /// In fr, this message translates to:
+  /// **'J\'ai oublié mon mot de passe, que faire?'**
+  String get faq_q27;
+
+  /// No description provided for @faq_a27.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sur l\'écran de connexion, appuyez sur \"Mot de passe oublié?\". Entrez votre email et vous recevrez un lien pour réinitialiser votre mot de passe.'**
+  String get faq_a27;
+
+  /// No description provided for @wfaq_q1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment devenir déneigeur sur Deneige Auto?'**
+  String get wfaq_q1;
+
+  /// No description provided for @wfaq_a1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour devenir déneigeur, vous devez créer un compte en tant que déneigeur, compléter votre profil avec vos informations personnelles, ajouter votre équipement disponible et configurer votre compte bancaire pour recevoir vos paiements.'**
+  String get wfaq_a1;
+
+  /// No description provided for @wfaq_q2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelles sont les conditions pour être déneigeur?'**
+  String get wfaq_q2;
+
+  /// No description provided for @wfaq_a2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devez avoir au moins 18 ans, posséder un équipement de déneigement de base (pelle, balai, grattoir), être disponible pendant les périodes de neige et avoir un compte bancaire canadien pour recevoir vos paiements.'**
+  String get wfaq_a2;
+
+  /// No description provided for @wfaq_q3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je choisir mes zones de travail?'**
+  String get wfaq_q3;
+
+  /// No description provided for @wfaq_a3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui! Dans vos paramètres, vous pouvez définir vos zones préférées. Vous recevrez des notifications prioritaires pour les jobs dans ces zones, mais vous pouvez aussi accepter des jobs ailleurs.'**
+  String get wfaq_a3;
+
+  /// No description provided for @wfaq_q4.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qu\'est-ce que l\'Assistant IA?'**
+  String get wfaq_q4;
+
+  /// No description provided for @wfaq_a4.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'Assistant IA est votre aide virtuel disponible 24/7 dans l\'application. Il peut répondre à vos questions sur les jobs, vous aider à résoudre des problèmes, donner des conseils pour améliorer votre service et vous informer sur les conditions météo pour planifier votre journée.'**
+  String get wfaq_a4;
+
+  /// No description provided for @wfaq_q5.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment utiliser l\'Assistant IA?'**
+  String get wfaq_q5;
+
+  /// No description provided for @wfaq_a5.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accédez à l\'Assistant IA depuis le menu principal. Posez vos questions en langage naturel:\n• \"Quels jobs sont disponibles près de moi?\"\n• \"Comment répondre à un litige?\"\n• \"Quelle météo est prévue demain?\"\n• \"Comment améliorer mon score?\"\nL\'assistant vous répondra instantanément.'**
+  String get wfaq_a5;
+
+  /// No description provided for @wfaq_q6.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'Assistant IA peut-il m\'aider avec la météo?'**
+  String get wfaq_q6;
+
+  /// No description provided for @wfaq_a6.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui! L\'Assistant IA a accès aux prévisions météo en temps réel. Demandez-lui les conditions actuelles ou les prévisions pour planifier vos disponibilités. Vous pouvez ainsi anticiper les journées de forte demande lors des tempêtes de neige.'**
+  String get wfaq_a6;
+
+  /// No description provided for @wfaq_q7.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment recevoir des jobs?'**
+  String get wfaq_q7;
+
+  /// No description provided for @wfaq_a7.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activez votre disponibilité dans l\'application. Vous recevrez des notifications push pour les nouveaux jobs disponibles dans votre zone. Vous pouvez alors accepter ou refuser chaque job.'**
+  String get wfaq_a7;
+
+  /// No description provided for @wfaq_q8.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je accepter plusieurs jobs en même temps?'**
+  String get wfaq_q8;
+
+  /// No description provided for @wfaq_a8.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui, vous pouvez gérer jusqu\'à 5 jobs simultanément. Dans vos paramètres, définissez le nombre maximum de jobs actifs que vous souhaitez avoir en même temps. Nous recommandons 2-3 jobs pour un service optimal.'**
+  String get wfaq_a8;
+
+  /// No description provided for @wfaq_q9.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment annuler un job accepté?'**
+  String get wfaq_q9;
+
+  /// No description provided for @wfaq_a9.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez annuler un job avant de commencer le travail. Allez dans les détails du job et appuyez sur \"Annuler\". Attention: des annulations fréquentes peuvent affecter votre score et votre visibilité.'**
+  String get wfaq_a9;
+
+  /// No description provided for @wfaq_q10.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que faire si je ne trouve pas le véhicule?'**
+  String get wfaq_q10;
+
+  /// No description provided for @wfaq_a10.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisez la messagerie intégrée pour contacter le client. Si le véhicule est introuvable après 15 minutes et sans réponse du client, vous pouvez signaler le problème et annuler le job sans pénalité.'**
+  String get wfaq_a10;
+
+  /// No description provided for @wfaq_q11.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment signaler un problème avec un job?'**
+  String get wfaq_q11;
+
+  /// No description provided for @wfaq_a11.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dans les détails du job, appuyez sur \"Signaler un problème\". Décrivez la situation et ajoutez des photos si nécessaire. Notre équipe examinera votre signalement rapidement.'**
+  String get wfaq_a11;
+
+  /// No description provided for @wfaq_q12.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment suis-je payé?'**
+  String get wfaq_q12;
+
+  /// No description provided for @wfaq_a12.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les paiements sont effectués automatiquement via Stripe Connect. Après chaque job complété, le montant est transféré sur votre compte bancaire dans un délai de 2-7 jours ouvrables.'**
+  String get wfaq_a12;
+
+  /// No description provided for @wfaq_q13.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment configurer mon compte bancaire?'**
+  String get wfaq_q13;
+
+  /// No description provided for @wfaq_a13.
+  ///
+  /// In fr, this message translates to:
+  /// **'Allez dans Paramètres > Mes paiements > Configuration Stripe. Suivez les étapes pour vérifier votre identité et ajouter vos coordonnées bancaires. Ce processus est sécurisé et obligatoire pour recevoir vos paiements.'**
+  String get wfaq_a13;
+
+  /// No description provided for @wfaq_q14.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment sont calculés mes gains?'**
+  String get wfaq_q14;
+
+  /// No description provided for @wfaq_a14.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos gains dépendent du type de service (déneigement standard, avec options), de la taille du véhicule et de la distance. Vous voyez le montant exact avant d\'accepter chaque job. Deneige Auto prélève une commission de 15%.'**
+  String get wfaq_a14;
+
+  /// No description provided for @wfaq_q15.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment fonctionnent les pourboires?'**
+  String get wfaq_q15;
+
+  /// No description provided for @wfaq_a15.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les clients peuvent laisser un pourboire après le service. Les pourboires sont 100% pour vous, sans commission. Vous recevez une notification et le montant est ajouté à votre prochain paiement.'**
+  String get wfaq_a15;
+
+  /// No description provided for @wfaq_q16.
+  ///
+  /// In fr, this message translates to:
+  /// **'Où voir mon historique de gains?'**
+  String get wfaq_q16;
+
+  /// No description provided for @wfaq_a16.
+  ///
+  /// In fr, this message translates to:
+  /// **'Allez dans l\'onglet \"Gains\" pour voir vos revenus quotidiens, hebdomadaires et mensuels. Vous pouvez aussi voir le détail de chaque job et les pourboires reçus.'**
+  String get wfaq_a16;
+
+  /// No description provided for @wfaq_q17.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que se passe-t-il si un client me signale un no-show?'**
+  String get wfaq_q17;
+
+  /// No description provided for @wfaq_a17.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si un client signale que vous n\'êtes pas venu, vous recevrez une notification et aurez l\'opportunité de répondre. Si vous avez marqué \"En route\" dans l\'application, cela sera pris en compte. Les faux signalements de clients sont aussi sanctionnés.'**
+  String get wfaq_a17;
+
+  /// No description provided for @wfaq_q18.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment répondre à un litige?'**
+  String get wfaq_q18;
+
+  /// No description provided for @wfaq_a18.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour répondre à un litige:\n1. Allez dans Profil > Mes litiges\n2. Ouvrez le litige concerné\n3. Appuyez sur \"Répondre au litige\"\n4. Expliquez votre version des faits en détail\n5. Ajoutez des photos comme preuves (avant/après, captures d\'écran, etc.)\n6. Soumettez votre réponse\n\nVous avez généralement 48 heures pour répondre.'**
+  String get wfaq_a18;
+
+  /// No description provided for @wfaq_q19.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment ajouter des preuves à ma défense?'**
+  String get wfaq_q19;
+
+  /// No description provided for @wfaq_a19.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les preuves sont essentielles pour défendre votre position. Dans les détails du litige, utilisez \"Ajouter des preuves\" pour:\n• Photos avant/après le déneigement\n• Captures d\'écran de communications\n• Photos horodatées sur le site\n• Tout document pertinent\n\nVous pouvez ajouter jusqu\'à 10 photos et une description détaillée.'**
+  String get wfaq_a19;
+
+  /// No description provided for @wfaq_q20.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qu\'est-ce que l\'analyse IA des litiges?'**
+  String get wfaq_q20;
+
+  /// No description provided for @wfaq_a20.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre système utilise l\'intelligence artificielle pour analyser objectivement chaque litige. L\'IA examine:\n• Les photos et preuves des deux parties\n• Les données GPS et timestamps\n• L\'historique du client et du déneigeur\n• La cohérence des déclarations\n\nCette analyse aide à prendre des décisions justes. Si l\'IA détecte un faux signalement, cela joue en votre faveur.'**
+  String get wfaq_a20;
+
+  /// No description provided for @wfaq_q21.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourquoi prendre des photos avant/après est important?'**
+  String get wfaq_q21;
+
+  /// No description provided for @wfaq_a21.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les photos avant/après sont vos meilleures preuves:\n• Elles documentent l\'état initial et le travail accompli\n• L\'IA peut analyser la qualité du déneigement\n• En cas de litige, elles prouvent votre travail\n• Elles sont horodatées automatiquement\n\nPrenez l\'habitude de photographier chaque job!'**
+  String get wfaq_a21;
+
+  /// No description provided for @wfaq_q22.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelles sont les conséquences d\'un litige contre moi?'**
+  String get wfaq_q22;
+
+  /// No description provided for @wfaq_a22.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les conséquences dépendent de la décision et de votre historique:\n• Premier avertissement: notification\n• Récidive: suspension temporaire (3-7 jours)\n• Problèmes répétés: suspension prolongée (30 jours)\n• Cas graves: exclusion permanente\n\nMaintenez un bon service pour éviter les litiges.'**
+  String get wfaq_a22;
+
+  /// No description provided for @wfaq_q23.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment contester une décision défavorable?'**
+  String get wfaq_q23;
+
+  /// No description provided for @wfaq_a23.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si vous n\'êtes pas d\'accord avec la décision prise sur un litige, vous pouvez faire appel dans les 7 jours. Fournissez des preuves supplémentaires (photos, messages, etc.) pour appuyer votre contestation.'**
+  String get wfaq_a23;
+
+  /// No description provided for @wfaq_q24.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment signaler un client problématique?'**
+  String get wfaq_q24;
+
+  /// No description provided for @wfaq_a24.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si un client est abusif, introuvable malgré vos efforts, ou fait de fausses réclamations, vous pouvez le signaler dans les détails du job. Notre équipe examinera la situation et pourra sanctionner le client si nécessaire.'**
+  String get wfaq_a24;
+
+  /// No description provided for @wfaq_q25.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon paiement est-il affecté pendant un litige?'**
+  String get wfaq_q25;
+
+  /// No description provided for @wfaq_a25.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pendant l\'examen d\'un litige, le paiement correspondant peut être temporairement retenu. Une fois la décision prise:\n• Litige en votre faveur: paiement complet versé\n• Litige contre vous: remboursement au client (partiel ou total selon la décision)'**
+  String get wfaq_a25;
+
+  /// No description provided for @wfaq_q26.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment protéger mon score de fiabilité?'**
+  String get wfaq_q26;
+
+  /// No description provided for @wfaq_a26.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour maintenir un bon score:\n• Arrivez à l\'heure (marquez \"En route\" dans l\'app)\n• Prenez des photos avant/après chaque job\n• Communiquez avec le client en cas de problème\n• Complétez le travail selon les standards demandés\n• Évitez les annulations de dernière minute'**
+  String get wfaq_a26;
+
+  /// No description provided for @wfaq_q27.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment modifier mon équipement disponible?'**
+  String get wfaq_q27;
+
+  /// No description provided for @wfaq_a27.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dans Paramètres ou dans votre Profil, vous pouvez cocher/décocher les équipements que vous possédez: pelle, balai, grattoir, épandeur de sel, souffleuse. Cela aide à vous assigner les jobs appropriés.'**
+  String get wfaq_a27;
+
+  /// No description provided for @wfaq_q28.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment changer mes notifications?'**
+  String get wfaq_q28;
+
+  /// No description provided for @wfaq_a28.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dans Paramètres > Notifications, vous pouvez activer/désactiver les alertes pour: nouveaux jobs, jobs urgents et pourboires reçus.'**
+  String get wfaq_a28;
+
+  /// No description provided for @wfaq_q29.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment améliorer mon score déneigeur?'**
+  String get wfaq_q29;
+
+  /// No description provided for @wfaq_a29.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre score est basé sur: la qualité du service (évaluations clients), le taux d\'acceptation des jobs, la ponctualité et le taux de complétion. Offrez un service de qualité et soyez fiable pour améliorer votre score.'**
+  String get wfaq_a29;
+
+  /// No description provided for @wfaq_q30.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je prendre une pause de l\'application?'**
+  String get wfaq_q30;
+
+  /// No description provided for @wfaq_a30.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui! Désactivez simplement votre disponibilité dans l\'application. Vous ne recevrez plus de notifications de jobs. Réactivez quand vous êtes prêt à travailler.'**
+  String get wfaq_a30;
+
+  /// No description provided for @adminDash_quickActions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actions rapides'**
+  String get adminDash_quickActions;
+
+  /// No description provided for @adminDash_users.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisateurs'**
+  String get adminDash_users;
+
+  /// No description provided for @adminDash_reservations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get adminDash_reservations;
+
+  /// No description provided for @adminDash_notify.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifier'**
+  String get adminDash_notify;
+
+  /// No description provided for @adminDash_support.
+  ///
+  /// In fr, this message translates to:
+  /// **'Support'**
+  String get adminDash_support;
+
+  /// No description provided for @adminDash_clientsWorkers.
+  ///
+  /// In fr, this message translates to:
+  /// **'{clients} clients, {workers} déneigeurs'**
+  String adminDash_clientsWorkers(int clients, int workers);
+
+  /// No description provided for @adminDash_todayCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} aujourd\'hui'**
+  String adminDash_todayCount(int count);
+
+  /// No description provided for @adminDash_pending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente'**
+  String get adminDash_pending;
+
+  /// No description provided for @adminDash_toProcess.
+  ///
+  /// In fr, this message translates to:
+  /// **'À traiter'**
+  String get adminDash_toProcess;
+
+  /// No description provided for @adminDash_completionRate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Taux de complétion'**
+  String get adminDash_completionRate;
+
+  /// No description provided for @adminDash_completedCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} terminées'**
+  String adminDash_completedCount(int count);
+
+  /// No description provided for @adminDash_pendingCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} en attente'**
+  String adminDash_pendingCount(int count);
+
+  /// No description provided for @adminDash_total.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total'**
+  String get adminDash_total;
+
+  /// No description provided for @adminDash_inProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get adminDash_inProgress;
+
+  /// No description provided for @adminDash_resolved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résolues'**
+  String get adminDash_resolved;
+
+  /// No description provided for @adminDash_newRequestsToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} nouvelle(s) demande(s) aujourd\'hui'**
+  String adminDash_newRequestsToday(int count);
+
+  /// No description provided for @adminDash_revenue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenus'**
+  String get adminDash_revenue;
+
+  /// No description provided for @adminDash_reservationCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} réservations'**
+  String adminDash_reservationCount(int count);
+
+  /// No description provided for @adminDash_thisMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce mois'**
+  String get adminDash_thisMonth;
+
+  /// No description provided for @adminDash_grossCommission.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commission brute (25%)'**
+  String get adminDash_grossCommission;
+
+  /// No description provided for @adminDash_stripeFees.
+  ///
+  /// In fr, this message translates to:
+  /// **'Frais Stripe'**
+  String get adminDash_stripeFees;
+
+  /// No description provided for @adminDash_netCommission.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commission nette'**
+  String get adminDash_netCommission;
+
+  /// No description provided for @adminDash_tips.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourboires'**
+  String get adminDash_tips;
+
+  /// No description provided for @adminDash_topWorkers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Top Déneigeurs'**
+  String get adminDash_topWorkers;
+
+  /// No description provided for @adminDash_viewAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir tous'**
+  String get adminDash_viewAll;
+
+  /// No description provided for @adminDash_noWorkers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun déneigeur pour le moment'**
+  String get adminDash_noWorkers;
+
+  /// No description provided for @adminDash_sendNotification.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer une notification'**
+  String get adminDash_sendNotification;
+
+  /// No description provided for @adminDash_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Titre'**
+  String get adminDash_title;
+
+  /// No description provided for @adminDash_messageLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message'**
+  String get adminDash_messageLabel;
+
+  /// No description provided for @adminDash_recipients.
+  ///
+  /// In fr, this message translates to:
+  /// **'Destinataires'**
+  String get adminDash_recipients;
+
+  /// No description provided for @adminDash_allUsers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les utilisateurs'**
+  String get adminDash_allUsers;
+
+  /// No description provided for @adminDash_clientsOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clients uniquement'**
+  String get adminDash_clientsOnly;
+
+  /// No description provided for @adminDash_workersOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigeurs uniquement'**
+  String get adminDash_workersOnly;
+
+  /// No description provided for @adminDash_cancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get adminDash_cancel;
+
+  /// No description provided for @adminDash_sendBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer'**
+  String get adminDash_sendBtn;
+
+  /// No description provided for @adminDash_fillAllFields.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez remplir tous les champs'**
+  String get adminDash_fillAllFields;
+
+  /// No description provided for @adminDash_adminLogout.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déconnexion Admin'**
+  String get adminDash_adminLogout;
+
+  /// No description provided for @adminDash_logoutConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous vraiment vous déconnecter du panneau d\'administration ?'**
+  String get adminDash_logoutConfirm;
+
+  /// No description provided for @adminDash_logout.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déconnexion'**
+  String get adminDash_logout;
+
+  /// No description provided for @addVehicle_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un véhicule'**
+  String get addVehicle_title;
+
+  /// No description provided for @addVehicle_tapAddPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Touchez pour ajouter une photo'**
+  String get addVehicle_tapAddPhoto;
+
+  /// No description provided for @addVehicle_newVehicle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau véhicule'**
+  String get addVehicle_newVehicle;
+
+  /// No description provided for @addVehicle_photoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo du véhicule'**
+  String get addVehicle_photoTitle;
+
+  /// No description provided for @addVehicle_photoVisibleWorker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette photo sera visible par le déneigeur'**
+  String get addVehicle_photoVisibleWorker;
+
+  /// No description provided for @addVehicle_takePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get addVehicle_takePhoto;
+
+  /// No description provided for @addVehicle_useCamera.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utiliser l\'appareil photo'**
+  String get addVehicle_useCamera;
+
+  /// No description provided for @addVehicle_choosePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une photo'**
+  String get addVehicle_choosePhoto;
+
+  /// No description provided for @addVehicle_fromGallery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Depuis la galerie'**
+  String get addVehicle_fromGallery;
+
+  /// No description provided for @addVehicle_deletePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer la photo'**
+  String get addVehicle_deletePhoto;
+
+  /// No description provided for @addVehicle_removeSelected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer la photo sélectionnée'**
+  String get addVehicle_removeSelected;
+
+  /// No description provided for @addVehicle_make.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marque'**
+  String get addVehicle_make;
+
+  /// No description provided for @addVehicle_model.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modèle'**
+  String get addVehicle_model;
+
+  /// No description provided for @addVehicle_year.
+  ///
+  /// In fr, this message translates to:
+  /// **'Année'**
+  String get addVehicle_year;
+
+  /// No description provided for @addVehicle_plate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plaque'**
+  String get addVehicle_plate;
+
+  /// No description provided for @addVehicle_required.
+  ///
+  /// In fr, this message translates to:
+  /// **'Requis'**
+  String get addVehicle_required;
+
+  /// No description provided for @addVehicle_invalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Invalide'**
+  String get addVehicle_invalid;
+
+  /// No description provided for @addVehicle_vehicleType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type de véhicule'**
+  String get addVehicle_vehicleType;
+
+  /// No description provided for @addVehicle_color.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couleur'**
+  String get addVehicle_color;
+
+  /// No description provided for @addVehicle_setDefault.
+  ///
+  /// In fr, this message translates to:
+  /// **'Définir comme véhicule par défaut'**
+  String get addVehicle_setDefault;
+
+  /// No description provided for @addVehicle_addBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter le véhicule'**
+  String get addVehicle_addBtn;
+
+  /// No description provided for @addVehicle_colorWhite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Blanc'**
+  String get addVehicle_colorWhite;
+
+  /// No description provided for @addVehicle_colorBlack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Noir'**
+  String get addVehicle_colorBlack;
+
+  /// No description provided for @addVehicle_colorGray.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gris'**
+  String get addVehicle_colorGray;
+
+  /// No description provided for @addVehicle_colorSilver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Argent'**
+  String get addVehicle_colorSilver;
+
+  /// No description provided for @addVehicle_colorRed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rouge'**
+  String get addVehicle_colorRed;
+
+  /// No description provided for @addVehicle_colorBlue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bleu'**
+  String get addVehicle_colorBlue;
+
+  /// No description provided for @addVehicle_colorGreen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vert'**
+  String get addVehicle_colorGreen;
+
+  /// No description provided for @addVehicle_colorBrown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Brun'**
+  String get addVehicle_colorBrown;
+
+  /// No description provided for @addVehicle_colorBeige.
+  ///
+  /// In fr, this message translates to:
+  /// **'Beige'**
+  String get addVehicle_colorBeige;
+
+  /// No description provided for @addCard_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une carte'**
+  String get addCard_title;
+
+  /// No description provided for @addCard_securePayment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement sécurisé'**
+  String get addCard_securePayment;
+
+  /// No description provided for @addCard_protectedByStripe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos informations sont protégées par Stripe'**
+  String get addCard_protectedByStripe;
+
+  /// No description provided for @addCard_cardInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations de la carte'**
+  String get addCard_cardInfo;
+
+  /// No description provided for @addCard_cardNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de carte'**
+  String get addCard_cardNumber;
+
+  /// No description provided for @addCard_setDefault.
+  ///
+  /// In fr, this message translates to:
+  /// **'Définir comme méthode par défaut'**
+  String get addCard_setDefault;
+
+  /// No description provided for @addCard_usedForFuture.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisée pour vos futurs paiements'**
+  String get addCard_usedForFuture;
+
+  /// No description provided for @addCard_encryptedSecure.
+  ///
+  /// In fr, this message translates to:
+  /// **'Données cryptées et sécurisées. Numéro de carte jamais stocké.'**
+  String get addCard_encryptedSecure;
+
+  /// No description provided for @addCard_addBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter la carte'**
+  String get addCard_addBtn;
+
+  /// No description provided for @addCard_errorAdding.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ajouter cette carte. Vérifiez les informations et réessayez.'**
+  String get addCard_errorAdding;
+
+  /// No description provided for @verify_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification d\'identité'**
+  String get verify_title;
+
+  /// No description provided for @verify_heading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez votre identité'**
+  String get verify_heading;
+
+  /// No description provided for @verify_description.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour la sécurité de tous, nous devons vérifier votre identité avant que vous puissiez accepter des jobs.'**
+  String get verify_description;
+
+  /// No description provided for @verify_step1Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pièce d\'identité'**
+  String get verify_step1Title;
+
+  /// No description provided for @verify_step1Desc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photographiez le recto (et verso si disponible) de votre pièce d\'identité'**
+  String get verify_step1Desc;
+
+  /// No description provided for @verify_step2Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Selfie'**
+  String get verify_step2Title;
+
+  /// No description provided for @verify_step2Desc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prenez un selfie pour confirmer que vous êtes bien la personne sur la pièce d\'identité'**
+  String get verify_step2Desc;
+
+  /// No description provided for @verify_step3Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification automatique'**
+  String get verify_step3Title;
+
+  /// No description provided for @verify_step3Desc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre système vérifie vos documents en quelques minutes'**
+  String get verify_step3Desc;
+
+  /// No description provided for @verify_acceptedDocs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Documents acceptés'**
+  String get verify_acceptedDocs;
+
+  /// No description provided for @verify_driverLicense.
+  ///
+  /// In fr, this message translates to:
+  /// **'Permis de conduire'**
+  String get verify_driverLicense;
+
+  /// No description provided for @verify_healthCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte d\'assurance maladie'**
+  String get verify_healthCard;
+
+  /// No description provided for @verify_passport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passeport'**
+  String get verify_passport;
+
+  /// No description provided for @verify_permanentResident.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte de résident permanent'**
+  String get verify_permanentResident;
+
+  /// No description provided for @verify_startBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commencer la vérification'**
+  String get verify_startBtn;
+
+  /// No description provided for @verify_approved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identité vérifiée'**
+  String get verify_approved;
+
+  /// No description provided for @verify_approvedDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez maintenant accepter des jobs de déneigement'**
+  String get verify_approvedDesc;
+
+  /// No description provided for @verify_expiresOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expire le {date}'**
+  String verify_expiresOn(String date);
+
+  /// No description provided for @verify_pendingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification en cours'**
+  String get verify_pendingTitle;
+
+  /// No description provided for @verify_pendingDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous analysons vos documents. Cela peut prendre quelques minutes.'**
+  String get verify_pendingDesc;
+
+  /// No description provided for @verify_refresh.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actualiser'**
+  String get verify_refresh;
+
+  /// No description provided for @verify_rejectedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification refusée'**
+  String get verify_rejectedTitle;
+
+  /// No description provided for @verify_attemptsRemaining.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tentatives restantes: {count}'**
+  String verify_attemptsRemaining(int count);
+
+  /// No description provided for @verify_resubmit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Resoumettre mes documents'**
+  String get verify_resubmit;
+
+  /// No description provided for @verify_maxAttempts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nombre maximum de tentatives atteint'**
+  String get verify_maxAttempts;
+
+  /// No description provided for @verify_contactSupport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez contacter le support pour assistance.'**
+  String get verify_contactSupport;
+
+  /// No description provided for @verify_expiredTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification expirée'**
+  String get verify_expiredTitle;
+
+  /// No description provided for @verify_expiredDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre vérification d\'identité a expiré. Veuillez resoumettre vos documents.'**
+  String get verify_expiredDesc;
+
+  /// No description provided for @verify_renewBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Renouveler ma vérification'**
+  String get verify_renewBtn;
+
+  /// No description provided for @worker_revenue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenus'**
+  String get worker_revenue;
+
+  /// No description provided for @worker_urgentCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} urgent'**
+  String worker_urgentCount(int count);
+
+  /// No description provided for @worker_myRevenue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes revenus'**
+  String get worker_myRevenue;
+
+  /// No description provided for @resDetail_errorPrefix.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur: {message}'**
+  String resDetail_errorPrefix(String message);
+
+  /// No description provided for @resDetail_ratingSuccessTipError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Évaluation envoyée, mais erreur pourboire: {message}'**
+  String resDetail_ratingSuccessTipError(String message);
+
+  /// No description provided for @resDetail_tipSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Merci! Pourboire de {amount}\$ envoyé'**
+  String resDetail_tipSent(String amount);
+
+  /// No description provided for @resDetail_ratingSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Merci pour votre évaluation!'**
+  String get resDetail_ratingSuccess;
+
+  /// No description provided for @activities_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activités'**
+  String get activities_title;
+
+  /// No description provided for @activities_inProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get activities_inProgress;
+
+  /// No description provided for @activities_completed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminées'**
+  String get activities_completed;
+
+  /// No description provided for @activities_emptyCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune activité terminée'**
+  String get activities_emptyCompleted;
+
+  /// No description provided for @activities_emptyInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune activité en cours'**
+  String get activities_emptyInProgress;
+
+  /// No description provided for @activities_emptyCompletedSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos déneigements terminés apparaîtront ici'**
+  String get activities_emptyCompletedSubtitle;
+
+  /// No description provided for @activities_emptyInProgressSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos déneigements en cours apparaîtront ici'**
+  String get activities_emptyInProgressSubtitle;
+
+  /// No description provided for @activities_total.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total'**
+  String get activities_total;
+
+  /// No description provided for @reservationSuccess_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation confirmée !'**
+  String get reservationSuccess_title;
+
+  /// No description provided for @reservationSuccess_subtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre demande de déneigement a été enregistrée avec succès.'**
+  String get reservationSuccess_subtitle;
+
+  /// No description provided for @reservationSuccess_reservationNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de réservation'**
+  String get reservationSuccess_reservationNumber;
+
+  /// No description provided for @reservationSuccess_nextSteps.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prochaines étapes'**
+  String get reservationSuccess_nextSteps;
+
+  /// No description provided for @reservationSuccess_step1.
+  ///
+  /// In fr, this message translates to:
+  /// **'1. Un déneigeur sera assigné sous peu'**
+  String get reservationSuccess_step1;
+
+  /// No description provided for @reservationSuccess_step2.
+  ///
+  /// In fr, this message translates to:
+  /// **'2. Vous recevrez une notification'**
+  String get reservationSuccess_step2;
+
+  /// No description provided for @reservationSuccess_step3.
+  ///
+  /// In fr, this message translates to:
+  /// **'3. Suivez l\'avancement en temps réel'**
+  String get reservationSuccess_step3;
+
+  /// No description provided for @reservationSuccess_backToHome.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour à l\'accueil'**
+  String get reservationSuccess_backToHome;
+
+  /// No description provided for @reservationSuccess_viewReservations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir mes réservations'**
+  String get reservationSuccess_viewReservations;
+
+  /// No description provided for @step1_vehicle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Véhicule'**
+  String get step1_vehicle;
+
+  /// No description provided for @step1_location.
+  ///
+  /// In fr, this message translates to:
+  /// **'Emplacement'**
+  String get step1_location;
+
+  /// No description provided for @step1_assignedSpot.
+  ///
+  /// In fr, this message translates to:
+  /// **'Place assignée'**
+  String get step1_assignedSpot;
+
+  /// No description provided for @step1_haveSpotNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'J\'ai un numéro de place'**
+  String get step1_haveSpotNumber;
+
+  /// No description provided for @step1_freeLocation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Emplacement libre'**
+  String get step1_freeLocation;
+
+  /// No description provided for @step1_describeLocation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décrivez où se trouve le véhicule'**
+  String get step1_describeLocation;
+
+  /// No description provided for @step1_noVehicle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun véhicule'**
+  String get step1_noVehicle;
+
+  /// No description provided for @step1_addFirstVehicle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez votre premier véhicule'**
+  String get step1_addFirstVehicle;
+
+  /// No description provided for @step1_addVehicle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un véhicule'**
+  String get step1_addVehicle;
+
+  /// No description provided for @step1_chipFrontBuilding.
+  ///
+  /// In fr, this message translates to:
+  /// **'Devant le bâtiment'**
+  String get step1_chipFrontBuilding;
+
+  /// No description provided for @step1_chipNearEntrance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Près de l\'entrée'**
+  String get step1_chipNearEntrance;
+
+  /// No description provided for @step1_chipVisitorZone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Zone visiteurs'**
+  String get step1_chipVisitorZone;
+
+  /// No description provided for @step1_chipRearParking.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stationnement arrière'**
+  String get step1_chipRearParking;
+
+  /// No description provided for @step2_gpsPosition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Position GPS'**
+  String get step2_gpsPosition;
+
+  /// No description provided for @step2_address.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse'**
+  String get step2_address;
+
+  /// No description provided for @step2_searching.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche en cours...'**
+  String get step2_searching;
+
+  /// No description provided for @step2_positionDetected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Position détectée'**
+  String get step2_positionDetected;
+
+  /// No description provided for @step2_positionUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Position non disponible, activez votre GPS'**
+  String get step2_positionUnavailable;
+
+  /// No description provided for @step2_pleaseWait.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez patienter'**
+  String get step2_pleaseWait;
+
+  /// No description provided for @step2_checkAddress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez l\'adresse ci-dessous'**
+  String get step2_checkAddress;
+
+  /// No description provided for @step2_enterManually.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez l\'adresse manuellement'**
+  String get step2_enterManually;
+
+  /// No description provided for @step2_refresh.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actualiser'**
+  String get step2_refresh;
+
+  /// No description provided for @step2_retry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get step2_retry;
+
+  /// No description provided for @step2_addressValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse validée'**
+  String get step2_addressValidated;
+
+  /// No description provided for @step2_validateAddress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider l\'adresse'**
+  String get step2_validateAddress;
+
+  /// No description provided for @step2_addressTip.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'adresse aide nos déneigeurs à localiser votre véhicule'**
+  String get step2_addressTip;
+
+  /// No description provided for @step3_departureDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de départ'**
+  String get step3_departureDate;
+
+  /// No description provided for @step3_departureTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'Heure de départ'**
+  String get step3_departureTime;
+
+  /// No description provided for @step3_selectDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionner une date'**
+  String get step3_selectDate;
+
+  /// No description provided for @step3_selectTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionner une heure'**
+  String get step3_selectTime;
+
+  /// No description provided for @step3_urgentReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation urgente'**
+  String get step3_urgentReservation;
+
+  /// No description provided for @step3_urgencyFee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Frais d\'urgence de 40% appliqués'**
+  String get step3_urgencyFee;
+
+  /// No description provided for @step4_additionalOptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Options supplementaires'**
+  String get step4_additionalOptions;
+
+  /// No description provided for @step4_snowDepth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profondeur de neige'**
+  String get step4_snowDepth;
+
+  /// No description provided for @step4_summary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recapitulatif'**
+  String get step4_summary;
+
+  /// No description provided for @step5_location.
+  ///
+  /// In fr, this message translates to:
+  /// **'Localisation'**
+  String get step5_location;
+
+  /// No description provided for @step5_yourReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre réservation'**
+  String get step5_yourReservation;
+
+  /// No description provided for @step5_total.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total'**
+  String get step5_total;
+
+  /// No description provided for @step5_ourGuarantees.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nos garanties'**
+  String get step5_ourGuarantees;
+
+  /// No description provided for @step5_freeCancellation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulation gratuite'**
+  String get step5_freeCancellation;
+
+  /// No description provided for @step5_upTo2hBefore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jusqu\'à 2h avant'**
+  String get step5_upTo2hBefore;
+
+  /// No description provided for @step5_qualityGuarantee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garantie qualité'**
+  String get step5_qualityGuarantee;
+
+  /// No description provided for @step5_satisfiedOrRefunded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Satisfait ou remboursé'**
+  String get step5_satisfiedOrRefunded;
+
+  /// No description provided for @step5_photosAfter.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photos après'**
+  String get step5_photosAfter;
+
+  /// No description provided for @step5_proofOfService.
+  ///
+  /// In fr, this message translates to:
+  /// **'Preuve de service'**
+  String get step5_proofOfService;
+
+  /// No description provided for @step5_punctuality.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ponctualité'**
+  String get step5_punctuality;
+
+  /// No description provided for @step5_discountIfLate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remise si retard'**
+  String get step5_discountIfLate;
+
+  /// No description provided for @month_jan.
+  ///
+  /// In fr, this message translates to:
+  /// **'JAN'**
+  String get month_jan;
+
+  /// No description provided for @month_feb.
+  ///
+  /// In fr, this message translates to:
+  /// **'FÉV'**
+  String get month_feb;
+
+  /// No description provided for @month_mar.
+  ///
+  /// In fr, this message translates to:
+  /// **'MAR'**
+  String get month_mar;
+
+  /// No description provided for @month_apr.
+  ///
+  /// In fr, this message translates to:
+  /// **'AVR'**
+  String get month_apr;
+
+  /// No description provided for @month_may.
+  ///
+  /// In fr, this message translates to:
+  /// **'MAI'**
+  String get month_may;
+
+  /// No description provided for @month_jun.
+  ///
+  /// In fr, this message translates to:
+  /// **'JUIN'**
+  String get month_jun;
+
+  /// No description provided for @month_jul.
+  ///
+  /// In fr, this message translates to:
+  /// **'JUIL'**
+  String get month_jul;
+
+  /// No description provided for @month_aug.
+  ///
+  /// In fr, this message translates to:
+  /// **'AOÛ'**
+  String get month_aug;
+
+  /// No description provided for @month_sep.
+  ///
+  /// In fr, this message translates to:
+  /// **'SEP'**
+  String get month_sep;
+
+  /// No description provided for @month_oct.
+  ///
+  /// In fr, this message translates to:
+  /// **'OCT'**
+  String get month_oct;
+
+  /// No description provided for @month_nov.
+  ///
+  /// In fr, this message translates to:
+  /// **'NOV'**
+  String get month_nov;
+
+  /// No description provided for @month_dec.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉC'**
+  String get month_dec;
+
+  /// No description provided for @profile_photoUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo de profil mise à jour'**
+  String get profile_photoUpdated;
+
+  /// No description provided for @profile_phoneVerified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de téléphone vérifié et mis à jour'**
+  String get profile_phoneVerified;
+
+  /// No description provided for @profile_verify.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier'**
+  String get profile_verify;
+
+  /// No description provided for @subscription_selectedPlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez sélectionné le plan {planName}'**
+  String subscription_selectedPlan(String planName);
+
+  /// No description provided for @subscription_comingSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette fonctionnalité sera bientôt disponible.'**
+  String get subscription_comingSoon;
+
+  /// No description provided for @subscription_planSelected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan {planName} sélectionné'**
+  String subscription_planSelected(String planName);
+
+  /// No description provided for @legal_legalNotices.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mentions légales'**
+  String get legal_legalNotices;
+
+  /// No description provided for @legal_appUsageRules.
+  ///
+  /// In fr, this message translates to:
+  /// **'Règles d\'utilisation de l\'application'**
+  String get legal_appUsageRules;
+
+  /// No description provided for @worker_photoSentSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo envoyée avec succès!'**
+  String get worker_photoSentSuccess;
+
+  /// No description provided for @worker_positionConfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Position confirmée!'**
+  String get worker_positionConfirmed;
+
+  /// No description provided for @worker_coordinatesUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coordonnées non disponibles'**
+  String get worker_coordinatesUnavailable;
+
+  /// No description provided for @worker_phoneUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de téléphone non disponible'**
+  String get worker_phoneUnavailable;
+
+  /// No description provided for @worker_userNotAuth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur: utilisateur non authentifié'**
+  String get worker_userNotAuth;
+
+  /// No description provided for @worker_iArrived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je suis arrivé'**
+  String get worker_iArrived;
+
+  /// No description provided for @worker_startJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commencer'**
+  String get worker_startJob;
+
+  /// No description provided for @worker_openGps.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir GPS'**
+  String get worker_openGps;
+
+  /// No description provided for @worker_finishJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminer le job'**
+  String get worker_finishJob;
+
+  /// No description provided for @worker_inFavorOfComplainant.
+  ///
+  /// In fr, this message translates to:
+  /// **'En faveur du plaignant'**
+  String get worker_inFavorOfComplainant;
+
+  /// No description provided for @worker_inFavorOfDefendant.
+  ///
+  /// In fr, this message translates to:
+  /// **'En faveur du defenseur'**
+  String get worker_inFavorOfDefendant;
+
+  /// No description provided for @worker_fullRefund.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remboursement complet'**
+  String get worker_fullRefund;
+
+  /// No description provided for @worker_partialRefund.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remboursement partiel'**
+  String get worker_partialRefund;
+
+  /// No description provided for @worker_noAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune action'**
+  String get worker_noAction;
+
+  /// No description provided for @worker_mutualAgreement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accord mutuel'**
+  String get worker_mutualAgreement;
+
+  /// No description provided for @worker_warningAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avertissement'**
+  String get worker_warningAction;
+
+  /// No description provided for @worker_permanentBan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bannissement permanent'**
+  String get worker_permanentBan;
+
+  /// No description provided for @worker_selectDecision.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez une décision'**
+  String get worker_selectDecision;
+
+  /// No description provided for @worker_disputeResolvedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Litige résolu avec succès'**
+  String get worker_disputeResolvedSuccess;
+
+  /// No description provided for @summary_reservationSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résumé de la réservation'**
+  String get summary_reservationSummary;
+
+  /// No description provided for @summary_spot.
+  ///
+  /// In fr, this message translates to:
+  /// **'Place'**
+  String get summary_spot;
+
+  /// No description provided for @summary_departure.
+  ///
+  /// In fr, this message translates to:
+  /// **'Départ'**
+  String get summary_departure;
+
+  /// No description provided for @summary_options.
+  ///
+  /// In fr, this message translates to:
+  /// **'Options'**
+  String get summary_options;
+
+  /// No description provided for @summary_snow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Neige'**
+  String get summary_snow;
+
+  /// No description provided for @summary_place.
+  ///
+  /// In fr, this message translates to:
+  /// **'Place {number}'**
+  String summary_place(String number);
+
+  /// No description provided for @option_windowScraping.
+  ///
+  /// In fr, this message translates to:
+  /// **'Grattage des vitres'**
+  String get option_windowScraping;
+
+  /// No description provided for @option_doorDeicing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déglaçage des portes'**
+  String get option_doorDeicing;
+
+  /// No description provided for @option_wheelClearance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dégagement des roues'**
+  String get option_wheelClearance;
+
+  /// No description provided for @option_roofClearing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigement du toit'**
+  String get option_roofClearing;
+
+  /// No description provided for @option_saltSpreading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Épandage de sel'**
+  String get option_saltSpreading;
+
+  /// No description provided for @option_lightsCleaning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nettoyage phares/feux'**
+  String get option_lightsCleaning;
+
+  /// No description provided for @option_perimeterClearance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dégagement périmètre'**
+  String get option_perimeterClearance;
+
+  /// No description provided for @option_exhaustCheck.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérif. échappement'**
+  String get option_exhaustCheck;
+
+  /// No description provided for @option_windowScrapingShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vitres'**
+  String get option_windowScrapingShort;
+
+  /// No description provided for @option_doorDeicingShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Portes'**
+  String get option_doorDeicingShort;
+
+  /// No description provided for @option_wheelClearanceShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Roues'**
+  String get option_wheelClearanceShort;
+
+  /// No description provided for @option_roofClearingShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toit'**
+  String get option_roofClearingShort;
+
+  /// No description provided for @option_saltSpreadingShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sel'**
+  String get option_saltSpreadingShort;
+
+  /// No description provided for @option_lightsCleaningShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Phares'**
+  String get option_lightsCleaningShort;
+
+  /// No description provided for @option_perimeterClearanceShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Périmètre'**
+  String get option_perimeterClearanceShort;
+
+  /// No description provided for @option_exhaustCheckShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échapp.'**
+  String get option_exhaustCheckShort;
+
+  /// No description provided for @option_windowScrapingDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Grattage complet de toutes les vitres'**
+  String get option_windowScrapingDesc;
+
+  /// No description provided for @option_doorDeicingDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dégivrage des poignées et serrures'**
+  String get option_doorDeicingDesc;
+
+  /// No description provided for @option_wheelClearanceDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dégagement de la neige autour des roues'**
+  String get option_wheelClearanceDesc;
+
+  /// No description provided for @option_roofClearingDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enlever la neige accumulée sur le toit'**
+  String get option_roofClearingDesc;
+
+  /// No description provided for @option_saltSpreadingDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Application de sel autour du véhicule'**
+  String get option_saltSpreadingDesc;
+
+  /// No description provided for @option_lightsCleaningDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nettoyage des phares et feux arrière'**
+  String get option_lightsCleaningDesc;
+
+  /// No description provided for @option_perimeterClearanceDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigement complet autour du véhicule'**
+  String get option_perimeterClearanceDesc;
+
+  /// No description provided for @option_exhaustCheckDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier que l\'échappement est dégagé'**
+  String get option_exhaustCheckDesc;
+
+  /// No description provided for @price_baseSnowRemoval.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigement de base'**
+  String get price_baseSnowRemoval;
+
+  /// No description provided for @price_vehicleAdjustment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajustement véhicule'**
+  String get price_vehicleAdjustment;
+
+  /// No description provided for @price_parkingAdjustment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajustement place'**
+  String get price_parkingAdjustment;
+
+  /// No description provided for @price_snowSurcharge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supplément neige'**
+  String get price_snowSurcharge;
+
+  /// No description provided for @price_additionalOptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Options supplémentaires'**
+  String get price_additionalOptions;
+
+  /// No description provided for @price_urgencyFee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Frais d\'urgence (40%)'**
+  String get price_urgencyFee;
+
+  /// No description provided for @price_subtotal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sous-total'**
+  String get price_subtotal;
+
+  /// No description provided for @price_serviceFee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Frais de service'**
+  String get price_serviceFee;
+
+  /// No description provided for @price_insuranceFee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Frais d\'assurance'**
+  String get price_insuranceFee;
+
+  /// No description provided for @price_taxesCalculatedFor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Taxes calculées pour: {province}'**
+  String price_taxesCalculatedFor(String province);
+
+  /// No description provided for @price_totalToPay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total à payer'**
+  String get price_totalToPay;
+
+  /// No description provided for @price_taxesIncluded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Taxes incluses'**
+  String get price_taxesIncluded;
+
+  /// No description provided for @price_urgentBanner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation urgente - Frais majorés'**
+  String get price_urgentBanner;
+
+  /// No description provided for @snow_estimatedDepth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profondeur de neige estimée'**
+  String get snow_estimatedDepth;
+
+  /// No description provided for @snow_optionalHelper.
+  ///
+  /// In fr, this message translates to:
+  /// **'Optionnel - Aide à estimer le temps requis'**
+  String get snow_optionalHelper;
+
+  /// No description provided for @ai_estimationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Estimation IA'**
+  String get ai_estimationTitle;
+
+  /// No description provided for @ai_estimationSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix suggéré basé sur la demande'**
+  String get ai_estimationSubtitle;
+
+  /// No description provided for @ai_priceFactors.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facteurs de prix'**
+  String get ai_priceFactors;
+
+  /// No description provided for @ai_urgency.
+  ///
+  /// In fr, this message translates to:
+  /// **'Urgence'**
+  String get ai_urgency;
+
+  /// No description provided for @ai_weather.
+  ///
+  /// In fr, this message translates to:
+  /// **'Météo'**
+  String get ai_weather;
+
+  /// No description provided for @ai_demand.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demande'**
+  String get ai_demand;
+
+  /// No description provided for @ai_zone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Zone'**
+  String get ai_zone;
+
+  /// No description provided for @ai_estimationLoading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Estimation IA en cours...'**
+  String get ai_estimationLoading;
+
+  /// No description provided for @ai_estimationUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Estimation IA non disponible'**
+  String get ai_estimationUnavailable;
+
+  /// No description provided for @worker_yesStart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui, commencer'**
+  String get worker_yesStart;
+
+  /// No description provided for @dispute_addEvidenceButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter des preuves'**
+  String get dispute_addEvidenceButton;
+
+  /// No description provided for @dispute_addEvidenceError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de l\'ajout des preuves'**
+  String get dispute_addEvidenceError;
+
+  /// No description provided for @dispute_addEvidenceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une preuve'**
+  String get dispute_addEvidenceTitle;
+
+  /// No description provided for @dispute_additionalDetailsOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détails supplémentaires (optionnel)'**
+  String get dispute_additionalDetailsOptional;
+
+  /// No description provided for @dispute_addMorePhotos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter plus de photos'**
+  String get dispute_addMorePhotos;
+
+  /// No description provided for @dispute_addPhotoOrDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez au moins une photo ou une description'**
+  String get dispute_addPhotoOrDescription;
+
+  /// No description provided for @dispute_addPhotosInstruction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez des photos pour appuyer votre réponse (photos du travail effectué, captures d\'écran de conversation, etc.)'**
+  String get dispute_addPhotosInstruction;
+
+  /// No description provided for @dispute_aiAnalysis.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse IA'**
+  String get dispute_aiAnalysis;
+
+  /// No description provided for @dispute_amount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant'**
+  String get dispute_amount;
+
+  /// No description provided for @dispute_appeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faire appel'**
+  String get dispute_appeal;
+
+  /// No description provided for @dispute_appealExplanation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expliquez pourquoi vous contestez cette décision (minimum 50 caractères):'**
+  String get dispute_appealExplanation;
+
+  /// No description provided for @dispute_appealJustificationHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre justification...'**
+  String get dispute_appealJustificationHint;
+
+  /// No description provided for @dispute_appealSubmitted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appel soumis avec succès'**
+  String get dispute_appealSubmitted;
+
+  /// No description provided for @dispute_attachedPhotos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photos jointes'**
+  String get dispute_attachedPhotos;
+
+  /// No description provided for @dispute_cannotSendReportRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'envoyer le signalement. Veuillez réessayer.'**
+  String get dispute_cannotSendReportRetry;
+
+  /// No description provided for @dispute_cannotSendResponseRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'envoyer la réponse. Veuillez réessayer.'**
+  String get dispute_cannotSendResponseRetry;
+
+  /// No description provided for @dispute_claimedAmountValue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant réclamé: {amount} \$'**
+  String dispute_claimedAmountValue(String amount);
+
+  /// No description provided for @dispute_confidencePercent.
+  ///
+  /// In fr, this message translates to:
+  /// **'{percent}%'**
+  String dispute_confidencePercent(int percent);
+
+  /// No description provided for @dispute_confirmNoShowRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez confirmer l\'absence du déneigeur avant de soumettre'**
+  String get dispute_confirmNoShowRequired;
+
+  /// No description provided for @dispute_confirmNoShowStatement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je confirme que le déneigeur ne s\'est pas présenté pour le service prévu.'**
+  String get dispute_confirmNoShowStatement;
+
+  /// No description provided for @dispute_deadlines.
+  ///
+  /// In fr, this message translates to:
+  /// **'Délais'**
+  String get dispute_deadlines;
+
+  /// No description provided for @dispute_decisionFavorClaimant.
+  ///
+  /// In fr, this message translates to:
+  /// **'En votre faveur'**
+  String get dispute_decisionFavorClaimant;
+
+  /// No description provided for @dispute_decisionFavorRespondent.
+  ///
+  /// In fr, this message translates to:
+  /// **'En faveur du défenseur'**
+  String get dispute_decisionFavorRespondent;
+
+  /// No description provided for @dispute_decisionFullRefund.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remboursement complet'**
+  String get dispute_decisionFullRefund;
+
+  /// No description provided for @dispute_decisionLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décision: {decision}'**
+  String dispute_decisionLabel(String decision);
+
+  /// No description provided for @dispute_decisionMutualAgreement.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accord mutuel'**
+  String get dispute_decisionMutualAgreement;
+
+  /// No description provided for @dispute_decisionNoAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune action'**
+  String get dispute_decisionNoAction;
+
+  /// No description provided for @dispute_decisionPartialRefund.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remboursement partiel'**
+  String get dispute_decisionPartialRefund;
+
+  /// No description provided for @dispute_describeEvidenceHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décrivez les preuves fournies...'**
+  String get dispute_describeEvidenceHint;
+
+  /// No description provided for @dispute_describeSituationHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décrivez la situation...'**
+  String get dispute_describeSituationHint;
+
+  /// No description provided for @dispute_descriptionOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Description (optionnelle)'**
+  String get dispute_descriptionOptional;
+
+  /// No description provided for @dispute_evidenceAddedMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos preuves ont été ajoutées au dossier du litige.'**
+  String get dispute_evidenceAddedMessage;
+
+  /// No description provided for @dispute_evidenceCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Preuves ({count})'**
+  String dispute_evidenceCount(int count);
+
+  /// No description provided for @dispute_evidenceStrength.
+  ///
+  /// In fr, this message translates to:
+  /// **'Force des preuves'**
+  String get dispute_evidenceStrength;
+
+  /// No description provided for @dispute_evidenceTips.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conseils pour de bonnes preuves'**
+  String get dispute_evidenceTips;
+
+  /// No description provided for @dispute_expired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expiré'**
+  String get dispute_expired;
+
+  /// No description provided for @dispute_falseReportWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les faux signalements peuvent entraîner des sanctions sur votre compte.'**
+  String get dispute_falseReportWarning;
+
+  /// No description provided for @dispute_filterAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous'**
+  String get dispute_filterAll;
+
+  /// No description provided for @dispute_filterOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouverts'**
+  String get dispute_filterOpen;
+
+  /// No description provided for @dispute_filterResolved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résolus'**
+  String get dispute_filterResolved;
+
+  /// No description provided for @dispute_filterUnderReview.
+  ///
+  /// In fr, this message translates to:
+  /// **'En examen'**
+  String get dispute_filterUnderReview;
+
+  /// No description provided for @dispute_imagesLoadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger les images'**
+  String get dispute_imagesLoadError;
+
+  /// No description provided for @dispute_keyFindings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Constats clés:'**
+  String get dispute_keyFindings;
+
+  /// No description provided for @dispute_maxPhotos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Maximum 10 photos'**
+  String get dispute_maxPhotos;
+
+  /// No description provided for @dispute_minCharsRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Minimum 50 caractères requis'**
+  String get dispute_minCharsRequired;
+
+  /// No description provided for @dispute_noDisputes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun litige'**
+  String get dispute_noDisputes;
+
+  /// No description provided for @dispute_noDisputesMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'avez aucun litige en cours. C\'est une bonne nouvelle!'**
+  String get dispute_noDisputesMessage;
+
+  /// No description provided for @dispute_notAssigned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non assigné'**
+  String get dispute_notAssigned;
+
+  /// No description provided for @dispute_notFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Litige introuvable'**
+  String get dispute_notFound;
+
+  /// No description provided for @dispute_notFoundMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce litige est introuvable ou a été supprimé.'**
+  String get dispute_notFoundMessage;
+
+  /// No description provided for @dispute_notifiedOfDecision.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous serez notifié de la décision finale.'**
+  String get dispute_notifiedOfDecision;
+
+  /// No description provided for @dispute_notifiedWhenResolved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous serez notifié lorsque le dossier sera résolu.'**
+  String get dispute_notifiedWhenResolved;
+
+  /// No description provided for @dispute_openDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date d\'ouverture'**
+  String get dispute_openDate;
+
+  /// No description provided for @dispute_photoCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count}/10 photos'**
+  String dispute_photoCount(int count);
+
+  /// No description provided for @dispute_photosLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photos'**
+  String get dispute_photosLabel;
+
+  /// No description provided for @dispute_priority.
+  ///
+  /// In fr, this message translates to:
+  /// **'Priorité'**
+  String get dispute_priority;
+
+  /// No description provided for @dispute_priorityHigh.
+  ///
+  /// In fr, this message translates to:
+  /// **'Haute'**
+  String get dispute_priorityHigh;
+
+  /// No description provided for @dispute_priorityLow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Basse'**
+  String get dispute_priorityLow;
+
+  /// No description provided for @dispute_priorityMedium.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moyenne'**
+  String get dispute_priorityMedium;
+
+  /// No description provided for @dispute_priorityUrgent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Urgente'**
+  String get dispute_priorityUrgent;
+
+  /// No description provided for @dispute_reasoning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Raisonnement'**
+  String get dispute_reasoning;
+
+  /// No description provided for @dispute_refund.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remboursement'**
+  String get dispute_refund;
+
+  /// No description provided for @dispute_refundAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remboursement: {amount} \$'**
+  String dispute_refundAmount(String amount);
+
+  /// No description provided for @dispute_refundIfConfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si l\'absence est confirmée, vous recevrez un remboursement de {amount} \$.'**
+  String dispute_refundIfConfirmed(String amount);
+
+  /// No description provided for @dispute_remainingTimeDaysHours.
+  ///
+  /// In fr, this message translates to:
+  /// **'{days}j {hours}h restantes'**
+  String dispute_remainingTimeDaysHours(int days, int hours);
+
+  /// No description provided for @dispute_remainingTimeHoursMin.
+  ///
+  /// In fr, this message translates to:
+  /// **'{hours}h {minutes}min restantes'**
+  String dispute_remainingTimeHoursMin(int hours, int minutes);
+
+  /// No description provided for @dispute_remainingTimeMin.
+  ///
+  /// In fr, this message translates to:
+  /// **'{minutes}min restantes'**
+  String dispute_remainingTimeMin(int minutes);
+
+  /// No description provided for @dispute_reportAutoConfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre signalement a été automatiquement confirmé. Un remboursement sera effectué.'**
+  String get dispute_reportAutoConfirmed;
+
+  /// No description provided for @dispute_reportNoShow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signaler une absence'**
+  String get dispute_reportNoShow;
+
+  /// No description provided for @dispute_reportNoShowButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signaler l\'absence'**
+  String get dispute_reportNoShowButton;
+
+  /// No description provided for @dispute_reportSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signalement envoyé'**
+  String get dispute_reportSent;
+
+  /// No description provided for @dispute_reportUnderReview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre signalement a été soumis et sera examiné par notre équipe.'**
+  String get dispute_reportUnderReview;
+
+  /// No description provided for @dispute_reservationDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détails de la réservation'**
+  String get dispute_reservationDetails;
+
+  /// No description provided for @dispute_resolvedCannotAddEvidence.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce litige est résolu ou fermé. Vous ne pouvez plus ajouter de preuves.'**
+  String get dispute_resolvedCannotAddEvidence;
+
+  /// No description provided for @dispute_resolvedOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résolu le {date}'**
+  String dispute_resolvedOn(String date);
+
+  /// No description provided for @dispute_responseDeadlinePassed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Délai de réponse dépassé'**
+  String get dispute_responseDeadlinePassed;
+
+  /// No description provided for @dispute_responseExpectedBefore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réponse attendue avant'**
+  String get dispute_responseExpectedBefore;
+
+  /// No description provided for @dispute_responseHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écrivez votre réponse ici...'**
+  String get dispute_responseHint;
+
+  /// No description provided for @dispute_responseInstruction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expliquez votre version des faits. Soyez précis et factuel.'**
+  String get dispute_responseInstruction;
+
+  /// No description provided for @dispute_responseSentMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre réponse a été enregistrée. L\'administrateur va examiner le litige et prendra une décision.'**
+  String get dispute_responseSentMessage;
+
+  /// No description provided for @dispute_responseTooShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre réponse est trop courte (minimum 50 caractères)'**
+  String get dispute_responseTooShort;
+
+  /// No description provided for @dispute_riskFactors.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facteurs de risque'**
+  String get dispute_riskFactors;
+
+  /// No description provided for @dispute_scheduledTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'Heure prévue'**
+  String get dispute_scheduledTime;
+
+  /// No description provided for @dispute_snowWorkerLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigeur'**
+  String get dispute_snowWorkerLabel;
+
+  /// No description provided for @dispute_submitAppeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Soumettre l\'appel'**
+  String get dispute_submitAppeal;
+
+  /// No description provided for @dispute_submitEvidence.
+  ///
+  /// In fr, this message translates to:
+  /// **'Soumettre les preuves'**
+  String get dispute_submitEvidence;
+
+  /// No description provided for @dispute_submittedOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Soumis le {date}'**
+  String dispute_submittedOn(String date);
+
+  /// No description provided for @dispute_takePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get dispute_takePhoto;
+
+  /// No description provided for @dispute_tipsRelevantDocs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout document pertinent'**
+  String get dispute_tipsRelevantDocs;
+
+  /// No description provided for @dispute_viewDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les détails'**
+  String get dispute_viewDetails;
+
+  /// No description provided for @dispute_workerDidNotCome.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le déneigeur ne s\'est pas présenté'**
+  String get dispute_workerDidNotCome;
+
+  /// No description provided for @dispute_workerDidNotComeDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signalez que le déneigeur {name} ne s\'est pas présenté pour le service prévu.'**
+  String dispute_workerDidNotComeDesc(String name);
+
+  /// No description provided for @worker_accountAlreadyConfigured.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre compte est déjà configuré!'**
+  String get worker_accountAlreadyConfigured;
+
+  /// No description provided for @worker_accountConfigured.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte configuré'**
+  String get worker_accountConfigured;
+
+  /// No description provided for @worker_accountDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte supprimé'**
+  String get worker_accountDeleted;
+
+  /// No description provided for @worker_accountsConfiguredCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} compte(s) configuré(s)'**
+  String worker_accountsConfiguredCount(int count);
+
+  /// No description provided for @worker_accountSetAsPrimary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte défini comme principal'**
+  String get worker_accountSetAsPrimary;
+
+  /// No description provided for @worker_accountVerified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte vérifié'**
+  String get worker_accountVerified;
+
+  /// No description provided for @worker_actions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actions'**
+  String get worker_actions;
+
+  /// No description provided for @worker_actionSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Action réussie'**
+  String get worker_actionSuccess;
+
+  /// No description provided for @worker_activeJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Job actif'**
+  String get worker_activeJob;
+
+  /// No description provided for @worker_addAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un compte'**
+  String get worker_addAccount;
+
+  /// No description provided for @worker_addBankAccountToReceive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez un compte bancaire pour recevoir vos gains'**
+  String get worker_addBankAccountToReceive;
+
+  /// No description provided for @worker_additionalDetailsOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détails supplémentaires (optionnel)'**
+  String get worker_additionalDetailsOptional;
+
+  /// No description provided for @worker_arrivedConfirmedMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous êtes à {distanceMeters}m du véhicule.\n\nVous pouvez maintenant commencer le travail.'**
+  String worker_arrivedConfirmedMessage(int distanceMeters);
+
+  /// No description provided for @worker_automaticTransfers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Virements automatiques'**
+  String get worker_automaticTransfers;
+
+  /// No description provided for @worker_balance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde'**
+  String get worker_balance;
+
+  /// No description provided for @worker_bankAccounts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comptes bancaires'**
+  String get worker_bankAccounts;
+
+  /// No description provided for @worker_basicInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations de base'**
+  String get worker_basicInfo;
+
+  /// No description provided for @worker_cameraPermissionError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de prendre la photo. Vérifiez les permissions de la caméra.'**
+  String get worker_cameraPermissionError;
+
+  /// No description provided for @worker_cancelJobQuestion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler le job?'**
+  String get worker_cancelJobQuestion;
+
+  /// No description provided for @worker_cancelReasonEquipmentFailure.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équipement défaillant'**
+  String get worker_cancelReasonEquipmentFailure;
+
+  /// No description provided for @worker_cancelReasonEquipmentFailureDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon équipement de déneigement est défaillant'**
+  String get worker_cancelReasonEquipmentFailureDesc;
+
+  /// No description provided for @worker_cancelReasonFamilyEmergency.
+  ///
+  /// In fr, this message translates to:
+  /// **'Urgence familiale'**
+  String get worker_cancelReasonFamilyEmergency;
+
+  /// No description provided for @worker_cancelReasonFamilyEmergencyDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'J\'ai une urgence familiale'**
+  String get worker_cancelReasonFamilyEmergencyDesc;
+
+  /// No description provided for @worker_cancelReasonLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Raison de l\'annulation:'**
+  String get worker_cancelReasonLabel;
+
+  /// No description provided for @worker_cancelReasonMedicalEmergency.
+  ///
+  /// In fr, this message translates to:
+  /// **'Urgence médicale'**
+  String get worker_cancelReasonMedicalEmergency;
+
+  /// No description provided for @worker_cancelReasonMedicalEmergencyDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'J\'ai une urgence médicale personnelle'**
+  String get worker_cancelReasonMedicalEmergencyDesc;
+
+  /// No description provided for @worker_cancelReasonRoadBlocked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Route bloquée'**
+  String get worker_cancelReasonRoadBlocked;
+
+  /// No description provided for @worker_cancelReasonRoadBlockedDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'La route vers le client est bloquée ou inaccessible'**
+  String get worker_cancelReasonRoadBlockedDesc;
+
+  /// No description provided for @worker_cancelReasonSevereWeather.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conditions météo dangereuses'**
+  String get worker_cancelReasonSevereWeather;
+
+  /// No description provided for @worker_cancelReasonSevereWeatherDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les conditions météo rendent le trajet dangereux'**
+  String get worker_cancelReasonSevereWeatherDesc;
+
+  /// No description provided for @worker_cancelReasonVehicleBreakdown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Panne de véhicule'**
+  String get worker_cancelReasonVehicleBreakdown;
+
+  /// No description provided for @worker_cancelReasonVehicleBreakdownDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon véhicule est en panne ou a un problème mécanique'**
+  String get worker_cancelReasonVehicleBreakdownDesc;
+
+  /// No description provided for @worker_cancelThisJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler ce job'**
+  String get worker_cancelThisJob;
+
+  /// No description provided for @worker_cancelWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous ne serez pas payé pour ce job.\nLes annulations fréquentes peuvent entraîner une suspension.'**
+  String get worker_cancelWarning;
+
+  /// No description provided for @worker_cannotDeterminePosition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de déterminer votre position. Activez la localisation et réessayez.'**
+  String get worker_cannotDeterminePosition;
+
+  /// No description provided for @worker_cannotOpenStripeLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ouvrir le lien Stripe'**
+  String get worker_cannotOpenStripeLink;
+
+  /// No description provided for @worker_canNowFinish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez maintenant terminer'**
+  String get worker_canNowFinish;
+
+  /// No description provided for @worker_configureNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurer maintenant'**
+  String get worker_configureNow;
+
+  /// No description provided for @worker_configurePayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurez vos paiements'**
+  String get worker_configurePayments;
+
+  /// No description provided for @worker_confirmCancellation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer l\'annulation'**
+  String get worker_confirmCancellation;
+
+  /// No description provided for @worker_confirmCompleteJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Êtes-vous sûr de vouloir marquer ce job comme terminé?'**
+  String get worker_confirmCompleteJob;
+
+  /// No description provided for @worker_connectingToStripe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion à Stripe...'**
+  String get worker_connectingToStripe;
+
+  /// No description provided for @worker_continueSetup.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer la configuration'**
+  String get worker_continueSetup;
+
+  /// No description provided for @worker_deleteAccountConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous vraiment supprimer le compte se terminant par {last4}?'**
+  String worker_deleteAccountConfirm(String last4);
+
+  /// No description provided for @worker_deleteAccountQuestion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer ce compte?'**
+  String get worker_deleteAccountQuestion;
+
+  /// No description provided for @worker_depositsIn23Days.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépôts sous 2-3 jours ouvrables'**
+  String get worker_depositsIn23Days;
+
+  /// No description provided for @worker_documentsRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Documents requis'**
+  String get worker_documentsRequired;
+
+  /// No description provided for @worker_documentsSubmitted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Documents soumis'**
+  String get worker_documentsSubmitted;
+
+  /// No description provided for @worker_documentsVerified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Documents vérifiés'**
+  String get worker_documentsVerified;
+
+  /// No description provided for @worker_enlarge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Agrandir'**
+  String get worker_enlarge;
+
+  /// No description provided for @worker_enRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'En route'**
+  String get worker_enRoute;
+
+  /// No description provided for @worker_fundsDepositedInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les fonds sont déposés sur votre compte bancaire sous 2-3 jours ouvrables.'**
+  String get worker_fundsDepositedInfo;
+
+  /// No description provided for @worker_goodJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bon travail!'**
+  String get worker_goodJob;
+
+  /// No description provided for @worker_headToClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dirigez-vous vers le client'**
+  String get worker_headToClient;
+
+  /// No description provided for @worker_howItWorks.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment ça fonctionne'**
+  String get worker_howItWorks;
+
+  /// No description provided for @worker_identityVerificationInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour recevoir vos paiements, Stripe doit vérifier votre identité. Préparez les documents suivants:'**
+  String get worker_identityVerificationInfo;
+
+  /// No description provided for @worker_jobCompletedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Job terminé avec succès!'**
+  String get worker_jobCompletedSuccess;
+
+  /// No description provided for @worker_jobStarted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Job démarré!'**
+  String get worker_jobStarted;
+
+  /// No description provided for @worker_locationError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur de localisation'**
+  String get worker_locationError;
+
+  /// No description provided for @worker_locationPermissionDenied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Permission de localisation refusée'**
+  String get worker_locationPermissionDenied;
+
+  /// No description provided for @worker_locationPermissionDeniedForever.
+  ///
+  /// In fr, this message translates to:
+  /// **'Permission de localisation refusée définitivement. Activez-la dans les paramètres.'**
+  String get worker_locationPermissionDeniedForever;
+
+  /// No description provided for @worker_manageBankAccounts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer mes comptes bancaires'**
+  String get worker_manageBankAccounts;
+
+  /// No description provided for @worker_noBankAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun compte bancaire'**
+  String get worker_noBankAccount;
+
+  /// No description provided for @worker_noBankAccountWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun compte bancaire configuré. Ajoutez-en un pour recevoir vos gains.'**
+  String get worker_noBankAccountWarning;
+
+  /// No description provided for @worker_noGpsConfirmArrival.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce job n\'a pas de coordonnées GPS enregistrées.\n\nConfirmez-vous être arrivé à l\'emplacement indiqué?'**
+  String get worker_noGpsConfirmArrival;
+
+  /// No description provided for @worker_notChargedForJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous ne serez pas facturé pour ce job.'**
+  String get worker_notChargedForJob;
+
+  /// No description provided for @worker_paymentDistribution.
+  ///
+  /// In fr, this message translates to:
+  /// **'Répartition des paiements'**
+  String get worker_paymentDistribution;
+
+  /// No description provided for @worker_paymentExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exemple: Pour un job à 50\$, vous recevez {amount}\$'**
+  String worker_paymentExample(String amount);
+
+  /// No description provided for @worker_payments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements'**
+  String get worker_payments;
+
+  /// No description provided for @worker_paymentsActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements actifs'**
+  String get worker_paymentsActive;
+
+  /// No description provided for @worker_payoutsActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Virements actifs'**
+  String get worker_payoutsActive;
+
+  /// No description provided for @worker_photoId.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pièce d\'identité avec photo'**
+  String get worker_photoId;
+
+  /// No description provided for @worker_photoIdDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Permis de conduire, passeport ou carte d\'identité'**
+  String get worker_photoIdDesc;
+
+  /// No description provided for @worker_photoOfCompletedWork.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo du travail terminé'**
+  String get worker_photoOfCompletedWork;
+
+  /// No description provided for @worker_photoRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo requise'**
+  String get worker_photoRequired;
+
+  /// No description provided for @worker_photoRequirements.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exigences pour les photos'**
+  String get worker_photoRequirements;
+
+  /// No description provided for @worker_photoUploadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'envoyer la photo. Vérifiez votre connexion.'**
+  String get worker_photoUploadError;
+
+  /// No description provided for @worker_platformCommission.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commission plateforme'**
+  String get worker_platformCommission;
+
+  /// No description provided for @worker_poweredByStripe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Propulsé par Stripe'**
+  String get worker_poweredByStripe;
+
+  /// No description provided for @worker_poweredByStripeLeader.
+  ///
+  /// In fr, this message translates to:
+  /// **'Propulsé par Stripe, leader mondial des paiements'**
+  String get worker_poweredByStripeLeader;
+
+  /// No description provided for @worker_pressEnRouteToStart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appuyez sur \"En route\" pour commencer'**
+  String get worker_pressEnRouteToStart;
+
+  /// No description provided for @worker_primary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Principal'**
+  String get worker_primary;
+
+  /// No description provided for @worker_primaryAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte principal'**
+  String get worker_primaryAccount;
+
+  /// No description provided for @worker_primaryAccountInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos gains seront déposés sur le compte marqué comme principal.'**
+  String get worker_primaryAccountInfo;
+
+  /// No description provided for @worker_proofOfAddress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Preuve d\'adresse'**
+  String get worker_proofOfAddress;
+
+  /// No description provided for @worker_proofOfAddressDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture de services publics ou relevé bancaire récent'**
+  String get worker_proofOfAddressDesc;
+
+  /// No description provided for @worker_readyToReceive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prêt à recevoir des paiements'**
+  String get worker_readyToReceive;
+
+  /// No description provided for @worker_receiveEarningsDirectly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recevez vos gains directement'**
+  String get worker_receiveEarningsDirectly;
+
+  /// No description provided for @worker_reqColorPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo en couleur (format JPG ou PNG)'**
+  String get worker_reqColorPhoto;
+
+  /// No description provided for @worker_reqNameDobVisible.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom et date de naissance lisibles'**
+  String get worker_reqNameDobVisible;
+
+  /// No description provided for @worker_reqNotExpired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Document non expiré'**
+  String get worker_reqNotExpired;
+
+  /// No description provided for @worker_reqOriginalDoc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Document original, pas une photocopie'**
+  String get worker_reqOriginalDoc;
+
+  /// No description provided for @worker_retakePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reprendre'**
+  String get worker_retakePhoto;
+
+  /// No description provided for @worker_securePayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements sécurisés'**
+  String get worker_securePayments;
+
+  /// No description provided for @worker_sendDocumentsToActivate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyez vos documents d\'identité pour activer les virements.'**
+  String get worker_sendDocumentsToActivate;
+
+  /// No description provided for @worker_sending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoi...'**
+  String get worker_sending;
+
+  /// No description provided for @worker_sendMyDocuments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer mes documents'**
+  String get worker_sendMyDocuments;
+
+  /// No description provided for @worker_setAsPrimary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Définir comme principal'**
+  String get worker_setAsPrimary;
+
+  /// No description provided for @worker_statusUnknown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inconnu'**
+  String get worker_statusUnknown;
+
+  /// No description provided for @worker_statusUpdatedEnRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statut mis à jour: En route'**
+  String get worker_statusUpdatedEnRoute;
+
+  /// No description provided for @worker_step1ClientPays.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le client paie'**
+  String get worker_step1ClientPays;
+
+  /// No description provided for @worker_step1Subtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le paiement est traité par Stripe'**
+  String get worker_step1Subtitle;
+
+  /// No description provided for @worker_step1SubtitleShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement traité par Stripe'**
+  String get worker_step1SubtitleShort;
+
+  /// No description provided for @worker_step2AutoDistribution.
+  ///
+  /// In fr, this message translates to:
+  /// **'Répartition automatique'**
+  String get worker_step2AutoDistribution;
+
+  /// No description provided for @worker_step2Distribution.
+  ///
+  /// In fr, this message translates to:
+  /// **'Répartition'**
+  String get worker_step2Distribution;
+
+  /// No description provided for @worker_step2Subtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre part est calculée instantanément'**
+  String get worker_step2Subtitle;
+
+  /// No description provided for @worker_step2SubtitleShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre part est calculée'**
+  String get worker_step2SubtitleShort;
+
+  /// No description provided for @worker_step3Deposit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépôt'**
+  String get worker_step3Deposit;
+
+  /// No description provided for @worker_step3DepositToAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépôt sur votre compte'**
+  String get worker_step3DepositToAccount;
+
+  /// No description provided for @worker_step3Subtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sous 2-3 jours ouvrables'**
+  String get worker_step3Subtitle;
+
+  /// No description provided for @worker_stripeResponse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réponse Stripe: {response}'**
+  String worker_stripeResponse(String response);
+
+  /// No description provided for @worker_stripeVerifying.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stripe vérifie vos informations'**
+  String get worker_stripeVerifying;
+
+  /// No description provided for @worker_takePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get worker_takePhoto;
+
+  /// No description provided for @worker_takePhotoBeforeFinish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prenez une photo avant de terminer'**
+  String get worker_takePhotoBeforeFinish;
+
+  /// No description provided for @worker_timeElapsed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Temps écoulé'**
+  String get worker_timeElapsed;
+
+  /// No description provided for @worker_tooFar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trop loin'**
+  String get worker_tooFar;
+
+  /// No description provided for @worker_tooFarMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous êtes à {distanceMeters}m du véhicule.\n\nVous devez être à moins de {maxRadius}m pour confirmer votre arrivée.\n\nContinuez à vous rapprocher.'**
+  String worker_tooFarMessage(int distanceMeters, int maxRadius);
+
+  /// No description provided for @worker_verificationInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification en cours'**
+  String get worker_verificationInProgress;
+
+  /// No description provided for @worker_verificationTimeInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'La vérification peut prendre quelques minutes à 24 heures.'**
+  String get worker_verificationTimeInfo;
+
+  /// No description provided for @worker_verifyingPosition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification de votre position...'**
+  String get worker_verifyingPosition;
+
+  /// No description provided for @worker_viewStatusOnStripe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir le statut sur Stripe'**
+  String get worker_viewStatusOnStripe;
+
+  /// No description provided for @worker_viewStripeDashboard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir mon dashboard Stripe'**
+  String get worker_viewStripeDashboard;
+
+  /// No description provided for @worker_workInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Travail en cours...'**
+  String get worker_workInProgress;
+
+  /// No description provided for @worker_youReceive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous recevez'**
+  String get worker_youReceive;
+
+  /// No description provided for @verification_addPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une photo'**
+  String get verification_addPhoto;
+
+  /// No description provided for @verification_backOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Verso (optionnel)'**
+  String get verification_backOptional;
+
+  /// No description provided for @verification_backSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si votre document a un verso'**
+  String get verification_backSubtitle;
+
+  /// No description provided for @verification_captureBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photographier le verso'**
+  String get verification_captureBack;
+
+  /// No description provided for @verification_captureFront.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photographier le recto'**
+  String get verification_captureFront;
+
+  /// No description provided for @verification_choosePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une photo'**
+  String get verification_choosePhoto;
+
+  /// No description provided for @verification_continueToSelfie.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer vers le selfie'**
+  String get verification_continueToSelfie;
+
+  /// No description provided for @verification_fromGallery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Depuis la galerie'**
+  String get verification_fromGallery;
+
+  /// No description provided for @verification_frontRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recto (obligatoire)'**
+  String get verification_frontRequired;
+
+  /// No description provided for @verification_frontSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Face avec votre photo'**
+  String get verification_frontSubtitle;
+
+  /// No description provided for @verification_idBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pièce d\'identité (verso)'**
+  String get verification_idBack;
+
+  /// No description provided for @verification_idFront.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pièce d\'identité (recto)'**
+  String get verification_idFront;
+
+  /// No description provided for @verification_photoTips.
+  ///
+  /// In fr, this message translates to:
+  /// **'Placez le document sur une surface plane, assurez-vous d\'avoir un bon éclairage, évitez les reflets et les ombres, capturez tout le document.'**
+  String get verification_photoTips;
+
+  /// No description provided for @verification_photoTipsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conseils pour une bonne photo'**
+  String get verification_photoTipsTitle;
+
+  /// No description provided for @verification_privacyNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos documents seront analysés de manière sécurisée et supprimés après vérification.'**
+  String get verification_privacyNote;
+
+  /// No description provided for @verification_retake.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reprendre'**
+  String get verification_retake;
+
+  /// No description provided for @verification_selfieInstructions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Regardez directement la caméra, gardez un visage neutre, assurez-vous d\'avoir un bon éclairage, retirez lunettes de soleil et chapeau.'**
+  String get verification_selfieInstructions;
+
+  /// No description provided for @verification_selfieRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez prendre un selfie'**
+  String get verification_selfieRequired;
+
+  /// No description provided for @verification_takeSelfie.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prenez un selfie'**
+  String get verification_takeSelfie;
+
+  /// No description provided for @verification_takeSelfieBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre le selfie'**
+  String get verification_takeSelfieBtn;
+
+  /// No description provided for @verification_yourSelfie.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre selfie'**
+  String get verification_yourSelfie;
+
+  /// No description provided for @profile_changePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer la photo de profil'**
+  String get profile_changePhoto;
+
+  /// No description provided for @profile_chooseFromGallery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir depuis la galerie'**
+  String get profile_chooseFromGallery;
+
+  /// No description provided for @profile_deletePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer la photo'**
+  String get profile_deletePhoto;
+
+  /// No description provided for @profile_deletePhotoConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Êtes-vous sûr de vouloir supprimer votre photo de profil?'**
+  String get profile_deletePhotoConfirm;
+
+  /// No description provided for @profile_editTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier le profil'**
+  String get profile_editTitle;
+
+  /// No description provided for @profile_emailNotEditable.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'email ne peut pas être modifié'**
+  String get profile_emailNotEditable;
+
+  /// No description provided for @profile_firstNameRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le prénom est requis'**
+  String get profile_firstNameRequired;
+
+  /// No description provided for @profile_lastNameRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le nom est requis'**
+  String get profile_lastNameRequired;
+
+  /// No description provided for @profile_personalInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations personnelles'**
+  String get profile_personalInfo;
+
+  /// No description provided for @profile_phoneInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format de téléphone invalide'**
+  String get profile_phoneInvalid;
+
+  /// No description provided for @profile_photoSelectionError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de la sélection: {error}'**
+  String profile_photoSelectionError(String error);
+
+  /// No description provided for @profile_saveChanges.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer les modifications'**
+  String get profile_saveChanges;
+
+  /// No description provided for @profile_smsVerification.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification SMS'**
+  String get profile_smsVerification;
+
+  /// No description provided for @profile_smsVerificationNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un code SMS sera envoyé pour vérifier le nouveau numéro'**
+  String get profile_smsVerificationNote;
+
+  /// No description provided for @profile_takePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get profile_takePhoto;
+
+  /// No description provided for @profile_verificationCodeSentTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un code de vérification a été envoyé au:'**
+  String get profile_verificationCodeSentTo;
+
+  /// No description provided for @subscription_basic.
+  ///
+  /// In fr, this message translates to:
+  /// **'Basique'**
+  String get subscription_basic;
+
+  /// No description provided for @subscription_basicFeature1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jusqu\'à 5 déneigements/mois'**
+  String get subscription_basicFeature1;
+
+  /// No description provided for @subscription_basicFeature2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Priorité normale'**
+  String get subscription_basicFeature2;
+
+  /// No description provided for @subscription_basicFeature3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Support par email'**
+  String get subscription_basicFeature3;
+
+  /// No description provided for @subscription_choosePlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez votre plan'**
+  String get subscription_choosePlan;
+
+  /// No description provided for @subscription_choosePlanBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir ce plan'**
+  String get subscription_choosePlanBtn;
+
+  /// No description provided for @subscription_month.
+  ///
+  /// In fr, this message translates to:
+  /// **'mois'**
+  String get subscription_month;
+
+  /// No description provided for @subscription_planTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan {planName}'**
+  String subscription_planTitle(String planName);
+
+  /// No description provided for @subscription_premium.
+  ///
+  /// In fr, this message translates to:
+  /// **'Premium'**
+  String get subscription_premium;
+
+  /// No description provided for @subscription_premiumFeature1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigements illimités'**
+  String get subscription_premiumFeature1;
+
+  /// No description provided for @subscription_premiumFeature2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Priorité haute'**
+  String get subscription_premiumFeature2;
+
+  /// No description provided for @subscription_premiumFeature3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Support 24/7'**
+  String get subscription_premiumFeature3;
+
+  /// No description provided for @subscription_premiumFeature4.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications SMS'**
+  String get subscription_premiumFeature4;
+
+  /// No description provided for @subscription_priceLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'{price}\$/{period}'**
+  String subscription_priceLabel(String price, String period);
+
+  /// No description provided for @subscription_recommended.
+  ///
+  /// In fr, this message translates to:
+  /// **'RECOMMANDÉ'**
+  String get subscription_recommended;
+
+  /// No description provided for @subscription_saveWith.
+  ///
+  /// In fr, this message translates to:
+  /// **'Économisez avec nos forfaits saisonniers'**
+  String get subscription_saveWith;
+
+  /// No description provided for @subscription_season.
+  ///
+  /// In fr, this message translates to:
+  /// **'saison'**
+  String get subscription_season;
+
+  /// No description provided for @subscription_seasonal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisonnier'**
+  String get subscription_seasonal;
+
+  /// No description provided for @subscription_seasonalFeature1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout du Premium'**
+  String get subscription_seasonalFeature1;
+
+  /// No description provided for @subscription_seasonalFeature2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plusieurs véhicules'**
+  String get subscription_seasonalFeature2;
+
+  /// No description provided for @subscription_seasonalFeature3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gestionnaire dédié'**
+  String get subscription_seasonalFeature3;
+
+  /// No description provided for @subscription_seasonalFeature4.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rapports détaillés'**
+  String get subscription_seasonalFeature4;
+
+  /// No description provided for @subscription_seasonalFeature5.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garantie satisfaction'**
+  String get subscription_seasonalFeature5;
+
+  /// No description provided for @subscription_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnements'**
+  String get subscription_title;
+
+  /// No description provided for @legal_andThe.
+  ///
+  /// In fr, this message translates to:
+  /// **' et la '**
+  String get legal_andThe;
+
+  /// No description provided for @legal_contactEmail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contact: privacy@deneige-auto.com'**
+  String get legal_contactEmail;
+
+  /// No description provided for @legal_iAccept.
+  ///
+  /// In fr, this message translates to:
+  /// **'J\'accepte les '**
+  String get legal_iAccept;
+
+  /// No description provided for @legal_lastUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière mise à jour: {date}'**
+  String legal_lastUpdated(String date);
+
+  /// No description provided for @legal_privacyPolicy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Politique de confidentialité'**
+  String get legal_privacyPolicy;
+
+  /// No description provided for @legal_privacyPolicySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment nous protégeons vos données'**
+  String get legal_privacyPolicySubtitle;
+
+  /// No description provided for @legal_rightsDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conformément à la Loi 25 du Québec, vous pouvez demander l\'accès, la rectification ou la suppression de vos données personnelles.'**
+  String get legal_rightsDescription;
+
+  /// No description provided for @legal_termsOfService.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conditions d\'utilisation'**
+  String get legal_termsOfService;
+
+  /// No description provided for @legal_yourRights.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos droits'**
+  String get legal_yourRights;
+
+  /// No description provided for @ai_alert.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alerte'**
+  String get ai_alert;
+
+  /// No description provided for @ai_analysisInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse IA en cours...'**
+  String get ai_analysisInProgress;
+
+  /// No description provided for @ai_analysisLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse IA'**
+  String get ai_analysisLabel;
+
+  /// No description provided for @ai_analysisUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse non disponible'**
+  String get ai_analysisUnavailable;
+
+  /// No description provided for @ai_analyzedOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analysé le {date}'**
+  String ai_analyzedOn(String date);
+
+  /// No description provided for @ai_basePrice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix de base'**
+  String get ai_basePrice;
+
+  /// No description provided for @ai_completeness.
+  ///
+  /// In fr, this message translates to:
+  /// **'Complétude'**
+  String get ai_completeness;
+
+  /// No description provided for @ai_criticalIssue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Problème critique détecté'**
+  String get ai_criticalIssue;
+
+  /// No description provided for @ai_estimatedDuration.
+  ///
+  /// In fr, this message translates to:
+  /// **'Durée estimée'**
+  String get ai_estimatedDuration;
+
+  /// No description provided for @ai_estimatedSnow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Neige estimée'**
+  String get ai_estimatedSnow;
+
+  /// No description provided for @ai_estimation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Estimation IA'**
+  String get ai_estimation;
+
+  /// No description provided for @ai_improvementPoints.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points à améliorer'**
+  String get ai_improvementPoints;
+
+  /// No description provided for @ai_issuesDetected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Problèmes détectés'**
+  String get ai_issuesDetected;
+
+  /// No description provided for @ai_multiplier.
+  ///
+  /// In fr, this message translates to:
+  /// **'Multiplicateur'**
+  String get ai_multiplier;
+
+  /// No description provided for @ai_notDetected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non détecté'**
+  String get ai_notDetected;
+
+  /// No description provided for @ai_noVehicleDetected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun véhicule détecté sur la photo'**
+  String get ai_noVehicleDetected;
+
+  /// No description provided for @ai_noVehicleDetectedBullet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun véhicule détecté'**
+  String get ai_noVehicleDetectedBullet;
+
+  /// No description provided for @ai_perfect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Parfait!'**
+  String get ai_perfect;
+
+  /// No description provided for @ai_photoAlert.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alerte Photo'**
+  String get ai_photoAlert;
+
+  /// No description provided for @ai_photosAnalyzed.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} photos analysées'**
+  String ai_photosAnalyzed(int count);
+
+  /// No description provided for @ai_priceRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fourchette'**
+  String get ai_priceRange;
+
+  /// No description provided for @ai_quality.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qualité'**
+  String get ai_quality;
+
+  /// No description provided for @ai_qualityVerification.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification de la qualité du travail'**
+  String get ai_qualityVerification;
+
+  /// No description provided for @ai_retakePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reprendre photo'**
+  String get ai_retakePhoto;
+
+  /// No description provided for @ai_snowDepth.
+  ///
+  /// In fr, this message translates to:
+  /// **'~{depth} cm neige'**
+  String ai_snowDepth(String depth);
+
+  /// No description provided for @ai_subtotal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sous-total'**
+  String get ai_subtotal;
+
+  /// No description provided for @ai_summary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résumé'**
+  String get ai_summary;
+
+  /// No description provided for @ai_surchargesApplied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Majorations appliquées'**
+  String get ai_surchargesApplied;
+
+  /// No description provided for @ai_suspiciousPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo suspecte détectée - Veuillez reprendre une photo authentique'**
+  String get ai_suspiciousPhoto;
+
+  /// No description provided for @ai_suspiciousPhotoFraud.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo suspecte (possible fraude)'**
+  String get ai_suspiciousPhotoFraud;
+
+  /// No description provided for @ai_taxIncluded.
+  ///
+  /// In fr, this message translates to:
+  /// **'taxes incluses'**
+  String get ai_taxIncluded;
+
+  /// No description provided for @ai_total.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total'**
+  String get ai_total;
+
+  /// No description provided for @ai_tps.
+  ///
+  /// In fr, this message translates to:
+  /// **'TPS (5%)'**
+  String get ai_tps;
+
+  /// No description provided for @ai_tvq.
+  ///
+  /// In fr, this message translates to:
+  /// **'TVQ (9.975%)'**
+  String get ai_tvq;
+
+  /// No description provided for @ai_vehicle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Véhicule'**
+  String get ai_vehicle;
+
+  /// No description provided for @ai_verificationLater.
+  ///
+  /// In fr, this message translates to:
+  /// **'La vérification IA sera effectuée ultérieurement'**
+  String get ai_verificationLater;
+
+  /// No description provided for @chat_today.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd\'hui'**
+  String get chat_today;
+
+  /// No description provided for @chat_yesterday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hier'**
+  String get chat_yesterday;
+
+  /// No description provided for @step1_freeLocationHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex: Devant le bâtiment A...'**
+  String get step1_freeLocationHint;
+
+  /// No description provided for @step1_spotNumberHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex: P32, A-15, 205...'**
+  String get step1_spotNumberHint;
+
+  /// No description provided for @worker_greetingName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bonjour, {name}'**
+  String worker_greetingName(String name);
+
+  /// No description provided for @worker_headerAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Disponible'**
+  String get worker_headerAvailable;
+
+  /// No description provided for @worker_headerOffline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hors ligne'**
+  String get worker_headerOffline;
+
+  /// No description provided for @worker_statsCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminés'**
+  String get worker_statsCompleted;
+
+  /// No description provided for @worker_statsInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get worker_statsInProgress;
+
+  /// No description provided for @worker_statsRevenue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenus'**
+  String get worker_statsRevenue;
+
+  /// No description provided for @worker_statsRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note'**
+  String get worker_statsRating;
+
+  /// No description provided for @worker_statsToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'aujourd\'hui'**
+  String get worker_statsToday;
+
+  /// No description provided for @worker_youAreOnline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous êtes en ligne'**
+  String get worker_youAreOnline;
+
+  /// No description provided for @worker_receivingSnowRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous recevez les demandes de déneigement'**
+  String get worker_receivingSnowRequests;
+
+  /// No description provided for @worker_activateToReceiveRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activez pour recevoir des demandes'**
+  String get worker_activateToReceiveRequests;
+
+  /// No description provided for @worker_activeCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} actif{count, plural, =1{} other{s}}'**
+  String worker_activeCount(int count);
+
+  /// No description provided for @worker_jobCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} job{count, plural, =1{} other{s}}'**
+  String worker_jobCount(int count);
+
+  /// No description provided for @worker_statusAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Disponible'**
+  String get worker_statusAvailable;
+
+  /// No description provided for @worker_statusAssigned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Assigné'**
+  String get worker_statusAssigned;
+
+  /// No description provided for @worker_statusEnRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'En route'**
+  String get worker_statusEnRoute;
+
+  /// No description provided for @worker_statusInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get worker_statusInProgress;
+
+  /// No description provided for @worker_statusCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get worker_statusCompleted;
+
+  /// No description provided for @worker_statusCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulé'**
+  String get worker_statusCancelled;
+
+  /// No description provided for @worker_serviceWindowScraping.
+  ///
+  /// In fr, this message translates to:
+  /// **'Grattage vitres'**
+  String get worker_serviceWindowScraping;
+
+  /// No description provided for @worker_serviceDoorDeicing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déglaçage portes'**
+  String get worker_serviceDoorDeicing;
+
+  /// No description provided for @worker_serviceWheelClearance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dégagement roues'**
+  String get worker_serviceWheelClearance;
+
+  /// No description provided for @worker_serviceRoofClearing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigement toit'**
+  String get worker_serviceRoofClearing;
+
+  /// No description provided for @worker_serviceSaltSpreading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Épandage sel'**
+  String get worker_serviceSaltSpreading;
+
+  /// No description provided for @worker_serviceLightsCleaning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nettoyage phares'**
+  String get worker_serviceLightsCleaning;
+
+  /// No description provided for @worker_servicePerimeterClearance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dégagement périmètre'**
+  String get worker_servicePerimeterClearance;
+
+  /// No description provided for @worker_serviceExhaustCheck.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérif. échappement'**
+  String get worker_serviceExhaustCheck;
+
+  /// No description provided for @worker_serviceWindows.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vitres'**
+  String get worker_serviceWindows;
+
+  /// No description provided for @worker_serviceDoors.
+  ///
+  /// In fr, this message translates to:
+  /// **'Portes'**
+  String get worker_serviceDoors;
+
+  /// No description provided for @worker_serviceWheels.
+  ///
+  /// In fr, this message translates to:
+  /// **'Roues'**
+  String get worker_serviceWheels;
+
+  /// No description provided for @worker_serviceRoof.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toit'**
+  String get worker_serviceRoof;
+
+  /// No description provided for @worker_serviceSalt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sel'**
+  String get worker_serviceSalt;
+
+  /// No description provided for @worker_serviceLights.
+  ///
+  /// In fr, this message translates to:
+  /// **'Phares'**
+  String get worker_serviceLights;
+
+  /// No description provided for @worker_servicePerimeter.
+  ///
+  /// In fr, this message translates to:
+  /// **'Périmètre'**
+  String get worker_servicePerimeter;
+
+  /// No description provided for @worker_serviceExhaustShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échapp.'**
+  String get worker_serviceExhaustShort;
+
+  /// No description provided for @worker_acceptLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'ACCEPTER'**
+  String get worker_acceptLabel;
+
+  /// No description provided for @worker_passLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'PASSER'**
+  String get worker_passLabel;
+
+  /// No description provided for @worker_accepting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Acceptation...'**
+  String get worker_accepting;
+
+  /// No description provided for @worker_acceptThisJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accepter ce job'**
+  String get worker_acceptThisJob;
+
+  /// No description provided for @worker_swipeHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Glisser → accepter  |  ← passer'**
+  String get worker_swipeHint;
+
+  /// No description provided for @worker_exceeded.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉPASSÉ'**
+  String get worker_exceeded;
+
+  /// No description provided for @worker_urgent.
+  ///
+  /// In fr, this message translates to:
+  /// **'URGENT'**
+  String get worker_urgent;
+
+  /// No description provided for @worker_equipmentCompatible.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équipement compatible'**
+  String get worker_equipmentCompatible;
+
+  /// No description provided for @worker_equipmentRequiredLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équipement requis'**
+  String get worker_equipmentRequiredLabel;
+
+  /// No description provided for @worker_distanceAndTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'{km} km • ~{min} min'**
+  String worker_distanceAndTime(String km, String min);
+
+  /// No description provided for @worker_dateAtTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date} à {time}'**
+  String worker_dateAtTime(String date, String time);
+
+  /// No description provided for @worker_verificationOngoing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Verification en cours'**
+  String get worker_verificationOngoing;
+
+  /// No description provided for @worker_verificationOngoingSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos documents sont en cours d\'analyse. Vous serez notifié une fois la vérification terminée.'**
+  String get worker_verificationOngoingSubtitle;
+
+  /// No description provided for @worker_verificationRejectedSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos documents n\'ont pas été approuvés. Veuillez resoumettre des documents valides.'**
+  String get worker_verificationRejectedSubtitle;
+
+  /// No description provided for @worker_verificationExpiredSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre vérification a expiré. Veuillez resoumettre vos documents.'**
+  String get worker_verificationExpiredSubtitle;
+
+  /// No description provided for @worker_verificationRequiredSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez votre identité pour pouvoir accepter des jobs de déneigement.'**
+  String get worker_verificationRequiredSubtitle;
+
+  /// No description provided for @worker_verificationRequiredForJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez votre identité pour accepter des jobs.'**
+  String get worker_verificationRequiredForJobs;
+
+  /// No description provided for @worker_retryLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get worker_retryLabel;
+
+  /// No description provided for @worker_notifUrgentJob.
+  ///
+  /// In fr, this message translates to:
+  /// **'🚨 JOB URGENT!'**
+  String get worker_notifUrgentJob;
+
+  /// No description provided for @worker_notifNewJobAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'📍 Nouveau job disponible'**
+  String get worker_notifNewJobAvailable;
+
+  /// No description provided for @worker_notifNewJobBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'{address} - {price}\$ - {distance} km'**
+  String worker_notifNewJobBody(String address, String price, String distance);
+
+  /// No description provided for @worker_notifUrgentJobsAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'🚨 Nouveaux jobs urgents!'**
+  String get worker_notifUrgentJobsAvailable;
+
+  /// No description provided for @worker_notifNewJobsAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'📍 Nouveaux jobs disponibles'**
+  String get worker_notifNewJobsAvailable;
+
+  /// No description provided for @worker_notifNewJobsNearby.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} nouveau{count, plural, =1{} other{x}} job{count, plural, =1{} other{s}} près de vous!'**
+  String worker_notifNewJobsNearby(int count);
+
+  /// No description provided for @worker_notifJobAccepted.
+  ///
+  /// In fr, this message translates to:
+  /// **'✅ Job accepté!'**
+  String get worker_notifJobAccepted;
+
+  /// No description provided for @worker_notifGoTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rendez-vous à {address}'**
+  String worker_notifGoTo(String address);
+
+  /// No description provided for @worker_notifJobDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'🎉 Travail terminé!'**
+  String get worker_notifJobDone;
+
+  /// No description provided for @worker_notifEarned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez gagné {amount}\$'**
+  String worker_notifEarned(String amount);
+
+  /// No description provided for @worker_notifChannelUrgent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jobs Urgents'**
+  String get worker_notifChannelUrgent;
+
+  /// No description provided for @worker_notifChannelNew.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveaux Jobs'**
+  String get worker_notifChannelNew;
+
+  /// No description provided for @worker_notifChannelUrgentDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications pour les jobs urgents'**
+  String get worker_notifChannelUrgentDesc;
+
+  /// No description provided for @worker_notifChannelNewDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications pour les nouveaux jobs'**
+  String get worker_notifChannelNewDesc;
+
+  /// No description provided for @worker_businessNewJobsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} nouveaux jobs'**
+  String worker_businessNewJobsCount(int count);
+
+  /// No description provided for @worker_businessIncludingUrgent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dont des jobs urgents!'**
+  String get worker_businessIncludingUrgent;
+
+  /// No description provided for @worker_businessNearYou.
+  ///
+  /// In fr, this message translates to:
+  /// **'Disponibles près de vous'**
+  String get worker_businessNearYou;
+
+  /// No description provided for @worker_businessJobConfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Job confirmé!'**
+  String get worker_businessJobConfirmed;
+
+  /// No description provided for @worker_businessJobCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Job annulé'**
+  String get worker_businessJobCancelled;
+
+  /// No description provided for @worker_businessJobCancelledBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le job à {address} a été annulé'**
+  String worker_businessJobCancelledBody(String address);
+
+  /// No description provided for @worker_businessJobCancelledReason.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le job à {address} a été annulé: {reason}'**
+  String worker_businessJobCancelledReason(String address, String reason);
+
+  /// No description provided for @worker_businessJobModified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Job modifié'**
+  String get worker_businessJobModified;
+
+  /// No description provided for @worker_businessPaymentReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement reçu!'**
+  String get worker_businessPaymentReceived;
+
+  /// No description provided for @worker_businessPaymentAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{amount}\$ pour {description}'**
+  String worker_businessPaymentAmount(String amount, String description);
+
+  /// No description provided for @worker_businessBonusEarned.
+  ///
+  /// In fr, this message translates to:
+  /// **'🎁 Bonus gagné!'**
+  String get worker_businessBonusEarned;
+
+  /// No description provided for @worker_businessBonusTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bonus gagné!'**
+  String get worker_businessBonusTitle;
+
+  /// No description provided for @worker_businessBonusBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'+{amount}\$ - {reason}'**
+  String worker_businessBonusBody(String amount, String reason);
+
+  /// No description provided for @worker_businessWeeklyPayout.
+  ///
+  /// In fr, this message translates to:
+  /// **'💰 Paiement prêt!'**
+  String get worker_businessWeeklyPayout;
+
+  /// No description provided for @worker_businessWeeklyPayoutBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre paiement de {amount}\$ est disponible'**
+  String worker_businessWeeklyPayoutBody(String amount);
+
+  /// No description provided for @worker_businessPayoutAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement disponible'**
+  String get worker_businessPayoutAvailable;
+
+  /// No description provided for @worker_businessNewRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle évaluation!'**
+  String get worker_businessNewRating;
+
+  /// No description provided for @worker_businessRatingReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Évaluation reçue'**
+  String get worker_businessRatingReceived;
+
+  /// No description provided for @worker_businessRatingStars.
+  ///
+  /// In fr, this message translates to:
+  /// **'{rating} étoiles'**
+  String worker_businessRatingStars(int rating);
+
+  /// No description provided for @worker_businessPerformanceAlert.
+  ///
+  /// In fr, this message translates to:
+  /// **'⚠️ Attention!'**
+  String get worker_businessPerformanceAlert;
+
+  /// No description provided for @worker_businessPerformanceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alerte performance'**
+  String get worker_businessPerformanceTitle;
+
+  /// No description provided for @worker_businessMilestone.
+  ///
+  /// In fr, this message translates to:
+  /// **'🏆 Félicitations!'**
+  String get worker_businessMilestone;
+
+  /// No description provided for @worker_businessKeepGoing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuez comme ça!'**
+  String get worker_businessKeepGoing;
+
+  /// No description provided for @worker_businessDocExpiring.
+  ///
+  /// In fr, this message translates to:
+  /// **'📄 Document expirant'**
+  String get worker_businessDocExpiring;
+
+  /// No description provided for @worker_businessDocExpiringBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre {docType} expire dans {days} jours'**
+  String worker_businessDocExpiringBody(String docType, int days);
+
+  /// No description provided for @worker_businessDocExpiringTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Document expirant'**
+  String get worker_businessDocExpiringTitle;
+
+  /// No description provided for @worker_businessDocExpiringShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'{docType} - {days} jours'**
+  String worker_businessDocExpiringShort(String docType, int days);
+
+  /// No description provided for @worker_businessHighDemand.
+  ///
+  /// In fr, this message translates to:
+  /// **'📈 Zone en demande!'**
+  String get worker_businessHighDemand;
+
+  /// No description provided for @worker_businessHighDemandBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'{zone} - {multiplier}x les gains!'**
+  String worker_businessHighDemandBody(String zone, String multiplier);
+
+  /// No description provided for @worker_businessHighDemandTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Zone en demande'**
+  String get worker_businessHighDemandTitle;
+
+  /// No description provided for @worker_businessHighDemandShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'{zone} - {multiplier}x'**
+  String worker_businessHighDemandShort(String zone, String multiplier);
+
+  /// No description provided for @worker_businessWeatherAlert.
+  ///
+  /// In fr, this message translates to:
+  /// **'❄️ Tempête prévue!'**
+  String get worker_businessWeatherAlert;
+
+  /// No description provided for @worker_businessWeatherBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'{forecast} - Environ {count} jobs attendus'**
+  String worker_businessWeatherBody(String forecast, int count);
+
+  /// No description provided for @worker_businessWeatherTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Opportunité météo'**
+  String get worker_businessWeatherTitle;
+
+  /// No description provided for @worker_businessClientEnRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigeur en route!'**
+  String get worker_businessClientEnRoute;
+
+  /// No description provided for @worker_businessClientEta.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrivée estimée dans {minutes} minutes'**
+  String worker_businessClientEta(int minutes);
+
+  /// No description provided for @worker_businessWorkStarted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigement commencé'**
+  String get worker_businessWorkStarted;
+
+  /// No description provided for @worker_businessWorkStartedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le déneigement de votre véhicule a commencé'**
+  String get worker_businessWorkStartedBody;
+
+  /// No description provided for @worker_businessWorkCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigement terminé!'**
+  String get worker_businessWorkCompleted;
+
+  /// No description provided for @worker_businessWorkCompletedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre véhicule est prêt'**
+  String get worker_businessWorkCompletedBody;
+
+  /// No description provided for @worker_businessWorkerMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message du déneigeur'**
+  String get worker_businessWorkerMessage;
+
+  /// No description provided for @privacy_introTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Introduction'**
+  String get privacy_introTitle;
+
+  /// No description provided for @privacy_introBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bienvenue sur Deneige Auto. Nous nous engageons à protéger votre vie privée et vos données personnelles. Cette politique explique comment nous collectons, utilisons et protégeons vos informations.'**
+  String get privacy_introBody;
+
+  /// No description provided for @privacy_dataCollectedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Données collectées'**
+  String get privacy_dataCollectedTitle;
+
+  /// No description provided for @privacy_dataCollectedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous collectons les données suivantes:\n• Informations d\'identification (nom, prénom, email, téléphone)\n• Informations de localisation pour le service de déneigement\n• Informations sur vos véhicules\n• Données de paiement (traitées de manière sécurisée par Stripe)\n• Historique de vos réservations'**
+  String get privacy_dataCollectedBody;
+
+  /// No description provided for @privacy_dataUsageTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisation des données'**
+  String get privacy_dataUsageTitle;
+
+  /// No description provided for @privacy_dataUsageBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos données sont utilisées pour:\n• Fournir nos services de déneigement\n• Communiquer avec vous concernant vos réservations\n• Améliorer nos services\n• Traiter vos paiements de manière sécurisée\n• Vous envoyer des notifications pertinentes'**
+  String get privacy_dataUsageBody;
+
+  /// No description provided for @privacy_dataSharingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partage des données'**
+  String get privacy_dataSharingTitle;
+
+  /// No description provided for @privacy_dataSharingBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous partageons vos données uniquement avec:\n• Les déneigeurs assignés à vos réservations (informations nécessaires au service)\n• Stripe pour le traitement des paiements\n• Les autorités si requis par la loi'**
+  String get privacy_dataSharingBody;
+
+  /// No description provided for @privacy_securityTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sécurité'**
+  String get privacy_securityTitle;
+
+  /// No description provided for @privacy_securityBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous utilisons des mesures de sécurité conformes aux normes de l\'industrie pour protéger vos données, incluant le chiffrement des données sensibles et des connexions sécurisées (HTTPS).'**
+  String get privacy_securityBody;
+
+  /// No description provided for @privacy_retentionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conservation des données'**
+  String get privacy_retentionTitle;
+
+  /// No description provided for @privacy_retentionBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos données sont conservées aussi longtemps que votre compte est actif. Après suppression de votre compte, vos données sont effacées dans un délai de 30 jours.'**
+  String get privacy_retentionBody;
+
+  /// No description provided for @privacy_rightsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos droits'**
+  String get privacy_rightsTitle;
+
+  /// No description provided for @privacy_rightsBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez le droit de:\n• Accéder à vos données personnelles\n• Corriger vos données inexactes\n• Supprimer votre compte et vos données\n• Exporter vos données\n• Retirer votre consentement à tout moment'**
+  String get privacy_rightsBody;
+
+  /// No description provided for @privacy_cookiesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cookies et technologies similaires'**
+  String get privacy_cookiesTitle;
+
+  /// No description provided for @privacy_cookiesBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre application mobile n\'utilise pas de cookies. Nous utilisons des identifiants d\'appareil uniquement pour les notifications push.'**
+  String get privacy_cookiesBody;
+
+  /// No description provided for @privacy_contactTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contact'**
+  String get privacy_contactTitle;
+
+  /// No description provided for @privacy_contactBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour toute question concernant cette politique de confidentialité, contactez-nous via la section \"Aide et Support\" de l\'application ou par email à support@deneige-auto.ca'**
+  String get privacy_contactBody;
+
+  /// No description provided for @terms_section1Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'1. Acceptation des conditions'**
+  String get terms_section1Title;
+
+  /// No description provided for @terms_section1Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'En utilisant l\'application Deneige Auto, vous acceptez d\'être lié par les présentes conditions d\'utilisation. Si vous n\'acceptez pas ces conditions, veuillez ne pas utiliser l\'application.'**
+  String get terms_section1Body;
+
+  /// No description provided for @terms_section2Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'2. Description du service'**
+  String get terms_section2Title;
+
+  /// No description provided for @terms_section2Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Deneige Auto est une plateforme mettant en relation des clients ayant besoin de services de déneigement avec des prestataires de services (déneigeurs) indépendants. Nous ne sommes pas l\'employeur des déneigeurs.'**
+  String get terms_section2Body;
+
+  /// No description provided for @terms_section3Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'3. Inscription et compte'**
+  String get terms_section3Title;
+
+  /// No description provided for @terms_section3Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour utiliser nos services, vous devez:\n• Être âgé d\'au moins 18 ans\n• Fournir des informations exactes et à jour\n• Maintenir la confidentialité de vos identifiants\n• Nous informer de toute utilisation non autorisée de votre compte'**
+  String get terms_section3Body;
+
+  /// No description provided for @terms_section4Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'4. Réservations et paiements'**
+  String get terms_section4Title;
+
+  /// No description provided for @terms_section4Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'• Les prix affichés incluent les taxes applicables\n• Le paiement est effectué au moment de la réservation\n• Les annulations sont soumises à notre politique d\'annulation\n• Un remboursement peut être demandé selon les conditions applicables'**
+  String get terms_section4Body;
+
+  /// No description provided for @terms_section5Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'5. Politique d\'annulation'**
+  String get terms_section5Title;
+
+  /// No description provided for @terms_section5Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'• Annulation plus de 24h avant: remboursement complet\n• Annulation entre 12h et 24h avant: remboursement de 50%\n• Annulation moins de 12h avant: aucun remboursement\n• Annulation par le déneigeur: remboursement complet et priorité de réassignation'**
+  String get terms_section5Body;
+
+  /// No description provided for @terms_section6Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'6. Responsabilités de l\'utilisateur'**
+  String get terms_section6Title;
+
+  /// No description provided for @terms_section6Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous vous engagez à:\n• Fournir un accès sécuritaire au véhicule\n• Décrire précisément l\'emplacement du véhicule\n• Être disponible pour toute communication urgente\n• Respecter les déneigeurs et leur travail'**
+  String get terms_section6Body;
+
+  /// No description provided for @terms_section7Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'7. Responsabilités des déneigeurs'**
+  String get terms_section7Title;
+
+  /// No description provided for @terms_section7Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les déneigeurs s\'engagent à:\n• Effectuer le service avec professionnalisme\n• Respecter les horaires convenus\n• Prendre soin des véhicules des clients\n• Signaler tout problème ou dommage'**
+  String get terms_section7Body;
+
+  /// No description provided for @terms_section8Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'8. Limitation de responsabilité'**
+  String get terms_section8Title;
+
+  /// No description provided for @terms_section8Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Deneige Auto agit comme intermédiaire et ne peut être tenu responsable des dommages directs ou indirects résultant de l\'exécution des services par les déneigeurs. Tout litige doit être signalé dans les 24h suivant le service.'**
+  String get terms_section8Body;
+
+  /// No description provided for @terms_section9Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'9. Propriété intellectuelle'**
+  String get terms_section9Title;
+
+  /// No description provided for @terms_section9Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les contenus de l\'application (logos, textes, images, code) sont la propriété de Deneige Auto et sont protégés par les lois sur la propriété intellectuelle.'**
+  String get terms_section9Body;
+
+  /// No description provided for @terms_section10Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'10. Modification des conditions'**
+  String get terms_section10Title;
+
+  /// No description provided for @terms_section10Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous nous réservons le droit de modifier ces conditions à tout moment. Les utilisateurs seront informés des changements significatifs par notification dans l\'application.'**
+  String get terms_section10Body;
+
+  /// No description provided for @terms_section11Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'11. Résiliation'**
+  String get terms_section11Title;
+
+  /// No description provided for @terms_section11Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous pouvons suspendre ou résilier votre compte en cas de violation de ces conditions. Vous pouvez supprimer votre compte à tout moment depuis les paramètres de l\'application.'**
+  String get terms_section11Body;
+
+  /// No description provided for @terms_section12Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'12. Droit applicable'**
+  String get terms_section12Title;
+
+  /// No description provided for @terms_section12Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ces conditions sont régies par les lois de la province de Québec, Canada. Tout litige sera soumis aux tribunaux compétents de Montréal.'**
+  String get terms_section12Body;
+
+  /// No description provided for @terms_section13Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'13. Contact'**
+  String get terms_section13Title;
+
+  /// No description provided for @terms_section13Body.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour toute question concernant ces conditions, contactez-nous via la section \"Aide et Support\" de l\'application.'**
+  String get terms_section13Body;
+
+  /// No description provided for @faq_catGeneral.
+  ///
+  /// In fr, this message translates to:
+  /// **'Général'**
+  String get faq_catGeneral;
+
+  /// No description provided for @faq_catReservations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get faq_catReservations;
+
+  /// No description provided for @faq_catPayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements'**
+  String get faq_catPayments;
+
+  /// No description provided for @faq_catDisputes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Litiges'**
+  String get faq_catDisputes;
+
+  /// No description provided for @faq_catAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte'**
+  String get faq_catAccount;
+
+  /// No description provided for @aiChat_suggestions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suggestions'**
+  String get aiChat_suggestions;
+
+  /// No description provided for @worker_navHome.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accueil'**
+  String get worker_navHome;
+
+  /// No description provided for @worker_navEarnings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenus'**
+  String get worker_navEarnings;
+
+  /// No description provided for @worker_navPayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements'**
+  String get worker_navPayments;
+
+  /// No description provided for @worker_navProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil'**
+  String get worker_navProfile;
+
+  /// No description provided for @earnings_myEarnings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes revenus'**
+  String get earnings_myEarnings;
+
+  /// No description provided for @earnings_day.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jour'**
+  String get earnings_day;
+
+  /// No description provided for @earnings_week.
+  ///
+  /// In fr, this message translates to:
+  /// **'Semaine'**
+  String get earnings_week;
+
+  /// No description provided for @earnings_month.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mois'**
+  String get earnings_month;
+
+  /// No description provided for @earnings_retry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get earnings_retry;
+
+  /// No description provided for @earnings_today.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd\'hui'**
+  String get earnings_today;
+
+  /// No description provided for @earnings_thisWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette semaine'**
+  String get earnings_thisWeek;
+
+  /// No description provided for @earnings_thisMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce mois'**
+  String get earnings_thisMonth;
+
+  /// No description provided for @earnings_jobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jobs'**
+  String get earnings_jobs;
+
+  /// No description provided for @earnings_tips.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourboires'**
+  String get earnings_tips;
+
+  /// No description provided for @earnings_average.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moyenne'**
+  String get earnings_average;
+
+  /// No description provided for @earnings_goalAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Objectif: {amount}\$'**
+  String earnings_goalAmount(int amount);
+
+  /// No description provided for @earnings_goalReached.
+  ///
+  /// In fr, this message translates to:
+  /// **'Objectif atteint!'**
+  String get earnings_goalReached;
+
+  /// No description provided for @earnings_completed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminés'**
+  String get earnings_completed;
+
+  /// No description provided for @earnings_inProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get earnings_inProgress;
+
+  /// No description provided for @earnings_assigned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Assignés'**
+  String get earnings_assigned;
+
+  /// No description provided for @earnings_earnings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenus'**
+  String get earnings_earnings;
+
+  /// No description provided for @earnings_tipsShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tips'**
+  String get earnings_tipsShort;
+
+  /// No description provided for @earnings_jobHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique des jobs'**
+  String get earnings_jobHistory;
+
+  /// No description provided for @earnings_viewAllJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir tous vos jobs terminés'**
+  String get earnings_viewAllJobs;
+
+  /// No description provided for @earnings_earningsPerDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenus par jour'**
+  String get earnings_earningsPerDay;
+
+  /// No description provided for @earnings_dayMon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lun'**
+  String get earnings_dayMon;
+
+  /// No description provided for @earnings_dayTue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mar'**
+  String get earnings_dayTue;
+
+  /// No description provided for @earnings_dayWed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mer'**
+  String get earnings_dayWed;
+
+  /// No description provided for @earnings_dayThu.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jeu'**
+  String get earnings_dayThu;
+
+  /// No description provided for @earnings_dayFri.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ven'**
+  String get earnings_dayFri;
+
+  /// No description provided for @earnings_daySat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sam'**
+  String get earnings_daySat;
+
+  /// No description provided for @earnings_daySun.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dim'**
+  String get earnings_daySun;
+
+  /// No description provided for @earnings_overallStats.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statistiques globales'**
+  String get earnings_overallStats;
+
+  /// No description provided for @earnings_totalJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total jobs'**
+  String get earnings_totalJobs;
+
+  /// No description provided for @earnings_totalEarnings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenus totaux'**
+  String get earnings_totalEarnings;
+
+  /// No description provided for @earnings_totalTips.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourboires totaux'**
+  String get earnings_totalTips;
+
+  /// No description provided for @earnings_averageRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note moyenne'**
+  String get earnings_averageRating;
+
+  /// No description provided for @workerFaq_q1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment devenir déneigeur sur Deneige Auto?'**
+  String get workerFaq_q1;
+
+  /// No description provided for @workerFaq_a1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour devenir déneigeur, vous devez créer un compte en tant que déneigeur, compléter votre profil avec vos informations personnelles, ajouter votre équipement disponible et configurer votre compte bancaire pour recevoir vos paiements.'**
+  String get workerFaq_a1;
+
+  /// No description provided for @workerFaq_q2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelles sont les conditions pour être déneigeur?'**
+  String get workerFaq_q2;
+
+  /// No description provided for @workerFaq_a2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devez avoir au moins 18 ans, posséder un équipement de déneigement de base (pelle, balai, grattoir), être disponible pendant les périodes de neige et avoir un compte bancaire canadien pour recevoir vos paiements.'**
+  String get workerFaq_a2;
+
+  /// No description provided for @workerFaq_q3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je choisir mes zones de travail?'**
+  String get workerFaq_q3;
+
+  /// No description provided for @workerFaq_a3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui! Dans vos paramètres, vous pouvez définir vos zones préférées. Vous recevrez des notifications prioritaires pour les jobs dans ces zones, mais vous pouvez aussi accepter des jobs ailleurs.'**
+  String get workerFaq_a3;
+
+  /// No description provided for @workerFaq_q4.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qu\'est-ce que l\'Assistant IA?'**
+  String get workerFaq_q4;
+
+  /// No description provided for @workerFaq_a4.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'Assistant IA est votre aide virtuel disponible 24/7 dans l\'application. Il peut répondre à vos questions sur les jobs, vous aider à résoudre des problèmes, donner des conseils pour améliorer votre service et vous informer sur les conditions météo pour planifier votre journée.'**
+  String get workerFaq_a4;
+
+  /// No description provided for @workerFaq_q5.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment utiliser l\'Assistant IA?'**
+  String get workerFaq_q5;
+
+  /// No description provided for @workerFaq_a5.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accédez à l\'Assistant IA depuis le menu principal. Posez vos questions en langage naturel:\n- \"Quels jobs sont disponibles près de moi?\"\n- \"Comment répondre à un litige?\"\n- \"Quelle météo est prévue demain?\"\n- \"Comment améliorer mon score?\"\nL\'assistant vous répondra instantanément.'**
+  String get workerFaq_a5;
+
+  /// No description provided for @workerFaq_q6.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'Assistant IA peut-il m\'aider avec la météo?'**
+  String get workerFaq_q6;
+
+  /// No description provided for @workerFaq_a6.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui! L\'Assistant IA a accès aux prévisions météo en temps réel. Demandez-lui les conditions actuelles ou les prévisions pour planifier vos disponibilités. Vous pouvez ainsi anticiper les journées de forte demande lors des tempêtes de neige.'**
+  String get workerFaq_a6;
+
+  /// No description provided for @workerFaq_q7.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment recevoir des jobs?'**
+  String get workerFaq_q7;
+
+  /// No description provided for @workerFaq_a7.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activez votre disponibilité dans l\'application. Vous recevrez des notifications push pour les nouveaux jobs disponibles dans votre zone. Vous pouvez alors accepter ou refuser chaque job.'**
+  String get workerFaq_a7;
+
+  /// No description provided for @workerFaq_q8.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je accepter plusieurs jobs en même temps?'**
+  String get workerFaq_q8;
+
+  /// No description provided for @workerFaq_a8.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui, vous pouvez gérer jusqu\'à 5 jobs simultanément. Dans vos paramètres, définissez le nombre maximum de jobs actifs que vous souhaitez avoir en même temps. Nous recommandons 2-3 jobs pour un service optimal.'**
+  String get workerFaq_a8;
+
+  /// No description provided for @workerFaq_q9.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment annuler un job accepté?'**
+  String get workerFaq_q9;
+
+  /// No description provided for @workerFaq_a9.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez annuler un job avant de commencer le travail. Allez dans les détails du job et appuyez sur \"Annuler\". Attention: des annulations fréquentes peuvent affecter votre score et votre visibilité.'**
+  String get workerFaq_a9;
+
+  /// No description provided for @workerFaq_q10.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que faire si je ne trouve pas le véhicule?'**
+  String get workerFaq_q10;
+
+  /// No description provided for @workerFaq_a10.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisez la messagerie intégrée pour contacter le client. Si le véhicule est introuvable après 15 minutes et sans réponse du client, vous pouvez signaler le problème et annuler le job sans pénalité.'**
+  String get workerFaq_a10;
+
+  /// No description provided for @workerFaq_q11.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment signaler un problème avec un job?'**
+  String get workerFaq_q11;
+
+  /// No description provided for @workerFaq_a11.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dans les détails du job, appuyez sur \"Signaler un problème\". Décrivez la situation et ajoutez des photos si nécessaire. Notre équipe examinera votre signalement rapidement.'**
+  String get workerFaq_a11;
+
+  /// No description provided for @workerFaq_q12.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment suis-je payé?'**
+  String get workerFaq_q12;
+
+  /// No description provided for @workerFaq_a12.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les paiements sont effectués automatiquement via Stripe Connect. Après chaque job complété, le montant est transféré sur votre compte bancaire dans un délai de 2-7 jours ouvrables.'**
+  String get workerFaq_a12;
+
+  /// No description provided for @workerFaq_q13.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment configurer mon compte bancaire?'**
+  String get workerFaq_q13;
+
+  /// No description provided for @workerFaq_a13.
+  ///
+  /// In fr, this message translates to:
+  /// **'Allez dans Paramètres > Mes paiements > Configuration Stripe. Suivez les étapes pour vérifier votre identité et ajouter vos coordonnées bancaires. Ce processus est sécurisé et obligatoire pour recevoir vos paiements.'**
+  String get workerFaq_a13;
+
+  /// No description provided for @workerFaq_q14.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment sont calculés mes gains?'**
+  String get workerFaq_q14;
+
+  /// No description provided for @workerFaq_a14.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos gains dépendent du type de service (déneigement standard, avec options), de la taille du véhicule et de la distance. Vous voyez le montant exact avant d\'accepter chaque job. Deneige Auto prélève une commission de 15%.'**
+  String get workerFaq_a14;
+
+  /// No description provided for @workerFaq_q15.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment fonctionnent les pourboires?'**
+  String get workerFaq_q15;
+
+  /// No description provided for @workerFaq_a15.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les clients peuvent laisser un pourboire après le service. Les pourboires sont 100% pour vous, sans commission. Vous recevez une notification et le montant est ajouté à votre prochain paiement.'**
+  String get workerFaq_a15;
+
+  /// No description provided for @workerFaq_q16.
+  ///
+  /// In fr, this message translates to:
+  /// **'Où voir mon historique de gains?'**
+  String get workerFaq_q16;
+
+  /// No description provided for @workerFaq_a16.
+  ///
+  /// In fr, this message translates to:
+  /// **'Allez dans l\'onglet \"Gains\" pour voir vos revenus quotidiens, hebdomadaires et mensuels. Vous pouvez aussi voir le détail de chaque job et les pourboires reçus.'**
+  String get workerFaq_a16;
+
+  /// No description provided for @workerFaq_q17.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que se passe-t-il si un client me signale un no-show?'**
+  String get workerFaq_q17;
+
+  /// No description provided for @workerFaq_a17.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si un client signale que vous n\'êtes pas venu, vous recevrez une notification et aurez l\'opportunité de répondre. Si vous avez marqué \"En route\" dans l\'application, cela sera pris en compte. Les faux signalements de clients sont aussi sanctionnés.'**
+  String get workerFaq_a17;
+
+  /// No description provided for @workerFaq_q18.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment répondre à un litige?'**
+  String get workerFaq_q18;
+
+  /// No description provided for @workerFaq_a18.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour répondre à un litige:\n1. Allez dans Profil > Mes litiges\n2. Ouvrez le litige concerné\n3. Appuyez sur \"Répondre au litige\"\n4. Expliquez votre version des faits en détail\n5. Ajoutez des photos comme preuves (avant/après, captures d\'écran, etc.)\n6. Soumettez votre réponse\n\nVous avez généralement 48 heures pour répondre.'**
+  String get workerFaq_a18;
+
+  /// No description provided for @workerFaq_q19.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment ajouter des preuves à ma défense?'**
+  String get workerFaq_q19;
+
+  /// No description provided for @workerFaq_a19.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les preuves sont essentielles pour défendre votre position. Dans les détails du litige, utilisez \"Ajouter des preuves\" pour:\n- Photos avant/après le déneigement\n- Captures d\'écran de communications\n- Photos horodatées sur le site\n- Tout document pertinent\n\nVous pouvez ajouter jusqu\'à 10 photos et une description détaillée.'**
+  String get workerFaq_a19;
+
+  /// No description provided for @workerFaq_q20.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qu\'est-ce que l\'analyse IA des litiges?'**
+  String get workerFaq_q20;
+
+  /// No description provided for @workerFaq_a20.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre système utilise l\'intelligence artificielle pour analyser objectivement chaque litige. L\'IA examine:\n- Les photos et preuves des deux parties\n- Les données GPS et timestamps\n- L\'historique du client et du déneigeur\n- La cohérence des déclarations\n\nCette analyse aide à prendre des décisions justes. Si l\'IA détecte un faux signalement, cela joue en votre faveur.'**
+  String get workerFaq_a20;
+
+  /// No description provided for @workerFaq_q21.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourquoi prendre des photos avant/après est important?'**
+  String get workerFaq_q21;
+
+  /// No description provided for @workerFaq_a21.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les photos avant/après sont vos meilleures preuves:\n- Elles documentent l\'état initial et le travail accompli\n- L\'IA peut analyser la qualité du déneigement\n- En cas de litige, elles prouvent votre travail\n- Elles sont horodatées automatiquement\n\nPrenez l\'habitude de photographier chaque job!'**
+  String get workerFaq_a21;
+
+  /// No description provided for @workerFaq_q22.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelles sont les conséquences d\'un litige contre moi?'**
+  String get workerFaq_q22;
+
+  /// No description provided for @workerFaq_a22.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les conséquences dépendent de la décision et de votre historique:\n- Premier avertissement: notification\n- Récidive: suspension temporaire (3-7 jours)\n- Problèmes répétés: suspension prolongée (30 jours)\n- Cas graves: exclusion permanente\n\nMaintenez un bon service pour éviter les litiges.'**
+  String get workerFaq_a22;
+
+  /// No description provided for @workerFaq_q23.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment contester une décision défavorable?'**
+  String get workerFaq_q23;
+
+  /// No description provided for @workerFaq_a23.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si vous n\'êtes pas d\'accord avec la décision prise sur un litige, vous pouvez faire appel dans les 7 jours. Fournissez des preuves supplémentaires (photos, messages, etc.) pour appuyer votre contestation.'**
+  String get workerFaq_a23;
+
+  /// No description provided for @workerFaq_q24.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment signaler un client problématique?'**
+  String get workerFaq_q24;
+
+  /// No description provided for @workerFaq_a24.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si un client est abusif, introuvable malgré vos efforts, ou fait de fausses réclamations, vous pouvez le signaler dans les détails du job. Notre équipe examinera la situation et pourra sanctionner le client si nécessaire.'**
+  String get workerFaq_a24;
+
+  /// No description provided for @workerFaq_q25.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mon paiement est-il affecté pendant un litige?'**
+  String get workerFaq_q25;
+
+  /// No description provided for @workerFaq_a25.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pendant l\'examen d\'un litige, le paiement correspondant peut être temporairement retenu. Une fois la décision prise:\n- Litige en votre faveur: paiement complet versé\n- Litige contre vous: remboursement au client (partiel ou total selon la décision)'**
+  String get workerFaq_a25;
+
+  /// No description provided for @workerFaq_q26.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment protéger mon score de fiabilité?'**
+  String get workerFaq_q26;
+
+  /// No description provided for @workerFaq_a26.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour maintenir un bon score:\n- Arrivez à l\'heure (marquez \"En route\" dans l\'app)\n- Prenez des photos avant/après chaque job\n- Communiquez avec le client en cas de problème\n- Complétez le travail selon les standards demandés\n- Évitez les annulations de dernière minute'**
+  String get workerFaq_a26;
+
+  /// No description provided for @workerFaq_q27.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment modifier mon équipement disponible?'**
+  String get workerFaq_q27;
+
+  /// No description provided for @workerFaq_a27.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dans Paramètres ou dans votre Profil, vous pouvez cocher/décocher les équipements que vous possédez: pelle, balai, grattoir, épandeur de sel, souffleuse. Cela aide à vous assigner les jobs appropriés.'**
+  String get workerFaq_a27;
+
+  /// No description provided for @workerFaq_q28.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment changer mes notifications?'**
+  String get workerFaq_q28;
+
+  /// No description provided for @workerFaq_a28.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dans Paramètres > Notifications, vous pouvez activer/désactiver les alertes pour: nouveaux jobs, jobs urgents et pourboires reçus.'**
+  String get workerFaq_a28;
+
+  /// No description provided for @workerFaq_q29.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment améliorer mon score déneigeur?'**
+  String get workerFaq_q29;
+
+  /// No description provided for @workerFaq_a29.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre score est basé sur: la qualité du service (évaluations clients), le taux d\'acceptation des jobs, la ponctualité et le taux de complétion. Offrez un service de qualité et soyez fiable pour améliorer votre score.'**
+  String get workerFaq_a29;
+
+  /// No description provided for @workerFaq_q30.
+  ///
+  /// In fr, this message translates to:
+  /// **'Puis-je prendre une pause de l\'application?'**
+  String get workerFaq_q30;
+
+  /// No description provided for @workerFaq_a30.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oui! Désactivez simplement votre disponibilité dans l\'application. Vous ne recevrez plus de notifications de jobs. Réactivez quand vous êtes prêt à travailler.'**
+  String get workerFaq_a30;
 }
 
 class _AppLocalizationsDelegate

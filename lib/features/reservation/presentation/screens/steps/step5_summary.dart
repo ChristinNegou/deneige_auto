@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_state.dart';
 import '../../widgets/reservation_summary_card.dart';
@@ -13,6 +14,7 @@ class Step5SummaryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<NewReservationBloc, NewReservationState>(
       builder: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
@@ -20,28 +22,31 @@ class Step5SummaryScreen extends StatelessWidget {
             children: [
               // Localisation
               if (state.hasValidLocation) ...[
-                _buildSectionHeader('Localisation', Icons.location_on_rounded),
+                _buildSectionHeader(
+                    l10n.step5_location, Icons.location_on_rounded),
                 const SizedBox(height: 12),
-                _buildLocationCard(state),
+                _buildLocationCard(context, state),
                 const SizedBox(height: 24),
               ],
 
               // Récapitulatif
-              _buildSectionHeader('Votre réservation', Icons.receipt_rounded),
+              _buildSectionHeader(
+                  l10n.step5_yourReservation, Icons.receipt_rounded),
               const SizedBox(height: 12),
               const ReservationSummaryCard(),
 
               const SizedBox(height: 24),
 
               // Prix
-              _buildSectionHeader('Total', Icons.payments_rounded),
+              _buildSectionHeader(l10n.step5_total, Icons.payments_rounded),
               const SizedBox(height: 12),
               const PriceSummaryCard(showBreakdown: true),
 
               const SizedBox(height: 24),
 
               // Garanties
-              _buildSectionHeader('Nos garanties', Icons.verified_user_rounded),
+              _buildSectionHeader(
+                  l10n.step5_ourGuarantees, Icons.verified_user_rounded),
               const SizedBox(height: 12),
               _buildGuarantees(),
 
@@ -70,7 +75,7 @@ class Step5SummaryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationCard(NewReservationState state) {
+  Widget _buildLocationCard(BuildContext context, NewReservationState state) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -84,7 +89,8 @@ class Step5SummaryScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              state.locationAddress ?? 'Position GPS enregistrée',
+              state.locationAddress ??
+                  AppLocalizations.of(context)!.step2_positionDetected,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -100,26 +106,35 @@ class Step5SummaryScreen extends StatelessWidget {
   }
 
   Widget _buildGuarantees() {
+    return Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        return _buildGuaranteesContent(l10n);
+      },
+    );
+  }
+
+  Widget _buildGuaranteesContent(AppLocalizations l10n) {
     final guarantees = [
       {
         'icon': Icons.cancel_outlined,
-        'title': 'Annulation gratuite',
-        'subtitle': 'Jusqu\'à 2h avant'
+        'title': l10n.step5_freeCancellation,
+        'subtitle': l10n.step5_upTo2hBefore
       },
       {
         'icon': Icons.verified_outlined,
-        'title': 'Garantie qualité',
-        'subtitle': 'Satisfait ou remboursé'
+        'title': l10n.step5_qualityGuarantee,
+        'subtitle': l10n.step5_satisfiedOrRefunded
       },
       {
         'icon': Icons.camera_alt_outlined,
-        'title': 'Photos après',
-        'subtitle': 'Preuve de service'
+        'title': l10n.step5_photosAfter,
+        'subtitle': l10n.step5_proofOfService
       },
       {
         'icon': Icons.timer_outlined,
-        'title': 'Ponctualité',
-        'subtitle': 'Remise si retard'
+        'title': l10n.step5_punctuality,
+        'subtitle': l10n.step5_discountIfLate
       },
     ];
 

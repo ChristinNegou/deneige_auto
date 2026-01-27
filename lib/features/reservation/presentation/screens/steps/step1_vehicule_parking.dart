@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/config/app_config.dart';
 import '../../../../../core/theme/app_theme.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
@@ -33,13 +34,15 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<NewReservationBloc, NewReservationState>(
       builder: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Section Véhicule
-              _buildSectionHeader('Véhicule', Icons.directions_car_rounded),
+              _buildSectionHeader(
+                  l10n.step1_vehicle, Icons.directions_car_rounded),
               const SizedBox(height: 12),
 
               if (state.availableVehicles.isEmpty)
@@ -50,7 +53,8 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
               const SizedBox(height: 32),
 
               // Section Emplacement
-              _buildSectionHeader('Emplacement', Icons.location_on_rounded),
+              _buildSectionHeader(
+                  l10n.step1_location, Icons.location_on_rounded),
               const SizedBox(height: 12),
 
               _buildLocationOptions(context),
@@ -106,7 +110,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
     return TextButton.icon(
       onPressed: () => _navigateToAddVehicle(context),
       icon: const Icon(Icons.add, size: 18),
-      label: const Text('Ajouter un véhicule'),
+      label: Text(AppLocalizations.of(context)!.step1_addVehicle),
       style: TextButton.styleFrom(
         foregroundColor: AppTheme.textPrimary,
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -115,12 +119,13 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
   }
 
   Widget _buildLocationOptions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Option 1: Place assignée
         _buildLocationOption(
-          title: 'Place assignée',
-          subtitle: 'J\'ai un numéro de place',
+          title: l10n.step1_assignedSpot,
+          subtitle: l10n.step1_haveSpotNumber,
           icon: Icons.local_parking_rounded,
           isSelected: _selectedLocationOption == 1,
           onTap: () => setState(() => _selectedLocationOption = 1),
@@ -130,7 +135,8 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                   child: TextField(
                     controller: _parkingSpotController,
                     decoration: InputDecoration(
-                      hintText: 'Ex: P32, A-15, 205...',
+                      hintText:
+                          AppLocalizations.of(context)!.step1_spotNumberHint,
                       hintStyle: TextStyle(color: AppTheme.textTertiary),
                       filled: true,
                       fillColor: AppTheme.surfaceContainer,
@@ -163,8 +169,8 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
 
         // Option 2: Emplacement libre
         _buildLocationOption(
-          title: 'Emplacement libre',
-          subtitle: 'Décrivez où se trouve le véhicule',
+          title: l10n.step1_freeLocation,
+          subtitle: l10n.step1_describeLocation,
           icon: Icons.edit_location_alt_rounded,
           isSelected: _selectedLocationOption == 2,
           onTap: () => setState(() => _selectedLocationOption = 2),
@@ -177,7 +183,8 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                       TextField(
                         controller: _customLocationController,
                         decoration: InputDecoration(
-                          hintText: 'Ex: Devant le bâtiment A...',
+                          hintText: AppLocalizations.of(context)!
+                              .step1_freeLocationHint,
                           hintStyle: TextStyle(color: AppTheme.textTertiary),
                           filled: true,
                           fillColor: AppTheme.surfaceContainer,
@@ -204,10 +211,10 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                         spacing: 6,
                         runSpacing: 6,
                         children: [
-                          _buildQuickChip('Devant le bâtiment'),
-                          _buildQuickChip('Près de l\'entrée'),
-                          _buildQuickChip('Zone visiteurs'),
-                          _buildQuickChip('Stationnement arrière'),
+                          _buildQuickChip(l10n.step1_chipFrontBuilding),
+                          _buildQuickChip(l10n.step1_chipNearEntrance),
+                          _buildQuickChip(l10n.step1_chipVisitorZone),
+                          _buildQuickChip(l10n.step1_chipRearParking),
                         ],
                       ),
                     ],
@@ -338,7 +345,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
               size: 48, color: AppTheme.textTertiary),
           const SizedBox(height: 12),
           Text(
-            'Aucun véhicule',
+            AppLocalizations.of(context)!.step1_noVehicle,
             style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -346,14 +353,14 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Ajoutez votre premier véhicule',
+            AppLocalizations.of(context)!.step1_addFirstVehicle,
             style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () => _navigateToAddVehicle(context),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Ajouter'),
+            label: Text(AppLocalizations.of(context)!.common_add),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: AppTheme.background,

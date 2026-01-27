@@ -34,7 +34,7 @@ class VerificationSubmitted extends VerificationState {
   final String message;
 
   const VerificationSubmitted({
-    this.message = 'Documents soumis avec succès',
+    this.message = 'verification_documentsSubmitted',
   });
 
   @override

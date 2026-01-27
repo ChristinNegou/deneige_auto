@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/new_reservation_bloc.dart';
 import '../bloc/new_reservation_state.dart';
 
@@ -21,6 +22,7 @@ class PriceSummaryCard extends StatelessWidget {
         }
 
         final breakdown = state.priceBreakdown!;
+        final l10n = AppLocalizations.of(context)!;
 
         return Container(
           decoration: BoxDecoration(
@@ -38,33 +40,33 @@ class PriceSummaryCard extends StatelessWidget {
                     children: [
                       // Services de base
                       _buildPriceRow(
-                          'Déneigement de base', breakdown.basePrice),
+                          l10n.price_baseSnowRemoval, breakdown.basePrice),
 
                       if (breakdown.vehicleAdjustment != 0)
                         _buildPriceRow(
-                          'Ajustement véhicule',
+                          l10n.price_vehicleAdjustment,
                           breakdown.vehicleAdjustment,
                           isAdjustment: true,
                         ),
 
                       if (breakdown.parkingAdjustment != 0)
                         _buildPriceRow(
-                          'Ajustement place',
+                          l10n.price_parkingAdjustment,
                           breakdown.parkingAdjustment,
                           isAdjustment: true,
                         ),
 
                       if (breakdown.snowSurcharge > 0)
                         _buildPriceRow(
-                            'Supplément neige', breakdown.snowSurcharge),
+                            l10n.price_snowSurcharge, breakdown.snowSurcharge),
 
                       if (breakdown.optionsCost > 0)
-                        _buildPriceRow(
-                            'Options supplémentaires', breakdown.optionsCost),
+                        _buildPriceRow(l10n.price_additionalOptions,
+                            breakdown.optionsCost),
 
                       if (breakdown.urgencyFee > 0)
                         _buildPriceRow(
-                          'Frais d\'urgence (40%)',
+                          l10n.price_urgencyFee,
                           breakdown.urgencyFee,
                           highlight: true,
                           highlightColor: AppTheme.warning,
@@ -76,7 +78,7 @@ class PriceSummaryCard extends StatelessWidget {
 
                       // Sous-total
                       _buildPriceRow(
-                        'Sous-total',
+                        l10n.price_subtotal,
                         breakdown.subtotal,
                         isBold: true,
                       ),
@@ -85,12 +87,12 @@ class PriceSummaryCard extends StatelessWidget {
 
                       // Frais
                       _buildPriceRow(
-                        'Frais de service',
+                        l10n.price_serviceFee,
                         breakdown.serviceFee,
                         isSmall: true,
                       ),
                       _buildPriceRow(
-                        'Frais d\'assurance',
+                        l10n.price_insuranceFee,
                         breakdown.insuranceFee,
                         isSmall: true,
                       ),
@@ -131,7 +133,8 @@ class PriceSummaryCard extends StatelessWidget {
                               size: 14, color: AppTheme.textTertiary),
                           const SizedBox(width: 4),
                           Text(
-                            'Taxes calculées pour: ${breakdown.provinceName}',
+                            l10n.price_taxesCalculatedFor(
+                                breakdown.provinceName),
                             style: TextStyle(
                               fontSize: 11,
                               color: AppTheme.textTertiary,
@@ -165,7 +168,7 @@ class PriceSummaryCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Total à payer',
+                          l10n.price_totalToPay,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -173,7 +176,7 @@ class PriceSummaryCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Taxes incluses',
+                          l10n.price_taxesIncluded,
                           style: TextStyle(
                             fontSize: 11,
                             color: AppTheme.textTertiary,
@@ -226,7 +229,7 @@ class PriceSummaryCard extends StatelessWidget {
                       Icon(Icons.bolt, size: 16, color: AppTheme.warning),
                       const SizedBox(width: 6),
                       Text(
-                        'Réservation urgente - Frais majorés',
+                        l10n.price_urgentBanner,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,

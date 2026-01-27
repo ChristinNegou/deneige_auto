@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/worker_availability_bloc.dart';
 import '../../domain/entities/worker_profile.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/services/locale_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -33,6 +34,7 @@ class _WorkerSettingsView extends StatefulWidget {
 
 class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   final _formKey = GlobalKey<FormState>();
+  final LocaleService _localeService = sl<LocaleService>();
   bool _initialized = false;
 
   // Equipment checkboxes
@@ -146,6 +148,8 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                           _buildZonesSection(),
                           const SizedBox(height: 16),
                           _buildNotificationsSection(),
+                          const SizedBox(height: 16),
+                          _buildLanguageSection(),
                           const SizedBox(height: 16),
                           _buildHelpSupportSection(context),
                           const SizedBox(height: 24),
@@ -872,6 +876,63 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _changeLanguage(String languageCode) {
+    _localeService.setLocale(Locale(languageCode));
+  }
+
+  Widget _buildLanguageSection() {
+    final l10n = AppLocalizations.of(context)!;
+    final currentLanguage = _localeService.locale.languageCode;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+                child: const Icon(Icons.language_rounded,
+                    color: AppTheme.primary, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child:
+                    Text(l10n.settings_language, style: AppTheme.headlineSmall),
+              ),
+              DropdownButton<String>(
+                value: currentLanguage,
+                underline: const SizedBox(),
+                dropdownColor: AppTheme.surface,
+                items: [
+                  DropdownMenuItem(
+                      value: 'fr', child: Text(l10n.settings_languageFrench)),
+                  DropdownMenuItem(
+                      value: 'en', child: Text(l10n.settings_languageEnglish)),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    _changeLanguage(value);
+                  }
+                },
+              ),
+            ],
           ),
         ],
       ),

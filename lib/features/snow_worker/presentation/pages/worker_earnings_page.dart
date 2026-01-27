@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:confetti/confetti.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/worker_stats_bloc.dart';
 import '../../domain/entities/worker_stats.dart';
 import '../../../../core/di/injection_container.dart';
@@ -241,7 +242,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
               context.read<WorkerStatsBloc>().add(const LoadEarnings());
             },
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Réessayer'),
+            label: Text(AppLocalizations.of(context)!.common_retry),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.success,
               foregroundColor: AppTheme.background,
@@ -531,7 +532,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
       children: [
         Expanded(
           child: _buildStatCard(
-            title: 'Terminés',
+            title: AppLocalizations.of(context)!.worker_earningsCompleted,
             value: stats.completed.toString(),
             icon: Icons.check_circle_rounded,
             color: AppTheme.success,
@@ -540,7 +541,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            title: 'En cours',
+            title: AppLocalizations.of(context)!.activities_inProgress,
             value: stats.inProgress.toString(),
             icon: Icons.engineering_rounded,
             color: AppTheme.warning,
@@ -549,7 +550,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
         const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            title: 'Assignés',
+            title: AppLocalizations.of(context)!.worker_earningsAssigned,
             value: stats.assigned.toString(),
             icon: Icons.assignment_rounded,
             color: AppTheme.primary,

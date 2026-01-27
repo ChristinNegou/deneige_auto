@@ -161,8 +161,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       (updatedPreferences) => emit(state.copyWith(
         preferences: updatedPreferences,
         successMessage: event.enabled
-            ? 'Notifications activées'
-            : 'Notifications désactivées',
+            ? 'settings_notificationsEnabled'
+            : 'settings_notificationsDisabled',
       )),
     );
   }
@@ -190,7 +190,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       },
       (updatedPreferences) => emit(state.copyWith(
         preferences: updatedPreferences,
-        successMessage: event.enabled ? 'Sons activés' : 'Sons désactivés',
+        successMessage: event.enabled
+            ? 'settings_soundsEnabled'
+            : 'settings_soundsDisabled',
       )),
     );
   }
@@ -218,8 +220,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       },
       (updatedPreferences) => emit(state.copyWith(
         preferences: updatedPreferences,
-        successMessage:
-            event.enabled ? 'Thème sombre activé' : 'Thème clair activé',
+        successMessage: event.enabled
+            ? 'settings_darkThemeEnabled'
+            : 'settings_lightThemeEnabled',
       )),
     );
   }
@@ -240,7 +243,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       (_) => emit(state.copyWith(
         isDeleting: false,
         isAccountDeleted: true,
-        successMessage: 'Compte supprimé avec succès',
+        successMessage: 'settings_accountDeleted',
       )),
     );
   }
