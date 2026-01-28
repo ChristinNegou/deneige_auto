@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -51,7 +52,13 @@ class AccountTypeSelectionScreen extends StatelessWidget {
               _AccountTypeCard(
                 title: l10n.accountType_client,
                 subtitle: l10n.accountType_clientSubtitle,
-                icon: Icons.home,
+                iconWidget: SvgPicture.asset(
+                  'assets/icons/person.svg',
+                  width: 40,
+                  height: 40,
+                  colorFilter:
+                      ColorFilter.mode(AppTheme.textPrimary, BlendMode.srcIn),
+                ),
                 isClient: true,
                 onTap: () {
                   Navigator.of(context).pushNamed(
@@ -67,7 +74,13 @@ class AccountTypeSelectionScreen extends StatelessWidget {
               _AccountTypeCard(
                 title: l10n.accountType_snowWorker,
                 subtitle: l10n.accountType_snowWorkerSubtitle,
-                icon: Icons.local_shipping,
+                iconWidget: SvgPicture.asset(
+                  'assets/icons/snowplow.svg',
+                  width: 40,
+                  height: 40,
+                  colorFilter:
+                      ColorFilter.mode(AppTheme.warning, BlendMode.srcIn),
+                ),
                 isClient: false,
                 onTap: () {
                   Navigator.of(context).pushNamed(
@@ -113,14 +126,14 @@ class AccountTypeSelectionScreen extends StatelessWidget {
 class _AccountTypeCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final IconData icon;
+  final Widget iconWidget;
   final bool isClient;
   final VoidCallback onTap;
 
   const _AccountTypeCard({
     required this.title,
     required this.subtitle,
-    required this.icon,
+    required this.iconWidget,
     required this.isClient,
     required this.onTap,
   });
@@ -151,11 +164,7 @@ class _AccountTypeCard extends StatelessWidget {
                     color: accentColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 40,
-                    color: accentColor,
-                  ),
+                  child: iconWidget,
                 ),
                 const SizedBox(width: 16),
                 Expanded(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -102,9 +103,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ? l10n.accountType_client
       : l10n.accountType_snowWorker;
 
-  IconData get _roleIcon => widget.role == UserRole.client
-      ? Icons.home_rounded
-      : Icons.local_shipping_rounded;
+  Widget get _roleIcon => widget.role == UserRole.client
+      ? SvgPicture.asset(
+          'assets/icons/person.svg',
+          width: 35,
+          height: 35,
+          colorFilter: ColorFilter.mode(_roleColor, BlendMode.srcIn),
+        )
+      : SvgPicture.asset(
+          'assets/icons/snowplow.svg',
+          width: 35,
+          height: 35,
+          colorFilter: ColorFilter.mode(_roleColor, BlendMode.srcIn),
+        );
 
   Color get _roleColor => widget.role == UserRole.client
       ? AppTheme.statusAssigned
@@ -230,11 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               color: _roleColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radiusLG),
             ),
-            child: Icon(
-              _roleIcon,
-              size: 35,
-              color: _roleColor,
-            ),
+            child: Center(child: _roleIcon),
           ),
           const SizedBox(height: 12),
           Container(
