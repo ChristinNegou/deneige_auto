@@ -6141,4 +6141,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get workerFaq_a30 =>
       'Yes! Simply deactivate your availability in the app. You will stop receiving job notifications. Reactivate when you\'re ready to work.';
+
+  @override
+  String get worker_verified => 'Verified';
 }

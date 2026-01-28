@@ -2608,5 +2608,6 @@
   "workerFaq_q29": "Comment améliorer mon score déneigeur?",
   "workerFaq_a29": "Votre score est basé sur: la qualité du service (évaluations clients), le taux d'acceptation des jobs, la ponctualité et le taux de complétion. Offrez un service de qualité et soyez fiable pour améliorer votre score.",
   "workerFaq_q30": "Puis-je prendre une pause de l'application?",
-  "workerFaq_a30": "Oui! Désactivez simplement votre disponibilité dans l'application. Vous ne recevrez plus de notifications de jobs. Réactivez quand vous êtes prêt à travailler."
+  "workerFaq_a30": "Oui! Désactivez simplement votre disponibilité dans l'application. Vous ne recevrez plus de notifications de jobs. Réactivez quand vous êtes prêt à travailler.",
+  "worker_verified": "Vérifié"
 }

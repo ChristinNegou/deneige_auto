@@ -97,6 +97,7 @@ class WorkerProfile extends Equatable {
   final double totalTipsReceived;
   final double averageRating;
   final int totalRatingsCount;
+  final bool isVerified;
 
   const WorkerProfile({
     required this.id,
@@ -117,6 +118,7 @@ class WorkerProfile extends Equatable {
     this.totalTipsReceived = 0,
     this.averageRating = 0,
     this.totalRatingsCount = 0,
+    this.isVerified = false,
   });
 
   String get fullName => '$firstName $lastName';
@@ -140,6 +142,7 @@ class WorkerProfile extends Equatable {
     double? totalTipsReceived,
     double? averageRating,
     int? totalRatingsCount,
+    bool? isVerified,
   }) {
     return WorkerProfile(
       id: id ?? this.id,
@@ -161,6 +164,7 @@ class WorkerProfile extends Equatable {
       totalTipsReceived: totalTipsReceived ?? this.totalTipsReceived,
       averageRating: averageRating ?? this.averageRating,
       totalRatingsCount: totalRatingsCount ?? this.totalRatingsCount,
+      isVerified: isVerified ?? this.isVerified,
     );
   }
 
@@ -184,5 +188,6 @@ class WorkerProfile extends Equatable {
         totalTipsReceived,
         averageRating,
         totalRatingsCount,
+        isVerified,
       ];
 }

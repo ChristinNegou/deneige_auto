@@ -393,13 +393,25 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
-                      ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            userName,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textPrimary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (authState is AuthAuthenticated &&
+                            authState.user.isVerified) ...[
+                          const SizedBox(width: 6),
+                          Icon(Icons.verified, color: AppTheme.info, size: 18),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 2),
                     if (userEmail.isNotEmpty)

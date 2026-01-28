@@ -650,14 +650,43 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  reservation.workerName ?? l10n.reservation_workerAssigned,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        reservation.workerName ??
+                            l10n.reservation_workerAssigned,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (reservation.workerIsVerified == true) ...[
+                      const SizedBox(width: 6),
+                      Icon(Icons.verified, color: AppTheme.info, size: 18),
+                    ],
+                  ],
                 ),
+                if (reservation.workerIsVerified == true) ...[
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Icon(Icons.verified, color: AppTheme.info, size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.worker_verified,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.info,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 if (reservation.rating != null) ...[
                   const SizedBox(height: 4),
                   Row(

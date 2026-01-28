@@ -13,6 +13,7 @@ class User extends Equatable {
   final String? photoUrl;
   final DateTime createdAt;
   final UserRole role;
+  final bool isVerified;
 
   const User({
     required this.id,
@@ -22,11 +23,12 @@ class User extends Equatable {
     this.photoUrl,
     required this.createdAt,
     required this.role,
+    this.isVerified = false,
   });
 
   @override
   List<Object?> get props =>
-      [id, email, name, phoneNumber, photoUrl, createdAt, role];
+      [id, email, name, phoneNumber, photoUrl, createdAt, role, isVerified];
 
   /// Extrait le prénom à partir du nom complet.
   String? get firstName {

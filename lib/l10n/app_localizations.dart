@@ -11395,6 +11395,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Oui! Désactivez simplement votre disponibilité dans l\'application. Vous ne recevrez plus de notifications de jobs. Réactivez quand vous êtes prêt à travailler.'**
   String get workerFaq_a30;
+
+  /// No description provided for @worker_verified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifié'**
+  String get worker_verified;
 }
 
 class _AppLocalizationsDelegate

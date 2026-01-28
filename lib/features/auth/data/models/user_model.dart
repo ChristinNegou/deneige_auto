@@ -11,6 +11,7 @@ class UserModel extends User {
     super.photoUrl,
     required super.createdAt,
     required super.role,
+    super.isVerified,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +24,8 @@ class UserModel extends User {
       photoUrl: _parsePhotoUrl(json['photoUrl']),
       createdAt: TimeUtils.parseUtcToLocal(json['createdAt'] as String?),
       role: _parseRole(json['role'] as String?),
+      isVerified: json['workerProfile']?['identityVerification']?['status'] ==
+          'approved',
     );
   }
 

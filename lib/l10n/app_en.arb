@@ -2427,5 +2427,6 @@
   "workerFaq_q29": "How do I improve my worker score?",
   "workerFaq_a29": "Your score is based on: service quality (client ratings), job acceptance rate, punctuality, and completion rate. Provide quality service and be reliable to improve your score.",
   "workerFaq_q30": "Can I take a break from the app?",
-  "workerFaq_a30": "Yes! Simply deactivate your availability in the app. You will stop receiving job notifications. Reactivate when you're ready to work."
+  "workerFaq_a30": "Yes! Simply deactivate your availability in the app. You will stop receiving job notifications. Reactivate when you're ready to work.",
+  "worker_verified": "Verified"
 }

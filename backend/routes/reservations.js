@@ -47,7 +47,7 @@ router.get('/', protect, async (req, res) => {
             Reservation.find(query)
                 .populate('vehicle')
                 .populate('parkingSpot')
-                .populate('workerId', 'firstName lastName phoneNumber photoUrl')
+                .populate('workerId', 'firstName lastName phoneNumber photoUrl workerProfile.identityVerification.status')
                 .sort({ departureTime: -1 })
                 .skip(skip)
                 .limit(limitNum)
@@ -84,7 +84,7 @@ router.get('/:id', protect, async (req, res) => {
         })
             .populate('vehicle')
             .populate('parkingSpot')
-            .populate('workerId', 'firstName lastName phoneNumber photoUrl')
+            .populate('workerId', 'firstName lastName phoneNumber photoUrl workerProfile.identityVerification.status')
             .lean();
 
         if (!reservation) {

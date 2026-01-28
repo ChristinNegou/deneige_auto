@@ -95,6 +95,7 @@ class WorkerProfileModel extends WorkerProfile {
     super.totalTipsReceived = 0,
     super.averageRating = 0,
     super.totalRatingsCount = 0,
+    super.isVerified = false,
   });
 
   factory WorkerProfileModel.fromJson(Map<String, dynamic> json) {
@@ -159,6 +160,8 @@ class WorkerProfileModel extends WorkerProfile {
           (workerProfile['totalTipsReceived'] as num?)?.toDouble() ?? 0,
       averageRating: (workerProfile['averageRating'] as num?)?.toDouble() ?? 0,
       totalRatingsCount: workerProfile['totalRatingsCount'] as int? ?? 0,
+      isVerified:
+          workerProfile['identityVerification']?['status'] == 'approved',
     );
   }
 

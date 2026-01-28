@@ -14,6 +14,7 @@ class ReservationModel extends Reservation {
     super.workerName,
     super.workerPhone,
     super.workerPhotoUrl,
+    super.workerIsVerified,
     required super.parkingSpot,
     required super.vehicle,
     required super.departureTime,
@@ -48,6 +49,7 @@ class ReservationModel extends Reservation {
       workerName: _parseWorkerName(json['workerId']),
       workerPhone: _parseWorkerPhone(json['workerId']),
       workerPhotoUrl: _parseWorkerPhotoUrl(json['workerId']),
+      workerIsVerified: _parseWorkerIsVerified(json['workerId']),
       parkingSpot: _parseParkingSpot(json),
       vehicle: _parseVehicle(json),
       departureTime: TimeUtils.parseUtcToLocal(
@@ -340,6 +342,18 @@ class ReservationModel extends Reservation {
         }
         return photoUrl;
       }
+    }
+    return null;
+  }
+
+  /// Parse workerIsVerified depuis l'objet worker (populated)
+  static bool? _parseWorkerIsVerified(dynamic workerId) {
+    if (workerId == null) {
+      return null;
+    }
+    if (workerId is Map<String, dynamic>) {
+      return workerId['workerProfile']?['identityVerification']?['status'] ==
+          'approved';
     }
     return null;
   }
