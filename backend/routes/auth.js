@@ -113,6 +113,11 @@ router.post('/register', registrationLimiter, validateRegister, async (req, res)
                 role: user.role,
                 photoUrl: user.photoUrl,
                 createdAt: user.createdAt,
+                workerProfile: user.role === 'snowWorker' ? {
+                    identityVerification: {
+                        status: user.workerProfile?.identityVerification?.status || 'not_submitted',
+                    },
+                } : undefined,
             },
             token,
         });
@@ -198,6 +203,11 @@ router.post('/login', authLimiter, validateLogin, async (req, res) => {
                 role: user.role,
                 photoUrl: user.photoUrl,
                 createdAt: user.createdAt,
+                workerProfile: user.role === 'snowWorker' ? {
+                    identityVerification: {
+                        status: user.workerProfile?.identityVerification?.status || 'not_submitted',
+                    },
+                } : undefined,
             },
             token: accessToken,
             refreshToken: refreshToken,
@@ -547,6 +557,11 @@ router.put('/update-profile', protect, validateUpdateProfile, async (req, res) =
                 role: user.role,
                 photoUrl: user.photoUrl,
                 createdAt: user.createdAt,
+                workerProfile: user.role === 'snowWorker' ? {
+                    identityVerification: {
+                        status: user.workerProfile?.identityVerification?.status || 'not_submitted',
+                    },
+                } : undefined,
             },
         });
     } catch (error) {
@@ -649,6 +664,11 @@ router.post('/upload-profile-photo', protect, profilePhotoUpload.single('photo')
                 role: user.role,
                 photoUrl: user.photoUrl,
                 createdAt: user.createdAt,
+                workerProfile: user.role === 'snowWorker' ? {
+                    identityVerification: {
+                        status: user.workerProfile?.identityVerification?.status || 'not_submitted',
+                    },
+                } : undefined,
             }
         });
     } catch (error) {
@@ -685,6 +705,11 @@ router.delete('/delete-profile-photo', protect, async (req, res) => {
                 role: user.role,
                 photoUrl: user.photoUrl,
                 createdAt: user.createdAt,
+                workerProfile: user.role === 'snowWorker' ? {
+                    identityVerification: {
+                        status: user.workerProfile?.identityVerification?.status || 'not_submitted',
+                    },
+                } : undefined,
             }
         });
     } catch (error) {

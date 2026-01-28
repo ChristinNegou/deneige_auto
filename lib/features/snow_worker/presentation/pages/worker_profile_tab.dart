@@ -406,8 +406,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (authState is AuthAuthenticated &&
-                            authState.user.isVerified) ...[
+                        if (_isUserVerified(authState)) ...[
                           const SizedBox(width: 6),
                           Icon(Icons.verified, color: AppTheme.info, size: 18),
                         ],
@@ -468,6 +467,19 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         ),
       ),
     );
+  }
+
+  bool _isUserVerified(AuthState authState) {
+    // Check auth state first
+    if (authState is AuthAuthenticated && authState.user.isVerified) {
+      return true;
+    }
+    // Fallback: check worker profile from WorkerAvailabilityBloc
+    final workerState = context.read<WorkerAvailabilityBloc>().state;
+    if (workerState is WorkerAvailabilityLoaded) {
+      return workerState.profile?.isVerified ?? false;
+    }
+    return false;
   }
 
   Widget _buildSection({required String title, required Widget child}) {
