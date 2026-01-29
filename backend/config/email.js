@@ -148,8 +148,10 @@ const sendPasswordResetEmail = async (user, resetToken) => {
                         </table>
                     </div>
 
-                    <p>Ou copiez-collez ce lien dans votre navigateur :</p>
-                    <p style="word-break: break-all; color: #3B82F6;">${resetUrl}</p>
+                    <p><strong>Si le bouton ne fonctionne pas</strong>, copiez ce lien dans votre navigateur :</p>
+                    <div style="background-color: #F3F4F6; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <a href="${resetUrl}" style="word-break: break-all; color: #3B82F6; font-size: 14px;">${resetUrl}</a>
+                    </div>
 
                     <div class="warning">
                         <p><strong>⚠️ Important :</strong></p>
