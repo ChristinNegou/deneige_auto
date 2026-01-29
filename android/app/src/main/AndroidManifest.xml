@@ -30,6 +30,22 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Deep Links pour ouvrir l'app depuis le navigateur -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="deneigeauto"/>
+            </intent-filter>
+
+            <!-- Universal Links pour deneige-auto.ca -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="deneige-auto.ca" android:pathPrefix="/app"/>
+            </intent-filter>
         </activity>
 
         <!-- Firebase Cloud Messaging -->

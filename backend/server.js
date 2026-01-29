@@ -57,6 +57,12 @@ const corsOptions = {
 
         const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
+        // Permettre les requêtes depuis le même domaine (pour reset-password, etc.)
+        const appUrl = process.env.APP_URL || process.env.FRONTEND_URL;
+        if (appUrl && origin === appUrl) {
+            return callback(null, true);
+        }
+
         // En développement, permettre localhost
         if (process.env.NODE_ENV !== 'production') {
             if (origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('192.168.')) {

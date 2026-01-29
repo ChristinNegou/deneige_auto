@@ -7,6 +7,7 @@ import '../../domain/entities/worker_profile.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/services/locale_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -311,15 +312,13 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+              Opacity(
+                opacity: 0.85,
+                child: AppIllustration(
+                  type: IllustrationType.workerEquipment,
+                  width: 40,
+                  height: 40,
                 ),
-                child: const Icon(Icons.build_rounded,
-                    color: AppTheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Text(l10n.worker_myEquipment, style: AppTheme.headlineSmall),

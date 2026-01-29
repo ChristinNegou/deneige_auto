@@ -4,6 +4,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'dispute_details_page.dart';
 
@@ -445,16 +446,12 @@ class _MyDisputesPageState extends State<MyDisputesPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppTheme.successLight,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check_circle_outline,
-                color: AppTheme.success,
-                size: 64,
+            Opacity(
+              opacity: 0.85,
+              child: AppIllustration(
+                type: IllustrationType.emptyDisputes,
+                width: 140,
+                height: 140,
               ),
             ),
             const SizedBox(height: 24),

@@ -18,6 +18,11 @@ enum IllustrationType {
   emptyJobs,
   emptyChat,
   emptyHistory,
+  emptyPaymentHistory,
+  emptyPaymentMethods,
+  emptyDisputes,
+  emptyWorkerJobs,
+  emptyWorkerHistory,
 
   // Wizard réservation
   stepVehicle,
@@ -41,6 +46,53 @@ enum IllustrationType {
   weather,
   earnings,
   worker,
+
+  // Worker dashboard
+  workerAvailable,
+  workerOffline,
+  statJobsCompleted,
+  statEarnings,
+  statRating,
+  workerEarnings,
+  workerEquipment,
+}
+
+/// Chemins des images PNG
+class _ImageAssets {
+  static const String basePath = 'assets/images';
+
+  static const Map<IllustrationType, String> paths = {
+    // Onboarding
+    IllustrationType.welcome: '$basePath/welcome.png',
+    IllustrationType.calendar: '$basePath/calendar.png',
+    IllustrationType.location: '$basePath/location.png',
+    IllustrationType.payment: '$basePath/payment.png',
+    // États vides
+    IllustrationType.emptyReservations: '$basePath/empty_reservations.png',
+    IllustrationType.emptyVehicles: '$basePath/empty_vehicles.png',
+    IllustrationType.emptyNotifications: '$basePath/empty_notifications.png',
+    IllustrationType.emptyChat: '$basePath/empty_chat.png',
+    IllustrationType.emptyActivities: '$basePath/empty_activities.png',
+    IllustrationType.emptyPaymentHistory: '$basePath/empty_payment_history.png',
+    IllustrationType.emptyPaymentMethods: '$basePath/empty_payment_methods.png',
+    IllustrationType.emptyDisputes: '$basePath/empty_disputes.png',
+    IllustrationType.emptyWorkerJobs: '$basePath/empty_worker_jobs.png',
+    IllustrationType.emptyWorkerHistory: '$basePath/empty_worker_history.png',
+    // Worker dashboard
+    IllustrationType.workerAvailable: '$basePath/worker_available.png',
+    IllustrationType.workerOffline: '$basePath/worker_offline.png',
+    IllustrationType.statJobsCompleted: '$basePath/stat_jobs_completed.png',
+    IllustrationType.statEarnings: '$basePath/stat_earnings.png',
+    IllustrationType.statRating: '$basePath/stat_rating.png',
+    IllustrationType.workerEarnings: '$basePath/worker_earnings.png',
+    IllustrationType.workerEquipment: '$basePath/worker_equipment.png',
+    // Wizard réservation
+    IllustrationType.stepVehicle: '$basePath/step_vehicle.png',
+    IllustrationType.stepLocation: '$basePath/step_location.png',
+    IllustrationType.stepDateTime: '$basePath/step_datetime.png',
+    IllustrationType.stepOptions: '$basePath/step_options.png',
+    IllustrationType.stepSummary: '$basePath/step_summary.png',
+  };
 }
 
 /// Chemins des animations Lottie locales
@@ -48,12 +100,6 @@ class _LottieAssets {
   static const String basePath = 'assets/lottie';
 
   static const Map<IllustrationType, String> paths = {
-    // Onboarding
-    IllustrationType.welcome: '$basePath/welcome.json',
-    IllustrationType.calendar: '$basePath/calendar.json',
-    IllustrationType.location: '$basePath/location.json',
-    IllustrationType.payment: '$basePath/payment.json',
-
     // États vides
     IllustrationType.emptyReservations: '$basePath/empty.json',
     IllustrationType.emptyVehicles: '$basePath/car.json',
@@ -107,9 +153,26 @@ class AppIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final path = _LottieAssets.paths[type];
+    // Vérifier d'abord si c'est une image PNG (onboarding)
+    final imagePath = _ImageAssets.paths[type];
+    if (imagePath != null) {
+      return SizedBox(
+        width: width ?? 200,
+        height: height ?? 200,
+        child: Image.asset(
+          imagePath,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildFallbackIcon();
+          },
+        ),
+      );
+    }
 
-    if (path == null) {
+    // Sinon utiliser les animations Lottie
+    final lottiePath = _LottieAssets.paths[type];
+
+    if (lottiePath == null) {
       return _buildFallbackIcon();
     }
 
@@ -117,7 +180,7 @@ class AppIllustration extends StatelessWidget {
       width: width ?? 200,
       height: height ?? 200,
       child: Lottie.asset(
-        path,
+        lottiePath,
         fit: fit,
         animate: animate,
         errorBuilder: (context, error, stackTrace) {
@@ -187,9 +250,18 @@ class AppIllustration extends StatelessWidget {
       case IllustrationType.emptyHistory:
         return Icons.history_rounded;
       case IllustrationType.emptyJobs:
+      case IllustrationType.emptyWorkerJobs:
         return Icons.work_outline_rounded;
       case IllustrationType.emptyChat:
         return Icons.chat_bubble_outline_rounded;
+      case IllustrationType.emptyPaymentHistory:
+        return Icons.receipt_long_rounded;
+      case IllustrationType.emptyPaymentMethods:
+        return Icons.credit_card_off_rounded;
+      case IllustrationType.emptyDisputes:
+        return Icons.gavel_rounded;
+      case IllustrationType.emptyWorkerHistory:
+        return Icons.assignment_rounded;
       case IllustrationType.stepDateTime:
         return Icons.access_time_rounded;
       case IllustrationType.stepOptions:
@@ -210,6 +282,20 @@ class AppIllustration extends StatelessWidget {
         return Icons.attach_money_rounded;
       case IllustrationType.worker:
         return Icons.engineering_rounded;
+      case IllustrationType.workerAvailable:
+        return Icons.work_rounded;
+      case IllustrationType.workerOffline:
+        return Icons.work_off_rounded;
+      case IllustrationType.statJobsCompleted:
+        return Icons.check_circle_rounded;
+      case IllustrationType.statEarnings:
+        return Icons.attach_money_rounded;
+      case IllustrationType.statRating:
+        return Icons.star_rounded;
+      case IllustrationType.workerEarnings:
+        return Icons.account_balance_wallet_rounded;
+      case IllustrationType.workerEquipment:
+        return Icons.build_rounded;
     }
   }
 }
@@ -230,7 +316,7 @@ class EmptyStateWidget extends StatelessWidget {
     this.subtitle,
     this.buttonText,
     this.onButtonPressed,
-    this.illustrationSize = 180,
+    this.illustrationSize = 140,
   });
 
   @override
@@ -241,12 +327,15 @@ class EmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AppIllustration(
-              type: illustrationType,
-              width: illustrationSize,
-              height: illustrationSize,
+            Opacity(
+              opacity: 0.85,
+              child: AppIllustration(
+                type: illustrationType,
+                width: illustrationSize,
+                height: illustrationSize,
+              ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             Text(
               title,
               style: AppTheme.headlineMedium,

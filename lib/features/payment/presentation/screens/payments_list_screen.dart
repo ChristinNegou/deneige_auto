@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/payment.dart';
 import '../../domain/entities/payment_method.dart';
@@ -386,8 +387,14 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       ),
       child: Column(
         children: [
-          Icon(Icons.credit_card_off_outlined,
-              size: 48, color: AppTheme.textTertiary),
+          Opacity(
+            opacity: 0.85,
+            child: AppIllustration(
+              type: IllustrationType.emptyPaymentMethods,
+              width: 100,
+              height: 100,
+            ),
+          ),
           const SizedBox(height: 12),
           Text(
             l10n.payment_noCardsRegistered,
@@ -595,8 +602,15 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 56, color: AppTheme.textTertiary),
-          const SizedBox(height: 16),
+          Opacity(
+            opacity: 0.85,
+            child: AppIllustration(
+              type: IllustrationType.emptyPaymentHistory,
+              width: 140,
+              height: 140,
+            ),
+          ),
+          const SizedBox(height: 20),
           Text(
             title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),

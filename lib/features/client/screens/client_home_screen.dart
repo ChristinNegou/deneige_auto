@@ -593,6 +593,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           children: [
             Expanded(
               child: _buildActionCard(
+                imagePath: 'assets/images/quick_new_reservation.png',
                 icon: Icons.add_circle_outline,
                 label: l10n.clientHome_book,
                 color: AppTheme.primary2,
@@ -603,6 +604,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
+                imagePath: 'assets/images/quick_my_reservations.png',
                 icon: Icons.calendar_today_outlined,
                 label: l10n.clientHome_myAppointments,
                 color: AppTheme.success,
@@ -610,9 +612,24 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     Navigator.pushNamed(context, AppRoutes.reservations),
               ),
             ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                imagePath: 'assets/images/quick_my_vehicles.png',
+                icon: Icons.directions_car_outlined,
+                label: l10n.vehicle_myVehicles,
+                color: AppTheme.warning,
+                onTap: () => Navigator.pushNamed(context, AppRoutes.vehicles),
+              ),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionCard(
+                imagePath: 'assets/images/quick_payment.png',
                 icon: Icons.credit_card_outlined,
                 label: l10n.profile_payments,
                 color: AppTheme.primary3,
@@ -630,6 +647,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     required String label,
     required Color color,
     required VoidCallback onTap,
+    String? imagePath,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -642,18 +660,43 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         ),
         child: Column(
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+            if (imagePath != null)
+              Opacity(
+                opacity: 0.85,
+                child: SizedBox(
+                  width: 52,
+                  height: 52,
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(icon, color: color, size: 22),
+                      );
+                    },
+                  ),
+                ),
+              )
+            else
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 22),
               ),
-              child: Icon(icon, color: color, size: 22),
-            ),
             const SizedBox(height: 8),
             Text(
               label,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,

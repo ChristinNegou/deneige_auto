@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_jobs_bloc.dart';
@@ -395,27 +396,15 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.primary.withValues(alpha: 0.1),
-                  AppTheme.secondary.withValues(alpha: 0.05),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-            ),
-            child: const Icon(
-              Icons.history_rounded,
-              size: 48,
-              color: AppTheme.primary,
+          Opacity(
+            opacity: 0.85,
+            child: AppIllustration(
+              type: IllustrationType.emptyWorkerHistory,
+              width: 130,
+              height: 130,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Text(
             l10n.worker_noHistory,
             style: AppTheme.headlineSmall.copyWith(

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../reservation/domain/entities/reservation.dart';
 import '../../../reservation/presentation/bloc/reservation_list_bloc.dart';
@@ -142,12 +143,15 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isCompleted ? Icons.check_circle_outline : Icons.hourglass_empty,
-              size: 64,
-              color: AppTheme.textTertiary,
+            Opacity(
+              opacity: 0.85,
+              child: AppIllustration(
+                type: IllustrationType.emptyActivities,
+                width: 140,
+                height: 140,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               isCompleted
                   ? AppLocalizations.of(context)!.activities_emptyCompleted

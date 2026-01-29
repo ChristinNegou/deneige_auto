@@ -317,7 +317,7 @@ router.post('/requests/:id/respond', protect, authorize('admin'), async (req, re
 
                                 <div class="footer">
                                     <p>L'équipe Déneige Auto</p>
-                                    <p>support@deneigeauto.com</p>
+                                    <p>support@deneige-auto.ca</p>
                                 </div>
                             </div>
                         </div>

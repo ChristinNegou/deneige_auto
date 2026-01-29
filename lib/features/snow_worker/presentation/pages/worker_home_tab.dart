@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../verification/presentation/bloc/verification_bloc.dart';
@@ -671,36 +672,36 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             ),
             child: Row(
               children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: isAvailable
-                        ? AppTheme.success.withValues(alpha: 0.1)
-                        : AppTheme.background,
-                    borderRadius: BorderRadius.circular(12),
-                    border:
-                        isAvailable ? null : Border.all(color: AppTheme.border),
-                  ),
+                SizedBox(
+                  width: 52,
+                  height: 52,
                   child: isLoading
-                      ? const Center(
-                          child: SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppTheme.textTertiary,
+                      ? Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.background,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppTheme.border),
+                          ),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppTheme.textTertiary,
+                              ),
                             ),
                           ),
                         )
-                      : Icon(
-                          isAvailable
-                              ? Icons.work_rounded
-                              : Icons.work_off_rounded,
-                          color: isAvailable
-                              ? AppTheme.success
-                              : AppTheme.textTertiary,
-                          size: 24,
+                      : Opacity(
+                          opacity: 0.9,
+                          child: AppIllustration(
+                            type: isAvailable
+                                ? IllustrationType.workerAvailable
+                                : IllustrationType.workerOffline,
+                            width: 52,
+                            height: 52,
+                          ),
                         ),
                 ),
                 const SizedBox(width: 14),
@@ -797,24 +798,27 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 iconColor: AppTheme.success,
                 value: completed.toString(),
                 label: l10n.worker_jobsCompleted,
+                illustrationType: IllustrationType.statJobsCompleted,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _buildMiniStatCard(
                 icon: Icons.attach_money_rounded,
                 iconColor: AppTheme.primary,
                 value: '${earnings.toStringAsFixed(0)}\$',
                 label: l10n.worker_todayLabel,
+                illustrationType: IllustrationType.statEarnings,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _buildMiniStatCard(
                 icon: Icons.star_rounded,
                 iconColor: AppTheme.warning,
                 value: rating > 0 ? rating.toStringAsFixed(1) : '-',
                 label: l10n.worker_ratingLabel,
+                illustrationType: IllustrationType.statRating,
               ),
             ),
           ],
@@ -828,9 +832,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     required Color iconColor,
     required String value,
     required String label,
+    IllustrationType? illustrationType,
   }) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
@@ -838,13 +843,23 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
       ),
       child: Column(
         children: [
-          Icon(icon, color: iconColor, size: 22),
-          const SizedBox(height: 8),
+          if (illustrationType != null)
+            Opacity(
+              opacity: 0.9,
+              child: AppIllustration(
+                type: illustrationType,
+                width: 36,
+                height: 36,
+              ),
+            )
+          else
+            Icon(icon, color: iconColor, size: 22),
+          const SizedBox(height: 6),
           Text(
             value,
             style: const TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: 18,
+              fontSize: 17,
               color: AppTheme.textPrimary,
             ),
           ),
@@ -853,9 +868,11 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             label,
             style: TextStyle(
               color: AppTheme.textTertiary,
-              fontSize: 11,
+              fontSize: 10,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -1188,12 +1205,15 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           ),
           child: Column(
             children: [
-              Icon(
-                Icons.hourglass_empty_rounded,
-                size: 36,
-                color: AppTheme.textTertiary,
+              Opacity(
+                opacity: 0.85,
+                child: AppIllustration(
+                  type: IllustrationType.emptyWorkerJobs,
+                  width: 120,
+                  height: 120,
+                ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               Text(
                 l10n.worker_waitingForJobs,
                 style: TextStyle(

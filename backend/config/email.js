@@ -101,10 +101,12 @@ const sendPasswordResetEmail = async (user, resetToken) => {
                     display: inline-block;
                     padding: 12px 30px;
                     background-color: #3B82F6;
-                    color: white !important;
+                    color: #ffffff !important;
                     text-decoration: none;
                     border-radius: 5px;
                     margin: 20px 0;
+                    font-weight: bold;
+                    mso-padding-alt: 0;
                 }
                 .footer {
                     text-align: center;
@@ -134,8 +136,16 @@ const sendPasswordResetEmail = async (user, resetToken) => {
 
                     <p>Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe :</p>
 
-                    <div style="text-align: center;">
-                        <a href="${resetUrl}" class="button">Réinitialiser mon mot de passe</a>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                            <tr>
+                                <td style="background-color: #3B82F6; border-radius: 5px;">
+                                    <a href="${resetUrl}" target="_blank" style="display: inline-block; padding: 14px 32px; font-size: 16px; font-weight: bold; color: #ffffff; text-decoration: none; border-radius: 5px;">
+                                        Réinitialiser mon mot de passe
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
                     <p>Ou copiez-collez ce lien dans votre navigateur :</p>
@@ -152,7 +162,7 @@ const sendPasswordResetEmail = async (user, resetToken) => {
 
                     <div class="footer">
                         <p>Cet email a été envoyé par Déneige Auto</p>
-                        <p>Si vous avez des questions, contactez-nous à support@deneigeauto.com</p>
+                        <p>Si vous avez des questions, contactez-nous à support@deneige-auto.ca</p>
                     </div>
                 </div>
             </div>
