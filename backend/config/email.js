@@ -134,21 +134,15 @@ const sendPasswordResetEmail = async (user, resetToken) => {
 
                     <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Déneige Auto.</p>
 
-                    <p>Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe :</p>
+                    <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
 
-                    <div style="text-align: center; margin: 30px 0;">
-                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
-                            <tr>
-                                <td style="background-color: #3B82F6; border-radius: 5px;">
-                                    <a href="${resetUrl}" target="_blank" style="display: inline-block; padding: 14px 32px; font-size: 16px; font-weight: bold; color: #ffffff; text-decoration: none; border-radius: 5px;">
-                                        Réinitialiser mon mot de passe
-                                    </a>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    <p style="text-align: center; margin: 30px 0;">
+                        <a href="${resetUrl}" target="_blank" style="background-color: #3B82F6; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+                            ➜ Réinitialiser mon mot de passe
+                        </a>
+                    </p>
 
-                    <p><strong>Si le bouton ne fonctionne pas</strong>, copiez ce lien dans votre navigateur :</p>
+                    <p><strong>Ou copiez ce lien</strong> dans votre navigateur :</p>
                     <div style="background-color: #F3F4F6; padding: 15px; border-radius: 8px; margin: 15px 0;">
                         <a href="${resetUrl}" style="word-break: break-all; color: #3B82F6; font-size: 14px;">${resetUrl}</a>
                     </div>
