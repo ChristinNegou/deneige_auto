@@ -2762,6 +2762,12 @@ abstract class AppLocalizations {
   /// **'Jobs'**
   String get worker_jobs;
 
+  /// No description provided for @worker_reportProblemHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signaler un client inapproprié, un paiement contesté ou tout autre problème'**
+  String get worker_reportProblemHint;
+
   /// No description provided for @verification_title.
   ///
   /// In fr, this message translates to:

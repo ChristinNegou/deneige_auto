@@ -490,6 +490,7 @@
   "dispute_describeRequired": "Please describe the problem",
   "dispute_amountExceedsPaid": "Amount cannot exceed the paid price",
   "dispute_amountMustBePositive": "Amount must be positive",
+  "worker_reportProblemHint": "Report an inappropriate client, disputed payment or any other issue",
   "dispute_respondTitle": "Respond to dispute",
   "dispute_yourResponse": "Your response",
   "dispute_deadlineExpired": "Deadline expired",

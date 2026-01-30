@@ -1408,6 +1408,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worker_jobs => 'Jobs';
 
   @override
+  String get worker_reportProblemHint =>
+      'Report an inappropriate client, disputed payment or any other issue';
+
+  @override
   String get verification_title => 'Identity verification';
 
   @override

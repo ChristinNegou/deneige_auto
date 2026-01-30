@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import '../network/dio_client.dart';
 
@@ -259,6 +260,34 @@ class DisputeService {
   final Dio _dio;
 
   DisputeService({required DioClient dioClient}) : _dio = dioClient.dio;
+
+  // ============== PHOTO UPLOAD ==============
+
+  /// Upload des photos pour un litige
+  /// Retourne la liste des URLs des photos uploadées
+  Future<List<String>> uploadPhotos(List<File> photos) async {
+    if (photos.isEmpty) return [];
+
+    final formData = FormData();
+    for (final photo in photos) {
+      final fileName = photo.path.split('/').last;
+      formData.files.add(
+        MapEntry(
+          'photos',
+          await MultipartFile.fromFile(photo.path, filename: fileName),
+        ),
+      );
+    }
+
+    final response = await _dio.post(
+      '/disputes/upload-photos',
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+
+    final List<dynamic> urls = response.data['urls'] ?? [];
+    return urls.cast<String>();
+  }
 
   // ============== CLIENT ENDPOINTS ==============
 

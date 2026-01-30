@@ -521,6 +521,7 @@
   "worker_noAssignedJobs": "Aucun job assigné",
   "worker_noAssignedSubtitle": "Acceptez des jobs disponibles pour les voir ici",
   "worker_jobs": "Jobs",
+  "worker_reportProblemHint": "Signaler un client inapproprié, un paiement contesté ou tout autre problème",
   "verification_title": "Vérification d'identité",
   "verification_verifyIdentity": "Vérifiez votre identité",
   "verification_idDocument": "Pièce d'identité",

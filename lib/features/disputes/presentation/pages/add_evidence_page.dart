@@ -191,10 +191,11 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Upload photos to cloud storage and get URLs
-      // For now, we'll send without photos if the service expects URLs
+      // Upload photos to cloud storage and get URLs
       List<String>? photoUrls;
-      // In a real implementation, upload photos here and collect URLs
+      if (_photos.isNotEmpty) {
+        photoUrls = await _disputeService.uploadPhotos(_photos);
+      }
 
       await _disputeService.addEvidence(
         disputeId: widget.disputeId,
@@ -210,7 +211,6 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
     } catch (e) {
       if (!mounted) return;
 
-      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

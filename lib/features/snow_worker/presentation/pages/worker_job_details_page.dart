@@ -19,6 +19,7 @@ import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_jobs_bloc.dart';
 import '../../data/datasources/worker_remote_datasource.dart'
     show WorkerCancellationReason;
+import '../../../disputes/presentation/pages/create_dispute_page.dart';
 
 class WorkerJobDetailsPage extends StatefulWidget {
   final WorkerJob job;
@@ -217,6 +218,11 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                         job.clientNotes!.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       _buildNotesCard(),
+                    ],
+                    // Report Problem button for completed jobs
+                    if (_canReportProblem()) ...[
+                      const SizedBox(height: 16),
+                      _buildReportProblemButton(),
                     ],
                     const SizedBox(height: 100),
                   ],
@@ -1287,6 +1293,118 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           ),
         );
       },
+    );
+  }
+
+  /// Check if the worker can report a problem for this job
+  bool _canReportProblem() {
+    // Can report for completed jobs within 72 hours
+    if (job.status == JobStatus.completed) {
+      if (job.completedAt != null) {
+        final hoursSinceCompletion =
+            DateTime.now().difference(job.completedAt!).inHours;
+        return hoursSinceCompletion < 72;
+      }
+      return false;
+    }
+
+    // Can also report for in-progress jobs
+    if (job.status == JobStatus.inProgress) {
+      return true;
+    }
+
+    return false;
+  }
+
+  Widget _buildReportProblemButton() {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.warning.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: const Icon(Icons.report_problem_rounded,
+                    color: AppTheme.warning, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Text(l10n.dispute_reportProblem, style: AppTheme.headlineSmall),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.worker_reportProblemHint,
+            style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                HapticFeedback.mediumImpact();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CreateDisputePage(
+                      reservationId: job.id,
+                      workerName: job.client.fullName,
+                      totalPrice: job.totalPrice,
+                      serviceDate: job.completedAt ?? job.departureTime,
+                    ),
+                  ),
+                ).then((reported) {
+                  if (reported == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.check_circle,
+                                color: AppTheme.background),
+                            const SizedBox(width: 12),
+                            Text(l10n.dispute_created),
+                          ],
+                        ),
+                        backgroundColor: AppTheme.success,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusMD),
+                        ),
+                      ),
+                    );
+                  }
+                });
+              },
+              icon: const Icon(Icons.report_problem, color: AppTheme.warning),
+              label: Text(
+                l10n.dispute_reportProblem,
+                style: const TextStyle(color: AppTheme.warning),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppTheme.warning,
+                side: const BorderSide(color: AppTheme.warning),
+                padding: const EdgeInsets.all(14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -32,6 +32,8 @@ const {
     confirmSatisfaction,
     getDisputeTypes,
 } = require('../controllers/disputeController');
+const { disputeEvidenceUpload, handleMulterError } = require('../middleware/fileUpload');
+const { uploadFromBuffer } = require('../config/cloudinary');
 
 // --- Routes publiques ---
 
@@ -40,6 +42,43 @@ const {
  * Retourne les types de litiges disponibles.
  */
 router.get('/types', getDisputeTypes);
+
+/**
+ * POST /api/disputes/upload-photos
+ * Upload des photos pour un litige (preuves).
+ * Retourne les URLs des photos uploadées.
+ */
+router.post('/upload-photos', protect, disputeEvidenceUpload.array('photos', 5), handleMulterError, async (req, res) => {
+    try {
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Aucune photo fournie',
+            });
+        }
+
+        const uploadPromises = req.files.map(file =>
+            uploadFromBuffer(file.buffer, {
+                folder: 'deneige-auto/disputes',
+            })
+        );
+
+        const results = await Promise.all(uploadPromises);
+        const urls = results.map(r => r.url);
+
+        res.json({
+            success: true,
+            message: `${urls.length} photo(s) uploadée(s) avec succès`,
+            urls,
+        });
+    } catch (error) {
+        console.error('Error uploading dispute photos:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'upload des photos',
+        });
+    }
+});
 
 // --- Routes client et déneigeur ---
 

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dispute_service.dart';
+import '../../../../core/services/location_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -32,6 +33,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
   late DisputeService _disputeService;
+  final LocationService _locationService = LocationService();
 
   bool _isLoading = false;
   DisputeType _selectedType = DisputeType.qualityIssue;
@@ -160,16 +162,21 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
         claimedAmount = double.tryParse(_amountController.text);
       }
 
-      // TODO: Implémenter l'upload des photos vers le cloud et récupérer les URLs
-      // Pour l'instant, les photos sont sélectionnées mais pas uploadées
-      // Dans une implémentation complète, il faudrait:
-      // 1. Uploader chaque photo vers Cloudinary
-      // 2. Récupérer les URLs
-      // 3. Passer les URLs au service
+      // Capture de la position GPS (non-bloquant si échec)
+      Map<String, double>? gpsLocation;
+      final position = await _locationService.getCurrentPosition();
+      if (position != null) {
+        gpsLocation = {
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+        };
+      }
+
+      // Upload des photos vers Cloudinary et récupérer les URLs
       List<String>? photoUrls;
-      // if (_photos.isNotEmpty) {
-      //   photoUrls = await _uploadPhotos(_photos);
-      // }
+      if (_photos.isNotEmpty) {
+        photoUrls = await _disputeService.uploadPhotos(_photos);
+      }
 
       final result = await _disputeService.createDispute(
         reservationId: widget.reservationId,
@@ -177,6 +184,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
         description: _descriptionController.text.trim(),
         claimedAmount: claimedAmount,
         photos: photoUrls,
+        gpsLocation: gpsLocation,
       );
 
       if (!mounted) return;

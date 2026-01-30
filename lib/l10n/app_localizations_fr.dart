@@ -1420,6 +1420,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get worker_jobs => 'Jobs';
 
   @override
+  String get worker_reportProblemHint =>
+      'Signaler un client inapproprié, un paiement contesté ou tout autre problème';
+
+  @override
   String get verification_title => 'Vérification d\'identité';
 
   @override

@@ -20,6 +20,7 @@ import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../chat/presentation/bloc/chat_bloc.dart';
 import '../../../chat/presentation/pages/chat_screen.dart';
 import '../../../disputes/presentation/pages/report_no_show_page.dart';
+import '../../../disputes/presentation/pages/create_dispute_page.dart';
 
 class ReservationDetailsPage extends StatelessWidget {
   final String reservationId;
@@ -334,6 +335,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                                 if (_canReportNoShow(reservation)) ...[
                                   const SizedBox(height: 12),
                                   _buildReportNoShowButton(
+                                      context, reservation),
+                                ],
+
+                                // Report Problem button (for completed reservations)
+                                if (_canReportProblem(reservation)) ...[
+                                  const SizedBox(height: 12),
+                                  _buildReportProblemButton(
                                       context, reservation),
                                 ],
 
@@ -2117,6 +2125,104 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         style: OutlinedButton.styleFrom(
           foregroundColor: AppTheme.error,
           side: BorderSide(color: AppTheme.error),
+          padding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Check if the user can report a general problem for this reservation
+  bool _canReportProblem(Reservation reservation) {
+    // Cannot report if cancelled
+    if (reservation.status == ReservationStatus.cancelled) {
+      return false;
+    }
+
+    // Must have a worker assigned
+    if (reservation.workerId == null) {
+      return false;
+    }
+
+    // Can report problem for completed reservations within 72 hours
+    if (reservation.status == ReservationStatus.completed) {
+      final completedAt = reservation.completedAt;
+      if (completedAt != null) {
+        final hoursSinceCompletion =
+            DateTime.now().difference(completedAt).inHours;
+        return hoursSinceCompletion < 72;
+      }
+      return false;
+    }
+
+    // Can also report for in-progress or late reservations
+    if (reservation.status == ReservationStatus.inProgress ||
+        reservation.status == ReservationStatus.late) {
+      return true;
+    }
+
+    return false;
+  }
+
+  Widget _buildReportProblemButton(
+      BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          HapticFeedback.mediumImpact();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CreateDisputePage(
+                reservationId: reservation.id,
+                workerName: reservation.workerName,
+                totalPrice: reservation.totalPrice,
+                serviceDate:
+                    reservation.completedAt ?? reservation.departureTime,
+              ),
+            ),
+          ).then((reported) {
+            if (reported == true) {
+              if (!mounted) return;
+              this
+                  .context
+                  .read<ReservationListBloc>()
+                  .add(LoadReservationById(widget.reservationId));
+
+              ScaffoldMessenger.of(this.context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: AppTheme.textPrimary),
+                      const SizedBox(width: 12),
+                      Text(
+                        l10n.dispute_created,
+                        style: TextStyle(color: AppTheme.textPrimary),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: AppTheme.success,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              );
+            }
+          });
+        },
+        icon: Icon(Icons.report_problem, color: AppTheme.warning),
+        label: Text(
+          l10n.dispute_reportProblem,
+          style: TextStyle(color: AppTheme.warning),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppTheme.warning,
+          side: BorderSide(color: AppTheme.warning),
           padding: const EdgeInsets.all(16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
