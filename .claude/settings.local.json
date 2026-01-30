@@ -42,7 +42,9 @@
       "Bash(\"/c/Users/chris/AppData/Local/Android/Sdk/platform-tools/adb\" -s emulator-5554 shell pm list packages)",
       "Bash(dir:*)",
       "Bash(flutter clean:*)",
-      "Bash(flutter gen-l10n:*)"
+      "Bash(flutter gen-l10n:*)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

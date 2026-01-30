@@ -396,13 +396,10 @@ class _WorkerHistoryViewState extends State<_WorkerHistoryView>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Opacity(
-            opacity: 0.85,
-            child: AppIllustration(
-              type: IllustrationType.emptyWorkerHistory,
-              width: 130,
-              height: 130,
-            ),
+          AppIllustration(
+            type: IllustrationType.emptyWorkerHistory,
+            width: 150,
+            height: 150,
           ),
           const SizedBox(height: 20),
           Text(

@@ -316,7 +316,7 @@ class EmptyStateWidget extends StatelessWidget {
     this.subtitle,
     this.buttonText,
     this.onButtonPressed,
-    this.illustrationSize = 140,
+    this.illustrationSize = 150,
   });
 
   @override
@@ -327,13 +327,10 @@ class EmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Opacity(
-              opacity: 0.85,
-              child: AppIllustration(
-                type: illustrationType,
-                width: illustrationSize,
-                height: illustrationSize,
-              ),
+            AppIllustration(
+              type: illustrationType,
+              width: illustrationSize,
+              height: illustrationSize,
             ),
             const SizedBox(height: 20),
             Text(

@@ -662,10 +662,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           children: [
             if (imagePath != null)
               Opacity(
-                opacity: 0.85,
+                opacity: 0.95,
                 child: SizedBox(
-                  width: 52,
-                  height: 52,
+                  width: 58,
+                  height: 58,
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,

@@ -312,13 +312,10 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
         children: [
           Row(
             children: [
-              Opacity(
-                opacity: 0.85,
-                child: AppIllustration(
-                  type: IllustrationType.workerEquipment,
-                  width: 40,
-                  height: 40,
-                ),
+              AppIllustration(
+                type: IllustrationType.workerEquipment,
+                width: 44,
+                height: 44,
               ),
               const SizedBox(width: 12),
               Text(l10n.worker_myEquipment, style: AppTheme.headlineSmall),

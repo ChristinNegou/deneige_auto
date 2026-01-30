@@ -143,13 +143,10 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Opacity(
-              opacity: 0.85,
-              child: AppIllustration(
-                type: IllustrationType.emptyActivities,
-                width: 140,
-                height: 140,
-              ),
+            AppIllustration(
+              type: IllustrationType.emptyActivities,
+              width: 150,
+              height: 150,
             ),
             const SizedBox(height: 20),
             Text(

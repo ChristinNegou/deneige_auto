@@ -387,13 +387,10 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       ),
       child: Column(
         children: [
-          Opacity(
-            opacity: 0.85,
-            child: AppIllustration(
-              type: IllustrationType.emptyPaymentMethods,
-              width: 100,
-              height: 100,
-            ),
+          AppIllustration(
+            type: IllustrationType.emptyPaymentMethods,
+            width: 110,
+            height: 110,
           ),
           const SizedBox(height: 12),
           Text(
@@ -602,13 +599,10 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Opacity(
-            opacity: 0.85,
-            child: AppIllustration(
-              type: IllustrationType.emptyPaymentHistory,
-              width: 140,
-              height: 140,
-            ),
+          AppIllustration(
+            type: IllustrationType.emptyPaymentHistory,
+            width: 150,
+            height: 150,
           ),
           const SizedBox(height: 20),
           Text(

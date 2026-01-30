@@ -446,13 +446,10 @@ class _MyDisputesPageState extends State<MyDisputesPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Opacity(
-              opacity: 0.85,
-              child: AppIllustration(
-                type: IllustrationType.emptyDisputes,
-                width: 140,
-                height: 140,
-              ),
+            AppIllustration(
+              type: IllustrationType.emptyDisputes,
+              width: 150,
+              height: 150,
             ),
             const SizedBox(height: 24),
             Text(

@@ -693,15 +693,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                             ),
                           ),
                         )
-                      : Opacity(
-                          opacity: 0.9,
-                          child: AppIllustration(
-                            type: isAvailable
-                                ? IllustrationType.workerAvailable
-                                : IllustrationType.workerOffline,
-                            width: 52,
-                            height: 52,
-                          ),
+                      : AppIllustration(
+                          type: isAvailable
+                              ? IllustrationType.workerAvailable
+                              : IllustrationType.workerOffline,
+                          width: 56,
+                          height: 56,
                         ),
                 ),
                 const SizedBox(width: 14),
@@ -844,13 +841,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
       child: Column(
         children: [
           if (illustrationType != null)
-            Opacity(
-              opacity: 0.9,
-              child: AppIllustration(
-                type: illustrationType,
-                width: 36,
-                height: 36,
-              ),
+            AppIllustration(
+              type: illustrationType,
+              width: 42,
+              height: 42,
             )
           else
             Icon(icon, color: iconColor, size: 22),
@@ -1205,13 +1199,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           ),
           child: Column(
             children: [
-              Opacity(
-                opacity: 0.85,
-                child: AppIllustration(
-                  type: IllustrationType.emptyWorkerJobs,
-                  width: 120,
-                  height: 120,
-                ),
+              AppIllustration(
+                type: IllustrationType.emptyWorkerJobs,
+                width: 140,
+                height: 140,
               ),
               const SizedBox(height: 16),
               Text(
