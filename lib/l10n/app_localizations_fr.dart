@@ -5160,7 +5160,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get legal_andThe => ' et la ';
 
   @override
-  String get legal_contactEmail => 'Contact: privacy@deneige-auto.com';
+  String get legal_contactEmail => 'Contact: privacy@deneige-auto.ca';
 
   @override
   String get legal_iAccept => 'J\'accepte les ';

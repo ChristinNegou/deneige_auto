@@ -13,7 +13,7 @@ En utilisant notre application mobile et nos services, vous consentez aux pratiq
 
 **Responsable de la protection des renseignements personnels :**
 Deneige-Auto
-Courriel : privacy@deneige-auto.com
+Courriel : privacy@deneige-auto.ca
 Adresse : [Votre adresse commerciale], Québec, Canada
 
 ---
@@ -168,7 +168,7 @@ Vous pouvez retirer votre consentement à tout moment pour les traitements basé
 Vous pouvez déposer une plainte auprès de la Commission d'accès à l'information du Québec.
 
 **Pour exercer vos droits :**
-Courriel : privacy@deneige-auto.com
+Courriel : privacy@deneige-auto.ca
 Délai de réponse : 30 jours
 
 ---
@@ -204,7 +204,7 @@ La date de « dernière mise à jour » en haut de cette page indique quand la p
 Pour toute question concernant cette politique de confidentialité ou vos renseignements personnels :
 
 **Deneige-Auto**
-Courriel : privacy@deneige-auto.com
+Courriel : privacy@deneige-auto.ca
 Téléphone : [Votre numéro]
 Adresse : [Votre adresse commerciale]
 Québec, Canada

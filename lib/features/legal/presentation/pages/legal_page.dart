@@ -116,7 +116,7 @@ Nous ne vendons jamais vos données à des tiers.''',
 • Droit à la portabilité
 • Droit de retirer votre consentement
 
-Pour exercer vos droits : privacy@deneige-auto.com''',
+Pour exercer vos droits : privacy@deneige-auto.ca''',
         ),
         _buildSection(
           '6. Conservation des données',
@@ -133,7 +133,7 @@ Pour exercer vos droits : privacy@deneige-auto.com''',
           '8. Contact',
           '''Pour toute question concernant cette politique :
 
-Courriel : privacy@deneige-auto.com
+Courriel : privacy@deneige-auto.ca
 Commission d'accès à l'information du Québec : www.cai.gouv.qc.ca''',
         ),
       ],
@@ -203,7 +203,7 @@ Commission de la plateforme : 20%''',
         _buildSection(
           '10. Contact',
           '''Pour toute question :
-Courriel : support@deneige-auto.com''',
+Courriel : support@deneige-auto.ca''',
         ),
       ],
     );

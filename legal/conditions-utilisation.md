@@ -306,7 +306,7 @@ Vous ne pouvez pas céder vos droits ou obligations sans notre consentement écr
 Pour toute question concernant ces Conditions :
 
 **Deneige-Auto**
-Courriel : support@deneige-auto.com
+Courriel : support@deneige-auto.ca
 Téléphone : [Votre numéro]
 Adresse : [Votre adresse commerciale]
 Trois-Rivières, Québec, Canada

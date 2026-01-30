@@ -9581,7 +9581,7 @@ abstract class AppLocalizations {
   /// No description provided for @legal_contactEmail.
   ///
   /// In fr, this message translates to:
-  /// **'Contact: privacy@deneige-auto.com'**
+  /// **'Contact: privacy@deneige-auto.ca'**
   String get legal_contactEmail;
 
   /// No description provided for @legal_iAccept.

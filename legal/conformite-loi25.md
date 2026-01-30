@@ -25,7 +25,7 @@ La Loi 25 (Loi modernisant des dispositions législatives en matière de protect
 **Exemple pour Deneige-Auto :**
 ```
 Responsable : [Nom du responsable]
-Courriel : privacy@deneige-auto.com
+Courriel : privacy@deneige-auto.ca
 Téléphone : [Numéro]
 ```
 
