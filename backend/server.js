@@ -206,6 +206,15 @@ app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
 });
 
+// ✅ Routes pour la politique de confidentialité et conditions d'utilisation
+app.get('/privacy-policy', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'privacy-policy.html'));
+});
+
+app.get('/terms-of-service', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'terms-of-service.html'));
+});
+
 // ✅ Routes pour les redirections Stripe Connect
 app.get('/worker/stripe-connect/complete', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'stripe-connect-complete.html'));
