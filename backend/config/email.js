@@ -134,13 +134,17 @@ const sendPasswordResetEmail = async (user, resetToken) => {
 
                     <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Déneige Auto.</p>
 
-                    <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+                    <p>Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe :</p>
 
-                    <p style="text-align: center; margin: 30px 0;">
-                        <a href="${resetUrl}" target="_blank" style="background-color: #3B82F6; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
-                            ➜ Réinitialiser mon mot de passe
-                        </a>
-                    </p>
+                    <table width="100%" cellspacing="0" cellpadding="0" style="margin: 25px 0;">
+                        <tr>
+                            <td align="center">
+                                <a href="${resetUrl}" target="_blank" style="background-color: #1E3A8A; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block;">
+                                    Réinitialiser mon mot de passe
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
 
                     <p><strong>Ou copiez ce lien</strong> dans votre navigateur :</p>
                     <div style="background-color: #F3F4F6; padding: 15px; border-radius: 8px; margin: 15px 0;">

@@ -46,12 +46,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             listener: (context, state) {
               if (state is ForgotPasswordSuccess) {
                 setState(() => _emailSent = true);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.forgotPassword_emailSent),
-                    backgroundColor: AppTheme.success,
-                  ),
-                );
               } else if (state is AuthError) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
