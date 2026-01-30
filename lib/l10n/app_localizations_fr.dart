@@ -4386,7 +4386,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dispute_noDisputesMessage =>
-      'Vous n\'avez aucun litige en cours. C\'est une bonne nouvelle!';
+      'Vous n\'avez aucun litige en cours. Pour signaler un problème, accédez aux détails d\'une réservation et appuyez sur \"Signaler un problème\".';
 
   @override
   String get dispute_notAssigned => 'Non assigné';

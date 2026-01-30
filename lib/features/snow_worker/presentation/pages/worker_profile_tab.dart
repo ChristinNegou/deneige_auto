@@ -16,6 +16,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/bloc/auth_event.dart' show LogoutRequested;
+import '../../../disputes/presentation/pages/my_disputes_page.dart';
 
 /// Profile tab that uses local state management to avoid bloc-related rebuilds.
 /// The bloc is only used for:
@@ -627,6 +628,15 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
       ),
       child: Column(
         children: [
+          _buildActionItem(
+            icon: Icons.gavel_outlined,
+            label: l10n.profile_myDisputes,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MyDisputesPage()),
+            ),
+          ),
+          Divider(height: 1, color: AppTheme.border, indent: 50),
           _buildActionItem(
             icon: Icons.help_outline,
             label: l10n.worker_helpSupport,

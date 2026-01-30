@@ -1763,7 +1763,7 @@
   "dispute_maxPhotos": "Maximum 10 photos",
   "dispute_minCharsRequired": "Minimum 50 caractères requis",
   "dispute_noDisputes": "Aucun litige",
-  "dispute_noDisputesMessage": "Vous n'avez aucun litige en cours. C'est une bonne nouvelle!",
+  "dispute_noDisputesMessage": "Vous n'avez aucun litige en cours. Pour signaler un problème, accédez aux détails d'une réservation et appuyez sur \"Signaler un problème\".",
   "dispute_notAssigned": "Non assigné",
   "dispute_notFound": "Litige introuvable",
   "dispute_notFoundMessage": "Ce litige est introuvable ou a été supprimé.",

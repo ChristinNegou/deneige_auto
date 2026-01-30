@@ -8195,7 +8195,7 @@ abstract class AppLocalizations {
   /// No description provided for @dispute_noDisputesMessage.
   ///
   /// In fr, this message translates to:
-  /// **'Vous n\'avez aucun litige en cours. C\'est une bonne nouvelle!'**
+  /// **'Vous n\'avez aucun litige en cours. Pour signaler un problème, accédez aux détails d\'une réservation et appuyez sur \"Signaler un problème\".'**
   String get dispute_noDisputesMessage;
 
   /// No description provided for @dispute_notAssigned.

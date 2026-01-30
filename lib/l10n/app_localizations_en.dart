@@ -4339,7 +4339,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dispute_noDisputesMessage =>
-      'You have no ongoing disputes. That\'s good news!';
+      'You have no ongoing disputes. To report a problem, go to a reservation\'s details and tap \"Report a problem\".';
 
   @override
   String get dispute_notAssigned => 'Not assigned';

@@ -1582,7 +1582,7 @@
   "dispute_maxPhotos": "Maximum 10 photos",
   "dispute_minCharsRequired": "Minimum 50 characters required",
   "dispute_noDisputes": "No disputes",
-  "dispute_noDisputesMessage": "You have no ongoing disputes. That's good news!",
+  "dispute_noDisputesMessage": "You have no ongoing disputes. To report a problem, go to a reservation's details and tap \"Report a problem\".",
   "dispute_notAssigned": "Not assigned",
   "dispute_notFound": "Dispute not found",
   "dispute_notFoundMessage": "This dispute could not be found or has been deleted.",
