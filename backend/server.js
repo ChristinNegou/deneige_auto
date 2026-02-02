@@ -215,6 +215,10 @@ app.get('/terms-of-service', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'terms-of-service.html'));
 });
 
+app.get('/delete-account', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'delete-account.html'));
+});
+
 // ✅ Routes pour les redirections Stripe Connect
 app.get('/worker/stripe-connect/complete', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'stripe-connect-complete.html'));
