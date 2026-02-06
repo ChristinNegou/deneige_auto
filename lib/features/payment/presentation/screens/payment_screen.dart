@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -291,11 +292,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final isSelected = _useNewCard;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _useNewCard = true;
-          _selectedPaymentMethod = null;
-        });
+      onTap: () async {
+        final result =
+            await Navigator.pushNamed(context, AppRoutes.addPaymentMethod);
+        if (result == true && mounted) {
+          context.read<PaymentMethodsBloc>().add(LoadPaymentMethods());
+        }
       },
       child: Container(
         padding: const EdgeInsets.all(14),
