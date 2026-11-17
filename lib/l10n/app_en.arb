@@ -674,6 +674,21 @@
   "clientHome_theWorker": "the worker",
   "clientHome_mySubscription": "My\nsubscription",
   "clientHome_userNotAuth": "Error: user not authenticated",
+  "reservation_stepVehicle": "Vehicle and spot",
+  "reservation_stepLocation": "Address",
+  "reservation_stepSchedule": "Date and time",
+  "reservation_stepOptions": "Options",
+  "reservation_stepSummary": "Summary",
+  "reservation_stepCounter": "Step {current} of {total}",
+  "@reservation_stepCounter": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "clientHome_heroTitle": "Your car cleared before you leave.",
+  "clientHome_heroCta": "Book snow removal",
+  "clientHome_shortcuts": "Shortcuts",
   "weather_snowDepthValue": "{depth} cm on ground",
   "worker_jobsAvailable": "Available",
   "worker_jobsMyJobs": "My jobs",

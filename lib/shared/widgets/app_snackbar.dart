@@ -18,12 +18,12 @@ class AppSnackBar {
       SnackBar(
         content: Row(
           children: [
-            Icon(icon, color: AppTheme.background),
+            Icon(icon, color: AppTheme.onPrimary),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(color: AppTheme.background),
+                style: TextStyle(color: AppTheme.onPrimary),
               ),
             ),
           ],
@@ -37,7 +37,7 @@ class AppSnackBar {
         action: onAction != null && actionLabel != null
             ? SnackBarAction(
                 label: actionLabel,
-                textColor: AppTheme.background,
+                textColor: AppTheme.onPrimary,
                 onPressed: onAction,
               )
             : null,

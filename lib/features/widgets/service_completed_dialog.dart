@@ -571,7 +571,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
         child: Text(
           amount == 0 ? 'Non' : '${amount.toInt()}\$',
           style: TextStyle(
-            color: isSelected ? AppTheme.background : AppTheme.textPrimary,
+            color: isSelected ? AppTheme.onPrimary : AppTheme.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
@@ -604,7 +604,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
         ),
         child: Icon(
           Icons.edit,
-          color: _showCustomTip ? AppTheme.background : AppTheme.textSecondary,
+          color: _showCustomTip ? AppTheme.onPrimary : AppTheme.textSecondary,
           size: 20,
         ),
       ),
@@ -671,7 +671,7 @@ class _ServiceCompletedDialogState extends State<ServiceCompletedDialog>
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

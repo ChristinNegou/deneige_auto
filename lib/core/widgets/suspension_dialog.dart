@@ -146,7 +146,7 @@ class SuspensionDialog extends StatelessWidget {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.error,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

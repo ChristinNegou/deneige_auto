@@ -151,22 +151,15 @@ class AppIllustration extends StatelessWidget {
     this.fallbackIconColor,
   });
 
+  /// Taille maximale de l'embleme : au-dela, il ecrase le texte qui l'accompagne.
+  static const double _maxEmblemSize = 96;
+
   @override
   Widget build(BuildContext context) {
-    // Vérifier d'abord si c'est une image PNG (onboarding)
-    final imagePath = _ImageAssets.paths[type];
-    if (imagePath != null) {
-      return SizedBox(
-        width: width ?? 200,
-        height: height ?? 200,
-        child: Image.asset(
-          imagePath,
-          fit: fit,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildFallbackIcon();
-          },
-        ),
-      );
+    // Les anciennes images PNG (generees, au texte illisible) sont remplacees
+    // par un embleme sobre coherent avec le theme.
+    if (_ImageAssets.paths.containsKey(type)) {
+      return _buildFallbackIcon();
     }
 
     // Sinon utiliser les animations Lottie
@@ -209,21 +202,32 @@ class AppIllustration extends StatelessWidget {
     );
   }
 
+  /// Embleme : cercle blanc borde, icone bleu nuit centree.
   Widget _buildFallbackIcon() {
     final iconData = _getFallbackIcon();
     final color = fallbackIconColor ?? AppTheme.primary;
+    final requested =
+        [width ?? 200, height ?? 200].reduce((a, b) => a < b ? a : b);
+    final size = requested > _maxEmblemSize ? _maxEmblemSize : requested;
 
-    return Container(
-      width: width ?? 200,
-      height: height ?? 200,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        iconData,
-        size: (width ?? 200) * 0.4,
-        color: color,
+    return SizedBox(
+      width: width != null && width! < _maxEmblemSize ? width : size,
+      height: height != null && height! < _maxEmblemSize ? height : size,
+      child: Center(
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppTheme.border, width: 1.5),
+          ),
+          child: Icon(
+            iconData,
+            size: size * 0.42,
+            color: color,
+          ),
+        ),
       ),
     );
   }

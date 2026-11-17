@@ -2048,6 +2048,36 @@ class AppLocalizationsFr extends AppLocalizations {
   String get clientHome_userNotAuth => 'Erreur: utilisateur non authentifié';
 
   @override
+  String get reservation_stepVehicle => 'Véhicule et emplacement';
+
+  @override
+  String get reservation_stepLocation => 'Adresse';
+
+  @override
+  String get reservation_stepSchedule => 'Date et heure';
+
+  @override
+  String get reservation_stepOptions => 'Options';
+
+  @override
+  String get reservation_stepSummary => 'Résumé';
+
+  @override
+  String reservation_stepCounter(int current, int total) {
+    return 'Étape $current sur $total';
+  }
+
+  @override
+  String get clientHome_heroTitle =>
+      'Votre voiture déneigée avant votre départ.';
+
+  @override
+  String get clientHome_heroCta => 'Réserver un déneigement';
+
+  @override
+  String get clientHome_shortcuts => 'Raccourcis';
+
+  @override
   String weather_snowDepthValue(String depth) {
     return '$depth cm au sol';
   }

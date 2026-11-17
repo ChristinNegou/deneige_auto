@@ -761,6 +761,21 @@
   "clientHome_theWorker": "le déneigeur",
   "clientHome_mySubscription": "Mon\nabonnement",
   "clientHome_userNotAuth": "Erreur: utilisateur non authentifié",
+  "reservation_stepVehicle": "Véhicule et emplacement",
+  "reservation_stepLocation": "Adresse",
+  "reservation_stepSchedule": "Date et heure",
+  "reservation_stepOptions": "Options",
+  "reservation_stepSummary": "Résumé",
+  "reservation_stepCounter": "Étape {current} sur {total}",
+  "@reservation_stepCounter": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "clientHome_heroTitle": "Votre voiture déneigée avant votre départ.",
+  "clientHome_heroCta": "Réserver un déneigement",
+  "clientHome_shortcuts": "Raccourcis",
   "weather_snowDepthValue": "{depth} cm au sol",
   "@weather_snowDepthValue": {
     "placeholders": {

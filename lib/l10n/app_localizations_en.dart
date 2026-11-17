@@ -2031,6 +2031,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientHome_userNotAuth => 'Error: user not authenticated';
 
   @override
+  String get reservation_stepVehicle => 'Vehicle and spot';
+
+  @override
+  String get reservation_stepLocation => 'Address';
+
+  @override
+  String get reservation_stepSchedule => 'Date and time';
+
+  @override
+  String get reservation_stepOptions => 'Options';
+
+  @override
+  String get reservation_stepSummary => 'Summary';
+
+  @override
+  String reservation_stepCounter(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get clientHome_heroTitle => 'Your car cleared before you leave.';
+
+  @override
+  String get clientHome_heroCta => 'Book snow removal';
+
+  @override
+  String get clientHome_shortcuts => 'Shortcuts';
+
+  @override
   String weather_snowDepthValue(String depth) {
     return '$depth cm on ground';
   }

@@ -3956,6 +3956,60 @@ abstract class AppLocalizations {
   /// **'Erreur: utilisateur non authentifié'**
   String get clientHome_userNotAuth;
 
+  /// No description provided for @reservation_stepVehicle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Véhicule et emplacement'**
+  String get reservation_stepVehicle;
+
+  /// No description provided for @reservation_stepLocation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse'**
+  String get reservation_stepLocation;
+
+  /// No description provided for @reservation_stepSchedule.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date et heure'**
+  String get reservation_stepSchedule;
+
+  /// No description provided for @reservation_stepOptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Options'**
+  String get reservation_stepOptions;
+
+  /// No description provided for @reservation_stepSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résumé'**
+  String get reservation_stepSummary;
+
+  /// No description provided for @reservation_stepCounter.
+  ///
+  /// In fr, this message translates to:
+  /// **'Étape {current} sur {total}'**
+  String reservation_stepCounter(int current, int total);
+
+  /// No description provided for @clientHome_heroTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre voiture déneigée avant votre départ.'**
+  String get clientHome_heroTitle;
+
+  /// No description provided for @clientHome_heroCta.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réserver un déneigement'**
+  String get clientHome_heroCta;
+
+  /// No description provided for @clientHome_shortcuts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Raccourcis'**
+  String get clientHome_shortcuts;
+
   /// No description provided for @weather_snowDepthValue.
   ///
   /// In fr, this message translates to:

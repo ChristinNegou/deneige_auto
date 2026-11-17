@@ -216,14 +216,7 @@ class _RatingDialogState extends State<RatingDialog>
           height: 80,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [
-                AppTheme.primary,
-                AppTheme.primary.withValues(alpha: 0.7),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: AppTheme.primary,
             boxShadow: [
               BoxShadow(
                 color: AppTheme.primary.withValues(alpha: 0.3),
@@ -239,14 +232,14 @@ class _RatingDialogState extends State<RatingDialog>
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Icon(
                       Icons.person,
-                      color: AppTheme.background,
+                      color: AppTheme.onPrimary,
                       size: 40,
                     ),
                   ),
                 )
               : Icon(
                   Icons.person,
-                  color: AppTheme.background,
+                  color: AppTheme.onPrimary,
                   size: 40,
                 ),
         ),
@@ -328,7 +321,7 @@ class _RatingDialogState extends State<RatingDialog>
             onPressed: _isSubmitting ? null : _handleSubmit,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -340,7 +333,7 @@ class _RatingDialogState extends State<RatingDialog>
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                      color: AppTheme.background,
+                      color: AppTheme.onPrimary,
                       strokeWidth: 2,
                     ),
                   )
