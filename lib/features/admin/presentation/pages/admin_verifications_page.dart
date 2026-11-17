@@ -134,7 +134,7 @@ class _AdminVerificationsPageState extends State<AdminVerificationsPage>
                       child: Text(
                         '${_stats['pending']}',
                         style: TextStyle(
-                          color: AppTheme.background,
+                          color: AppTheme.onPrimary,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
@@ -171,11 +171,7 @@ class _AdminVerificationsPageState extends State<AdminVerificationsPage>
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primary, AppTheme.primary.withValues(alpha: 0.8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppTheme.primary,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -203,7 +199,7 @@ class _AdminVerificationsPageState extends State<AdminVerificationsPage>
         Text(
           value,
           style: TextStyle(
-            color: AppTheme.background,
+            color: AppTheme.onPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -211,7 +207,7 @@ class _AdminVerificationsPageState extends State<AdminVerificationsPage>
         Text(
           label,
           style: TextStyle(
-            color: AppTheme.background.withValues(alpha: 0.8),
+            color: AppTheme.onPrimary.withValues(alpha: 0.8),
             fontSize: 11,
           ),
         ),

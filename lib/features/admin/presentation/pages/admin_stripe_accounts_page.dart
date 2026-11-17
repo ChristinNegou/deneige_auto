@@ -362,8 +362,9 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,8 +529,9 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -629,7 +631,7 @@ class _AdminStripeAccountsPageState extends State<AdminStripeAccountsPage> {
                         stripeAccountId,
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: 'monospace',
+                          fontFeatures: [FontFeature.tabularFigures()],
                           color: AppTheme.textSecondary,
                         ),
                       ),

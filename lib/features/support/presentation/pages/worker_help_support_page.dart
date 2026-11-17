@@ -429,8 +429,8 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.warning,
-                      foregroundColor: AppTheme.background,
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: AppTheme.onPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -442,7 +442,7 @@ class _WorkerContactTabState extends State<_WorkerContactTab> {
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: AppTheme.background,
+                              color: AppTheme.onPrimary,
                             ),
                           )
                         : Row(

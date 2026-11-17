@@ -144,7 +144,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
-                foregroundColor: AppTheme.background,
+                foregroundColor: AppTheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -405,7 +405,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                           child: _confirmed
                               ? Icon(
                                   Icons.check,
-                                  color: AppTheme.background,
+                                  color: AppTheme.onPrimary,
                                   size: 16,
                                 )
                               : null,
@@ -433,7 +433,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                     onPressed: _isLoading ? null : _submitReport,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.error,
-                      foregroundColor: AppTheme.background,
+                      foregroundColor: AppTheme.onPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -446,7 +446,7 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
-                              color: AppTheme.background,
+                              color: AppTheme.onPrimary,
                               strokeWidth: 2,
                             ),
                           )

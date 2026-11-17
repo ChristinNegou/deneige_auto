@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_illustration.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../domain/entities/chat_message.dart';
 import '../bloc/chat_bloc.dart';
@@ -190,18 +191,15 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.chat_bubble_outline,
-                  size: 64,
-                  color: AppTheme.textTertiary,
+                const AppIllustration(
+                  type: IllustrationType.emptyChat,
+                  width: 80,
+                  height: 80,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   AppLocalizations.of(context)!.chat_noMessages,
-                  style: TextStyle(
-                    color: AppTheme.textTertiary,
-                    fontSize: 16,
-                  ),
+                  style: AppTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -273,7 +271,12 @@ class _ChatScreenState extends State<ChatScreen> {
     } else if (_isSameDay(date, now.subtract(const Duration(days: 1)))) {
       text = AppLocalizations.of(context)!.chat_yesterday;
     } else {
-      text = DateFormat('d MMMM yyyy', 'fr_FR').format(date);
+      text = DateFormat(
+              'd MMMM yyyy',
+              Localizations.localeOf(context).languageCode == 'en'
+                  ? 'en_CA'
+                  : 'fr_CA')
+          .format(date);
     }
 
     return Padding(
@@ -283,16 +286,9 @@ class _ChatScreenState extends State<ChatScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
             color: AppTheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusFull),
           ),
-          child: Text(
-            text,
-            style: TextStyle(
-              color: AppTheme.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          child: Text(text, style: AppTheme.labelSmall),
         ),
       ),
     );
@@ -312,18 +308,12 @@ class _ChatScreenState extends State<ChatScreen> {
         decoration: BoxDecoration(
           color: isMe ? AppTheme.primary : AppTheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isMe ? 16 : 4),
-            bottomRight: Radius.circular(isMe ? 4 : 16),
+            topLeft: const Radius.circular(18),
+            topRight: const Radius.circular(18),
+            bottomLeft: Radius.circular(isMe ? 18 : 4),
+            bottomRight: Radius.circular(isMe ? 4 : 18),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.shadowColor.withValues(alpha: 0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          border: isMe ? null : Border.all(color: AppTheme.border),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -331,7 +321,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Text(
               message.content,
               style: TextStyle(
-                color: isMe ? AppTheme.background : AppTheme.textPrimary,
+                color: isMe ? AppTheme.onPrimary : AppTheme.textPrimary,
                 fontSize: 15,
               ),
             ),
@@ -343,7 +333,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   DateFormat('HH:mm').format(message.createdAt),
                   style: TextStyle(
                     color: isMe
-                        ? AppTheme.background.withValues(alpha: 0.7)
+                        ? AppTheme.onPrimary.withValues(alpha: 0.7)
                         : AppTheme.textTertiary,
                     fontSize: 11,
                   ),
@@ -354,8 +344,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     message.isRead ? Icons.done_all : Icons.done,
                     size: 14,
                     color: message.isRead
-                        ? AppTheme.background
-                        : AppTheme.background.withValues(alpha: 0.7),
+                        ? AppTheme.onPrimary
+                        : AppTheme.onPrimary.withValues(alpha: 0.7),
                   ),
                 ],
               ],
@@ -374,15 +364,9 @@ class _ChatScreenState extends State<ChatScreen> {
         top: 8,
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppTheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        border: Border(top: BorderSide(color: AppTheme.divider)),
       ),
       child: Row(
         children: [
@@ -396,7 +380,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 controller: _messageController,
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.chat_inputHint,
+                  filled: false,
                   border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,
@@ -418,12 +405,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     ? const SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppTheme.onPrimary,
+                        ),
                       )
-                    : const Icon(Icons.send_rounded),
-                color: AppTheme.primary,
+                    : const Icon(Icons.arrow_upward_rounded),
+                color: AppTheme.onPrimary,
                 style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
+                  backgroundColor: AppTheme.primary,
+                  disabledBackgroundColor: AppTheme.primary,
+                  fixedSize: const Size(44, 44),
                 ),
               );
             },

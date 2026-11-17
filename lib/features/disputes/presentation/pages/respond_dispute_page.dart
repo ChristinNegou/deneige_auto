@@ -295,7 +295,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -653,7 +653,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
         onPressed: (_isLoading || deadlinePassed) ? null : _submitResponse,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primary,
-          foregroundColor: AppTheme.background,
+          foregroundColor: AppTheme.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

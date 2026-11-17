@@ -513,7 +513,7 @@ class _MyDisputesPageState extends State<MyDisputesPage> {
               label: Text(l10n.common_retry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
-                foregroundColor: AppTheme.background,
+                foregroundColor: AppTheme.onPrimary,
               ),
             ),
           ],

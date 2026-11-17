@@ -120,7 +120,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
             ),
             child: Text(l10n.dispute_submitAppeal),
           ),
@@ -334,12 +334,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            statusColor,
-            statusColor.withValues(alpha: 0.7),
-          ],
-        ),
+        color: statusColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -362,7 +357,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                 ),
                 child: Icon(
                   _getTypeIcon(dispute.type),
-                  color: AppTheme.background,
+                  color: AppTheme.onPrimary,
                   size: 28,
                 ),
               ),
@@ -374,7 +369,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                     Text(
                       dispute.type.label,
                       style: TextStyle(
-                        color: AppTheme.background,
+                        color: AppTheme.onPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -383,7 +378,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                     Text(
                       dispute.status.label,
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.9),
+                        color: AppTheme.onPrimary.withValues(alpha: 0.9),
                         fontSize: 14,
                       ),
                     ),
@@ -405,7 +400,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                 children: [
                   Icon(
                     Icons.attach_money,
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                     size: 18,
                   ),
                   const SizedBox(width: 4),
@@ -413,7 +408,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
                     AppLocalizations.of(context)!.dispute_claimedAmountValue(
                         dispute.claimedAmount.toStringAsFixed(2)),
                     style: TextStyle(
-                      color: AppTheme.background,
+                      color: AppTheme.onPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -827,12 +822,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.primary.withValues(alpha: 0.1),
-            AppTheme.primary.withValues(alpha: 0.05),
-          ],
-        ),
+        color: AppTheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
       ),
@@ -1126,11 +1116,11 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
         Expanded(
           child: ElevatedButton.icon(
             onPressed: _navigateToRespond,
-            icon: Icon(Icons.reply, color: AppTheme.background),
+            icon: Icon(Icons.reply, color: AppTheme.onPrimary),
             label: Text(l10n.dispute_respond),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1153,11 +1143,11 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               HapticFeedback.mediumImpact();
               _showAppealDialog();
             },
-            icon: Icon(Icons.gavel, color: AppTheme.background),
+            icon: Icon(Icons.gavel, color: AppTheme.onPrimary),
             label: Text(l10n.dispute_appeal),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.warning,
-              foregroundColor: AppTheme.background,
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1388,7 +1378,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
               label: Text(l10n.common_retry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
-                foregroundColor: AppTheme.background,
+                foregroundColor: AppTheme.onPrimary,
               ),
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -50,7 +51,7 @@ class WeatherView extends StatelessWidget {
                   Icon(
                     Icons.cloud_off,
                     size: 80,
-                    color: Colors.grey[400],
+                    color: AppTheme.textTertiary,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -141,14 +142,14 @@ class WeatherView extends StatelessWidget {
                   // Alerte neige
                   if (weather.hasSnowAlert) ...[
                     Card(
-                      color: Colors.orange.shade50,
+                      color: AppTheme.warningLight,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
                             Icon(
                               Icons.warning_amber_rounded,
-                              color: Colors.orange.shade700,
+                              color: AppTheme.warning,
                               size: 32,
                             ),
                             const SizedBox(width: 16),
@@ -160,7 +161,7 @@ class WeatherView extends StatelessWidget {
                                     l10n.weather_snowAlert,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.orange.shade900,
+                                      color: AppTheme.warning,
                                       fontSize: 16,
                                     ),
                                   ),
@@ -169,7 +170,7 @@ class WeatherView extends StatelessWidget {
                                     weather.alertDescription ??
                                         l10n.weather_snowAlertDefault,
                                     style: TextStyle(
-                                      color: Colors.orange.shade800,
+                                      color: AppTheme.warning,
                                     ),
                                   ),
                                 ],
@@ -186,7 +187,7 @@ class WeatherView extends StatelessWidget {
                   Text(
                     weather.location,
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: AppTheme.textSecondary,
                       fontSize: 16,
                     ),
                   ),

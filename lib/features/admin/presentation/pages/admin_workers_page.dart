@@ -201,11 +201,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primary, AppTheme.primary.withValues(alpha: 0.8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppTheme.primary,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -227,12 +223,12 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: AppTheme.background, size: 24),
+        Icon(icon, color: AppTheme.onPrimary, size: 24),
         const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
-            color: AppTheme.background,
+            color: AppTheme.onPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -240,7 +236,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
         Text(
           label,
           style: TextStyle(
-            color: AppTheme.background.withValues(alpha: 0.8),
+            color: AppTheme.onPrimary.withValues(alpha: 0.8),
             fontSize: 12,
           ),
         ),
@@ -354,7 +350,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
                             child: Text(
                               '${index + 1}',
                               style: TextStyle(
-                                color: AppTheme.background,
+                                color: AppTheme.onPrimary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),

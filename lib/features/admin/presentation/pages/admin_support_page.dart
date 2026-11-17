@@ -879,7 +879,7 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.error,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),

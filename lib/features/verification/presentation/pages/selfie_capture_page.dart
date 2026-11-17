@@ -303,7 +303,7 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                                   children: [
                                     Icon(
                                       Icons.camera_alt,
-                                      color: AppTheme.background,
+                                      color: AppTheme.onPrimary,
                                       size: 20,
                                     ),
                                     const SizedBox(width: 8),
@@ -311,7 +311,7 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                                       AppLocalizations.of(context)!
                                           .verification_takeSelfieBtn,
                                       style: TextStyle(
-                                        color: AppTheme.background,
+                                        color: AppTheme.onPrimary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -334,8 +334,10 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppTheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.border),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+                  border:
+                      Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+                  boxShadow: AppTheme.shadowSM,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

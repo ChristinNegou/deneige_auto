@@ -156,8 +156,9 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.border),
+              borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+              border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+              boxShadow: AppTheme.shadowSM,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,8 +195,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           ElevatedButton(
             onPressed: () => _startVerification(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.success,
-              foregroundColor: AppTheme.background,
+              backgroundColor: AppTheme.accent,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -477,8 +478,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ElevatedButton(
               onPressed: () => _startVerification(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.success,
-                foregroundColor: AppTheme.background,
+                backgroundColor: AppTheme.accent,
+                foregroundColor: AppTheme.onPrimary,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -562,8 +563,8 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             ElevatedButton(
               onPressed: () => _startVerification(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.success,
-                foregroundColor: AppTheme.background,
+                backgroundColor: AppTheme.accent,
+                foregroundColor: AppTheme.onPrimary,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(

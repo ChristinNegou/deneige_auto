@@ -273,7 +273,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -583,7 +583,7 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
         onPressed: (_isLoading || !hasContent) ? null : _submitEvidence,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primary,
-          foregroundColor: AppTheme.background,
+          foregroundColor: AppTheme.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

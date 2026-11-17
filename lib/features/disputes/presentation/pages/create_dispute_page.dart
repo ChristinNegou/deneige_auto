@@ -284,7 +284,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -688,7 +688,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
         onPressed: _isLoading ? null : _submitDispute,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primary,
-          foregroundColor: AppTheme.background,
+          foregroundColor: AppTheme.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

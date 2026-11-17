@@ -123,14 +123,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.primary2,
-                  AppTheme.primary2.withValues(alpha: 0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: AppTheme.primary2,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -140,14 +133,14 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   children: [
                     Icon(
                       Icons.account_balance,
-                      color: AppTheme.background.withValues(alpha: 0.8),
+                      color: AppTheme.onPrimary.withValues(alpha: 0.8),
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Revenus Stripe',
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.8),
+                        color: AppTheme.onPrimary.withValues(alpha: 0.8),
                         fontSize: 16,
                       ),
                     ),
@@ -158,7 +151,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     child: CircularProgressIndicator(
-                      color: AppTheme.background,
+                      color: AppTheme.onPrimary,
                     ),
                   )
                 else if (reconciliation != null)
@@ -167,7 +160,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                       Text(
                         currencyFormat.format(stripeNetRevenue),
                         style: TextStyle(
-                          color: AppTheme.background,
+                          color: AppTheme.onPrimary,
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
                         ),
@@ -175,7 +168,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                       Text(
                         '(30 derniers jours)',
                         style: TextStyle(
-                          color: AppTheme.background.withValues(alpha: 0.6),
+                          color: AppTheme.onPrimary.withValues(alpha: 0.6),
                           fontSize: 12,
                         ),
                       ),
@@ -185,7 +178,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                   Text(
                     'Chargement...',
                     style: TextStyle(
-                      color: AppTheme.background.withValues(alpha: 0.7),
+                      color: AppTheme.onPrimary.withValues(alpha: 0.7),
                       fontSize: 18,
                     ),
                   ),
@@ -202,7 +195,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                       Container(
                         width: 1,
                         height: 40,
-                        color: AppTheme.background.withValues(alpha: 0.3),
+                        color: AppTheme.onPrimary.withValues(alpha: 0.3),
                       ),
                       _buildRevenueSubItem(
                         'Frais Stripe',
@@ -457,12 +450,12 @@ class _AdminReportsPageState extends State<AdminReportsPage>
   Widget _buildRevenueSubItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: AppTheme.background.withValues(alpha: 0.7), size: 20),
+        Icon(icon, color: AppTheme.onPrimary.withValues(alpha: 0.7), size: 20),
         const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
-            color: AppTheme.background,
+            color: AppTheme.onPrimary,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -470,7 +463,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
         Text(
           label,
           style: TextStyle(
-            color: AppTheme.background.withValues(alpha: 0.7),
+            color: AppTheme.onPrimary.withValues(alpha: 0.7),
             fontSize: 12,
           ),
         ),
@@ -962,7 +955,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                     child: Text(
                       '${index + 1}',
                       style: TextStyle(
-                        color: AppTheme.background,
+                        color: AppTheme.onPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -1113,12 +1106,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.primary2,
-            AppTheme.primary2.withValues(alpha: 0.8),
-          ],
-        ),
+        color: AppTheme.primary2,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -1126,12 +1114,12 @@ class _AdminReportsPageState extends State<AdminReportsPage>
         children: [
           Row(
             children: [
-              Icon(Icons.account_balance, color: AppTheme.background, size: 20),
+              Icon(Icons.account_balance, color: AppTheme.onPrimary, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Solde Stripe',
                 style: TextStyle(
-                  color: AppTheme.background.withValues(alpha: 0.8),
+                  color: AppTheme.onPrimary.withValues(alpha: 0.8),
                   fontSize: 14,
                 ),
               ),
@@ -1147,14 +1135,14 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                     Text(
                       'Disponible',
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.7),
+                        color: AppTheme.onPrimary.withValues(alpha: 0.7),
                         fontSize: 12,
                       ),
                     ),
                     Text(
                       '${balance.available.toStringAsFixed(2)} \$',
                       style: TextStyle(
-                        color: AppTheme.background,
+                        color: AppTheme.onPrimary,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1165,7 +1153,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
               Container(
                 width: 1,
                 height: 40,
-                color: AppTheme.background.withValues(alpha: 0.3),
+                color: AppTheme.onPrimary.withValues(alpha: 0.3),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1175,14 +1163,14 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                     Text(
                       'En attente',
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.7),
+                        color: AppTheme.onPrimary.withValues(alpha: 0.7),
                         fontSize: 12,
                       ),
                     ),
                     Text(
                       '${balance.pending.toStringAsFixed(2)} \$',
                       style: TextStyle(
-                        color: AppTheme.background,
+                        color: AppTheme.onPrimary,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1450,7 +1438,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                         r.id.substring(0, 8),
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: 'monospace',
+                          fontFeatures: [FontFeature.tabularFigures()],
                           color: AppTheme.textSecondary,
                         ),
                       ),
@@ -1722,7 +1710,7 @@ class _AdminReportsPageState extends State<AdminReportsPage>
                                   : detail.reservationId,
                               style: const TextStyle(
                                 fontSize: 12,
-                                fontFamily: 'monospace',
+                                fontFeatures: [FontFeature.tabularFigures()],
                               ),
                             ),
                             Text(

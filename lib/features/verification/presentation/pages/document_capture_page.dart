@@ -253,7 +253,7 @@ class _DocumentCapturePageState extends State<DocumentCapturePage> {
               onPressed: _idFront != null ? _proceedToSelfie : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.success,
-                foregroundColor: AppTheme.background,
+                foregroundColor: AppTheme.onPrimary,
                 disabledBackgroundColor:
                     AppTheme.textTertiary.withValues(alpha: 0.3),
                 disabledForegroundColor: AppTheme.textTertiary,

@@ -100,11 +100,7 @@ class _AdminAIPageContent extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primary, AppTheme.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppTheme.primary,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -127,7 +123,7 @@ class _AdminAIPageContent extends StatelessWidget {
                 ),
                 child: Icon(
                   Icons.smart_toy,
-                  color: AppTheme.background,
+                  color: AppTheme.onPrimary,
                   size: 28,
                 ),
               ),
@@ -139,7 +135,7 @@ class _AdminAIPageContent extends StatelessWidget {
                     Text(
                       'Statut IA',
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.8),
+                        color: AppTheme.onPrimary.withValues(alpha: 0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -148,7 +144,7 @@ class _AdminAIPageContent extends StatelessWidget {
                           ? 'Tous les services actifs'
                           : '${status.activeServicesCount}/5 services actifs',
                       style: TextStyle(
-                        color: AppTheme.background,
+                        color: AppTheme.onPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -172,14 +168,14 @@ class _AdminAIPageContent extends StatelessWidget {
                       status.allServicesActive
                           ? Icons.check_circle
                           : Icons.warning,
-                      color: AppTheme.background,
+                      color: AppTheme.onPrimary,
                       size: 16,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       status.allServicesActive ? 'OK' : 'Partiel',
                       style: TextStyle(
-                        color: AppTheme.background,
+                        color: AppTheme.onPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -193,7 +189,7 @@ class _AdminAIPageContent extends StatelessWidget {
           Text(
             'Modele: ${status.modelVersion.isNotEmpty ? status.modelVersion : "Claude"}',
             style: TextStyle(
-              color: AppTheme.background.withValues(alpha: 0.7),
+              color: AppTheme.onPrimary.withValues(alpha: 0.7),
               fontSize: 12,
             ),
           ),
@@ -597,7 +593,7 @@ class _AdminAIPageContent extends StatelessWidget {
                 child: Text(
                   '${disputes.length}',
                   style: TextStyle(
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

@@ -35,12 +35,7 @@ class PriceEstimationCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.primary.withValues(alpha: 0.1),
-                  AppTheme.primary.withValues(alpha: 0.05),
-                ],
-              ),
+              color: AppTheme.primary.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(AppTheme.radiusLG),
               ),

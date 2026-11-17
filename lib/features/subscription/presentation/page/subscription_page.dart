@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../../l10n/app_localizations.dart';
 
 class SubscriptionPage extends StatelessWidget {
@@ -23,7 +24,7 @@ class SubscriptionPage extends StatelessWidget {
           Text(
             AppLocalizations.of(context)!.subscription_saveWith,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[600],
+                  color: AppTheme.textSecondary,
                 ),
           ),
           const SizedBox(height: 24),
@@ -37,7 +38,7 @@ class SubscriptionPage extends StatelessWidget {
               AppLocalizations.of(context)!.subscription_basicFeature2,
               AppLocalizations.of(context)!.subscription_basicFeature3,
             ],
-            color: Colors.blue,
+            color: AppTheme.primary2,
           ),
           const SizedBox(height: 16),
           _buildSubscriptionCard(
@@ -51,7 +52,7 @@ class SubscriptionPage extends StatelessWidget {
               AppLocalizations.of(context)!.subscription_premiumFeature3,
               AppLocalizations.of(context)!.subscription_premiumFeature4,
             ],
-            color: Colors.purple,
+            color: AppTheme.primary,
             recommended: true,
           ),
           const SizedBox(height: 16),
@@ -67,7 +68,7 @@ class SubscriptionPage extends StatelessWidget {
               AppLocalizations.of(context)!.subscription_seasonalFeature4,
               AppLocalizations.of(context)!.subscription_seasonalFeature5,
             ],
-            color: Colors.orange,
+            color: AppTheme.accent,
           ),
         ],
       ),
@@ -137,7 +138,7 @@ class SubscriptionPage extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
                       '/$period',
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(color: AppTheme.textSecondary),
                     ),
                   ),
                 ],
@@ -220,7 +221,7 @@ class SubscriptionPage extends StatelessWidget {
                 SnackBar(
                   content: Text(AppLocalizations.of(context)!
                       .subscription_planSelected(planName)),
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppTheme.accent,
                 ),
               );
             },

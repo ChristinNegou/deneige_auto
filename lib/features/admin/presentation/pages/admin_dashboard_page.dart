@@ -114,14 +114,7 @@ class AdminDashboardPage extends StatelessWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.primary,
-                  AppTheme.primary.withValues(alpha: 0.8)
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: AppTheme.primary,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,13 +127,13 @@ class AdminDashboardPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(Icons.admin_panel_settings,
-                      size: 35, color: AppTheme.background),
+                      size: 35, color: AppTheme.onPrimary),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   l10n.admin_administration,
                   style: TextStyle(
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -148,7 +141,7 @@ class AdminDashboardPage extends StatelessWidget {
                 Text(
                   'Deneige Auto',
                   style: TextStyle(
-                    color: AppTheme.background.withValues(alpha: 0.8),
+                    color: AppTheme.onPrimary.withValues(alpha: 0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -570,12 +563,12 @@ class AdminDashboardPage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.priority_high,
-                            color: AppTheme.background, size: 16),
+                            color: AppTheme.onPrimary, size: 16),
                         const SizedBox(width: 4),
                         Text(
                           '${stats.support.pending} en attente',
                           style: TextStyle(
-                            color: AppTheme.background,
+                            color: AppTheme.onPrimary,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
@@ -684,11 +677,7 @@ class AdminDashboardPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primary2, AppTheme.primary2.withValues(alpha: 0.7)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppTheme.primary2,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -696,12 +685,12 @@ class AdminDashboardPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.attach_money, color: AppTheme.background),
+              Icon(Icons.attach_money, color: AppTheme.onPrimary),
               const SizedBox(width: 8),
               Text(
                 'Revenus',
                 style: TextStyle(
-                  color: AppTheme.background,
+                  color: AppTheme.onPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -716,7 +705,7 @@ class AdminDashboardPage extends StatelessWidget {
                 child: Text(
                   '${stats.revenue.reservationCount} réservations',
                   style: TextStyle(
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                     fontSize: 12,
                   ),
                 ),
@@ -732,7 +721,7 @@ class AdminDashboardPage extends StatelessWidget {
             ],
           ),
           Divider(
-              color: AppTheme.background.withValues(alpha: 0.24), height: 32),
+              color: AppTheme.onPrimary.withValues(alpha: 0.24), height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -765,7 +754,7 @@ class AdminDashboardPage extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: AppTheme.background.withValues(alpha: 0.7),
+            color: AppTheme.onPrimary.withValues(alpha: 0.7),
             fontSize: 12,
           ),
         ),
@@ -777,7 +766,7 @@ class AdminDashboardPage extends StatelessWidget {
               Text(
                 '-',
                 style: TextStyle(
-                  color: AppTheme.background.withValues(alpha: 0.7),
+                  color: AppTheme.onPrimary.withValues(alpha: 0.7),
                   fontSize: isMain ? 28 : 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -785,7 +774,7 @@ class AdminDashboardPage extends StatelessWidget {
             Text(
               '${amount.toStringAsFixed(2)} \$',
               style: TextStyle(
-                color: isHighlighted ? AppTheme.success : AppTheme.background,
+                color: isHighlighted ? AppTheme.success : AppTheme.onPrimary,
                 fontSize: isMain ? 28 : 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -855,7 +844,7 @@ class AdminDashboardPage extends StatelessWidget {
                       child: Text(
                         '${index + 1}',
                         style: TextStyle(
-                          color: AppTheme.background,
+                          color: AppTheme.onPrimary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1068,7 +1057,7 @@ class AdminDashboardPage extends StatelessWidget {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.error,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),

@@ -742,7 +742,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.smart_toy, color: AppTheme.background, size: 20),
+            Icon(Icons.smart_toy, color: AppTheme.onPrimary, size: 20),
             const SizedBox(width: 8),
             const Text('Recommandation IA appliquee'),
           ],
@@ -1082,7 +1082,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
                       onPressed: _isLoading ? null : _resolveDispute,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.success,
-                        foregroundColor: AppTheme.background,
+                        foregroundColor: AppTheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -1093,7 +1093,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
                               width: 24,
                               height: 24,
                               child: CircularProgressIndicator(
-                                color: AppTheme.background,
+                                color: AppTheme.onPrimary,
                                 strokeWidth: 2,
                               ),
                             )
@@ -1319,18 +1319,11 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.black.withValues(alpha: 0.7),
-                        Colors.transparent,
-                      ],
-                    ),
+                    color: Colors.black.withValues(alpha: 0.7),
                   ),
                   child: Icon(
                     Icons.zoom_in,
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                     size: 16,
                   ),
                 ),
@@ -1425,14 +1418,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.primary.withValues(alpha: 0.1),
-            AppTheme.secondary.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppTheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppTheme.primary.withValues(alpha: 0.2),
@@ -1720,7 +1706,7 @@ class _DisputeDetailsSheetState extends State<_DisputeDetailsSheet> {
             label: const Text('Appliquer la recommandation'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
