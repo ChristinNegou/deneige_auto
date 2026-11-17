@@ -96,11 +96,21 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       const SizedBox(height: 40),
 
                       // Icône
-                      Icon(
-                        isSuccess ? Icons.check_circle : Icons.lock_reset,
-                        size: 80,
-                        color:
-                            isSuccess ? AppTheme.success : AppTheme.textPrimary,
+                      Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          color: isSuccess
+                              ? AppTheme.successLight
+                              : AppTheme.primaryLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isSuccess ? Icons.check_rounded : Icons.lock_reset,
+                          size: 40,
+                          color:
+                              isSuccess ? AppTheme.success : AppTheme.primary,
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -110,9 +120,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             ? l10n.resetPassword_successTitle
                             : l10n.resetPassword_title,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.6,
                           color: AppTheme.textPrimary,
                         ),
                       ),

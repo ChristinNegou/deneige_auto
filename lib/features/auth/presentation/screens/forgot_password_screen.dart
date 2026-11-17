@@ -69,18 +69,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: IconButton(
-                          icon: Icon(Icons.arrow_back,
-                              color: AppTheme.textPrimary),
+                          icon: const Icon(Icons.arrow_back_rounded),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
                       const SizedBox(height: 20),
 
                       // Icône
-                      Icon(
-                        Icons.lock_reset,
-                        size: 80,
-                        color: AppTheme.textPrimary,
+                      Container(
+                        width: 88,
+                        height: 88,
+                        decoration: const BoxDecoration(
+                          color: AppTheme.primaryLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.lock_reset,
+                          size: 40,
+                          color: AppTheme.primary,
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -88,9 +95,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       Text(
                         l10n.forgotPassword_title,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.6,
                           color: AppTheme.textPrimary,
                         ),
                       ),

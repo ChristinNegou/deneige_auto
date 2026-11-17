@@ -20,33 +20,39 @@ class AccountTypeSelectionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
-              // Logo ou titre
-              Icon(
-                Icons.ac_unit,
-                size: 80,
-                color: AppTheme.textPrimary,
-              ),
               const SizedBox(height: 16),
+              // Marque
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                    ),
+                    child: const Icon(
+                      Icons.ac_unit_rounded,
+                      color: AppTheme.onPrimary,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(l10n.appTitle, style: AppTheme.headlineSmall),
+                ],
+              ),
+              const Spacer(),
               Text(
-                l10n.appTitle,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+                l10n.accountType_welcome,
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.8,
+                  height: 1.15,
                   color: AppTheme.textPrimary,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.accountType_welcome,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-              const Spacer(),
+              const SizedBox(height: 28),
 
               // Carte Client
               _AccountTypeCard(
@@ -57,7 +63,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                   width: 40,
                   height: 40,
                   colorFilter:
-                      ColorFilter.mode(AppTheme.textPrimary, BlendMode.srcIn),
+                      ColorFilter.mode(AppTheme.primary, BlendMode.srcIn),
                 ),
                 isClient: true,
                 onTap: () {
@@ -68,7 +74,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                 },
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
 
               // Carte Déneigeur
               _AccountTypeCard(
@@ -79,7 +85,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                   width: 40,
                   height: 40,
                   colorFilter:
-                      ColorFilter.mode(AppTheme.warning, BlendMode.srcIn),
+                      ColorFilter.mode(AppTheme.accentDark, BlendMode.srcIn),
                 ),
                 isClient: false,
                 onTap: () {
@@ -90,7 +96,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                 },
               ),
 
-              const Spacer(),
+              const SizedBox(height: 32),
 
               // Lien vers connexion
               Row(
@@ -104,17 +110,11 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pushNamed(AppRoutes.login);
                     },
-                    child: Text(
-                      l10n.login_submit,
-                      style: TextStyle(
-                        color: AppTheme.textPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: Text(l10n.login_submit),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
             ],
           ),
         ),
@@ -140,64 +140,37 @@ class _AccountTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = isClient ? AppTheme.textPrimary : AppTheme.warning;
+    final tint = isClient ? AppTheme.primaryLight : AppTheme.accentLight;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border),
-        boxShadow: AppTheme.shadowMD,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Row(
+    return GlassCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(18),
+      child: Row(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: tint,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            ),
+            child: iconWidget,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: accentColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: iconWidget,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppTheme.textTertiary,
-                ),
+                Text(title, style: AppTheme.headlineMedium),
+                const SizedBox(height: 4),
+                Text(subtitle, style: AppTheme.bodySmall),
               ],
             ),
           ),
-        ),
+          const SizedBox(width: 8),
+          const Icon(Icons.arrow_forward_rounded, color: AppTheme.textPrimary),
+        ],
       ),
     );
   }

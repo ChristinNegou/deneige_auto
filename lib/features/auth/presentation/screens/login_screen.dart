@@ -87,18 +87,18 @@ class _LoginScreenState extends State<LoginScreen> {
           return SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(AppTheme.paddingXL),
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 8),
 
                       // Logo et titre
                       _buildHeader(l10n),
 
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 36),
 
                       // Formulaire de connexion
                       _buildLoginForm(isLoading, l10n),
@@ -125,59 +125,58 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildHeader(AppLocalizations l10n) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Logo
-        Container(
-          width: 90,
-          height: 90,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppTheme.primary, AppTheme.secondary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.primary.withValues(alpha: 0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+        Row(
+          children: [
+            if (Navigator.of(context).canPop()) ...[
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: IconButton.styleFrom(padding: EdgeInsets.zero),
+                icon: const Icon(Icons.arrow_back_rounded),
               ),
+              const SizedBox(width: 4),
             ],
-          ),
-          child: Icon(
-            Icons.ac_unit_rounded,
-            size: 45,
-            color: AppTheme.background,
-          ),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.primary,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+              child: const Icon(
+                Icons.ac_unit_rounded,
+                size: 22,
+                color: AppTheme.onPrimary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(l10n.appTitle, style: AppTheme.headlineSmall),
+          ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 40),
         Text(
           l10n.login_welcome,
-          style: AppTheme.headlineLarge.copyWith(
-            fontSize: 28,
-            letterSpacing: -0.5,
+          style: const TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.8,
+            height: 1.15,
+            color: AppTheme.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           l10n.login_subtitle,
-          style: AppTheme.bodyMedium.copyWith(
-            color: AppTheme.textSecondary,
-          ),
+          style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
         ),
       ],
     );
   }
 
   Widget _buildLoginForm(bool isLoading, AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowMD,
-      ),
+    return Padding(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -238,13 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: Text(
-                l10n.login_forgotPassword,
-                style: AppTheme.labelMedium.copyWith(
-                  color: AppTheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: Text(l10n.login_forgotPassword),
             ),
           ),
 
@@ -270,30 +263,17 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTheme.labelMedium.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 8),
+        Text(label, style: AppTheme.labelMedium),
+        const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
-          style: AppTheme.bodyMedium,
+          style: AppTheme.bodyLarge,
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle:
-                AppTheme.bodyMedium.copyWith(color: AppTheme.textTertiary),
-            prefixIcon: Container(
-              margin: const EdgeInsets.only(left: 12, right: 8),
-              child: Icon(icon, color: AppTheme.textSecondary, size: 20),
-            ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 0, minHeight: 0),
+            prefixIcon: Icon(icon, size: 20),
             suffixIcon: suffixIcon != null
                 ? Padding(
                     padding: const EdgeInsets.only(right: 12),
@@ -302,30 +282,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 : null,
             suffixIconConstraints:
                 const BoxConstraints(minWidth: 0, minHeight: 0),
-            filled: true,
-            fillColor: AppTheme.background,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              borderSide: const BorderSide(color: AppTheme.error),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              borderSide: const BorderSide(color: AppTheme.error, width: 1.5),
-            ),
           ),
         ),
       ],
@@ -333,45 +289,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginButton(bool isLoading, AppLocalizations l10n) {
-    return GestureDetector(
-      onTap: isLoading ? null : _handleLogin,
-      child: Container(
-        height: 52,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppTheme.primary, AppTheme.secondary],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primary.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: isLoading
-              ? SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    color: AppTheme.background,
-                    strokeWidth: 2.5,
-                  ),
-                )
-              : Text(
-                  l10n.login_submit,
-                  style: TextStyle(
-                    color: AppTheme.background,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-        ),
-      ),
+    return ElevatedButton(
+      onPressed: isLoading ? null : _handleLogin,
+      child: isLoading
+          ? const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                color: AppTheme.onPrimary,
+                strokeWidth: 2.5,
+              ),
+            )
+          : Text(l10n.login_submit),
     );
   }
 
@@ -385,15 +314,10 @@ class _LoginScreenState extends State<LoginScreen> {
             color: AppTheme.textSecondary,
           ),
         ),
-        GestureDetector(
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.accountType),
-          child: Text(
-            l10n.login_register,
-            style: AppTheme.bodyMedium.copyWith(
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+        TextButton(
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.accountType),
+          child: Text(l10n.login_register),
         ),
       ],
     );

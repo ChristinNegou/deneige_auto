@@ -211,13 +211,9 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
       child: Scaffold(
         backgroundColor: AppTheme.background,
         appBar: AppBar(
-          title: Text(
-            l10n.phoneVerification_title,
-            style: TextStyle(color: AppTheme.textPrimary),
-          ),
-          backgroundColor: AppTheme.surface,
-          foregroundColor: AppTheme.textPrimary,
-          elevation: 0,
+          title:
+              Text(l10n.phoneVerification_title, style: AppTheme.labelMedium),
+          centerTitle: true,
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -231,14 +227,14 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                 Container(
                   width: 100,
                   height: 100,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary2.withValues(alpha: 0.15),
+                  decoration: const BoxDecoration(
+                    color: AppTheme.primaryLight,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.phone_android,
-                    size: 50,
-                    color: AppTheme.primary2,
+                  child: const Icon(
+                    Icons.sms_outlined,
+                    size: 44,
+                    color: AppTheme.primary,
                   ),
                 ),
 
@@ -247,9 +243,10 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                 // Titre
                 Text(
                   l10n.phoneVerification_subtitle,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.6,
                     color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
@@ -274,8 +271,8 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                   widget.phoneNumber,
                   style: TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.primary2,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
 
@@ -325,9 +322,10 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           maxLength: 1,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.6,
                             color: AppTheme.textPrimary,
                           ),
                           decoration: InputDecoration(
@@ -400,7 +398,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                     onPressed: _isVerifying ? null : _verifyCode,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primary,
-                      foregroundColor: AppTheme.background,
+                      foregroundColor: AppTheme.onPrimary,
                       disabledBackgroundColor: AppTheme.surfaceContainer,
                       disabledForegroundColor: AppTheme.textTertiary,
                       shape: RoundedRectangleBorder(
@@ -412,7 +410,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
-                              color: AppTheme.background,
+                              color: AppTheme.onPrimary,
                               strokeWidth: 2,
                             ),
                           )

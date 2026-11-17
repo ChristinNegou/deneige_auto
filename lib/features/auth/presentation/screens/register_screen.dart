@@ -117,9 +117,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           colorFilter: ColorFilter.mode(_roleColor, BlendMode.srcIn),
         );
 
-  Color get _roleColor => widget.role == UserRole.client
-      ? AppTheme.statusAssigned
-      : AppTheme.success;
+  /// Memes couleurs que l'ecran de choix du type de compte.
+  Color get _roleColor =>
+      widget.role == UserRole.client ? AppTheme.primary : AppTheme.accentDark;
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Form
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppTheme.paddingXL),
+                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -173,7 +173,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           // Role badge
                           _buildRoleBadge(l10n),
 
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 28),
 
                           // Form card
                           _buildFormCard(isLoading, l10n),
@@ -199,31 +199,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildHeader(AppLocalizations l10n) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
-          const SizedBox(width: 16),
-          Text(
-            l10n.register_title,
-            style: AppTheme.headlineMedium,
-          ),
+          const SizedBox(width: 4),
+          Text(l10n.register_title, style: AppTheme.labelMedium),
         ],
       ),
     );
@@ -231,52 +215,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildRoleBadge(AppLocalizations l10n) {
     final roleTitle = _getRoleTitle(l10n);
-    return Center(
-      child: Column(
-        children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: _roleColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-            ),
-            child: Center(child: _roleIcon),
+    return Row(
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: widget.role == UserRole.client
+                ? AppTheme.primaryLight
+                : AppTheme.accentLight,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
           ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: _roleColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-            ),
-            child: Text(
-              l10n.register_accountLabel(roleTitle),
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: _roleColor,
+          child: Center(child: _roleIcon),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.register_accountLabel(roleTitle),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                  color: AppTheme.textPrimary,
+                ),
               ),
-            ),
+              const SizedBox(height: 2),
+              Text(l10n.register_subtitle, style: AppTheme.bodySmall),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.register_subtitle,
-            style: AppTheme.bodySmall,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildFormCard(bool isLoading, AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowMD,
-      ),
+    return Padding(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -348,19 +326,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
             padding: const EdgeInsets.only(top: 6, left: 4),
             child: Row(
               children: [
-                Icon(
-                  Icons.info_outline_rounded,
+                const Icon(
+                  Icons.sms_outlined,
                   size: 14,
-                  color: AppTheme.primary.withValues(alpha: 0.7),
+                  color: AppTheme.textTertiary,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     l10n.register_verificationCodeSent,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.textSecondary,
-                    ),
+                    style: AppTheme.labelSmall,
                   ),
                 ),
               ],
@@ -459,62 +434,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTheme.labelSmall.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary,
-          ),
-        ),
+        Text(label, style: AppTheme.labelMedium),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
-          style: AppTheme.bodyMedium.copyWith(fontSize: 14),
+          style: AppTheme.bodyLarge,
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle:
-                AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary),
-            prefixIcon: Container(
-              margin: const EdgeInsets.only(left: 10, right: 6),
-              child: Icon(icon, color: AppTheme.textTertiary, size: 18),
-            ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 0, minHeight: 0),
+            prefixIcon: Icon(icon, size: 20),
             suffixIcon: suffixIcon != null
                 ? Padding(
-                    padding: const EdgeInsets.only(right: 10),
+                    padding: const EdgeInsets.only(right: 12),
                     child: suffixIcon,
                   )
                 : null,
             suffixIconConstraints:
                 const BoxConstraints(minWidth: 0, minHeight: 0),
-            filled: true,
-            fillColor: AppTheme.background,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: const BorderSide(color: AppTheme.error),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: const BorderSide(color: AppTheme.error, width: 1.5),
-            ),
             errorStyle: const TextStyle(fontSize: 11),
           ),
         ),
@@ -523,56 +461,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildRegisterButton(bool isLoading, AppLocalizations l10n) {
-    return GestureDetector(
-      onTap: isLoading ? null : () => _handleRegister(l10n),
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [_roleColor, _roleColor.withValues(alpha: 0.8)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          boxShadow: [
-            BoxShadow(
-              color: _roleColor.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(
-          child: isLoading
-              ? SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    color: AppTheme.background,
-                    strokeWidth: 2.5,
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.register_submit,
-                      style: TextStyle(
-                        color: AppTheme.background,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      color: AppTheme.background,
-                      size: 20,
-                    ),
-                  ],
-                ),
-        ),
+    return FilledButton(
+      onPressed: isLoading ? null : () => _handleRegister(l10n),
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(double.infinity, 56),
       ),
+      child: isLoading
+          ? const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                color: AppTheme.onPrimary,
+                strokeWidth: 2.5,
+              ),
+            )
+          : Text(l10n.register_submit),
     );
   }
 
@@ -586,15 +489,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             color: AppTheme.textSecondary,
           ),
         ),
-        GestureDetector(
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.login),
-          child: Text(
-            l10n.login_submit,
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.login),
+          child: Text(l10n.login_submit),
         ),
       ],
     );
