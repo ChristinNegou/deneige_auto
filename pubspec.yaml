@@ -125,11 +125,19 @@ flutter:
 
 # Configuration du splash screen
 flutter_native_splash:
-  color: "#000000"
-  image: assets/images/logoApp.jpg
+  # Meme fond bleu-glace que l'application (AppTheme.background), y compris
+  # en mode sombre : l'app n'a pas de theme sombre, on evite un flash noir.
+  color: "#F3F6F9"
+  color_dark: "#F3F6F9"
+  image: assets/images/splash_logo.png
+  image_dark: assets/images/splash_logo.png
   android_12:
-    color: "#000000"
-    image: assets/images/logoApp.jpg
+    color: "#F3F6F9"
+    color_dark: "#F3F6F9"
+    image: assets/images/splash_android12.png
+    image_dark: assets/images/splash_android12.png
+    icon_background_color: "#0E1C2B"
+    icon_background_color_dark: "#0E1C2B"
   ios: true
   android: true
   web: false
