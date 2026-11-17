@@ -10,7 +10,6 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/app_illustration.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../verification/presentation/bloc/verification_bloc.dart';
@@ -106,12 +105,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppTheme.background.withValues(alpha: 0.2),
+                    color: AppTheme.onPrimary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     hasUrgent ? Icons.bolt : Icons.work_rounded,
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                     size: 20,
                   ),
                 ),
@@ -135,7 +134,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                           newJobs.first.displayAddress,
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppTheme.background.withValues(alpha: 0.9),
+                            color: AppTheme.onPrimary.withValues(alpha: 0.9),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -291,13 +290,13 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     child: _buildVerificationBanner(),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.all(AppTheme.paddingLG),
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
                         _buildAvailabilityCard(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 12),
                         _buildQuickStats(),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 28),
                         _buildMyJobsSection(),
                         _buildAvailableJobsSection(),
                         const SizedBox(height: 20),
@@ -328,12 +327,11 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               }
 
               return Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: AppTheme.background,
-                  borderRadius: BorderRadius.circular(26),
-                  border: Border.all(color: AppTheme.border, width: 2),
+                width: 48,
+                height: 48,
+                decoration: const BoxDecoration(
+                  color: AppTheme.primary,
+                  shape: BoxShape.circle,
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
@@ -358,10 +356,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                               userName.isNotEmpty
                                   ? userName[0].toUpperCase()
                                   : 'D',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textSecondary,
+                              style: const TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.onPrimary,
                               ),
                             ),
                           ),
@@ -371,10 +369,10 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                             userName.isNotEmpty
                                 ? userName[0].toUpperCase()
                                 : 'D',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.textSecondary,
+                            style: const TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w800,
+                              color: AppTheme.onPrimary,
                             ),
                           ),
                         ),
@@ -389,11 +387,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               children: [
                 Text(
                   l10n.worker_greetingName(userName.split(' ').first),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
-                  ),
+                  style: AppTheme.headlineMedium,
                 ),
                 const SizedBox(height: 2),
                 BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
@@ -419,10 +413,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                           isAvailable
                               ? l10n.worker_headerAvailable
                               : l10n.worker_headerOffline,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.textTertiary,
-                          ),
+                          style: AppTheme.bodySmall,
                         ),
                       ],
                     );
@@ -444,12 +435,12 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               height: 44,
               decoration: BoxDecoration(
                 color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(12),
+                shape: BoxShape.circle,
                 border: Border.all(color: AppTheme.border),
               ),
               child: const Icon(
-                Icons.notifications_outlined,
-                color: AppTheme.textSecondary,
+                Icons.notifications_none_rounded,
+                color: AppTheme.textPrimary,
                 size: 22,
               ),
             ),
@@ -467,7 +458,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
               border: Border.all(color: AppTheme.border),
             ),
             child: Row(
@@ -476,7 +467,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 Icon(
                   _getWeatherIcon(state.weather!.condition),
                   size: 18,
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.primary2,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -575,9 +566,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
         return Container(
           margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withValues(alpha: 0.3)),
+            color: color.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            border: Border.all(color: color.withValues(alpha: 0.25)),
           ),
           child: Material(
             color: Colors.transparent,
@@ -637,6 +628,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     );
   }
 
+  /// Interrupteur de service : panneau bleu nuit en service, carte blanche hors ligne.
   Widget _buildAvailabilityCard() {
     final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
@@ -651,86 +643,108 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           isLoading = true;
         }
 
-        return GestureDetector(
-          onTap: isLoading
-              ? null
-              : () {
-                  HapticFeedback.mediumImpact();
-                  context
-                      .read<WorkerAvailabilityBloc>()
-                      .add(const ToggleAvailability());
-                },
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isAvailable ? AppTheme.success : AppTheme.border,
-                width: isAvailable ? 1.5 : 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 52,
-                  height: 52,
-                  child: isLoading
-                      ? Container(
-                          decoration: BoxDecoration(
-                            color: AppTheme.background,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppTheme.border),
-                          ),
-                          child: const Center(
-                            child: SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppTheme.textTertiary,
+        final onDark = isAvailable;
+        final titleColor = onDark ? AppTheme.onPrimary : AppTheme.textPrimary;
+        final subtitleColor = onDark
+            ? AppTheme.onPrimary.withValues(alpha: 0.7)
+            : AppTheme.textSecondary;
+
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            color: onDark ? AppTheme.primary : AppTheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+            border: onDark ? null : Border.all(color: AppTheme.border),
+            boxShadow: onDark ? AppTheme.shadowLG : AppTheme.shadowSM,
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+              onTap: isLoading
+                  ? null
+                  : () {
+                      HapticFeedback.mediumImpact();
+                      context
+                          .read<WorkerAvailabilityBloc>()
+                          .add(const ToggleAvailability());
+                    },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 16, 18),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 9,
+                                height: 9,
+                                decoration: BoxDecoration(
+                                  color: isAvailable
+                                      ? AppTheme.success
+                                      : AppTheme.textTertiary,
+                                  shape: BoxShape.circle,
+                                  boxShadow: isAvailable
+                                      ? [
+                                          BoxShadow(
+                                            color: AppTheme.success
+                                                .withValues(alpha: 0.6),
+                                            blurRadius: 8,
+                                          ),
+                                        ]
+                                      : null,
+                                ),
                               ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  isAvailable
+                                      ? l10n.worker_youAreAvailable
+                                      : l10n.worker_youAreOffline,
+                                  style: TextStyle(
+                                    color: titleColor,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 18,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            isAvailable
+                                ? l10n.worker_receivingJobs
+                                : l10n.worker_activateToReceive,
+                            style: TextStyle(
+                              color: subtitleColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        )
-                      : AppIllustration(
-                          type: isAvailable
-                              ? IllustrationType.workerAvailable
-                              : IllustrationType.workerOffline,
-                          width: 56,
-                          height: 56,
-                        ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isAvailable
-                            ? l10n.worker_youAreAvailable
-                            : l10n.worker_youAreOffline,
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        isAvailable
-                            ? l10n.worker_receivingJobs
-                            : l10n.worker_activateToReceive,
-                        style: TextStyle(
-                          color: AppTheme.textTertiary,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 12),
+                    isLoading
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: onDark
+                                  ? AppTheme.onPrimary
+                                  : AppTheme.textTertiary,
+                            ),
+                          )
+                        : _buildCustomSwitch(isAvailable),
+                  ],
                 ),
-                _buildCustomSwitch(isAvailable),
-              ],
+              ),
             ),
           ),
         );
@@ -739,24 +753,27 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   }
 
   Widget _buildCustomSwitch(bool value) {
-    return Container(
-      width: 48,
-      height: 26,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: 56,
+      height: 32,
       decoration: BoxDecoration(
-        color: value ? AppTheme.success : AppTheme.background,
-        borderRadius: BorderRadius.circular(13),
+        color: value ? AppTheme.success : AppTheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(AppTheme.radiusFull),
         border: value ? null : Border.all(color: AppTheme.border, width: 1.5),
       ),
       child: AnimatedAlign(
-        duration: const Duration(milliseconds: 150),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
         alignment: value ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
-          width: 20,
-          height: 20,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
+          width: 24,
+          height: 24,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: value ? Colors.white : AppTheme.textTertiary,
+            color: Colors.white,
             shape: BoxShape.circle,
+            boxShadow: AppTheme.shadowSM,
           ),
         ),
       ),
@@ -787,89 +804,76 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           rating = state.stats.allTime.averageRating;
         }
 
-        return Row(
-          children: [
-            Expanded(
-              child: _buildMiniStatCard(
-                icon: Icons.check_circle_rounded,
-                iconColor: AppTheme.success,
-                value: completed.toString(),
-                label: l10n.worker_jobsCompleted,
-                illustrationType: IllustrationType.statJobsCompleted,
-              ),
+        return GlassCard(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildMiniStatCard(
+                    value: completed.toString(),
+                    label: l10n.worker_jobsCompleted,
+                  ),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  child: _buildMiniStatCard(
+                    value: '${earnings.toStringAsFixed(0)} \$',
+                    label: l10n.worker_todayLabel,
+                  ),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(
+                  child: _buildMiniStatCard(
+                    value: rating > 0 ? rating.toStringAsFixed(1) : '–',
+                    label: l10n.worker_ratingLabel,
+                    icon: rating > 0 ? Icons.star_rounded : null,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _buildMiniStatCard(
-                icon: Icons.attach_money_rounded,
-                iconColor: AppTheme.primary,
-                value: '${earnings.toStringAsFixed(0)}\$',
-                label: l10n.worker_todayLabel,
-                illustrationType: IllustrationType.statEarnings,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _buildMiniStatCard(
-                icon: Icons.star_rounded,
-                iconColor: AppTheme.warning,
-                value: rating > 0 ? rating.toStringAsFixed(1) : '-',
-                label: l10n.worker_ratingLabel,
-                illustrationType: IllustrationType.statRating,
-              ),
-            ),
-          ],
+          ),
         );
       },
     );
   }
 
   Widget _buildMiniStatCard({
-    required IconData icon,
-    required Color iconColor,
     required String value,
     required String label,
-    IllustrationType? illustrationType,
+    IconData? icon,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
-      ),
-      child: Column(
-        children: [
-          if (illustrationType != null)
-            AppIllustration(
-              type: illustrationType,
-              width: 42,
-              height: 42,
-            )
-          else
-            Icon(icon, color: iconColor, size: 22),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 17,
-              color: AppTheme.textPrimary,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 18, color: AppTheme.warning),
+              const SizedBox(width: 2),
+            ],
+            Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+                letterSpacing: -0.4,
+                color: AppTheme.textPrimary,
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: AppTheme.textTertiary,
-              fontSize: 10,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: AppTheme.labelSmall,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 
@@ -893,30 +897,11 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  l10n.worker_myActiveJobs,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textSecondary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    l10n.worker_activeCount(myJobs.length),
-                    style: TextStyle(
-                      color: AppTheme.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 11,
-                    ),
-                  ),
+                Text(l10n.worker_myActiveJobs, style: AppTheme.headlineMedium),
+                StatusBadge(
+                  label: l10n.worker_activeCount(myJobs.length),
+                  color: AppTheme.statusInProgress,
+                  small: true,
                 ),
               ],
             ),
@@ -971,12 +956,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    l10n.worker_availableJobs,
-                    style: AppTheme.headlineSmall.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  Text(l10n.worker_availableJobs,
+                      style: AppTheme.headlineMedium),
                   const SizedBox(height: 14),
                   const JobCardSkeleton(),
                   const SizedBox(height: 12),
@@ -1017,47 +998,17 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                   children: [
                     Row(
                       children: [
-                        Text(
-                          l10n.worker_availableJobs,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.textSecondary,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
+                        Text(l10n.worker_availableJobs,
+                            style: AppTheme.headlineMedium),
                         if (availableJobs.any((j) => j.isPriority)) ...[
-                          const SizedBox(width: 10),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppTheme.warning.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.bolt,
-                                  color: AppTheme.warning,
-                                  size: 12,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  l10n.worker_urgentCount(availableJobs
-                                      .where((j) => j.isPriority)
-                                      .length),
-                                  style: TextStyle(
-                                    color: AppTheme.warning,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          const SizedBox(width: 8),
+                          StatusBadge(
+                            label: l10n.worker_urgentCount(availableJobs
+                                .where((j) => j.isPriority)
+                                .length),
+                            color: AppTheme.accent,
+                            icon: Icons.bolt_rounded,
+                            small: true,
                           ),
                         ],
                       ],
@@ -1065,11 +1016,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     if (availableJobs.isNotEmpty)
                       Text(
                         l10n.worker_jobCount(availableJobs.length),
-                        style: TextStyle(
-                          color: AppTheme.textTertiary,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                        ),
+                        style: AppTheme.bodySmall,
                       ),
                   ],
                 ),
@@ -1112,68 +1059,77 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     );
   }
 
-  Widget _buildNoEquipmentWarning() {
-    final l10n = AppLocalizations.of(context)!;
+  /// Carte d'etat de la section des travaux : icone, titre, message, action.
+  Widget _buildStateCard({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String message,
+    String? actionLabel,
+    VoidCallback? onAction,
+    List<Widget> extra = const [],
+  }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.build_rounded,
-            size: 32,
-            color: AppTheme.warning,
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 26, color: color),
           ),
           const SizedBox(height: 14),
           Text(
-            l10n.worker_configureEquipment,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
-              color: AppTheme.textPrimary,
-            ),
+            title,
+            style: AppTheme.headlineSmall,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
           Text(
-            l10n.worker_configureEquipmentMessage,
+            message,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppTheme.textSecondary,
-              fontSize: 13,
-              height: 1.4,
-            ),
+            style: AppTheme.bodySmall,
           ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.mediumImpact();
-              WorkerMainDashboard.switchToTab(
-                context,
-                WorkerMainDashboard.profileTab,
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppTheme.warning,
-                borderRadius: BorderRadius.circular(8),
+          ...extra,
+          if (actionLabel != null && onAction != null) ...[
+            const SizedBox(height: 18),
+            OutlinedButton(
+              onPressed: () {
+                HapticFeedback.mediumImpact();
+                onAction();
+              },
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(180, 44),
               ),
-              child: Text(
-                l10n.worker_configure,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-              ),
+              child: Text(actionLabel),
             ),
-          ),
+          ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildNoEquipmentWarning() {
+    final l10n = AppLocalizations.of(context)!;
+    return _buildStateCard(
+      icon: Icons.handyman_outlined,
+      color: AppTheme.warning,
+      title: l10n.worker_configureEquipment,
+      message: l10n.worker_configureEquipmentMessage,
+      actionLabel: l10n.worker_configure,
+      onAction: () => WorkerMainDashboard.switchToTab(
+        context,
+        WorkerMainDashboard.profileTab,
       ),
     );
   }
@@ -1186,82 +1142,44 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
         if (state is WorkerAvailabilityLoaded && state.profile != null) {
           equipmentCount = state.profile!.equipmentList.length;
         }
-
         final bool hasLimitedEquipment =
             equipmentCount > 0 && equipmentCount < 4;
 
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.border),
-          ),
-          child: Column(
-            children: [
-              AppIllustration(
-                type: IllustrationType.emptyWorkerJobs,
-                width: 140,
-                height: 140,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.worker_waitingForJobs,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                l10n.worker_waitingSubtitle,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppTheme.textTertiary,
-                  fontSize: 13,
-                ),
-              ),
-              if (hasLimitedEquipment) ...[
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.background,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppTheme.border),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.lightbulb_outline,
-                        color: AppTheme.textSecondary,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          l10n.worker_addMoreEquipment,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+        return _buildStateCard(
+          icon: Icons.ac_unit_rounded,
+          color: AppTheme.primary2,
+          title: l10n.worker_waitingForJobs,
+          message: l10n.worker_waitingSubtitle,
+          extra: [
+            if (hasLimitedEquipment) ...[
               const SizedBox(height: 14),
-              Text(
-                l10n.worker_autoRefresh,
-                style: TextStyle(
-                  color: AppTheme.textTertiary,
-                  fontSize: 11,
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.background,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.lightbulb_outline_rounded,
+                      color: AppTheme.textSecondary,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        l10n.worker_addMoreEquipment,
+                        style: AppTheme.bodySmall,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
+            const SizedBox(height: 12),
+            Text(l10n.worker_autoRefresh, style: AppTheme.labelSmall),
+          ],
         );
       },
     );
@@ -1269,123 +1187,26 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
 
   Widget _buildErrorState(String message) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.error_outline_rounded,
-            size: 32,
-            color: AppTheme.error,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.worker_oops,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppTheme.textTertiary,
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.mediumImpact();
-              _loadDataWithDefaultLocation();
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppTheme.success,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                l10n.worker_retryLabel,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return _buildStateCard(
+      icon: Icons.cloud_off_rounded,
+      color: AppTheme.error,
+      title: l10n.worker_oops,
+      message: message,
+      actionLabel: l10n.worker_retryLabel,
+      onAction: _loadDataWithDefaultLocation,
     );
   }
 
   Widget _buildVerificationRequiredState() {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.verified_user_outlined,
-            size: 32,
-            color: AppTheme.warning,
-          ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.worker_verificationRequired,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.worker_verificationRequiredForJobs,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppTheme.textTertiary,
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.mediumImpact();
-              Navigator.of(context).pushNamed(AppRoutes.identityVerification);
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppTheme.warning,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                l10n.worker_verify,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return _buildStateCard(
+      icon: Icons.verified_user_outlined,
+      color: AppTheme.warning,
+      title: l10n.worker_verificationRequired,
+      message: l10n.worker_verificationRequiredForJobs,
+      actionLabel: l10n.worker_verify,
+      onAction: () =>
+          Navigator.of(context).pushNamed(AppRoutes.identityVerification),
     );
   }
 }

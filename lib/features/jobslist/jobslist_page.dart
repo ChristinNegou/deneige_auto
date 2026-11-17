@@ -78,25 +78,12 @@ class _JobsListViewState extends State<JobsListView>
 
   Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
           const SizedBox(width: 16),
           Text(
@@ -104,26 +91,14 @@ class _JobsListViewState extends State<JobsListView>
             style: AppTheme.headlineMedium,
           ),
           const Spacer(),
-          GestureDetector(
-            onTap: () {
+          IconButton(
+            onPressed: () {
               context.read<WorkerJobsBloc>()
                 ..add(const LoadMyJobs())
                 ..add(const LoadAvailableJobs(
                     latitude: 45.5017, longitude: -73.5673, radiusKm: 50));
             },
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-              child: const Icon(
-                Icons.refresh_rounded,
-                color: AppTheme.primary,
-                size: 20,
-              ),
-            ),
+            icon: const Icon(Icons.refresh_rounded),
           ),
         ],
       ),
@@ -135,7 +110,8 @@ class _JobsListViewState extends State<JobsListView>
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: TabBar(
@@ -470,17 +446,17 @@ class _JobsListViewState extends State<JobsListView>
   Color _getStatusColor(JobStatus status) {
     switch (status) {
       case JobStatus.pending:
-        return AppTheme.warning;
+        return AppTheme.statusPending;
       case JobStatus.assigned:
-        return AppTheme.primary;
+        return AppTheme.statusAssigned;
       case JobStatus.enRoute:
-        return AppTheme.secondary;
+        return AppTheme.statusEnRoute;
       case JobStatus.inProgress:
-        return AppTheme.success;
+        return AppTheme.statusInProgress;
       case JobStatus.completed:
-        return const Color(0xFF059669);
+        return AppTheme.statusCompleted;
       case JobStatus.cancelled:
-        return AppTheme.textTertiary;
+        return AppTheme.statusCancelled;
     }
   }
 

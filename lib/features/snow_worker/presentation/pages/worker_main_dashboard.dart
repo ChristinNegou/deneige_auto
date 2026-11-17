@@ -174,20 +174,15 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
             width: _fabSize,
             height: _fabSize,
             decoration: BoxDecoration(
-              color: AppTheme.primary2,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primary2.withValues(alpha: 0.4),
-                  blurRadius: _isDragging ? 16 : 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              color: AppTheme.primary,
+              shape: BoxShape.circle,
+              boxShadow:
+                  _isDragging ? AppTheme.shadowElevated : AppTheme.shadowLG,
             ),
             child: const Icon(
-              Icons.smart_toy,
-              color: Colors.white,
-              size: 28,
+              Icons.auto_awesome_rounded,
+              color: AppTheme.onPrimary,
+              size: 24,
             ),
           ),
         ),
@@ -198,20 +193,14 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
   Widget _buildBottomNavBar() {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppTheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        border: Border(top: BorderSide(color: AppTheme.divider)),
       ),
       child: SafeArea(
         top: false,
         child: Container(
-          height: 60,
+          height: 64,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -270,9 +259,7 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
           vertical: 6,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.primary.withValues(alpha: 0.1)
-              : Colors.transparent,
+          color: isSelected ? AppTheme.primaryLight : Colors.transparent,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         ),
         child: Column(
@@ -288,8 +275,8 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                 color: isSelected ? AppTheme.primary : AppTheme.textTertiary,
               ),
             ),

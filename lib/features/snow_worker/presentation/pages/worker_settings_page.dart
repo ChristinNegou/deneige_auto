@@ -81,7 +81,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
     ));
 
     return Scaffold(
@@ -95,7 +95,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   content: Row(
                     children: [
                       Icon(Icons.error_outline,
-                          color: AppTheme.background, size: 20),
+                          color: AppTheme.onPrimary, size: 20),
                       const SizedBox(width: 12),
                       Expanded(child: Text(state.message)),
                     ],
@@ -174,25 +174,12 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   Widget _buildHeader() {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
           const SizedBox(width: 16),
           Text(
@@ -234,19 +221,9 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.success.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: AppTheme.primary,
+          borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+          boxShadow: AppTheme.shadowMD,
         ),
         child: Row(
           children: [
@@ -259,7 +236,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               ),
               child: Icon(
                 Icons.account_balance_wallet,
-                color: AppTheme.background,
+                color: AppTheme.onPrimary,
                 size: 24,
               ),
             ),
@@ -271,7 +248,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   Text(
                     l10n.worker_myPayments,
                     style: TextStyle(
-                      color: AppTheme.background,
+                      color: AppTheme.onPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -280,7 +257,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                   Text(
                     l10n.worker_configureBankAccount,
                     style: TextStyle(
-                      color: AppTheme.background.withValues(alpha: 0.8),
+                      color: AppTheme.onPrimary.withValues(alpha: 0.8),
                       fontSize: 13,
                     ),
                   ),
@@ -289,7 +266,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
             ),
             Icon(
               Icons.chevron_right,
-              color: AppTheme.background,
+              color: AppTheme.onPrimary,
               size: 24,
             ),
           ],
@@ -305,6 +282,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
@@ -394,7 +372,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                         : Border.all(color: AppTheme.border, width: 2),
                   ),
                   child: value
-                      ? Icon(Icons.check, color: AppTheme.background, size: 16)
+                      ? Icon(Icons.check, color: AppTheme.onPrimary, size: 16)
                       : null,
                 ),
               ],
@@ -413,27 +391,13 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.secondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.directions_car_rounded,
-                    color: AppTheme.secondary, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(l10n.worker_myVehicle, style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(l10n.worker_myVehicle, style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           ...VehicleType.values.map((type) => _buildVehicleOption(type)),
         ],
@@ -444,7 +408,6 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
   Widget _buildVehicleOption(VehicleType type) {
     final l10n = AppLocalizations.of(context)!;
     final isSelected = _selectedVehicle == type;
-    final emoji = _getVehicleEmoji(type);
 
     return GestureDetector(
       onTap: () => setState(() => _selectedVehicle = type),
@@ -452,17 +415,28 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.primary.withValues(alpha: 0.08)
-              : AppTheme.background,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          border: isSelected
-              ? Border.all(color: AppTheme.primary, width: 2)
-              : Border.all(color: AppTheme.border),
+          border: Border.all(
+            color: isSelected ? AppTheme.primary : AppTheme.border,
+            width: 1.5,
+          ),
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: isSelected ? AppTheme.primaryLight : AppTheme.background,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+              child: Icon(
+                _getVehicleIcon(type),
+                color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
+                size: 22,
+              ),
+            ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -472,8 +446,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                     _getVehicleLabel(l10n, type),
                     style: AppTheme.labelLarge.copyWith(
                       fontWeight: FontWeight.w600,
-                      color:
-                          isSelected ? AppTheme.primary : AppTheme.textPrimary,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -495,7 +468,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
                     : Border.all(color: AppTheme.textTertiary, width: 2),
               ),
               child: isSelected
-                  ? Icon(Icons.check, color: AppTheme.background, size: 14)
+                  ? Icon(Icons.check, color: AppTheme.onPrimary, size: 14)
                   : null,
             ),
           ],
@@ -511,27 +484,13 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.success.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.tune_rounded,
-                    color: AppTheme.success, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(l10n.worker_workPreferences, style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(l10n.worker_workPreferences, style: AppTheme.headlineSmall),
           const SizedBox(height: 20),
           Text(
             l10n.worker_maxSimultaneousJobs,
@@ -634,6 +593,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
@@ -760,27 +720,13 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.info.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.notifications_rounded,
-                    color: AppTheme.info, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(l10n.worker_notifications, style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(l10n.worker_notifications, style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           _buildNotificationToggle(
             icon: Icons.work_outline_rounded,
@@ -890,6 +836,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
@@ -944,6 +891,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
         decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+          border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
           boxShadow: AppTheme.shadowSM,
         ),
         child: Row(
@@ -998,55 +946,22 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
 
   Widget _buildSaveButton() {
     final l10n = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: _saveSettings,
-      child: Container(
-        width: double.infinity,
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppTheme.primary, AppTheme.secondary],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primary.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.save_rounded, color: AppTheme.background, size: 22),
-            const SizedBox(width: 10),
-            Text(
-              l10n.common_save,
-              style: TextStyle(
-                color: AppTheme.background,
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return ElevatedButton(
+      onPressed: _saveSettings,
+      child: Text(l10n.common_save),
     );
   }
 
-  String _getVehicleEmoji(VehicleType type) {
+  IconData _getVehicleIcon(VehicleType type) {
     switch (type) {
       case VehicleType.car:
-        return '🚗';
+        return Icons.directions_car_filled_rounded;
       case VehicleType.truck:
-        return '🛻';
+        return Icons.local_shipping_rounded;
       case VehicleType.atv:
-        return '🏍️';
+        return Icons.two_wheeler_rounded;
       case VehicleType.other:
-        return '🚙';
+        return Icons.airport_shuttle_rounded;
     }
   }
 
@@ -1164,28 +1079,13 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
         border: Border.all(color: AppTheme.error.withValues(alpha: 0.2)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.logout_rounded,
-                    color: AppTheme.error, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(l10n.worker_account, style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(l10n.worker_account, style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           GestureDetector(
             onTap: () => _showLogoutDialog(context),
@@ -1268,7 +1168,7 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.error,
-                foregroundColor: AppTheme.background,
+                foregroundColor: AppTheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),

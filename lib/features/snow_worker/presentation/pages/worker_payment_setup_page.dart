@@ -295,16 +295,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isConfigured
-              ? [AppTheme.success, AppTheme.success.withValues(alpha: 0.7)]
-              : isPendingVerification
-                  ? [AppTheme.warning, AppTheme.warning.withValues(alpha: 0.7)]
-                  : [AppTheme.primary, AppTheme.secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
+        // L'etat est porte par l'icone et le texte ; le panneau reste bleu nuit.
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,8 +308,12 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppTheme.background.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  color: isConfigured
+                      ? AppTheme.success
+                      : isPendingVerification
+                          ? AppTheme.warning
+                          : AppTheme.onPrimary.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(
                   isConfigured
@@ -324,7 +321,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
                       : isPendingVerification
                           ? Icons.hourglass_top
                           : Icons.account_balance_wallet,
-                  color: AppTheme.background,
+                  color: AppTheme.onPrimary,
                   size: 24,
                 ),
               ),
@@ -343,7 +340,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
                               : AppLocalizations.of(context)!
                                   .worker_configurePayments,
                       style: TextStyle(
-                        color: AppTheme.background,
+                        color: AppTheme.onPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
@@ -358,7 +355,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
                               : AppLocalizations.of(context)!
                                   .worker_receiveEarningsDirectly,
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.8),
+                        color: AppTheme.onPrimary.withValues(alpha: 0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -384,8 +381,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
               child: OutlinedButton(
                 onPressed: _openDashboard,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.background,
-                  side: BorderSide(color: AppTheme.background),
+                  foregroundColor: AppTheme.onPrimary,
+                  side: BorderSide(color: AppTheme.onPrimary),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -416,14 +413,13 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline,
-                      color: AppTheme.background, size: 20),
+                  Icon(Icons.info_outline, color: AppTheme.onPrimary, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       AppLocalizations.of(context)!.worker_verificationTimeInfo,
                       style: TextStyle(
-                        color: AppTheme.background,
+                        color: AppTheme.onPrimary,
                         fontSize: 12,
                       ),
                     ),
@@ -437,8 +433,8 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
               child: OutlinedButton(
                 onPressed: _openDashboard,
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.background,
-                  side: BorderSide(color: AppTheme.background),
+                  foregroundColor: AppTheme.onPrimary,
+                  side: BorderSide(color: AppTheme.onPrimary),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -456,7 +452,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
               child: ElevatedButton(
                 onPressed: _createOrContinueSetup,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.background,
+                  backgroundColor: AppTheme.onPrimary,
                   foregroundColor: AppTheme.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -494,14 +490,14 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
           child: Icon(
             isActive ? Icons.check : Icons.close,
             size: 14,
-            color: isActive ? AppTheme.success : AppTheme.background,
+            color: isActive ? AppTheme.success : AppTheme.onPrimary,
           ),
         ),
         const SizedBox(width: 10),
         Text(
           label,
           style: TextStyle(
-            color: AppTheme.background.withValues(alpha: 0.9),
+            color: AppTheme.onPrimary.withValues(alpha: 0.9),
             fontSize: 14,
           ),
         ),
@@ -517,8 +513,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -627,8 +624,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -737,7 +735,7 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: AppTheme.textSecondary,
-                                  fontFamily: 'monospace',
+                                  fontFeatures: [FontFeature.tabularFigures()],
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -839,8 +837,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -934,8 +933,9 @@ class _WorkerPaymentSetupPageState extends State<WorkerPaymentSetupPage>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

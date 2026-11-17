@@ -78,7 +78,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
     ));
 
     return Scaffold(
@@ -149,25 +149,12 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
           const SizedBox(width: 16),
           Text(
@@ -204,7 +191,8 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: TabBar(
@@ -245,7 +233,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
             label: Text(AppLocalizations.of(context)!.common_retry),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.success,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
@@ -334,19 +322,9 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppTheme.success, Color(0xFF059669)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.success.withValues(alpha: 0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            color: AppTheme.primary,
+            borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+            boxShadow: AppTheme.shadowLG,
           ),
           child: Column(
             children: [
@@ -357,7 +335,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
               Text(
                 title,
                 style: TextStyle(
-                  color: AppTheme.background.withValues(alpha: 0.9),
+                  color: AppTheme.onPrimary.withValues(alpha: 0.9),
                   fontSize: 14,
                   letterSpacing: 0.5,
                 ),
@@ -370,7 +348,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                   Text(
                     animatedAmount.toStringAsFixed(2),
                     style: TextStyle(
-                      color: AppTheme.background,
+                      color: AppTheme.onPrimary,
                       fontSize: 44,
                       fontWeight: FontWeight.bold,
                       fontFeatures: [FontFeature.tabularFigures()],
@@ -381,7 +359,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
                     child: Text(
                       ' \$',
                       style: TextStyle(
-                        color: AppTheme.background.withValues(alpha: 0.7),
+                        color: AppTheme.onPrimary.withValues(alpha: 0.7),
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
                       ),
@@ -468,9 +446,9 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: AppTheme.background.withValues(alpha: 0.2),
+            backgroundColor: AppTheme.onPrimary.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(
-              progress >= 1.0 ? AppTheme.warning : AppTheme.background,
+              progress >= 1.0 ? AppTheme.success : AppTheme.accent,
             ),
             minHeight: 6,
           ),
@@ -506,12 +484,12 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
   }) {
     return Column(
       children: [
-        Icon(icon, color: AppTheme.background, size: 18),
+        Icon(icon, color: AppTheme.onPrimary, size: 18),
         const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
-            color: AppTheme.background,
+            color: AppTheme.onPrimary,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -519,7 +497,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
         Text(
           label,
           style: TextStyle(
-            color: AppTheme.background.withValues(alpha: 0.8),
+            color: AppTheme.onPrimary.withValues(alpha: 0.8),
             fontSize: 11,
           ),
         ),
@@ -603,7 +581,8 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
@@ -645,7 +624,8 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
@@ -699,28 +679,14 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(Icons.analytics_rounded,
-                    color: AppTheme.primary, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text('Statistiques globales', style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text('Statistiques globales', style: AppTheme.headlineSmall),
           const SizedBox(height: 20),
           _buildAllTimeRow('Total jobs', allTime.completed.toString()),
           _buildAllTimeRow(

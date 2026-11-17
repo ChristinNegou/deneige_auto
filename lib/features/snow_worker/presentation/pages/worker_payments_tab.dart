@@ -141,7 +141,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                 slivers: [
                   SliverToBoxAdapter(child: _buildHeader()),
                   SliverPadding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
                         if (_errorMessage != null) _buildErrorBanner(),
@@ -169,38 +169,21 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
       child: Row(
         children: [
           Text(
             AppLocalizations.of(context)!.worker_payments,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
-            ),
+            style: AppTheme.headlineLarge,
           ),
           const Spacer(),
-          GestureDetector(
-            onTap: () {
+          IconButton(
+            onPressed: () {
               HapticFeedback.lightImpact();
               _loadAccountStatus();
             },
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppTheme.border),
-              ),
-              child: Icon(
-                Icons.refresh_rounded,
-                color: AppTheme.textSecondary,
-                size: 20,
-              ),
-            ),
+            icon: const Icon(Icons.refresh_rounded),
           ),
         ],
       ),
@@ -246,12 +229,13 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         border: Border.all(
           color: isConfigured
               ? AppTheme.success.withValues(alpha: 0.3)
-              : AppTheme.border,
+              : AppTheme.border.withValues(alpha: 0.7),
         ),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,11 +265,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                                   .worker_verificationInProgress
                               : AppLocalizations.of(context)!
                                   .worker_configurePayments,
-                      style: const TextStyle(
-                        color: AppTheme.textPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTheme.headlineSmall,
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -318,36 +298,11 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             _buildStatusRow(AppLocalizations.of(context)!.worker_payoutsActive,
                 _payoutsEnabled),
             const SizedBox(height: 14),
-            SizedBox(
-              width: double.infinity,
-              child: GestureDetector(
-                onTap: _openDashboard,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.background,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppTheme.border),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.open_in_new_rounded,
-                          size: 16, color: AppTheme.textSecondary),
-                      const SizedBox(width: 8),
-                      Text(
-                        AppLocalizations.of(context)!
-                            .worker_viewStripeDashboard,
-                        style: TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            OutlinedButton.icon(
+              onPressed: _openDashboard,
+              icon: const Icon(Icons.open_in_new_rounded, size: 18),
+              label: Text(
+                  AppLocalizations.of(context)!.worker_viewStripeDashboard),
             ),
           ] else if (isPendingVerification) ...[
             _buildStatusRow(
@@ -363,8 +318,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.warning.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
+                color: AppTheme.warningLight,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,51 +340,19 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               ),
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: GestureDetector(
-                onTap: _openDashboard,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warning,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.worker_sendMyDocuments,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              ),
+            ElevatedButton(
+              onPressed: _openDashboard,
+              child: Text(AppLocalizations.of(context)!.worker_sendMyDocuments),
             ),
           ] else ...[
-            SizedBox(
-              width: double.infinity,
-              child: GestureDetector(
-                onTap: _createOrContinueSetup,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.success,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    _hasAccount
-                        ? AppLocalizations.of(context)!.worker_continueSetup
-                        : AppLocalizations.of(context)!.worker_configureNow,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
+            // Sans compte de paiement, le deneigeur ne peut pas etre paye :
+            // c'est l'action cle de l'onglet.
+            FilledButton(
+              onPressed: _createOrContinueSetup,
+              child: Text(
+                _hasAccount
+                    ? AppLocalizations.of(context)!.worker_continueSetup
+                    : AppLocalizations.of(context)!.worker_configureNow,
               ),
             ),
           ],
@@ -466,21 +389,15 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppLocalizations.of(context)!.worker_balance,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textSecondary,
-              letterSpacing: 0.5,
-            ),
-          ),
+          Text(AppLocalizations.of(context)!.worker_balance,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 14),
           Row(
             children: [
@@ -498,10 +415,12 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                     const SizedBox(height: 4),
                     Text(
                       '${available.toStringAsFixed(2)} \$',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.success,
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                        color: AppTheme.textPrimary,
+                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
                     ),
                   ],
@@ -528,10 +447,12 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
                       const SizedBox(height: 4),
                       Text(
                         '${pending.toStringAsFixed(2)} \$',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.warning,
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                          color: AppTheme.textTertiary,
+                          fontFeatures: [FontFeature.tabularFigures()],
                         ),
                       ),
                     ],
@@ -550,8 +471,9 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Row(
         children: [
@@ -563,11 +485,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               children: [
                 Text(
                   AppLocalizations.of(context)!.worker_automaticTransfers,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: AppTheme.textPrimary,
-                  ),
+                  style: AppTheme.labelLarge,
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -594,21 +512,15 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppLocalizations.of(context)!.worker_paymentDistribution,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textSecondary,
-              letterSpacing: 0.5,
-            ),
-          ),
+          Text(AppLocalizations.of(context)!.worker_paymentDistribution,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 14),
           _buildCommissionRow(
             AppLocalizations.of(context)!.worker_youReceive,
@@ -698,21 +610,15 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppLocalizations.of(context)!.worker_howItWorks,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textSecondary,
-              letterSpacing: 0.5,
-            ),
-          ),
+          Text(AppLocalizations.of(context)!.worker_howItWorks,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 14),
           _buildStep(1, AppLocalizations.of(context)!.worker_step1ClientPays,
               AppLocalizations.of(context)!.worker_step1SubtitleShort),
@@ -733,18 +639,17 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
           Container(
             width: 26,
             height: 26,
-            decoration: BoxDecoration(
-              color: AppTheme.background,
+            decoration: const BoxDecoration(
+              color: AppTheme.primaryLight,
               shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.border),
             ),
             child: Center(
               child: Text(
                 '$number',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textSecondary,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.primary,
                 ),
               ),
             ),
@@ -754,21 +659,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppTheme.textTertiary,
-                  ),
-                ),
+                Text(title, style: AppTheme.labelLarge),
+                Text(subtitle, style: AppTheme.bodySmall),
               ],
             ),
           ),
@@ -781,9 +673,8 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
+        color: AppTheme.successLight,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
       ),
       child: Row(
         children: [
@@ -795,11 +686,7 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
               children: [
                 Text(
                   AppLocalizations.of(context)!.worker_securePayments,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: AppTheme.textPrimary,
-                  ),
+                  style: AppTheme.labelLarge,
                 ),
                 const SizedBox(height: 2),
                 Text(

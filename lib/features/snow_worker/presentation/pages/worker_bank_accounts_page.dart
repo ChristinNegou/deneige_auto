@@ -416,7 +416,7 @@ class _WorkerBankAccountsPageState extends State<WorkerBankAccountsPage> {
                           style: TextStyle(
                             fontSize: 13,
                             color: AppTheme.textSecondary,
-                            fontFamily: 'monospace',
+                            fontFeatures: [FontFeature.tabularFigures()],
                           ),
                         ),
                         const SizedBox(width: 8),

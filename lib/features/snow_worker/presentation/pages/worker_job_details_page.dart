@@ -17,6 +17,7 @@ import '../../../chat/presentation/bloc/chat_bloc.dart';
 import '../../../chat/presentation/pages/chat_screen.dart';
 import '../../domain/entities/worker_job.dart';
 import '../bloc/worker_jobs_bloc.dart';
+import '../widgets/client_contact_row.dart';
 import '../../data/datasources/worker_remote_datasource.dart'
     show WorkerCancellationReason;
 import '../../../disputes/presentation/pages/create_dispute_page.dart';
@@ -201,7 +202,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             _buildHeader(context),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppTheme.paddingLG),
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -238,25 +239,12 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
           const SizedBox(width: 16),
           Text(
@@ -278,29 +266,15 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: const Icon(Icons.person_rounded,
-                    color: AppTheme.primary, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Text(AppLocalizations.of(context)!.worker_client,
-                  style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(AppLocalizations.of(context)!.worker_client,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           _buildInfoRow(
               AppLocalizations.of(context)!.common_name, job.client.fullName),
@@ -309,112 +283,13 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 job.client.phoneNumber!),
           const SizedBox(height: 12),
           // Boutons de contact - toujours visibles
-          Row(
-            children: [
-              // Bouton Appeler
-              Expanded(
-                child: _buildContactButton(
-                  icon: Icons.phone_rounded,
-                  label: AppLocalizations.of(context)!.common_call,
-                  color: job.client.phoneNumber != null
-                      ? AppTheme.success
-                      : AppTheme.textTertiary,
-                  onTap: _handleCallClient,
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Bouton Chat avec gradient
-              Expanded(
-                child: _buildChatButton(),
-              ),
-              const SizedBox(width: 8),
-              // Bouton SMS
-              Expanded(
-                child: _buildContactButton(
-                  icon: Icons.sms_rounded,
-                  label: AppLocalizations.of(context)!.common_sms,
-                  color: job.client.phoneNumber != null
-                      ? AppTheme.info
-                      : AppTheme.textTertiary,
-                  onTap: _handleMessageClient,
-                ),
-              ),
-            ],
+          ClientContactRow(
+            hasPhone: job.client.phoneNumber != null,
+            onCall: _handleCallClient,
+            onChat: _openChat,
+            onSms: _handleMessageClient,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildContactButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: AppTheme.background, size: 18),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: const TextStyle(
-                color: AppTheme.background,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChatButton() {
-    return GestureDetector(
-      onTap: _openChat,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppTheme.primary, AppTheme.secondary],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primary.withValues(alpha: 0.3),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.chat_bubble_rounded,
-                color: AppTheme.background, size: 18),
-            const SizedBox(width: 6),
-            Text(
-              AppLocalizations.of(context)!.reservation_chat,
-              style: const TextStyle(
-                color: AppTheme.background,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -456,29 +331,15 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppTheme.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: const Icon(Icons.location_on_rounded,
-                    color: AppTheme.error, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Text(AppLocalizations.of(context)!.common_address,
-                  style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(AppLocalizations.of(context)!.common_address,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           Text(job.displayAddress, style: AppTheme.bodyMedium),
           const SizedBox(height: 8),
@@ -503,15 +364,11 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   child: OutlinedButton.icon(
                     onPressed: () => _openMaps(
                         job.location!.latitude, job.location!.longitude),
-                    icon: const Icon(Icons.map_rounded, size: 18),
+                    icon: const Icon(Icons.map_outlined, size: 18),
                     label:
                         Text(AppLocalizations.of(context)!.worker_googleMaps),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.primary,
-                      side: const BorderSide(color: AppTheme.primary),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                      ),
+                      minimumSize: const Size(0, 48),
                     ),
                   ),
                 ),
@@ -523,11 +380,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     icon: const Icon(Icons.navigation_rounded, size: 18),
                     label: Text(AppLocalizations.of(context)!.worker_waze),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.info,
-                      side: const BorderSide(color: AppTheme.info),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                      ),
+                      minimumSize: const Size(0, 48),
                     ),
                   ),
                 ),
@@ -549,29 +402,15 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppTheme.secondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: const Icon(Icons.directions_car_rounded,
-                    color: AppTheme.secondary, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Text(AppLocalizations.of(context)!.step1_vehicle,
-                  style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(AppLocalizations.of(context)!.step1_vehicle,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           // Vehicle photo if available
           if (hasPhoto && photoUrl != null) ...[
@@ -725,29 +564,15 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppTheme.info.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: const Icon(Icons.ac_unit_rounded,
-                    color: AppTheme.info, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Text(AppLocalizations.of(context)!.worker_service,
-                  style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(AppLocalizations.of(context)!.worker_service,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           _buildInfoRow(AppLocalizations.of(context)!.addVehicle_vehicleType,
               AppLocalizations.of(context)!.worker_snowRemoval),
@@ -761,8 +586,8 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   padding: const EdgeInsets.only(bottom: 6),
                   child: Row(
                     children: [
-                      Icon(Icons.check_circle_rounded,
-                          color: AppTheme.success, size: 16),
+                      const Icon(Icons.check_rounded,
+                          color: AppTheme.primary, size: 18),
                       const SizedBox(width: 8),
                       Text(_getOptionLabel(option), style: AppTheme.bodyMedium),
                     ],
@@ -779,29 +604,15 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppTheme.success.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: const Icon(Icons.attach_money_rounded,
-                    color: AppTheme.success, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Text(AppLocalizations.of(context)!.worker_pricing,
-                  style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(AppLocalizations.of(context)!.worker_pricing,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -810,8 +621,9 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   style: AppTheme.bodyMedium),
               Text(
                 '${job.totalPrice.toStringAsFixed(2)} \$',
-                style:
-                    AppTheme.headlineMedium.copyWith(color: AppTheme.success),
+                style: AppTheme.headlineLarge.copyWith(
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
               ),
             ],
           ),
@@ -822,20 +634,9 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               children: [
                 Text(AppLocalizations.of(context)!.worker_tip,
                     style: AppTheme.bodyMedium),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warning.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                  ),
-                  child: Text(
-                    '+ ${job.tipAmount!.toStringAsFixed(2)} \$',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.warning,
-                    ),
-                  ),
+                StatusBadge(
+                  label: '+ ${job.tipAmount!.toStringAsFixed(2)} \$',
+                  color: AppTheme.success,
                 ),
               ],
             ),
@@ -850,29 +651,15 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppTheme.warning.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: const Icon(Icons.note_rounded,
-                    color: AppTheme.warning, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Text(AppLocalizations.of(context)!.worker_clientNotes,
-                  style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(AppLocalizations.of(context)!.worker_clientNotes,
+              style: AppTheme.headlineSmall),
           const SizedBox(height: 16),
           Text(job.clientNotes!, style: AppTheme.bodyMedium),
         ],
@@ -887,8 +674,13 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: AppTheme.bodySmall),
-          Text(value,
-              style: AppTheme.labelLarge.copyWith(fontWeight: FontWeight.w500)),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: AppTheme.labelLarge,
+            ),
+          ),
         ],
       ),
     );
@@ -903,7 +695,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.check_circle, color: AppTheme.background),
+                  const Icon(Icons.check_circle, color: AppTheme.onPrimary),
                   const SizedBox(width: 12),
                   Text(AppLocalizations.of(context)!.worker_jobAccepted),
                 ],
@@ -921,7 +713,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error, color: AppTheme.background),
+                  const Icon(Icons.error, color: AppTheme.onPrimary),
                   const SizedBox(width: 12),
                   Expanded(child: Text(state.message)),
                 ],
@@ -938,69 +730,36 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         final isLoading = state is JobActionLoading && state.jobId == job.id;
 
         return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+          decoration: const BoxDecoration(
             color: AppTheme.surface,
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.shadowColor.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -4),
-              ),
-            ],
+            border: Border(top: BorderSide(color: AppTheme.divider)),
           ),
           child: SafeArea(
-            child: GestureDetector(
-              onTap: isLoading
+            top: false,
+            child: FilledButton.icon(
+              onPressed: isLoading
                   ? null
                   : () {
                       HapticFeedback.mediumImpact();
                       context.read<WorkerJobsBloc>().add(AcceptJob(job.id));
                     },
-              child: Container(
-                height: 56,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppTheme.success, Color(0xFF059669)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.success.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: AppTheme.background,
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.check_circle_rounded,
-                                color: AppTheme.background, size: 24),
-                            const SizedBox(width: 8),
-                            Text(
-                              AppLocalizations.of(context)!.worker_acceptJob,
-                              style: const TextStyle(
-                                color: AppTheme.background,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 56),
+              ),
+              icon: isLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: AppTheme.onPrimary,
+                      ),
+                    )
+                  : const Icon(Icons.check_rounded, size: 22),
+              label: Text(
+                AppLocalizations.of(context)!.worker_acceptJob,
+                style: const TextStyle(fontSize: 17),
               ),
             ),
           ),
@@ -1030,17 +789,17 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
   Color _getStatusColor(JobStatus status) {
     switch (status) {
       case JobStatus.pending:
-        return AppTheme.warning;
+        return AppTheme.statusPending;
       case JobStatus.assigned:
-        return AppTheme.primary;
+        return AppTheme.statusAssigned;
       case JobStatus.enRoute:
-        return AppTheme.secondary;
+        return AppTheme.statusEnRoute;
       case JobStatus.inProgress:
-        return AppTheme.success;
+        return AppTheme.statusInProgress;
       case JobStatus.completed:
-        return const Color(0xFF059669);
+        return AppTheme.statusCompleted;
       case JobStatus.cancelled:
-        return AppTheme.textTertiary;
+        return AppTheme.statusCancelled;
     }
   }
 
@@ -1202,7 +961,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     state.result.consequence?.type == 'suspension'
                         ? Icons.block
                         : Icons.warning_amber_rounded,
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                   ),
                   const SizedBox(width: 12),
                   Expanded(child: Text(message)),
@@ -1222,7 +981,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error, color: AppTheme.background),
+                  const Icon(Icons.error, color: AppTheme.onPrimary),
                   const SizedBox(width: 12),
                   Expanded(child: Text(state.message)),
                 ],
@@ -1322,28 +1081,14 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppTheme.warning.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-                child: const Icon(Icons.report_problem_rounded,
-                    color: AppTheme.warning, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Text(l10n.dispute_reportProblem, style: AppTheme.headlineSmall),
-            ],
-          ),
+          Text(l10n.dispute_reportProblem, style: AppTheme.headlineSmall),
           const SizedBox(height: 12),
           Text(
             l10n.worker_reportProblemHint,
@@ -1372,7 +1117,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                         content: Row(
                           children: [
                             const Icon(Icons.check_circle,
-                                color: AppTheme.background),
+                                color: AppTheme.onPrimary),
                             const SizedBox(width: 12),
                             Text(l10n.dispute_created),
                           ],
@@ -1569,7 +1314,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.error,
-                foregroundColor: AppTheme.background,
+                foregroundColor: AppTheme.onPrimary,
               ),
               child: Text(
                   AppLocalizations.of(context)!.worker_confirmCancellation),

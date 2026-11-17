@@ -127,10 +127,9 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     required Alignment alignment,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
       ),
       alignment: alignment,
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -138,12 +137,12 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         mainAxisSize: MainAxisSize.min,
         children: alignment == Alignment.centerLeft
             ? [
-                Icon(icon, color: AppTheme.background, size: 32),
+                Icon(icon, color: AppTheme.onPrimary, size: 32),
                 const SizedBox(width: 8),
                 Text(
                   label,
                   style: const TextStyle(
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -153,13 +152,13 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                 Text(
                   label,
                   style: const TextStyle(
-                    color: AppTheme.background,
+                    color: AppTheme.onPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
                 const SizedBox(width: 8),
-                Icon(icon, color: AppTheme.background, size: 32),
+                Icon(icon, color: AppTheme.onPrimary, size: 32),
               ],
       ),
     );
@@ -170,58 +169,27 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     final dateFormatter = DateFormat('dd MMM', locale == 'fr' ? 'fr_CA' : 'en');
     final isUrgent = widget.job.isPriority || _timeRemaining.inMinutes < 60;
 
+    final radius = BorderRadius.circular(AppTheme.radiusLG);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        elevation: widget.job.isPriority ? 6 : 2,
-        shadowColor: widget.job.isPriority
-            ? AppTheme.warning.withValues(alpha: 0.4)
-            : AppTheme.shadowColor.withValues(alpha: 0.26),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: widget.job.isPriority
-              ? const BorderSide(color: AppTheme.warning, width: 2)
-              : BorderSide.none,
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: radius,
+        border: Border.all(
+          color: widget.job.isPriority
+              ? AppTheme.accent
+              : AppTheme.border.withValues(alpha: 0.7),
+          width: widget.job.isPriority ? 1.5 : 1,
         ),
+        boxShadow: AppTheme.shadowSM,
+      ),
+      child: Material(
+        type: MaterialType.transparency,
         child: InkWell(
           onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: radius,
           child: Stack(
             children: [
-              // Shimmer effect for urgent jobs
-              if (widget.job.isPriority)
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: AnimatedBuilder(
-                      animation: _shimmerController,
-                      builder: (context, child) {
-                        return ShaderMask(
-                          shaderCallback: (bounds) {
-                            return LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.transparent,
-                                AppTheme.warning.withValues(alpha: 0.1),
-                                Colors.transparent,
-                              ],
-                              stops: [
-                                _shimmerController.value - 0.3,
-                                _shimmerController.value,
-                                _shimmerController.value + 0.3,
-                              ].map((s) => s.clamp(0.0, 1.0)).toList(),
-                            ).createShader(bounds);
-                          },
-                          blendMode: BlendMode.srcATop,
-                          child: Container(color: AppTheme.surface),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -256,28 +224,19 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                     // Address with icon
                     Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppTheme.info.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.location_on,
-                            color: AppTheme.info,
-                            size: 20,
-                          ),
+                        const Icon(
+                          Icons.place_outlined,
+                          color: AppTheme.textSecondary,
+                          size: 22,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 widget.job.displayAddress,
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: AppTheme.headlineSmall,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -288,10 +247,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                                     _estimateTravelTime(widget.job.distanceKm!)
                                         .toString(),
                                   ),
-                                  style: TextStyle(
-                                    color: AppTheme.textSecondary,
-                                    fontSize: 12,
-                                  ),
+                                  style: AppTheme.bodySmall,
                                 ),
                             ],
                           ),
@@ -309,11 +265,11 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                           child: Row(
                             children: [
                               Icon(
-                                Icons.schedule,
+                                Icons.schedule_rounded,
                                 color: isUrgent
-                                    ? AppTheme.error
-                                    : AppTheme.textSecondary,
-                                size: 18,
+                                    ? AppTheme.accentDark
+                                    : AppTheme.textTertiary,
+                                size: 16,
                               ),
                               const SizedBox(width: 6),
                               Text(
@@ -325,11 +281,11 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                                 ),
                                 style: TextStyle(
                                   color: isUrgent
-                                      ? AppTheme.error
+                                      ? AppTheme.accentDark
                                       : AppTheme.textSecondary,
                                   fontWeight: isUrgent
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   fontSize: 13,
                                 ),
                               ),
@@ -343,8 +299,9 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.surfaceContainer,
-                            borderRadius: BorderRadius.circular(6),
+                            color: AppTheme.background,
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSM),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -357,10 +314,10 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                                 children: [
                                   Text(
                                     widget.job.vehicle.displayName,
-                                    style: TextStyle(
-                                      color: AppTheme.textSecondary,
+                                    style: const TextStyle(
+                                      color: AppTheme.textPrimary,
                                       fontSize: 12,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                   if (widget.job.vehicle.color != null)
@@ -417,64 +374,20 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
   }
 
   Widget _buildUrgentBadge(AppLocalizations l10n) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.9, end: 1.1),
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-      builder: (context, scale, child) {
-        return Transform.scale(
-          scale: scale,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.warning,
-                  AppTheme.warning.withValues(alpha: 0.8)
-                ],
-              ),
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.warning.withValues(alpha: 0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.bolt, color: AppTheme.background, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  l10n.worker_urgent,
-                  style: const TextStyle(
-                    color: AppTheme.background,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      onEnd: () {
-        // Reverse animation
-        if (mounted) setState(() {});
-      },
+    return StatusBadge(
+      label: l10n.worker_urgent,
+      color: AppTheme.accentDark,
+      icon: Icons.bolt_rounded,
     );
   }
 
   Widget _buildCountdownBadge(bool isUrgent, AppLocalizations l10n) {
     if (_timeRemaining.inSeconds <= 0) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: AppTheme.errorLight,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(AppTheme.radiusFull),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -508,31 +421,26 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isUrgent ? AppTheme.errorLight : AppTheme.infoLight,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: isUrgent
-              ? AppTheme.error.withValues(alpha: 0.3)
-              : AppTheme.info.withValues(alpha: 0.3),
-        ),
+        color: isUrgent ? AppTheme.accentLight : AppTheme.background,
+        borderRadius: BorderRadius.circular(AppTheme.radiusFull),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.timer,
-            color: isUrgent ? AppTheme.error : AppTheme.info,
+            Icons.timer_outlined,
+            color: isUrgent ? AppTheme.accentDark : AppTheme.textSecondary,
             size: 14,
           ),
           const SizedBox(width: 4),
           Text(
             timeText,
             style: TextStyle(
-              color: isUrgent ? AppTheme.error : AppTheme.info,
+              color: isUrgent ? AppTheme.accentDark : AppTheme.textPrimary,
               fontSize: 12,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w800,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
@@ -542,26 +450,14 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
   }
 
   Widget _buildPriceTag(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppTheme.successLight,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.attach_money, color: AppTheme.success, size: 18),
-          Text(
-            widget.job.totalPrice.toStringAsFixed(2),
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: AppTheme.success,
-            ),
-          ),
-        ],
+    return Text(
+      '${widget.job.totalPrice.toStringAsFixed(2)} \$',
+      style: const TextStyle(
+        fontWeight: FontWeight.w800,
+        fontSize: 20,
+        letterSpacing: -0.4,
+        color: AppTheme.textPrimary,
+        fontFeatures: [FontFeature.tabularFigures()],
       ),
     );
   }
@@ -575,21 +471,20 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: optionData.color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: optionData.color.withValues(alpha: 0.3)),
+            color: AppTheme.background,
+            borderRadius: BorderRadius.circular(AppTheme.radiusFull),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(optionData.icon, size: 12, color: optionData.color),
+              Icon(optionData.icon, size: 12, color: AppTheme.textSecondary),
               const SizedBox(width: 4),
               Text(
                 optionData.label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
-                  color: optionData.color,
-                  fontWeight: FontWeight.w500,
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -636,18 +531,13 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(6),
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
                 border: Border.all(color: AppTheme.border),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    equipment.icon,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  const SizedBox(width: 4),
                   Text(
                     equipment.label,
                     style: const TextStyle(
@@ -676,21 +566,16 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                 height: 18,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppTheme.background,
+                  color: AppTheme.onPrimary,
                 ),
               )
-            : const Icon(Icons.check_circle),
+            : const Icon(Icons.check_rounded),
         label: Text(widget.isLoading
             ? l10n.worker_accepting
             : l10n.worker_acceptThisJob),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.success,
-          foregroundColor: AppTheme.background,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 2,
+          backgroundColor: AppTheme.accent,
+          foregroundColor: AppTheme.onPrimary,
         ),
       ),
     );
@@ -700,15 +585,10 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.swipe, color: AppTheme.textTertiary, size: 16),
+        const Icon(Icons.swipe_right_alt_rounded,
+            color: AppTheme.textTertiary, size: 16),
         const SizedBox(width: 6),
-        Text(
-          l10n.worker_swipeHint,
-          style: TextStyle(
-            color: AppTheme.textTertiary,
-            fontSize: 11,
-          ),
-        ),
+        Text(l10n.worker_swipeHint, style: AppTheme.labelSmall),
       ],
     );
   }
@@ -720,22 +600,22 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
 
     switch (status) {
       case JobStatus.pending:
-        color = AppTheme.info;
+        color = AppTheme.statusPending;
         label = l10n.worker_statusAvailable;
         icon = Icons.pending;
         break;
       case JobStatus.assigned:
-        color = AppTheme.warning;
+        color = AppTheme.statusAssigned;
         label = l10n.worker_statusAssigned;
         icon = Icons.assignment_ind;
         break;
       case JobStatus.enRoute:
-        color = AppTheme.primary2;
+        color = AppTheme.statusEnRoute;
         label = l10n.worker_statusEnRoute;
         icon = Icons.directions_car;
         break;
       case JobStatus.inProgress:
-        color = AppTheme.primary2;
+        color = AppTheme.statusInProgress;
         label = l10n.worker_statusInProgress;
         icon = Icons.engineering;
         break;
@@ -751,29 +631,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         break;
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
+    return StatusBadge(label: label, color: color, icon: icon);
   }
 
   int _estimateTravelTime(double distanceKm) {
@@ -843,7 +701,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
       width: 28,
       height: 28,
       decoration: BoxDecoration(
-        color: AppTheme.primary.withValues(alpha: 0.1),
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(6),
       ),
       clipBehavior: Clip.antiAlias,

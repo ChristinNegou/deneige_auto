@@ -257,7 +257,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: AppTheme.error),
+            const Icon(Icons.cloud_off_rounded,
+                size: 40, color: AppTheme.textTertiary),
             const SizedBox(height: 16),
             Text(
               _errorMessage,
@@ -265,7 +266,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(minimumSize: const Size(160, 44)),
               onPressed: () {
                 setState(() {
                   _isLoading = true;
@@ -282,25 +284,25 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
     // Main content - built from local state only
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       children: [
         _buildProfileHeader(),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         _buildSection(
           title: l10n.worker_myEquipment,
           child: _buildEquipmentGrid(),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         _buildSection(
           title: l10n.worker_workPreferences,
           child: _buildPreferencesContent(),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         _buildSection(
           title: l10n.worker_notifications,
           child: _buildNotificationsContent(),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         _buildActionsList(),
         const SizedBox(height: 24),
       ],
@@ -325,8 +327,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.border),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+            boxShadow: AppTheme.shadowSM,
           ),
           child: Row(
             children: [
@@ -337,13 +340,12 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     Container(
                       width: 64,
                       height: 64,
-                      decoration: BoxDecoration(
-                        color: AppTheme.background,
-                        borderRadius: BorderRadius.circular(32),
-                        border: Border.all(color: AppTheme.border, width: 2),
+                      decoration: const BoxDecoration(
+                        color: AppTheme.primary,
+                        shape: BoxShape.circle,
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(32),
                         child: _isUploadingPhoto
                             ? const Center(
                                 child: SizedBox(
@@ -351,6 +353,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                                   height: 24,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
+                                    color: AppTheme.onPrimary,
                                   ),
                                 ),
                               )
@@ -379,10 +382,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                           shape: BoxShape.circle,
                           border: Border.all(color: AppTheme.border),
                         ),
-                        child: Icon(
-                          Icons.camera_alt,
+                        child: const Icon(
+                          Icons.photo_camera_outlined,
                           size: 12,
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.textPrimary,
                         ),
                       ),
                     ),
@@ -399,11 +402,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                         Flexible(
                           child: Text(
                             userName,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.textPrimary,
-                            ),
+                            style: AppTheme.headlineMedium,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -417,10 +416,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                     if (userEmail.isNotEmpty)
                       Text(
                         userEmail,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppTheme.textSecondary,
-                        ),
+                        style: AppTheme.bodySmall,
                         overflow: TextOverflow.ellipsis,
                       ),
                     if (userPhone.isNotEmpty)
@@ -434,21 +430,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                   ],
                 ),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.success.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  l10n.worker_badge,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.success,
-                  ),
-                ),
+              StatusBadge(
+                label: l10n.worker_badge,
+                color: AppTheme.primary2,
+                small: true,
               ),
             ],
           ),
@@ -461,10 +446,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     return Center(
       child: Text(
         name.isNotEmpty ? name[0].toUpperCase() : 'D',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 24,
-          fontWeight: FontWeight.w600,
-          color: AppTheme.textSecondary,
+          fontWeight: FontWeight.w800,
+          color: AppTheme.onPrimary,
         ),
       ),
     );
@@ -484,37 +469,32 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   Widget _buildSection({required String title, required Widget child}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textSecondary,
-                letterSpacing: 0.5,
-              ),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 10),
+          child: Text(title, style: AppTheme.headlineSmall),
+        ),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.only(top: 12),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+            boxShadow: AppTheme.shadowSM,
           ),
-          child,
-        ],
-      ),
+          child: child,
+        ),
+      ],
     );
   }
 
   Widget _buildEquipmentGrid() {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       child: Wrap(
         spacing: 8,
         runSpacing: 8,
@@ -566,20 +546,10 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.worker_maxSimultaneousJobs,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-                Text(
-                  l10n.worker_maxSimultaneousJobsDesc,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppTheme.textTertiary,
-                  ),
-                ),
+                Text(l10n.worker_maxSimultaneousJobs,
+                    style: AppTheme.labelLarge),
+                Text(l10n.worker_maxSimultaneousJobsDesc,
+                    style: AppTheme.bodySmall),
               ],
             ),
           ),
@@ -601,13 +571,13 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
           notifier: _notifyNewJobs,
           onChanged: _autoSave,
         ),
-        Divider(height: 1, color: AppTheme.border, indent: 14, endIndent: 14),
+        const Divider(height: 1, indent: 14, endIndent: 14),
         _NotificationToggle(
           label: l10n.worker_notifUrgentJobs,
           notifier: _notifyUrgentJobs,
           onChanged: _autoSave,
         ),
-        Divider(height: 1, color: AppTheme.border, indent: 14, endIndent: 14),
+        const Divider(height: 1, indent: 14, endIndent: 14),
         _NotificationToggle(
           label: l10n.worker_tipsReceived,
           notifier: _notifyTips,
@@ -623,8 +593,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         children: [
@@ -636,16 +607,16 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               MaterialPageRoute(builder: (_) => const MyDisputesPage()),
             ),
           ),
-          Divider(height: 1, color: AppTheme.border, indent: 50),
+          const Divider(height: 1, indent: 48),
           _buildActionItem(
             icon: Icons.help_outline,
             label: l10n.worker_helpSupport,
             onTap: () =>
                 Navigator.pushNamed(context, AppRoutes.workerHelpSupport),
           ),
-          Divider(height: 1, color: AppTheme.border, indent: 50),
+          const Divider(height: 1, indent: 48),
           _buildLanguageItem(l10n),
-          Divider(height: 1, color: AppTheme.border, indent: 50),
+          const Divider(height: 1, indent: 48),
           _buildActionItem(
             icon: Icons.logout,
             label: l10n.common_logout,
@@ -677,10 +648,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: color,
-                ),
+                style: AppTheme.labelLarge.copyWith(color: color),
               ),
             ),
             Icon(
@@ -703,13 +671,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
           Icon(Icons.language, size: 20, color: AppTheme.textPrimary),
           const SizedBox(width: 14),
           Expanded(
-            child: Text(
-              l10n.settings_language,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppTheme.textPrimary,
-              ),
-            ),
+            child: Text(l10n.settings_language, style: AppTheme.labelLarge),
           ),
           DropdownButton<String>(
             value: currentLanguage,
@@ -741,26 +703,12 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppTheme.border,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.camera_alt),
+              leading: const Icon(Icons.photo_camera_outlined),
               title: Text(l10n.vehicle_takePhoto),
               onTap: () {
                 Navigator.pop(context);
@@ -768,7 +716,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library),
+              leading: const Icon(Icons.photo_library_outlined),
               title: Text(l10n.vehicle_choosePhoto),
               onTap: () {
                 Navigator.pop(context);
@@ -813,9 +761,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
         title: Text(l10n.common_logout),
         content: Text(
           l10n.common_logoutConfirm,
@@ -875,22 +820,20 @@ class _EquipmentChip extends StatelessWidget {
             duration: const Duration(milliseconds: 150),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: value
-                  ? AppTheme.primary.withValues(alpha: 0.1)
-                  : AppTheme.background,
-              borderRadius: BorderRadius.circular(8),
+              color: value ? AppTheme.primary : AppTheme.surface,
+              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
               border: Border.all(
                 color: value ? AppTheme.primary : AppTheme.border,
-                width: value ? 1.5 : 1,
+                width: 1.5,
               ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  value ? Icons.check_circle : Icons.circle_outlined,
+                  value ? Icons.check_rounded : Icons.add_rounded,
                   size: 16,
-                  color: value ? AppTheme.primary : AppTheme.textTertiary,
+                  color: value ? AppTheme.onPrimary : AppTheme.textTertiary,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -898,8 +841,7 @@ class _EquipmentChip extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: value ? FontWeight.w600 : FontWeight.w500,
-                    color:
-                        value ? AppTheme.textPrimary : AppTheme.textSecondary,
+                    color: value ? AppTheme.onPrimary : AppTheme.textPrimary,
                   ),
                 ),
               ],
