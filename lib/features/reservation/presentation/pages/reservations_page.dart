@@ -32,7 +32,7 @@ class ReservationsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
             if (Navigator.of(context).canPop()) {
               Navigator.of(context).pop();
@@ -44,7 +44,7 @@ class ReservationsView extends StatelessWidget {
         title: Text(l10n.reservation_myReservations),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             onPressed: () {
               context.read<ReservationListBloc>().add(RefreshReservations());
             },
@@ -93,76 +93,17 @@ class ReservationsView extends StatelessWidget {
               context.read<ReservationListBloc>().add(RefreshReservations());
             },
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 96),
               itemCount: state.reservations.length,
               itemBuilder: (context, index) {
                 final reservation = state.reservations[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: _getStatusColor(reservation.status)
-                          .withValues(alpha: 0.2),
-                      child: Text(
-                        reservation.status.icon,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    ),
-                    title: Text(reservation.vehicle.displayName),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l10n.reservation_parkingSpot(
-                            reservation.parkingSpot.displayName)),
-                        Text(
-                          DateFormat('d MMM yyyy, HH:mm')
-                              .format(reservation.departureTime),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getStatusColor(reservation.status)
-                                .withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            reservation.status.displayName,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: _getStatusColor(reservation.status),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${reservation.totalPrice.toStringAsFixed(2)} \$',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.reservationDetails,
-                        arguments: reservation.id,
-                      );
-                    },
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _ReservationTile(
+                    reservation: reservation,
+                    statusColor: _getStatusColor(reservation.status),
+                    parkingLabel: l10n.reservation_parkingSpot(
+                        reservation.parkingSpot.displayName),
                   ),
                 );
               },
@@ -172,7 +113,7 @@ class ReservationsView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.pushNamed(context, AppRoutes.newReservation),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
         label: Text(l10n.reservation_newShort),
       ),
     );
@@ -181,19 +122,119 @@ class ReservationsView extends StatelessWidget {
   Color _getStatusColor(ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
-        return AppTheme.warning;
+        return AppTheme.statusPending;
       case ReservationStatus.assigned:
-        return AppTheme.info;
+        return AppTheme.statusAssigned;
       case ReservationStatus.enRoute:
-        return AppTheme.primary2;
+        return AppTheme.statusEnRoute;
       case ReservationStatus.inProgress:
-        return AppTheme.primary2;
+        return AppTheme.statusInProgress;
       case ReservationStatus.completed:
-        return AppTheme.success;
+        return AppTheme.statusCompleted;
       case ReservationStatus.cancelled:
-        return AppTheme.textTertiary;
+        return AppTheme.statusCancelled;
       case ReservationStatus.late:
         return AppTheme.error;
     }
+  }
+}
+
+/// Ligne de reservation : bloc date, vehicule, heure et place, statut et prix.
+class _ReservationTile extends StatelessWidget {
+  final Reservation reservation;
+  final Color statusColor;
+  final String parkingLabel;
+
+  const _ReservationTile({
+    required this.reservation,
+    required this.statusColor,
+    required this.parkingLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode == 'en'
+        ? 'en_CA'
+        : 'fr_CA';
+    final date = reservation.departureTime;
+
+    return GlassCard(
+      padding: const EdgeInsets.all(12),
+      onTap: () => Navigator.pushNamed(
+        context,
+        AppRoutes.reservationDetails,
+        arguments: reservation.id,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: AppTheme.background,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  DateFormat('MMM', locale).format(date).toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.accentDark,
+                  ),
+                ),
+                Text(
+                  '${date.day}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    height: 1.1,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  reservation.vehicle.displayName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.headlineSmall,
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '${DateFormat('HH:mm', locale).format(date)}  ·  $parkingLabel',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+                StatusBadge(
+                  label: reservation.status.displayName,
+                  color: statusColor,
+                  small: true,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${reservation.totalPrice.toStringAsFixed(2)} \$',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.textPrimary,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

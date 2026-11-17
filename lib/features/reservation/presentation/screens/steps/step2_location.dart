@@ -81,20 +81,7 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
   }
 
   Widget _buildSectionHeader(String title, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 20),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-      ],
-    );
+    return Text(title, style: AppTheme.headlineSmall);
   }
 
   Widget _buildGpsStatus(BuildContext context, NewReservationState state) {
@@ -278,7 +265,7 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                     ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -290,7 +277,7 @@ class _Step2LocationScreenState extends State<Step2LocationScreen> {
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: AppTheme.background),
+                        strokeWidth: 2, color: AppTheme.onPrimary),
                   )
                 : Text(AppLocalizations.of(context)!.step2_validateAddress,
                     style: const TextStyle(fontWeight: FontWeight.w600)),

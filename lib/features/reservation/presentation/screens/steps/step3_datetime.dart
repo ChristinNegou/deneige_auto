@@ -74,20 +74,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
   }
 
   Widget _buildSectionHeader(String title, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: AppTheme.primary),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-      ],
-    );
+    return Text(title, style: AppTheme.headlineSmall);
   }
 
   Widget _buildDateSelector(BuildContext context) {
@@ -226,18 +213,21 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
             _updateDateTime();
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
             decoration: BoxDecoration(
-              color: isSelected ? AppTheme.primary : AppTheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(20),
+              color: isSelected ? AppTheme.primary : AppTheme.surface,
+              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+              border: Border.all(
+                color: isSelected ? AppTheme.primary : AppTheme.border,
+              ),
             ),
             child: Text(
               time,
               style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color:
-                    isSelected ? AppTheme.background : AppTheme.textSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                fontFeatures: const [FontFeature.tabularFigures()],
+                color: isSelected ? AppTheme.onPrimary : AppTheme.textPrimary,
               ),
             ),
           ),
@@ -323,24 +313,6 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       firstDate: now,
       lastDate: now.add(const Duration(days: 30)),
       locale: Localizations.localeOf(context),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: AppTheme.primary,
-              onPrimary: AppTheme.background,
-              surface: AppTheme.surface,
-              onSurface: AppTheme.textPrimary,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppTheme.primary,
-              ),
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
 
     if (picked != null && mounted) {
@@ -356,22 +328,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: Theme(
-            data: ThemeData.dark().copyWith(
-              colorScheme: ColorScheme.dark(
-                primary: AppTheme.primary,
-                onPrimary: AppTheme.background,
-                surface: AppTheme.surface,
-                onSurface: AppTheme.textPrimary,
-              ),
-              textButtonTheme: TextButtonThemeData(
-                style: TextButton.styleFrom(
-                  foregroundColor: AppTheme.primary,
-                ),
-              ),
-            ),
-            child: child!,
-          ),
+          child: child!,
         );
       },
     );

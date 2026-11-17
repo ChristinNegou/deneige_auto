@@ -68,13 +68,11 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
 
                     Text(
                       l10n.reservationSuccess_title,
-                      style: AppTheme.headlineLarge.copyWith(
-                        color: AppTheme.success,
-                      ),
+                      style: AppTheme.headlineLarge,
                       textAlign: TextAlign.center,
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
 
                     Text(
                       l10n.reservationSuccess_subtitle,
@@ -85,66 +83,42 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                     ),
 
                     if (widget.reservationId != null) ...[
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: AppTheme.surface,
                           borderRadius:
-                              BorderRadius.circular(AppTheme.radiusMD),
-                          boxShadow: AppTheme.shadowSM,
+                              BorderRadius.circular(AppTheme.radiusFull),
+                          border: Border.all(color: AppTheme.border),
                         ),
-                        child: Column(
-                          children: [
-                            Text(
-                              l10n.reservationSuccess_reservationNumber,
-                              style: AppTheme.labelSmall,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.reservationId!,
-                              style: AppTheme.headlineSmall.copyWith(
-                                fontFamily: 'monospace',
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          '${l10n.reservationSuccess_reservationNumber} #${_shortReference(widget.reservationId!)}',
+                          style: AppTheme.labelLarge.copyWith(
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
                         ),
                       ),
                     ],
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
 
-                    // Informations supplémentaires
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryLight,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                        border: Border.all(
-                            color: AppTheme.primary.withValues(alpha: 0.3)),
-                      ),
+                    // Prochaines etapes : une vraie sequence, donc numerotee
+                    GlassCard(
+                      padding: const EdgeInsets.all(20),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: AppTheme.primary,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                l10n.reservationSuccess_nextSteps,
-                                style: AppTheme.labelLarge.copyWith(
-                                  color: AppTheme.primary,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            l10n.reservationSuccess_nextSteps,
+                            style: AppTheme.headlineSmall,
                           ),
-                          const SizedBox(height: 12),
-                          _buildInfoRow(l10n.reservationSuccess_step1),
-                          _buildInfoRow(l10n.reservationSuccess_step2),
-                          _buildInfoRow(l10n.reservationSuccess_step3),
+                          const SizedBox(height: 16),
+                          _buildInfoRow(1, l10n.reservationSuccess_step1),
+                          _buildInfoRow(2, l10n.reservationSuccess_step2),
+                          _buildInfoRow(3, l10n.reservationSuccess_step3,
+                              isLast: true),
                         ],
                       ),
                     ),
@@ -161,10 +135,6 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                             (route) => false,
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.success,
-                          padding: const EdgeInsets.all(16),
-                        ),
                         child: Text(l10n.reservationSuccess_backToHome),
                       ),
                     ),
@@ -180,9 +150,6 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
                             (route) => false,
                           );
                         },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(16),
-                        ),
                         child: Text(l10n.reservationSuccess_viewReservations),
                       ),
                     ),
@@ -200,11 +167,11 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
               shouldLoop: false,
-              colors: [
-                AppTheme.success,
+              colors: const [
+                AppTheme.accent,
                 AppTheme.primary,
-                AppTheme.secondary,
-                AppTheme.textPrimary,
+                AppTheme.primary2,
+                AppTheme.primary3,
               ],
               numberOfParticles: 30,
               gravity: 0.2,
@@ -215,22 +182,45 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
     );
   }
 
-  Widget _buildInfoRow(String text) {
+  /// Reference courte et lisible a partir de l'identifiant technique.
+  String _shortReference(String id) {
+    final clean = id.replaceAll('-', '');
+    return (clean.length > 6 ? clean.substring(clean.length - 6) : clean)
+        .toUpperCase();
+  }
+
+  Widget _buildInfoRow(int number, String text, {bool isLast = false}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.check_circle_outline,
-            size: 16,
-            color: AppTheme.primary,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
+          Container(
+            width: 24,
+            height: 24,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: AppTheme.primaryLight,
+              shape: BoxShape.circle,
+            ),
             child: Text(
-              text,
-              style: AppTheme.bodySmall.copyWith(
+              '$number',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
                 color: AppTheme.primary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                text,
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
               ),
             ),
           ),

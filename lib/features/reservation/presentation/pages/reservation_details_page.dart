@@ -165,10 +165,6 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                     },
                     icon: const Icon(Icons.refresh),
                     label: Text(l10n.reservation_refresh),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.info,
-                      foregroundColor: AppTheme.textPrimary,
-                    ),
                   ),
                   const SizedBox(height: 12),
                   TextButton(
@@ -188,71 +184,58 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             reservation.status == ReservationStatus.inProgress;
 
         return Scaffold(
-          body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  _getStatusColor(reservation.status),
-                  _getStatusColor(reservation.status).withValues(alpha: 0.7),
-                  AppTheme.background,
-                ],
-                stops: const [0.0, 0.15, 0.3],
-              ),
-            ),
+          backgroundColor: AppTheme.background,
+          body: ColoredBox(
+            color: AppTheme.background,
             child: SafeArea(
               child: CustomScrollView(
                 slivers: [
                   // App Bar
                   SliverAppBar(
-                    backgroundColor: Colors.transparent,
+                    backgroundColor: AppTheme.background,
+                    surfaceTintColor: Colors.transparent,
                     elevation: 0,
                     floating: true,
                     leading: IconButton(
-                      icon: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppTheme.textPrimary.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child:
-                            Icon(Icons.arrow_back, color: AppTheme.textPrimary),
-                      ),
+                      icon: const Icon(Icons.arrow_back_rounded),
                       onPressed: () => Navigator.pop(context),
                     ),
+                    title: Text(l10n.reservation_details,
+                        style: AppTheme.labelMedium),
+                    centerTitle: true,
                     actions: [
                       if (isActive)
                         Container(
                           margin: const EdgeInsets.only(right: 16),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
+                            horizontal: 10,
+                            vertical: 5,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.textPrimary.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
+                            color: AppTheme.errorLight,
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusFull),
                           ),
                           child: Row(
                             children: [
                               ScaleTransition(
                                 scale: _pulseAnimation,
                                 child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.textPrimary,
+                                  width: 7,
+                                  height: 7,
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.error,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               Text(
                                 l10n.reservation_live,
-                                style: TextStyle(
-                                  color: AppTheme.textPrimary,
+                                style: const TextStyle(
+                                  color: AppTheme.error,
                                   fontSize: 11,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
                             ],
@@ -269,85 +252,74 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                         _buildStatusHeader(context, reservation),
 
                         // Main Content
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppTheme.background,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(32),
-                              topRight: Radius.circular(32),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Timeline
-                                _buildTimeline(context, reservation),
-                                const SizedBox(height: 24),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Timeline
+                              _buildTimeline(context, reservation),
+                              const SizedBox(height: 16),
 
-                                // Worker Card (if assigned)
-                                if (reservation.workerId != null)
-                                  _buildWorkerCard(context, reservation),
-
-                                const SizedBox(height: 20),
-
-                                // Quick Actions (if active)
-                                if (isActive) ...[
-                                  _buildQuickActions(context, reservation),
-                                  const SizedBox(height: 20),
-                                ],
-
-                                // Details Card
-                                _buildDetailsCard(context, reservation),
+                              // Worker Card (if assigned)
+                              if (reservation.workerId != null) ...[
+                                _buildWorkerCard(context, reservation),
                                 const SizedBox(height: 16),
-
-                                // Service Options Card
-                                _buildServiceOptionsCard(context, reservation),
-                                const SizedBox(height: 16),
-
-                                // Photos Card (if available)
-                                if (reservation.afterPhotoUrl != null ||
-                                    reservation.beforePhotoUrl != null) ...[
-                                  _buildPhotosCard(context, reservation),
-                                  const SizedBox(height: 16),
-                                ],
-
-                                // Price Card
-                                _buildPriceCard(context, reservation),
-                                const SizedBox(height: 24),
-
-                                // Rating section (if completed and not rated)
-                                if (reservation.status ==
-                                    ReservationStatus.completed)
-                                  _buildRatingSection(context, reservation),
-
-                                // Action Buttons
-                                if (reservation.canBeEdited)
-                                  _buildEditButton(context, reservation),
-                                if (reservation.canBeEdited &&
-                                    reservation.canBeCancelled)
-                                  const SizedBox(height: 12),
-                                if (reservation.canBeCancelled)
-                                  _buildCancelButton(context, reservation),
-
-                                // Report No-Show button
-                                if (_canReportNoShow(reservation)) ...[
-                                  const SizedBox(height: 12),
-                                  _buildReportNoShowButton(
-                                      context, reservation),
-                                ],
-
-                                // Report Problem button (for completed reservations)
-                                if (_canReportProblem(reservation)) ...[
-                                  const SizedBox(height: 12),
-                                  _buildReportProblemButton(
-                                      context, reservation),
-                                ],
-
-                                const SizedBox(height: 40),
                               ],
-                            ),
+
+                              // Quick Actions (if active)
+                              if (isActive) ...[
+                                _buildQuickActions(context, reservation),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // Details Card
+                              _buildDetailsCard(context, reservation),
+                              const SizedBox(height: 16),
+
+                              // Service Options Card
+                              _buildServiceOptionsCard(context, reservation),
+                              const SizedBox(height: 16),
+
+                              // Photos Card (if available)
+                              if (reservation.afterPhotoUrl != null ||
+                                  reservation.beforePhotoUrl != null) ...[
+                                _buildPhotosCard(context, reservation),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // Price Card
+                              _buildPriceCard(context, reservation),
+                              const SizedBox(height: 24),
+
+                              // Rating section (if completed and not rated)
+                              if (reservation.status ==
+                                  ReservationStatus.completed)
+                                _buildRatingSection(context, reservation),
+
+                              // Action Buttons
+                              if (reservation.canBeEdited)
+                                _buildEditButton(context, reservation),
+                              if (reservation.canBeEdited &&
+                                  reservation.canBeCancelled)
+                                const SizedBox(height: 12),
+                              if (reservation.canBeCancelled)
+                                _buildCancelButton(context, reservation),
+
+                              // Report No-Show button
+                              if (_canReportNoShow(reservation)) ...[
+                                const SizedBox(height: 12),
+                                _buildReportNoShowButton(context, reservation),
+                              ],
+
+                              // Report Problem button (for completed reservations)
+                              if (_canReportProblem(reservation)) ...[
+                                const SizedBox(height: 12),
+                                _buildReportProblemButton(context, reservation),
+                              ],
+
+                              const SizedBox(height: 40),
+                            ],
                           ),
                         ),
                       ],
@@ -364,49 +336,30 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
 
   Widget _buildStatusHeader(BuildContext context, Reservation reservation) {
     final l10n = AppLocalizations.of(context)!;
+    final color = _getStatusColor(reservation.status);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Status Icon with animation
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppTheme.surface,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.border.withValues(alpha: 0.5),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                reservation.status.icon,
-                style: const TextStyle(fontSize: 40),
-              ),
-            ),
+          StatusBadge(
+            label: reservation.status.displayName,
+            color: color,
           ),
-          const SizedBox(height: 16),
-          Text(
-            reservation.status.displayName,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             _getStatusDescription(l10n, reservation),
-            style: TextStyle(
-              fontSize: 14,
-              color: AppTheme.textPrimary.withValues(alpha: 0.9),
-            ),
-            textAlign: TextAlign.center,
+            style: AppTheme.headlineLarge,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            DateFormat(
+                    'EEEE d MMMM, HH:mm',
+                    Localizations.localeOf(context).languageCode == 'en'
+                        ? 'en_CA'
+                        : 'fr_CA')
+                .format(reservation.departureTime),
+            style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
           ),
         ],
       ),
@@ -444,106 +397,59 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     ];
 
     final currentIndex = statuses.indexOf(reservation.status);
+    // Une reservation annulee ou en retard n'est pas sur le parcours normal
+    if (currentIndex < 0) return const SizedBox.shrink();
+    final currentColor = _getStatusColor(reservation.status);
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
-        boxShadow: AppTheme.shadowSM,
-      ),
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(l10n.reservation_progress, style: AppTheme.headlineSmall),
+          const SizedBox(height: 14),
           Row(
-            children: [
-              Icon(Icons.timeline, color: AppTheme.info),
-              const SizedBox(width: 8),
-              Text(
-                l10n.reservation_progress,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: List.generate(statuses.length * 2 - 1, (index) {
-              if (index.isOdd) {
-                // Connector line
-                final stepIndex = index ~/ 2;
-                final isCompleted = stepIndex < currentIndex;
-                return Expanded(
-                  child: Container(
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: isCompleted ? AppTheme.success : AppTheme.border,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                );
+            children: List.generate(statuses.length, (index) {
+              final Color color;
+              if (index < currentIndex) {
+                color = AppTheme.primary;
+              } else if (index == currentIndex) {
+                color = currentColor;
               } else {
-                // Step circle
-                final stepIndex = index ~/ 2;
-                final status = statuses[stepIndex];
-                final isCompleted = stepIndex < currentIndex;
-                final isCurrent = stepIndex == currentIndex;
-
-                return Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: isCompleted
-                        ? AppTheme.success
-                        : isCurrent
-                            ? _getStatusColor(status)
-                            : AppTheme.surfaceContainer,
-                    shape: BoxShape.circle,
-                    border: isCurrent
-                        ? Border.all(
-                            color:
-                                _getStatusColor(status).withValues(alpha: 0.3),
-                            width: 4,
-                          )
-                        : null,
-                  ),
-                  child: Center(
-                    child: isCompleted
-                        ? Icon(Icons.check,
-                            color: AppTheme.background, size: 20)
-                        : Text(
-                            status.icon,
-                            style: TextStyle(
-                              fontSize: isCurrent ? 18 : 14,
-                            ),
-                          ),
-                  ),
-                );
+                color = AppTheme.border;
               }
+              return Expanded(
+                child: Container(
+                  height: 4,
+                  margin: EdgeInsets.only(
+                      right: index < statuses.length - 1 ? 4 : 0),
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                  ),
+                ),
+              );
             }),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: statuses.map((status) {
-              final isCurrent = status == reservation.status;
-              return SizedBox(
-                width: 50,
+            children: statuses.asMap().entries.map((entry) {
+              final isCurrent = entry.key == currentIndex;
+              final isDone = entry.key < currentIndex;
+              return Expanded(
                 child: Text(
-                  _getShortStatusName(l10n, status),
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                    color: isCurrent
-                        ? _getStatusColor(status)
-                        : AppTheme.textSecondary,
-                  ),
-                  textAlign: TextAlign.center,
+                  _getShortStatusName(l10n, entry.value),
                   maxLines: 2,
+                  style: TextStyle(
+                    fontSize: 11,
+                    height: 1.2,
+                    fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
+                    color: isCurrent
+                        ? AppTheme.textPrimary
+                        : isDone
+                            ? AppTheme.textSecondary
+                            : AppTheme.textTertiary,
+                  ),
                 ),
               );
             }).toList(),
@@ -574,35 +480,30 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
 
   Widget _buildWorkerCard(BuildContext context, Reservation reservation) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.info.withValues(alpha: 0.1),
-            AppTheme.primary2.withValues(alpha: 0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppTheme.info.withValues(alpha: 0.2),
+    final initial = reservation.workerName?.isNotEmpty == true
+        ? reservation.workerName![0].toUpperCase()
+        : '?';
+    final initialAvatar = Center(
+      child: Text(
+        initial,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: AppTheme.onPrimary,
         ),
       ),
+    );
+
+    return GlassCard(
+      padding: const EdgeInsets.all(14),
       child: Row(
         children: [
           Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: AppTheme.info,
+            width: 52,
+            height: 52,
+            decoration: const BoxDecoration(
+              color: AppTheme.primary,
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.info.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
             ),
             child: ClipOval(
               child: reservation.workerPhotoUrl != null &&
@@ -610,138 +511,76 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                   ? CachedNetworkImage(
                       imageUrl: reservation.workerPhotoUrl!,
                       fit: BoxFit.cover,
-                      width: 60,
-                      height: 60,
-                      placeholder: (context, url) => Center(
-                        child: CircularProgressIndicator(
-                          color: AppTheme.textPrimary,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Center(
-                        child: Text(
-                          reservation.workerName?.isNotEmpty == true
-                              ? reservation.workerName![0].toUpperCase()
-                              : '?',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.textPrimary,
-                          ),
-                        ),
-                      ),
+                      width: 52,
+                      height: 52,
+                      placeholder: (context, url) => initialAvatar,
+                      errorWidget: (context, url, error) => initialAvatar,
                     )
-                  : Center(
-                      child: Text(
-                        reservation.workerName?.isNotEmpty == true
-                            ? reservation.workerName![0].toUpperCase()
-                            : '?',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                    ),
+                  : initialAvatar,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.reservation_yourWorker,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 4),
+                Text(l10n.reservation_yourWorker, style: AppTheme.labelMedium),
+                const SizedBox(height: 2),
                 Row(
                   children: [
                     Flexible(
                       child: Text(
                         reservation.workerName ??
                             l10n.reservation_workerAssigned,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
+                        style: AppTheme.headlineSmall,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (reservation.workerIsVerified == true) ...[
-                      const SizedBox(width: 6),
-                      Icon(Icons.verified, color: AppTheme.info, size: 18),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.verified_rounded,
+                        color: AppTheme.info,
+                        size: 16,
+                        semanticLabel: l10n.worker_verified,
+                      ),
                     ],
                   ],
                 ),
-                if (reservation.workerIsVerified == true) ...[
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Icon(Icons.verified, color: AppTheme.info, size: 14),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.worker_verified,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppTheme.info,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
                 if (reservation.rating != null) ...[
                   const SizedBox(height: 4),
                   Row(
-                    children: [
-                      ...List.generate(5, (index) {
-                        return Icon(
-                          index < (reservation.rating ?? 0).round()
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: AppTheme.warning,
-                          size: 16,
-                        );
-                      }),
-                    ],
+                    children: List.generate(5, (index) {
+                      return Icon(
+                        index < (reservation.rating ?? 0).round()
+                            ? Icons.star_rounded
+                            : Icons.star_outline_rounded,
+                        color: AppTheme.warning,
+                        size: 15,
+                      );
+                    }),
                   ),
                 ],
               ],
             ),
           ),
-          // Bouton Chat
-          IconButton(
+          IconButton.filledTonal(
             onPressed: () => _openChat(context, reservation),
-            icon: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppTheme.info, AppTheme.primary2],
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.chat_bubble_rounded,
-                  color: AppTheme.textPrimary, size: 20),
+            style: IconButton.styleFrom(
+              backgroundColor: AppTheme.surfaceContainer,
+              foregroundColor: AppTheme.textPrimary,
             ),
+            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
           ),
-          if (reservation.workerPhone != null) ...[
-            IconButton(
+          if (reservation.workerPhone != null)
+            IconButton.filledTonal(
               onPressed: () => _callWorker(reservation),
-              icon: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppTheme.success,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.phone, color: AppTheme.textPrimary, size: 20),
+              style: IconButton.styleFrom(
+                backgroundColor: AppTheme.surfaceContainer,
+                foregroundColor: AppTheme.textPrimary,
               ),
+              icon: const Icon(Icons.phone_outlined, size: 20),
             ),
-          ],
         ],
       ),
     );
@@ -753,76 +592,29 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       children: [
         Expanded(
           child: _buildQuickActionButton(
-            icon: Icons.phone,
+            icon: Icons.chat_bubble_outline_rounded,
+            label: l10n.reservation_chat,
+            filled: true,
+            onTap: () => _openChat(context, reservation),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildQuickActionButton(
+            icon: Icons.phone_outlined,
             label: l10n.common_call,
-            color: AppTheme.success,
             onTap: () => _callWorker(reservation),
           ),
         ),
-        const SizedBox(width: 8),
-        // Chat in-app avec gradient
-        Expanded(
-          child: _buildChatButton(context, reservation),
-        ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 10),
         Expanded(
           child: _buildQuickActionButton(
-            icon: Icons.map,
+            icon: Icons.map_outlined,
             label: l10n.reservation_map,
-            color: AppTheme.primary2,
             onTap: () => _openMap(reservation),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildChatButton(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    return Material(
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          _openChat(context, reservation);
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppTheme.info, AppTheme.primary2],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.info.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Column(
-              children: [
-                Icon(Icons.chat_bubble_rounded,
-                    color: AppTheme.textPrimary, size: 24),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.reservation_chat,
-                  style: TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -834,7 +626,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         SnackBar(
           content: Text(
             l10n.reservation_userNotAuth,
-            style: TextStyle(color: AppTheme.textPrimary),
+            style: TextStyle(color: AppTheme.onPrimary),
           ),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
@@ -852,11 +644,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         SnackBar(
           content: Row(
             children: [
-              Icon(Icons.info_outline, color: AppTheme.textPrimary),
+              Icon(Icons.info_outline, color: AppTheme.onPrimary),
               const SizedBox(width: 12),
               Text(
                 l10n.reservation_noWorkerYet,
-                style: TextStyle(color: AppTheme.textPrimary),
+                style: TextStyle(color: AppTheme.onPrimary),
               ),
             ],
           ),
@@ -890,30 +682,36 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   Widget _buildQuickActionButton({
     required IconData icon,
     required String label,
-    required Color color,
     required VoidCallback onTap,
+    bool filled = false,
   }) {
+    final foreground = filled ? AppTheme.onPrimary : AppTheme.textPrimary;
     return Material(
-      color: color,
-      borderRadius: BorderRadius.circular(16),
+      color: filled ? AppTheme.primary : AppTheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        side: filled
+            ? BorderSide.none
+            : const BorderSide(color: AppTheme.border, width: 1.5),
+      ),
       child: InkWell(
         onTap: () {
           HapticFeedback.lightImpact();
           onTap();
         },
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
           child: Column(
             children: [
-              Icon(icon, color: AppTheme.textPrimary, size: 24),
+              Icon(icon, color: foreground, size: 22),
               const SizedBox(height: 6),
               Text(
                 label,
                 style: TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: foreground,
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -925,34 +723,25 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
 
   Widget _buildDetailsCard(BuildContext context, Reservation reservation) {
     final l10n = AppLocalizations.of(context)!;
-    final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
+    final dateFormat = DateFormat(
+        'd MMM yyyy, HH:mm',
+        Localizations.localeOf(context).languageCode == 'en'
+            ? 'en_CA'
+            : 'fr_CA');
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.info_outline, color: AppTheme.info),
-              const SizedBox(width: 8),
-              Text(
-                l10n.reservation_info,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          Divider(height: 24, color: AppTheme.border),
+          Text(l10n.reservation_info, style: AppTheme.headlineSmall),
+          const Divider(height: 28),
           _buildDetailRow(
             Icons.directions_car,
             l10n.reservation_vehicle,
@@ -1015,28 +804,16 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.ac_unit, color: AppTheme.info),
-              const SizedBox(width: 8),
-              Text(
-                l10n.reservation_servicesRequested,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          Divider(height: 24, color: AppTheme.border),
+          Text(l10n.reservation_servicesRequested,
+              style: AppTheme.headlineSmall),
+          const Divider(height: 28),
           // Base service
           _buildServiceItem(
             icon: Icons.cleaning_services,
@@ -1059,16 +836,17 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             }),
           ],
           if (reservation.snowDepthCm != null) ...[
-            Divider(height: 24, color: AppTheme.border),
+            const Divider(height: 28),
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppTheme.infoLight,
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppTheme.background,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                   ),
-                  child: Icon(Icons.height, color: AppTheme.info, size: 20),
+                  child: const Icon(Icons.ac_unit_rounded,
+                      color: AppTheme.primary, size: 18),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -1097,14 +875,13 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color:
-                isIncluded ? AppTheme.successLight : AppTheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(8),
+            color: AppTheme.background,
+            borderRadius: BorderRadius.circular(AppTheme.radiusSM),
           ),
           child: Icon(
             icon,
-            color: isIncluded ? AppTheme.success : AppTheme.textTertiary,
-            size: 20,
+            color: isIncluded ? AppTheme.primary : AppTheme.textTertiary,
+            size: 18,
           ),
         ),
         const SizedBox(width: 12),
@@ -1116,9 +893,10 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         ),
         Text(
           '${price.toStringAsFixed(2)} \$',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary,
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textPrimary,
+            fontFeatures: [FontFeature.tabularFigures()],
           ),
         ),
       ],
@@ -1194,47 +972,19 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.border),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
         boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.successLight,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child:
-                    Icon(Icons.photo_camera, color: AppTheme.success, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                l10n.reservation_photos,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          Divider(height: 24, color: AppTheme.border),
+          Text(l10n.reservation_photos, style: AppTheme.headlineSmall),
+          const Divider(height: 28),
 
           // After Photo (primary - result)
           if (reservation.afterPhotoUrl != null) ...[
-            Text(
-              l10n.reservation_afterPhoto,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.success,
-              ),
-            ),
+            Text(l10n.reservation_afterPhoto, style: AppTheme.labelLarge),
             const SizedBox(height: 8),
             GestureDetector(
               onTap: () => _showPhotoFullscreen(
@@ -1356,13 +1106,14 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          backgroundColor: AppTheme.background,
+          backgroundColor: Colors.black,
           appBar: AppBar(
-            backgroundColor: AppTheme.surface,
-            iconTheme: IconThemeData(color: AppTheme.textPrimary),
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            systemOverlayStyle: SystemUiOverlayStyle.light,
             title: Text(
               title,
-              style: TextStyle(color: AppTheme.textPrimary),
+              style: const TextStyle(color: Colors.white),
             ),
           ),
           body: Center(
@@ -1373,9 +1124,9 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 placeholder: (context, url) => Center(
                   child: CircularProgressIndicator(color: AppTheme.primary),
                 ),
-                errorWidget: (context, url, error) => Icon(
-                  Icons.error,
-                  color: AppTheme.textPrimary,
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.broken_image_outlined,
+                  color: Colors.white54,
                   size: 48,
                 ),
               ),
@@ -1391,105 +1142,68 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.info,
-            AppTheme.info.withValues(alpha: 0.7),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.info.withValues(alpha: 0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.reservation_totalPrice,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.textPrimary.withValues(alpha: 0.8),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    reservation.totalPrice.toStringAsFixed(2),
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                    ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.reservation_totalPrice,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.onPrimary.withValues(alpha: 0.7),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 6, left: 4),
-                    child: Text(
-                      '\$',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary.withValues(alpha: 0.7),
-                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${reservation.totalPrice.toStringAsFixed(2)} \$',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.8,
+                    color: AppTheme.onPrimary,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ),
+                if (reservation.tip != null && reservation.tip! > 0) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.reservation_tipAmount(
+                        reservation.tip!.toStringAsFixed(2)),
+                    style: TextStyle(
+                      color: AppTheme.onPrimary.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
                     ),
                   ),
                 ],
-              ),
-              if (reservation.tip != null && reservation.tip! > 0) ...[
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warning.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.favorite, color: AppTheme.warning, size: 16),
-                      const SizedBox(width: 6),
-                      Text(
-                        l10n.reservation_tipAmount(
-                            reservation.tip!.toStringAsFixed(2)),
-                        style: TextStyle(
-                          color: AppTheme.warning,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
-            ],
+            ),
           ),
           if (reservation.isPriority)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
-                color: AppTheme.warning,
-                borderRadius: BorderRadius.circular(30),
+                color: AppTheme.accent,
+                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
               ),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.bolt, color: AppTheme.background, size: 18),
-                  const SizedBox(width: 6),
+                  const Icon(Icons.bolt_rounded,
+                      color: AppTheme.onPrimary, size: 16),
+                  const SizedBox(width: 4),
                   Text(
                     l10n.reservation_urgent,
-                    style: TextStyle(
-                      color: AppTheme.background,
-                      fontWeight: FontWeight.bold,
+                    style: const TextStyle(
+                      color: AppTheme.onPrimary,
+                      fontWeight: FontWeight.w800,
                       fontSize: 12,
                     ),
                   ),
@@ -1571,8 +1285,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: Material(
-        color: AppTheme.warning,
-        borderRadius: BorderRadius.circular(16),
+        color: AppTheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+          side: const BorderSide(color: AppTheme.border, width: 1.5),
+        ),
         child: InkWell(
           onTap: () {
             HapticFeedback.mediumImpact();
@@ -1598,11 +1315,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                       SnackBar(
                         content: Row(
                           children: [
-                            Icon(Icons.error, color: AppTheme.textPrimary),
+                            Icon(Icons.error, color: AppTheme.onPrimary),
                             const SizedBox(width: 12),
                             Text(
                               l10n.resDetail_errorPrefix(failure.message),
-                              style: TextStyle(color: AppTheme.textPrimary),
+                              style: TextStyle(color: AppTheme.onPrimary),
                             ),
                           ],
                         ),
@@ -1629,13 +1346,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                               content: Row(
                                 children: [
                                   Icon(Icons.warning,
-                                      color: AppTheme.textPrimary),
+                                      color: AppTheme.onPrimary),
                                   const SizedBox(width: 12),
                                   Text(
                                     l10n.resDetail_ratingSuccessTipError(
                                         failure.message),
-                                    style:
-                                        TextStyle(color: AppTheme.textPrimary),
+                                    style: TextStyle(color: AppTheme.onPrimary),
                                   ),
                                 ],
                               ),
@@ -1653,13 +1369,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                               content: Row(
                                 children: [
                                   Icon(Icons.check_circle,
-                                      color: AppTheme.textPrimary),
+                                      color: AppTheme.onPrimary),
                                   const SizedBox(width: 12),
                                   Text(
                                     l10n.resDetail_tipSent(
                                         tip.toStringAsFixed(0)),
-                                    style:
-                                        TextStyle(color: AppTheme.textPrimary),
+                                    style: TextStyle(color: AppTheme.onPrimary),
                                   ),
                                 ],
                               ),
@@ -1678,11 +1393,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                           content: Row(
                             children: [
                               Icon(Icons.check_circle,
-                                  color: AppTheme.textPrimary),
+                                  color: AppTheme.onPrimary),
                               const SizedBox(width: 12),
                               Text(
                                 l10n.resDetail_ratingSuccess,
-                                style: TextStyle(color: AppTheme.textPrimary),
+                                style: TextStyle(color: AppTheme.onPrimary),
                               ),
                             ],
                           ),
@@ -1705,45 +1420,36 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               },
             );
           },
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(20),
+          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
-                    color: AppTheme.background.withValues(alpha: 0.3),
-                    shape: BoxShape.circle,
+                    color: AppTheme.warningLight,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
-                  child: Icon(Icons.star, color: AppTheme.background, size: 28),
+                  child: const Icon(Icons.star_rounded,
+                      color: AppTheme.warning, size: 26),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        l10n.reservation_rateService,
-                        style: TextStyle(
-                          color: AppTheme.background,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        l10n.reservation_rateSubtitle,
-                        style: TextStyle(
-                          color: AppTheme.background.withValues(alpha: 0.8),
-                          fontSize: 13,
-                        ),
-                      ),
+                      Text(l10n.reservation_rateService,
+                          style: AppTheme.headlineSmall),
+                      const SizedBox(height: 2),
+                      Text(l10n.reservation_rateSubtitle,
+                          style: AppTheme.bodySmall),
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios,
-                    color: AppTheme.background, size: 18),
+                const Icon(Icons.chevron_right_rounded,
+                    color: AppTheme.textTertiary),
               ],
             ),
           ),
@@ -1764,10 +1470,10 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(8),
+            color: AppTheme.background,
+            borderRadius: BorderRadius.circular(AppTheme.radiusSM),
           ),
-          child: Icon(icon, size: 20, color: AppTheme.textSecondary),
+          child: Icon(icon, size: 18, color: AppTheme.primary),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -1820,16 +1526,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             arguments: reservation,
           );
         },
-        icon: const Icon(Icons.edit),
+        icon: const Icon(Icons.edit_outlined),
         label: Text(l10n.reservation_edit),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.info,
-          foregroundColor: AppTheme.textPrimary,
-          padding: const EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
       ),
     );
   }
@@ -1840,15 +1538,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () => _showCancelDialog(context, reservation),
-        icon: const Icon(Icons.cancel),
+        icon: const Icon(Icons.close_rounded),
         label: Text(l10n.reservation_cancelReservation),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppTheme.error,
-          side: BorderSide(color: AppTheme.error),
-          padding: const EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          side: BorderSide(color: AppTheme.error.withValues(alpha: 0.4)),
         ),
       ),
     );
@@ -1890,8 +1584,6 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
@@ -1966,7 +1658,8 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.error,
-              foregroundColor: AppTheme.textPrimary,
+              foregroundColor: AppTheme.onPrimary,
+              minimumSize: const Size(0, 44),
             ),
             child: Text(l10n.reservation_cancelYes),
           ),
@@ -1988,7 +1681,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
           SnackBar(
             content: Text(
               l10n.reservation_phoneUnavailable,
-              style: TextStyle(color: AppTheme.textPrimary),
+              style: TextStyle(color: AppTheme.onPrimary),
             ),
             backgroundColor: AppTheme.warning,
           ),
@@ -2012,17 +1705,17 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
   Color _getStatusColor(ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
-        return AppTheme.warning;
+        return AppTheme.statusPending;
       case ReservationStatus.assigned:
-        return AppTheme.info;
+        return AppTheme.statusAssigned;
       case ReservationStatus.enRoute:
-        return AppTheme.primary2;
+        return AppTheme.statusEnRoute;
       case ReservationStatus.inProgress:
-        return AppTheme.primary2;
+        return AppTheme.statusInProgress;
       case ReservationStatus.completed:
-        return AppTheme.success;
+        return AppTheme.statusCompleted;
       case ReservationStatus.cancelled:
-        return AppTheme.textTertiary;
+        return AppTheme.statusCancelled;
       case ReservationStatus.late:
         return AppTheme.error;
     }
@@ -2099,11 +1792,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 SnackBar(
                   content: Row(
                     children: [
-                      Icon(Icons.check_circle, color: AppTheme.textPrimary),
+                      Icon(Icons.check_circle, color: AppTheme.onPrimary),
                       const SizedBox(width: 12),
                       Text(
                         l10n.reservation_noShowReported,
-                        style: TextStyle(color: AppTheme.textPrimary),
+                        style: TextStyle(color: AppTheme.onPrimary),
                       ),
                     ],
                   ),
@@ -2124,11 +1817,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         ),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppTheme.error,
-          side: BorderSide(color: AppTheme.error),
-          padding: const EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          side: BorderSide(color: AppTheme.error.withValues(alpha: 0.4)),
         ),
       ),
     );
@@ -2197,11 +1886,11 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
                 SnackBar(
                   content: Row(
                     children: [
-                      Icon(Icons.check_circle, color: AppTheme.textPrimary),
+                      Icon(Icons.check_circle, color: AppTheme.onPrimary),
                       const SizedBox(width: 12),
                       Text(
                         l10n.dispute_created,
-                        style: TextStyle(color: AppTheme.textPrimary),
+                        style: TextStyle(color: AppTheme.onPrimary),
                       ),
                     ],
                   ),
@@ -2222,11 +1911,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         ),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppTheme.warning,
-          side: BorderSide(color: AppTheme.warning),
-          padding: const EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          side: BorderSide(color: AppTheme.warning.withValues(alpha: 0.4)),
         ),
       ),
     );

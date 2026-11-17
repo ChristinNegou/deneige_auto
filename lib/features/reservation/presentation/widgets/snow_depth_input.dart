@@ -137,7 +137,7 @@ class _SnowDepthInputState extends State<SnowDepthInput> {
               overlayColor: AppTheme.primary.withValues(alpha: 0.2),
               valueIndicatorColor: AppTheme.primary,
               valueIndicatorTextStyle: TextStyle(
-                color: AppTheme.background,
+                color: AppTheme.onPrimary,
               ),
             ),
             child: Slider(

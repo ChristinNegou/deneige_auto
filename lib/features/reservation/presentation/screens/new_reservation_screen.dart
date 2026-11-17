@@ -73,7 +73,6 @@ class NewReservationView extends StatelessWidget {
             child: Column(
               children: [
                 _buildStepper(context, state),
-                const Divider(height: 1),
                 Expanded(
                   child: _buildStepContent(context, state),
                 ),
@@ -92,9 +91,10 @@ class NewReservationView extends StatelessWidget {
   ) {
     final l10n = AppLocalizations.of(context)!;
     return AppBar(
-      title: Text(l10n.reservation_new),
+      title: Text(l10n.reservation_new, style: AppTheme.labelMedium),
+      centerTitle: true,
       leading: IconButton(
-        icon: const Icon(Icons.close),
+        icon: const Icon(Icons.close_rounded),
         onPressed: () => _showCancelDialog(context),
       ),
       actions: [
@@ -113,79 +113,51 @@ class NewReservationView extends StatelessWidget {
     );
   }
 
+  /// En-tete de progression : numero d'etape, nom de l'etape et barre segmentee.
   Widget _buildStepper(BuildContext context, NewReservationState state) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      child: Row(
-        children: List.generate(5, (index) {
-          return Expanded(
-            child: _buildStepIndicator(
-              context: context,
-              index: index,
-              currentStep: state.currentStep,
-              isCompleted: index < state.currentStep,
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildStepIndicator({
-    required BuildContext context,
-    required int index,
-    required int currentStep,
-    required bool isCompleted,
-  }) {
-    final isActive = index == currentStep;
-
-    final stepIcons = [
-      Icons.directions_car, // Step 1: Véhicule/Parking
-      Icons.location_on, // Step 2: Localisation
-      Icons.access_time, // Step 3: Date/Heure
-      Icons.tune, // Step 4: Options
-      Icons.receipt_long, // Step 5: Résumé
+    const totalSteps = 5;
+    final l10n = AppLocalizations.of(context)!;
+    final stepTitles = [
+      l10n.reservation_stepVehicle,
+      l10n.reservation_stepLocation,
+      l10n.reservation_stepSchedule,
+      l10n.reservation_stepOptions,
+      l10n.reservation_stepSummary,
     ];
 
-    Color getColor() {
-      if (isCompleted) return AppTheme.textPrimary;
-      if (isActive) return AppTheme.textPrimary;
-      return AppTheme.border;
-    }
-
-    return Row(
-      children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isActive ? AppTheme.textPrimary : Colors.transparent,
-            border: Border.all(
-              color: getColor(),
-              width: 2,
-            ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.reservation_stepCounter(state.currentStep + 1, totalSteps),
+            style: AppTheme.labelMedium,
           ),
-          child: Center(
-            child: isCompleted
-                ? Icon(Icons.check, size: 18, color: AppTheme.textPrimary)
-                : Icon(
-                    stepIcons[index],
-                    size: 18,
-                    color:
-                        isActive ? AppTheme.background : AppTheme.textTertiary,
+          const SizedBox(height: 2),
+          Text(stepTitles[state.currentStep], style: AppTheme.headlineLarge),
+          const SizedBox(height: 14),
+          Row(
+            children: List.generate(totalSteps, (index) {
+              return Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                  height: 4,
+                  margin:
+                      EdgeInsets.only(right: index < totalSteps - 1 ? 6 : 0),
+                  decoration: BoxDecoration(
+                    color: index <= state.currentStep
+                        ? AppTheme.primary
+                        : AppTheme.border,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
                   ),
+                ),
+              );
+            }),
           ),
-        ),
-        if (index < 4)
-          Expanded(
-            child: Container(
-              height: 2,
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              color: isCompleted ? AppTheme.textPrimary : AppTheme.border,
-            ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -227,67 +199,54 @@ class NewReservationView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final bloc = context.read<NewReservationBloc>();
 
+    final isLastStep = state.currentStep == 4;
+    final buttonContent = state.isLoading
+        ? const SizedBox(
+            height: 20,
+            width: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppTheme.onPrimary,
+            ),
+          )
+        : Text(_getNextButtonText(state, l10n));
+    final onNext = _getNextButtonOnPressed(context, state);
+
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+      decoration: const BoxDecoration(
         color: AppTheme.surface,
-        boxShadow: AppTheme.shadowMD,
+        border: Border(top: BorderSide(color: AppTheme.divider)),
       ),
       child: SafeArea(
+        top: false,
         child: Row(
           children: [
-            if (state.currentStep > 0)
-              Expanded(
+            if (state.currentStep > 0) ...[
+              SizedBox(
+                width: AppTheme.buttonHeight,
+                height: AppTheme.buttonHeight,
                 child: OutlinedButton(
                   onPressed: state.isLoading
                       ? null
                       : () => bloc.add(GoToPreviousStep()),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
                   ),
-                  child: Text(l10n.common_back),
+                  child: Icon(
+                    Icons.arrow_back_rounded,
+                    semanticLabel: l10n.common_back,
+                  ),
                 ),
               ),
-            if (state.currentStep > 0) const SizedBox(width: 12),
+              const SizedBox(width: 12),
+            ],
+            // L'orange est reserve a l'action qui engage le client : payer.
             Expanded(
-              flex: state.currentStep == 0 ? 1 : 2,
-              child: ElevatedButton(
-                onPressed: _getNextButtonOnPressed(context, state),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: AppTheme.background,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: state.isLoading
-                    ? SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              AppTheme.background),
-                        ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(_getNextButtonText(state, l10n)),
-                          const SizedBox(width: 8),
-                          Icon(
-                            state.currentStep == 4
-                                ? Icons.check
-                                : Icons.arrow_forward,
-                            size: 20,
-                          ),
-                        ],
-                      ),
-              ),
+              child: isLastStep
+                  ? FilledButton(onPressed: onNext, child: buttonContent)
+                  : ElevatedButton(onPressed: onNext, child: buttonContent),
             ),
           ],
         ),
@@ -448,7 +407,7 @@ class NewReservationView extends StatelessWidget {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppTheme.background,
+                                color: AppTheme.onPrimary,
                               ),
                             ),
                             const SizedBox(width: 12),

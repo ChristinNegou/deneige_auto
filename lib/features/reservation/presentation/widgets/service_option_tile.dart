@@ -28,85 +28,70 @@ class ServiceOptionTile extends StatelessWidget {
   }
 
   Widget _buildCompactTile(BuildContext context) {
-    return InkWell(
-      onTap: onToggle,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.primary.withValues(alpha: 0.1)
-              : AppTheme.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected ? AppTheme.primary : AppTheme.border,
-            width: isSelected ? 2 : 1,
+    return Material(
+      color: AppTheme.surface,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+      child: InkWell(
+        onTap: onToggle,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            border: Border.all(
+              color: isSelected ? AppTheme.primary : AppTheme.border,
+              width: 1.5,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color:
-                    isSelected ? AppTheme.primary : AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Icon(
-                _getOptionIcon(option),
-                size: 16,
-                color:
-                    isSelected ? AppTheme.background : AppTheme.textSecondary,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _getCompactTitle(context, option),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
-                      height: 1.2,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '+${price.toStringAsFixed(0)} \$',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: isSelected
-                          ? AppTheme.primary
-                          : AppTheme.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: isSelected ? AppTheme.primary : AppTheme.textTertiary,
-                  width: 2,
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: isSelected ? AppTheme.primary : AppTheme.background,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                ),
+                child: Icon(
+                  isSelected ? Icons.check_rounded : _getOptionIcon(option),
+                  size: 18,
+                  color:
+                      isSelected ? AppTheme.onPrimary : AppTheme.textSecondary,
                 ),
               ),
-              child: isSelected
-                  ? Icon(Icons.check, size: 12, color: AppTheme.background)
-                  : null,
-            ),
-          ],
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _getCompactTitle(context, option),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '+${price.toStringAsFixed(0)} \$',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -162,8 +147,7 @@ class ServiceOptionTile extends StatelessWidget {
               ),
               child: Icon(
                 _getOptionIcon(option),
-                color:
-                    isSelected ? AppTheme.background : AppTheme.textSecondary,
+                color: isSelected ? AppTheme.onPrimary : AppTheme.textSecondary,
               ),
             ),
             const SizedBox(width: 16),
@@ -218,7 +202,7 @@ class ServiceOptionTile extends StatelessWidget {
                       ? Icon(
                           Icons.check,
                           size: 16,
-                          color: AppTheme.background,
+                          color: AppTheme.onPrimary,
                         )
                       : null,
                 ),

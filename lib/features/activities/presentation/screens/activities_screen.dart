@@ -12,6 +12,7 @@ import '../../../reservation/domain/usecases/get_reservations_usecase.dart';
 import '../../../reservation/domain/usecases/get_reservation_by_id_usecase.dart';
 import '../../../reservation/domain/usecases/cancel_reservation_usecase.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../../vehicule/presentation/widgets/vehicle_visuals.dart';
 
 class ActivitiesScreen extends StatelessWidget {
   const ActivitiesScreen({super.key});
@@ -60,13 +61,8 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(l10n.activities_title),
-        backgroundColor: AppTheme.surface,
-        elevation: 0,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppTheme.primary,
-          unselectedLabelColor: AppTheme.textSecondary,
-          indicatorColor: AppTheme.primary,
           tabs: [
             Tab(text: l10n.activities_inProgress),
             Tab(text: l10n.activities_completed),
@@ -86,10 +82,10 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: AppTheme.error,
+                  const Icon(
+                    Icons.cloud_off_rounded,
+                    size: 40,
+                    color: AppTheme.textTertiary,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -98,7 +94,10 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(160, 44),
+                    ),
                     onPressed: () {
                       context
                           .read<ReservationListBloc>()
@@ -153,23 +152,16 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
               isCompleted
                   ? AppLocalizations.of(context)!.activities_emptyCompleted
                   : AppLocalizations.of(context)!.activities_emptyInProgress,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
-              ),
+              style: AppTheme.headlineSmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               isCompleted
                   ? AppLocalizations.of(context)!
                       .activities_emptyCompletedSubtitle
                   : AppLocalizations.of(context)!
                       .activities_emptyInProgressSubtitle,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppTheme.textSecondary,
-              ),
+              style: AppTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
           ],
@@ -182,7 +174,7 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
         context.read<ReservationListBloc>().add(const LoadAllReservations());
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         itemCount: reservations.length,
         itemBuilder: (context, index) {
           final reservation = reservations[index];
@@ -193,243 +185,112 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
   }
 
   Widget _buildActivityCard(Reservation reservation) {
-    final dateFormat = DateFormat('dd MMM yyyy', 'fr_FR');
-    final timeFormat = DateFormat('HH:mm', 'fr_FR');
+    final locale = Localizations.localeOf(context).languageCode == 'en'
+        ? 'en_CA'
+        : 'fr_CA';
+    final when =
+        DateFormat('d MMM, HH:mm', locale).format(reservation.departureTime);
+    final statusColor = _getStatusColor(reservation.status);
+    final isRated = reservation.status == ReservationStatus.completed &&
+        reservation.rating != null;
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          AppRoutes.activityDetails,
-          arguments: reservation.id,
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          border: Border.all(color: AppTheme.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: GlassCard(
+        padding: const EdgeInsets.all(14),
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            AppRoutes.activityDetails,
+            arguments: reservation.id,
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Statut et moment
+            Row(
+              children: [
+                StatusBadge(
+                  label: reservation.status.displayName,
+                  color: statusColor,
+                  small: true,
+                ),
+                const Spacer(),
+                Text(when, style: AppTheme.bodySmall),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Vehicule
+            Row(
+              children: [
+                Icon(
+                  vehicleTypeIcon(reservation.vehicle.type),
+                  size: 20,
+                  color: AppTheme.textSecondary,
+                ),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    '${reservation.vehicle.make} ${reservation.vehicle.model}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTheme.headlineSmall,
+                  ),
+                ),
+                if (reservation.vehicle.licensePlate != null) ...[
+                  const SizedBox(width: 10),
+                  LicensePlate(plate: reservation.vehicle.licensePlate!),
+                ],
+              ],
+            ),
+            const Divider(height: 24),
+
+            // Deneigeur, note et prix
+            Row(
+              children: [
+                if (reservation.workerName != null) ...[
+                  const Icon(
+                    Icons.person_outline_rounded,
+                    size: 16,
+                    color: AppTheme.textTertiary,
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      reservation.workerName!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.bodySmall,
+                    ),
+                  ),
+                ],
+                if (isRated) ...[
+                  const SizedBox(width: 10),
+                  const Icon(Icons.star_rounded,
+                      size: 16, color: AppTheme.warning),
+                  const SizedBox(width: 2),
+                  Text(
+                    reservation.rating!.toStringAsFixed(1),
+                    style: AppTheme.labelMedium
+                        .copyWith(color: AppTheme.textPrimary),
+                  ),
+                ],
+                const Spacer(),
+                Text(
+                  '${reservation.totalPrice.toStringAsFixed(2)} \$',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.textPrimary,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header avec statut
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      _buildStatusIcon(reservation.status),
-                      const SizedBox(width: 8),
-                      Text(
-                        reservation.status.displayName,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: _getStatusColor(reservation.status),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: AppTheme.textTertiary,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Divider(height: 1),
-              const SizedBox(height: 12),
-
-              // Informations du véhicule
-              Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.directions_car,
-                      color: AppTheme.primary,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${reservation.vehicle.make} ${reservation.vehicle.model}',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.textPrimary,
-                          ),
-                        ),
-                        if (reservation.vehicle.licensePlate != null)
-                          Text(
-                            reservation.vehicle.licensePlate!,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Date et heure
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today_outlined,
-                    size: 16,
-                    color: AppTheme.textSecondary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    dateFormat.format(reservation.departureTime),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Icon(
-                    Icons.access_time,
-                    size: 16,
-                    color: AppTheme.textSecondary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    timeFormat.format(reservation.departureTime),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Déneigeur assigné (si disponible)
-              if (reservation.workerName != null) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      size: 16,
-                      color: AppTheme.textSecondary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      reservation.workerName!,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-
-              // Prix
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.activities_total,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  Text(
-                    '${reservation.totalPrice.toStringAsFixed(2)} \$',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.primary,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Rating si terminé
-              if (reservation.status == ReservationStatus.completed &&
-                  reservation.rating != null) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    ...List.generate(5, (index) {
-                      return Icon(
-                        index < reservation.rating!.round()
-                            ? Icons.star
-                            : Icons.star_border,
-                        size: 18,
-                        color: Colors.amber,
-                      );
-                    }),
-                  ],
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusIcon(ReservationStatus status) {
-    IconData icon;
-    Color color = _getStatusColor(status);
-
-    switch (status) {
-      case ReservationStatus.assigned:
-        icon = Icons.person_add;
-        break;
-      case ReservationStatus.enRoute:
-        icon = Icons.directions_car;
-        break;
-      case ReservationStatus.inProgress:
-        icon = Icons.build;
-        break;
-      case ReservationStatus.completed:
-        icon = Icons.check_circle;
-        break;
-      default:
-        icon = Icons.hourglass_empty;
-    }
-
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Icon(
-        icon,
-        size: 16,
-        color: color,
       ),
     );
   }

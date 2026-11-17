@@ -39,13 +39,13 @@ class ProfilePage extends StatelessWidget {
                 ),
                 // Content
                 SliverPadding(
-                  padding: const EdgeInsets.all(AppTheme.paddingLG),
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       _buildProfileCard(context, user),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       _buildMenuSection(context),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       _buildLogoutButton(context),
                       const SizedBox(height: 40),
                     ]),
@@ -61,124 +61,107 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context, dynamic user) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 12, 12),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
-          const SizedBox(width: 16),
-          Text(
-            l10n.profile_title,
-            style: AppTheme.headlineMedium,
-          ),
+          const SizedBox(width: 4),
+          Text(l10n.profile_title, style: AppTheme.headlineMedium),
           const Spacer(),
-          GestureDetector(
-            onTap: () => Navigator.pushNamed(context, AppRoutes.editProfile),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-              child: const Icon(
-                Icons.edit_rounded,
-                color: AppTheme.primary,
-                size: 20,
-              ),
+          IconButton.filledTonal(
+            onPressed: () =>
+                Navigator.pushNamed(context, AppRoutes.editProfile),
+            style: IconButton.styleFrom(
+              backgroundColor: AppTheme.surface,
+              foregroundColor: AppTheme.textPrimary,
+              side: const BorderSide(color: AppTheme.border),
             ),
+            icon: const Icon(Icons.edit_outlined, size: 20),
           ),
         ],
       ),
     );
   }
 
+  /// Identite : avatar (photo ou initiales), nom, courriel et telephone.
   Widget _buildProfileCard(BuildContext context, dynamic user) {
     final l10n = AppLocalizations.of(context)!;
-    final firstName = user?.firstName ?? l10n.profile_defaultName;
-    final lastName = user?.lastName ?? '';
-    final email = user?.email ?? 'email@example.com';
-    final phone = user?.phoneNumber ?? l10n.common_notSpecified;
-    final photoUrl = user?.photoUrl;
+    final String firstName = user?.firstName ?? l10n.profile_defaultName;
+    final String lastName = user?.lastName ?? '';
+    final String email = user?.email ?? '';
+    final String phone = user?.phoneNumber ?? l10n.common_notSpecified;
+    final String? photoUrl = user?.photoUrl;
+    final initials = [firstName, lastName]
+        .where((p) => p.isNotEmpty)
+        .map((p) => p[0].toUpperCase())
+        .join();
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
+    final initialsAvatar = Center(
+      child: Text(
+        initials.isEmpty ? '?' : initials,
+        style: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: AppTheme.onPrimary,
+        ),
       ),
+    );
+
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Avatar
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primary, AppTheme.secondary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primary.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+          Row(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: const BoxDecoration(
+                  color: AppTheme.primary,
+                  shape: BoxShape.circle,
                 ),
-              ],
-            ),
-            child: photoUrl != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-                    child: Image.network(
-                      photoUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.person_rounded,
-                        color: AppTheme.background,
-                        size: 40,
-                      ),
+                child: ClipOval(
+                  child: photoUrl != null
+                      ? Image.network(
+                          photoUrl,
+                          fit: BoxFit.cover,
+                          width: 64,
+                          height: 64,
+                          errorBuilder: (_, __, ___) => initialsAvatar,
+                        )
+                      : initialsAvatar,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$firstName $lastName'.trim(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.headlineMedium,
                     ),
-                  )
-                : const Icon(
-                    Icons.person_rounded,
-                    color: AppTheme.background,
-                    size: 40,
-                  ),
+                    if (email.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        email,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.bodySmall,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          // Name
-          Text(
-            '$firstName $lastName'.trim(),
-            style: AppTheme.headlineMedium,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            email,
-            style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
-          ),
-          const SizedBox(height: 20),
-          // Info items
-          _buildInfoRow(Icons.email_outlined, l10n.common_email, email),
-          const Divider(height: 24, color: AppTheme.divider),
+          const Divider(height: 28),
           _buildInfoRow(Icons.phone_outlined, l10n.common_phone, phone),
         ],
       ),
@@ -188,69 +171,38 @@ class ProfilePage extends StatelessWidget {
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: AppTheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-          ),
-          child: Icon(icon, color: AppTheme.primary, size: 20),
-        ),
+        Icon(icon, color: AppTheme.textSecondary, size: 20),
         const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: AppTheme.labelSmall,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style:
-                    AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w500),
-              ),
-            ],
-          ),
-        ),
+        Text(label, style: AppTheme.bodySmall),
+        const Spacer(),
+        Text(value, style: AppTheme.labelLarge),
       ],
     );
   }
 
+  /// Deux groupes : ce qui concerne le compte, puis les preferences et l'aide.
   Widget _buildMenuSection(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        children: [
+    return Column(
+      children: [
+        _buildMenuGroup([
           _buildMenuItem(
             context,
-            icon: Icons.directions_car_outlined,
-            iconColor: AppTheme.primary,
+            icon: Icons.directions_car_filled_outlined,
             title: l10n.profile_myVehicles,
             subtitle: l10n.profile_manageVehicles,
             onTap: () => Navigator.pushNamed(context, AppRoutes.vehicles),
           ),
-          const Divider(height: 1, indent: 56, color: AppTheme.divider),
           _buildMenuItem(
             context,
-            icon: Icons.payment_outlined,
-            iconColor: AppTheme.success,
+            icon: Icons.credit_card_rounded,
             title: l10n.profile_payments,
             subtitle: l10n.profile_paymentHistory,
             onTap: () => Navigator.pushNamed(context, AppRoutes.payments),
           ),
-          const Divider(height: 1, indent: 56, color: AppTheme.divider),
           _buildMenuItem(
             context,
-            icon: Icons.gavel_outlined,
-            iconColor: AppTheme.error,
+            icon: Icons.gavel_rounded,
             title: l10n.profile_myDisputes,
             subtitle: l10n.profile_disputesSubtitle,
             onTap: () => Navigator.push(
@@ -258,33 +210,44 @@ class ProfilePage extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const MyDisputesPage()),
             ),
           ),
-          const Divider(height: 1, indent: 56, color: AppTheme.divider),
+        ]),
+        const SizedBox(height: 16),
+        _buildMenuGroup([
           _buildMenuItem(
             context,
-            icon: Icons.notifications_outlined,
-            iconColor: AppTheme.warning,
+            icon: Icons.notifications_none_rounded,
             title: l10n.profile_notifications,
             subtitle: l10n.notifications_settings,
             onTap: () => Navigator.pushNamed(context, AppRoutes.notifications),
           ),
-          const Divider(height: 1, indent: 56, color: AppTheme.divider),
           _buildMenuItem(
             context,
             icon: Icons.settings_outlined,
-            iconColor: AppTheme.textSecondary,
             title: l10n.profile_settings,
             subtitle: l10n.profile_settingsSubtitle,
             onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
           ),
-          const Divider(height: 1, indent: 56, color: AppTheme.divider),
           _buildMenuItem(
             context,
             icon: Icons.help_outline_rounded,
-            iconColor: AppTheme.info,
             title: l10n.profile_helpSupport,
             subtitle: l10n.profile_helpSubtitle,
             onTap: () => Navigator.pushNamed(context, AppRoutes.helpSupport),
           ),
+        ]),
+      ],
+    );
+  }
+
+  Widget _buildMenuGroup(List<Widget> items) {
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            if (i > 0) const Divider(height: 1, indent: 64),
+            items[i],
+          ],
         ],
       ),
     );
@@ -293,7 +256,6 @@ class ProfilePage extends StatelessWidget {
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
-    required Color iconColor,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
@@ -301,33 +263,26 @@ class ProfilePage extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                color: AppTheme.background,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSM + 2),
               ),
-              child: Icon(icon, color: iconColor, size: 20),
+              child: Icon(icon, color: AppTheme.primary, size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppTheme.labelLarge
-                        .copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: AppTheme.labelSmall,
-                  ),
+                  Text(title, style: AppTheme.labelLarge),
+                  const SizedBox(height: 1),
+                  Text(subtitle, style: AppTheme.bodySmall),
                 ],
               ),
             ),
@@ -344,34 +299,14 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildLogoutButton(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: () => _showLogoutDialog(context),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.error.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.logout_rounded,
-              color: AppTheme.error,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              l10n.common_logout,
-              style: AppTheme.labelLarge.copyWith(
-                color: AppTheme.error,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
+    return TextButton.icon(
+      onPressed: () => _showLogoutDialog(context),
+      style: TextButton.styleFrom(
+        foregroundColor: AppTheme.error,
+        minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
       ),
+      icon: const Icon(Icons.logout_rounded, size: 20),
+      label: Text(l10n.common_logout),
     );
   }
 
@@ -380,24 +315,7 @@ class ProfilePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              ),
-              child:
-                  Icon(Icons.logout_rounded, color: AppTheme.error, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Text(l10n.common_logout),
-          ],
-        ),
+        title: Text(l10n.common_logout),
         content: Text(
           l10n.common_logoutConfirmAccount,
         ),
@@ -423,10 +341,8 @@ class ProfilePage extends StatelessWidget {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.error,
-              foregroundColor: AppTheme.background,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
+              foregroundColor: AppTheme.onPrimary,
+              minimumSize: const Size(0, 44),
             ),
             child: Text(l10n.common_logout),
           ),

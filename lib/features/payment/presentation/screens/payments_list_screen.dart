@@ -9,6 +9,7 @@ import '../../domain/entities/payment.dart';
 import '../../domain/entities/payment_method.dart';
 import '../bloc/payment_history_bloc.dart';
 import '../bloc/payment_methods_bloc.dart';
+import '../widgets/card_brand_mark.dart';
 import 'package:intl/intl.dart';
 
 class PaymentsListScreen extends StatelessWidget {
@@ -61,23 +62,17 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(l10n.payment_payments),
-        backgroundColor: AppTheme.surface,
-        elevation: 0,
         actions: [
           IconButton(
             onPressed: () {
               context.read<PaymentHistoryBloc>().add(RefreshPaymentHistory());
               context.read<PaymentMethodsBloc>().add(LoadPaymentMethods());
             },
-            icon: Icon(Icons.refresh, color: AppTheme.primary),
+            icon: const Icon(Icons.refresh_rounded),
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppTheme.primary,
-          unselectedLabelColor: AppTheme.textSecondary,
-          indicatorColor: AppTheme.primary,
-          indicatorWeight: 2,
           tabs: [
             Tab(text: l10n.payment_historyTab),
             Tab(text: l10n.payment_methodsTab),
@@ -106,13 +101,14 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     return BlocBuilder<PaymentHistoryBloc, PaymentHistoryState>(
       builder: (context, state) {
         return Container(
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AppTheme.primary,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusXL),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
                 child: Column(
@@ -121,47 +117,45 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                     Text(
                       l10n.payment_totalSpent,
                       style: TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.background.withValues(alpha: 0.7),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.onPrimary.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${state.totalSpent.toStringAsFixed(2)} \$',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.background,
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.8,
+                        color: AppTheme.onPrimary,
+                        fontFeatures: [FontFeature.tabularFigures()],
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(
-                height: 40,
-                width: 1,
-                color: AppTheme.background.withValues(alpha: 0.2),
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      '${state.transactionCount}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.background,
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${state.transactionCount}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.onPrimary,
                     ),
-                    Text(
-                      l10n.payment_transactions,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: AppTheme.background.withValues(alpha: 0.7),
-                      ),
+                  ),
+                  Text(
+                    l10n.payment_transactions,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.onPrimary.withValues(alpha: 0.7),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -199,9 +193,9 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             context.read<PaymentHistoryBloc>().add(RefreshPaymentHistory());
           },
           child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
             itemCount: state.filteredPayments.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               return _buildPaymentItem(state.filteredPayments[index]);
             },
@@ -213,23 +207,24 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
 
   Widget _buildPaymentItem(Payment payment) {
     final statusColor = _getStatusColor(payment.status);
+    final locale = Localizations.localeOf(context).languageCode == 'en'
+        ? 'en_CA'
+        : 'fr_CA';
+    final meta = [
+      DateFormat('d MMM, HH:mm', locale).format(payment.createdAt),
+      if (payment.last4 != null) '•••• ${payment.last4}',
+    ].join('  ·  ');
 
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.border),
-      ),
       child: Row(
         children: [
-          // Icône statut
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: statusColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
             ),
             child: Icon(
               _getStatusIcon(payment.status),
@@ -238,45 +233,22 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             ),
           ),
           const SizedBox(width: 12),
-
-          // Infos
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   payment.displayDescription,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTheme.labelLarge,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Row(
-                  children: [
-                    Text(
-                      DateFormat('dd MMM, HH:mm').format(payment.createdAt),
-                      style:
-                          TextStyle(fontSize: 12, color: AppTheme.textTertiary),
-                    ),
-                    if (payment.last4 != null) ...[
-                      Text(' · ',
-                          style: TextStyle(color: AppTheme.textTertiary)),
-                      Text(
-                        '•••• ${payment.last4}',
-                        style: TextStyle(
-                            fontSize: 12, color: AppTheme.textTertiary),
-                      ),
-                    ],
-                  ],
-                ),
+                Text(meta, style: AppTheme.bodySmall),
               ],
             ),
           ),
-
-          // Montant
+          const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -284,24 +256,16 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                 '${payment.amount.toStringAsFixed(2)} \$',
                 style: const TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.textPrimary,
+                  fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
-              const SizedBox(height: 2),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  payment.status.displayName,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
-                  ),
-                ),
+              const SizedBox(height: 4),
+              StatusBadge(
+                label: payment.status.displayName,
+                color: statusColor,
+                small: true,
               ),
             ],
           ),
@@ -313,17 +277,17 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   Color _getStatusColor(PaymentStatus status) {
     switch (status) {
       case PaymentStatus.succeeded:
-        return AppTheme.success;
+        return AppTheme.statusCompleted;
       case PaymentStatus.pending:
       case PaymentStatus.processing:
-        return AppTheme.warning;
+        return AppTheme.statusPending;
       case PaymentStatus.failed:
         return AppTheme.error;
       case PaymentStatus.refunded:
       case PaymentStatus.partiallyRefunded:
         return AppTheme.info;
       case PaymentStatus.canceled:
-        return AppTheme.textTertiary;
+        return AppTheme.statusCancelled;
     }
   }
 
@@ -359,13 +323,13 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
         }
 
         return ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           children: [
             if (state.methods.isEmpty)
               _buildEmptyMethodsMessage()
             else
               ...state.methods.map((method) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.only(bottom: 10),
                     child: _buildMethodCard(method),
                   )),
             const SizedBox(height: 8),
@@ -382,8 +346,8 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
       padding: const EdgeInsets.all(24),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border, width: 1.5),
       ),
       child: Column(
         children: [
@@ -395,7 +359,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
           const SizedBox(height: 12),
           Text(
             l10n.payment_noCardsRegistered,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            style: AppTheme.headlineSmall,
           ),
           const SizedBox(height: 4),
           Text(
@@ -411,45 +375,17 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
   Widget _buildMethodCard(PaymentMethod method) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(14, 10, 4, 10),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: method.isDefault
-              ? AppTheme.success.withValues(alpha: 0.5)
-              : AppTheme.border,
-          width: method.isDefault ? 1.5 : 1,
-        ),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+        boxShadow: AppTheme.shadowSM,
       ),
       child: Row(
         children: [
-          // Logo carte
-          Container(
-            width: 44,
-            height: 30,
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Center(
-              child: Text(
-                method.brand.displayName.substring(
-                    0,
-                    method.brand.displayName.length > 4
-                        ? 4
-                        : method.brand.displayName.length),
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-            ),
-          ),
+          CardBrandMark(brand: method.brand),
           const SizedBox(width: 12),
-
-          // Infos carte
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,28 +394,16 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                   children: [
                     Text(
                       method.displayNumber,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                      style: AppTheme.labelLarge.copyWith(
+                        fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
                     if (method.isDefault) ...[
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppTheme.successLight,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          l10n.common_default,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.success,
-                          ),
-                        ),
+                      StatusBadge(
+                        label: l10n.common_default,
+                        color: AppTheme.textSecondary,
+                        small: true,
                       ),
                     ],
                   ],
@@ -487,8 +411,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                 const SizedBox(height: 2),
                 Text(
                   l10n.payment_expires(method.expiryDisplay),
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: AppTheme.bodySmall.copyWith(
                     color: method.isExpired
                         ? AppTheme.error
                         : AppTheme.textTertiary,
@@ -500,9 +423,10 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
 
           // Menu actions
           PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: AppTheme.textTertiary, size: 20),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            icon: const Icon(Icons.more_horiz_rounded,
+                color: AppTheme.textSecondary),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD)),
             onSelected: (value) {
               if (value == 'default') {
                 context.read<PaymentMethodsBloc>().add(
@@ -535,7 +459,6 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(l10n.payment_deleteCardTitle),
         content: Text(l10n.payment_deleteCardConfirm(method.displayNumber)),
         actions: [
@@ -560,37 +483,16 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
 
   Widget _buildAddCardButton() {
     final l10n = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: () async {
+    return OutlinedButton.icon(
+      onPressed: () async {
         final result =
             await Navigator.pushNamed(context, AppRoutes.addPaymentMethod);
         if (result == true && mounted) {
           context.read<PaymentMethodsBloc>().add(LoadPaymentMethods());
         }
       },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.primary.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add, color: AppTheme.primary, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              l10n.payment_addCard,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.primary,
-              ),
-            ),
-          ],
-        ),
-      ),
+      icon: const Icon(Icons.add_rounded),
+      label: Text(l10n.payment_addCard),
     );
   }
 
@@ -605,14 +507,12 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             height: 150,
           ),
           const SizedBox(height: 20),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
+          Text(title, style: AppTheme.headlineSmall),
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(fontSize: 13, color: AppTheme.textTertiary),
+            textAlign: TextAlign.center,
+            style: AppTheme.bodySmall,
           ),
         ],
       ),

@@ -8,6 +8,7 @@ import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
 import '../../../domain/entities/vehicle.dart';
+import '../../../../vehicule/presentation/widgets/vehicle_visuals.dart';
 
 class Step1VehicleParkingScreen extends StatefulWidget {
   const Step1VehicleParkingScreen({super.key});
@@ -68,20 +69,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
   }
 
   Widget _buildSectionHeader(String title, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: AppTheme.primary),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-      ],
-    );
+    return Text(title, style: AppTheme.headlineSmall);
   }
 
   Widget _buildVehicleList(BuildContext context, NewReservationState state) {
@@ -296,7 +284,8 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                     ),
                   ),
                   child: isSelected
-                      ? Icon(Icons.check, size: 12, color: AppTheme.background)
+                      ? Icon(Icons.check_rounded,
+                          size: 13, color: AppTheme.onPrimary)
                       : null,
                 ),
               ],
@@ -363,7 +352,7 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
             label: Text(AppLocalizations.of(context)!.common_add),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.background,
+              foregroundColor: AppTheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -462,16 +451,7 @@ class _VehicleCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: _getColor(vehicle.color),
-                          shape: BoxShape.circle,
-                          border:
-                              Border.all(color: AppTheme.border, width: 0.5),
-                        ),
-                      ),
+                      VehicleColorDot(colorName: vehicle.color, size: 10),
                       const SizedBox(width: 6),
                       Text(
                         vehicle.color,
@@ -506,7 +486,8 @@ class _VehicleCard extends StatelessWidget {
                 ),
               ),
               child: isSelected
-                  ? Icon(Icons.check, size: 12, color: AppTheme.background)
+                  ? Icon(Icons.check_rounded,
+                      size: 13, color: AppTheme.onPrimary)
                   : null,
             ),
           ],
@@ -517,24 +498,11 @@ class _VehicleCard extends StatelessWidget {
 
   Widget _buildIcon() {
     return Center(
-      child: Text(vehicle.type.icon, style: const TextStyle(fontSize: 20)),
+      child: Icon(
+        vehicleTypeIcon(vehicle.type),
+        size: 22,
+        color: AppTheme.textSecondary,
+      ),
     );
-  }
-
-  Color _getColor(String colorName) {
-    final colors = {
-      'Blanc': AppTheme.background,
-      'Noir': AppTheme.shadowColor,
-      'Gris': AppTheme.textTertiary,
-      'Rouge': AppTheme.error,
-      'Bleu': AppTheme.info,
-      'Vert': AppTheme.success,
-      'Jaune': AppTheme.warning,
-      'Orange': AppTheme.warning,
-      'Argent': AppTheme.textSecondary,
-      'Brun': const Color(0xFF795548),
-      'Beige': const Color(0xFFF5F5DC),
-    };
-    return colors[colorName] ?? AppTheme.textTertiary;
   }
 }

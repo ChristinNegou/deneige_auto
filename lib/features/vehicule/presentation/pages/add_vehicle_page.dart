@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/di/injection_container.dart';
@@ -10,6 +9,7 @@ import '../../../reservation/domain/entities/vehicle.dart';
 import '../../../reservation/domain/usecases/add_vehicle_usecase.dart'
     show AddVehicleParams;
 import '../bloc/vehicule_bloc.dart';
+import '../widgets/vehicle_visuals.dart';
 
 class AddVehiclePage extends StatelessWidget {
   const AddVehiclePage({super.key});
@@ -41,17 +41,21 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   bool _isDefault = false;
   File? _selectedPhoto;
 
-  final List<Map<String, dynamic>> _colors = [
-    {'name': 'Blanc', 'color': AppTheme.textPrimary},
-    {'name': 'Noir', 'color': AppTheme.shadowColor},
-    {'name': 'Gris', 'color': AppTheme.textTertiary},
-    {'name': 'Argent', 'color': const Color(0xFFC0C0C0)},
-    {'name': 'Rouge', 'color': AppTheme.error},
-    {'name': 'Bleu', 'color': AppTheme.info},
-    {'name': 'Vert', 'color': AppTheme.success},
-    {'name': 'Brun', 'color': const Color(0xFF795548)},
-    {'name': 'Beige', 'color': const Color(0xFFF5F5DC)},
+  /// Couleurs proposees ; la teinte affichee vient de [vehicleBodyColor].
+  static const List<String> _colors = [
+    'Blanc',
+    'Noir',
+    'Gris',
+    'Argent',
+    'Rouge',
+    'Bleu',
+    'Vert',
+    'Brun',
+    'Beige',
   ];
+
+  /// Couleurs claires : la coche doit etre foncee pour rester visible.
+  static const Set<String> _lightColors = {'Blanc', 'Beige', 'Argent'};
 
   @override
   void dispose() {
@@ -64,11 +68,6 @@ class _AddVehicleViewState extends State<AddVehicleView> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ));
-
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -110,20 +109,27 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 _buildHeader(),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppTheme.paddingXL),
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
                     child: Form(
                       key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _buildVehiclePreview(),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 28),
                           _buildFormCard(state),
-                          const SizedBox(height: 20),
                         ],
                       ),
                     ),
                   ),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                  decoration: const BoxDecoration(
+                    color: AppTheme.surface,
+                    border: Border(top: BorderSide(color: AppTheme.divider)),
+                  ),
+                  child: _buildSubmitButton(state),
                 ),
               ],
             );
@@ -134,28 +140,15 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 4),
           Text(
             AppLocalizations.of(context)!.addVehicle_title,
             style: AppTheme.headlineMedium,
@@ -165,119 +158,98 @@ class _AddVehicleViewState extends State<AddVehicleView> {
     );
   }
 
+  /// Apercu en direct du vehicule saisi : photo ou icone, nom, couleur, plaque.
   Widget _buildVehiclePreview() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowMD,
-      ),
-      child: Column(
+    final name = '${_makeController.text} ${_modelController.text}'.trim();
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
+      child: Row(
         children: [
-          // Clickable photo/icon area
           GestureDetector(
             onTap: _showPhotoOptions,
             child: Stack(
               children: [
                 Container(
-                  width: 100,
-                  height: 100,
+                  width: 76,
+                  height: 76,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+                    color: AppTheme.background,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusLG),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: _selectedPhoto != null
                       ? Image.file(
                           _selectedPhoto!,
                           fit: BoxFit.cover,
-                          width: 100,
-                          height: 100,
+                          width: 76,
+                          height: 76,
                         )
-                      : Center(
-                          child: Text(
-                            _selectedType.icon,
-                            style: const TextStyle(fontSize: 48),
-                          ),
+                      : Icon(
+                          vehicleTypeIcon(_selectedType),
+                          size: 34,
+                          color: AppTheme.textSecondary,
                         ),
                 ),
-                // Camera icon overlay
                 Positioned(
-                  right: 0,
-                  bottom: 0,
+                  right: 3,
+                  bottom: 3,
                   child: Container(
-                    width: 32,
-                    height: 32,
+                    width: 26,
+                    height: 26,
                     decoration: BoxDecoration(
-                      color: AppTheme.primary,
+                      color: AppTheme.surface,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppTheme.surface, width: 2),
-                      boxShadow: AppTheme.shadowSM,
+                      border: Border.all(color: AppTheme.border),
                     ),
                     child: const Icon(
-                      Icons.camera_alt_rounded,
-                      size: 16,
-                      color: Colors.white,
+                      Icons.photo_camera_outlined,
+                      size: 14,
+                      color: AppTheme.textPrimary,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            AppLocalizations.of(context)!.addVehicle_tapAddPhoto,
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.primary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _makeController.text.isNotEmpty || _modelController.text.isNotEmpty
-                ? '${_makeController.text} ${_modelController.text}'.trim()
-                : AppLocalizations.of(context)!.addVehicle_newVehicle,
-            style: AppTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 16,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: _colors.firstWhere(
-                      (c) => c['name'] == _selectedColor)['color'] as Color,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppTheme.border),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name.isNotEmpty
+                      ? name
+                      : AppLocalizations.of(context)!.addVehicle_newVehicle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.headlineSmall.copyWith(
+                    color: name.isNotEmpty
+                        ? AppTheme.textPrimary
+                        : AppTheme.textTertiary,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                _selectedColor,
-                style: AppTheme.bodySmall,
-              ),
-              if (_licensePlateController.text.isNotEmpty) ...[
-                const SizedBox(width: 12),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppTheme.background,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    _licensePlateController.text.toUpperCase(),
-                    style: AppTheme.labelSmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    VehicleColorDot(colorName: _selectedColor),
+                    const SizedBox(width: 6),
+                    Text(_selectedColor, style: AppTheme.bodySmall),
+                    if (_licensePlateController.text.isNotEmpty) ...[
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child:
+                            LicensePlate(plate: _licensePlateController.text),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppLocalizations.of(context)!.addVehicle_tapAddPhoto,
+                  style: AppTheme.labelSmall,
                 ),
               ],
-            ],
+            ),
           ),
         ],
       ),
@@ -287,26 +259,13 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   void _showPhotoOptions() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (bottomSheetContext) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.only(bottom: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: AppTheme.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
                 Text(
                   AppLocalizations.of(context)!.addVehicle_photoTitle,
                   style: AppTheme.headlineSmall,
@@ -319,16 +278,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 ),
                 const SizedBox(height: 20),
                 ListTile(
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.camera_alt_rounded,
-                        color: AppTheme.primary),
-                  ),
+                  leading: const Icon(Icons.photo_camera_outlined,
+                      color: AppTheme.primary),
                   title:
                       Text(AppLocalizations.of(context)!.addVehicle_takePhoto),
                   subtitle: Text(
@@ -342,16 +293,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                   },
                 ),
                 ListTile(
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppTheme.info.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.photo_library_rounded,
-                        color: AppTheme.info),
-                  ),
+                  leading: const Icon(Icons.photo_library_outlined,
+                      color: AppTheme.primary),
                   title: Text(
                       AppLocalizations.of(context)!.addVehicle_choosePhoto),
                   subtitle: Text(
@@ -366,16 +309,8 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 ),
                 if (_selectedPhoto != null)
                   ListTile(
-                    leading: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppTheme.error.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.delete_rounded,
-                          color: AppTheme.error),
-                    ),
+                    leading: const Icon(Icons.delete_outline_rounded,
+                        color: AppTheme.error),
                     title: Text(
                         AppLocalizations.of(context)!.addVehicle_deletePhoto),
                     subtitle: Text(
@@ -413,222 +348,211 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   }
 
   Widget _buildFormCard(VehicleState state) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Marque et Modèle
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  controller: _makeController,
-                  label: AppLocalizations.of(context)!.addVehicle_make,
-                  hint: 'Toyota',
-                  icon: Icons.directions_car_rounded,
-                  validator: (value) => value?.isEmpty ?? true
-                      ? AppLocalizations.of(context)!.addVehicle_required
-                      : null,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Marque et Modèle
+        Row(
+          children: [
+            Expanded(
+              child: _buildTextField(
+                controller: _makeController,
+                label: AppLocalizations.of(context)!.addVehicle_make,
+                hint: 'Toyota',
+                icon: Icons.directions_car_rounded,
+                validator: (value) => value?.isEmpty ?? true
+                    ? AppLocalizations.of(context)!.addVehicle_required
+                    : null,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildTextField(
-                  controller: _modelController,
-                  label: AppLocalizations.of(context)!.addVehicle_model,
-                  hint: 'Camry',
-                  icon: Icons.directions_car_outlined,
-                  validator: (value) => value?.isEmpty ?? true
-                      ? AppLocalizations.of(context)!.addVehicle_required
-                      : null,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Année et Plaque
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  controller: _yearController,
-                  label: AppLocalizations.of(context)!.addVehicle_year,
-                  hint: '2024',
-                  icon: Icons.calendar_today_rounded,
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true)
-                      return AppLocalizations.of(context)!.addVehicle_required;
-                    final year = int.tryParse(value!);
-                    if (year == null ||
-                        year < 1900 ||
-                        year > DateTime.now().year + 1) {
-                      return AppLocalizations.of(context)!.addVehicle_invalid;
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildTextField(
-                  controller: _licensePlateController,
-                  label: AppLocalizations.of(context)!.addVehicle_plate,
-                  hint: 'ABC 123',
-                  icon: Icons.badge_outlined,
-                  textCapitalization: TextCapitalization.characters,
-                  validator: (value) => value?.isEmpty ?? true
-                      ? AppLocalizations.of(context)!.addVehicle_required
-                      : null,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Type de véhicule
-          Text(
-            AppLocalizations.of(context)!.addVehicle_vehicleType,
-            style: AppTheme.labelSmall.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textSecondary,
             ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: AppTheme.background,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildTextField(
+                controller: _modelController,
+                label: AppLocalizations.of(context)!.addVehicle_model,
+                hint: 'Camry',
+                icon: Icons.directions_car_outlined,
+                validator: (value) => value?.isEmpty ?? true
+                    ? AppLocalizations.of(context)!.addVehicle_required
+                    : null,
+              ),
             ),
-            child: Row(
-              children: VehicleType.values.map((type) {
-                final isSelected = type == _selectedType;
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _selectedType = type),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected ? AppTheme.primary : Colors.transparent,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            type.icon,
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            type.displayName,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: isSelected
-                                  ? AppTheme.background
-                                  : AppTheme.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        // Année et Plaque
+        Row(
+          children: [
+            Expanded(
+              child: _buildTextField(
+                controller: _yearController,
+                label: AppLocalizations.of(context)!.addVehicle_year,
+                hint: '2024',
+                icon: Icons.calendar_today_rounded,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return AppLocalizations.of(context)!.addVehicle_required;
+                  }
+                  final year = int.tryParse(value!);
+                  if (year == null ||
+                      year < 1900 ||
+                      year > DateTime.now().year + 1) {
+                    return AppLocalizations.of(context)!.addVehicle_invalid;
+                  }
+                  return null;
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildTextField(
+                controller: _licensePlateController,
+                label: AppLocalizations.of(context)!.addVehicle_plate,
+                hint: 'ABC 123',
+                icon: Icons.badge_outlined,
+                textCapitalization: TextCapitalization.characters,
+                validator: (value) => value?.isEmpty ?? true
+                    ? AppLocalizations.of(context)!.addVehicle_required
+                    : null,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // Type de véhicule
+        Text(
+          AppLocalizations.of(context)!.addVehicle_vehicleType,
+          style: AppTheme.headlineSmall,
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          ),
+          child: Row(
+            children: VehicleType.values.map((type) {
+              final isSelected = type == _selectedType;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedType = type),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppTheme.surface : Colors.transparent,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                      boxShadow: isSelected ? AppTheme.shadowSM : null,
                     ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Couleur
-          Text(
-            AppLocalizations.of(context)!.addVehicle_color,
-            style: AppTheme.labelSmall.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: _colors.map((colorData) {
-              final isSelected = colorData['name'] == _selectedColor;
-              return GestureDetector(
-                onTap: () => setState(
-                    () => _selectedColor = colorData['name'] as String),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: colorData['color'] as Color,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected ? AppTheme.primary : AppTheme.border,
-                      width: isSelected ? 2.5 : 1,
-                    ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: AppTheme.primary.withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: isSelected
-                      ? Icon(
-                          Icons.check_rounded,
-                          size: 18,
-                          color: colorData['name'] == 'Blanc' ||
-                                  colorData['name'] == 'Beige'
+                    child: Column(
+                      children: [
+                        Icon(
+                          vehicleTypeIcon(type),
+                          size: 22,
+                          color: isSelected
                               ? AppTheme.primary
-                              : AppTheme.background,
-                        )
-                      : null,
+                              : AppTheme.textTertiary,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          type.displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight:
+                                isSelected ? FontWeight.w800 : FontWeight.w600,
+                            color: isSelected
+                                ? AppTheme.textPrimary
+                                : AppTheme.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             }).toList(),
           ),
-          const SizedBox(height: 20),
+        ),
+        const SizedBox(height: 24),
 
-          // Véhicule par défaut
-          Container(
-            decoration: BoxDecoration(
-              color: AppTheme.background,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        // Couleur
+        Row(
+          children: [
+            Text(
+              AppLocalizations.of(context)!.addVehicle_color,
+              style: AppTheme.headlineSmall,
             ),
-            child: CheckboxListTile(
-              value: _isDefault,
-              onChanged: (value) => setState(() => _isDefault = value ?? false),
-              activeColor: AppTheme.success,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            const SizedBox(width: 8),
+            Text(_selectedColor, style: AppTheme.bodySmall),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: _colors.map((name) {
+            final isSelected = name == _selectedColor;
+            return Semantics(
+              label: name,
+              selected: isSelected,
+              button: true,
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedColor = name),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: 40,
+                  height: 40,
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? AppTheme.primary : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: vehicleBodyColor(name),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppTheme.border),
+                    ),
+                    child: isSelected
+                        ? Icon(
+                            Icons.check_rounded,
+                            size: 18,
+                            color: _lightColors.contains(name)
+                                ? AppTheme.primary
+                                : Colors.white,
+                          )
+                        : null,
+                  ),
+                ),
               ),
-              title: Text(
-                AppLocalizations.of(context)!.addVehicle_setDefault,
-                style:
-                    AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w500),
-              ),
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 24),
+
+        // Véhicule par défaut
+        GlassCard(
+          padding: EdgeInsets.zero,
+          child: SwitchListTile(
+            value: _isDefault,
+            onChanged: (value) => setState(() => _isDefault = value),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            title: Text(
+              AppLocalizations.of(context)!.addVehicle_setDefault,
+              style: AppTheme.labelLarge,
             ),
           ),
-          const SizedBox(height: 24),
-
-          // Bouton Ajouter
-          _buildSubmitButton(state),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -646,53 +570,21 @@ class _AddVehicleViewState extends State<AddVehicleView> {
       children: [
         Text(
           label,
-          style: AppTheme.labelSmall.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary,
-          ),
+          style: AppTheme.labelMedium,
         ),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           textCapitalization: textCapitalization,
-          style: AppTheme.bodyMedium.copyWith(fontSize: 14),
+          style: AppTheme.bodyLarge,
           validator: validator,
           onChanged: (_) => setState(() {}),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle:
-                AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary),
-            prefixIcon: Container(
-              margin: const EdgeInsets.only(left: 10, right: 6),
-              child: Icon(icon, color: AppTheme.textTertiary, size: 18),
-            ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 0, minHeight: 0),
-            filled: true,
-            fillColor: AppTheme.background,
+            prefixIcon: Icon(icon, size: 18),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: const BorderSide(color: AppTheme.error),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              borderSide: const BorderSide(color: AppTheme.error, width: 1.5),
-            ),
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             errorStyle: const TextStyle(fontSize: 11),
           ),
         ),
@@ -701,60 +593,20 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   }
 
   Widget _buildSubmitButton(VehicleState state) {
-    return GestureDetector(
-      onTap: state.isSubmitting ? null : _submitForm,
-      child: Container(
-        height: 52,
-        decoration: BoxDecoration(
-          gradient: !state.isSubmitting
-              ? const LinearGradient(
-                  colors: [AppTheme.primary, AppTheme.secondary],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                )
-              : null,
-          color: state.isSubmitting ? AppTheme.border : null,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          boxShadow: !state.isSubmitting
-              ? [
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Center(
-          child: state.isSubmitting
-              ? SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    color: AppTheme.background,
-                    strokeWidth: 2.5,
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add_rounded,
-                      color: AppTheme.background,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      AppLocalizations.of(context)!.addVehicle_addBtn,
-                      style: TextStyle(
-                        color: AppTheme.background,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+    return SafeArea(
+      top: false,
+      child: ElevatedButton(
+        onPressed: state.isSubmitting ? null : _submitForm,
+        child: state.isSubmitting
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: AppTheme.onPrimary,
+                  strokeWidth: 2,
                 ),
-        ),
+              )
+            : Text(AppLocalizations.of(context)!.addVehicle_addBtn),
       ),
     );
   }

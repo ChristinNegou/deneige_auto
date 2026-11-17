@@ -32,14 +32,7 @@ class AIPriceEstimationWidget extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppTheme.primary.withValues(alpha: 0.08),
-                AppTheme.secondary.withValues(alpha: 0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: AppTheme.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: AppTheme.primary.withValues(alpha: 0.2),

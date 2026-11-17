@@ -172,13 +172,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   child: Form(
                     key: _formKey,
                     child: ListView(
-                      padding: const EdgeInsets.all(AppTheme.paddingLG),
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                       children: [
                         _buildAvatarSection(photoUrl),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 28),
                         _buildFormSection(),
-                        const SizedBox(height: 32),
-                        _buildSaveButton(),
                       ],
                     ),
                   ),
@@ -186,34 +184,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ],
             ),
           ),
+          bottomNavigationBar: Container(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            decoration: const BoxDecoration(
+              color: AppTheme.surface,
+              border: Border(top: BorderSide(color: AppTheme.divider)),
+            ),
+            child: SafeArea(top: false, child: _buildSaveButton()),
+          ),
         );
       },
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 4),
           Text(
             AppLocalizations.of(context)!.profile_editTitle,
             style: AppTheme.headlineMedium,
@@ -224,101 +217,90 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget _buildAvatarSection(String? photoUrl) {
+    final initials = [_firstNameController.text, _lastNameController.text]
+        .where((p) => p.isNotEmpty)
+        .map((p) => p[0].toUpperCase())
+        .join();
+    final initialsAvatar = Center(
+      child: Text(
+        initials.isEmpty ? '?' : initials,
+        style: const TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.w800,
+          color: AppTheme.onPrimary,
+        ),
+      ),
+    );
+
+    Widget content;
+    if (_isUploadingPhoto) {
+      content = const Center(
+        child: CircularProgressIndicator(
+          color: AppTheme.onPrimary,
+          strokeWidth: 2,
+        ),
+      );
+    } else if (_selectedImage != null) {
+      content = Image.file(
+        _selectedImage!,
+        fit: BoxFit.cover,
+        width: 96,
+        height: 96,
+      );
+    } else if (photoUrl != null) {
+      content = Image.network(
+        photoUrl,
+        fit: BoxFit.cover,
+        width: 96,
+        height: 96,
+        errorBuilder: (_, __, ___) => initialsAvatar,
+      );
+    } else {
+      content = initialsAvatar;
+    }
+
     return Center(
-      child: Stack(
-        children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primary, AppTheme.secondary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+      child: GestureDetector(
+        onTap: _isUploadingPhoto ? null : _changePhoto,
+        child: Stack(
+          children: [
+            Container(
+              width: 96,
+              height: 96,
+              decoration: const BoxDecoration(
+                color: AppTheme.primary,
+                shape: BoxShape.circle,
               ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primary.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              child: ClipOval(child: content),
             ),
-            child: _isUploadingPhoto
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : _selectedImage != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-                        child: Image.file(
-                          _selectedImage!,
-                          fit: BoxFit.cover,
-                          width: 100,
-                          height: 100,
-                        ),
-                      )
-                    : photoUrl != null
-                        ? ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusXL),
-                            child: Image.network(
-                              photoUrl,
-                              fit: BoxFit.cover,
-                              width: 100,
-                              height: 100,
-                              errorBuilder: (_, __, ___) => const Icon(
-                                Icons.person_rounded,
-                                color: AppTheme.background,
-                                size: 50,
-                              ),
-                            ),
-                          )
-                        : const Icon(
-                            Icons.person_rounded,
-                            color: AppTheme.background,
-                            size: 50,
-                          ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: GestureDetector(
-              onTap: _isUploadingPhoto ? null : _changePhoto,
+            Positioned(
+              bottom: 0,
+              right: 0,
               child: Container(
-                width: 36,
-                height: 36,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
-                  color: AppTheme.primary,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-                  border: Border.all(color: AppTheme.surface, width: 3),
+                  color: AppTheme.surface,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppTheme.border),
                   boxShadow: AppTheme.shadowSM,
                 ),
                 child: const Icon(
-                  Icons.camera_alt_rounded,
-                  color: AppTheme.background,
+                  Icons.photo_camera_outlined,
+                  color: AppTheme.textPrimary,
                   size: 18,
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildFormSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: AppTheme.shadowSM,
-      ),
+    return Padding(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -326,7 +308,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             AppLocalizations.of(context)!.profile_personalInfo,
             style: AppTheme.headlineSmall,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           _buildTextField(
             controller: _firstNameController,
             label: AppLocalizations.of(context)!.common_firstName,
@@ -353,7 +335,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: _emailController,
-            label: 'Email',
+            label: AppLocalizations.of(context)!.common_email,
             icon: Icons.email_outlined,
             enabled: false,
             suffixIcon: Icons.lock_outline_rounded,
@@ -363,9 +345,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             padding: const EdgeInsets.only(left: 4),
             child: Text(
               AppLocalizations.of(context)!.profile_emailNotEditable,
-              style: AppTheme.labelSmall.copyWith(
-                fontStyle: FontStyle.italic,
-              ),
+              style: AppTheme.labelSmall,
             ),
           ),
           const SizedBox(height: 16),
@@ -399,10 +379,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 Expanded(
                   child: Text(
                     AppLocalizations.of(context)!.profile_smsVerificationNote,
-                    style: AppTheme.labelSmall.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: AppTheme.textTertiary,
-                    ),
+                    style: AppTheme.labelSmall,
                   ),
                 ),
               ],
@@ -428,130 +405,81 @@ class _EditProfilePageState extends State<EditProfilePage> {
       enabled: enabled,
       keyboardType: keyboardType,
       validator: validator,
-      style: AppTheme.bodyMedium,
+      style: AppTheme.bodyLarge,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon, color: AppTheme.textSecondary, size: 20),
-        suffixIcon: suffixIcon != null
-            ? Icon(suffixIcon, color: AppTheme.textTertiary, size: 18)
-            : null,
-        filled: true,
-        fillColor: enabled ? AppTheme.background : AppTheme.divider,
-        border: OutlineInputBorder(
+        prefixIcon: Icon(icon, size: 20),
+        suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 18) : null,
+        fillColor: enabled ? AppTheme.surface : AppTheme.surfaceContainer,
+        disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          borderSide: const BorderSide(color: AppTheme.border),
+          borderSide: BorderSide.none,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          borderSide: const BorderSide(color: AppTheme.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          borderSide: const BorderSide(color: AppTheme.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          borderSide: const BorderSide(color: AppTheme.error),
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
 
   Widget _buildSaveButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _saveProfile,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primary,
-          foregroundColor: AppTheme.background,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          ),
-          elevation: 0,
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(AppTheme.background),
-                ),
-              )
-            : Text(
-                AppLocalizations.of(context)!.profile_saveChanges,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _saveProfile,
+      child: _isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppTheme.onPrimary,
               ),
-      ),
+            )
+          : Text(AppLocalizations.of(context)!.profile_saveChanges),
     );
   }
 
   void _changePhoto() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXL)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppTheme.border,
-                borderRadius: BorderRadius.circular(2),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.profile_changePhoto,
+                style: AppTheme.headlineSmall,
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              AppLocalizations.of(context)!.profile_changePhoto,
-              style: AppTheme.headlineSmall,
-            ),
-            const SizedBox(height: 24),
-            _buildPhotoOption(
-              icon: Icons.camera_alt_rounded,
-              iconColor: AppTheme.primary,
-              title: AppLocalizations.of(context)!.profile_takePhoto,
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.camera);
-              },
-            ),
-            const SizedBox(height: 12),
-            _buildPhotoOption(
-              icon: Icons.photo_library_rounded,
-              iconColor: AppTheme.secondary,
-              title: AppLocalizations.of(context)!.profile_chooseFromGallery,
-              onTap: () {
-                Navigator.pop(context);
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-            const SizedBox(height: 12),
-            _buildPhotoOption(
-              icon: Icons.delete_rounded,
-              iconColor: AppTheme.error,
-              title: AppLocalizations.of(context)!.profile_deletePhoto,
-              onTap: () {
-                Navigator.pop(context);
-                _deletePhoto();
-              },
-            ),
-          ],
+              const SizedBox(height: 12),
+              _buildPhotoOption(
+                icon: Icons.photo_camera_outlined,
+                iconColor: AppTheme.primary,
+                title: AppLocalizations.of(context)!.profile_takePhoto,
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              _buildPhotoOption(
+                icon: Icons.photo_library_outlined,
+                iconColor: AppTheme.primary,
+                title: AppLocalizations.of(context)!.profile_chooseFromGallery,
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              _buildPhotoOption(
+                icon: Icons.delete_outline_rounded,
+                iconColor: AppTheme.error,
+                title: AppLocalizations.of(context)!.profile_deletePhoto,
+                onTap: () {
+                  Navigator.pop(context);
+                  _deletePhoto();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -619,36 +547,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required String title,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return ListTile(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.background,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              ),
-              child: Icon(icon, color: iconColor, size: 22),
-            ),
-            const SizedBox(width: 14),
-            Text(
-              title,
-              style: AppTheme.labelLarge.copyWith(
-                color: iconColor == AppTheme.error
-                    ? AppTheme.error
-                    : AppTheme.textPrimary,
-              ),
-            ),
-          ],
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, color: iconColor),
+      title: Text(
+        title,
+        style: AppTheme.labelLarge.copyWith(
+          color: iconColor == AppTheme.error
+              ? AppTheme.error
+              : AppTheme.textPrimary,
         ),
       ),
     );
@@ -706,31 +614,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               }
             },
             child: AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-              ),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                    ),
-                    child: const Icon(
-                      Icons.sms_outlined,
-                      color: AppTheme.primary,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context)!.profile_smsVerification,
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ],
+              title: Text(
+                AppLocalizations.of(context)!.profile_smsVerification,
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -789,27 +674,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     maxLength: 6,
                     style: const TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
                       letterSpacing: 8,
+                      fontFeatures: [FontFeature.tabularFigures()],
                     ),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: '000000',
                       counterText: '',
-                      filled: true,
-                      fillColor: AppTheme.background,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                        borderSide: const BorderSide(color: AppTheme.border),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                        borderSide: const BorderSide(color: AppTheme.border),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                        borderSide:
-                            const BorderSide(color: AppTheme.primary, width: 2),
-                      ),
                     ),
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -859,9 +730,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 }
                               },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          minimumSize: const Size(0, 44),
                         ),
                         child: isVerifying
                             ? const SizedBox(

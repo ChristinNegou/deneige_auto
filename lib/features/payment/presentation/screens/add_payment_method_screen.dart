@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe/flutter_stripe.dart' hide CardBrand;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/payment_method.dart' show CardBrand;
 import '../bloc/payment_methods_bloc.dart';
+import '../widgets/card_brand_mark.dart';
 
 class AddPaymentMethodScreen extends StatefulWidget {
   const AddPaymentMethodScreen({super.key});
@@ -25,13 +27,11 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       appBar: AppBar(
         title: Text(
           AppLocalizations.of(context)!.addCard_title,
-          style: TextStyle(color: AppTheme.textPrimary),
+          style: AppTheme.labelMedium,
         ),
-        backgroundColor: AppTheme.surface,
-        foregroundColor: AppTheme.textPrimary,
-        elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -59,60 +59,33 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSecurityBanner(),
-                const SizedBox(height: 24),
                 _buildCardSection(),
-                const SizedBox(height: 16),
-                _buildDefaultOption(),
-                const SizedBox(height: 24),
-                _buildSecurityInfo(),
-                const SizedBox(height: 32),
-                _buildSubmitButton(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                 _buildAcceptedCards(),
+                const SizedBox(height: 28),
+                _buildDefaultOption(),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildSecurityBanner() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.infoLight,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.info.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.lock_outline, size: 20, color: AppTheme.info),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.addCard_securePayment,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.info,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  AppLocalizations.of(context)!.addCard_protectedByStripe,
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.info.withValues(alpha: 0.8)),
-                ),
-              ],
-            ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+        decoration: const BoxDecoration(
+          color: AppTheme.surface,
+          border: Border(top: BorderSide(color: AppTheme.divider)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildSubmitButton(),
+              const SizedBox(height: 10),
+              _buildSecurityInfo(),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -123,20 +96,11 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       children: [
         Text(
           AppLocalizations.of(context)!.addCard_cardInfo,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
+          style: AppTheme.headlineSmall,
         ),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppTheme.border),
-          ),
+        SizedBox(
+          height: 50,
           child: CardField(
             onCardChanged: (card) {
               setState(() {
@@ -145,10 +109,26 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
             },
             style: TextStyle(fontSize: 15, color: AppTheme.textPrimary),
             enablePostalCode: true,
+            countryCode: 'CA',
             decoration: InputDecoration(
-              border: InputBorder.none,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppTheme.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppTheme.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppTheme.primary),
+              ),
+              filled: true,
+              fillColor: AppTheme.surface,
               hintText: AppLocalizations.of(context)!.addCard_cardNumber,
               hintStyle: TextStyle(color: AppTheme.textTertiary),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
           ),
         ),
@@ -157,70 +137,42 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
   }
 
   Widget _buildDefaultOption() {
-    return GestureDetector(
-      onTap: () => setState(() => _setAsDefault = !_setAsDefault),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppTheme.border),
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      child: SwitchListTile(
+        value: _setAsDefault,
+        onChanged: (value) => setState(() => _setAsDefault = value),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        title: Text(
+          AppLocalizations.of(context)!.addCard_setDefault,
+          style: AppTheme.labelLarge,
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                color: _setAsDefault ? AppTheme.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color:
-                      _setAsDefault ? AppTheme.primary : AppTheme.textTertiary,
-                  width: 1.5,
-                ),
-              ),
-              child: _setAsDefault
-                  ? Icon(Icons.check, size: 14, color: AppTheme.background)
-                  : null,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.addCard_setDefault,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    AppLocalizations.of(context)!.addCard_usedForFuture,
-                    style:
-                        TextStyle(fontSize: 12, color: AppTheme.textTertiary),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        subtitle: Text(
+          AppLocalizations.of(context)!.addCard_usedForFuture,
+          style: AppTheme.bodySmall,
         ),
       ),
     );
   }
 
   Widget _buildSecurityInfo() {
+    final l10n = AppLocalizations.of(context)!;
+    return _buildSecureLine(
+        '${l10n.addCard_encryptedSecure} ${l10n.addCard_protectedByStripe}');
+  }
+
+  Widget _buildSecureLine(String text) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.verified_user_outlined, size: 16, color: AppTheme.success),
-        const SizedBox(width: 8),
-        Expanded(
+        const Icon(Icons.lock_outline_rounded,
+            size: 14, color: AppTheme.textTertiary),
+        const SizedBox(width: 6),
+        Flexible(
           child: Text(
-            AppLocalizations.of(context)!.addCard_encryptedSecure,
-            style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+            text,
+            textAlign: TextAlign.center,
+            style: AppTheme.labelSmall,
           ),
         ),
       ],
@@ -230,63 +182,29 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
   Widget _buildSubmitButton() {
     final canSubmit = _cardComplete && !_isLoading;
 
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canSubmit ? _handleAddCard : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primary,
-          foregroundColor: AppTheme.background,
-          disabledBackgroundColor: AppTheme.surfaceContainer,
-          disabledForegroundColor: AppTheme.textTertiary,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 0,
-        ),
-        child: _isLoading
-            ? SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: AppTheme.background),
-              )
-            : Text(
-                AppLocalizations.of(context)!.addCard_addBtn,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-      ),
+    return ElevatedButton(
+      onPressed: canSubmit ? _handleAddCard : null,
+      child: _isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, color: AppTheme.onPrimary),
+            )
+          : Text(AppLocalizations.of(context)!.addCard_addBtn),
     );
   }
 
+  /// Reseaux acceptes, affiches sous le champ de carte.
   Widget _buildAcceptedCards() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return const Row(
       children: [
-        _buildCardLogo('Visa'),
-        const SizedBox(width: 8),
-        _buildCardLogo('Mastercard'),
-        const SizedBox(width: 8),
-        _buildCardLogo('Amex'),
+        CardBrandMark(brand: CardBrand.visa, width: 36),
+        SizedBox(width: 6),
+        CardBrandMark(brand: CardBrand.mastercard, width: 36),
+        SizedBox(width: 6),
+        CardBrandMark(brand: CardBrand.amex, width: 36),
       ],
-    );
-  }
-
-  Widget _buildCardLogo(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary),
-      ),
     );
   }
 
@@ -295,7 +213,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       SnackBar(
         content: Text(
           message,
-          style: TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: AppTheme.onPrimary),
         ),
         backgroundColor: isError ? AppTheme.error : AppTheme.success,
       ),

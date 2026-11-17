@@ -231,14 +231,17 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                         ),
                         // Contenu principal
                         SliverPadding(
-                          padding: const EdgeInsets.all(AppTheme.paddingLG),
+                          padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
                           sliver: SliverList(
                             delegate: SliverChildListDelegate([
                               // Live tracking (si actif)
                               _buildLiveTrackingSection(),
-                              // Actions rapides
+                              // Panneau meteo + reservation
+                              _buildHeroCard(context),
+                              const SizedBox(height: 28),
+                              // Raccourcis
                               _buildQuickActions(context),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 28),
                               // Prochaines réservations
                               _buildUpcomingSection(context),
                               const SizedBox(height: 80),
@@ -260,103 +263,128 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   }
 
   Widget _buildHeader(BuildContext context, String userName) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-      child: Column(
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+      child: Row(
         children: [
-          // Ligne principale
-          Row(
-            children: [
-              // Avatar
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppTheme.statusAssigned, AppTheme.statusAssigned],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.clientHome_greetingLabel,
+                  style: AppTheme.bodySmall,
                 ),
-                child: Center(
-                  child: Text(
-                    userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.background,
-                    ),
+                const SizedBox(height: 2),
+                Text(
+                  userName.split(' ').first,
+                  style: AppTheme.headlineLarge,
+                ),
+              ],
+            ),
+          ),
+          _buildNotificationButton(context),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: AppTheme.primary,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.onPrimary,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              // Salutation
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.clientHome_greetingLabel,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                    Text(
-                      userName.split(' ').first,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Météo badge
-              _buildWeatherBadge(),
-              const SizedBox(width: 8),
-              // Notifications
-              _buildNotificationButton(context),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildWeatherBadge() {
+  /// Panneau principal : la meteo du moment et l'action de reservation.
+  /// C'est l'element signature de l'accueil, le seul en bleu nuit.
+  Widget _buildHeroCard(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
-        if (!state.isLoading && state.weather != null) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: AppTheme.shadowSM,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  _getWeatherIcon(state.weather!.condition),
-                  size: 18,
-                  color: AppTheme.statusAssigned,
+        final weather = state.isLoading ? null : state.weather;
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppTheme.primary,
+            borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+            boxShadow: AppTheme.shadowLG,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (weather != null) ...[
+                Row(
+                  children: [
+                    Icon(
+                      _getWeatherIcon(weather.condition),
+                      size: 20,
+                      color: AppTheme.primary3,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${weather.temperature.round()}°C',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.onPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        weather.snowDepth != null && weather.snowDepth! > 0
+                            ? l10n.weather_snowDepthValue(
+                                weather.snowDepth.toString())
+                            : weather.condition,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.onPrimary.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  '${state.weather!.temperature.round()}°',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
+                const SizedBox(height: 16),
               ],
-            ),
-          );
-        }
-        return const SizedBox.shrink();
+              Text(
+                l10n.clientHome_heroTitle,
+                style: const TextStyle(
+                  fontSize: 22,
+                  height: 1.25,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4,
+                  color: AppTheme.onPrimary,
+                ),
+              ),
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                onPressed: () =>
+                    Navigator.pushNamed(context, AppRoutes.newReservation),
+                icon: const Icon(Icons.add_rounded, size: 22),
+                label: Text(l10n.clientHome_heroCta),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
@@ -387,27 +415,28 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             height: 44,
             decoration: BoxDecoration(
               color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: AppTheme.shadowSM,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppTheme.border),
             ),
             child: Stack(
               alignment: Alignment.center,
               children: [
                 const Icon(
-                  Icons.notifications_outlined,
-                  color: AppTheme.textSecondary,
+                  Icons.notifications_none_rounded,
+                  color: AppTheme.textPrimary,
                   size: 22,
                 ),
                 if (state.unreadCount > 0)
                   Positioned(
-                    top: 8,
-                    right: 8,
+                    top: 10,
+                    right: 11,
                     child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.error,
+                      width: 9,
+                      height: 9,
+                      decoration: BoxDecoration(
+                        color: AppTheme.accent,
                         shape: BoxShape.circle,
+                        border: Border.all(color: AppTheme.surface, width: 1.5),
                       ),
                     ),
                   ),
@@ -433,7 +462,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         if (activeReservation == null) return const SizedBox.shrink();
 
         return Padding(
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.only(bottom: 16),
           child: _buildCompactTrackingCard(activeReservation),
         );
       },
@@ -441,140 +470,68 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   }
 
   Widget _buildCompactTrackingCard(Reservation reservation) {
-    final isEnRoute = reservation.status == ReservationStatus.enRoute;
-    final isInProgress = reservation.status == ReservationStatus.inProgress;
-
-    Color statusColor;
-    String statusText;
-    IconData statusIcon;
-
     final l10n = AppLocalizations.of(context)!;
-    if (isInProgress) {
-      statusColor = AppTheme.success;
-      statusText = l10n.reservation_shortInProgress;
-      statusIcon = Icons.construction;
-    } else if (isEnRoute) {
-      statusColor = AppTheme.secondary;
-      statusText = l10n.reservation_shortEnRoute;
-      statusIcon = Icons.directions_car;
-    } else {
-      statusColor = AppTheme.primary;
-      statusText = l10n.reservation_shortAssigned;
-      statusIcon = Icons.person;
+    final statusColor = _getStatusColor(reservation.status);
+    final statusText = _getStatusLabel(reservation.status);
+    final IconData statusIcon;
+    switch (reservation.status) {
+      case ReservationStatus.inProgress:
+        statusIcon = Icons.ac_unit_rounded;
+        break;
+      case ReservationStatus.enRoute:
+        statusIcon = Icons.directions_car_rounded;
+        break;
+      default:
+        statusIcon = Icons.person_rounded;
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [statusColor, statusColor.withValues(alpha: 0.8)],
-        ),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        boxShadow: [
-          BoxShadow(
-            color: statusColor.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+    return GlassCard(
+      padding: const EdgeInsets.all(14),
+      onTap: () => Navigator.pushNamed(
+        context,
+        AppRoutes.reservationDetails,
+        arguments: reservation.id,
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.pushNamed(
-            context,
-            AppRoutes.reservationDetails,
-            arguments: reservation.id,
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
+            child: Icon(statusIcon, color: statusColor, size: 22),
           ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icône avec animation
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppTheme.background.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(statusIcon, color: AppTheme.background, size: 22),
-                ),
-                const SizedBox(width: 12),
-                // Infos
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: AppTheme.background,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppTheme.background
-                                      .withValues(alpha: 0.5),
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            statusText,
-                            style: const TextStyle(
-                              color: AppTheme.background,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        reservation.workerName ??
-                            l10n.clientHome_workerApproaching,
-                        style: TextStyle(
-                          color: AppTheme.background.withValues(alpha: 0.9),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Bouton Chat si déneigeur assigné
-                if (reservation.workerId != null) ...[
-                  GestureDetector(
-                    onTap: () => _openChatFromCard(reservation),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppTheme.background.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.chat_bubble_rounded,
-                        color: AppTheme.background,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                ],
-                // Flèche
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppTheme.background.withValues(alpha: 0.7),
-                  size: 16,
+                StatusBadge(label: statusText, color: statusColor, small: true),
+                const SizedBox(height: 6),
+                Text(
+                  reservation.workerName ?? l10n.clientHome_workerApproaching,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.headlineSmall,
                 ),
               ],
             ),
           ),
-        ),
+          if (reservation.workerId != null)
+            IconButton.filledTonal(
+              onPressed: () => _openChatFromCard(reservation),
+              style: IconButton.styleFrom(
+                backgroundColor: AppTheme.surfaceContainer,
+                foregroundColor: AppTheme.textPrimary,
+              ),
+              icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+            ),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppTheme.textTertiary,
+          ),
+        ],
       ),
     );
   }
@@ -584,55 +541,31 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.clientHome_quickActions,
-          style: AppTheme.headlineMedium,
-        ),
+        Text(l10n.clientHome_shortcuts, style: AppTheme.headlineMedium),
         const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
               child: _buildActionCard(
-                imagePath: 'assets/images/quick_new_reservation.png',
-                icon: Icons.add_circle_outline,
-                label: l10n.clientHome_book,
-                color: AppTheme.primary2,
-                onTap: () =>
-                    Navigator.pushNamed(context, AppRoutes.newReservation),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildActionCard(
-                imagePath: 'assets/images/quick_my_reservations.png',
-                icon: Icons.calendar_today_outlined,
+                icon: Icons.event_note_rounded,
                 label: l10n.clientHome_myAppointments,
-                color: AppTheme.success,
                 onTap: () =>
                     Navigator.pushNamed(context, AppRoutes.reservations),
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
+            const SizedBox(width: 10),
             Expanded(
               child: _buildActionCard(
-                imagePath: 'assets/images/quick_my_vehicles.png',
-                icon: Icons.directions_car_outlined,
+                icon: Icons.directions_car_filled_outlined,
                 label: l10n.vehicle_myVehicles,
-                color: AppTheme.warning,
                 onTap: () => Navigator.pushNamed(context, AppRoutes.vehicles),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _buildActionCard(
-                imagePath: 'assets/images/quick_payment.png',
-                icon: Icons.credit_card_outlined,
+                icon: Icons.credit_card_rounded,
                 label: l10n.profile_payments,
-                color: AppTheme.primary3,
                 onTap: () => Navigator.pushNamed(context, AppRoutes.payments),
               ),
             ),
@@ -645,66 +578,35 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   Widget _buildActionCard({
     required IconData icon,
     required String label,
-    required Color color,
     required VoidCallback onTap,
-    String? imagePath,
   }) {
-    return GestureDetector(
+    return GlassCard(
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          boxShadow: AppTheme.shadowSM,
-        ),
-        child: Column(
-          children: [
-            if (imagePath != null)
-              Opacity(
-                opacity: 0.95,
-                child: SizedBox(
-                  width: 58,
-                  height: 58,
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(icon, color: color, size: 22),
-                      );
-                    },
-                  ),
-                ),
-              )
-            else
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 22),
-              ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryLight,
+              borderRadius: BorderRadius.circular(AppTheme.radiusSM + 2),
             ),
-          ],
-        ),
+            child: Icon(icon, color: AppTheme.primary, size: 20),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -728,7 +630,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 4),
         BlocBuilder<reservation_bloc.ReservationListBloc,
             reservation_bloc.ReservationListState>(
           builder: (context, state) {
@@ -749,46 +651,32 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
-      padding: const EdgeInsets.all(24),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(color: AppTheme.border, width: 1.5),
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.calendar_today_outlined,
-            size: 48,
+          const Icon(
+            Icons.event_available_rounded,
+            size: 32,
             color: AppTheme.textTertiary,
           ),
           const SizedBox(height: 12),
           Text(
-            AppLocalizations.of(context)!.reservation_empty,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
-            ),
+            l10n.reservation_empty,
+            textAlign: TextAlign.center,
+            style: AppTheme.headlineSmall,
           ),
           const SizedBox(height: 4),
           Text(
-            AppLocalizations.of(context)!.clientHome_bookFirstSnowRemoval,
-            style: TextStyle(
-              fontSize: 14,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: () =>
-                Navigator.pushNamed(context, AppRoutes.newReservation),
-            icon: const Icon(Icons.add, size: 18),
-            label: Text(AppLocalizations.of(context)!.clientHome_book),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
+            l10n.clientHome_bookFirstSnowRemoval,
+            textAlign: TextAlign.center,
+            style: AppTheme.bodySmall,
           ),
         ],
       ),
@@ -796,99 +684,80 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   }
 
   Widget _buildReservationCard(Reservation reservation) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.pushNamed(
-            context,
-            AppRoutes.reservationDetails,
-            arguments: reservation.id,
-          ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                // Date
-                Container(
-                  width: 50,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryLight,
-                    borderRadius: BorderRadius.circular(8),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: GlassCard(
+        padding: const EdgeInsets.all(12),
+        onTap: () => Navigator.pushNamed(
+          context,
+          AppRoutes.reservationDetails,
+          arguments: reservation.id,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: AppTheme.background,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    _formatMonth(reservation.departureTime),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.accentDark,
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      Text(
-                        _formatDay(reservation.departureTime),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                      Text(
-                        _formatMonth(reservation.departureTime),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    _formatDay(reservation.departureTime),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      height: 1.1,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                // Infos
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${reservation.vehicle.make} ${reservation.vehicle.model}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: AppTheme.textTertiary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _formatTime(reservation.departureTime),
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // Statut
-                StatusBadge(
-                  label: _getStatusLabel(reservation.status),
-                  color: _getStatusColor(reservation.status),
-                  small: true,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${reservation.vehicle.make} ${reservation.vehicle.model}',
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.schedule_rounded,
+                        size: 14,
+                        color: AppTheme.textTertiary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _formatTime(reservation.departureTime),
+                        style: AppTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            StatusBadge(
+              label: _getStatusLabel(reservation.status),
+              color: _getStatusColor(reservation.status),
+              small: true,
+            ),
+          ],
         ),
       ),
     );
@@ -942,17 +811,17 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   Color _getStatusColor(ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
-        return AppTheme.warning;
+        return AppTheme.statusPending;
       case ReservationStatus.assigned:
-        return AppTheme.primary;
+        return AppTheme.statusAssigned;
       case ReservationStatus.enRoute:
-        return AppTheme.secondary;
+        return AppTheme.statusEnRoute;
       case ReservationStatus.inProgress:
-        return AppTheme.success;
+        return AppTheme.statusInProgress;
       case ReservationStatus.completed:
-        return AppTheme.success;
+        return AppTheme.statusCompleted;
       case ReservationStatus.cancelled:
-        return AppTheme.textTertiary;
+        return AppTheme.statusCancelled;
       default:
         return AppTheme.textTertiary;
     }
@@ -960,15 +829,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
   Widget _buildBottomNav(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppTheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowColor.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        border: Border(top: BorderSide(color: AppTheme.divider)),
       ),
       child: SafeArea(
         child: Padding(
@@ -995,18 +858,12 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primary.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    color: AppTheme.accent,
+                    shape: BoxShape.circle,
+                    boxShadow: AppTheme.glowPrimary,
                   ),
-                  child: const Icon(Icons.add,
-                      color: AppTheme.background, size: 28),
+                  child: const Icon(Icons.add_rounded,
+                      color: AppTheme.onPrimary, size: 28),
                 ),
               ),
               _buildNavItem(

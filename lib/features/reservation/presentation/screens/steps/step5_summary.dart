@@ -59,20 +59,7 @@ class Step5SummaryScreen extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(String title, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: AppTheme.primary),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-      ],
-    );
+    return Text(title, style: AppTheme.headlineSmall);
   }
 
   Widget _buildLocationCard(BuildContext context, NewReservationState state) {
@@ -157,13 +144,13 @@ class Step5SummaryScreen extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: AppTheme.successLight,
-                      borderRadius: BorderRadius.circular(8),
+                      color: AppTheme.background,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                     ),
                     child: Icon(
                       item['icon'] as IconData,
                       size: 18,
-                      color: AppTheme.success,
+                      color: AppTheme.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -189,7 +176,6 @@ class Step5SummaryScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(Icons.check, size: 16, color: AppTheme.success),
                 ],
               ),
               if (index < guarantees.length - 1) ...[

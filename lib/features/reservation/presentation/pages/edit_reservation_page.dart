@@ -95,34 +95,36 @@ class _EditReservationViewState extends State<EditReservationView> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.block,
-                      size: 64,
-                      color: AppTheme.error,
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: const BoxDecoration(
+                        color: AppTheme.surfaceContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.lock_clock_outlined,
+                        size: 30,
+                        color: AppTheme.textSecondary,
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     Text(
                       l10n.reservation_editImpossible,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary,
-                      ),
+                      textAlign: TextAlign.center,
+                      style: AppTheme.headlineMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       l10n.reservation_editImpossibleMessage,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppTheme.textSecondary,
-                      ),
+                      style: AppTheme.bodyMedium
+                          .copyWith(color: AppTheme.textSecondary),
                     ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
+                    const SizedBox(height: 28),
+                    OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back),
-                      label: Text(l10n.common_back),
+                      child: Text(l10n.common_back),
                     ),
                   ],
                 ),
@@ -136,91 +138,94 @@ class _EditReservationViewState extends State<EditReservationView> {
             title: Text(l10n.reservation_editTitle),
           ),
           body: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             children: [
-              if (!state.hasChanges)
+              if (!state.hasChanges) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: AppTheme.infoLight,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: AppTheme.info),
-                      const SizedBox(width: 8),
+                      const Icon(Icons.info_outline_rounded,
+                          color: AppTheme.info, size: 20),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           l10n.reservation_editSubtitle,
-                          style: TextStyle(color: AppTheme.info),
+                          style:
+                              AppTheme.bodySmall.copyWith(color: AppTheme.info),
                         ),
                       ),
                     ],
                   ),
                 ),
-              if (!state.hasChanges) const SizedBox(height: 16),
+                const SizedBox(height: 24),
+              ],
               _buildVehicleSection(context, state),
-              const SizedBox(height: 16),
-              _buildParkingSpotSection(context, state),
-              const SizedBox(height: 16),
-              _buildLocationSection(context, state),
-              const SizedBox(height: 16),
-              _buildDepartureTimeSection(context, state),
-              const SizedBox(height: 16),
-              _buildServiceOptionsSection(context, state),
-              const SizedBox(height: 16),
-              _buildPriceCard(context, state),
               const SizedBox(height: 24),
-              _buildSubmitButton(context, state),
+              _buildParkingSpotSection(context, state),
+              const SizedBox(height: 24),
+              _buildLocationSection(context, state),
+              const SizedBox(height: 24),
+              _buildDepartureTimeSection(context, state),
+              const SizedBox(height: 24),
+              _buildServiceOptionsSection(context, state),
+              const SizedBox(height: 24),
+              _buildPriceCard(context, state),
             ],
+          ),
+          bottomNavigationBar: Container(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            decoration: const BoxDecoration(
+              color: AppTheme.surface,
+              border: Border(top: BorderSide(color: AppTheme.divider)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: _buildSubmitButton(context, state),
+            ),
           ),
         );
       },
     );
   }
 
+  /// Section de formulaire : un titre puis son contenu.
+  Widget _buildSection(String title, Widget child) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: AppTheme.headlineSmall),
+        const SizedBox(height: 10),
+        child,
+      ],
+    );
+  }
+
   Widget _buildVehicleSection(
       BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.directions_car),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.reservation_vehicle,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              initialValue: _getValidVehicleValue(state),
-              decoration: InputDecoration(
-                labelText: l10n.reservation_selectVehicle,
-                border: const OutlineInputBorder(),
-              ),
-              items: _buildVehicleItems(state),
-              onChanged: (value) {
-                if (value != null) {
-                  final vehicle = _getAllVehicles(state).firstWhere(
-                    (v) => v.id == value,
-                  );
-                  context
-                      .read<EditReservationBloc>()
-                      .add(UpdateVehicle(vehicle));
-                }
-              },
-            ),
-          ],
+    return _buildSection(
+      l10n.reservation_vehicle,
+      DropdownButtonFormField<String>(
+        initialValue: _getValidVehicleValue(state),
+        decoration: InputDecoration(
+          labelText: l10n.reservation_selectVehicle,
+          prefixIcon: const Icon(Icons.directions_car_filled_outlined),
         ),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        items: _buildVehicleItems(state),
+        onChanged: (value) {
+          if (value != null) {
+            final vehicle = _getAllVehicles(state).firstWhere(
+              (v) => v.id == value,
+            );
+            context.read<EditReservationBloc>().add(UpdateVehicle(vehicle));
+          }
+        },
       ),
     );
   }
@@ -228,45 +233,24 @@ class _EditReservationViewState extends State<EditReservationView> {
   Widget _buildParkingSpotSection(
       BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.local_parking),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.reservation_location,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              initialValue: _getValidParkingSpotValue(state),
-              decoration: InputDecoration(
-                labelText: l10n.reservation_selectSpot,
-                border: const OutlineInputBorder(),
-              ),
-              items: _buildParkingSpotItems(state),
-              onChanged: (value) {
-                if (value != null) {
-                  final spot = _getAllParkingSpots(state).firstWhere(
-                    (s) => s.id == value,
-                  );
-                  context
-                      .read<EditReservationBloc>()
-                      .add(UpdateParkingSpot(spot));
-                }
-              },
-            ),
-          ],
+    return _buildSection(
+      l10n.reservation_location,
+      DropdownButtonFormField<String>(
+        initialValue: _getValidParkingSpotValue(state),
+        decoration: InputDecoration(
+          labelText: l10n.reservation_selectSpot,
+          prefixIcon: const Icon(Icons.local_parking_rounded),
         ),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        items: _buildParkingSpotItems(state),
+        onChanged: (value) {
+          if (value != null) {
+            final spot = _getAllParkingSpots(state).firstWhere(
+              (s) => s.id == value,
+            );
+            context.read<EditReservationBloc>().add(UpdateParkingSpot(spot));
+          }
+        },
       ),
     );
   }
@@ -274,79 +258,52 @@ class _EditReservationViewState extends State<EditReservationView> {
   Widget _buildLocationSection(
       BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return _buildSection(
+      l10n.reservation_vehicleAddress,
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _addressController,
+            decoration: InputDecoration(
+              labelText: l10n.common_address,
+              hintText: l10n.reservation_addressHint,
+              prefixIcon: const Icon(Icons.location_on_outlined),
+              suffixIcon: _isSearchingAddress
+                  ? const Padding(
+                      padding: EdgeInsets.all(14),
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.search_rounded),
+                      onPressed: () => _searchAddress(context),
+                    ),
+            ),
+            textInputAction: TextInputAction.search,
+            onSubmitted: (_) => _searchAddress(context),
+          ),
+          if (state.locationAddress != null &&
+              state.locationLatitude != null) ...[
+            const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.location_on),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.reservation_vehicleAddress,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                const Icon(Icons.check_circle_rounded,
+                    color: AppTheme.success, size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    l10n.reservation_gpsRecorded,
+                    style: AppTheme.bodySmall.copyWith(color: AppTheme.success),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _addressController,
-              decoration: InputDecoration(
-                labelText: l10n.common_address,
-                hintText: l10n.reservation_addressHint,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.home),
-                suffixIcon: _isSearchingAddress
-                    ? const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () => _searchAddress(context),
-                      ),
-              ),
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) => _searchAddress(context),
-            ),
-            if (state.locationAddress != null &&
-                state.locationLatitude != null) ...[
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.successLight,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                      color: AppTheme.success.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: AppTheme.success, size: 16),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l10n.reservation_gpsRecorded,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppTheme.success,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
   }
@@ -410,54 +367,42 @@ class _EditReservationViewState extends State<EditReservationView> {
   Widget _buildDepartureTimeSection(
       BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
-    final dateFormat = DateFormat('d MMM yyyy, HH:mm', 'fr_CA');
+    final dateFormat = DateFormat(
+        'EEEE d MMMM, HH:mm',
+        Localizations.localeOf(context).languageCode == 'en'
+            ? 'en_CA'
+            : 'fr_CA');
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.access_time),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.reservation_departureTime,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            InkWell(
-              onTap: () => _selectDateTime(context, state),
-              child: InputDecorator(
-                decoration: InputDecoration(
-                  labelText: l10n.reservation_selectDateTime,
-                  border: const OutlineInputBorder(),
-                  suffixIcon: const Icon(Icons.calendar_today),
-                ),
-                child: Text(
-                  state.departureTime != null
-                      ? dateFormat.format(state.departureTime!)
-                      : l10n.reservation_noDateSelected,
-                ),
+    return _buildSection(
+      l10n.reservation_departureTime,
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => _selectDateTime(context, state),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            child: InputDecorator(
+              decoration: InputDecoration(
+                labelText: l10n.reservation_selectDateTime,
+                prefixIcon: const Icon(Icons.event_outlined),
+                suffixIcon: const Icon(Icons.chevron_right_rounded),
+              ),
+              child: Text(
+                state.departureTime != null
+                    ? dateFormat.format(state.departureTime!)
+                    : l10n.reservation_noDateSelected,
+                style: AppTheme.bodyLarge,
               ),
             ),
-            if (state.deadlineTime != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                'Deadline: ${dateFormat.format(state.deadlineTime!)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-            ],
+          ),
+          if (state.deadlineTime != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Deadline: ${dateFormat.format(state.deadlineTime!)}',
+              style: AppTheme.bodySmall,
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -479,6 +424,10 @@ class _EditReservationViewState extends State<EditReservationView> {
       final selectedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(initialDate),
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        ),
       );
 
       if (selectedTime != null && context.mounted) {
@@ -500,46 +449,40 @@ class _EditReservationViewState extends State<EditReservationView> {
   Widget _buildServiceOptionsSection(
       BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    final options = [
+      (
+        ServiceOption.windowScraping,
+        l10n.reservation_windowScraping,
+        l10n.service_windowScraping5,
+      ),
+      (
+        ServiceOption.doorDeicing,
+        l10n.reservation_doorDeicing,
+        l10n.service_doorDeicing3,
+      ),
+      (
+        ServiceOption.wheelClearance,
+        l10n.reservation_wheelClearing,
+        l10n.service_wheelClearing4,
+      ),
+    ];
+
+    return _buildSection(
+      l10n.reservation_serviceOptions,
+      GlassCard(
+        padding: const EdgeInsets.symmetric(vertical: 4),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                const Icon(Icons.miscellaneous_services),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.reservation_serviceOptions,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildServiceOptionTile(
-              context,
-              state,
-              ServiceOption.windowScraping,
-              l10n.reservation_windowScraping,
-              l10n.service_windowScraping5,
-            ),
-            _buildServiceOptionTile(
-              context,
-              state,
-              ServiceOption.doorDeicing,
-              l10n.reservation_doorDeicing,
-              l10n.service_doorDeicing3,
-            ),
-            _buildServiceOptionTile(
-              context,
-              state,
-              ServiceOption.wheelClearance,
-              l10n.reservation_wheelClearing,
-              l10n.service_wheelClearing4,
-            ),
+            for (var i = 0; i < options.length; i++) ...[
+              if (i > 0) const Divider(indent: 56),
+              _buildServiceOptionTile(
+                context,
+                state,
+                options[i].$1,
+                options[i].$2,
+                options[i].$3,
+              ),
+            ],
           ],
         ),
       ),
@@ -562,69 +505,80 @@ class _EditReservationViewState extends State<EditReservationView> {
             .read<EditReservationBloc>()
             .add(ToggleServiceOptionEdit(option));
       },
-      title: Text(title),
-      subtitle: Text(price),
+      title: Text(title, style: AppTheme.labelLarge),
+      subtitle: Text(price, style: AppTheme.bodySmall),
       controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsets.zero,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 
+  /// Nouveau prix, avec l'ancien barre pour comparer.
   Widget _buildPriceCard(BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
-    return Card(
-      color: AppTheme.primaryLight,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
+    final original = state.originalReservation?.totalPrice;
+    final current = state.calculatedPrice ?? 0;
+    final priceChanged = original != null && original != current;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   l10n.reservation_totalPrice,
                   style: TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.onPrimary.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  state.calculatedPrice != null
-                      ? '${state.calculatedPrice!.toStringAsFixed(2)} \$'
-                      : '0.00 \$',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.primary,
+                  '${current.toStringAsFixed(2)} \$',
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.8,
+                    color: AppTheme.onPrimary,
+                    fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
               ],
             ),
-            if (state.originalReservation != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    l10n.reservation_originalPrice,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textSecondary,
-                    ),
+          ),
+          if (priceChanged)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  l10n.reservation_originalPrice,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.onPrimary.withValues(alpha: 0.6),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${state.originalReservation!.totalPrice.toStringAsFixed(2)} \$',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppTheme.textTertiary,
-                      decoration: TextDecoration.lineThrough,
-                    ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${original.toStringAsFixed(2)} \$',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.onPrimary.withValues(alpha: 0.6),
+                    decoration: TextDecoration.lineThrough,
+                    decorationColor: AppTheme.onPrimary.withValues(alpha: 0.6),
                   ),
-                ],
-              ),
-          ],
-        ),
+                ),
+              ],
+            ),
+        ],
       ),
     );
   }
@@ -633,40 +587,28 @@ class _EditReservationViewState extends State<EditReservationView> {
     final l10n = AppLocalizations.of(context)!;
     final canSubmit = state.canSubmit && state.hasChanges;
 
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: canSubmit && !state.isLoading
-            ? () {
-                context
-                    .read<EditReservationBloc>()
-                    .add(SubmitReservationUpdate());
-              }
-            : null,
-        icon: state.isLoading
-            ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(AppTheme.background),
-                ),
-              )
-            : const Icon(Icons.check),
-        label: Text(
-          state.isLoading
-              ? l10n.reservation_modifying
-              : !state.hasChanges
+    return ElevatedButton(
+      onPressed: canSubmit && !state.isLoading
+          ? () {
+              context
+                  .read<EditReservationBloc>()
+                  .add(SubmitReservationUpdate());
+            }
+          : null,
+      child: state.isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppTheme.onPrimary,
+              ),
+            )
+          : Text(
+              !state.hasChanges
                   ? l10n.reservation_noChanges
                   : l10n.reservation_saveChanges,
-        ),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(16),
-          backgroundColor: canSubmit ? AppTheme.primary : AppTheme.textTertiary,
-          foregroundColor: AppTheme.background,
-        ),
-      ),
+            ),
     );
   }
 

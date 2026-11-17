@@ -8,6 +8,7 @@ import '../../domain/entities/payment_method.dart';
 import '../bloc/payment_methods_bloc.dart';
 import '../../data/payment_service.dart';
 import '../../../../core/network/dio_client.dart';
+import '../widgets/card_brand_mark.dart';
 
 class PaymentScreen extends StatefulWidget {
   final double amount;
@@ -43,15 +44,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
       child: Scaffold(
         backgroundColor: AppTheme.background,
         appBar: AppBar(
-          title: Text(
-            l10n.payment_title,
-            style: TextStyle(color: AppTheme.textPrimary),
-          ),
-          backgroundColor: AppTheme.surface,
-          foregroundColor: AppTheme.textPrimary,
-          elevation: 0,
+          title: Text(l10n.payment_title, style: AppTheme.labelMedium),
+          centerTitle: true,
           leading: IconButton(
-            icon: const Icon(Icons.close),
+            icon: const Icon(Icons.close_rounded),
             onPressed: () => Navigator.pop(context, false),
           ),
         ),
@@ -80,7 +76,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 children: [
                   // Montant
                   _buildAmountCard(),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 32),
 
                   // Méthodes de paiement
                   _buildSectionTitle(l10n.reservation_paymentMethod),
@@ -92,84 +88,141 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ],
 
                   _buildNewCardTile(),
-
-                  const SizedBox(height: 28),
-
-                  // Info sécurité
-                  _buildSecurityInfo(),
-
-                  const SizedBox(height: 28),
-
-                  // Bouton payer
-                  _buildPaymentButton(),
-
-                  const SizedBox(height: 16),
-
-                  // Logos
-                  _buildCardLogos(),
                 ],
               ),
             );
           },
+        ),
+        bottomNavigationBar: Container(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+          decoration: const BoxDecoration(
+            color: AppTheme.surface,
+            border: Border(top: BorderSide(color: AppTheme.divider)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildPaymentButton(),
+                const SizedBox(height: 10),
+                _buildSecureLine(l10n.payment_securePaymentDetails),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.textPrimary,
-      ),
-    );
+    return Text(title, style: AppTheme.headlineSmall);
   }
 
   Widget _buildAmountCard() {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.primary,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.payment_amountToPay,
             style: TextStyle(
               fontSize: 13,
-              color: AppTheme.background.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w600,
+              color: AppTheme.onPrimary.withValues(alpha: 0.7),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
                 widget.amount.toStringAsFixed(2),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 36,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.background,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -1,
+                  color: AppTheme.onPrimary,
+                  fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
               const SizedBox(width: 6),
               Text(
                 '\$ CAD',
                 style: TextStyle(
-                  fontSize: 16,
-                  color: AppTheme.background.withValues(alpha: 0.7),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.onPrimary.withValues(alpha: 0.7),
                 ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  /// Ligne de choix (carte enregistree ou nouvelle carte).
+  Widget _buildChoiceTile({
+    required bool isSelected,
+    required VoidCallback onTap,
+    required Widget leading,
+    required Widget content,
+    bool showRadio = true,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: AppTheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          side: BorderSide(
+            color: isSelected ? AppTheme.primary : AppTheme.border,
+            width: 1.5,
+          ),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                leading,
+                const SizedBox(width: 12),
+                Expanded(child: content),
+                if (showRadio)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected ? AppTheme.primary : Colors.transparent,
+                      border: Border.all(
+                        color: isSelected
+                            ? AppTheme.primary
+                            : AppTheme.textTertiary,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: isSelected
+                        ? const Icon(Icons.check_rounded,
+                            size: 14, color: AppTheme.onPrimary)
+                        : null,
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -180,118 +233,55 @@ class _PaymentScreenState extends State<PaymentScreen> {
         _selectedPaymentMethod?.stripePaymentMethodId ==
             method.stripePaymentMethodId;
 
-    return GestureDetector(
+    return _buildChoiceTile(
+      isSelected: isSelected,
       onTap: () {
         setState(() {
           _useNewCard = false;
           _selectedPaymentMethod = method;
         });
       },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.primary.withValues(alpha: 0.05)
-              : AppTheme.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected ? AppTheme.primary : AppTheme.border,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            // Radio
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSelected ? AppTheme.primary : Colors.transparent,
-                border: Border.all(
-                  color: isSelected ? AppTheme.primary : AppTheme.textTertiary,
-                  width: 1.5,
+      leading: CardBrandMark(brand: method.brand),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                method.displayNumber,
+                style: AppTheme.labelLarge.copyWith(
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
-              child: isSelected
-                  ? Icon(Icons.check, size: 12, color: AppTheme.background)
-                  : null,
+              if (method.isDefault) ...[
+                const SizedBox(width: 8),
+                StatusBadge(
+                  label: l10n.common_default,
+                  color: AppTheme.textSecondary,
+                  small: true,
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            l10n.payment_expires(
+                '${method.expMonth.toString().padLeft(2, '0')}/${method.expYear}'),
+            style: AppTheme.bodySmall.copyWith(
+              color: method.isExpired ? AppTheme.error : AppTheme.textTertiary,
             ),
-            const SizedBox(width: 12),
-
-            // Icône carte
-            Container(
-              width: 40,
-              height: 28,
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Center(
-                child: Icon(Icons.credit_card,
-                    size: 18, color: AppTheme.textSecondary),
-              ),
-            ),
-            const SizedBox(width: 12),
-
-            // Infos
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        method.displayNumber,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      if (method.isDefault) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppTheme.successLight,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            l10n.common_default,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.success,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.payment_expires(
-                        '${method.expMonth.toString().padLeft(2, '0')}/${method.expYear}'),
-                    style:
-                        TextStyle(fontSize: 12, color: AppTheme.textTertiary),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildNewCardTile() {
     final l10n = AppLocalizations.of(context)!;
-    final isSelected = _useNewCard;
 
-    return GestureDetector(
+    return _buildChoiceTile(
+      isSelected: _useNewCard,
+      showRadio: false,
       onTap: () async {
         final result =
             await Navigator.pushNamed(context, AppRoutes.addPaymentMethod);
@@ -299,102 +289,34 @@ class _PaymentScreenState extends State<PaymentScreen> {
           context.read<PaymentMethodsBloc>().add(LoadPaymentMethods());
         }
       },
-      child: Container(
-        padding: const EdgeInsets.all(14),
+      leading: Container(
+        width: 44,
+        height: 29,
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.primary.withValues(alpha: 0.05)
-              : AppTheme.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isSelected ? AppTheme.primary : AppTheme.border,
-            width: isSelected ? 1.5 : 1,
-          ),
+          color: AppTheme.background,
+          borderRadius: BorderRadius.circular(5),
         ),
-        child: Row(
-          children: [
-            // Radio
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSelected ? AppTheme.primary : Colors.transparent,
-                border: Border.all(
-                  color: isSelected ? AppTheme.primary : AppTheme.textTertiary,
-                  width: 1.5,
-                ),
-              ),
-              child: isSelected
-                  ? Icon(Icons.check, size: 12, color: AppTheme.background)
-                  : null,
-            ),
-            const SizedBox(width: 12),
-
-            // Icône
-            Container(
-              width: 40,
-              height: 28,
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Icon(Icons.add, size: 18, color: AppTheme.primary),
-            ),
-            const SizedBox(width: 12),
-
-            // Texte
-            Text(
-              l10n.payment_useNewCard,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
-              ),
-            ),
-          ],
-        ),
+        child: const Icon(Icons.add_rounded, size: 20, color: AppTheme.primary),
       ),
+      content: Text(l10n.payment_useNewCard, style: AppTheme.labelLarge),
     );
   }
 
-  Widget _buildSecurityInfo() {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.infoLight,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.info.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.lock_outline, size: 20, color: AppTheme.info),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.payment_securePayment,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.info,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  l10n.payment_securePaymentDetails,
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.info.withValues(alpha: 0.8)),
-                ),
-              ],
-            ),
+  Widget _buildSecureLine(String text) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.lock_outline_rounded,
+            size: 14, color: AppTheme.textTertiary),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: AppTheme.labelSmall,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -403,64 +325,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final canPay =
         (_selectedPaymentMethod != null || _useNewCard) && !_isLoading;
 
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canPay ? _handlePayment : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primary,
-          foregroundColor: AppTheme.background,
-          disabledBackgroundColor: AppTheme.surfaceContainer,
-          disabledForegroundColor: AppTheme.textTertiary,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          elevation: 0,
-        ),
-        child: _isLoading
-            ? SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: AppTheme.background),
-              )
-            : Text(
-                l10n.payment_payAmount(
-                    '${widget.amount.toStringAsFixed(2)} \$'),
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-      ),
-    );
-  }
-
-  Widget _buildCardLogos() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildCardLogo('Visa'),
-        const SizedBox(width: 8),
-        _buildCardLogo('Mastercard'),
-        const SizedBox(width: 8),
-        _buildCardLogo('Amex'),
-      ],
-    );
-  }
-
-  Widget _buildCardLogo(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary),
-      ),
+    return FilledButton(
+      onPressed: canPay ? _handlePayment : null,
+      child: _isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, color: AppTheme.onPrimary),
+            )
+          : Text(
+              l10n.payment_payAmount('${widget.amount.toStringAsFixed(2)} \$'),
+            ),
     );
   }
 
@@ -496,7 +372,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           SnackBar(
               content: Text(
                 l10n.payment_success,
-                style: TextStyle(color: AppTheme.textPrimary),
+                style: TextStyle(color: AppTheme.onPrimary),
               ),
               backgroundColor: AppTheme.success),
         );
@@ -521,7 +397,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       SnackBar(
         content: Text(
           message,
-          style: TextStyle(color: AppTheme.textPrimary),
+          style: TextStyle(color: AppTheme.onPrimary),
         ),
         backgroundColor: AppTheme.error,
       ),

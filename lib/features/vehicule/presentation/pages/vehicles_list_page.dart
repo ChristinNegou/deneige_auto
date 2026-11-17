@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:deneige_auto/features/reservation/domain/entities/vehicle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/config/app_config.dart';
@@ -12,6 +11,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_illustration.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../bloc/vehicule_bloc.dart';
+import '../widgets/vehicle_visuals.dart';
 
 class VehiclesListPage extends StatelessWidget {
   const VehiclesListPage({super.key});
@@ -30,11 +30,6 @@ class VehiclesListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ));
-
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -71,7 +66,7 @@ class VehiclesListView extends StatelessWidget {
                     },
                     color: AppTheme.primary,
                     child: ListView.builder(
-                      padding: const EdgeInsets.all(AppTheme.paddingLG),
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
                       itemCount: state.vehicles.length + 1,
                       itemBuilder: (context, index) {
                         if (index == state.vehicles.length) {
@@ -92,65 +87,30 @@ class VehiclesListView extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 12),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: AppTheme.shadowSM,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppTheme.textPrimary,
-                size: 20,
-              ),
-            ),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 4),
           Text(
             AppLocalizations.of(context)!.vehicle_myVehicles,
             style: AppTheme.headlineMedium,
           ),
-          const Spacer(),
-          GestureDetector(
-            onTap: () async {
-              final result =
-                  await Navigator.pushNamed(context, AppRoutes.addVehicle);
-              if (result == true && context.mounted) {
-                context.read<VehicleBloc>().add(LoadVehicles());
-              }
-            },
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.primary,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.add_rounded,
-                color: AppTheme.background,
-                size: 22,
-              ),
-            ),
-          ),
         ],
       ),
     );
+  }
+
+  /// Ouvre l'ajout de vehicule et recharge la liste au retour.
+  Future<void> _openAddVehicle(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, AppRoutes.addVehicle);
+    if (result == true && context.mounted) {
+      context.read<VehicleBloc>().add(LoadVehicles());
+    }
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -160,121 +120,71 @@ class VehiclesListView extends StatelessWidget {
       title: l10n.vehicle_empty,
       subtitle: l10n.vehicle_emptySubtitle,
       buttonText: l10n.vehicle_add,
-      onButtonPressed: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
+      onButtonPressed: () => _openAddVehicle(context),
     );
   }
 
   Widget _buildVehicleCard(BuildContext context, Vehicle vehicle) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        border: vehicle.isDefault
-            ? Border.all(
-                color: AppTheme.success.withValues(alpha: 0.5), width: 1.5)
-            : null,
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Row(
-        children: [
-          // Vehicle photo or icon
-          _buildVehiclePhoto(context, vehicle),
-          const SizedBox(width: 14),
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        vehicle.displayName,
-                        style: AppTheme.labelLarge
-                            .copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    if (vehicle.isDefault)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppTheme.success.withValues(alpha: 0.1),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusFull),
-                        ),
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: GlassCard(
+        padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
+        child: Row(
+          children: [
+            _buildVehiclePhoto(context, vehicle),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
                         child: Text(
-                          AppLocalizations.of(context)!.common_default,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.success,
-                          ),
+                          vehicle.displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTheme.headlineSmall,
                         ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: _getVehicleColor(vehicle.color),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      vehicle.color,
-                      style: AppTheme.bodySmall,
-                    ),
-                    if (vehicle.licensePlate != null) ...[
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppTheme.background,
-                          borderRadius: BorderRadius.circular(4),
+                      if (vehicle.isDefault) ...[
+                        const SizedBox(width: 8),
+                        StatusBadge(
+                          label: l10n.common_default,
+                          color: AppTheme.textSecondary,
+                          small: true,
                         ),
-                        child: Text(
-                          vehicle.licensePlate!,
-                          style: AppTheme.labelSmall.copyWith(
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
+                      ],
                     ],
-                  ],
-                ),
-              ],
-            ),
-          ),
-          // Delete button
-          if (!vehicle.isDefault)
-            GestureDetector(
-              onTap: () => _showDeleteConfirmation(context, vehicle.id),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: AppTheme.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                ),
-                child: const Icon(
-                  Icons.delete_outline_rounded,
-                  color: AppTheme.error,
-                  size: 18,
-                ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      VehicleColorDot(colorName: vehicle.color),
+                      const SizedBox(width: 6),
+                      Text(vehicle.color, style: AppTheme.bodySmall),
+                      if (vehicle.licensePlate != null) ...[
+                        const SizedBox(width: 10),
+                        LicensePlate(plate: vehicle.licensePlate!),
+                      ],
+                    ],
+                  ),
+                ],
               ),
             ),
-        ],
+            if (!vehicle.isDefault)
+              IconButton(
+                onPressed: () => _showDeleteConfirmation(context, vehicle.id),
+                tooltip: l10n.common_delete,
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: AppTheme.textTertiary,
+                  size: 20,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -283,16 +193,23 @@ class VehiclesListView extends StatelessWidget {
     final hasPhoto = vehicle.photoUrl != null && vehicle.photoUrl!.isNotEmpty;
     final photoUrl =
         hasPhoto ? '${AppConfig.apiBaseUrl}${vehicle.photoUrl}' : null;
+    final typeIcon = Center(
+      child: Icon(
+        vehicleTypeIcon(vehicle.type),
+        size: 26,
+        color: AppTheme.textSecondary,
+      ),
+    );
 
     return GestureDetector(
       onTap: () => _showPhotoOptions(context, vehicle),
       child: Stack(
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.1),
+              color: AppTheme.background,
               borderRadius: BorderRadius.circular(AppTheme.radiusMD),
             ),
             clipBehavior: Clip.antiAlias,
@@ -300,46 +217,26 @@ class VehiclesListView extends StatelessWidget {
                 ? CachedNetworkImage(
                     imageUrl: photoUrl!,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppTheme.primary.withValues(alpha: 0.5),
-                        ),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Center(
-                      child: Text(
-                        vehicle.type.icon,
-                        style: const TextStyle(fontSize: 28),
-                      ),
-                    ),
+                    placeholder: (context, url) => typeIcon,
+                    errorWidget: (context, url, error) => typeIcon,
                   )
-                : Center(
-                    child: Text(
-                      vehicle.type.icon,
-                      style: const TextStyle(fontSize: 28),
-                    ),
-                  ),
+                : typeIcon,
           ),
-          // Camera icon overlay
           Positioned(
-            right: 0,
-            bottom: 0,
+            right: 2,
+            bottom: 2,
             child: Container(
-              width: 20,
-              height: 20,
+              width: 22,
+              height: 22,
               decoration: BoxDecoration(
-                color: AppTheme.primary,
+                color: AppTheme.surface,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppTheme.surface, width: 1.5),
+                border: Border.all(color: AppTheme.border),
               ),
               child: const Icon(
-                Icons.camera_alt_rounded,
-                size: 10,
-                color: Colors.white,
+                Icons.photo_camera_outlined,
+                size: 12,
+                color: AppTheme.textPrimary,
               ),
             ),
           ),
@@ -352,26 +249,13 @@ class VehiclesListView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (bottomSheetContext) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.only(bottom: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: AppTheme.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
                 Text(
                   l10n.vehicle_photoTitle,
                   style: AppTheme.headlineSmall,
@@ -384,16 +268,8 @@ class VehiclesListView extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 ListTile(
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.camera_alt_rounded,
-                        color: AppTheme.primary),
-                  ),
+                  leading: const Icon(Icons.photo_camera_outlined,
+                      color: AppTheme.primary),
                   title: Text(l10n.vehicle_takePhoto),
                   subtitle: Text(
                     l10n.vehicle_takePhotoSubtitle,
@@ -406,16 +282,8 @@ class VehiclesListView extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppTheme.info.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.photo_library_rounded,
-                        color: AppTheme.info),
-                  ),
+                  leading: const Icon(Icons.photo_library_outlined,
+                      color: AppTheme.primary),
                   title: Text(l10n.vehicle_choosePhoto),
                   subtitle: Text(
                     l10n.vehicle_choosePhotoSubtitle,
@@ -457,45 +325,12 @@ class VehiclesListView extends StatelessWidget {
   }
 
   Widget _buildAddButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, AppRoutes.addVehicle),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          border: Border.all(
-            color: AppTheme.primary.withValues(alpha: 0.3),
-            style: BorderStyle.solid,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-              ),
-              child: const Icon(
-                Icons.add_rounded,
-                color: AppTheme.primary,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              AppLocalizations.of(context)!.vehicle_add,
-              style: AppTheme.labelLarge.copyWith(
-                color: AppTheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: OutlinedButton.icon(
+        onPressed: () => _openAddVehicle(context),
+        icon: const Icon(Icons.add_rounded),
+        label: Text(AppLocalizations.of(context)!.vehicle_add),
       ),
     );
   }
@@ -505,9 +340,6 @@ class VehiclesListView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
         title: Text(l10n.vehicle_deleteTitle),
         content: Text(l10n.vehicle_deleteConfirm),
         actions: [
@@ -531,22 +363,5 @@ class VehiclesListView extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _getVehicleColor(String colorName) {
-    final colors = {
-      'Blanc': AppTheme.textPrimary,
-      'Noir': AppTheme.shadowColor,
-      'Gris': AppTheme.textTertiary,
-      'Rouge': AppTheme.error,
-      'Bleu': AppTheme.info,
-      'Vert': AppTheme.success,
-      'Jaune': AppTheme.warning,
-      'Orange': AppTheme.warning,
-      'Argent': AppTheme.textSecondary,
-      'Brun': const Color(0xFF795548),
-      'Beige': const Color(0xFFF5F5DC),
-    };
-    return colors[colorName] ?? AppTheme.textTertiary;
   }
 }
