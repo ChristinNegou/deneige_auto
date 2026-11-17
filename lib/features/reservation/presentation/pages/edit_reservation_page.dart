@@ -398,7 +398,8 @@ class _EditReservationViewState extends State<EditReservationView> {
           if (state.deadlineTime != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Deadline: ${dateFormat.format(state.deadlineTime!)}',
+              AppLocalizations.of(context)!
+                  .reservation_deadline(dateFormat.format(state.deadlineTime!)),
               style: AppTheme.bodySmall,
             ),
           ],

@@ -674,6 +674,12 @@
   "clientHome_theWorker": "the worker",
   "clientHome_mySubscription": "My\nsubscription",
   "clientHome_userNotAuth": "Error: user not authenticated",
+  "reservation_deadline": "Must be done by {time}",
+  "@reservation_deadline": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "reservation_stepVehicle": "Vehicle and spot",
   "reservation_stepLocation": "Address",
   "reservation_stepSchedule": "Date and time",

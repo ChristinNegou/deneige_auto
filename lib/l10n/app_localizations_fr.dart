@@ -2048,6 +2048,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get clientHome_userNotAuth => 'Erreur: utilisateur non authentifié';
 
   @override
+  String reservation_deadline(String time) {
+    return 'À terminer avant $time';
+  }
+
+  @override
   String get reservation_stepVehicle => 'Véhicule et emplacement';
 
   @override

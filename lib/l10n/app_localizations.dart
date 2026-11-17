@@ -3956,6 +3956,12 @@ abstract class AppLocalizations {
   /// **'Erreur: utilisateur non authentifié'**
   String get clientHome_userNotAuth;
 
+  /// No description provided for @reservation_deadline.
+  ///
+  /// In fr, this message translates to:
+  /// **'À terminer avant {time}'**
+  String reservation_deadline(String time);
+
   /// No description provided for @reservation_stepVehicle.
   ///
   /// In fr, this message translates to:

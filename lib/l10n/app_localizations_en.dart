@@ -2031,6 +2031,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientHome_userNotAuth => 'Error: user not authenticated';
 
   @override
+  String reservation_deadline(String time) {
+    return 'Must be done by $time';
+  }
+
+  @override
   String get reservation_stepVehicle => 'Vehicle and spot';
 
   @override

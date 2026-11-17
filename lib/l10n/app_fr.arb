@@ -761,6 +761,12 @@
   "clientHome_theWorker": "le déneigeur",
   "clientHome_mySubscription": "Mon\nabonnement",
   "clientHome_userNotAuth": "Erreur: utilisateur non authentifié",
+  "reservation_deadline": "À terminer avant {time}",
+  "@reservation_deadline": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "reservation_stepVehicle": "Véhicule et emplacement",
   "reservation_stepLocation": "Adresse",
   "reservation_stepSchedule": "Date et heure",

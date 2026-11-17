@@ -251,10 +251,11 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildEarningsSummaryCard(
-            title: "Aujourd'hui",
+            title: AppLocalizations.of(context)!.earnings_today,
             amount: stats.today.earnings,
             jobsCount: stats.today.completed,
             tips: stats.today.tips,
+            showGoal: true,
           ),
           const SizedBox(height: 20),
           _buildTodayStatsGrid(stats.today),
@@ -270,7 +271,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildEarningsSummaryCard(
-            title: 'Cette semaine',
+            title: AppLocalizations.of(context)!.earnings_thisWeek,
             amount: stats.week.earnings,
             jobsCount: stats.week.completed,
             tips: stats.week.tips,
@@ -291,7 +292,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildEarningsSummaryCard(
-            title: 'Ce mois',
+            title: AppLocalizations.of(context)!.earnings_thisMonth,
             amount: stats.month.earnings,
             jobsCount: stats.month.completed,
             tips: stats.month.tips,
@@ -310,6 +311,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
     required double amount,
     required int jobsCount,
     required double tips,
+    bool showGoal = false,
   }) {
     return AnimatedBuilder(
       animation: _countAnimation,
@@ -328,7 +330,7 @@ class _WorkerEarningsViewState extends State<_WorkerEarningsView>
           ),
           child: Column(
             children: [
-              if (title == "Aujourd'hui") ...[
+              if (showGoal) ...[
                 _buildDailyGoalProgress(animatedAmount),
                 const SizedBox(height: 16),
               ],
