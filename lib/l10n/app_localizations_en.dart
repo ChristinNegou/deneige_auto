@@ -626,23 +626,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservation_vehicleAddress => 'Vehicle address';
 
   @override
-  String get reservation_addressHint => 'E.g.: 123 Main Street, Montreal, QC';
-
-  @override
-  String get reservation_gpsRecorded => 'GPS position recorded';
-
-  @override
-  String get reservation_addressValidated => 'Address validated successfully';
-
-  @override
-  String get reservation_addressNotFound =>
-      'Address not found. Please try again.';
-
-  @override
-  String get reservation_addressError =>
-      'Error while searching for the address';
-
-  @override
   String get reservation_selectDateTime => 'Select a date and time';
 
   @override

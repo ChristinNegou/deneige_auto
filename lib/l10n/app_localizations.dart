@@ -1256,36 +1256,6 @@ abstract class AppLocalizations {
   /// **'Adresse du véhicule'**
   String get reservation_vehicleAddress;
 
-  /// No description provided for @reservation_addressHint.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ex: 123 Rue Principale, Montréal, QC'**
-  String get reservation_addressHint;
-
-  /// No description provided for @reservation_gpsRecorded.
-  ///
-  /// In fr, this message translates to:
-  /// **'Position GPS enregistrée'**
-  String get reservation_gpsRecorded;
-
-  /// No description provided for @reservation_addressValidated.
-  ///
-  /// In fr, this message translates to:
-  /// **'Adresse validée avec succès'**
-  String get reservation_addressValidated;
-
-  /// No description provided for @reservation_addressNotFound.
-  ///
-  /// In fr, this message translates to:
-  /// **'Adresse non trouvée. Veuillez réessayer.'**
-  String get reservation_addressNotFound;
-
-  /// No description provided for @reservation_addressError.
-  ///
-  /// In fr, this message translates to:
-  /// **'Erreur lors de la recherche de l\'adresse'**
-  String get reservation_addressError;
-
   /// No description provided for @reservation_selectDateTime.
   ///
   /// In fr, this message translates to:

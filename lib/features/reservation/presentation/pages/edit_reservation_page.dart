@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/di/injection_container.dart';
@@ -9,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/parking_spot.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/entities/vehicle.dart';
+import '../widgets/address_autocomplete_field.dart';
 import '../bloc/edit_reservation_bloc.dart';
 
 class EditReservationPage extends StatelessWidget {
@@ -35,11 +35,13 @@ class EditReservationView extends StatefulWidget {
 
 class _EditReservationViewState extends State<EditReservationView> {
   final TextEditingController _addressController = TextEditingController();
-  bool _isSearchingAddress = false;
+  final FocusNode _addressFocus = FocusNode();
+  bool _addressInitialized = false;
 
   @override
   void dispose() {
     _addressController.dispose();
+    _addressFocus.dispose();
     super.dispose();
   }
 
@@ -69,10 +71,11 @@ class _EditReservationViewState extends State<EditReservationView> {
           );
         }
 
-        // Initialize address controller when data is loaded
-        if (!state.isLoadingData &&
-            state.locationAddress != null &&
-            _addressController.text.isEmpty) {
+        // Adresse actuelle affichee une seule fois, au chargement
+        if (!_addressInitialized &&
+            !state.isLoadingData &&
+            state.locationAddress != null) {
+          _addressInitialized = true;
           _addressController.text = state.locationAddress!;
         }
       },
@@ -255,113 +258,28 @@ class _EditReservationViewState extends State<EditReservationView> {
     );
   }
 
+  /// Adresse : on cherche et on choisit une suggestion. Tant que le texte
+  /// ne correspond pas a une suggestion choisie, l'enregistrement est bloque.
   Widget _buildLocationSection(
       BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
+    final bloc = context.read<EditReservationBloc>();
     return _buildSection(
       l10n.reservation_vehicleAddress,
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: _addressController,
-            decoration: InputDecoration(
-              labelText: l10n.common_address,
-              hintText: l10n.reservation_addressHint,
-              prefixIcon: const Icon(Icons.location_on_outlined),
-              suffixIcon: _isSearchingAddress
-                  ? const Padding(
-                      padding: EdgeInsets.all(14),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                  : IconButton(
-                      icon: const Icon(Icons.search_rounded),
-                      onPressed: () => _searchAddress(context),
-                    ),
-            ),
-            textInputAction: TextInputAction.search,
-            onSubmitted: (_) => _searchAddress(context),
-          ),
-          if (state.locationAddress != null &&
-              state.locationLatitude != null) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.check_circle_rounded,
-                    color: AppTheme.success, size: 16),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    l10n.reservation_gpsRecorded,
-                    style: AppTheme.bodySmall.copyWith(color: AppTheme.success),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
+      AddressAutocompleteField(
+        controller: _addressController,
+        focusNode: _addressFocus,
+        confirmedAddress: state.addressPending ? null : state.locationAddress,
+        biasLatitude: state.locationLatitude,
+        biasLongitude: state.locationLongitude,
+        onEdited: () => bloc.add(AddressEdited()),
+        onSelected: (s) => bloc.add(UpdateLocationAddress(
+          address: s.fullAddress,
+          latitude: s.latitude,
+          longitude: s.longitude,
+        )),
       ),
     );
-  }
-
-  Future<void> _searchAddress(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-    final address = _addressController.text.trim();
-    if (address.isEmpty) return;
-
-    setState(() => _isSearchingAddress = true);
-
-    try {
-      final locations = await locationFromAddress(address);
-      if (locations.isNotEmpty) {
-        final location = locations.first;
-        if (context.mounted) {
-          context.read<EditReservationBloc>().add(
-                UpdateLocationAddress(
-                  address: address,
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                ),
-              );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.reservation_addressValidated),
-              backgroundColor: AppTheme.success,
-              behavior: SnackBarBehavior.floating,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.reservation_addressNotFound),
-              backgroundColor: AppTheme.warning,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.reservation_addressError),
-            backgroundColor: AppTheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isSearchingAddress = false);
-      }
-    }
   }
 
   Widget _buildDepartureTimeSection(

@@ -96,4 +96,45 @@ void main() {
       expect(params.totalPrice, 29.03);
     },
   );
+
+  blocTest<EditReservationBloc, EditReservationState>(
+    'blocks saving while a typed address has not been picked from the list',
+    build: build,
+    act: (bloc) async {
+      bloc.add(LoadEditReservationData(paid));
+      await Future<void>.delayed(Duration.zero);
+      bloc.add(AddressEdited());
+      await Future<void>.delayed(Duration.zero);
+      bloc.add(SubmitReservationUpdate());
+    },
+    wait: const Duration(milliseconds: 50),
+    verify: (bloc) {
+      expect(bloc.state.canSubmit, false);
+      verifyNever(() => updateReservation(any()));
+    },
+  );
+
+  blocTest<EditReservationBloc, EditReservationState>(
+    'saves the picked address with its coordinates',
+    build: build,
+    act: (bloc) async {
+      bloc.add(LoadEditReservationData(paid));
+      await Future<void>.delayed(Duration.zero);
+      bloc.add(AddressEdited());
+      bloc.add(const UpdateLocationAddress(
+          address: '12 Rue des Forges, Trois-Rivières',
+          latitude: 46.34,
+          longitude: -72.54));
+      await Future<void>.delayed(Duration.zero);
+      bloc.add(SubmitReservationUpdate());
+    },
+    wait: const Duration(milliseconds: 50),
+    verify: (_) {
+      final params = verify(() => updateReservation(captureAny()))
+          .captured
+          .single as UpdateReservationParams;
+      expect(params.address, '12 Rue des Forges, Trois-Rivières');
+      expect(params.latitude, 46.34);
+    },
+  );
 }

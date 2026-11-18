@@ -66,6 +66,9 @@ class RecalculatePrice extends EditReservationEvent {}
 
 class SubmitReservationUpdate extends EditReservationEvent {}
 
+/// Le texte de l'adresse a change sans qu'une suggestion soit choisie.
+class AddressEdited extends EditReservationEvent {}
+
 class UpdateLocationAddress extends EditReservationEvent {
   final String address;
   final double? latitude;
@@ -103,6 +106,10 @@ class EditReservationState extends Equatable {
   final double? locationLongitude;
   final String? locationAddress;
 
+  /// Adresse en cours de saisie : il faut choisir une suggestion avant
+  /// d'enregistrer.
+  final bool addressPending;
+
   const EditReservationState({
     this.originalReservation,
     this.availableVehicles = const [],
@@ -120,6 +127,7 @@ class EditReservationState extends Equatable {
     this.locationLatitude,
     this.locationLongitude,
     this.locationAddress,
+    this.addressPending = false,
   });
 
   bool get canSubmit =>
@@ -127,6 +135,7 @@ class EditReservationState extends Equatable {
       selectedParkingSpot != null &&
       departureTime != null &&
       calculatedPrice != null &&
+      !addressPending &&
       !isLoading;
 
   bool get hasChanges {
@@ -178,6 +187,7 @@ class EditReservationState extends Equatable {
     double? locationLatitude,
     double? locationLongitude,
     String? locationAddress,
+    bool? addressPending,
   }) {
     return EditReservationState(
       originalReservation: originalReservation ?? this.originalReservation,
@@ -197,6 +207,7 @@ class EditReservationState extends Equatable {
       locationLatitude: locationLatitude ?? this.locationLatitude,
       locationLongitude: locationLongitude ?? this.locationLongitude,
       locationAddress: locationAddress ?? this.locationAddress,
+      addressPending: addressPending ?? this.addressPending,
     );
   }
 
@@ -218,6 +229,7 @@ class EditReservationState extends Equatable {
         locationLatitude,
         locationLongitude,
         locationAddress,
+        addressPending,
       ];
 }
 
@@ -242,6 +254,8 @@ class EditReservationBloc
     on<RecalculatePrice>(_onRecalculatePrice);
     on<SubmitReservationUpdate>(_onSubmitUpdate);
     on<UpdateLocationAddress>(_onUpdateLocationAddress);
+    on<AddressEdited>(
+        (event, emit) => emit(state.copyWith(addressPending: true)));
   }
 
   Future<void> _onLoadEditReservationData(
@@ -292,6 +306,7 @@ class EditReservationBloc
       locationAddress: event.address,
       locationLatitude: event.latitude,
       locationLongitude: event.longitude,
+      addressPending: false,
     ));
   }
 
