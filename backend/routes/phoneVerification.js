@@ -180,7 +180,6 @@ router.post('/verify-code', validateVerifyCode, async (req, res) => {
                 phoneNumber: formattedPhone,
                 phoneVerified: true,
                 role,
-                skipPasswordHash: passwordHashed === true, // Flag pour ne pas re-hasher le mdp
             };
 
             // Initialiser workerProfile pour les déneigeurs
@@ -203,8 +202,13 @@ router.post('/verify-code', validateVerifyCode, async (req, res) => {
                 };
             }
 
-            // Créer l'utilisateur
-            const user = await User.create(userData);
+            // Créer l'utilisateur. Le mot de passe est deja hashe dans
+            // phoneVerification : le signaler au hook via $locals (un champ
+            // hors schema serait supprime par Mongoose et le mot de passe
+            // serait hashe deux fois, rendant toute connexion impossible).
+            const user = new User(userData);
+            user.$locals.skipPasswordHash = passwordHashed === true;
+            await user.save();
 
             // Générer le token JWT
             const token = jwt.sign(

@@ -534,10 +534,10 @@ userSchema.pre('save', async function (next) {
         return next();
     }
 
-    // Ne pas re-hasher si le flag skipPasswordHash est défini
-    // (cas où le mot de passe vient de phoneVerification déjà hashé)
-    if (this.skipPasswordHash) {
-        this.skipPasswordHash = undefined; // Supprimer le flag temporaire
+    // Ne pas re-hasher si le mot de passe vient de phoneVerification deja hashe.
+    // Le drapeau passe par $locals : un champ hors schema serait ignore par Mongoose.
+    if (this.$locals.skipPasswordHash) {
+        this.$locals.skipPasswordHash = false;
         return next();
     }
 
