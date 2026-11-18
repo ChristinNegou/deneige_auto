@@ -295,6 +295,8 @@ extension NotificationTypeInfo on NotificationType {
         return l10n.notifDesc_weatherAlert;
       case NotificationType.urgentRequest:
         return l10n.notifDesc_urgentRequest;
+      case NotificationType.searchingWorker:
+        return l10n.notifDesc_searchingWorker;
       case NotificationType.workerMessage:
         return l10n.notifDesc_workerMessage;
       case NotificationType.newMessage:

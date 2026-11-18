@@ -2717,6 +2717,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifType_urgentRequest => 'Urgent';
 
   @override
+  String get notifType_searchingWorker => 'Finding a snow remover';
+
+  @override
   String get notifType_workerMessage => 'Message';
 
   @override
@@ -2774,6 +2777,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifDesc_urgentRequest => 'Urgent requests';
+
+  @override
+  String get notifDesc_searchingWorker =>
+      'When nobody has accepted your request yet';
 
   @override
   String get notifDesc_workerMessage => 'Snow worker messages';

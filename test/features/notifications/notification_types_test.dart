@@ -26,4 +26,12 @@ void main() {
     expect(
         parse('reservationUpdate').type, NotificationType.reservationCancelled);
   });
+
+  test('dispatch notifications: new job for workers, search update for clients',
+      () {
+    expect(parse('urgentRequest').type, NotificationType.urgentRequest);
+    final searching = parse('searchingWorker');
+    expect(searching.type, NotificationType.searchingWorker);
+    expect(searching.toJson()['type'], 'searchingWorker');
+  });
 }

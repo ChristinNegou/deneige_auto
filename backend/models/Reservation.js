@@ -313,6 +313,13 @@ const reservationSchema = new mongoose.Schema({
         },
     },
 
+    // Mise en relation : deneigeurs deja prevenus, alerte "personne n'a
+    // encore accepte" envoyee au client.
+    dispatch: {
+        notifiedWorkers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        clientAlertedAt: { type: Date, default: null },
+    },
+
     // Worker tracking timestamps
     assignedAt: {
         type: Date,

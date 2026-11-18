@@ -8,6 +8,7 @@ const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { sendPushNotification } = require('./firebaseService');
+const { alertUnassignedReservations } = require('./dispatchService');
 
 // --- Configuration ---
 
@@ -37,7 +38,7 @@ async function findExpiredJobs() {
     })
     .populate('userId', 'firstName lastName email fcmToken')
     .populate('workerId', 'firstName lastName email fcmToken workerProfile')
-    .populate('vehicle', 'brand model licensePlate');
+    .populate('vehicle', 'make model licensePlate');
 
     return expiredJobs;
 }
@@ -57,7 +58,7 @@ async function findJobsApproachingDeadline() {
     })
     .populate('userId', 'firstName lastName')
     .populate('workerId', 'firstName lastName fcmToken')
-    .populate('vehicle', 'brand model');
+    .populate('vehicle', 'make model');
 
     return approachingJobs;
 }
@@ -74,8 +75,10 @@ async function cancelExpiredJob(reservation) {
     const now = new Date();
     const minutesOverdue = Math.floor((now - reservation.deadlineTime) / (1000 * 60));
 
-    // Ne pas annuler si pas assez en retard
-    if (minutesOverdue < CONFIG.AUTO_CANCEL_DELAY_MINUTES) {
+    // Ne pas annuler si pas assez en retard. Sans deneigeur, inutile
+    // d'attendre : personne ne viendra, on rembourse des l'heure limite.
+    const unassigned = reservation.status === 'pending' && !reservation.workerId;
+    if (!unassigned && minutesOverdue < CONFIG.AUTO_CANCEL_DELAY_MINUTES) {
         return { action: 'waiting', minutesOverdue };
     }
 
@@ -92,7 +95,9 @@ async function cancelExpiredJob(reservation) {
         reservation.status = 'cancelled';
         reservation.cancelledAt = now;
         reservation.cancelledBy = 'system';
-        reservation.cancelReason = `Annulation automatique - Job non complete ${minutesOverdue} minutes apres la deadline`;
+        reservation.cancelReason = unassigned
+            ? 'Annulation automatique - Aucun déneigeur n\'a accepté avant l\'heure limite'
+            : `Annulation automatique - Job non complete ${minutesOverdue} minutes apres la deadline`;
 
         // Marquer pour remboursement si paye (le remboursement réel sera fait après la sauvegarde)
         const needsRefund = reservation.paymentStatus === 'paid' && reservation.paymentIntentId;
@@ -225,14 +230,17 @@ async function notifyClientJobExpired(reservation) {
     try {
         const client = reservation.userId;
         const vehicle = reservation.vehicle;
-        const vehicleName = vehicle ? `${vehicle.brand || ''} ${vehicle.model || ''}`.trim() : 'votre véhicule';
+        const vehicleName = (vehicle && `${vehicle.make || ''} ${vehicle.model || ''}`.trim()) || 'votre véhicule';
+        const why = reservation.workerId
+            ? 'le déneigeur n\'a pas pu compléter le travail dans le délai prévu'
+            : 'aucun déneigeur n\'a accepté votre demande avant l\'heure limite';
         const refundAmount = reservation.totalPrice ? reservation.totalPrice.toFixed(2) : '';
 
         const notification = await Notification.create({
             userId: client._id,
             type: 'reservationUpdate',
             title: '😔 Réservation annulée - Remboursement prévu',
-            message: `Nous sommes désolés, votre réservation pour ${vehicleName} a dû être annulée car le déneigeur n'a pas pu compléter le travail dans le délai prévu.${refundAmount ? ` Un remboursement de ${refundAmount}$ sera automatiquement crédité sur votre carte sous 5-10 jours ouvrables.` : ' Vous serez remboursé intégralement.'} Nous nous excusons pour ce désagrément.`,
+            message: `Nous sommes désolés, votre réservation pour ${vehicleName} a dû être annulée car ${why}.${refundAmount ? ` Un remboursement de ${refundAmount}$ sera automatiquement crédité sur votre carte sous 5-10 jours ouvrables.` : ' Vous serez remboursé intégralement.'} Nous nous excusons pour ce désagrément.`,
             metadata: {
                 reservationId: reservation._id,
                 reason: 'expired',
@@ -267,7 +275,7 @@ async function notifyWorkerJobExpired(reservation) {
         if (!worker) return;
 
         const vehicle = reservation.vehicle;
-        const vehicleName = vehicle ? `${vehicle.brand || ''} ${vehicle.model || ''}`.trim() : 'le véhicule';
+        const vehicleName = vehicle ? `${vehicle.make || ''} ${vehicle.model || ''}`.trim() : 'le véhicule';
         const clientName = reservation.userId?.firstName || 'le client';
 
         const notification = await Notification.create({
@@ -322,7 +330,7 @@ async function sendDeadlineReminders() {
         const worker = job.workerId;
         const minutesLeft = Math.floor((job.deadlineTime - now) / (1000 * 60));
         const clientName = job.userId?.firstName || 'le client';
-        const vehicleName = job.vehicle ? `${job.vehicle.brand || ''} ${job.vehicle.model || ''}`.trim() : 'le véhicule';
+        const vehicleName = job.vehicle ? `${job.vehicle.make || ''} ${job.vehicle.model || ''}`.trim() : 'le véhicule';
 
         return {
             userId: worker._id,
@@ -392,6 +400,9 @@ async function processExpiredJobs() {
     try {
         // Envoyer les rappels pour jobs approchant deadline
         results.reminders = await sendDeadlineReminders();
+
+        // Prevenir les clients dont personne n'a encore accepte la demande
+        results.clientAlerts = await alertUnassignedReservations();
 
         // Trouver et traiter les jobs expires
         const expiredJobs = await findExpiredJobs();

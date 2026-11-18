@@ -250,6 +250,25 @@ describe('Reservation Routes', () => {
         expect(res.body.reservation.paymentStatus).toBe('paid');
       });
 
+      it('notifies the snow workers nearby', async () => {
+        const Notification = require('../models/Notification');
+        const nearby = await createTestWorker({ email: 'nearby@example.com' });
+
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest());
+        expect(res.status).toBe(201);
+
+        // L'envoi ne retarde pas la reponse : on attend qu'il se termine
+        let sent = null;
+        for (let i = 0; i < 50 && !sent; i++) {
+          sent = await Notification.findOne({ userId: nearby._id, type: 'urgentRequest' });
+          if (!sent) await new Promise((r) => setTimeout(r, 20));
+        }
+        expect(String(sent.reservationId)).toBe(res.body.reservation.id);
+      });
+
       it('refuses a payment made by another account', async () => {
         stripe.paymentIntents.retrieve.mockResolvedValue({
           id: 'pi_orphan_1',

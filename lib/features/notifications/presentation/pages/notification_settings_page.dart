@@ -638,6 +638,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         return Icons.wb_cloudy;
       case NotificationType.urgentRequest:
         return Icons.priority_high;
+      case NotificationType.searchingWorker:
+        return Icons.person_search;
       case NotificationType.workerMessage:
         return Icons.message;
       case NotificationType.newMessage:

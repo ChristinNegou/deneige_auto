@@ -312,6 +312,8 @@ class _NotificationBannerState extends State<NotificationBanner>
         return Icons.wb_cloudy;
       case NotificationType.urgentRequest:
         return Icons.priority_high;
+      case NotificationType.searchingWorker:
+        return Icons.person_search;
       case NotificationType.workerMessage:
         return Icons.message;
       case NotificationType.newMessage:
@@ -340,6 +342,7 @@ class _NotificationBannerState extends State<NotificationBanner>
       case NotificationType.urgentRequest:
         return AppTheme.error;
       case NotificationType.refundProcessed:
+      case NotificationType.searchingWorker:
         return AppTheme.warning;
       case NotificationType.weatherAlert:
         return AppTheme.info;

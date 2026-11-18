@@ -13,6 +13,7 @@ enum NotificationType {
   refundProcessed, // Remboursement effectué
   weatherAlert, // Alerte météo (neige prévue)
   urgentRequest, // Demande urgente
+  searchingWorker, // Personne n'a encore accepte la reservation (client)
   workerMessage, // Message du déneigeur
   newMessage, // Nouveau message de chat
   tipReceived, // Pourboire reçu par le déneigeur
@@ -174,6 +175,8 @@ extension NotificationTypeExtension on NotificationType {
         return 'wb_cloudy';
       case NotificationType.urgentRequest:
         return 'priority_high';
+      case NotificationType.searchingWorker:
+        return 'person_search';
       case NotificationType.workerMessage:
         return 'message';
       case NotificationType.newMessage:
@@ -209,6 +212,8 @@ extension NotificationTypeExtension on NotificationType {
         return l10n.notifType_weatherAlert;
       case NotificationType.urgentRequest:
         return l10n.notifType_urgentRequest;
+      case NotificationType.searchingWorker:
+        return l10n.notifType_searchingWorker;
       case NotificationType.workerMessage:
         return l10n.notifType_workerMessage;
       case NotificationType.newMessage:

@@ -78,6 +78,8 @@ class NotificationModel extends AppNotification {
         return NotificationType.weatherAlert;
       case 'urgentRequest':
         return NotificationType.urgentRequest;
+      case 'searchingWorker':
+        return NotificationType.searchingWorker;
       case 'workerMessage':
         return NotificationType.workerMessage;
       case 'newMessage':
@@ -130,6 +132,8 @@ class NotificationModel extends AppNotification {
         return 'weatherAlert';
       case NotificationType.urgentRequest:
         return 'urgentRequest';
+      case NotificationType.searchingWorker:
+        return 'searchingWorker';
       case NotificationType.workerMessage:
         return 'workerMessage';
       case NotificationType.newMessage:

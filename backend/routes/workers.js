@@ -20,6 +20,12 @@ const { logError, safeNotify } = require('../utils/errorHandler');
 const { locationLimiter, uploadLimiter } = require('../middleware/rateLimiter');
 const smartNotifications = require('../services/smartNotificationService');
 const verificationRequired = require('../middleware/verificationRequired');
+const {
+    ACTIVE_JOB_STATUSES,
+    isWorkerSuspended,
+    openJobQuery,
+    workerHasRequiredEquipment,
+} = require('../services/dispatchService');
 const identityVerificationService = require('../services/identityVerificationService');
 
 // Configure multer with memory storage for Cloudinary uploads
@@ -55,32 +61,7 @@ const profileUpload = multer({
 
 // --- Règles d'attribution ---
 
-/** Statuts d'un travail accepte mais pas termine (compte dans la limite). */
-const ACTIVE_JOB_STATUSES = ['assigned', 'enRoute', 'inProgress'];
-
-/**
- * Suspendu par un admin (racine du compte) ou automatiquement apres trop de
- * travaux non termines, d'annulations ou de litiges (workerProfile) : dans
- * tous les cas, plus de travail. Une suspension datee prend fin d'elle-meme.
- */
-const isWorkerSuspended = (user) => {
-    const active = (flag, until) => Boolean(flag) && (!until || new Date(until) > new Date());
-    return active(user?.isSuspended, user?.suspendedUntil)
-        || active(user?.workerProfile?.isSuspended, user?.workerProfile?.suspendedUntil);
-};
-
 const SUSPENDED_MESSAGE = 'Votre compte déneigeur est suspendu. Contactez le support pour le rétablir.';
-
-/**
- * Une reservation peut etre proposee puis acceptee si elle attend un
- * deneigeur, est payee et que l'heure limite (voiture prete) n'est pas passee.
- */
-const openJobQuery = (now) => ({
-    status: 'pending',
-    workerId: null,
-    paymentStatus: 'paid',
-    deadlineTime: { $gt: now },
-});
 
 // --- Disponibilité et localisation ---
 
@@ -169,18 +150,6 @@ router.put('/location', protect, authorize('snowWorker'), locationLimiter, async
 
 // Meme regle que le modele : une seule source pour l'equipement requis.
 const computeRequiredEquipment = (reservation) => Reservation.computeRequiredEquipment(reservation);
-
-/**
- * Vérifie si le déneigeur possède tout l'équipement requis.
- * @param {string[]} workerEquipment - Équipement du déneigeur
- * @param {string[]} requiredEquipment - Équipement requis
- * @returns {boolean} true si le déneigeur a tout l'équipement
- */
-const workerHasRequiredEquipment = (workerEquipment, requiredEquipment) => {
-    if (!requiredEquipment || requiredEquipment.length === 0) return true;
-    if (!workerEquipment || workerEquipment.length === 0) return false;
-    return requiredEquipment.every(eq => workerEquipment.includes(eq));
-};
 
 /**
  * GET /api/workers/available-jobs

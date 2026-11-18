@@ -204,6 +204,7 @@ class NotificationNavigationService {
       case NotificationType.workerEnRoute:
       case NotificationType.workStarted:
       case NotificationType.workCompleted:
+      case NotificationType.searchingWorker:
         return notification.reservationId != null
             ? AppRoutes.reservationDetails
             : AppRoutes.reservations;
@@ -329,6 +330,13 @@ class NotificationNavigationService {
           icon: Icons.ac_unit,
           route: AppRoutes.newReservation,
           isHighlighted: true,
+        );
+
+      case NotificationType.searchingWorker:
+        return NotificationAction(
+          label: l10n.notifAction_viewDetails,
+          icon: Icons.person_search_rounded,
+          route: AppRoutes.reservationDetails,
         );
 
       case NotificationType.urgentRequest:

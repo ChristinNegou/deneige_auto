@@ -318,6 +318,8 @@ class NotificationsPageContent extends StatelessWidget {
         return Icons.wb_cloudy_rounded;
       case NotificationType.urgentRequest:
         return Icons.priority_high_rounded;
+      case NotificationType.searchingWorker:
+        return Icons.person_search_rounded;
       case NotificationType.workerMessage:
         return Icons.message_rounded;
       case NotificationType.newMessage:

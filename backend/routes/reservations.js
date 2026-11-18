@@ -8,6 +8,7 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
 const Reservation = require('../models/Reservation');
+const { notifyNearbyWorkers } = require('../services/dispatchService');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 const Vehicle = require('../models/Vehicle');
@@ -322,6 +323,12 @@ router.post('/', protect, async (req, res) => {
         }
 
         console.log('✅ Réservation créée avec succès:', reservation._id);
+
+        // Prevenir les deneigeurs proches, sans retarder la reponse au client
+        if (reservation.paymentStatus === 'paid') {
+            notifyNearbyWorkers(reservation).catch((err) =>
+                console.error('⚠️ Notification des déneigeurs échouée:', err.message));
+        }
 
         // ✅ Créer l'ID de parking avec le numéro/emplacement pour l'édition future
         const manualSpotId = finalCustomLocation

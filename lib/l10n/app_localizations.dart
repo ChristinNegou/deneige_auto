@@ -5132,6 +5132,12 @@ abstract class AppLocalizations {
   /// **'Urgent'**
   String get notifType_urgentRequest;
 
+  /// No description provided for @notifType_searchingWorker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche d\'un déneigeur'**
+  String get notifType_searchingWorker;
+
   /// No description provided for @notifType_workerMessage.
   ///
   /// In fr, this message translates to:
@@ -5245,6 +5251,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Demandes urgentes'**
   String get notifDesc_urgentRequest;
+
+  /// No description provided for @notifDesc_searchingWorker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quand personne n\'a encore accepté votre demande'**
+  String get notifDesc_searchingWorker;
 
   /// No description provided for @notifDesc_workerMessage.
   ///

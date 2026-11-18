@@ -49,6 +49,7 @@ const notificationSchema = new mongoose.Schema({
             'dispute_won',
             'dispute_lost',
             'identityVerification',
+            'searchingWorker',       // Personne n'a encore accepte la reservation
         ],
         required: [true, 'Le type est requis'],
     },
