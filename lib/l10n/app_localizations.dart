@@ -1094,12 +1094,6 @@ abstract class AppLocalizations {
   /// **'+{amount}\$ pourboire'**
   String reservation_tipAmount(String amount);
 
-  /// No description provided for @reservation_urgent.
-  ///
-  /// In fr, this message translates to:
-  /// **'URGENT'**
-  String get reservation_urgent;
-
   /// No description provided for @reservation_yourRating.
   ///
   /// In fr, this message translates to:
@@ -2431,12 +2425,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Nouveaux jobs'**
   String get worker_notifNewJobs;
-
-  /// No description provided for @worker_notifUrgentJobs.
-  ///
-  /// In fr, this message translates to:
-  /// **'Jobs urgents'**
-  String get worker_notifUrgentJobs;
 
   /// No description provided for @worker_notifTipsReceived.
   ///
@@ -4399,12 +4387,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Alerte pour les nouveaux jobs disponibles'**
   String get worker_notifNewJobsDesc;
-
-  /// No description provided for @worker_notifUrgentJobsDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Alertes prioritaires'**
-  String get worker_notifUrgentJobsDesc;
 
   /// No description provided for @worker_addZone.
   ///
@@ -6998,12 +6980,6 @@ abstract class AppLocalizations {
   /// **'Revenus'**
   String get worker_revenue;
 
-  /// No description provided for @worker_urgentCount.
-  ///
-  /// In fr, this message translates to:
-  /// **'{count} urgent'**
-  String worker_urgentCount(int count);
-
   /// No description provided for @worker_myRevenue.
   ///
   /// In fr, this message translates to:
@@ -7316,29 +7292,47 @@ abstract class AppLocalizations {
   /// **'Heure de départ'**
   String get step3_departureTime;
 
-  /// No description provided for @step3_selectDate.
-  ///
-  /// In fr, this message translates to:
-  /// **'Sélectionner une date'**
-  String get step3_selectDate;
-
   /// No description provided for @step3_selectTime.
   ///
   /// In fr, this message translates to:
   /// **'Sélectionner une heure'**
   String get step3_selectTime;
 
-  /// No description provided for @step3_urgentReservation.
+  /// No description provided for @step3_today.
   ///
   /// In fr, this message translates to:
-  /// **'Réservation urgente'**
-  String get step3_urgentReservation;
+  /// **'Aujourd’hui'**
+  String get step3_today;
 
-  /// No description provided for @step3_urgencyFee.
+  /// No description provided for @step3_tomorrow.
   ///
   /// In fr, this message translates to:
-  /// **'Frais d\'urgence de 40% appliqués'**
-  String get step3_urgencyFee;
+  /// **'Demain'**
+  String get step3_tomorrow;
+
+  /// No description provided for @step3_otherDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre date'**
+  String get step3_otherDate;
+
+  /// No description provided for @step3_timeHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’heure à laquelle vous partez. Le déneigement sera terminé avant.'**
+  String get step3_timeHelp;
+
+  /// No description provided for @step3_readyBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Véhicule prêt avant {time}'**
+  String step3_readyBy(String time);
+
+  /// No description provided for @step3_tooSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez une heure de départ au moins {minutes} min à l’avance.'**
+  String step3_tooSoon(int minutes);
 
   /// No description provided for @step4_additionalOptions.
   ///
@@ -7874,12 +7868,6 @@ abstract class AppLocalizations {
   /// **'Options supplémentaires'**
   String get price_additionalOptions;
 
-  /// No description provided for @price_urgencyFee.
-  ///
-  /// In fr, this message translates to:
-  /// **'Frais d\'urgence (40%)'**
-  String get price_urgencyFee;
-
   /// No description provided for @price_subtotal.
   ///
   /// In fr, this message translates to:
@@ -7915,12 +7903,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Taxes incluses'**
   String get price_taxesIncluded;
-
-  /// No description provided for @price_urgentBanner.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réservation urgente - Frais majorés'**
-  String get price_urgentBanner;
 
   /// No description provided for @snow_estimatedDepth.
   ///
@@ -10195,12 +10177,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'DÉPASSÉ'**
   String get worker_exceeded;
-
-  /// No description provided for @worker_urgent.
-  ///
-  /// In fr, this message translates to:
-  /// **'URGENT'**
-  String get worker_urgent;
 
   /// No description provided for @worker_equipmentCompatible.
   ///

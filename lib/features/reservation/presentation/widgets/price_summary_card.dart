@@ -64,14 +64,6 @@ class PriceSummaryCard extends StatelessWidget {
                         _buildPriceRow(l10n.price_additionalOptions,
                             breakdown.optionsCost),
 
-                      if (breakdown.urgencyFee > 0)
-                        _buildPriceRow(
-                          l10n.price_urgencyFee,
-                          breakdown.urgencyFee,
-                          highlight: true,
-                          highlightColor: AppTheme.warning,
-                        ),
-
                       const SizedBox(height: 8),
                       _buildDivider(),
                       const SizedBox(height: 8),
@@ -210,35 +202,6 @@ class PriceSummaryCard extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Badge urgence
-              if (state.isUrgent)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warningLight,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(12),
-                      bottomRight: Radius.circular(12),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.bolt, size: 16, color: AppTheme.warning),
-                      const SizedBox(width: 6),
-                      Text(
-                        l10n.price_urgentBanner,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.warning,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
             ],
           ),
         );

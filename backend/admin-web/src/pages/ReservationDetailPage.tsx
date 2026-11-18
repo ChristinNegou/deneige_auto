@@ -106,7 +106,6 @@ export function ReservationDetailPage() {
           <span className="flex flex-wrap gap-2">
             <Badge tone={status.tone}>{status.label}</Badge>
             <Badge tone={pay.tone}>{pay.label}</Badge>
-            {r.isPriority && <Badge tone="progress">Urgente</Badge>}
             {r.dispute?.hasDispute && <Badge tone="danger">Litige ouvert</Badge>}
           </span>
         }

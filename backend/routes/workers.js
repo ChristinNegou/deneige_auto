@@ -326,12 +326,8 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
             }));
         }
 
-        // Sort: priority first, then by urgency, then by distance
+        // Sort: soonest departure first, then by distance
         allReservations.sort((a, b) => {
-            // Priority first
-            if (a.isPriority && !b.isPriority) return -1;
-            if (!a.isPriority && b.isPriority) return 1;
-            // Then by urgency (hours until departure)
             if (a.hoursUntilDeparture !== b.hoursUntilDeparture) {
                 return a.hoursUntilDeparture - b.hoursUntilDeparture;
             }

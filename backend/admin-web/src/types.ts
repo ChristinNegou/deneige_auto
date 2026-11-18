@@ -109,7 +109,6 @@ export interface Reservation {
   refundedAt?: string | null;
   tipAmount?: number;
   rating?: number;
-  isPriority?: boolean;
   serviceOptions?: string[];
   snowDepthCm?: number | null;
   parkingSpotNumber?: string;

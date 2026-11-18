@@ -386,18 +386,6 @@ class EditReservationBloc
     }
     price += optionsCost;
 
-    // Calcul des frais d'urgence (si départ dans moins de 45 minutes)
-    if (state.departureTime != null) {
-      final now = DateTime.now();
-      final minutesUntilDeparture =
-          state.departureTime!.difference(now).inMinutes;
-
-      if (minutesUntilDeparture < AppConfig.urgencyThresholdMinutes) {
-        final urgencyFee = price * AppConfig.urgencyFeePercentage;
-        price += urgencyFee;
-      }
-    }
-
     emit(state.copyWith(calculatedPrice: price));
   }
 

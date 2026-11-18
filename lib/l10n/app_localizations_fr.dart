@@ -544,9 +544,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get reservation_urgent => 'URGENT';
-
-  @override
   String get reservation_yourRating => 'Votre évaluation';
 
   @override
@@ -1243,9 +1240,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get worker_notifNewJobs => 'Nouveaux jobs';
-
-  @override
-  String get worker_notifUrgentJobs => 'Jobs urgents';
 
   @override
   String get worker_notifTipsReceived => 'Pourboires reçus';
@@ -2305,9 +2299,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get worker_notifNewJobsDesc =>
       'Alerte pour les nouveaux jobs disponibles';
-
-  @override
-  String get worker_notifUrgentJobsDesc => 'Alertes prioritaires';
 
   @override
   String get worker_addZone => 'Ajouter une zone';
@@ -3752,11 +3743,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get worker_revenue => 'Revenus';
 
   @override
-  String worker_urgentCount(int count) {
-    return '$count urgent';
-  }
-
-  @override
   String get worker_myRevenue => 'Mes revenus';
 
   @override
@@ -3929,16 +3915,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get step3_departureTime => 'Heure de départ';
 
   @override
-  String get step3_selectDate => 'Sélectionner une date';
-
-  @override
   String get step3_selectTime => 'Sélectionner une heure';
 
   @override
-  String get step3_urgentReservation => 'Réservation urgente';
+  String get step3_today => 'Aujourd’hui';
 
   @override
-  String get step3_urgencyFee => 'Frais d\'urgence de 40% appliqués';
+  String get step3_tomorrow => 'Demain';
+
+  @override
+  String get step3_otherDate => 'Autre date';
+
+  @override
+  String get step3_timeHelp =>
+      'L’heure à laquelle vous partez. Le déneigement sera terminé avant.';
+
+  @override
+  String step3_readyBy(String time) {
+    return 'Véhicule prêt avant $time';
+  }
+
+  @override
+  String step3_tooSoon(int minutes) {
+    return 'Choisissez une heure de départ au moins $minutes min à l’avance.';
+  }
 
   @override
   String get step4_additionalOptions => 'Options supplementaires';
@@ -4223,9 +4223,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get price_additionalOptions => 'Options supplémentaires';
 
   @override
-  String get price_urgencyFee => 'Frais d\'urgence (40%)';
-
-  @override
   String get price_subtotal => 'Sous-total';
 
   @override
@@ -4244,9 +4241,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get price_taxesIncluded => 'Taxes incluses';
-
-  @override
-  String get price_urgentBanner => 'Réservation urgente - Frais majorés';
 
   @override
   String get snow_estimatedDepth => 'Profondeur de neige estimée';
@@ -5518,9 +5512,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get worker_exceeded => 'DÉPASSÉ';
-
-  @override
-  String get worker_urgent => 'URGENT';
 
   @override
   String get worker_equipmentCompatible => 'Équipement compatible';

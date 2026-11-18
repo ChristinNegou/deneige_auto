@@ -167,7 +167,8 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
   Widget _buildCard(ThemeData theme, AppLocalizations l10n, String locale) {
     final timeFormatter = DateFormat('HH:mm');
     final dateFormatter = DateFormat('dd MMM', locale == 'fr' ? 'fr_CA' : 'en');
-    final isUrgent = widget.job.isPriority || _timeRemaining.inMinutes < 60;
+    // Echeance proche : le compte a rebours passe en orange
+    final isUrgent = _timeRemaining.inMinutes < 60;
 
     final radius = BorderRadius.circular(AppTheme.radiusLG);
     return AnimatedContainer(
@@ -176,10 +177,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
         color: AppTheme.surface,
         borderRadius: radius,
         border: Border.all(
-          color: widget.job.isPriority
-              ? AppTheme.accent
-              : AppTheme.border.withValues(alpha: 0.7),
-          width: widget.job.isPriority ? 1.5 : 1,
+          color: AppTheme.border.withValues(alpha: 0.7),
         ),
         boxShadow: AppTheme.shadowSM,
       ),
@@ -206,10 +204,6 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                                 _buildStatusChip(widget.job.status, l10n),
                                 const SizedBox(width: 8),
                               ] else ...[
-                                if (widget.job.isPriority) ...[
-                                  _buildUrgentBadge(l10n),
-                                  const SizedBox(width: 8),
-                                ],
                                 _buildCountdownBadge(isUrgent, l10n),
                               ],
                             ],
@@ -370,14 +364,6 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildUrgentBadge(AppLocalizations l10n) {
-    return StatusBadge(
-      label: l10n.worker_urgent,
-      color: AppTheme.accentDark,
-      icon: Icons.bolt_rounded,
     );
   }
 

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../../core/config/app_config.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
 
+/// Etape Date et heure : le jour en un geste (aujourd'hui, demain ou autre),
+/// l'heure de depart, puis une ligne neutre qui dit quand le vehicule sera pret
+/// ou pourquoi l'heure choisie ne convient pas.
 class Step3DateTimeScreen extends StatefulWidget {
   const Step3DateTimeScreen({super.key});
 
@@ -18,6 +22,15 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
 
+  static const _quickTimes = [
+    TimeOfDay(hour: 6, minute: 0),
+    TimeOfDay(hour: 7, minute: 0),
+    TimeOfDay(hour: 8, minute: 0),
+    TimeOfDay(hour: 9, minute: 0),
+    TimeOfDay(hour: 17, minute: 0),
+    TimeOfDay(hour: 18, minute: 0),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -28,43 +41,75 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
     }
   }
 
+  String get _localeTag =>
+      Localizations.localeOf(context).languageCode == 'en' ? 'en_CA' : 'fr_CA';
+
+  String _formatTime(TimeOfDay t) =>
+      DateFormat.Hm(_localeTag).format(DateTime(2000, 1, 1, t.hour, t.minute));
+
+  DateTime get _today {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  bool _sameDay(DateTime? a, DateTime b) =>
+      a != null && a.year == b.year && a.month == b.month && a.day == b.day;
+
+  /// Heure trop proche pour laisser le temps au deneigeur (regle du serveur).
+  bool _isTooSoon(DateTime date, TimeOfDay time) {
+    final departure =
+        DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    final earliest = DateTime.now()
+        .add(const Duration(minutes: AppConfig.minReservationTimeMinutes));
+    return departure.isBefore(earliest);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocBuilder<NewReservationBloc, NewReservationState>(
       builder: (context, state) {
+        final tooSoon = selectedDate != null &&
+            selectedTime != null &&
+            _isTooSoon(selectedDate!, selectedTime!);
+
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Section Date
-              _buildSectionHeader(
-                  AppLocalizations.of(context)!.step3_departureDate,
-                  Icons.calendar_today_rounded),
+              Text(l10n.step3_departureDate, style: AppTheme.headlineSmall),
               const SizedBox(height: 12),
-              _buildDateSelector(context),
-
+              _buildDateChoices(context),
               const SizedBox(height: 28),
-
-              // Section Heure
-              _buildSectionHeader(
-                  AppLocalizations.of(context)!.step3_departureTime,
-                  Icons.access_time_rounded),
+              Text(l10n.step3_departureTime, style: AppTheme.headlineSmall),
+              const SizedBox(height: 4),
+              Text(
+                l10n.step3_timeHelp,
+                style:
+                    AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+              ),
               const SizedBox(height: 12),
               _buildTimeSelector(context),
               const SizedBox(height: 12),
               _buildQuickTimes(),
-
-              const SizedBox(height: 24),
-
-              // Messages d'info
-              if (state.departureDateTime != null) _buildConfirmation(state),
-
-              if (state.isUrgent) ...[
-                const SizedBox(height: 12),
-                _buildUrgentWarning(),
+              const SizedBox(height: 20),
+              if (tooSoon)
+                _buildNote(
+                  icon: Icons.info_outline_rounded,
+                  text: l10n.step3_tooSoon(AppConfig.minReservationTimeMinutes),
+                  color: AppTheme.error,
+                )
+              else if (state.deadlineTime != null &&
+                  state.departureDateTime != null) ...[
+                _buildNote(
+                  icon: Icons.schedule_rounded,
+                  text: l10n.step3_readyBy(
+                      _formatTime(TimeOfDay.fromDateTime(state.deadlineTime!))),
+                  color: AppTheme.textPrimary,
+                ),
               ],
-
               const SizedBox(height: 24),
             ],
           ),
@@ -73,161 +118,179 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
-    return Text(title, style: AppTheme.headlineSmall);
-  }
+  /// Aujourd'hui, demain, ou une autre date via le calendrier.
+  Widget _buildDateChoices(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tomorrow = _today.add(const Duration(days: 1));
+    final isToday = _sameDay(selectedDate, _today);
+    final isTomorrow = _sameDay(selectedDate, tomorrow);
+    final isOther = selectedDate != null && !isToday && !isTomorrow;
 
-  Widget _buildDateSelector(BuildContext context) {
-    final hasDate = selectedDate != null;
-
-    return GestureDetector(
-      onTap: () => _selectDate(context),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: hasDate
-              ? AppTheme.primary.withValues(alpha: 0.05)
-              : AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: hasDate ? AppTheme.primary : AppTheme.border,
-            width: hasDate ? 1.5 : 1,
+    return Row(
+      children: [
+        Expanded(
+          child: _dateChip(
+            label: l10n.step3_today,
+            selected: isToday,
+            onTap: () => _setDate(_today),
           ),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child:
-                  Icon(Icons.calendar_month, color: AppTheme.primary, size: 22),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    hasDate
-                        ? DateFormat(
-                                'EEEE d MMMM',
-                                Localizations.localeOf(context).languageCode ==
-                                        'en'
-                                    ? 'en_CA'
-                                    : 'fr_CA')
-                            .format(selectedDate!)
-                        : AppLocalizations.of(context)!.step3_selectDate,
+        const SizedBox(width: 8),
+        Expanded(
+          child: _dateChip(
+            label: l10n.step3_tomorrow,
+            selected: isTomorrow,
+            onTap: () => _setDate(tomorrow),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _dateChip(
+            label: isOther
+                ? DateFormat('EEE d MMM', _localeTag).format(selectedDate!)
+                : l10n.step3_otherDate,
+            icon: Icons.calendar_month_rounded,
+            selected: isOther,
+            onTap: () => _pickDate(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _dateChip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+    IconData? icon,
+  }) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: Material(
+        color: selected ? AppTheme.primary : AppTheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side:
+              BorderSide(color: selected ? AppTheme.primary : AppTheme.border),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            height: 48,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (icon != null) ...[
+                  Icon(icon,
+                      size: 16,
+                      color: selected
+                          ? AppTheme.onPrimary
+                          : AppTheme.textSecondary),
+                  const SizedBox(width: 6),
+                ],
+                Flexible(
+                  child: Text(
+                    label,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: hasDate
-                          ? AppTheme.textPrimary
-                          : AppTheme.textTertiary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color:
+                          selected ? AppTheme.onPrimary : AppTheme.textPrimary,
                     ),
                   ),
-                  if (hasDate)
-                    Text(
-                      DateFormat('yyyy').format(selectedDate!),
-                      style: TextStyle(
-                          fontSize: 13, color: AppTheme.textSecondary),
-                    ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Icon(Icons.chevron_right, color: AppTheme.textTertiary),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTimeSelector(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasTime = selectedTime != null;
 
-    return GestureDetector(
-      onTap: () => _selectTime(context),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: hasTime
-              ? AppTheme.primary.withValues(alpha: 0.05)
-              : AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: hasTime ? AppTheme.primary : AppTheme.border,
-            width: hasTime ? 1.5 : 1,
-          ),
+    return Material(
+      color: AppTheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: hasTime ? AppTheme.primary : AppTheme.border,
+          width: hasTime ? 1.5 : 1,
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(Icons.schedule, color: AppTheme.primary, size: 22),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                hasTime
-                    ? '${selectedTime!.hour.toString().padLeft(2, '0')}:${selectedTime!.minute.toString().padLeft(2, '0')}'
-                    : AppLocalizations.of(context)!.step3_selectTime,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: hasTime ? AppTheme.textPrimary : AppTheme.textTertiary,
+      ),
+      child: InkWell(
+        onTap: () => _pickTime(context),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Icon(Icons.schedule_rounded,
+                  color: AppTheme.textSecondary, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  hasTime ? _formatTime(selectedTime!) : l10n.step3_selectTime,
+                  style: TextStyle(
+                    fontSize: hasTime ? 18 : 15,
+                    fontWeight: hasTime ? FontWeight.w800 : FontWeight.w600,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                    color:
+                        hasTime ? AppTheme.textPrimary : AppTheme.textTertiary,
+                  ),
                 ),
               ),
-            ),
-            Icon(Icons.chevron_right, color: AppTheme.textTertiary),
-          ],
+              Icon(Icons.chevron_right_rounded, color: AppTheme.textTertiary),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  /// Heures frequentes ; celles deja trop proches aujourd'hui sont grisees.
   Widget _buildQuickTimes() {
-    final times = ['06:00', '07:00', '08:00', '09:00', '17:00', '18:00'];
-
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: times.map((time) {
-        final parts = time.split(':');
-        final hour = int.parse(parts[0]);
-        final minute = int.parse(parts[1]);
-        final isSelected =
-            selectedTime?.hour == hour && selectedTime?.minute == minute;
+      children: _quickTimes.map((time) {
+        final isSelected = selectedTime == time;
+        final disabled =
+            selectedDate != null && _isTooSoon(selectedDate!, time);
 
-        return GestureDetector(
-          onTap: () {
-            setState(
-                () => selectedTime = TimeOfDay(hour: hour, minute: minute));
-            _updateDateTime();
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-            decoration: BoxDecoration(
-              color: isSelected ? AppTheme.primary : AppTheme.surface,
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-              border: Border.all(
-                color: isSelected ? AppTheme.primary : AppTheme.border,
+        return Semantics(
+          button: true,
+          selected: isSelected,
+          enabled: !disabled,
+          child: GestureDetector(
+            onTap: disabled ? null : () => _setTime(time),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+              decoration: BoxDecoration(
+                color: isSelected ? AppTheme.primary : AppTheme.surface,
+                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                border: Border.all(
+                  color: isSelected ? AppTheme.primary : AppTheme.border,
+                ),
               ),
-            ),
-            child: Text(
-              time,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                fontFeatures: const [FontFeature.tabularFigures()],
-                color: isSelected ? AppTheme.onPrimary : AppTheme.textPrimary,
+              child: Text(
+                _formatTime(time),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                  color: isSelected
+                      ? AppTheme.onPrimary
+                      : disabled
+                          ? AppTheme.textTertiary.withValues(alpha: 0.6)
+                          : AppTheme.textPrimary,
+                  decoration: disabled ? TextDecoration.lineThrough : null,
+                ),
               ),
             ),
           ),
@@ -236,92 +299,53 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
     );
   }
 
-  Widget _buildConfirmation(NewReservationState state) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.successLight,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.check_circle, color: AppTheme.success, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              DateFormat(
-                      'EEEE d MMMM – HH:mm',
-                      Localizations.localeOf(context).languageCode == 'en'
-                          ? 'en_CA'
-                          : 'fr_CA')
-                  .format(state.departureDateTime!),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.success,
-              ),
+  /// Ligne d'information sobre : icone + texte, sans fond colore.
+  Widget _buildNote({
+    required IconData icon,
+    required String text,
+    required Color color,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: color),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: color,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildUrgentWarning() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.warningLight,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.warning_amber_rounded, color: AppTheme.warning, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.step3_urgentReservation,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.warning,
-                  ),
-                ),
-                Text(
-                  AppLocalizations.of(context)!.step3_urgencyFee,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.warning.withValues(alpha: 0.8),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  void _setDate(DateTime date) {
+    setState(() => selectedDate = date);
+    _updateDateTime();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final now = DateTime.now();
+  void _setTime(TimeOfDay time) {
+    setState(() => selectedTime = time);
+    _updateDateTime();
+  }
+
+  Future<void> _pickDate(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? now.add(const Duration(days: 1)),
-      firstDate: now,
-      lastDate: now.add(const Duration(days: 30)),
+      initialDate: selectedDate ?? _today.add(const Duration(days: 2)),
+      firstDate: _today,
+      lastDate: _today.add(const Duration(days: 30)),
       locale: Localizations.localeOf(context),
     );
-
-    if (picked != null && mounted) {
-      setState(() => selectedDate = picked);
-      _updateDateTime();
-    }
+    if (picked != null && mounted) _setDate(picked);
   }
 
-  Future<void> _selectTime(BuildContext context) async {
+  Future<void> _pickTime(BuildContext context) async {
     final picked = await showTimePicker(
       context: context,
       initialTime: selectedTime ?? const TimeOfDay(hour: 7, minute: 0),
@@ -332,11 +356,7 @@ class _Step3DateTimeScreenState extends State<Step3DateTimeScreen> {
         );
       },
     );
-
-    if (picked != null && mounted) {
-      setState(() => selectedTime = picked);
-      _updateDateTime();
-    }
+    if (picked != null && mounted) _setTime(picked);
   }
 
   void _updateDateTime() {

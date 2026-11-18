@@ -537,9 +537,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get reservation_urgent => 'URGENT';
-
-  @override
   String get reservation_yourRating => 'Your rating';
 
   @override
@@ -1231,9 +1228,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get worker_notifNewJobs => 'New jobs';
-
-  @override
-  String get worker_notifUrgentJobs => 'Urgent jobs';
 
   @override
   String get worker_notifTipsReceived => 'Tips received';
@@ -2284,9 +2278,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get worker_notifNewJobsDesc => 'Alert for new available jobs';
-
-  @override
-  String get worker_notifUrgentJobsDesc => 'Priority alerts';
 
   @override
   String get worker_addZone => 'Add a zone';
@@ -3710,11 +3701,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worker_revenue => 'Revenue';
 
   @override
-  String worker_urgentCount(int count) {
-    return '$count urgent';
-  }
-
-  @override
   String get worker_myRevenue => 'My revenue';
 
   @override
@@ -3885,16 +3871,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get step3_departureTime => 'Departure time';
 
   @override
-  String get step3_selectDate => 'Select a date';
-
-  @override
   String get step3_selectTime => 'Select a time';
 
   @override
-  String get step3_urgentReservation => 'Urgent reservation';
+  String get step3_today => 'Today';
 
   @override
-  String get step3_urgencyFee => '40% urgency fee applied';
+  String get step3_tomorrow => 'Tomorrow';
+
+  @override
+  String get step3_otherDate => 'Other date';
+
+  @override
+  String get step3_timeHelp =>
+      'When you leave. Snow removal will be done before then.';
+
+  @override
+  String step3_readyBy(String time) {
+    return 'Vehicle ready before $time';
+  }
+
+  @override
+  String step3_tooSoon(int minutes) {
+    return 'Pick a departure time at least $minutes min from now.';
+  }
 
   @override
   String get step4_additionalOptions => 'Additional options';
@@ -4171,9 +4171,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get price_additionalOptions => 'Additional options';
 
   @override
-  String get price_urgencyFee => 'Urgency fee (40%)';
-
-  @override
   String get price_subtotal => 'Subtotal';
 
   @override
@@ -4192,9 +4189,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get price_taxesIncluded => 'Taxes included';
-
-  @override
-  String get price_urgentBanner => 'Urgent reservation - Increased fees';
 
   @override
   String get snow_estimatedDepth => 'Estimated snow depth';
@@ -5451,9 +5445,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get worker_exceeded => 'EXCEEDED';
-
-  @override
-  String get worker_urgent => 'URGENT';
 
   @override
   String get worker_equipmentCompatible => 'Equipment compatible';

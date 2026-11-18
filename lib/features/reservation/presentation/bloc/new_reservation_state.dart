@@ -26,7 +26,6 @@ class NewReservationState extends Equatable {
   final List<ParkingSpot> availableParkingSpots;
   final DateTime? departureDateTime;
   final DateTime? deadlineTime;
-  final bool isUrgent;
   final List<ServiceOption> selectedOptions;
   final int? snowDepthCm;
   final double? calculatedPrice;
@@ -56,7 +55,6 @@ class NewReservationState extends Equatable {
     this.availableParkingSpots = const [],
     this.departureDateTime,
     this.deadlineTime,
-    this.isUrgent = false,
     this.selectedOptions = const [],
     this.snowDepthCm,
     this.calculatedPrice,
@@ -149,7 +147,6 @@ class NewReservationState extends Equatable {
     List<ParkingSpot>? availableParkingSpots,
     DateTime? departureDateTime,
     DateTime? deadlineTime,
-    bool? isUrgent,
     List<ServiceOption>? selectedOptions,
     int? snowDepthCm,
     double? calculatedPrice,
@@ -183,7 +180,6 @@ class NewReservationState extends Equatable {
           availableParkingSpots ?? this.availableParkingSpots,
       departureDateTime: departureDateTime ?? this.departureDateTime,
       deadlineTime: deadlineTime ?? this.deadlineTime,
-      isUrgent: isUrgent ?? this.isUrgent,
       selectedOptions: selectedOptions ?? this.selectedOptions,
       snowDepthCm: snowDepthCm ?? this.snowDepthCm,
       calculatedPrice: calculatedPrice ?? this.calculatedPrice,
@@ -220,7 +216,6 @@ class NewReservationState extends Equatable {
         availableParkingSpots,
         departureDateTime,
         deadlineTime,
-        isUrgent,
         selectedOptions,
         snowDepthCm,
         calculatedPrice,
@@ -248,7 +243,6 @@ class PriceBreakdown extends Equatable {
   final double parkingAdjustment;
   final double snowSurcharge;
   final double optionsCost;
-  final double urgencyFee;
   final double subtotal; // Sous-total avant taxes
   final double serviceFee; // Frais de service
   final double insuranceFee; // Frais d'assurance
@@ -272,7 +266,6 @@ class PriceBreakdown extends Equatable {
     required this.parkingAdjustment,
     required this.snowSurcharge,
     required this.optionsCost,
-    required this.urgencyFee,
     required this.subtotal,
     required this.serviceFee,
     required this.insuranceFee,
@@ -314,7 +307,6 @@ class PriceBreakdown extends Equatable {
         parkingAdjustment,
         snowSurcharge,
         optionsCost,
-        urgencyFee,
         subtotal,
         serviceFee,
         insuranceFee,

@@ -215,7 +215,6 @@
       }
     }
   },
-  "reservation_urgent": "URGENT",
   "reservation_yourRating": "Votre évaluation",
   "reservation_rateService": "Évaluer le service",
   "reservation_rateSubtitle": "Partagez votre expérience et ajoutez un pourboire",
@@ -459,7 +458,6 @@
   "worker_maxSimultaneousJobs": "Jobs simultanés max",
   "worker_maxSimultaneousJobsDesc": "Nombre de jobs actifs en même temps",
   "worker_notifNewJobs": "Nouveaux jobs",
-  "worker_notifUrgentJobs": "Jobs urgents",
   "worker_notifTipsReceived": "Pourboires reçus",
   "worker_helpSupport": "Aide et support",
   "worker_jobDetails": "Détails du job",
@@ -911,7 +909,6 @@
   "worker_vehicleAtvDesc": "Accès difficile, terrains variés",
   "worker_recommendedJobs": "Recommandé: 2-3 jobs",
   "worker_notifNewJobsDesc": "Alerte pour les nouveaux jobs disponibles",
-  "worker_notifUrgentJobsDesc": "Alertes prioritaires",
   "worker_addZone": "Ajouter une zone",
   "worker_zoneName": "Nom de la zone",
   "worker_zoneHint": "Ex: Trois-Rivières Ouest",
@@ -1497,14 +1494,6 @@
   "verify_expiredDesc": "Votre vérification d'identité a expiré. Veuillez resoumettre vos documents.",
   "verify_renewBtn": "Renouveler ma vérification",
   "worker_revenue": "Revenus",
-  "worker_urgentCount": "{count} urgent",
-  "@worker_urgentCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "worker_myRevenue": "Mes revenus",
   "resDetail_errorPrefix": "Erreur: {message}",
   "@resDetail_errorPrefix": {
@@ -1578,10 +1567,15 @@
   "step2_selectSuggestion": "Choisissez une adresse dans la liste.",
   "step3_departureDate": "Date de départ",
   "step3_departureTime": "Heure de départ",
-  "step3_selectDate": "Sélectionner une date",
   "step3_selectTime": "Sélectionner une heure",
-  "step3_urgentReservation": "Réservation urgente",
-  "step3_urgencyFee": "Frais d'urgence de 40% appliqués",
+  "step3_today": "Aujourd’hui",
+  "step3_tomorrow": "Demain",
+  "step3_otherDate": "Autre date",
+  "step3_timeHelp": "L’heure à laquelle vous partez. Le déneigement sera terminé avant.",
+  "step3_readyBy": "Véhicule prêt avant {time}",
+  "@step3_readyBy": {"placeholders": {"time": {"type": "String"}}},
+  "step3_tooSoon": "Choisissez une heure de départ au moins {minutes} min à l’avance.",
+  "@step3_tooSoon": {"placeholders": {"minutes": {"type": "int"}}},
   "step4_additionalOptions": "Options supplementaires",
   "step4_snowDepth": "Profondeur de neige",
   "step4_summary": "Recapitulatif",
@@ -1692,7 +1686,6 @@
   "price_parkingAdjustment": "Ajustement place",
   "price_snowSurcharge": "Supplément neige",
   "price_additionalOptions": "Options supplémentaires",
-  "price_urgencyFee": "Frais d'urgence (40%)",
   "price_subtotal": "Sous-total",
   "price_serviceFee": "Frais de service",
   "price_insuranceFee": "Frais d'assurance",
@@ -1706,7 +1699,6 @@
   },
   "price_totalToPay": "Total à payer",
   "price_taxesIncluded": "Taxes incluses",
-  "price_urgentBanner": "Réservation urgente - Frais majorés",
   "snow_estimatedDepth": "Profondeur de neige estimée",
   "snow_optionalHelper": "Optionnel - Aide à estimer le temps requis",
   "ai_estimationTitle": "Estimation IA",
@@ -2303,7 +2295,6 @@
   "worker_acceptThisJob": "Accepter ce job",
   "worker_swipeHint": "Glisser → accepter  |  ← passer",
   "worker_exceeded": "DÉPASSÉ",
-  "worker_urgent": "URGENT",
   "worker_equipmentCompatible": "Équipement compatible",
   "worker_equipmentRequiredLabel": "Équipement requis",
   "worker_distanceAndTime": "{km} km • ~{min} min",

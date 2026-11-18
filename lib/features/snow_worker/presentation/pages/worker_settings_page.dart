@@ -53,7 +53,6 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
 
   // Notifications
   bool _notifyNewJobs = true;
-  bool _notifyUrgentJobs = true;
   bool _notifyTips = true;
 
   // Zones
@@ -734,15 +733,6 @@ class _WorkerSettingsViewState extends State<_WorkerSettingsView> {
             subtitle: l10n.worker_notifNewJobsDesc,
             value: _notifyNewJobs,
             onChanged: (val) => setState(() => _notifyNewJobs = val),
-          ),
-          const Divider(height: 1, color: AppTheme.divider),
-          _buildNotificationToggle(
-            icon: Icons.priority_high_rounded,
-            title: l10n.worker_notifUrgentJobs,
-            subtitle: l10n.worker_notifUrgentJobsDesc,
-            value: _notifyUrgentJobs,
-            onChanged: (val) => setState(() => _notifyUrgentJobs = val),
-            iconColor: AppTheme.error,
           ),
           const Divider(height: 1, color: AppTheme.divider),
           _buildNotificationToggle(

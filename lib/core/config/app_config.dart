@@ -65,9 +65,6 @@ class AppConfig {
       60; // 60 min avant l'heure de sortie
   static const int maxSimultaneousJobsPerWorker = 3;
   static const int lateToleranceMinutes = 15;
-  static const double urgencyFeePercentage = 0.40; // +40% si < 45 min
-  static const int urgencyThresholdMinutes =
-      45; // 45 min avant l'heure de départ
 
   // --- Tarification (en dollars CAD) ---
   static const double basePrice = 15.0;

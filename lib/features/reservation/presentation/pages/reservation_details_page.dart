@@ -1186,30 +1186,6 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
               ],
             ),
           ),
-          if (reservation.isPriority)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-              decoration: BoxDecoration(
-                color: AppTheme.accent,
-                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.bolt_rounded,
-                      color: AppTheme.onPrimary, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    l10n.reservation_urgent,
-                    style: const TextStyle(
-                      color: AppTheme.onPrimary,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );

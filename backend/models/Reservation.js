@@ -591,17 +591,6 @@ reservationSchema.virtual('statusDisplayName').get(function() {
 
 // --- Middleware pre-save ---
 
-// Recalcule le prix total si la priorité ou le prix de base change
-reservationSchema.pre('save', function(next) {
-    if (this.isModified('isPriority') || this.isModified('basePrice')) {
-        if (this.isPriority) {
-            this.urgencyMultiplier = 1.4; // +40%
-            this.totalPrice = this.basePrice * this.urgencyMultiplier;
-        }
-    }
-    next();
-});
-
 // Middleware pour calculer l'équipement requis
 reservationSchema.pre('save', function(next) {
     // Base equipment always required

@@ -61,7 +61,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   // Preferences - using ValueNotifiers
   final _maxActiveJobs = ValueNotifier<int>(3);
   final _notifyNewJobs = ValueNotifier<bool>(true);
-  final _notifyUrgentJobs = ValueNotifier<bool>(true);
   final _notifyTips = ValueNotifier<bool>(true);
 
   // Auto-save
@@ -93,7 +92,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     _hasDeicerSpray.dispose();
     _maxActiveJobs.dispose();
     _notifyNewJobs.dispose();
-    _notifyUrgentJobs.dispose();
     _notifyTips.dispose();
     super.dispose();
   }
@@ -128,7 +126,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
     _maxActiveJobs.value = profile.maxActiveJobs;
     _notifyNewJobs.value = profile.notificationPreferences.newJobs;
-    _notifyUrgentJobs.value = profile.notificationPreferences.urgentJobs;
     _notifyTips.value = profile.notificationPreferences.tips;
   }
 
@@ -160,7 +157,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
     final notificationPrefs = WorkerNotificationPreferences(
       newJobs: _notifyNewJobs.value,
-      urgentJobs: _notifyUrgentJobs.value,
       tips: _notifyTips.value,
     );
 
@@ -569,12 +565,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
         _NotificationToggle(
           label: l10n.worker_notifNewJobs,
           notifier: _notifyNewJobs,
-          onChanged: _autoSave,
-        ),
-        const Divider(height: 1, indent: 14, endIndent: 14),
-        _NotificationToggle(
-          label: l10n.worker_notifUrgentJobs,
-          notifier: _notifyUrgentJobs,
           onChanged: _autoSave,
         ),
         const Divider(height: 1, indent: 14, endIndent: 14),

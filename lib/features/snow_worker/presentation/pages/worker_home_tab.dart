@@ -93,7 +93,6 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     if (newJobIds.isNotEmpty) {
       final newJobs =
           currentJobs.where((j) => newJobIds.contains(j.id)).toList();
-      final hasUrgent = newJobs.any((j) => j.isPriority);
 
       final l10nNotif = mounted ? AppLocalizations.of(context) : null;
       _notificationService.notifyNewJob(newJobs.first, l10n: l10nNotif);
@@ -112,7 +111,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    hasUrgent ? Icons.bolt : Icons.work_rounded,
+                    Icons.work_rounded,
                     color: AppTheme.onPrimary,
                     size: 20,
                   ),
@@ -147,7 +146,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 ),
               ],
             ),
-            backgroundColor: hasUrgent ? AppTheme.warning : AppTheme.success,
+            backgroundColor: AppTheme.success,
             duration: const Duration(seconds: 4),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1004,11 +1003,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               availableJobs = loaded.availableJobs;
             }
 
-            availableJobs.sort((a, b) {
-              if (a.isPriority && !b.isPriority) return -1;
-              if (!a.isPriority && b.isPriority) return 1;
-              return a.departureTime.compareTo(b.departureTime);
-            });
+            availableJobs
+                .sort((a, b) => a.departureTime.compareTo(b.departureTime));
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1020,18 +1016,6 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                       children: [
                         Text(l10n.worker_availableJobs,
                             style: AppTheme.headlineMedium),
-                        if (!isOffline &&
-                            availableJobs.any((j) => j.isPriority)) ...[
-                          const SizedBox(width: 8),
-                          StatusBadge(
-                            label: l10n.worker_urgentCount(availableJobs
-                                .where((j) => j.isPriority)
-                                .length),
-                            color: AppTheme.accent,
-                            icon: Icons.bolt_rounded,
-                            small: true,
-                          ),
-                        ],
                       ],
                     ),
                     if (!isOffline && availableJobs.isNotEmpty)

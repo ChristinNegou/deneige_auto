@@ -292,20 +292,13 @@ class NewReservationBloc
     SelectDateTime event,
     Emitter<NewReservationState> emit,
   ) {
-    final now = DateTime.now();
-    final timeDifference = event.departureDateTime.difference(now);
-
     final deadline = event.departureDateTime.subtract(
       const Duration(minutes: 30),
     );
 
-    final isUrgent =
-        timeDifference.inMinutes < AppConfig.minReservationTimeMinutes;
-
     emit(state.copyWith(
       departureDateTime: event.departureDateTime,
       deadlineTime: deadline,
-      isUrgent: isUrgent,
     ));
 
     if (state.currentStep >= 2) {
@@ -413,13 +406,6 @@ class NewReservationBloc
     }
     price += optionsCost;
 
-    // ✅ Calcul des frais d'urgence
-    double urgencyFee = 0;
-    if (state.isUrgent) {
-      urgencyFee = price * AppConfig.urgencyFeePercentage;
-      price += urgencyFee;
-    }
-
     // ✅ Sous-total avant taxes et frais
     final subtotal = price;
 
@@ -442,7 +428,6 @@ class NewReservationBloc
       parkingAdjustment: parkingAdjustment,
       snowSurcharge: snowSurcharge,
       optionsCost: optionsCost,
-      urgencyFee: urgencyFee,
       subtotal: subtotal,
       serviceFee: serviceFee,
       insuranceFee: insuranceFee,
