@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Ban, ShieldCheck, Undo2 } from 'lucide-react';
-import { Badge, Button, Card, ErrorState, Field, Label, Modal, PageHeader, Select, Spinner, Textarea, useToast } from '../components/ui';
+import { Badge, Button, Card, DataTable, ErrorState, Field, Label, Modal, PageHeader, Select, Spinner, Textarea, useToast } from '../components/ui';
 import { api } from '../lib/api';
-import { formatDate, formatMoney, formatRating, fullName } from '../lib/format';
-import { equipment, roleLabel, verificationStatus } from '../lib/labels';
-import type { User } from '../types';
+import { formatDate, formatDateTime, formatMoney, formatRating, fullName } from '../lib/format';
+import { equipment, reservationStatus, roleLabel, verificationStatus } from '../lib/labels';
+import type { Reservation, User } from '../types';
 import { Avatar, isUserSuspended } from './UsersPage';
 
 export function BackLink({ to, label }: { to: string; label: string }) {
@@ -66,6 +66,41 @@ function SuspendDialog({ user, open, onClose }: { user: User; open: boolean; onC
         <Textarea id="reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Ex. : annulations répétées à la dernière minute" />
       </div>
     </Modal>
+  );
+}
+
+function WorkerJobs({ workerId }: { workerId: string }) {
+  const navigate = useNavigate();
+  const query = useQuery({
+    queryKey: ['user', workerId, 'jobs'],
+    queryFn: () => api<{ jobs: Reservation[]; pagination: { total: number } }>(`/admin/workers/${workerId}/jobs`, { query: { limit: 10 } }),
+  });
+  const jobs = query.data?.jobs ?? [];
+  return (
+    <Card title={`Travaux récents${query.data ? ` (${query.data.pagination.total} au total)` : ''}`} className="mt-6" padded={false}>
+      {jobs.length ? (
+        <DataTable
+          rows={jobs}
+          rowKey={(j) => j._id}
+          onRowClick={(j) => navigate(`/reservations/${j._id}`)}
+          columns={[
+            { header: 'Départ', cell: (j) => <span className="tabular font-semibold">{formatDateTime(j.departureTime)}</span> },
+            { header: 'Client', cell: (j) => <span className="text-slate-2">{fullName(j.userId)}</span> },
+            {
+              header: 'Statut',
+              cell: (j) => {
+                const s = reservationStatus(j.status);
+                return <Badge tone={s.tone}>{s.label}</Badge>;
+              },
+            },
+            { header: 'Note', align: 'right', cell: (j) => <span className="tabular">{j.rating ? `${j.rating} / 5` : '—'}</span> },
+            { header: 'Montant', align: 'right', cell: (j) => <span className="tabular font-extrabold">{formatMoney(j.totalPrice)}</span> },
+          ]}
+        />
+      ) : (
+        <p className="p-5 text-slate-3">{query.isLoading ? 'Chargement…' : 'Aucun travail pour l’instant.'}</p>
+      )}
+    </Card>
   );
 }
 
@@ -186,6 +221,8 @@ export function UserDetailPage() {
           </Card>
         )}
       </div>
+
+      {u.role === 'snowWorker' && <WorkerJobs workerId={u._id} />}
 
       <SuspendDialog user={u} open={suspendOpen} onClose={() => setSuspendOpen(false)} />
     </>

@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { CalendarCheck, Gavel, LayoutDashboard, LifeBuoy, LogOut, ShieldCheck, Snowflake, Users } from 'lucide-react';
+import { BellRing, CalendarCheck, CreditCard, Gavel, HardHat, LayoutDashboard, LifeBuoy, LogOut, ShieldCheck, Snowflake, Users, Wallet } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -78,6 +78,12 @@ export function Layout() {
           <NavItem to="/disputes" icon={<Gavel className={iconClass} />} label="Litiges" count={counts.disputes} />
           <NavItem to="/verifications" icon={<ShieldCheck className={iconClass} />} label="Vérifications" count={counts.verifications} />
           <NavItem to="/support" icon={<LifeBuoy className={iconClass} />} label="Support" count={counts.support} />
+
+          <p className="mb-1 mt-5 px-3 text-xs font-bold text-white/40">Opérations</p>
+          <NavItem to="/workers" icon={<HardHat className={iconClass} />} label="Déneigeurs" />
+          <NavItem to="/finance" icon={<Wallet className={iconClass} />} label="Finances" />
+          <NavItem to="/stripe" icon={<CreditCard className={iconClass} />} label="Comptes Stripe" />
+          <NavItem to="/notifications" icon={<BellRing className={iconClass} />} label="Notifications" />
         </nav>
 
         <div className="border-t border-white/10 px-2 pt-4">

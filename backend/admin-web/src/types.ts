@@ -215,3 +215,96 @@ export interface SupportRequest {
   createdAt: string;
   resolvedAt?: string;
 }
+
+/* ---------- Phase 2 ---------- */
+
+export interface RevenueRow {
+  _id: string | number;
+  totalRevenue: number;
+  platformFees: number;
+  workerPayouts: number;
+  tips: number;
+  count: number;
+}
+
+export interface Reconciliation {
+  period: { start: string; end: string };
+  localDatabase: {
+    totalRevenue: number;
+    platformFeesNet: number;
+    workerPayouts: number;
+    stripeFees: number;
+    tips: number;
+    reservationCount: number;
+  };
+  stripe: {
+    balance?: { available: number; pending: number; currency: string };
+    chargesTotal: number;
+    chargesCount: number;
+    transfersTotal: number;
+    refundsTotal: number;
+    feesTotal: number;
+    error?: string | null;
+  };
+  discrepancies: Record<string, { local: number; stripe: number; difference: number; percentDiff?: string }>;
+  problematicReservations: {
+    id: string;
+    totalPrice: number;
+    status: string;
+    paymentStatus: string;
+    payoutStatus: string;
+    createdAt: string;
+  }[];
+  recommendations: { type: string; message: string; action?: string }[];
+}
+
+export interface PayoutSummary {
+  found: number;
+  noAccount?: number;
+  processed?: number;
+  succeeded?: number;
+  failed?: number;
+  fixed?: number;
+  // Les deux routes ne nomment pas leurs champs pareil (reservationId/amount ou id/workerAmount)
+  details?: {
+    reservationId?: string;
+    id?: string;
+    workerName?: string;
+    amount?: number;
+    workerAmount?: number;
+    totalPrice?: number;
+    hasStripeConnect?: boolean;
+  }[];
+}
+
+export interface WorkerWarning {
+  id: string;
+  name: string;
+  email: string;
+  warningCount: number;
+  isSuspended: boolean;
+}
+
+export interface ConnectAccount {
+  stripeAccountId: string;
+  email?: string | null;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+  detailsSubmitted: boolean;
+  created?: string | null;
+  country?: string | null;
+  workerId?: string | null;
+  workerName?: string | null;
+  workerEmail?: string | null;
+  isOrphan?: boolean;
+  isInvalidOnStripe?: boolean;
+}
+
+export interface FcmStatus {
+  stats: {
+    total: number;
+    withFcmToken: number;
+    withoutFcmToken: number;
+    byRole: Record<string, { total: number; withToken: number }>;
+  };
+}

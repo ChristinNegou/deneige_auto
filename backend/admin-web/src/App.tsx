@@ -4,14 +4,18 @@ import { useAuth } from './lib/auth';
 import { DashboardPage } from './pages/DashboardPage';
 import { DisputeDetailPage } from './pages/DisputeDetailPage';
 import { DisputesPage } from './pages/DisputesPage';
+import { FinancePage } from './pages/FinancePage';
 import { LoginPage } from './pages/LoginPage';
+import { NotificationsPage } from './pages/NotificationsPage';
 import { ReservationDetailPage } from './pages/ReservationDetailPage';
 import { ReservationsPage } from './pages/ReservationsPage';
+import { StripeAccountsPage } from './pages/StripeAccountsPage';
 import { SupportPage } from './pages/SupportPage';
 import { UserDetailPage } from './pages/UserDetailPage';
 import { UsersPage } from './pages/UsersPage';
 import { VerificationDetailPage } from './pages/VerificationDetailPage';
 import { VerificationsPage } from './pages/VerificationsPage';
+import { WorkersPage } from './pages/WorkersPage';
 
 export default function App() {
   const { user } = useAuth();
@@ -30,6 +34,10 @@ export default function App() {
         <Route path="verifications" element={<VerificationsPage />} />
         <Route path="verifications/:id" element={<VerificationDetailPage />} />
         <Route path="support" element={<SupportPage />} />
+        <Route path="workers" element={<WorkersPage />} />
+        <Route path="finance" element={<FinancePage />} />
+        <Route path="stripe" element={<StripeAccountsPage />} />
+        <Route path="notifications" element={<NotificationsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
