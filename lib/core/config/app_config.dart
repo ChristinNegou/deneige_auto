@@ -114,8 +114,11 @@ class AppConfig {
 
   // --- Stripe (paiement) ---
   static String get stripePublishableKey {
-    // Le backend utilise sk_live, donc on doit utiliser pk_live
-    return ApiKeys.stripePublishableKeyLive;
+    // La cle publique doit etre du meme mode que la cle secrete du backend :
+    // live en production (Railway), test en developpement (backend local).
+    return isProduction
+        ? ApiKeys.stripePublishableKeyLive
+        : ApiKeys.stripePublishableKeyTest;
   }
 
   // --- Google Maps ---

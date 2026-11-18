@@ -136,26 +136,29 @@ class PaymentMethodsBloc
       setAsDefault: event.setAsDefault,
     );
 
-    result.fold(
+    // Pas de callback async dans fold() : il ne serait pas attendu et ses emit
+    // arriveraient apres la fin du handler (rejetes par Bloc, chargement infini).
+    final saveFailure = result.fold((failure) => failure, (_) => null);
+    if (saveFailure != null) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: saveFailure.message,
+      ));
+      return;
+    }
+
+    // Recharger la liste pour afficher la nouvelle carte
+    final reloadResult = await getPaymentMethods();
+    reloadResult.fold(
       (failure) => emit(state.copyWith(
         isLoading: false,
         errorMessage: failure.message,
       )),
-      (_) async {
-        // Reload payment methods
-        final reloadResult = await getPaymentMethods();
-        reloadResult.fold(
-          (failure) => emit(state.copyWith(
-            isLoading: false,
-            errorMessage: failure.message,
-          )),
-          (methods) => emit(state.copyWith(
-            isLoading: false,
-            methods: methods,
-            successMessage: 'Méthode de paiement ajoutée',
-          )),
-        );
-      },
+      (methods) => emit(state.copyWith(
+        isLoading: false,
+        methods: methods,
+        successMessage: 'Méthode de paiement ajoutée',
+      )),
     );
   }
 
@@ -195,26 +198,27 @@ class PaymentMethodsBloc
 
     final result = await setDefaultPaymentMethod(event.paymentMethodId);
 
-    result.fold(
+    final setFailure = result.fold((failure) => failure, (_) => null);
+    if (setFailure != null) {
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: setFailure.message,
+      ));
+      return;
+    }
+
+    // Recharger la liste pour refleter la nouvelle carte par defaut
+    final reloadResult = await getPaymentMethods();
+    reloadResult.fold(
       (failure) => emit(state.copyWith(
         isLoading: false,
         errorMessage: failure.message,
       )),
-      (_) async {
-        // Reload payment methods to get updated default
-        final reloadResult = await getPaymentMethods();
-        reloadResult.fold(
-          (failure) => emit(state.copyWith(
-            isLoading: false,
-            errorMessage: failure.message,
-          )),
-          (methods) => emit(state.copyWith(
-            isLoading: false,
-            methods: methods,
-            successMessage: 'Méthode par défaut mise à jour',
-          )),
-        );
-      },
+      (methods) => emit(state.copyWith(
+        isLoading: false,
+        methods: methods,
+        successMessage: 'Méthode par défaut mise à jour',
+      )),
     );
   }
 }

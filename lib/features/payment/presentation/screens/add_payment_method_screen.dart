@@ -242,7 +242,22 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
               ),
             );
       }
+    } on StripeException catch (e) {
+      // Erreur renvoyee par Stripe (carte refusee, cle invalide, mauvais mode...) :
+      // on affiche son message, plus utile que le message generique.
+      debugPrint('[AddCard] StripeException: ${e.error.code} - '
+          '${e.error.message} (${e.error.stripeErrorCode})');
+      setState(() => _isLoading = false);
+      if (mounted) {
+        _showSnackBar(
+          e.error.localizedMessage ??
+              e.error.message ??
+              AppLocalizations.of(context)!.addCard_errorAdding,
+          isError: true,
+        );
+      }
     } catch (e) {
+      debugPrint('[AddCard] Erreur: $e');
       setState(() => _isLoading = false);
       if (mounted) {
         _showSnackBar(AppLocalizations.of(context)!.addCard_errorAdding,
