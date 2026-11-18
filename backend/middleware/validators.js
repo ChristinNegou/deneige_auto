@@ -292,7 +292,9 @@ const validateCreatePaymentIntent = [
             return true;
         }),
     body('reservationId')
-        .optional()
+        // L'app envoie null pour une nouvelle reservation (pas encore creee) :
+        // null doit etre traite comme absent, pas comme un ID invalide.
+        .optional({ values: 'null' })
         .custom((value) => {
             // Allow 'temp' or valid MongoDB ObjectId
             if (value === 'temp' || /^[0-9a-fA-F]{24}$/.test(value)) {
