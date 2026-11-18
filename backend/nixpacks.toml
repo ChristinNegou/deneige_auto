@@ -2,7 +2,7 @@
 cmds = ["npm install --omit=dev"]
 
 [phases.build]
-cmds = []
+cmds = ["npm run build:admin"]
 
 [start]
 cmd = "npm start"

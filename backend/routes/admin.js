@@ -158,7 +158,7 @@ router.get('/dashboard', protect, adminOnly, async (req, res) => {
             { $match: { createdAt: { $gte: sevenDaysAgo } } },
             {
                 $group: {
-                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: 'America/Toronto' } },
                     count: { $sum: 1 },
                     revenue: {
                         $sum: {

@@ -147,6 +147,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Site d'administration (React, construit dans admin-web/dist).
+// Toute route /admin/* renvoie index.html : le routage se fait dans le navigateur.
+const adminDist = path.join(__dirname, 'admin-web', 'dist');
+app.use('/admin', express.static(adminDist, { index: false, maxAge: '1h' }));
+app.get(['/admin', '/admin/*'], (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.sendFile(path.join(adminDist, 'index.html'), (err) => {
+        if (err) res.status(404).send('Site admin non construit : lancez npm run build:admin');
+    });
+});
+
 
 // --- Journalisation (développement uniquement) ---
 
