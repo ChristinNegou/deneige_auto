@@ -92,6 +92,15 @@ class GoToNextStep extends NewReservationEvent {}
 
 class GoToPreviousStep extends NewReservationEvent {}
 
+/// Retour direct a une etape deja remplie (lien "Modifier" du recapitulatif).
+class GoToStep extends NewReservationEvent {
+  final int step;
+  const GoToStep(this.step);
+
+  @override
+  List<Object?> get props => [step];
+}
+
 class ResetReservation extends NewReservationEvent {}
 
 // Location Events

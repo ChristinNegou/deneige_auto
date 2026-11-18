@@ -7190,12 +7190,6 @@ abstract class AppLocalizations {
   /// **'Stationnement arrière'**
   String get step1_chipRearParking;
 
-  /// No description provided for @step2_positionDetected.
-  ///
-  /// In fr, this message translates to:
-  /// **'Position détectée'**
-  String get step2_positionDetected;
-
   /// No description provided for @step2_retry.
   ///
   /// In fr, this message translates to:
@@ -7400,77 +7394,53 @@ abstract class AppLocalizations {
   /// **'Plus de 30 cm'**
   String get snow_over30;
 
-  /// No description provided for @step5_location.
-  ///
-  /// In fr, this message translates to:
-  /// **'Localisation'**
-  String get step5_location;
-
   /// No description provided for @step5_yourReservation.
   ///
   /// In fr, this message translates to:
   /// **'Votre réservation'**
   String get step5_yourReservation;
 
-  /// No description provided for @step5_total.
+  /// No description provided for @step5_edit.
   ///
   /// In fr, this message translates to:
-  /// **'Total'**
-  String get step5_total;
+  /// **'Modifier'**
+  String get step5_edit;
 
-  /// No description provided for @step5_ourGuarantees.
+  /// No description provided for @step5_address.
   ///
   /// In fr, this message translates to:
-  /// **'Nos garanties'**
-  String get step5_ourGuarantees;
+  /// **'Adresse'**
+  String get step5_address;
 
-  /// No description provided for @step5_freeCancellation.
+  /// No description provided for @step5_noOptions.
   ///
   /// In fr, this message translates to:
-  /// **'Annulation gratuite'**
-  String get step5_freeCancellation;
+  /// **'Aucune'**
+  String get step5_noOptions;
 
-  /// No description provided for @step5_upTo2hBefore.
+  /// No description provided for @step5_showPriceDetail.
   ///
   /// In fr, this message translates to:
-  /// **'Jusqu\'à 2h avant'**
-  String get step5_upTo2hBefore;
+  /// **'Voir le détail du prix'**
+  String get step5_showPriceDetail;
 
-  /// No description provided for @step5_qualityGuarantee.
+  /// No description provided for @step5_hidePriceDetail.
   ///
   /// In fr, this message translates to:
-  /// **'Garantie qualité'**
-  String get step5_qualityGuarantee;
+  /// **'Masquer le détail'**
+  String get step5_hidePriceDetail;
 
-  /// No description provided for @step5_satisfiedOrRefunded.
+  /// No description provided for @step5_cancelPolicy.
   ///
   /// In fr, this message translates to:
-  /// **'Satisfait ou remboursé'**
-  String get step5_satisfiedOrRefunded;
+  /// **'Annulation gratuite tant que le déneigeur n’est pas en route.'**
+  String get step5_cancelPolicy;
 
-  /// No description provided for @step5_photosAfter.
+  /// No description provided for @step5_photoProof.
   ///
   /// In fr, this message translates to:
-  /// **'Photos après'**
-  String get step5_photosAfter;
-
-  /// No description provided for @step5_proofOfService.
-  ///
-  /// In fr, this message translates to:
-  /// **'Preuve de service'**
-  String get step5_proofOfService;
-
-  /// No description provided for @step5_punctuality.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ponctualité'**
-  String get step5_punctuality;
-
-  /// No description provided for @step5_discountIfLate.
-  ///
-  /// In fr, this message translates to:
-  /// **'Remise si retard'**
-  String get step5_discountIfLate;
+  /// **'Une photo du travail terminé vous est envoyée.'**
+  String get step5_photoProof;
 
   /// No description provided for @month_jan.
   ///
@@ -7706,12 +7676,6 @@ abstract class AppLocalizations {
   /// **'Litige résolu avec succès'**
   String get worker_disputeResolvedSuccess;
 
-  /// No description provided for @summary_reservationSummary.
-  ///
-  /// In fr, this message translates to:
-  /// **'Résumé de la réservation'**
-  String get summary_reservationSummary;
-
   /// No description provided for @summary_spot.
   ///
   /// In fr, this message translates to:
@@ -7789,54 +7753,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Vérif. échappement'**
   String get option_exhaustCheck;
-
-  /// No description provided for @option_windowScrapingShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vitres'**
-  String get option_windowScrapingShort;
-
-  /// No description provided for @option_doorDeicingShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Portes'**
-  String get option_doorDeicingShort;
-
-  /// No description provided for @option_wheelClearanceShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Roues'**
-  String get option_wheelClearanceShort;
-
-  /// No description provided for @option_roofClearingShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Toit'**
-  String get option_roofClearingShort;
-
-  /// No description provided for @option_saltSpreadingShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Sel'**
-  String get option_saltSpreadingShort;
-
-  /// No description provided for @option_lightsCleaningShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Phares'**
-  String get option_lightsCleaningShort;
-
-  /// No description provided for @option_perimeterClearanceShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Périmètre'**
-  String get option_perimeterClearanceShort;
-
-  /// No description provided for @option_exhaustCheckShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Échapp.'**
-  String get option_exhaustCheckShort;
 
   /// No description provided for @option_windowScrapingDesc.
   ///

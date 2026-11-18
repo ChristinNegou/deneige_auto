@@ -1,55 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../bloc/new_reservation_bloc.dart';
+import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
-import '../../widgets/reservation_summary_card.dart';
 import '../../widgets/price_summary_card.dart';
+import '../../widgets/service_option_info.dart';
 
-class Step5SummaryScreen extends StatelessWidget {
+/// Recapitulatif : une carte avec chaque choix et un lien pour le modifier,
+/// le total (detail sur demande), puis les deux engagements reels du service.
+class Step5SummaryScreen extends StatefulWidget {
   const Step5SummaryScreen({super.key});
 
   @override
+  State<Step5SummaryScreen> createState() => _Step5SummaryScreenState();
+}
+
+// Index des etapes du parcours (voir NewReservationScreen)
+const _stepVehicle = 0;
+const _stepAddress = 1;
+const _stepDateTime = 2;
+const _stepOptions = 3;
+
+class _Step5SummaryScreenState extends State<Step5SummaryScreen> {
+  bool _showPriceDetail = false;
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocBuilder<NewReservationBloc, NewReservationState>(
       builder: (context, state) {
-        final l10n = AppLocalizations.of(context)!;
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Localisation
-              if (state.hasValidLocation) ...[
-                _buildSectionHeader(
-                    l10n.step5_location, Icons.location_on_rounded),
-                const SizedBox(height: 12),
-                _buildLocationCard(context, state),
-                const SizedBox(height: 24),
-              ],
-
-              // Récapitulatif
-              _buildSectionHeader(
-                  l10n.step5_yourReservation, Icons.receipt_rounded),
+              Text(l10n.step5_yourReservation, style: AppTheme.headlineSmall),
               const SizedBox(height: 12),
-              const ReservationSummaryCard(),
-
+              _buildDetails(context, state),
               const SizedBox(height: 24),
-
-              // Prix
-              _buildSectionHeader(l10n.step5_total, Icons.payments_rounded),
+              PriceSummaryCard(showBreakdown: _showPriceDetail),
+              TextButton.icon(
+                onPressed: () =>
+                    setState(() => _showPriceDetail = !_showPriceDetail),
+                icon: Icon(
+                  _showPriceDetail
+                      ? Icons.expand_less_rounded
+                      : Icons.expand_more_rounded,
+                  color: AppTheme.primary,
+                ),
+                label: Text(
+                  _showPriceDetail
+                      ? l10n.step5_hidePriceDetail
+                      : l10n.step5_showPriceDetail,
+                  style: TextStyle(
+                      color: AppTheme.primary, fontWeight: FontWeight.w700),
+                ),
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                ),
+              ),
               const SizedBox(height: 12),
-              const PriceSummaryCard(showBreakdown: true),
-
-              const SizedBox(height: 24),
-
-              // Garanties
-              _buildSectionHeader(
-                  l10n.step5_ourGuarantees, Icons.verified_user_rounded),
-              const SizedBox(height: 12),
-              _buildGuarantees(),
-
+              _buildFact(Icons.event_busy_rounded, l10n.step5_cancelPolicy),
+              const SizedBox(height: 10),
+              _buildFact(Icons.photo_camera_outlined, l10n.step5_photoProof),
               const SizedBox(height: 80),
             ],
           ),
@@ -58,134 +76,166 @@ class Step5SummaryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
-    return Text(title, style: AppTheme.headlineSmall);
-  }
+  Widget _buildDetails(BuildContext context, NewReservationState state) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode == 'en'
+        ? 'en_CA'
+        : 'fr_CA';
 
-  Widget _buildLocationCard(BuildContext context, NewReservationState state) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.successLight,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
+    final departure = state.departureDateTime;
+    final readyBy = state.deadlineTime;
+    final vehicle = state.selectedVehicle;
+
+    final rows = <Widget>[
+      _SummaryRow(
+        label: l10n.step1_vehicle,
+        value: vehicle?.displayName ?? '—',
+        detail: vehicle?.licensePlate,
+        step: _stepVehicle,
       ),
-      child: Row(
-        children: [
-          Icon(Icons.check_circle, color: AppTheme.success, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              state.locationAddress ??
-                  AppLocalizations.of(context)!.step2_positionDetected,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.textPrimary,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+      _SummaryRow(
+        label: l10n.summary_spot,
+        value: _parkingLabel(l10n, state),
+        step: _stepVehicle,
       ),
-    );
-  }
-
-  Widget _buildGuarantees() {
-    return Builder(
-      builder: (context) {
-        final l10n = AppLocalizations.of(context)!;
-        return _buildGuaranteesContent(l10n);
-      },
-    );
-  }
-
-  Widget _buildGuaranteesContent(AppLocalizations l10n) {
-    final guarantees = [
-      {
-        'icon': Icons.cancel_outlined,
-        'title': l10n.step5_freeCancellation,
-        'subtitle': l10n.step5_upTo2hBefore
-      },
-      {
-        'icon': Icons.verified_outlined,
-        'title': l10n.step5_qualityGuarantee,
-        'subtitle': l10n.step5_satisfiedOrRefunded
-      },
-      {
-        'icon': Icons.camera_alt_outlined,
-        'title': l10n.step5_photosAfter,
-        'subtitle': l10n.step5_proofOfService
-      },
-      {
-        'icon': Icons.timer_outlined,
-        'title': l10n.step5_punctuality,
-        'subtitle': l10n.step5_discountIfLate
-      },
+      _SummaryRow(
+        label: l10n.step5_address,
+        value: state.locationAddress ?? '—',
+        step: _stepAddress,
+      ),
+      _SummaryRow(
+        label: l10n.summary_departure,
+        value: departure == null
+            ? '—'
+            : '${DateFormat('EEE d MMM', locale).format(departure)}, '
+                '${DateFormat.Hm(locale).format(departure)}',
+        detail: readyBy == null
+            ? null
+            : l10n.step3_readyBy(DateFormat.Hm(locale).format(readyBy)),
+        step: _stepDateTime,
+      ),
+      _SummaryRow(
+        label: l10n.summary_options,
+        value: state.selectedOptions.isEmpty
+            ? l10n.step5_noOptions
+            : state.selectedOptions
+                .map((o) => serviceOptionInfo(l10n, o).title)
+                .join(', '),
+        step: _stepOptions,
+      ),
+      if (state.snowDepthCm != null)
+        _SummaryRow(
+          label: l10n.summary_snow,
+          value: snowRangeLabel(l10n, state.snowDepthCm),
+          step: _stepOptions,
+        ),
     ];
 
     return Container(
-      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppTheme.border),
       ),
       child: Column(
-        children: guarantees.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-          return Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: AppTheme.background,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                    ),
-                    child: Icon(
-                      item['icon'] as IconData,
-                      size: 18,
-                      color: AppTheme.primary,
-                    ),
+        children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0) Divider(height: 1, color: AppTheme.border),
+            rows[i],
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _parkingLabel(AppLocalizations l10n, NewReservationState state) {
+    if (state.selectedParkingSpot != null) {
+      return state.selectedParkingSpot!.fullDisplayName;
+    }
+    final spot = state.parkingSpotNumber;
+    if (spot != null && spot.isNotEmpty) return l10n.summary_place(spot);
+    final custom = state.customLocation;
+    if (custom != null && custom.isNotEmpty) return custom;
+    return '—';
+  }
+
+  Widget _buildFact(IconData icon, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: AppTheme.textSecondary),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Une ligne : libelle, valeur (et precision), lien pour revenir a l'etape.
+class _SummaryRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final String? detail;
+  final int step;
+
+  const _SummaryRow({
+    required this.label,
+    required this.value,
+    required this.step,
+    this.detail,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 12, 4, 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item['title'] as String,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.textPrimary,
-                          ),
-                        ),
-                        Text(
-                          item['subtitle'] as String,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
+                ),
+                if (detail != null && detail!.isNotEmpty)
+                  Text(
+                    detail!,
+                    style:
+                        TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                   ),
-                ],
-              ),
-              if (index < guarantees.length - 1) ...[
-                const SizedBox(height: 10),
-                Divider(color: AppTheme.border, height: 1),
-                const SizedBox(height: 10),
               ],
-            ],
-          );
-        }).toList(),
+            ),
+          ),
+          TextButton(
+            onPressed: () =>
+                context.read<NewReservationBloc>().add(GoToStep(step)),
+            child: Text(
+              l10n.step5_edit,
+              style: TextStyle(
+                color: AppTheme.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

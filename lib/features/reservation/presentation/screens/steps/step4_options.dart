@@ -7,6 +7,7 @@ import '../../bloc/new_reservation_bloc.dart';
 import '../../bloc/new_reservation_event.dart';
 import '../../bloc/new_reservation_state.dart';
 import '../../widgets/price_summary_card.dart';
+import '../../widgets/service_option_info.dart';
 
 /// Etape Options : options facultatives en liste lisible (les plus demandees
 /// d'abord), quantite de neige en quelques choix, et total estime. Le detail
@@ -16,14 +17,6 @@ class Step4OptionsScreen extends StatefulWidget {
 
   @override
   State<Step4OptionsScreen> createState() => _Step4OptionsScreenState();
-}
-
-/// Tranche de neige proposee, et la valeur envoyee au calcul du prix.
-class _SnowRange {
-  final String Function(AppLocalizations) label;
-  final int? cm;
-  final bool Function(int? cm) matches;
-  const _SnowRange(this.label, this.cm, this.matches);
 }
 
 class _Step4OptionsScreenState extends State<Step4OptionsScreen> {
@@ -39,17 +32,6 @@ class _Step4OptionsScreenState extends State<Step4OptionsScreen> {
     ServiceOption.saltSpreading,
     ServiceOption.perimeterClearance,
     ServiceOption.exhaustCheck,
-  ];
-
-  // Valeur au milieu de chaque tranche ; au-dela de 15 cm, souffleuse requise.
-  static final _snowRanges = [
-    _SnowRange((l) => l.snow_unknown, null, (cm) => cm == null),
-    _SnowRange((l) => l.snow_under10, 5, (cm) => cm != null && cm < 10),
-    _SnowRange(
-        (l) => l.snow_10to20, 15, (cm) => cm != null && cm >= 10 && cm < 20),
-    _SnowRange(
-        (l) => l.snow_20to30, 25, (cm) => cm != null && cm >= 20 && cm < 30),
-    _SnowRange((l) => l.snow_over30, 40, (cm) => cm != null && cm >= 30),
   ];
 
   late bool _showMore;
@@ -138,7 +120,7 @@ class _Step4OptionsScreenState extends State<Step4OptionsScreen> {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  for (final range in _snowRanges)
+                  for (final range in snowRanges)
                     _SnowChip(
                       label: range.label(l10n),
                       selected: range.matches(state.snowDepthCm),
@@ -173,57 +155,8 @@ class _OptionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final (String title, String description, IconData icon, double price) =
-        switch (option) {
-      ServiceOption.windowScraping => (
-          l10n.option_windowScraping,
-          l10n.option_windowScrapingDesc,
-          Icons.cleaning_services_rounded,
-          AppConfig.iceRemovalSurcharge,
-        ),
-      ServiceOption.doorDeicing => (
-          l10n.option_doorDeicing,
-          l10n.option_doorDeicingDesc,
-          Icons.door_front_door_rounded,
-          AppConfig.doorDeicingSurcharge,
-        ),
-      ServiceOption.wheelClearance => (
-          l10n.option_wheelClearance,
-          l10n.option_wheelClearanceDesc,
-          Icons.tire_repair_rounded,
-          AppConfig.wheelClearanceSurcharge,
-        ),
-      ServiceOption.roofClearing => (
-          l10n.option_roofClearing,
-          l10n.option_roofClearingDesc,
-          Icons.directions_car_filled_rounded,
-          AppConfig.roofClearingSurcharge,
-        ),
-      ServiceOption.saltSpreading => (
-          l10n.option_saltSpreading,
-          l10n.option_saltSpreadingDesc,
-          Icons.grain_rounded,
-          AppConfig.saltSpreadingSurcharge,
-        ),
-      ServiceOption.lightsCleaning => (
-          l10n.option_lightsCleaning,
-          l10n.option_lightsCleaningDesc,
-          Icons.highlight_rounded,
-          AppConfig.lightsCleaningSurcharge,
-        ),
-      ServiceOption.perimeterClearance => (
-          l10n.option_perimeterClearance,
-          l10n.option_perimeterClearanceDesc,
-          Icons.crop_free_rounded,
-          AppConfig.perimeterClearanceSurcharge,
-        ),
-      ServiceOption.exhaustCheck => (
-          l10n.option_exhaustCheck,
-          l10n.option_exhaustCheckDesc,
-          Icons.air_rounded,
-          AppConfig.exhaustCheckSurcharge,
-        ),
-    };
+    final (:title, :description, :icon, :price) =
+        serviceOptionInfo(l10n, option);
 
     return Semantics(
       checked: selected,

@@ -258,6 +258,24 @@ void main() {
       );
     });
 
+    group('GoToStep', () {
+      blocTest<NewReservationBloc, NewReservationState>(
+        'goes back to an earlier step from the summary',
+        build: () => bloc,
+        seed: () => const NewReservationState(currentStep: 4),
+        act: (bloc) => bloc.add(const GoToStep(1)),
+        verify: (bloc) => expect(bloc.state.currentStep, 1),
+      );
+
+      blocTest<NewReservationBloc, NewReservationState>(
+        'never jumps ahead past unvalidated steps',
+        build: () => bloc,
+        seed: () => const NewReservationState(currentStep: 1),
+        act: (bloc) => bloc.add(const GoToStep(4)),
+        expect: () => [],
+      );
+    });
+
     group('GoToNextStep', () {
       blocTest<NewReservationBloc, NewReservationState>(
         'increments current step when not at last step',

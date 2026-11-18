@@ -33,6 +33,7 @@ class NewReservationBloc
     on<SubmitReservation>(_onSubmitReservation);
     on<GoToNextStep>(_onGoToNextStep);
     on<GoToPreviousStep>(_onGoToPreviousStep);
+    on<GoToStep>(_onGoToStep);
     on<ResetReservation>(_onResetReservation);
     on<UpdateParkingSpotNumber>(_onUpdateParkingSpotNumber);
     on<UpdateCustomLocation>(_onUpdateCustomLocation);
@@ -598,6 +599,16 @@ class NewReservationBloc
       if (nextStep == 3) {
         add(CalculatePrice());
       }
+    }
+  }
+
+  void _onGoToStep(
+    GoToStep event,
+    Emitter<NewReservationState> emit,
+  ) {
+    // Seulement vers l'arriere : les etapes suivantes n'ont pas ete validees
+    if (event.step >= 0 && event.step < state.currentStep) {
+      emit(state.copyWith(currentStep: event.step));
     }
   }
 

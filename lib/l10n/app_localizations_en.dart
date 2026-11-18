@@ -3816,9 +3816,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get step1_chipRearParking => 'Rear parking';
 
   @override
-  String get step2_positionDetected => 'Position detected';
-
-  @override
   String get step2_retry => 'Retry';
 
   @override
@@ -3934,40 +3931,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get snow_over30 => 'Over 30 cm';
 
   @override
-  String get step5_location => 'Location';
-
-  @override
   String get step5_yourReservation => 'Your reservation';
 
   @override
-  String get step5_total => 'Total';
+  String get step5_edit => 'Edit';
 
   @override
-  String get step5_ourGuarantees => 'Our guarantees';
+  String get step5_address => 'Address';
 
   @override
-  String get step5_freeCancellation => 'Free cancellation';
+  String get step5_noOptions => 'None';
 
   @override
-  String get step5_upTo2hBefore => 'Up to 2h before';
+  String get step5_showPriceDetail => 'See price details';
 
   @override
-  String get step5_qualityGuarantee => 'Quality guarantee';
+  String get step5_hidePriceDetail => 'Hide details';
 
   @override
-  String get step5_satisfiedOrRefunded => 'Satisfied or refunded';
+  String get step5_cancelPolicy =>
+      'Free cancellation until the snow worker is on the way.';
 
   @override
-  String get step5_photosAfter => 'After photos';
-
-  @override
-  String get step5_proofOfService => 'Proof of service';
-
-  @override
-  String get step5_punctuality => 'Punctuality';
-
-  @override
-  String get step5_discountIfLate => 'Discount if late';
+  String get step5_photoProof => 'You receive a photo of the finished work.';
 
   @override
   String get month_jan => 'JAN';
@@ -4091,9 +4077,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worker_disputeResolvedSuccess => 'Dispute resolved successfully';
 
   @override
-  String get summary_reservationSummary => 'Reservation summary';
-
-  @override
   String get summary_spot => 'Spot';
 
   @override
@@ -4133,30 +4116,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get option_exhaustCheck => 'Exhaust check';
-
-  @override
-  String get option_windowScrapingShort => 'Windows';
-
-  @override
-  String get option_doorDeicingShort => 'Doors';
-
-  @override
-  String get option_wheelClearanceShort => 'Wheels';
-
-  @override
-  String get option_roofClearingShort => 'Roof';
-
-  @override
-  String get option_saltSpreadingShort => 'Salt';
-
-  @override
-  String get option_lightsCleaningShort => 'Lights';
-
-  @override
-  String get option_perimeterClearanceShort => 'Perimeter';
-
-  @override
-  String get option_exhaustCheckShort => 'Exhaust';
 
   @override
   String get option_windowScrapingDesc => 'Complete scraping of all windows';
