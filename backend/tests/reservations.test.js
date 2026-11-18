@@ -371,6 +371,65 @@ describe('Reservation Routes', () => {
     });
   });
 
+  describe('options that need extra equipment (door de-icing, roof, lights)', () => {
+    const options = ['doorDeicing', 'roofClearing', 'lightsCleaning'];
+
+    it('lets the client edit the reservation', async () => {
+      const reservation = await createTestReservation(testUser._id, testVehicle._id, {
+        serviceOptions: options,
+      });
+
+      const res = await request(app)
+        .put(`/api/reservations/${reservation._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          departureTime: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+          serviceOptions: options,
+        });
+
+      expect(res.status).toBe(200);
+      const saved = await Reservation.findById(reservation._id);
+      expect(saved.requiredEquipment).toEqual(
+        expect.arrayContaining(['deicer_spray', 'roof_broom', 'microfiber_cloth']),
+      );
+    });
+
+    it('lets the client cancel, and the reservation leaves the upcoming list', async () => {
+      const reservation = await createTestReservation(testUser._id, testVehicle._id, {
+        serviceOptions: options,
+      });
+
+      const cancel = await request(app)
+        .patch(`/api/reservations/${reservation._id}/cancel-by-client`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ reason: 'Plus besoin' });
+
+      expect(cancel.status).toBe(200);
+      expect((await Reservation.findById(reservation._id)).status).toBe('cancelled');
+
+      const upcoming = await request(app)
+        .get('/api/reservations?upcoming=true')
+        .set('Authorization', `Bearer ${authToken}`);
+      const ids = (upcoming.body.reservations || []).map((r) => String(r._id || r.id));
+      expect(ids).not.toContain(String(reservation._id));
+    });
+  });
+
+  describe('GET /api/reservations?upcoming=true', () => {
+    it('keeps a reservation whose snow worker is on the way', async () => {
+      const reservation = await createTestReservation(testUser._id, testVehicle._id, {
+        status: 'enRoute',
+      });
+
+      const res = await request(app)
+        .get('/api/reservations?upcoming=true')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      const ids = (res.body.reservations || []).map((r) => String(r._id || r.id));
+      expect(ids).toContain(String(reservation._id));
+    });
+  });
+
   describe('DELETE /api/reservations/:id', () => {
     it('should cancel a pending reservation', async () => {
       const reservation = await createTestReservation(testUser._id, testVehicle._id, {

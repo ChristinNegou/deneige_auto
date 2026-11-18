@@ -28,6 +28,17 @@ describe('Reservation model', () => {
       expect(required).toEqual(['shovel', 'brush', 'ice_scraper', 'deicer_spray', 'roof_broom']);
     });
 
+    it('only produces equipment the model accepts, for every option', () => {
+      const reservation = new Reservation({
+        serviceOptions: Reservation.SERVICE_OPTIONS,
+        snowDepthCm: 30,
+      });
+      reservation.requiredEquipment = Reservation.computeRequiredEquipment(reservation);
+      const error = reservation.validateSync();
+      const equipmentErrors = Object.keys(error?.errors || {}).filter((k) => k.startsWith('requiredEquipment'));
+      expect(equipmentErrors).toEqual([]);
+    });
+
     it('requires a snow blower above 15 cm only', () => {
       expect(Reservation.computeRequiredEquipment({ snowDepthCm: 15 })).not.toContain('snow_blower');
       expect(Reservation.computeRequiredEquipment({ snowDepthCm: 25 })).toContain('snow_blower');

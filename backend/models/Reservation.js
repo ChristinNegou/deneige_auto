@@ -19,6 +19,18 @@ const SERVICE_OPTIONS = [
     'exhaustCheck',
 ];
 
+/** Equipement connu (memes cles que la liste d'equipement du deneigeur). */
+const EQUIPMENT = [
+    'shovel',
+    'brush',
+    'ice_scraper',
+    'salt_spreader',
+    'snow_blower',
+    'roof_broom',
+    'microfiber_cloth',
+    'deicer_spray',
+];
+
 /** Equipement exige par chaque option (pelle et brosse toujours requises). */
 const OPTION_EQUIPMENT = {
     windowScraping: ['ice_scraper'],
@@ -337,7 +349,7 @@ const reservationSchema = new mongoose.Schema({
     // Equipment required for this job (computed from service options and snow depth)
     requiredEquipment: [{
         type: String,
-        enum: ['shovel', 'brush', 'ice_scraper', 'salt_spreader', 'snow_blower'],
+        enum: EQUIPMENT,
     }],
 
     // --- Litige et vérification ---

@@ -38,7 +38,7 @@ router.get('/', protect, async (req, res) => {
         const query = { userId: req.user.id };
 
         if (upcoming === 'true') {
-            query.status = { $in: ['pending', 'assigned', 'inProgress'] };
+            query.status = { $in: ['pending', 'assigned', 'enRoute', 'inProgress'] };
             query.departureTime = { $gte: new Date() };
         }
 
@@ -1279,9 +1279,10 @@ router.patch('/:id/cancel-by-client', protect, async (req, res) => {
             await reservation.save();
         }
 
-        // Notifier le déneigeur si assigné
+        // Les notifications ne doivent jamais faire echouer une annulation
+        // deja enregistree (et deja remboursee)
         if (reservation.workerId) {
-            await Notification.create({
+            await safeNotify(() => Notification.create({
                 userId: reservation.workerId._id || reservation.workerId,
                 type: 'reservationCancelled',
                 title: '❌ Réservation annulée par le client',
@@ -1294,22 +1295,21 @@ router.patch('/:id/cancel-by-client', protect, async (req, res) => {
                     cancellationFee: cancellationFeeAmount,
                     workerCompensation: cancellationFeeAmount * 0.75,
                 },
-            });
+            }), 'reservationCancelled:worker');
         }
 
-        // Notifier le client
-        await Notification.create({
+        await safeNotify(() => Notification.create({
             userId: req.user.id,
             type: 'reservationCancelled',
             title: '✅ Réservation annulée',
             message: message,
-            priority: 'medium',
+            priority: 'normal',
             metadata: {
                 reservationId: reservation._id,
                 cancellationFee: cancellationFeeAmount,
                 refundAmount,
             },
-        });
+        }), 'reservationCancelled:client');
 
         res.status(200).json({
             success: true,
