@@ -6,12 +6,14 @@ import 'core/di/injection_container.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/analytics_service.dart';
 import 'core/services/locale_service.dart';
+import 'core/services/push_notification_service.dart';
 import 'core/widgets/suspension_dialog.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/auth/presentation/bloc/auth_state.dart';
 import 'features/auth/domain/entities/user.dart';
 import 'features/home/presentation/bloc/home_bloc.dart';
+import 'features/notifications/services/notification_navigation_service.dart';
 import 'l10n/app_localizations.dart';
 
 /// Cle globale du navigateur pour permettre la navigation depuis n'importe
@@ -31,18 +33,43 @@ class DeneigeAutoApp extends StatefulWidget {
 class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
   bool _hasNavigatedToHome = false;
   final LocaleService _localeService = sl<LocaleService>();
+  final PushNotificationService _push = sl<PushNotificationService>();
+
+  /// Push touchee avant que l'utilisateur soit connecte et sur l'accueil.
+  Map<String, dynamic>? _pendingPush;
 
   @override
   void initState() {
     super.initState();
     _localeService.loadLocale();
     _localeService.addListener(_onLocaleChanged);
+    _pendingPush = _push.takePendingTap();
+    _push.onNotificationTap = _onPushTap;
   }
 
   @override
   void dispose() {
     _localeService.removeListener(_onLocaleChanged);
+    _push.onNotificationTap = null;
     super.dispose();
+  }
+
+  /// Ouvre l'ecran de la notification, ou attend l'arrivee sur l'accueil :
+  /// la navigation vers l'accueil effacerait l'ecran ouvert trop tot.
+  void _onPushTap(Map<String, dynamic> data) {
+    if (_hasNavigatedToHome) {
+      _openPush(data);
+    } else {
+      _pendingPush = data;
+    }
+  }
+
+  void _openPush(Map<String, dynamic> data) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = navigatorKey.currentContext;
+      if (context == null) return;
+      NotificationNavigationService().openFromPush(context, data);
+    });
   }
 
   void _onLocaleChanged() {
@@ -92,6 +119,9 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
           AppRoutes.home,
           (route) => false,
         );
+        final pending = _pendingPush;
+        _pendingPush = null;
+        if (pending != null) _openPush(pending);
       }
     });
   }

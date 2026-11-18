@@ -7,6 +7,7 @@ import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_state.dart';
 import '../../chat/presentation/bloc/chat_bloc.dart';
 import '../../chat/presentation/pages/chat_screen.dart';
+import '../data/models/notification_model.dart';
 import '../domain/entities/notification.dart';
 
 /// Service de navigation basé sur les notifications
@@ -18,6 +19,26 @@ class NotificationNavigationService {
   NotificationNavigationService._internal();
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  /// Notification reconstruite a partir des donnees d'une push (le serveur
+  /// envoie type, reservationId, workerId, disputeId, plus titre et texte).
+  static AppNotification notificationFromPush(Map<String, dynamic> data) {
+    final disputeId = data['disputeId'];
+    return NotificationModel.fromJson({
+      '_id': data['notificationId'] ?? '',
+      'userId': '',
+      'type': data['type'] ?? 'systemNotification',
+      'title': data['title'] ?? '',
+      'message': data['body'] ?? '',
+      'reservationId': data['reservationId'],
+      'workerId': data['workerId'],
+      if (disputeId != null) 'metadata': {'disputeId': disputeId},
+    });
+  }
+
+  /// Ouvre l'ecran d'une notification push touchee.
+  Future<void> openFromPush(BuildContext context, Map<String, dynamic> data) =>
+      handleNotificationTap(context, notificationFromPush(data));
 
   /// Navigue vers l'écran approprié selon le type de notification
   Future<void> handleNotificationTap(

@@ -140,6 +140,8 @@ notificationSchema.statics.createNotification = async function(data) {
                 type: data.type,
                 ...(data.reservationId && { reservationId: data.reservationId.toString() }),
                 ...(data.workerId && { workerId: data.workerId.toString() }),
+                // L'app ouvre le litige quand on touche la notification
+                ...(data.metadata?.disputeId && { disputeId: data.metadata.disputeId.toString() }),
             };
 
             const result = await sendPushNotification(

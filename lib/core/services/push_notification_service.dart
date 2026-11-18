@@ -49,6 +49,35 @@ class PushNotificationService {
   /// Callback pour gérer les clics sur les notifications
   void Function(Map<String, dynamic> data)? onNotificationTap;
 
+  /// Notification touchee avant que l'app soit prete (lancement a froid) :
+  /// gardee jusqu'a ce que l'app la reclame avec [takePendingTap].
+  Map<String, dynamic>? _pendingTap;
+
+  /// Retourne puis oublie la notification touchee en attente.
+  Map<String, dynamic>? takePendingTap() {
+    final tap = _pendingTap;
+    _pendingTap = null;
+    return tap;
+  }
+
+  /// Le titre et le texte voyagent avec les donnees : une notification
+  /// systeme les affiche quand on la touche.
+  static Map<String, dynamic> tapData(RemoteMessage message) => {
+        ...message.data,
+        if (message.notification?.title != null)
+          'title': message.notification!.title,
+        if (message.notification?.body != null)
+          'body': message.notification!.body,
+      };
+
+  void _deliverTap(Map<String, dynamic> data) {
+    if (onNotificationTap != null) {
+      onNotificationTap!(data);
+    } else {
+      _pendingTap = data;
+    }
+  }
+
   // --- Initialisation ---
 
   /// Initialise le service de notifications.
@@ -188,20 +217,17 @@ class PushNotificationService {
   /// Gérer l'ouverture d'une notification
   void _handleNotificationOpen(RemoteMessage message) {
     debugPrint('Notification opened: ${message.data}');
-
-    if (onNotificationTap != null) {
-      onNotificationTap!(message.data);
-    }
+    _deliverTap(tapData(message));
   }
 
   /// Gérer la réponse à une notification locale
   void _handleNotificationResponse(NotificationResponse response) {
     debugPrint('Local notification response: ${response.payload}');
 
-    if (response.payload != null && onNotificationTap != null) {
+    if (response.payload != null) {
       try {
         final data = jsonDecode(response.payload!);
-        onNotificationTap!(Map<String, dynamic>.from(data));
+        _deliverTap(Map<String, dynamic>.from(data));
       } catch (e) {
         debugPrint('Error parsing notification payload: $e');
       }
@@ -241,7 +267,7 @@ class PushNotificationService {
       notification.title,
       notification.body,
       details,
-      payload: jsonEncode(message.data),
+      payload: jsonEncode(tapData(message)),
     );
   }
 
