@@ -56,10 +56,11 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 const sendNotification = async (userId, title, body, type, data = {}) => {
     try {
         // Créer la notification en base de données
+        // Le modele limite le titre a 100 et le message a 500 caracteres
         const notification = await Notification.create({
             userId,
-            title,
-            message: body,
+            title: title.length > 100 ? `${title.slice(0, 99)}…` : title,
+            message: body.length > 500 ? `${body.slice(0, 499)}…` : body,
             type,
             metadata: data,
         });
@@ -468,23 +469,32 @@ exports.reportNoShow = async (req, res) => {
             });
         }
 
-        // Vérifier le statut de la réservation
-        if (!['assigned', 'enRoute'].includes(reservation.status)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Le signalement no-show n\'est possible que pour les réservations assignées ou en route',
-            });
-        }
-
-        // Vérifier que l'heure de départ est passée
         const now = new Date();
-        const departureTime = new Date(reservation.departureTime);
-        const graceMinutes = 30; // 30 minutes de grâce après l'heure de départ
 
-        if (now < new Date(departureTime.getTime() + graceMinutes * 60 * 1000)) {
+        if (reservation.status === 'completed') {
+            // Travail marque termine sans que le deneigeur soit venu : le
+            // client a 24 h apres la fin pour le signaler (comme dans l'app)
+            const completedAt = reservation.completedAt ? new Date(reservation.completedAt) : null;
+            if (!completedAt || now - completedAt > 24 * 60 * 60 * 1000) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Le signalement d’absence est possible jusqu’à 24 h après la fin du travail.',
+                });
+            }
+        } else if (['assigned', 'enRoute'].includes(reservation.status)) {
+            // Deneigeur attendu : 30 min de grace apres l'heure prevue
+            const graceMinutes = 30;
+            const departureTime = new Date(reservation.departureTime);
+            if (now < new Date(departureTime.getTime() + graceMinutes * 60 * 1000)) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Vous pourrez signaler l’absence ${graceMinutes} minutes après l’heure de départ prévue.`,
+                });
+            }
+        } else {
             return res.status(400).json({
                 success: false,
-                message: `Vous pouvez signaler un no-show ${graceMinutes} minutes après l'heure de départ prévue`,
+                message: 'Le signalement d’absence n’est possible que si un déneigeur a été assigné.',
             });
         }
 
@@ -506,8 +516,12 @@ exports.reportNoShow = async (req, res) => {
         let autoResolutionEligible = false;
         let autoResolutionReason = '';
 
-        // Si le worker n'a jamais marqué "en route", c'est un no-show confirmé
-        if (!reservation.workerEnRouteAt) {
+        // Travail marque termine : la photo "apres" fournie par le deneigeur
+        // doit etre examinee par un admin, pas de remboursement automatique.
+        if (reservation.status === 'completed') {
+            autoResolutionEligible = false;
+        } else if (!reservation.workerEnRouteAt) {
+            // Si le worker n'a jamais marqué "en route", c'est un no-show confirmé
             autoResolutionEligible = true;
             autoResolutionReason = 'Le déneigeur n\'a jamais commencé le trajet';
         } else if (!reservation.workerArrivedAt) {
@@ -894,9 +908,10 @@ exports.getDisputeDetails = async (req, res) => {
             });
         }
 
-        // Masquer les notes admin si pas admin
+        // Notes et analyse IA : outils internes de l'admin, pas pour les parties
         if (!isAdmin) {
             dispute.adminNotes = undefined;
+            dispute.aiAnalysis = undefined;
         }
 
         res.json({
@@ -960,10 +975,14 @@ exports.respondToDispute = async (req, res) => {
         }
 
         // Enregistrer la réponse
+        // Garde les preuves deja ajoutees par le defendeur avant sa reponse
         dispute.response = {
             text,
             submittedAt: new Date(),
-            photos: photos?.map(url => ({ url, uploadedAt: new Date() })) || [],
+            photos: [
+                ...(dispute.response?.photos || []),
+                ...(photos || []).map(url => ({ url, uploadedAt: new Date() })),
+            ],
         };
 
         dispute.status = 'under_review';
@@ -1042,11 +1061,16 @@ exports.addEvidence = async (req, res) => {
             });
         }
 
-        // Ajouter les preuves
+        // Ajouter les preuves : celles du defendeur vont avec sa reponse,
+        // sinon l'admin les voyait comme des preuves du plaignant
         if (photos?.length) {
-            dispute.evidence.photos.push(
-                ...photos.map(url => ({ url, uploadedAt: new Date(), description }))
-            );
+            const added = photos.map(url => ({ url, uploadedAt: new Date(), description }));
+            if (isRespondent) {
+                if (!dispute.response) dispute.response = {};
+                dispute.response.photos = [...(dispute.response.photos || []), ...added];
+            } else {
+                dispute.evidence.photos.push(...added);
+            }
         }
 
         if (documents?.length) {

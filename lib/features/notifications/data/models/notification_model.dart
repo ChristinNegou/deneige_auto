@@ -64,10 +64,13 @@ class NotificationModel extends AppNotification {
       case 'workCompleted':
         return NotificationType.workCompleted;
       case 'reservationCancelled':
+      case 'reservationUpdate': // reservation expiree, remboursee
         return NotificationType.reservationCancelled;
       case 'paymentSuccess':
+      case 'payment_success':
         return NotificationType.paymentSuccess;
       case 'paymentFailed':
+      case 'payment_failed':
         return NotificationType.paymentFailed;
       case 'refundProcessed':
         return NotificationType.refundProcessed;

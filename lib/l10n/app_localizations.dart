@@ -2876,29 +2876,131 @@ abstract class AppLocalizations {
   /// **'Détails du litige'**
   String get dispute_details;
 
-  /// No description provided for @dispute_resolutionExpectedBefore.
+  /// No description provided for @disputeD_openedOn.
   ///
   /// In fr, this message translates to:
-  /// **'Résolution attendue avant'**
-  String get dispute_resolutionExpectedBefore;
+  /// **'Ouvert le {date}'**
+  String disputeD_openedOn(String date);
 
-  /// No description provided for @dispute_resolution.
+  /// No description provided for @disputeD_yourTurn.
   ///
   /// In fr, this message translates to:
-  /// **'Résolution'**
-  String get dispute_resolution;
+  /// **'Votre réponse est attendue avant le {date}.'**
+  String disputeD_yourTurn(String date);
+
+  /// No description provided for @disputeD_yourTurnLate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le délai de réponse est dépassé : l’équipe décidera sans votre version.'**
+  String get disputeD_yourTurnLate;
+
+  /// No description provided for @disputeD_complaint.
+  ///
+  /// In fr, this message translates to:
+  /// **'La plainte'**
+  String get disputeD_complaint;
+
+  /// No description provided for @disputeD_filedBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signalée par {name}'**
+  String disputeD_filedBy(String name);
+
+  /// No description provided for @disputeD_claimed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant réclamé : {amount}'**
+  String disputeD_claimed(String amount);
+
+  /// No description provided for @disputeD_response.
+  ///
+  /// In fr, this message translates to:
+  /// **'La réponse'**
+  String get disputeD_response;
+
+  /// No description provided for @disputeD_waitingResponse.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente de la réponse de l’autre partie, au plus tard le {date}.'**
+  String disputeD_waitingResponse(String date);
+
+  /// No description provided for @disputeD_noResponse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de réponse.'**
+  String get disputeD_noResponse;
+
+  /// No description provided for @disputeD_underReview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre équipe examine les deux versions. Vous serez notifié de la décision.'**
+  String get disputeD_underReview;
+
+  /// No description provided for @disputeD_forYou.
+  ///
+  /// In fr, this message translates to:
+  /// **'En votre faveur'**
+  String get disputeD_forYou;
+
+  /// No description provided for @disputeD_againstYou.
+  ///
+  /// In fr, this message translates to:
+  /// **'En faveur de l’autre partie'**
+  String get disputeD_againstYou;
+
+  /// No description provided for @disputeD_refund.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remboursement : {amount}'**
+  String disputeD_refund(String amount);
+
+  /// No description provided for @disputeR_intro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expliquez ce que vous avez fait. L’équipe lira les deux versions avant de décider.'**
+  String get disputeR_intro;
+
+  /// No description provided for @disputeR_deadline.
+  ///
+  /// In fr, this message translates to:
+  /// **'À envoyer avant le {date}.'**
+  String disputeR_deadline(String date);
+
+  /// No description provided for @disputeR_photosHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photos du travail fait (vitres, roues, contour du véhicule…). Jusqu’à {max}.'**
+  String disputeR_photosHelp(int max);
+
+  /// No description provided for @disputeR_addPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une photo'**
+  String get disputeR_addPhoto;
+
+  /// No description provided for @disputeR_sending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoi en cours…'**
+  String get disputeR_sending;
+
+  /// No description provided for @disputeR_sent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réponse envoyée. Vous serez notifié de la décision.'**
+  String get disputeR_sent;
+
+  /// No description provided for @disputeR_minChars.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} caractères minimum ({current}/{count})'**
+  String disputeR_minChars(int count, int current);
 
   /// No description provided for @dispute_decision.
   ///
   /// In fr, this message translates to:
   /// **'Décision'**
   String get dispute_decision;
-
-  /// No description provided for @dispute_respondentResponse.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réponse du défendeur'**
-  String get dispute_respondentResponse;
 
   /// No description provided for @dispute_noResponse.
   ///
@@ -2996,24 +3098,6 @@ abstract class AppLocalizations {
   /// **'Délai dépassé'**
   String get dispute_deadlineExpired;
 
-  /// No description provided for @dispute_deadlineExpiredMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le délai de réponse est dépassé'**
-  String get dispute_deadlineExpiredMessage;
-
-  /// No description provided for @dispute_responseDeadline.
-  ///
-  /// In fr, this message translates to:
-  /// **'Délai de réponse'**
-  String get dispute_responseDeadline;
-
-  /// No description provided for @dispute_complaintReceived.
-  ///
-  /// In fr, this message translates to:
-  /// **'Plainte reçue'**
-  String get dispute_complaintReceived;
-
   /// No description provided for @dispute_writeResponse.
   ///
   /// In fr, this message translates to:
@@ -3032,47 +3116,11 @@ abstract class AppLocalizations {
   /// **'Erreur lors de l\'envoi de la réponse'**
   String get dispute_responseError;
 
-  /// No description provided for @dispute_responseSent.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réponse envoyée'**
-  String get dispute_responseSent;
-
   /// No description provided for @dispute_addEvidence.
   ///
   /// In fr, this message translates to:
   /// **'Ajouter des preuves'**
   String get dispute_addEvidence;
-
-  /// No description provided for @dispute_multipleSelection.
-  ///
-  /// In fr, this message translates to:
-  /// **'Sélection multiple possible'**
-  String get dispute_multipleSelection;
-
-  /// No description provided for @dispute_evidenceAdded.
-  ///
-  /// In fr, this message translates to:
-  /// **'Preuves ajoutées'**
-  String get dispute_evidenceAdded;
-
-  /// No description provided for @dispute_tipsPhotos.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photos claires et bien éclairées'**
-  String get dispute_tipsPhotos;
-
-  /// No description provided for @dispute_tipsScreenshots.
-  ///
-  /// In fr, this message translates to:
-  /// **'Captures d\'écran de communications'**
-  String get dispute_tipsScreenshots;
-
-  /// No description provided for @dispute_tipsTimestamp.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photos horodatées si possible'**
-  String get dispute_tipsTimestamp;
 
   /// No description provided for @admin_dashboard.
   ///
@@ -7934,12 +7982,6 @@ abstract class AppLocalizations {
   /// **'Oui, commencer'**
   String get worker_yesStart;
 
-  /// No description provided for @dispute_addEvidenceButton.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajouter des preuves'**
-  String get dispute_addEvidenceButton;
-
   /// No description provided for @dispute_addEvidenceError.
   ///
   /// In fr, this message translates to:
@@ -7958,23 +8000,11 @@ abstract class AppLocalizations {
   /// **'Détails supplémentaires (optionnel)'**
   String get dispute_additionalDetailsOptional;
 
-  /// No description provided for @dispute_addMorePhotos.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajouter plus de photos'**
-  String get dispute_addMorePhotos;
-
   /// No description provided for @dispute_addPhotoOrDescription.
   ///
   /// In fr, this message translates to:
   /// **'Ajoutez au moins une photo ou une description'**
   String get dispute_addPhotoOrDescription;
-
-  /// No description provided for @dispute_addPhotosInstruction.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajoutez des photos pour appuyer votre réponse (photos du travail effectué, captures d\'écran de conversation, etc.)'**
-  String get dispute_addPhotosInstruction;
 
   /// No description provided for @dispute_aiAnalysis.
   ///
@@ -8012,12 +8042,6 @@ abstract class AppLocalizations {
   /// **'Appel soumis avec succès'**
   String get dispute_appealSubmitted;
 
-  /// No description provided for @dispute_attachedPhotos.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photos jointes'**
-  String get dispute_attachedPhotos;
-
   /// No description provided for @dispute_cannotSendReportRetry.
   ///
   /// In fr, this message translates to:
@@ -8053,12 +8077,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Je confirme que le déneigeur ne s\'est pas présenté pour le service prévu.'**
   String get dispute_confirmNoShowStatement;
-
-  /// No description provided for @dispute_deadlines.
-  ///
-  /// In fr, this message translates to:
-  /// **'Délais'**
-  String get dispute_deadlines;
 
   /// No description provided for @dispute_decisionFavorClaimant.
   ///
@@ -8126,29 +8144,11 @@ abstract class AppLocalizations {
   /// **'Vos preuves ont été ajoutées au dossier du litige.'**
   String get dispute_evidenceAddedMessage;
 
-  /// No description provided for @dispute_evidenceCount.
-  ///
-  /// In fr, this message translates to:
-  /// **'Preuves ({count})'**
-  String dispute_evidenceCount(int count);
-
   /// No description provided for @dispute_evidenceStrength.
   ///
   /// In fr, this message translates to:
   /// **'Force des preuves'**
   String get dispute_evidenceStrength;
-
-  /// No description provided for @dispute_evidenceTips.
-  ///
-  /// In fr, this message translates to:
-  /// **'Conseils pour de bonnes preuves'**
-  String get dispute_evidenceTips;
-
-  /// No description provided for @dispute_expired.
-  ///
-  /// In fr, this message translates to:
-  /// **'Expiré'**
-  String get dispute_expired;
 
   /// No description provided for @dispute_falseReportWarning.
   ///
@@ -8192,12 +8192,6 @@ abstract class AppLocalizations {
   /// **'Constats clés:'**
   String get dispute_keyFindings;
 
-  /// No description provided for @dispute_maxPhotos.
-  ///
-  /// In fr, this message translates to:
-  /// **'Maximum 10 photos'**
-  String get dispute_maxPhotos;
-
   /// No description provided for @dispute_minCharsRequired.
   ///
   /// In fr, this message translates to:
@@ -8234,41 +8228,17 @@ abstract class AppLocalizations {
   /// **'Ce litige est introuvable ou a été supprimé.'**
   String get dispute_notFoundMessage;
 
-  /// No description provided for @dispute_notifiedOfDecision.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous serez notifié de la décision finale.'**
-  String get dispute_notifiedOfDecision;
-
   /// No description provided for @dispute_notifiedWhenResolved.
   ///
   /// In fr, this message translates to:
   /// **'Vous serez notifié lorsque le dossier sera résolu.'**
   String get dispute_notifiedWhenResolved;
 
-  /// No description provided for @dispute_openDate.
-  ///
-  /// In fr, this message translates to:
-  /// **'Date d\'ouverture'**
-  String get dispute_openDate;
-
-  /// No description provided for @dispute_photoCount.
-  ///
-  /// In fr, this message translates to:
-  /// **'{count}/10 photos'**
-  String dispute_photoCount(int count);
-
   /// No description provided for @dispute_photosLabel.
   ///
   /// In fr, this message translates to:
   /// **'Photos'**
   String get dispute_photosLabel;
-
-  /// No description provided for @dispute_priority.
-  ///
-  /// In fr, this message translates to:
-  /// **'Priorité'**
-  String get dispute_priority;
 
   /// No description provided for @dispute_priorityHigh.
   ///
@@ -8390,29 +8360,11 @@ abstract class AppLocalizations {
   /// **'Délai de réponse dépassé'**
   String get dispute_responseDeadlinePassed;
 
-  /// No description provided for @dispute_responseExpectedBefore.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réponse attendue avant'**
-  String get dispute_responseExpectedBefore;
-
   /// No description provided for @dispute_responseHint.
   ///
   /// In fr, this message translates to:
   /// **'Écrivez votre réponse ici...'**
   String get dispute_responseHint;
-
-  /// No description provided for @dispute_responseInstruction.
-  ///
-  /// In fr, this message translates to:
-  /// **'Expliquez votre version des faits. Soyez précis et factuel.'**
-  String get dispute_responseInstruction;
-
-  /// No description provided for @dispute_responseSentMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre réponse a été enregistrée. L\'administrateur va examiner le litige et prendra une décision.'**
-  String get dispute_responseSentMessage;
 
   /// No description provided for @dispute_responseTooShort.
   ///
@@ -8461,12 +8413,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Prendre une photo'**
   String get dispute_takePhoto;
-
-  /// No description provided for @dispute_tipsRelevantDocs.
-  ///
-  /// In fr, this message translates to:
-  /// **'Tout document pertinent'**
-  String get dispute_tipsRelevantDocs;
 
   /// No description provided for @dispute_viewDetails.
   ///

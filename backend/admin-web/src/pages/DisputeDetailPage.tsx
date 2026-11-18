@@ -205,13 +205,14 @@ export function DisputeDetailPage() {
               <>
                 <p className="whitespace-pre-line rounded-lg bg-ice px-4 py-3">{d.response.text}</p>
                 <p className="mb-4 mt-1 text-xs text-slate-3">Envoyée le {formatDateTime(d.response.submittedAt)}</p>
-                <Photos photos={d.response.photos} />
               </>
             ) : (
-              <p className="text-slate-3">
+              <p className="mb-4 text-slate-3">
                 Pas encore de réponse{d.deadlines?.responseDeadline ? ` (échéance : ${formatDateTime(d.deadlines.responseDeadline)})` : ''}.
               </p>
             )}
+            {/* Le defendeur peut envoyer des photos avant d'ecrire sa reponse */}
+            {(d.response?.photos?.length ?? 0) > 0 && <Photos photos={d.response?.photos} />}
           </Card>
 
           {d.resolution?.decision && (

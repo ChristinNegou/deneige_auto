@@ -1488,16 +1488,89 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dispute_details => 'Détails du litige';
 
   @override
-  String get dispute_resolutionExpectedBefore => 'Résolution attendue avant';
+  String disputeD_openedOn(String date) {
+    return 'Ouvert le $date';
+  }
 
   @override
-  String get dispute_resolution => 'Résolution';
+  String disputeD_yourTurn(String date) {
+    return 'Votre réponse est attendue avant le $date.';
+  }
+
+  @override
+  String get disputeD_yourTurnLate =>
+      'Le délai de réponse est dépassé : l’équipe décidera sans votre version.';
+
+  @override
+  String get disputeD_complaint => 'La plainte';
+
+  @override
+  String disputeD_filedBy(String name) {
+    return 'Signalée par $name';
+  }
+
+  @override
+  String disputeD_claimed(String amount) {
+    return 'Montant réclamé : $amount';
+  }
+
+  @override
+  String get disputeD_response => 'La réponse';
+
+  @override
+  String disputeD_waitingResponse(String date) {
+    return 'En attente de la réponse de l’autre partie, au plus tard le $date.';
+  }
+
+  @override
+  String get disputeD_noResponse => 'Pas de réponse.';
+
+  @override
+  String get disputeD_underReview =>
+      'Notre équipe examine les deux versions. Vous serez notifié de la décision.';
+
+  @override
+  String get disputeD_forYou => 'En votre faveur';
+
+  @override
+  String get disputeD_againstYou => 'En faveur de l’autre partie';
+
+  @override
+  String disputeD_refund(String amount) {
+    return 'Remboursement : $amount';
+  }
+
+  @override
+  String get disputeR_intro =>
+      'Expliquez ce que vous avez fait. L’équipe lira les deux versions avant de décider.';
+
+  @override
+  String disputeR_deadline(String date) {
+    return 'À envoyer avant le $date.';
+  }
+
+  @override
+  String disputeR_photosHelp(int max) {
+    return 'Photos du travail fait (vitres, roues, contour du véhicule…). Jusqu’à $max.';
+  }
+
+  @override
+  String get disputeR_addPhoto => 'Ajouter une photo';
+
+  @override
+  String get disputeR_sending => 'Envoi en cours…';
+
+  @override
+  String get disputeR_sent =>
+      'Réponse envoyée. Vous serez notifié de la décision.';
+
+  @override
+  String disputeR_minChars(int count, int current) {
+    return '$count caractères minimum ($current/$count)';
+  }
 
   @override
   String get dispute_decision => 'Décision';
-
-  @override
-  String get dispute_respondentResponse => 'Réponse du défendeur';
 
   @override
   String get dispute_noResponse => 'Aucune réponse';
@@ -1549,16 +1622,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dispute_deadlineExpired => 'Délai dépassé';
 
   @override
-  String get dispute_deadlineExpiredMessage =>
-      'Le délai de réponse est dépassé';
-
-  @override
-  String get dispute_responseDeadline => 'Délai de réponse';
-
-  @override
-  String get dispute_complaintReceived => 'Plainte reçue';
-
-  @override
   String get dispute_writeResponse => 'Veuillez écrire votre réponse';
 
   @override
@@ -1568,25 +1631,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dispute_responseError => 'Erreur lors de l\'envoi de la réponse';
 
   @override
-  String get dispute_responseSent => 'Réponse envoyée';
-
-  @override
   String get dispute_addEvidence => 'Ajouter des preuves';
-
-  @override
-  String get dispute_multipleSelection => 'Sélection multiple possible';
-
-  @override
-  String get dispute_evidenceAdded => 'Preuves ajoutées';
-
-  @override
-  String get dispute_tipsPhotos => 'Photos claires et bien éclairées';
-
-  @override
-  String get dispute_tipsScreenshots => 'Captures d\'écran de communications';
-
-  @override
-  String get dispute_tipsTimestamp => 'Photos horodatées si possible';
 
   @override
   String get admin_dashboard => 'Dashboard';
@@ -4272,9 +4317,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get worker_yesStart => 'Oui, commencer';
 
   @override
-  String get dispute_addEvidenceButton => 'Ajouter des preuves';
-
-  @override
   String get dispute_addEvidenceError => 'Erreur lors de l\'ajout des preuves';
 
   @override
@@ -4285,15 +4327,8 @@ class AppLocalizationsFr extends AppLocalizations {
       'Détails supplémentaires (optionnel)';
 
   @override
-  String get dispute_addMorePhotos => 'Ajouter plus de photos';
-
-  @override
   String get dispute_addPhotoOrDescription =>
       'Ajoutez au moins une photo ou une description';
-
-  @override
-  String get dispute_addPhotosInstruction =>
-      'Ajoutez des photos pour appuyer votre réponse (photos du travail effectué, captures d\'écran de conversation, etc.)';
 
   @override
   String get dispute_aiAnalysis => 'Analyse IA';
@@ -4313,9 +4348,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dispute_appealSubmitted => 'Appel soumis avec succès';
-
-  @override
-  String get dispute_attachedPhotos => 'Photos jointes';
 
   @override
   String get dispute_cannotSendReportRetry =>
@@ -4342,9 +4374,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get dispute_confirmNoShowStatement =>
       'Je confirme que le déneigeur ne s\'est pas présenté pour le service prévu.';
-
-  @override
-  String get dispute_deadlines => 'Délais';
 
   @override
   String get dispute_decisionFavorClaimant => 'En votre faveur';
@@ -4383,18 +4412,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Vos preuves ont été ajoutées au dossier du litige.';
 
   @override
-  String dispute_evidenceCount(int count) {
-    return 'Preuves ($count)';
-  }
-
-  @override
   String get dispute_evidenceStrength => 'Force des preuves';
-
-  @override
-  String get dispute_evidenceTips => 'Conseils pour de bonnes preuves';
-
-  @override
-  String get dispute_expired => 'Expiré';
 
   @override
   String get dispute_falseReportWarning =>
@@ -4419,9 +4437,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dispute_keyFindings => 'Constats clés:';
 
   @override
-  String get dispute_maxPhotos => 'Maximum 10 photos';
-
-  @override
   String get dispute_minCharsRequired => 'Minimum 50 caractères requis';
 
   @override
@@ -4442,26 +4457,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce litige est introuvable ou a été supprimé.';
 
   @override
-  String get dispute_notifiedOfDecision =>
-      'Vous serez notifié de la décision finale.';
-
-  @override
   String get dispute_notifiedWhenResolved =>
       'Vous serez notifié lorsque le dossier sera résolu.';
 
   @override
-  String get dispute_openDate => 'Date d\'ouverture';
-
-  @override
-  String dispute_photoCount(int count) {
-    return '$count/10 photos';
-  }
-
-  @override
   String get dispute_photosLabel => 'Photos';
-
-  @override
-  String get dispute_priority => 'Priorité';
 
   @override
   String get dispute_priorityHigh => 'Haute';
@@ -4539,18 +4539,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dispute_responseDeadlinePassed => 'Délai de réponse dépassé';
 
   @override
-  String get dispute_responseExpectedBefore => 'Réponse attendue avant';
-
-  @override
   String get dispute_responseHint => 'Écrivez votre réponse ici...';
-
-  @override
-  String get dispute_responseInstruction =>
-      'Expliquez votre version des faits. Soyez précis et factuel.';
-
-  @override
-  String get dispute_responseSentMessage =>
-      'Votre réponse a été enregistrée. L\'administrateur va examiner le litige et prendra une décision.';
 
   @override
   String get dispute_responseTooShort =>
@@ -4578,9 +4567,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dispute_takePhoto => 'Prendre une photo';
-
-  @override
-  String get dispute_tipsRelevantDocs => 'Tout document pertinent';
 
   @override
   String get dispute_viewDetails => 'Voir les détails';

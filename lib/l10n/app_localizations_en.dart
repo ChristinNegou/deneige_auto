@@ -1475,16 +1475,89 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dispute_details => 'Dispute details';
 
   @override
-  String get dispute_resolutionExpectedBefore => 'Resolution expected before';
+  String disputeD_openedOn(String date) {
+    return 'Opened on $date';
+  }
 
   @override
-  String get dispute_resolution => 'Resolution';
+  String disputeD_yourTurn(String date) {
+    return 'Your response is expected before $date.';
+  }
+
+  @override
+  String get disputeD_yourTurnLate =>
+      'The response deadline has passed: the team will decide without your side.';
+
+  @override
+  String get disputeD_complaint => 'The complaint';
+
+  @override
+  String disputeD_filedBy(String name) {
+    return 'Reported by $name';
+  }
+
+  @override
+  String disputeD_claimed(String amount) {
+    return 'Amount claimed: $amount';
+  }
+
+  @override
+  String get disputeD_response => 'The response';
+
+  @override
+  String disputeD_waitingResponse(String date) {
+    return 'Waiting for the other party’s response, at the latest on $date.';
+  }
+
+  @override
+  String get disputeD_noResponse => 'No response.';
+
+  @override
+  String get disputeD_underReview =>
+      'Our team is reviewing both sides. You will be notified of the decision.';
+
+  @override
+  String get disputeD_forYou => 'In your favour';
+
+  @override
+  String get disputeD_againstYou => 'In the other party’s favour';
+
+  @override
+  String disputeD_refund(String amount) {
+    return 'Refund: $amount';
+  }
+
+  @override
+  String get disputeR_intro =>
+      'Explain what you did. The team reads both sides before deciding.';
+
+  @override
+  String disputeR_deadline(String date) {
+    return 'Send before $date.';
+  }
+
+  @override
+  String disputeR_photosHelp(int max) {
+    return 'Photos of the work done (windows, wheels, around the vehicle…). Up to $max.';
+  }
+
+  @override
+  String get disputeR_addPhoto => 'Add a photo';
+
+  @override
+  String get disputeR_sending => 'Sending…';
+
+  @override
+  String get disputeR_sent =>
+      'Response sent. You will be notified of the decision.';
+
+  @override
+  String disputeR_minChars(int count, int current) {
+    return 'At least $count characters ($current/$count)';
+  }
 
   @override
   String get dispute_decision => 'Decision';
-
-  @override
-  String get dispute_respondentResponse => 'Respondent\'s response';
 
   @override
   String get dispute_noResponse => 'No response';
@@ -1535,16 +1608,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dispute_deadlineExpired => 'Deadline expired';
 
   @override
-  String get dispute_deadlineExpiredMessage =>
-      'The response deadline has passed';
-
-  @override
-  String get dispute_responseDeadline => 'Response deadline';
-
-  @override
-  String get dispute_complaintReceived => 'Complaint received';
-
-  @override
   String get dispute_writeResponse => 'Please write your response';
 
   @override
@@ -1554,25 +1617,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dispute_responseError => 'Error sending response';
 
   @override
-  String get dispute_responseSent => 'Response sent';
-
-  @override
   String get dispute_addEvidence => 'Add evidence';
-
-  @override
-  String get dispute_multipleSelection => 'Multiple selection available';
-
-  @override
-  String get dispute_evidenceAdded => 'Evidence added';
-
-  @override
-  String get dispute_tipsPhotos => 'Clear, well-lit photos';
-
-  @override
-  String get dispute_tipsScreenshots => 'Screenshots of communications';
-
-  @override
-  String get dispute_tipsTimestamp => 'Timestamped photos if possible';
 
   @override
   String get admin_dashboard => 'Dashboard';
@@ -4218,9 +4263,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worker_yesStart => 'Yes, start';
 
   @override
-  String get dispute_addEvidenceButton => 'Add evidence';
-
-  @override
   String get dispute_addEvidenceError => 'Error adding evidence';
 
   @override
@@ -4231,15 +4273,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Additional details (optional)';
 
   @override
-  String get dispute_addMorePhotos => 'Add more photos';
-
-  @override
   String get dispute_addPhotoOrDescription =>
       'Add at least one photo or a description';
-
-  @override
-  String get dispute_addPhotosInstruction =>
-      'Add photos to support your response (photos of work done, conversation screenshots, etc.)';
 
   @override
   String get dispute_aiAnalysis => 'AI Analysis';
@@ -4259,9 +4294,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dispute_appealSubmitted => 'Appeal submitted successfully';
-
-  @override
-  String get dispute_attachedPhotos => 'Attached photos';
 
   @override
   String get dispute_cannotSendReportRetry =>
@@ -4288,9 +4320,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dispute_confirmNoShowStatement =>
       'I confirm that the snow worker did not show up for the scheduled service.';
-
-  @override
-  String get dispute_deadlines => 'Deadlines';
 
   @override
   String get dispute_decisionFavorClaimant => 'In your favor';
@@ -4330,18 +4359,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your evidence has been added to the dispute file.';
 
   @override
-  String dispute_evidenceCount(int count) {
-    return 'Evidence ($count)';
-  }
-
-  @override
   String get dispute_evidenceStrength => 'Evidence strength';
-
-  @override
-  String get dispute_evidenceTips => 'Tips for good evidence';
-
-  @override
-  String get dispute_expired => 'Expired';
 
   @override
   String get dispute_falseReportWarning =>
@@ -4366,9 +4384,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dispute_keyFindings => 'Key findings:';
 
   @override
-  String get dispute_maxPhotos => 'Maximum 10 photos';
-
-  @override
   String get dispute_minCharsRequired => 'Minimum 50 characters required';
 
   @override
@@ -4389,26 +4404,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'This dispute could not be found or has been deleted.';
 
   @override
-  String get dispute_notifiedOfDecision =>
-      'You will be notified of the final decision.';
-
-  @override
   String get dispute_notifiedWhenResolved =>
       'You will be notified when the case is resolved.';
 
   @override
-  String get dispute_openDate => 'Open date';
-
-  @override
-  String dispute_photoCount(int count) {
-    return '$count/10 photos';
-  }
-
-  @override
   String get dispute_photosLabel => 'Photos';
-
-  @override
-  String get dispute_priority => 'Priority';
 
   @override
   String get dispute_priorityHigh => 'High';
@@ -4486,18 +4486,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dispute_responseDeadlinePassed => 'Response deadline passed';
 
   @override
-  String get dispute_responseExpectedBefore => 'Response expected before';
-
-  @override
   String get dispute_responseHint => 'Write your response here...';
-
-  @override
-  String get dispute_responseInstruction =>
-      'Explain your version of the facts. Be precise and factual.';
-
-  @override
-  String get dispute_responseSentMessage =>
-      'Your response has been recorded. The administrator will review the dispute and make a decision.';
 
   @override
   String get dispute_responseTooShort =>
@@ -4525,9 +4514,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dispute_takePhoto => 'Take a photo';
-
-  @override
-  String get dispute_tipsRelevantDocs => 'Any relevant documents';
 
   @override
   String get dispute_viewDetails => 'View details';

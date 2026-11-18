@@ -7,7 +7,9 @@ import '../../../../core/services/dispute_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 
-/// Écran pour ajouter des preuves supplémentaires à un litige
+/// Ajout de preuves a un litige ouvert (client ou deneigeur) : des photos et
+/// une courte explication. Le serveur range celles du defendeur avec sa
+/// reponse et celles du plaignant avec sa plainte.
 class AddEvidencePage extends StatefulWidget {
   final String disputeId;
   final String disputeStatus;
@@ -23,18 +25,22 @@ class AddEvidencePage extends StatefulWidget {
 }
 
 class _AddEvidencePageState extends State<AddEvidencePage> {
-  final _formKey = GlobalKey<FormState>();
-  final _descriptionController = TextEditingController();
-  late DisputeService _disputeService;
+  /// La limite du serveur (upload-photos).
+  static const _maxPhotos = 10;
 
-  bool _isLoading = false;
+  final _descriptionController = TextEditingController();
+  final _picker = ImagePicker();
+  late final DisputeService _disputeService;
+
   final List<File> _photos = [];
-  final ImagePicker _picker = ImagePicker();
+  bool _sending = false;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _disputeService = DisputeService(dioClient: sl<DioClient>());
+    _descriptionController.addListener(() => setState(() {}));
   }
 
   @override
@@ -43,69 +49,48 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
     super.dispose();
   }
 
-  bool _canAddEvidence() {
-    // Les preuves peuvent être ajoutées tant que le litige n'est pas résolu/fermé
-    return !['resolved', 'closed'].contains(widget.disputeStatus);
-  }
+  /// Plus de preuves une fois la decision rendue.
+  bool get _open => !['resolved', 'closed'].contains(widget.disputeStatus);
 
-  Future<void> _pickImage(ImageSource source) async {
+  bool get _hasContent =>
+      _photos.isNotEmpty || _descriptionController.text.trim().isNotEmpty;
+
+  Future<void> _takePhoto() async {
     try {
-      final XFile? image = await _picker.pickImage(
-        source: source,
+      final image = await _picker.pickImage(
+        source: ImageSource.camera,
         maxWidth: 1920,
         maxHeight: 1920,
         imageQuality: 85,
       );
-      if (image != null) {
-        setState(() {
-          _photos.add(File(image.path));
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.dispute_imageLoadError),
-            backgroundColor: AppTheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+      if (image != null) setState(() => _photos.add(File(image.path)));
+    } catch (_) {
+      _showPickError();
     }
   }
 
-  Future<void> _pickMultipleImages() async {
+  Future<void> _pickFromGallery() async {
     try {
-      final List<XFile> images = await _picker.pickMultiImage(
+      final images = await _picker.pickMultiImage(
         maxWidth: 1920,
         maxHeight: 1920,
         imageQuality: 85,
       );
-      if (images.isNotEmpty) {
-        setState(() {
-          for (final image in images) {
-            if (_photos.length < 10) {
-              _photos.add(File(image.path));
-            }
-          }
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.dispute_imagesLoadError),
-            backgroundColor: AppTheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+      final room = _maxPhotos - _photos.length;
+      setState(
+          () => _photos.addAll(images.take(room).map((x) => File(x.path))));
+    } catch (_) {
+      _showPickError();
     }
   }
 
-  void _showImageSourceDialog() {
+  void _showPickError() {
+    if (!mounted) return;
+    setState(
+        () => _error = AppLocalizations.of(context)!.dispute_imagesLoadError);
+  }
+
+  void _chooseSource() {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
@@ -113,59 +98,28 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                l10n.dispute_addEvidence,
-                style: TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
               ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.camera_alt, color: AppTheme.primary),
-                ),
-                title: Text(
-                  l10n.dispute_takePhoto,
-                  style: TextStyle(color: AppTheme.textPrimary),
-                ),
+                leading: const Icon(Icons.photo_camera_outlined,
+                    color: AppTheme.textPrimary),
+                title: Text(l10n.dispute_takePhoto),
                 onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.camera);
+                  Navigator.pop(sheetContext);
+                  _takePhoto();
                 },
               ),
               ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.photo_library, color: AppTheme.primary),
-                ),
-                title: Text(
-                  l10n.dispute_chooseFromGallery,
-                  style: TextStyle(color: AppTheme.textPrimary),
-                ),
-                subtitle: Text(
-                  l10n.dispute_multipleSelection,
-                  style: TextStyle(color: AppTheme.textTertiary, fontSize: 12),
-                ),
+                leading: const Icon(Icons.photo_library_outlined,
+                    color: AppTheme.textPrimary),
+                title: Text(l10n.dispute_chooseFromGallery),
                 onTap: () {
-                  Navigator.pop(context);
-                  _pickMultipleImages();
+                  Navigator.pop(sheetContext);
+                  _pickFromGallery();
                 },
               ),
             ],
@@ -175,438 +129,211 @@ class _AddEvidencePageState extends State<AddEvidencePage> {
     );
   }
 
-  Future<void> _submitEvidence() async {
+  Future<void> _send() async {
     final l10n = AppLocalizations.of(context)!;
-    if (_photos.isEmpty && _descriptionController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.dispute_addPhotoOrDescription),
-          backgroundColor: AppTheme.warning,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (!_hasContent) {
+      setState(() => _error = l10n.dispute_addPhotoOrDescription);
       return;
     }
-
-    setState(() => _isLoading = true);
+    setState(() {
+      _sending = true;
+      _error = null;
+    });
 
     try {
-      // Upload photos to cloud storage and get URLs
-      List<String>? photoUrls;
-      if (_photos.isNotEmpty) {
-        photoUrls = await _disputeService.uploadPhotos(_photos);
-      }
-
+      final photoUrls = await _disputeService.uploadPhotos(_photos);
+      final description = _descriptionController.text.trim();
       await _disputeService.addEvidence(
         disputeId: widget.disputeId,
-        photos: photoUrls,
-        description: _descriptionController.text.trim().isNotEmpty
-            ? _descriptionController.text.trim()
-            : null,
+        photos: photoUrls.isEmpty ? null : photoUrls,
+        description: description.isEmpty ? null : description,
       );
-
       if (!mounted) return;
-
-      _showSuccessDialog();
-    } catch (e) {
-      if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            e.toString().contains('Exception:')
-                ? e.toString().replaceFirst('Exception: ', '')
-                : l10n.dispute_addEvidenceError,
-          ),
-          backgroundColor: AppTheme.error,
+          content: Text(l10n.dispute_evidenceAddedMessage,
+              style: const TextStyle(color: AppTheme.onPrimary)),
+          backgroundColor: AppTheme.primary,
           behavior: SnackBarBehavior.floating,
         ),
       );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _sending = false;
+        _error = disputeErrorMessage(e, l10n.dispute_addEvidenceError);
+      });
     }
-  }
-
-  void _showSuccessDialog() {
-    final l10n = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.success.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.check_circle, color: AppTheme.success),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                l10n.dispute_evidenceAdded,
-                style: TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          l10n.dispute_evidenceAddedMessage,
-          style: TextStyle(color: AppTheme.textSecondary),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context, true);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              foregroundColor: AppTheme.onPrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(l10n.common_understood),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final canAdd = _canAddEvidence();
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        title: Text(
-          l10n.dispute_addEvidence,
-          style: TextStyle(color: AppTheme.textPrimary),
+    return PopScope(
+      canPop: !_sending,
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        appBar: AppBar(
+          title: Text(l10n.dispute_addEvidence, style: AppTheme.labelMedium),
+          centerTitle: true,
+          backgroundColor: AppTheme.background,
+          surfaceTintColor: Colors.transparent,
         ),
-        backgroundColor: AppTheme.surface,
-        foregroundColor: AppTheme.textPrimary,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Status Warning
-                if (!canAdd) _buildStatusWarning(),
-                if (!canAdd) const SizedBox(height: 20),
-
-                // Info Card
-                _buildInfoCard(),
-                const SizedBox(height: 24),
-
-                // Photos Section
-                _buildSectionTitle(l10n.dispute_photosLabel),
-                const SizedBox(height: 12),
-                _buildPhotoSection(canAdd),
-                const SizedBox(height: 24),
-
-                // Description Section
-                _buildSectionTitle(l10n.dispute_descriptionOptional),
-                const SizedBox(height: 12),
-                _buildDescriptionField(canAdd),
-                const SizedBox(height: 32),
-
-                // Submit Button
-                if (canAdd) _buildSubmitButton(),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusWarning() {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.warningLight,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.warning),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.warning, color: AppTheme.warning),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              l10n.dispute_resolvedCannotAddEvidence,
-              style: TextStyle(
-                color: AppTheme.warning,
-                fontWeight: FontWeight.w500,
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          children: [
+            if (!_open)
+              Text(l10n.dispute_resolvedCannotAddEvidence,
+                  style: AppTheme.bodyMedium.copyWith(color: AppTheme.error))
+            else ...[
+              Text(l10n.dispute_photosLabel, style: AppTheme.headlineSmall),
+              const SizedBox(height: 4),
+              Text(l10n.disputeR_photosHelp(_maxPhotos),
+                  style: AppTheme.bodySmall
+                      .copyWith(color: AppTheme.textSecondary)),
+              const SizedBox(height: 12),
+              _buildPhotoGrid(l10n),
+              const SizedBox(height: 24),
+              Text(l10n.dispute_descriptionOptional,
+                  style: AppTheme.headlineSmall),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _descriptionController,
+                enabled: !_sending,
+                minLines: 3,
+                maxLines: 6,
+                maxLength: 1000,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  hintText: l10n.dispute_describeEvidenceHint,
+                  filled: true,
+                  fillColor: AppTheme.surface,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppTheme.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        const BorderSide(color: AppTheme.primary, width: 1.5),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+            if (_error != null) ...[
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.error_outline_rounded,
+                      size: 18, color: AppTheme.error),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(_error!,
+                        style:
+                            AppTheme.bodySmall.copyWith(color: AppTheme.error)),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+        bottomNavigationBar: !_open
+            ? null
+            : SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  child: FilledButton(
+                    onPressed: _sending || !_hasContent ? null : _send,
+                    child: _sending
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: AppTheme.onPrimary),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(l10n.disputeR_sending),
+                            ],
+                          )
+                        : Text(l10n.dispute_submitEvidence),
+                  ),
+                ),
+              ),
       ),
     );
   }
 
-  Widget _buildInfoCard() {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.infoLight,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+  Widget _buildPhotoGrid(AppLocalizations l10n) {
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+      children: [
+        for (var i = 0; i < _photos.length; i++)
+          Stack(
+            fit: StackFit.expand,
             children: [
-              Icon(Icons.lightbulb, color: AppTheme.info, size: 20),
-              const SizedBox(width: 10),
-              Text(
-                l10n.dispute_evidenceTips,
-                style: TextStyle(
-                  color: AppTheme.info,
-                  fontWeight: FontWeight.bold,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+                child: Image.file(_photos[i], fit: BoxFit.cover),
+              ),
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Material(
+                  color: AppTheme.primary.withValues(alpha: 0.75),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: _sending
+                        ? null
+                        : () => setState(() => _photos.removeAt(i)),
+                    child: const Padding(
+                      padding: EdgeInsets.all(4),
+                      child: Icon(Icons.close_rounded,
+                          size: 16, color: AppTheme.onPrimary),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          _buildTip(l10n.dispute_tipsPhotos),
-          _buildTip(l10n.dispute_tipsScreenshots),
-          _buildTip(l10n.dispute_tipsTimestamp),
-          _buildTip(l10n.dispute_tipsRelevantDocs),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTip(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.check_circle, color: AppTheme.info, size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: AppTheme.info,
-                fontSize: 13,
-              ),
+        if (_photos.length < _maxPhotos)
+          Material(
+            color: AppTheme.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              side: const BorderSide(color: AppTheme.border),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        color: AppTheme.textPrimary,
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-      ),
-    );
-  }
-
-  Widget _buildPhotoSection(bool enabled) {
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      children: [
-        // Photo grid
-        if (_photos.isNotEmpty)
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-            ),
-            itemCount: _photos.length,
-            itemBuilder: (context, index) {
-              return Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      _photos[index],
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
-                  ),
-                  if (enabled)
-                    Positioned(
-                      top: 4,
-                      right: 4,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _photos.removeAt(index);
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: AppTheme.error,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-        if (_photos.isNotEmpty) const SizedBox(height: 12),
-
-        // Add photo button
-        if (_photos.length < 10 && enabled)
-          InkWell(
-            onTap: _showImageSourceDialog,
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: AppTheme.border,
-                  style: BorderStyle.solid,
-                ),
-              ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+              onTap: _sending ? null : _chooseSource,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_a_photo, color: AppTheme.primary, size: 32),
-                  const SizedBox(height: 8),
+                  const Icon(Icons.add_a_photo_outlined,
+                      color: AppTheme.textPrimary),
+                  const SizedBox(height: 6),
                   Text(
-                    _photos.isEmpty
-                        ? l10n.dispute_addPhotos
-                        : l10n.dispute_addMorePhotos,
-                    style: TextStyle(
-                      color: AppTheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    l10n.dispute_photoCount(_photos.length),
-                    style: TextStyle(
-                      color: AppTheme.textTertiary,
-                      fontSize: 12,
-                    ),
+                    l10n.disputeR_addPhoto,
+                    textAlign: TextAlign.center,
+                    style: AppTheme.bodySmall
+                        .copyWith(color: AppTheme.textPrimary),
                   ),
                 ],
               ),
             ),
           ),
       ],
-    );
-  }
-
-  Widget _buildDescriptionField(bool enabled) {
-    final l10n = AppLocalizations.of(context)!;
-    return TextFormField(
-      controller: _descriptionController,
-      maxLines: 4,
-      maxLength: 500,
-      enabled: enabled,
-      style: TextStyle(color: AppTheme.textPrimary),
-      decoration: InputDecoration(
-        hintText: l10n.dispute_describeEvidenceHint,
-        hintStyle: TextStyle(color: AppTheme.textTertiary),
-        filled: true,
-        fillColor: enabled
-            ? AppTheme.surfaceContainer
-            : AppTheme.surfaceContainer.withValues(alpha: 0.5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppTheme.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppTheme.border),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppTheme.border.withValues(alpha: 0.5)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppTheme.primary, width: 2),
-        ),
-        counterStyle: TextStyle(color: AppTheme.textTertiary),
-      ),
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    final l10n = AppLocalizations.of(context)!;
-    final hasContent =
-        _photos.isNotEmpty || _descriptionController.text.trim().isNotEmpty;
-
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: ElevatedButton(
-        onPressed: (_isLoading || !hasContent) ? null : _submitEvidence,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primary,
-          foregroundColor: AppTheme.onPrimary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          disabledBackgroundColor: AppTheme.primary.withValues(alpha: 0.5),
-        ),
-        child: _isLoading
-            ? SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(AppTheme.background),
-                ),
-              )
-            : Text(
-                l10n.dispute_submitEvidence,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-      ),
     );
   }
 }

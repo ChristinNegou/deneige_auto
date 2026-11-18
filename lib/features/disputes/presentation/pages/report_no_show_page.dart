@@ -160,7 +160,8 @@ class _ReportNoShowPageState extends State<ReportNoShowPage> {
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.dispute_cannotSendReportRetry),
+          content:
+              Text(disputeErrorMessage(e, l10n.dispute_cannotSendReportRetry)),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,
         ),

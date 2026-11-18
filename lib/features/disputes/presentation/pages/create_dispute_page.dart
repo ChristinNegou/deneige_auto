@@ -196,9 +196,7 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            e.toString().contains('Exception:')
-                ? e.toString().replaceFirst('Exception: ', '')
-                : l10n.dispute_createError,
+            disputeErrorMessage(e, l10n.dispute_createError),
           ),
           backgroundColor: AppTheme.error,
           behavior: SnackBarBehavior.floating,

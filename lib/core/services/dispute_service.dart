@@ -253,6 +253,31 @@ class Dispute {
   bool get hasEvidence => evidencePhotos.isNotEmpty;
 
   bool get hasAIAnalysis => aiAnalysis != null;
+
+  /// Identifiant d'une partie : `user` est un objet si le serveur l'a
+  /// rempli, sinon directement l'identifiant.
+  static String? _partyUserId(Map<String, dynamic>? party) {
+    final user = party?['user'];
+    if (user is Map) return (user['_id'] ?? user['id'])?.toString();
+    return user?.toString();
+  }
+
+  static String? _partyName(Map<String, dynamic>? party) {
+    final user = party?['user'];
+    if (user is! Map) return null;
+    final name = '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim();
+    return name.isEmpty ? null : name;
+  }
+
+  String? get claimantUserId => _partyUserId(claimant);
+  String? get respondentUserId => _partyUserId(respondent);
+  String? get claimantName => _partyName(claimant);
+
+  /// Le defendeur est le seul a pouvoir repondre au litige.
+  bool isRespondent(String? userId) =>
+      userId != null && userId == respondentUserId;
+
+  bool isClaimant(String? userId) => userId != null && userId == claimantUserId;
 }
 
 /// Service pour gérer les litiges
@@ -524,4 +549,23 @@ class DisputeService {
     final response = await _dio.post('/disputes/verify-quality/$reservationId');
     return response.data['verification'];
   }
+}
+
+/// Message a montrer au client apres un echec : celui du serveur s'il en a
+/// donne un (ex. "Vous pourrez signaler l'absence 30 minutes apres..."),
+/// sinon [fallback].
+String disputeErrorMessage(Object error, String fallback) {
+  if (error is DioException) {
+    final data = error.response?.data;
+    if (data is Map) {
+      final message = data['message'];
+      if (message is String && message.trim().isNotEmpty) return message;
+      final errors = data['errors'];
+      if (errors is List && errors.isNotEmpty && errors.first is Map) {
+        final msg = (errors.first as Map)['msg'];
+        if (msg is String && msg.isNotEmpty) return msg;
+      }
+    }
+  }
+  return fallback;
 }

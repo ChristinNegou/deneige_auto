@@ -48,7 +48,8 @@ router.get('/types', getDisputeTypes);
  * Upload des photos pour un litige (preuves).
  * Retourne les URLs des photos uploadées.
  */
-router.post('/upload-photos', protect, disputeEvidenceUpload.array('photos', 5), handleMulterError, async (req, res) => {
+// 10 photos : autant que les ecrans de reponse et de preuves en proposent
+router.post('/upload-photos', protect, disputeEvidenceUpload.array('photos', 10), handleMulterError, async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({

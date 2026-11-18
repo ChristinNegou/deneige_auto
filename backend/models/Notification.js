@@ -33,6 +33,22 @@ const notificationSchema = new mongoose.Schema({
             'newMessage',      // Pour les messages de chat
             'tipReceived',     // Pourboire reçu par le déneigeur
             'rating',          // Évaluation reçue par le déneigeur
+            // Types envoyes par le serveur qui manquaient : la creation
+            // echouait sans bruit et la notification n'arrivait jamais.
+            'dispute',               // Litiges (signalement, reponse, decision)
+            'penalty',               // Sanction apres un litige
+            'reservationUpdate',     // Reservation expiree et remboursee
+            'deadline_reminder',     // Rappel d'echeance au deneigeur
+            'paymentReceived',       // Versement recu par le deneigeur
+            'payout_success',
+            'payout_failed',
+            'payment_success',
+            'payment_failed',
+            'stripe_connect_ready',
+            'dispute_created',       // Contestation de paiement (Stripe)
+            'dispute_won',
+            'dispute_lost',
+            'identityVerification',
         ],
         required: [true, 'Le type est requis'],
     },

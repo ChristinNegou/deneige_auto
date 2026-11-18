@@ -31,6 +31,14 @@ class NotificationNavigationService {
       return;
     }
 
+    // Litiges (signalement, reponse, decision) : ouvrir le litige concerne
+    final disputeId = notification.metadata?['disputeId'];
+    if (disputeId is String && disputeId.isNotEmpty) {
+      Navigator.of(context)
+          .pushNamed(AppRoutes.disputeDetails, arguments: disputeId);
+      return;
+    }
+
     // Traitement spécial pour les notifications système (support, etc.)
     if (notification.type == NotificationType.systemNotification) {
       _showNotificationDetails(context, notification);
