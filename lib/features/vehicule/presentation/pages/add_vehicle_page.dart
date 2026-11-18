@@ -42,20 +42,45 @@ class _AddVehicleViewState extends State<AddVehicleView> {
   File? _selectedPhoto;
 
   /// Couleurs proposees ; la teinte affichee vient de [vehicleBodyColor].
+  /// Rangees des neutres aux teintes chaudes puis froides.
   static const List<String> _colors = [
     'Blanc',
-    'Noir',
-    'Gris',
+    'Blanc nacré',
     'Argent',
-    'Rouge',
-    'Bleu',
-    'Vert',
-    'Brun',
+    'Gris',
+    'Gris foncé',
+    'Noir',
     'Beige',
+    'Champagne',
+    'Brun',
+    'Bronze',
+    'Or',
+    'Jaune',
+    'Orange',
+    'Rouge',
+    'Bordeaux',
+    'Rose',
+    'Violet',
+    'Bleu ciel',
+    'Bleu',
+    'Bleu marine',
+    'Turquoise',
+    'Vert',
+    'Vert foncé',
   ];
 
   /// Couleurs claires : la coche doit etre foncee pour rester visible.
-  static const Set<String> _lightColors = {'Blanc', 'Beige', 'Argent'};
+  static const Set<String> _lightColors = {
+    'Blanc',
+    'Blanc nacré',
+    'Argent',
+    'Beige',
+    'Champagne',
+    'Or',
+    'Jaune',
+    'Rose',
+    'Bleu ciel',
+  };
 
   @override
   void dispose() {
