@@ -2,6 +2,7 @@
 // Import this file to access all services at once:
 // `import 'package:deneige_auto/core/services/services.dart';`
 
+export 'address_search_service.dart';
 export 'analytics_service.dart';
 export 'cache_service.dart';
 export 'connectivity_service.dart';

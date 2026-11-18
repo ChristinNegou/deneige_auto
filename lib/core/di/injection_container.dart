@@ -26,6 +26,7 @@ import '../../features/reservation/presentation/bloc/edit_reservation_bloc.dart'
 import '../../features/vehicule/presentation/bloc/vehicule_bloc.dart';
 import '../../service/secure_storage_service.dart';
 import '../network/dio_client.dart';
+import '../services/address_search_service.dart';
 import '../services/location_service.dart';
 import '../services/push_notification_service.dart';
 import '../services/socket_service.dart';
@@ -165,6 +166,7 @@ Future<void> initializeDependencies() async {
   // --- Core : services transversaux ---
   sl.registerLazySingleton<SecureStorageService>(() => SecureStorageService());
   sl.registerLazySingleton<LocationService>(() => LocationService());
+  sl.registerLazySingleton<AddressSearchService>(() => AddressSearchService());
   sl.registerLazySingleton<DioClient>(
       () => DioClient(secureStorage: sl(), localeService: sl()));
   sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);

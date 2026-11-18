@@ -317,5 +317,44 @@ void main() {
         ],
       );
     });
+
+    group('SetLocationFromSuggestion', () {
+      blocTest<NewReservationBloc, NewReservationState>(
+        'stores the address and its coordinates, unblocking step 2',
+        build: () => bloc,
+        act: (bloc) => bloc.add(const SetLocationFromSuggestion(
+          address: '3746 Boulevard Jean-XXIII, Trois-Rivières',
+          latitude: 46.34,
+          longitude: -72.58,
+        )),
+        verify: (bloc) {
+          expect(bloc.state.locationAddress,
+              '3746 Boulevard Jean-XXIII, Trois-Rivières');
+          expect(bloc.state.locationLatitude, 46.34);
+          expect(bloc.state.canProceedStep2, true);
+        },
+      );
+    });
+
+    group('ClearLocation', () {
+      blocTest<NewReservationBloc, NewReservationState>(
+        'forgets the previous position when the address is edited',
+        build: () => bloc,
+        seed: () => const NewReservationState(
+          locationAddress: '12 Rue A',
+          locationLatitude: 46.3,
+          locationLongitude: -72.5,
+          locationIssue: LocationIssue.serviceDisabled,
+        ),
+        act: (bloc) => bloc.add(ClearLocation()),
+        verify: (bloc) {
+          expect(bloc.state.locationAddress, isNull);
+          expect(bloc.state.hasValidLocation, false);
+          expect(bloc.state.canProceedStep2, false);
+          // Le message GPS reste affiche tant que le probleme existe
+          expect(bloc.state.locationIssue, LocationIssue.serviceDisabled);
+        },
+      );
+    });
   });
 }

@@ -106,3 +106,21 @@ class SetLocationFromAddress extends NewReservationEvent {
 }
 
 class ClearLocationError extends NewReservationEvent {}
+
+/// Adresse choisie dans les suggestions : deja geolocalisee.
+class SetLocationFromSuggestion extends NewReservationEvent {
+  final String address;
+  final double latitude;
+  final double longitude;
+  const SetLocationFromSuggestion({
+    required this.address,
+    required this.latitude,
+    required this.longitude,
+  });
+
+  @override
+  List<Object?> get props => [address, latitude, longitude];
+}
+
+/// L'adresse saisie a change : l'ancienne position ne vaut plus.
+class ClearLocation extends NewReservationEvent {}

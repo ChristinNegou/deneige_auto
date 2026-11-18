@@ -3830,45 +3830,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get step1_chipRearParking => 'Rear parking';
 
   @override
-  String get step2_gpsPosition => 'GPS Position';
-
-  @override
-  String get step2_address => 'Address';
-
-  @override
-  String get step2_searching => 'Searching...';
-
-  @override
   String get step2_positionDetected => 'Position detected';
-
-  @override
-  String get step2_positionUnavailable =>
-      'Position unavailable, enable your GPS';
-
-  @override
-  String get step2_pleaseWait => 'Please wait';
-
-  @override
-  String get step2_checkAddress => 'Check the address below';
-
-  @override
-  String get step2_enterManually => 'Enter the address manually';
-
-  @override
-  String get step2_refresh => 'Refresh';
 
   @override
   String get step2_retry => 'Retry';
 
   @override
-  String get step2_addressValidated => 'Address validated';
+  String get step2_subtitle => 'The snow worker will go to this address.';
 
   @override
-  String get step2_validateAddress => 'Validate address';
+  String get step2_searchHint =>
+      'Number and street, e.g. 3746 boul. Jean-XXIII';
 
   @override
-  String get step2_addressTip =>
-      'The address helps our snow workers locate your vehicle';
+  String get step2_useMyLocation => 'Use my current location';
+
+  @override
+  String get step2_locating => 'Finding your location…';
+
+  @override
+  String get step2_gpsOff =>
+      'Turn on location to fill in the address automatically.';
+
+  @override
+  String get step2_gpsDenied =>
+      'Allow location access to fill in the address automatically.';
+
+  @override
+  String get step2_gpsUnavailable =>
+      'Location not found right now. Search for your address below.';
+
+  @override
+  String get step2_enableGps => 'Turn on';
+
+  @override
+  String get step2_allow => 'Allow';
+
+  @override
+  String get step2_openSettings => 'Settings';
+
+  @override
+  String get step2_noResults => 'No address found. Add the number or the city.';
+
+  @override
+  String get step2_searchFailed => 'Search unavailable. Check your connection.';
+
+  @override
+  String get step2_selectSuggestion => 'Pick an address from the list.';
 
   @override
   String get step3_departureDate => 'Departure date';

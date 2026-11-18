@@ -3873,45 +3873,54 @@ class AppLocalizationsFr extends AppLocalizations {
   String get step1_chipRearParking => 'Stationnement arrière';
 
   @override
-  String get step2_gpsPosition => 'Position GPS';
-
-  @override
-  String get step2_address => 'Adresse';
-
-  @override
-  String get step2_searching => 'Recherche en cours...';
-
-  @override
   String get step2_positionDetected => 'Position détectée';
-
-  @override
-  String get step2_positionUnavailable =>
-      'Position non disponible, activez votre GPS';
-
-  @override
-  String get step2_pleaseWait => 'Veuillez patienter';
-
-  @override
-  String get step2_checkAddress => 'Vérifiez l\'adresse ci-dessous';
-
-  @override
-  String get step2_enterManually => 'Entrez l\'adresse manuellement';
-
-  @override
-  String get step2_refresh => 'Actualiser';
 
   @override
   String get step2_retry => 'Réessayer';
 
   @override
-  String get step2_addressValidated => 'Adresse validée';
+  String get step2_subtitle => 'Le déneigeur se rendra à cette adresse.';
 
   @override
-  String get step2_validateAddress => 'Valider l\'adresse';
+  String get step2_searchHint => 'Numéro et rue, ex. 3746 boul. Jean-XXIII';
 
   @override
-  String get step2_addressTip =>
-      'L\'adresse aide nos déneigeurs à localiser votre véhicule';
+  String get step2_useMyLocation => 'Utiliser ma position actuelle';
+
+  @override
+  String get step2_locating => 'Recherche de votre position…';
+
+  @override
+  String get step2_gpsOff =>
+      'Activez la localisation pour remplir l’adresse automatiquement.';
+
+  @override
+  String get step2_gpsDenied =>
+      'Autorisez l’accès à votre position pour remplir l’adresse automatiquement.';
+
+  @override
+  String get step2_gpsUnavailable =>
+      'Position introuvable pour l’instant. Cherchez votre adresse ci-dessous.';
+
+  @override
+  String get step2_enableGps => 'Activer';
+
+  @override
+  String get step2_allow => 'Autoriser';
+
+  @override
+  String get step2_openSettings => 'Réglages';
+
+  @override
+  String get step2_noResults =>
+      'Aucune adresse trouvée. Ajoutez le numéro ou la ville.';
+
+  @override
+  String get step2_searchFailed =>
+      'Recherche indisponible. Vérifiez votre connexion.';
+
+  @override
+  String get step2_selectSuggestion => 'Choisissez une adresse dans la liste.';
 
   @override
   String get step3_departureDate => 'Date de départ';

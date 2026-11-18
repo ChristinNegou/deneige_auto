@@ -7214,59 +7214,11 @@ abstract class AppLocalizations {
   /// **'Stationnement arrière'**
   String get step1_chipRearParking;
 
-  /// No description provided for @step2_gpsPosition.
-  ///
-  /// In fr, this message translates to:
-  /// **'Position GPS'**
-  String get step2_gpsPosition;
-
-  /// No description provided for @step2_address.
-  ///
-  /// In fr, this message translates to:
-  /// **'Adresse'**
-  String get step2_address;
-
-  /// No description provided for @step2_searching.
-  ///
-  /// In fr, this message translates to:
-  /// **'Recherche en cours...'**
-  String get step2_searching;
-
   /// No description provided for @step2_positionDetected.
   ///
   /// In fr, this message translates to:
   /// **'Position détectée'**
   String get step2_positionDetected;
-
-  /// No description provided for @step2_positionUnavailable.
-  ///
-  /// In fr, this message translates to:
-  /// **'Position non disponible, activez votre GPS'**
-  String get step2_positionUnavailable;
-
-  /// No description provided for @step2_pleaseWait.
-  ///
-  /// In fr, this message translates to:
-  /// **'Veuillez patienter'**
-  String get step2_pleaseWait;
-
-  /// No description provided for @step2_checkAddress.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vérifiez l\'adresse ci-dessous'**
-  String get step2_checkAddress;
-
-  /// No description provided for @step2_enterManually.
-  ///
-  /// In fr, this message translates to:
-  /// **'Entrez l\'adresse manuellement'**
-  String get step2_enterManually;
-
-  /// No description provided for @step2_refresh.
-  ///
-  /// In fr, this message translates to:
-  /// **'Actualiser'**
-  String get step2_refresh;
 
   /// No description provided for @step2_retry.
   ///
@@ -7274,23 +7226,83 @@ abstract class AppLocalizations {
   /// **'Réessayer'**
   String get step2_retry;
 
-  /// No description provided for @step2_addressValidated.
+  /// No description provided for @step2_subtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Adresse validée'**
-  String get step2_addressValidated;
+  /// **'Le déneigeur se rendra à cette adresse.'**
+  String get step2_subtitle;
 
-  /// No description provided for @step2_validateAddress.
+  /// No description provided for @step2_searchHint.
   ///
   /// In fr, this message translates to:
-  /// **'Valider l\'adresse'**
-  String get step2_validateAddress;
+  /// **'Numéro et rue, ex. 3746 boul. Jean-XXIII'**
+  String get step2_searchHint;
 
-  /// No description provided for @step2_addressTip.
+  /// No description provided for @step2_useMyLocation.
   ///
   /// In fr, this message translates to:
-  /// **'L\'adresse aide nos déneigeurs à localiser votre véhicule'**
-  String get step2_addressTip;
+  /// **'Utiliser ma position actuelle'**
+  String get step2_useMyLocation;
+
+  /// No description provided for @step2_locating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche de votre position…'**
+  String get step2_locating;
+
+  /// No description provided for @step2_gpsOff.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activez la localisation pour remplir l’adresse automatiquement.'**
+  String get step2_gpsOff;
+
+  /// No description provided for @step2_gpsDenied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autorisez l’accès à votre position pour remplir l’adresse automatiquement.'**
+  String get step2_gpsDenied;
+
+  /// No description provided for @step2_gpsUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Position introuvable pour l’instant. Cherchez votre adresse ci-dessous.'**
+  String get step2_gpsUnavailable;
+
+  /// No description provided for @step2_enableGps.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer'**
+  String get step2_enableGps;
+
+  /// No description provided for @step2_allow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autoriser'**
+  String get step2_allow;
+
+  /// No description provided for @step2_openSettings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réglages'**
+  String get step2_openSettings;
+
+  /// No description provided for @step2_noResults.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune adresse trouvée. Ajoutez le numéro ou la ville.'**
+  String get step2_noResults;
+
+  /// No description provided for @step2_searchFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche indisponible. Vérifiez votre connexion.'**
+  String get step2_searchFailed;
+
+  /// No description provided for @step2_selectSuggestion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez une adresse dans la liste.'**
+  String get step2_selectSuggestion;
 
   /// No description provided for @step3_departureDate.
   ///

@@ -3,6 +3,21 @@ import '../../domain/entities/vehicle.dart';
 import '../../domain/entities/parking_spot.dart';
 import '../../../../core/config/app_config.dart';
 
+/// Pourquoi la position GPS n'a pas pu etre obtenue.
+enum LocationIssue {
+  /// La localisation de l'appareil est desactivee.
+  serviceDisabled,
+
+  /// L'utilisateur a refuse l'acces a sa position.
+  permissionDenied,
+
+  /// Refus definitif : seule la page des reglages permet de l'autoriser.
+  permissionDeniedForever,
+
+  /// GPS actif mais aucune position obtenue (delai depasse, etc.).
+  unavailable,
+}
+
 class NewReservationState extends Equatable {
   final int currentStep;
   final Vehicle? selectedVehicle;
@@ -31,6 +46,7 @@ class NewReservationState extends Equatable {
   final bool isGettingLocation;
   final bool needsManualAddress;
   final String? locationError;
+  final LocationIssue? locationIssue;
 
   const NewReservationState({
     this.currentStep = 0,
@@ -58,6 +74,7 @@ class NewReservationState extends Equatable {
     this.isGettingLocation = false,
     this.needsManualAddress = false,
     this.locationError,
+    this.locationIssue,
   });
 
   bool get hasValidLocation =>
@@ -153,6 +170,9 @@ class NewReservationState extends Equatable {
     bool? isGettingLocation,
     bool? needsManualAddress,
     String? locationError,
+    LocationIssue? locationIssue,
+    // Efface la position et l'adresse (l'adresse saisie a change).
+    bool clearLocation = false,
   }) {
     return NewReservationState(
       currentStep: currentStep ?? this.currentStep,
@@ -178,12 +198,16 @@ class NewReservationState extends Equatable {
           : parkingSpotNumber ?? this.parkingSpotNumber,
       customLocation:
           clearCustomLocation ? null : customLocation ?? this.customLocation,
-      locationLatitude: locationLatitude ?? this.locationLatitude,
-      locationLongitude: locationLongitude ?? this.locationLongitude,
-      locationAddress: locationAddress ?? this.locationAddress,
+      locationLatitude:
+          clearLocation ? null : locationLatitude ?? this.locationLatitude,
+      locationLongitude:
+          clearLocation ? null : locationLongitude ?? this.locationLongitude,
+      locationAddress:
+          clearLocation ? null : locationAddress ?? this.locationAddress,
       isGettingLocation: isGettingLocation ?? this.isGettingLocation,
       needsManualAddress: needsManualAddress ?? this.needsManualAddress,
       locationError: locationError,
+      locationIssue: locationIssue,
     );
   }
 
@@ -213,6 +237,7 @@ class NewReservationState extends Equatable {
         locationAddress,
         isGettingLocation,
         needsManualAddress,
+        locationIssue,
         locationError,
       ];
 }

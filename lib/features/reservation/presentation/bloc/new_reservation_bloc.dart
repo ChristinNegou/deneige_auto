@@ -38,6 +38,8 @@ class NewReservationBloc
     on<UpdateCustomLocation>(_onUpdateCustomLocation);
     on<GetCurrentLocation>(_onGetCurrentLocation);
     on<SetLocationFromAddress>(_onSetLocationFromAddress);
+    on<SetLocationFromSuggestion>(_onSetLocationFromSuggestion);
+    on<ClearLocation>(_onClearLocation);
     on<ClearLocationError>(_onClearLocationError);
   }
 
@@ -51,29 +53,29 @@ class NewReservationBloc
       needsManualAddress: false,
     ));
 
+    // L'ecran explique le probleme et propose la bonne action (reglages).
+    void fail(LocationIssue issue) => emit(state.copyWith(
+          isGettingLocation: false,
+          needsManualAddress: true,
+          locationIssue: issue,
+        ));
+
     try {
-      // Vérifier les permissions
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        fail(LocationIssue.serviceDisabled);
+        return;
+      }
+
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          emit(state.copyWith(
-            isGettingLocation: false,
-            needsManualAddress: true,
-            locationError:
-                'Permission de localisation refusée. Veuillez entrer votre adresse.',
-          ));
-          return;
-        }
       }
-
+      if (permission == LocationPermission.denied) {
+        fail(LocationIssue.permissionDenied);
+        return;
+      }
       if (permission == LocationPermission.deniedForever) {
-        emit(state.copyWith(
-          isGettingLocation: false,
-          needsManualAddress: true,
-          locationError:
-              'Permission refusée définitivement. Veuillez entrer votre adresse.',
-        ));
+        fail(LocationIssue.permissionDeniedForever);
         return;
       }
 
@@ -129,14 +131,35 @@ class NewReservationBloc
         needsManualAddress: false,
         locationError: null,
       ));
+    } on LocationServiceDisabledException {
+      fail(LocationIssue.serviceDisabled);
     } catch (e) {
-      emit(state.copyWith(
-        isGettingLocation: false,
-        needsManualAddress: true,
-        locationError:
-            'Impossible d\'obtenir votre position. Veuillez entrer votre adresse.',
-      ));
+      fail(LocationIssue.unavailable);
     }
+  }
+
+  void _onSetLocationFromSuggestion(
+    SetLocationFromSuggestion event,
+    Emitter<NewReservationState> emit,
+  ) {
+    emit(state.copyWith(
+      isGettingLocation: false,
+      locationLatitude: event.latitude,
+      locationLongitude: event.longitude,
+      locationAddress: event.address,
+      needsManualAddress: false,
+    ));
+  }
+
+  void _onClearLocation(
+    ClearLocation event,
+    Emitter<NewReservationState> emit,
+  ) {
+    if (!state.hasValidLocation && state.locationAddress == null) return;
+    emit(state.copyWith(
+      clearLocation: true,
+      locationIssue: state.locationIssue,
+    ));
   }
 
   Future<void> _onSetLocationFromAddress(
