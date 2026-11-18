@@ -161,6 +161,7 @@ class NewReservationState extends Equatable {
     // `null` garde la valeur actuelle : ces drapeaux permettent de l'effacer.
     bool clearParkingSpotNumber = false,
     bool clearCustomLocation = false,
+    bool clearSnowDepth = false,
     double? locationLatitude,
     double? locationLongitude,
     String? locationAddress,
@@ -181,7 +182,7 @@ class NewReservationState extends Equatable {
       departureDateTime: departureDateTime ?? this.departureDateTime,
       deadlineTime: deadlineTime ?? this.deadlineTime,
       selectedOptions: selectedOptions ?? this.selectedOptions,
-      snowDepthCm: snowDepthCm ?? this.snowDepthCm,
+      snowDepthCm: clearSnowDepth ? null : snowDepthCm ?? this.snowDepthCm,
       calculatedPrice: calculatedPrice ?? this.calculatedPrice,
       priceBreakdown: priceBreakdown ?? this.priceBreakdown,
       isLoading: isLoading ?? this.isLoading,

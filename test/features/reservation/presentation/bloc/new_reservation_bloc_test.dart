@@ -245,6 +245,17 @@ void main() {
           expect(bloc.state.snowDepthCm, 15);
         },
       );
+
+      blocTest<NewReservationBloc, NewReservationState>(
+        'clears the depth when the client picks "unknown"',
+        build: () => bloc,
+        act: (bloc) => bloc
+          ..add(const UpdateSnowDepth(25))
+          ..add(const UpdateSnowDepth(null)),
+        verify: (bloc) {
+          expect(bloc.state.snowDepthCm, isNull);
+        },
+      );
     });
 
     group('GoToNextStep', () {

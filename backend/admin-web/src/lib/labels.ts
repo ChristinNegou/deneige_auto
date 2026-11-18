@@ -110,6 +110,11 @@ export const serviceOptions: Record<string, string> = {
   windowScraping: 'Grattage des vitres',
   doorDeicing: 'Dégivrage des portes',
   wheelClearance: 'Dégagement des roues',
+  roofClearing: 'Déneigement du toit',
+  saltSpreading: 'Épandage de sel',
+  lightsCleaning: 'Nettoyage des phares',
+  perimeterClearance: 'Dégagement du périmètre',
+  exhaustCheck: 'Vérification de l’échappement',
 };
 
 export const equipment: Record<string, string> = {

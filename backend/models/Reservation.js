@@ -7,6 +7,46 @@ const mongoose = require('mongoose');
 
 // --- Schéma principal ---
 
+/** Options proposees dans l'application (ecran Options). */
+const SERVICE_OPTIONS = [
+    'windowScraping',
+    'doorDeicing',
+    'wheelClearance',
+    'roofClearing',
+    'saltSpreading',
+    'lightsCleaning',
+    'perimeterClearance',
+    'exhaustCheck',
+];
+
+/** Equipement exige par chaque option (pelle et brosse toujours requises). */
+const OPTION_EQUIPMENT = {
+    windowScraping: ['ice_scraper'],
+    doorDeicing: ['ice_scraper', 'deicer_spray'],
+    roofClearing: ['roof_broom'],
+    saltSpreading: ['salt_spreader'],
+    lightsCleaning: ['microfiber_cloth'],
+    // wheelClearance, perimeterClearance : la pelle suffit
+    // exhaustCheck : simple verification visuelle
+};
+
+/**
+ * Calcule l'equipement requis selon les options et la quantite de neige.
+ * @param {{serviceOptions?: string[], snowDepthCm?: number}} reservation
+ * @returns {string[]} Equipement requis, sans doublons
+ */
+const computeRequiredEquipment = (reservation) => {
+    const required = ['shovel', 'brush'];
+    for (const option of reservation.serviceOptions || []) {
+        required.push(...(OPTION_EQUIPMENT[option] || []));
+    }
+    // Grosse bordee : souffleuse obligatoire
+    if (reservation.snowDepthCm && reservation.snowDepthCm > 15) {
+        required.push('snow_blower');
+    }
+    return [...new Set(required)];
+};
+
 const reservationSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -55,7 +95,7 @@ const reservationSchema = new mongoose.Schema({
     },
     serviceOptions: [{
         type: String,
-        enum: ['windowScraping', 'doorDeicing', 'wheelClearance'],
+        enum: SERVICE_OPTIONS,
     }],
     snowDepthCm: {
         type: Number,
@@ -593,25 +633,7 @@ reservationSchema.virtual('statusDisplayName').get(function() {
 
 // Middleware pour calculer l'équipement requis
 reservationSchema.pre('save', function(next) {
-    // Base equipment always required
-    const required = ['shovel', 'brush'];
-
-    // Check service options
-    if (this.serviceOptions && this.serviceOptions.length > 0) {
-        if (this.serviceOptions.includes('windowScraping')) {
-            required.push('ice_scraper');
-        }
-        if (this.serviceOptions.includes('doorDeicing')) {
-            required.push('salt_spreader');
-        }
-    }
-
-    // Check snow depth - heavy snow requires snow blower
-    if (this.snowDepthCm && this.snowDepthCm > 15) {
-        required.push('snow_blower');
-    }
-
-    this.requiredEquipment = [...new Set(required)]; // Remove duplicates
+    this.requiredEquipment = computeRequiredEquipment(this);
     next();
 });
 
@@ -645,5 +667,8 @@ reservationSchema.pre('save', function(next) {
 // Options pour inclure les virtuals dans JSON
 reservationSchema.set('toJSON', { virtuals: true });
 reservationSchema.set('toObject', { virtuals: true });
+
+reservationSchema.statics.computeRequiredEquipment = computeRequiredEquipment;
+reservationSchema.statics.SERVICE_OPTIONS = SERVICE_OPTIONS;
 
 module.exports = mongoose.model('Reservation', reservationSchema);

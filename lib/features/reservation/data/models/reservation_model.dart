@@ -59,6 +59,7 @@ class ReservationModel extends Reservation {
       status: _parseReservationStatus(json['status'] as String? ?? 'pending'),
       serviceOptions: (json['serviceOptions'] as List<dynamic>?)
               ?.map((e) => _parseServiceOption(e as String))
+              .whereType<ServiceOption>()
               .toList() ??
           [],
       basePrice: (json['basePrice'] as num).toDouble(),
@@ -237,20 +238,13 @@ class ReservationModel extends Reservation {
     }
   }
 
-  static ServiceOption _parseServiceOption(String option) {
-    switch (option.toLowerCase()) {
-      case 'windowscraping':
-      case 'window_scraping':
-        return ServiceOption.windowScraping;
-      case 'doordeicing':
-      case 'door_deicing':
-        return ServiceOption.doorDeicing;
-      case 'wheelclearance':
-      case 'wheel_clearance':
-        return ServiceOption.wheelClearance;
-      default:
-        return ServiceOption.windowScraping;
+  /// Accepte "roofClearing" comme "roof_clearing" ; null si l'option est inconnue.
+  static ServiceOption? _parseServiceOption(String option) {
+    final key = option.replaceAll('_', '').toLowerCase();
+    for (final value in ServiceOption.values) {
+      if (value.name.toLowerCase() == key) return value;
     }
+    return null;
   }
 
   static String _serviceOptionToString(ServiceOption option) {

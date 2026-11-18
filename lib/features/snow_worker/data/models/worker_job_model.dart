@@ -148,18 +148,13 @@ class WorkerJobModel extends WorkerJob {
   factory WorkerJobModel.fromJson(Map<String, dynamic> json) {
     // Parse service options
     final serviceOptionsJson = json['serviceOptions'] as List<dynamic>? ?? [];
-    final serviceOptions = serviceOptionsJson.map((option) {
-      switch (option.toString()) {
-        case 'windowScraping':
-          return ServiceOption.windowScraping;
-        case 'doorDeicing':
-          return ServiceOption.doorDeicing;
-        case 'wheelClearance':
-          return ServiceOption.wheelClearance;
-        default:
-          return ServiceOption.windowScraping;
-      }
-    }).toList();
+    // Une option inconnue est ignoree plutot que confondue avec une autre
+    final serviceOptions = serviceOptionsJson
+        .map((option) => ServiceOption.values
+            .where((o) => o.name == option.toString())
+            .firstOrNull)
+        .whereType<ServiceOption>()
+        .toList();
 
     // Parse status
     JobStatus status;

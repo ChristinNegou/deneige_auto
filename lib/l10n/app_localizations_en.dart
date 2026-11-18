@@ -3900,10 +3900,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get step4_additionalOptions => 'Additional options';
 
   @override
-  String get step4_snowDepth => 'Snow depth';
+  String get step4_snowDepth => 'Amount of snow';
 
   @override
-  String get step4_summary => 'Summary';
+  String get step4_optionsHelp =>
+      'Optional. Clearing the vehicle is always included.';
+
+  @override
+  String step4_moreOptions(int count) {
+    return 'More options ($count)';
+  }
+
+  @override
+  String get step4_fewerOptions => 'Fewer options';
+
+  @override
+  String get step4_snowHelp =>
+      'Optional. Helps the snow worker bring the right equipment.';
+
+  @override
+  String get snow_unknown => 'I don\'t know';
+
+  @override
+  String get snow_under10 => 'Under 10 cm';
+
+  @override
+  String get snow_10to20 => '10 to 20 cm';
+
+  @override
+  String get snow_20to30 => '20 to 30 cm';
+
+  @override
+  String get snow_over30 => 'Over 30 cm';
 
   @override
   String get step5_location => 'Location';
@@ -4189,13 +4217,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get price_taxesIncluded => 'Taxes included';
-
-  @override
-  String get snow_estimatedDepth => 'Estimated snow depth';
-
-  @override
-  String get snow_optionalHelper =>
-      'Optional - Helps estimate the required time';
 
   @override
   String get ai_estimationTitle => 'AI Estimation';

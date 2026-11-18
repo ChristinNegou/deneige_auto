@@ -326,7 +326,11 @@ class NewReservationBloc
     UpdateSnowDepth event,
     Emitter<NewReservationState> emit,
   ) {
-    emit(state.copyWith(snowDepthCm: event.snowDepthCm));
+    // null = "Je ne sais pas" : il faut effacer la valeur precedente
+    emit(state.copyWith(
+      snowDepthCm: event.snowDepthCm,
+      clearSnowDepth: event.snowDepthCm == null,
+    ));
     add(CalculatePrice());
   }
 

@@ -3941,13 +3941,41 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get step4_additionalOptions => 'Options supplementaires';
+  String get step4_additionalOptions => 'Options supplémentaires';
 
   @override
-  String get step4_snowDepth => 'Profondeur de neige';
+  String get step4_snowDepth => 'Quantité de neige';
 
   @override
-  String get step4_summary => 'Recapitulatif';
+  String get step4_optionsHelp =>
+      'Facultatif. Le déneigement du véhicule est toujours inclus.';
+
+  @override
+  String step4_moreOptions(int count) {
+    return 'Plus d’options ($count)';
+  }
+
+  @override
+  String get step4_fewerOptions => 'Moins d’options';
+
+  @override
+  String get step4_snowHelp =>
+      'Facultatif. Aide le déneigeur à prévoir le bon équipement.';
+
+  @override
+  String get snow_unknown => 'Je ne sais pas';
+
+  @override
+  String get snow_under10 => 'Moins de 10 cm';
+
+  @override
+  String get snow_10to20 => '10 à 20 cm';
+
+  @override
+  String get snow_20to30 => '20 à 30 cm';
+
+  @override
+  String get snow_over30 => 'Plus de 30 cm';
 
   @override
   String get step5_location => 'Localisation';
@@ -4241,13 +4269,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get price_taxesIncluded => 'Taxes incluses';
-
-  @override
-  String get snow_estimatedDepth => 'Profondeur de neige estimée';
-
-  @override
-  String get snow_optionalHelper =>
-      'Optionnel - Aide à estimer le temps requis';
 
   @override
   String get ai_estimationTitle => 'Estimation IA';

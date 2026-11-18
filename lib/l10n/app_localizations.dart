@@ -7337,20 +7337,68 @@ abstract class AppLocalizations {
   /// No description provided for @step4_additionalOptions.
   ///
   /// In fr, this message translates to:
-  /// **'Options supplementaires'**
+  /// **'Options supplémentaires'**
   String get step4_additionalOptions;
 
   /// No description provided for @step4_snowDepth.
   ///
   /// In fr, this message translates to:
-  /// **'Profondeur de neige'**
+  /// **'Quantité de neige'**
   String get step4_snowDepth;
 
-  /// No description provided for @step4_summary.
+  /// No description provided for @step4_optionsHelp.
   ///
   /// In fr, this message translates to:
-  /// **'Recapitulatif'**
-  String get step4_summary;
+  /// **'Facultatif. Le déneigement du véhicule est toujours inclus.'**
+  String get step4_optionsHelp;
+
+  /// No description provided for @step4_moreOptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus d’options ({count})'**
+  String step4_moreOptions(int count);
+
+  /// No description provided for @step4_fewerOptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moins d’options'**
+  String get step4_fewerOptions;
+
+  /// No description provided for @step4_snowHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facultatif. Aide le déneigeur à prévoir le bon équipement.'**
+  String get step4_snowHelp;
+
+  /// No description provided for @snow_unknown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je ne sais pas'**
+  String get snow_unknown;
+
+  /// No description provided for @snow_under10.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moins de 10 cm'**
+  String get snow_under10;
+
+  /// No description provided for @snow_10to20.
+  ///
+  /// In fr, this message translates to:
+  /// **'10 à 20 cm'**
+  String get snow_10to20;
+
+  /// No description provided for @snow_20to30.
+  ///
+  /// In fr, this message translates to:
+  /// **'20 à 30 cm'**
+  String get snow_20to30;
+
+  /// No description provided for @snow_over30.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus de 30 cm'**
+  String get snow_over30;
 
   /// No description provided for @step5_location.
   ///
@@ -7903,18 +7951,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Taxes incluses'**
   String get price_taxesIncluded;
-
-  /// No description provided for @snow_estimatedDepth.
-  ///
-  /// In fr, this message translates to:
-  /// **'Profondeur de neige estimée'**
-  String get snow_estimatedDepth;
-
-  /// No description provided for @snow_optionalHelper.
-  ///
-  /// In fr, this message translates to:
-  /// **'Optionnel - Aide à estimer le temps requis'**
-  String get snow_optionalHelper;
 
   /// No description provided for @ai_estimationTitle.
   ///
