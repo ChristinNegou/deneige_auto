@@ -34,20 +34,18 @@ class PaymentService {
     }
   }
 
-  /// Confirmer le paiement avec Payment Sheet (nouvelle carte)
+  /// Confirmer le paiement avec Payment Sheet (nouvelle carte).
+  /// Retourne false si le client ferme la feuille ; leve
+  /// [PaymentDeclinedException] si la banque refuse.
   Future<bool> confirmPayment({
     required String clientSecret,
   }) async {
     try {
-      // Confirmer le paiement avec Stripe Payment Sheet
       await Stripe.instance.presentPaymentSheet();
       return true;
     } on StripeException catch (e) {
-      debugPrint('Erreur Stripe: ${e.error.message}');
-      return false;
-    } catch (e) {
-      debugPrint('Erreur: $e');
-      return false;
+      if (e.error.code == FailureCode.Canceled) return false;
+      throw PaymentDeclinedException.fromStripe(e);
     }
   }
 
@@ -68,11 +66,8 @@ class PaymentService {
       );
       return true;
     } on StripeException catch (e) {
-      debugPrint('Erreur Stripe: ${e.error.message}');
-      throw Exception(e.error.message ?? 'Erreur de paiement');
-    } catch (e) {
-      debugPrint('Erreur: $e');
-      throw Exception('Erreur de paiement: $e');
+      if (e.error.code == FailureCode.Canceled) return false;
+      throw PaymentDeclinedException.fromStripe(e);
     }
   }
 
@@ -94,4 +89,20 @@ class PaymentService {
       ),
     );
   }
+}
+
+/// Paiement refuse par la banque ou Stripe, avec la raison a montrer au client
+/// (ex. "Votre carte a été refusée."), deja traduite par Stripe.
+class PaymentDeclinedException implements Exception {
+  final String? reason;
+  const PaymentDeclinedException(this.reason);
+
+  factory PaymentDeclinedException.fromStripe(StripeException e) {
+    debugPrint('Paiement refuse: ${e.error.code} ${e.error.declineCode}');
+    return PaymentDeclinedException(
+        e.error.localizedMessage ?? e.error.message);
+  }
+
+  @override
+  String toString() => 'PaymentDeclinedException($reason)';
 }

@@ -174,10 +174,12 @@ class AppRouter {
         );
 
       case AppRoutes.reservationSuccess:
-        final reservationId = settings.arguments as String?;
+        final args = settings.arguments;
         return MaterialPageRoute(
           builder: (_) => ReservationSuccessScreen(
-            reservationId: reservationId,
+            args: args is ReservationSuccessArgs
+                ? args
+                : ReservationSuccessArgs(reservationId: args as String? ?? ''),
           ),
           settings: settings,
         );

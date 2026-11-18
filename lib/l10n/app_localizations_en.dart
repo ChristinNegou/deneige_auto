@@ -698,18 +698,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservation_paymentMethod => 'Payment method';
 
   @override
-  String get reservation_creditCard => 'Credit card';
-
-  @override
-  String get reservation_creditCardSubtitle => 'Visa, Mastercard, Amex';
-
-  @override
-  String get reservation_creatingReservation => 'Creating reservation...';
-
-  @override
-  String get reservation_securePayment => 'Secure payment by Stripe';
-
-  @override
   String get service_windowScraping5 => '+\$5';
 
   @override
@@ -2440,9 +2428,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get payment_securePayment => 'Secure payment';
-
-  @override
   String get payment_securePaymentDetails =>
       'SSL 256-bit · PCI DSS · Powered by Stripe';
 
@@ -2450,12 +2435,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String payment_payAmount(String amount) {
     return 'Pay $amount \$';
   }
-
-  @override
-  String get payment_success => 'Payment successful!';
-
-  @override
-  String get payment_cancelled => 'Payment cancelled';
 
   @override
   String get payment_failedRetry =>
@@ -3748,11 +3727,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activities_total => 'Total';
 
   @override
-  String get reservationSuccess_title => 'Reservation confirmed!';
-
-  @override
-  String get reservationSuccess_subtitle =>
-      'Your snow removal request has been successfully registered.';
+  String get reservationSuccess_title => 'Reservation confirmed';
 
   @override
   String get reservationSuccess_reservationNumber => 'Reservation number';
@@ -3761,20 +3736,68 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservationSuccess_nextSteps => 'Next steps';
 
   @override
-  String get reservationSuccess_step1 =>
-      '1. A snow worker will be assigned shortly';
+  String get reservationSuccess_step1 => 'A snow worker accepts your request.';
 
   @override
-  String get reservationSuccess_step2 => '2. You will receive a notification';
+  String get reservationSuccess_step2 =>
+      'You are notified when the snow worker is on the way.';
 
   @override
-  String get reservationSuccess_step3 => '3. Track the progress in real time';
+  String get reservationSuccess_step3 =>
+      'You receive a photo of the finished work.';
 
   @override
   String get reservationSuccess_backToHome => 'Back to home';
 
   @override
-  String get reservationSuccess_viewReservations => 'View my reservations';
+  String payment_forReservation(String date) {
+    return 'Snow removal on $date';
+  }
+
+  @override
+  String get payment_processing => 'Processing payment…';
+
+  @override
+  String get payment_confirmingReservation => 'Confirming your reservation…';
+
+  @override
+  String get payment_declinedTitle => 'Payment declined';
+
+  @override
+  String get payment_declinedHelp => 'Choose another card or add a new one.';
+
+  @override
+  String get payment_declinedGeneric => 'Your bank declined the payment.';
+
+  @override
+  String get payment_expiredCard => 'Expired card';
+
+  @override
+  String get payment_creationFailedTitle => 'Reservation not saved';
+
+  @override
+  String get payment_creationFailedHelp =>
+      'If you were charged and not refunded, contact support and we will sort it out.';
+
+  @override
+  String get payment_contactSupport => 'Contact support';
+
+  @override
+  String get payment_backToSummary => 'Back to summary';
+
+  @override
+  String reservationSuccess_paid(String amount) {
+    return 'Payment of $amount accepted.';
+  }
+
+  @override
+  String get reservationSuccess_viewReservation => 'View my reservation';
+
+  @override
+  String get reservationSuccess_departure => 'Departure';
+
+  @override
+  String get reservationSuccess_readyBy => 'Ready before';
 
   @override
   String get step1_vehicle => 'Vehicle';

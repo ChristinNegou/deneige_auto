@@ -10,6 +10,9 @@ const { protect } = require('../middleware/auth');
 const Reservation = require('../models/Reservation');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const Vehicle = require('../models/Vehicle');
+const ParkingSpot = require('../models/ParkingSpot');
+const { minimumTotal } = require('../services/pricingService');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, CANCELLATION_POLICY } = require('../config/constants');
 const { safeNotify } = require('../utils/errorHandler');
@@ -110,6 +113,76 @@ router.get('/:id', protect, async (req, res) => {
 // --- Création de réservation ---
 
 /**
+ * Rembourse un paiement Stripe qui n'a pas abouti a une reservation (la
+ * carte est debitee avant la creation). Ne rembourse que si le paiement
+ * appartient au client, a reussi, et n'est rattache a aucune reservation.
+ * @returns {Promise<boolean>} true si le remboursement a ete emis
+ */
+const refundOrphanPayment = async (paymentIntentId, userId) => {
+    if (!paymentIntentId) return false;
+    try {
+        if (await Reservation.exists({ paymentIntentId })) return false;
+        const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        if (intent.status !== 'succeeded' || intent.metadata?.userId !== String(userId)) {
+            return false;
+        }
+        await stripe.refunds.create(
+            { payment_intent: paymentIntentId, reason: 'requested_by_customer' },
+            { idempotencyKey: `orphan_refund_${paymentIntentId}` },
+        );
+        console.warn('💸 Paiement rembourse (reservation non creee):', paymentIntentId);
+        return true;
+    } catch (refundError) {
+        console.error('❌ Remboursement automatique impossible:', paymentIntentId, refundError.message);
+        return false;
+    }
+};
+
+/**
+ * Verifie aupres de Stripe qu'un paiement est reel, reussi, au nom du client,
+ * pas deja utilise, et qu'il couvre le prix de la reservation.
+ * @returns {Promise<{ok: true} | {ok: false, status: number, code: string, message: string}>}
+ */
+const verifyPayment = async (paymentIntentId, userId, totalPrice) => {
+    const refuse = (code, message) => ({ ok: false, status: 402, code, message });
+
+    let intent;
+    try {
+        intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    } catch (error) {
+        return refuse('PAYMENT_NOT_FOUND', 'Paiement introuvable.');
+    }
+    if (intent.metadata?.userId !== String(userId)) {
+        return refuse('PAYMENT_NOT_OWNED', 'Ce paiement ne correspond pas à votre compte.');
+    }
+    if (intent.status !== 'succeeded') {
+        return refuse('PAYMENT_NOT_COMPLETED', 'Le paiement n’a pas été complété.');
+    }
+    if (await Reservation.exists({ paymentIntentId })) {
+        return refuse('PAYMENT_ALREADY_USED', 'Ce paiement a déjà servi pour une autre réservation.');
+    }
+    // 1 cent de tolerance pour les arrondis
+    const received = intent.amount_received ?? intent.amount ?? 0;
+    if (received < Math.round(totalPrice * 100) - 1) {
+        return refuse('PAYMENT_AMOUNT_MISMATCH', 'Le montant payé ne correspond pas au prix de la réservation.');
+    }
+    return { ok: true };
+};
+
+/** Reponse d'echec de creation, avec remboursement si le client a deja paye. */
+const failCreation = async (res, req, status, message, code) => {
+    const refunded = await refundOrphanPayment(req.body.paymentIntentId, req.user.id);
+    return res.status(status).json({
+        success: false,
+        code,
+        refunded,
+        message: refunded
+            ? `${message} Votre paiement a été remboursé automatiquement.`
+            : message,
+    });
+};
+
+/**
  * POST /api/reservations
  * Crée une nouvelle réservation de déneigement avec localisation GPS obligatoire.
  * Gère les places de parking manuelles, personnalisées et par référence.
@@ -181,11 +254,39 @@ router.post('/', protect, async (req, res) => {
 
         // Vérifier que les coordonnées GPS sont fournies (OBLIGATOIRE)
         if (!latitude || !longitude) {
-            return res.status(400).json({
-                success: false,
-                message: 'La localisation GPS est requise pour créer une réservation',
-                code: 'LOCATION_REQUIRED',
-            });
+            return failCreation(res, req, 400,
+                'La localisation GPS est requise pour créer une réservation.', 'LOCATION_REQUIRED');
+        }
+
+        // Le vehicule doit appartenir au client (il fixe aussi le prix plancher)
+        const vehicle = vehicleId
+            ? await Vehicle.findOne({ _id: vehicleId, userId: req.user.id }).lean().catch(() => null)
+            : null;
+        if (!vehicle) {
+            return failCreation(res, req, 400, 'Véhicule introuvable.', 'VEHICLE_NOT_FOUND');
+        }
+
+        // Le prix vient de l'application : on refuse un montant sous le plancher
+        const parkingSpotDoc = finalParkingSpotId
+            ? await ParkingSpot.findById(finalParkingSpotId).lean().catch(() => null)
+            : null;
+        const floor = minimumTotal({
+            vehicleType: vehicle.type,
+            parkingLevel: parkingSpotDoc?.level,
+            snowDepthCm,
+            serviceOptions,
+        });
+        if (!(Number(totalPrice) >= floor)) {
+            return failCreation(res, req, 400,
+                'Le prix de la réservation est invalide. Recommencez la réservation.', 'INVALID_PRICE');
+        }
+
+        // Une reservation n'est "payee" que si Stripe le confirme
+        if (paymentIntentId) {
+            const payment = await verifyPayment(paymentIntentId, req.user.id, Number(totalPrice));
+            if (!payment.ok) {
+                return failCreation(res, req, payment.status, payment.message, payment.code);
+            }
         }
 
         // Construire l'objet location GeoJSON
@@ -264,10 +365,8 @@ router.post('/', protect, async (req, res) => {
         });
     } catch (error) {
         console.error('❌ Erreur lors de la création de la réservation:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Erreur lors de la création de la réservation',
-        });
+        return failCreation(res, req, 500,
+            'La réservation n’a pas pu être enregistrée.', 'CREATION_FAILED');
     }
 });
 

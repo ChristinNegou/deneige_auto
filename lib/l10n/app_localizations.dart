@@ -1400,30 +1400,6 @@ abstract class AppLocalizations {
   /// **'Méthode de paiement'**
   String get reservation_paymentMethod;
 
-  /// No description provided for @reservation_creditCard.
-  ///
-  /// In fr, this message translates to:
-  /// **'Carte de crédit'**
-  String get reservation_creditCard;
-
-  /// No description provided for @reservation_creditCardSubtitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Visa, Mastercard, Amex'**
-  String get reservation_creditCardSubtitle;
-
-  /// No description provided for @reservation_creatingReservation.
-  ///
-  /// In fr, this message translates to:
-  /// **'Création de la réservation...'**
-  String get reservation_creatingReservation;
-
-  /// No description provided for @reservation_securePayment.
-  ///
-  /// In fr, this message translates to:
-  /// **'Paiement sécurisé par Stripe'**
-  String get reservation_securePayment;
-
   /// No description provided for @service_windowScraping5.
   ///
   /// In fr, this message translates to:
@@ -4688,12 +4664,6 @@ abstract class AppLocalizations {
   /// **'Expire {date}'**
   String payment_expires(String date);
 
-  /// No description provided for @payment_securePayment.
-  ///
-  /// In fr, this message translates to:
-  /// **'Paiement sécurisé'**
-  String get payment_securePayment;
-
   /// No description provided for @payment_securePaymentDetails.
   ///
   /// In fr, this message translates to:
@@ -4705,18 +4675,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Payer {amount} \$'**
   String payment_payAmount(String amount);
-
-  /// No description provided for @payment_success.
-  ///
-  /// In fr, this message translates to:
-  /// **'Paiement réussi !'**
-  String get payment_success;
-
-  /// No description provided for @payment_cancelled.
-  ///
-  /// In fr, this message translates to:
-  /// **'Paiement annulé'**
-  String get payment_cancelled;
 
   /// No description provided for @payment_failedRetry.
   ///
@@ -7061,14 +7019,8 @@ abstract class AppLocalizations {
   /// No description provided for @reservationSuccess_title.
   ///
   /// In fr, this message translates to:
-  /// **'Réservation confirmée !'**
+  /// **'Réservation confirmée'**
   String get reservationSuccess_title;
-
-  /// No description provided for @reservationSuccess_subtitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre demande de déneigement a été enregistrée avec succès.'**
-  String get reservationSuccess_subtitle;
 
   /// No description provided for @reservationSuccess_reservationNumber.
   ///
@@ -7085,19 +7037,19 @@ abstract class AppLocalizations {
   /// No description provided for @reservationSuccess_step1.
   ///
   /// In fr, this message translates to:
-  /// **'1. Un déneigeur sera assigné sous peu'**
+  /// **'Un déneigeur accepte votre demande.'**
   String get reservationSuccess_step1;
 
   /// No description provided for @reservationSuccess_step2.
   ///
   /// In fr, this message translates to:
-  /// **'2. Vous recevrez une notification'**
+  /// **'Vous êtes notifié quand le déneigeur est en route.'**
   String get reservationSuccess_step2;
 
   /// No description provided for @reservationSuccess_step3.
   ///
   /// In fr, this message translates to:
-  /// **'3. Suivez l\'avancement en temps réel'**
+  /// **'Vous recevez une photo du travail terminé.'**
   String get reservationSuccess_step3;
 
   /// No description provided for @reservationSuccess_backToHome.
@@ -7106,11 +7058,95 @@ abstract class AppLocalizations {
   /// **'Retour à l\'accueil'**
   String get reservationSuccess_backToHome;
 
-  /// No description provided for @reservationSuccess_viewReservations.
+  /// No description provided for @payment_forReservation.
   ///
   /// In fr, this message translates to:
-  /// **'Voir mes réservations'**
-  String get reservationSuccess_viewReservations;
+  /// **'Déneigement du {date}'**
+  String payment_forReservation(String date);
+
+  /// No description provided for @payment_processing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement en cours…'**
+  String get payment_processing;
+
+  /// No description provided for @payment_confirmingReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmation de votre réservation…'**
+  String get payment_confirmingReservation;
+
+  /// No description provided for @payment_declinedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement refusé'**
+  String get payment_declinedTitle;
+
+  /// No description provided for @payment_declinedHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez une autre carte ou ajoutez-en une nouvelle.'**
+  String get payment_declinedHelp;
+
+  /// No description provided for @payment_declinedGeneric.
+  ///
+  /// In fr, this message translates to:
+  /// **'La banque a refusé le paiement.'**
+  String get payment_declinedGeneric;
+
+  /// No description provided for @payment_expiredCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte expirée'**
+  String get payment_expiredCard;
+
+  /// No description provided for @payment_creationFailedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation non enregistrée'**
+  String get payment_creationFailedTitle;
+
+  /// No description provided for @payment_creationFailedHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si un montant a été prélevé sans être remboursé, contactez le support : nous réglerons la situation.'**
+  String get payment_creationFailedHelp;
+
+  /// No description provided for @payment_contactSupport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contacter le support'**
+  String get payment_contactSupport;
+
+  /// No description provided for @payment_backToSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour au récapitulatif'**
+  String get payment_backToSummary;
+
+  /// No description provided for @reservationSuccess_paid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement de {amount} accepté.'**
+  String reservationSuccess_paid(String amount);
+
+  /// No description provided for @reservationSuccess_viewReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir ma réservation'**
+  String get reservationSuccess_viewReservation;
+
+  /// No description provided for @reservationSuccess_departure.
+  ///
+  /// In fr, this message translates to:
+  /// **'Départ'**
+  String get reservationSuccess_departure;
+
+  /// No description provided for @reservationSuccess_readyBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prêt avant'**
+  String get reservationSuccess_readyBy;
 
   /// No description provided for @step1_vehicle.
   ///

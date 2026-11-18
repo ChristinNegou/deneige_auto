@@ -1,182 +1,197 @@
-import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/app_illustration.dart';
 import '../../../../l10n/app_localizations.dart';
 
-class ReservationSuccessScreen extends StatefulWidget {
-  final String? reservationId;
+/// Ce que l'ecran de confirmation affiche de la reservation qui vient d'etre
+/// payee. Seul l'identifiant est obligatoire.
+class ReservationSuccessArgs {
+  final String reservationId;
+  final double? amount;
+  final DateTime? departure;
+  final DateTime? readyBy;
+  final String? address;
 
-  const ReservationSuccessScreen({
-    super.key,
-    this.reservationId,
+  const ReservationSuccessArgs({
+    required this.reservationId,
+    this.amount,
+    this.departure,
+    this.readyBy,
+    this.address,
   });
-
-  @override
-  State<ReservationSuccessScreen> createState() =>
-      _ReservationSuccessScreenState();
 }
 
-class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
-  late ConfettiController _confettiController;
+/// Confirmation sobre : la reservation est enregistree et payee, ses
+/// informations cles, ce qui va se passer, puis les deux actions utiles.
+class ReservationSuccessScreen extends StatelessWidget {
+  final ReservationSuccessArgs args;
 
-  @override
-  void initState() {
-    super.initState();
-    _confettiController =
-        ConfettiController(duration: const Duration(seconds: 3));
-    _confettiController.play();
-  }
-
-  @override
-  void dispose() {
-    _confettiController.dispose();
-    super.dispose();
-  }
+  const ReservationSuccessScreen({super.key, required this.args});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height -
-                      MediaQuery.of(context).padding.top -
-                      MediaQuery.of(context).padding.bottom -
-                      48,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 20),
+    final locale = Localizations.localeOf(context).languageCode == 'en'
+        ? 'en_CA'
+        : 'fr_CA';
+    final money = NumberFormat.currency(locale: locale, symbol: '\$');
 
-                    // Animation Lottie de succès
-                    const AppIllustration(
-                      type: IllustrationType.success,
-                      width: 150,
-                      height: 150,
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    Text(
-                      l10n.reservationSuccess_title,
-                      style: AppTheme.headlineLarge,
-                      textAlign: TextAlign.center,
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Text(
-                      l10n.reservationSuccess_subtitle,
-                      style: AppTheme.bodyLarge.copyWith(
-                        color: AppTheme.textSecondary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-
-                    if (widget.reservationId != null) ...[
-                      const SizedBox(height: 16),
+    return PopScope(
+      // Retour = accueil : le parcours de reservation est termine
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _goHome(context);
+      },
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                        width: 56,
+                        height: 56,
                         decoration: BoxDecoration(
-                          color: AppTheme.surface,
+                          color: AppTheme.primary,
                           borderRadius:
-                              BorderRadius.circular(AppTheme.radiusFull),
-                          border: Border.all(color: AppTheme.border),
+                              BorderRadius.circular(AppTheme.radiusLG),
                         ),
-                        child: Text(
-                          '${l10n.reservationSuccess_reservationNumber} #${_shortReference(widget.reservationId!)}',
-                          style: AppTheme.labelLarge.copyWith(
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
-                        ),
+                        child: const Icon(Icons.check_rounded,
+                            color: AppTheme.onPrimary, size: 32),
                       ),
+                      const SizedBox(height: 20),
+                      Text(l10n.reservationSuccess_title,
+                          style: AppTheme.headlineLarge),
+                      if (args.amount != null) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.reservationSuccess_paid(
+                              money.format(args.amount)),
+                          style: AppTheme.bodyLarge
+                              .copyWith(color: AppTheme.textSecondary),
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      _buildDetails(context, l10n, locale),
+                      const SizedBox(height: 28),
+                      Text(l10n.reservationSuccess_nextSteps,
+                          style: AppTheme.headlineSmall),
+                      const SizedBox(height: 14),
+                      // Une vraie sequence : numerotee
+                      _buildStep(1, l10n.reservationSuccess_step1),
+                      _buildStep(2, l10n.reservationSuccess_step2),
+                      _buildStep(3, l10n.reservationSuccess_step3,
+                          isLast: true),
                     ],
-
-                    const SizedBox(height: 32),
-
-                    // Prochaines etapes : une vraie sequence, donc numerotee
-                    GlassCard(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.reservationSuccess_nextSteps,
-                            style: AppTheme.headlineSmall,
-                          ),
-                          const SizedBox(height: 16),
-                          _buildInfoRow(1, l10n.reservationSuccess_step1),
-                          _buildInfoRow(2, l10n.reservationSuccess_step2),
-                          _buildInfoRow(3, l10n.reservationSuccess_step3,
-                              isLast: true),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // Boutons d'action
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+                child: Column(
+                  children: [
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            AppRoutes.home,
-                            (route) => false,
-                          );
-                        },
-                        child: Text(l10n.reservationSuccess_backToHome),
+                      child: FilledButton(
+                        onPressed: () =>
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.reservationDetails,
+                          (route) => route.isFirst,
+                          arguments: args.reservationId,
+                        ),
+                        child: Text(l10n.reservationSuccess_viewReservation),
                       ),
                     ),
-
-                    const SizedBox(height: 12),
-
+                    const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            AppRoutes.reservations,
-                            (route) => false,
-                          );
-                        },
-                        child: Text(l10n.reservationSuccess_viewReservations),
+                        onPressed: () => _goHome(context),
+                        child: Text(l10n.reservationSuccess_backToHome),
                       ),
                     ),
-
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
-          // Confetti
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              shouldLoop: false,
-              colors: const [
-                AppTheme.accent,
-                AppTheme.primary,
-                AppTheme.primary2,
-                AppTheme.primary3,
-              ],
-              numberOfParticles: 30,
-              gravity: 0.2,
+        ),
+      ),
+    );
+  }
+
+  void _goHome(BuildContext context) {
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+  }
+
+  Widget _buildDetails(
+      BuildContext context, AppLocalizations l10n, String locale) {
+    final departure = args.departure;
+    final readyBy = args.readyBy;
+    final rows = <(String, String)>[
+      if (departure != null)
+        (
+          l10n.reservationSuccess_departure,
+          '${DateFormat('EEEE d MMMM', locale).format(departure)}, '
+              '${DateFormat.Hm(locale).format(departure)}',
+        ),
+      if (readyBy != null)
+        (
+          l10n.reservationSuccess_readyBy,
+          DateFormat.Hm(locale).format(readyBy),
+        ),
+      if (args.address != null) (l10n.step5_address, args.address!),
+      (
+        l10n.reservationSuccess_reservationNumber,
+        '#${_shortReference(args.reservationId)}',
+      ),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0) const Divider(height: 1, color: AppTheme.border),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 120,
+                    child: Text(
+                      rows[i].$1,
+                      style: AppTheme.bodySmall
+                          .copyWith(color: AppTheme.textSecondary),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      rows[i].$2,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -189,9 +204,9 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
         .toUpperCase();
   }
 
-  Widget _buildInfoRow(int number, String text, {bool isLast = false}) {
+  Widget _buildStep(int number, String text, {bool isLast = false}) {
     return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -218,9 +233,8 @@ class _ReservationSuccessScreenState extends State<ReservationSuccessScreen> {
               padding: const EdgeInsets.only(top: 2),
               child: Text(
                 text,
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+                style:
+                    AppTheme.bodyMedium.copyWith(color: AppTheme.textPrimary),
               ),
             ),
           ),

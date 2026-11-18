@@ -61,11 +61,27 @@ module.exports = {
     },
 
     // ============== TARIFICATION ==============
+    // Tarifs en CAD : doivent rester identiques a lib/core/config/app_config.dart
     PRICING: {
-        // Multiplicateur pour les réservations prioritaires
-        PRIORITY_MULTIPLIER: 1.4, // +40%
-        // Prix minimum en CAD
-        MIN_PRICE_CAD: 15,
+        BASE_PRICE: 15.0,
+        PRICE_PER_CM_OVER_10: 0.5,
+        SERVICE_FEE: 1.5,
+        INSURANCE_FEE: 0.75,
+        OPTION_SURCHARGES: {
+            windowScraping: 5.0,
+            doorDeicing: 3.0,
+            wheelClearance: 4.0,
+            roofClearing: 8.0,
+            saltSpreading: 5.0,
+            lightsCleaning: 3.0,
+            perimeterClearance: 12.0,
+            exhaustCheck: 2.0,
+        },
+        VEHICLE_FACTORS: { sedan: 1.0, car: 1.0, coupe: 1.0, hatchback: 1.0, suv: 1.2, truck: 1.3, van: 1.25 },
+        // Facteur le plus bas de l'app pour chaque niveau (souterrain : 0.6 a 0.8)
+        PARKING_FACTORS: { outdoor: 1.0, ground: 1.0, covered: 0.85, underground: 0.6 },
+        // Taxe la plus basse au Canada (TPS seule) : sert de plancher
+        MIN_TAX_RATE: 0.05,
         // Pourboire minimum
         MIN_TIP_CAD: 1,
     },

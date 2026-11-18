@@ -1,6 +1,8 @@
 import 'package:deneige_auto/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../payment/presentation/screens/payment_screen.dart';
@@ -12,6 +14,7 @@ import 'steps/step2_location.dart';
 import 'steps/step3_datetime.dart';
 import 'steps/step4_options.dart';
 import 'steps/step5_summary.dart';
+import 'reservation_success_screen.dart';
 
 class NewReservationScreen extends StatelessWidget {
   const NewReservationScreen({super.key});
@@ -36,14 +39,9 @@ class NewReservationView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<NewReservationBloc, NewReservationState>(
       listener: (context, state) {
-        debugPrint(
-            '🔄 [NewReservationView] State changed: isLoading=${state.isLoading}, isSubmitted=${state.isSubmitted}, error=${state.errorMessage}');
-
-        if (state.errorMessage != null) {
-          // Fermer le SnackBar de chargement
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-          debugPrint('❌ [NewReservationView] Erreur: ${state.errorMessage}');
+        // Pendant le paiement, l'ecran de paiement affiche lui-meme l'issue
+        final isOnTop = ModalRoute.of(context)?.isCurrent ?? true;
+        if (state.errorMessage != null && isOnTop) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
@@ -51,18 +49,6 @@ class NewReservationView extends StatelessWidget {
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 5),
             ),
-          );
-        }
-
-        if (state.isSubmitted && state.reservationId != null) {
-          // Fermer le SnackBar de chargement
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-          debugPrint(
-              '✅ [NewReservationView] Réservation créée: ${state.reservationId}');
-          Navigator.of(context).pushReplacementNamed(
-            '/reservation/success',
-            arguments: state.reservationId,
           );
         }
       },
@@ -286,7 +272,7 @@ class NewReservationView extends StatelessWidget {
           bloc.add(GoToNextStep());
         };
       case 4:
-        return state.canSubmit ? () => _showPaymentDialog(context) : null;
+        return state.canSubmit ? () => _openPayment(context) : null;
       default:
         return null;
     }
@@ -332,191 +318,61 @@ class NewReservationView extends StatelessWidget {
     );
   }
 
-  // Modifier la méthode _showPaymentDialog
-
-  void _showPaymentDialog(BuildContext context) {
+  /// Paiement puis creation de la reservation, sur l'ecran de paiement.
+  /// En cas de succes, la confirmation remplace tout le parcours.
+  Future<void> _openPayment(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final bloc = context.read<NewReservationBloc>();
     final state = bloc.state;
+    final locale = Localizations.localeOf(context).languageCode == 'en'
+        ? 'en_CA'
+        : 'fr_CA';
+    final departure = state.departureDateTime;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (sheetContext) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.payment,
-                  color: AppTheme.textPrimary,
-                  size: 28,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  l10n.reservation_paymentMethod,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            _PaymentMethodTile(
-              icon: Icons.credit_card,
-              title: l10n.reservation_creditCard,
-              subtitle: l10n.reservation_creditCardSubtitle,
-              onTap: () async {
-                Navigator.of(sheetContext).pop();
-
-                // Ouvrir la page de paiement
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => PaymentScreen(
-                      amount: state.calculatedPrice ?? 0,
-                      reservationId: null, // Sera mis à jour après création
-                    ),
-                  ),
-                );
-
-                // Si le paiement réussit
-                if (result != null && result['success'] == true) {
-                  debugPrint(
-                      '✅ [NewReservationScreen] Paiement réussi, création réservation...');
-                  debugPrint(
-                      '✅ [NewReservationScreen] paymentIntentId: ${result['paymentIntentId']}');
-
-                  // Montrer un indicateur de chargement
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppTheme.onPrimary,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(l10n.reservation_creatingReservation),
-                          ],
-                        ),
-                        backgroundColor: AppTheme.primary,
-                        duration: const Duration(seconds: 10),
-                      ),
-                    );
-                  }
-
-                  bloc.add(SubmitReservation(
-                    'card',
-                    paymentIntentId: result['paymentIntentId'],
-                  ));
-                } else {
-                  debugPrint(
-                      '❌ [NewReservationScreen] Paiement annulé ou échoué');
-                }
-              },
-            ),
-            const SizedBox(height: 24),
-            Center(
-              child: Text(
-                l10n.reservation_securePayment,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.textTertiary,
-                ),
-              ),
-            ),
-          ],
+    final outcome = await Navigator.push<Object?>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PaymentScreen(
+          amount: state.calculatedPrice ?? 0,
+          description: departure == null
+              ? null
+              : l10n.payment_forReservation(
+                  '${DateFormat('EEE d MMM', locale).format(departure)}, '
+                  '${DateFormat.Hm(locale).format(departure)}'),
+          onPaid: (paymentIntentId) =>
+              _createReservation(bloc, paymentIntentId),
         ),
       ),
     );
+
+    if (outcome is PaidOutcome && outcome.isSuccess && context.mounted) {
+      final done = bloc.state;
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.reservationSuccess,
+        (route) => route.isFirst,
+        arguments: ReservationSuccessArgs(
+          reservationId: outcome.reservationId!,
+          amount: done.calculatedPrice,
+          departure: done.departureDateTime,
+          readyBy: done.deadlineTime,
+          address: done.locationAddress,
+        ),
+      );
+    }
   }
-}
 
-class _PaymentMethodTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  const _PaymentMethodTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceContainer,
-          border: Border.all(color: AppTheme.border),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: AppTheme.textPrimary,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: AppTheme.textTertiary,
-            ),
-          ],
-        ),
-      ),
+  /// Envoie la reservation payee et attend la reponse du serveur.
+  Future<PaidOutcome> _createReservation(
+    NewReservationBloc bloc,
+    String paymentIntentId,
+  ) async {
+    final result = bloc.stream.firstWhere(
+      (s) => !s.isLoading && (s.isSubmitted || s.errorMessage != null),
     );
+    bloc.add(SubmitReservation('card', paymentIntentId: paymentIntentId));
+    final s = await result;
+    return s.isSubmitted && s.reservationId != null
+        ? PaidOutcome.success(s.reservationId!)
+        : PaidOutcome.failure(s.errorMessage ?? '');
   }
 }

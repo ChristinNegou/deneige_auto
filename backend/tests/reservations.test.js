@@ -214,6 +214,161 @@ describe('Reservation Routes', () => {
       expect(res.body.success).toBe(false);
       expect(res.body.code).toBe('LOCATION_REQUIRED');
     });
+
+    describe('when the client already paid', () => {
+      const stripe = require('stripe')();
+      const paidRequest = (overrides = {}) => ({
+        vehicleId: testVehicle._id.toString(),
+        customLocation: '456 Rue Test, Montreal',
+        departureTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
+        deadlineTime: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+        totalPrice: 30,
+        paymentMethod: 'card',
+        paymentIntentId: 'pi_orphan_1',
+        latitude: 45.5017,
+        longitude: -73.5673,
+        ...overrides,
+      });
+
+      beforeEach(() => {
+        stripe.refunds.create.mockClear();
+        stripe.paymentIntents.retrieve.mockResolvedValue({
+          id: 'pi_orphan_1',
+          status: 'succeeded',
+          amount_received: 3000,
+          metadata: { userId: testUser._id.toString() },
+        });
+      });
+
+      it('marks the reservation paid when Stripe confirms the payment', async () => {
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest());
+
+        expect(res.status).toBe(201);
+        expect(res.body.reservation.paymentStatus).toBe('paid');
+      });
+
+      it('refuses a payment made by another account', async () => {
+        stripe.paymentIntents.retrieve.mockResolvedValue({
+          id: 'pi_orphan_1',
+          status: 'succeeded',
+          amount_received: 3000,
+          metadata: { userId: 'another-user' },
+        });
+
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest());
+
+        expect(res.status).toBe(402);
+        expect(res.body.code).toBe('PAYMENT_NOT_OWNED');
+        expect(await Reservation.countDocuments({ paymentIntentId: 'pi_orphan_1' })).toBe(0);
+      });
+
+      it('refuses a payment that was not completed', async () => {
+        stripe.paymentIntents.retrieve.mockResolvedValue({
+          id: 'pi_orphan_1',
+          status: 'requires_payment_method',
+          amount_received: 0,
+          metadata: { userId: testUser._id.toString() },
+        });
+
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest());
+
+        expect(res.status).toBe(402);
+        expect(res.body.code).toBe('PAYMENT_NOT_COMPLETED');
+      });
+
+      it('refuses to reuse a payment for a second reservation', async () => {
+        await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest());
+
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest());
+
+        expect(res.status).toBe(402);
+        expect(res.body.code).toBe('PAYMENT_ALREADY_USED');
+        expect(stripe.refunds.create).not.toHaveBeenCalled();
+      });
+
+      it('refuses a payment smaller than the price, and refunds it', async () => {
+        stripe.paymentIntents.retrieve.mockResolvedValue({
+          id: 'pi_orphan_1',
+          status: 'succeeded',
+          amount_received: 100,
+          metadata: { userId: testUser._id.toString() },
+        });
+
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest());
+
+        expect(res.status).toBe(402);
+        expect(res.body.code).toBe('PAYMENT_AMOUNT_MISMATCH');
+        expect(res.body.refunded).toBe(true);
+      });
+
+      it('refuses a price below what the service costs', async () => {
+        stripe.paymentIntents.retrieve.mockResolvedValue({
+          id: 'pi_orphan_1',
+          status: 'succeeded',
+          amount_received: 1,
+          metadata: { userId: testUser._id.toString() },
+        });
+
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest({ totalPrice: 0.01 }));
+
+        expect(res.status).toBe(400);
+        expect(res.body.code).toBe('INVALID_PRICE');
+        expect(res.body.refunded).toBe(true);
+      });
+
+      it('refunds the payment if the reservation cannot be saved', async () => {
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest({ serviceOptions: ['carWash'] }));
+
+        expect(res.status).toBe(500);
+        expect(res.body.refunded).toBe(true);
+        expect(res.body.message).toMatch(/remboursé/);
+        expect(stripe.refunds.create).toHaveBeenCalledWith(
+          expect.objectContaining({ payment_intent: 'pi_orphan_1' }),
+          expect.anything(),
+        );
+      });
+
+      it('never refunds a payment that belongs to someone else', async () => {
+        stripe.paymentIntents.retrieve.mockResolvedValue({
+          id: 'pi_orphan_1',
+          status: 'succeeded',
+          metadata: { userId: 'another-user' },
+        });
+
+        const res = await request(app)
+          .post('/api/reservations')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(paidRequest({ latitude: undefined }));
+
+        expect(res.status).toBe(400);
+        expect(res.body.refunded).toBe(false);
+        expect(stripe.refunds.create).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe('DELETE /api/reservations/:id', () => {
