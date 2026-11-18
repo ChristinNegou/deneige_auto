@@ -417,9 +417,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reservation_refresh => 'Actualiser';
 
   @override
-  String get reservation_live => 'EN DIRECT';
-
-  @override
   String get reservation_statusPending =>
       'En attente d\'un déneigeur disponible';
 
@@ -444,9 +441,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reservation_statusDelayed => 'Le service est en retard';
-
-  @override
-  String get reservation_progress => 'Progression';
 
   @override
   String get reservation_shortPending => 'Attente';
@@ -476,9 +470,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reservation_workerAssigned => 'Déneigeur assigné';
 
   @override
-  String get reservation_map => 'Carte';
-
-  @override
   String get reservation_chat => 'Chat';
 
   @override
@@ -489,7 +480,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucun déneigeur assigné pour le moment';
 
   @override
-  String get reservation_info => 'Informations';
+  String get details_history => 'Historique';
+
+  @override
+  String get details_departure => 'Départ';
+
+  @override
+  String get details_noShowLink => 'Le déneigeur n’est pas venu';
+
+  @override
+  String get details_problemLink => 'Signaler un problème';
 
   @override
   String get reservation_vehicle => 'Véhicule';
@@ -510,17 +510,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reservation_completedAt => 'Terminée le';
 
   @override
-  String get reservation_servicesRequested => 'Services demandés';
-
-  @override
-  String get reservation_basicSnowRemoval => 'Déneigement de base';
-
-  @override
-  String reservation_snowDepthCm(String depth) {
-    return 'Profondeur de neige: $depth cm';
-  }
-
-  @override
   String get reservation_photos => 'Photos du service';
 
   @override
@@ -528,9 +517,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reservation_photoUnavailable => 'Photo non disponible';
-
-  @override
-  String get reservation_tapToEnlarge => 'Appuyez pour agrandir';
 
   @override
   String get reservation_beforePhoto => 'Avant le service';
@@ -683,21 +669,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reservation_wheelClearing => 'Dégagement des roues';
-
-  @override
-  String get reservation_roofSnowRemoval => 'Déneigement du toit';
-
-  @override
-  String get reservation_saltSpreading => 'Épandage de sel';
-
-  @override
-  String get reservation_lightsCleanup => 'Nettoyage phares/feux';
-
-  @override
-  String get reservation_perimeterClearing => 'Dégagement périmètre';
-
-  @override
-  String get reservation_exhaustCheck => 'Vérif. échappement';
 
   @override
   String get edit_paidPrice => 'Prix payé';

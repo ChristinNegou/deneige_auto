@@ -14,6 +14,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../widgets/cancel_reservation_sheet.dart';
+import '../widgets/service_option_info.dart';
 import '../bloc/reservation_list_bloc.dart';
 import '../../../widgets/rating_tip_dialog.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -38,6 +39,8 @@ class ReservationDetailsPage extends StatelessWidget {
   }
 }
 
+/// Detail d'une reservation : ou elle en est, qui s'en occupe, ce qui a ete
+/// commande et paye, puis les actions possibles a ce stade.
 class ReservationDetailsView extends StatefulWidget {
   final String reservationId;
 
@@ -47,51 +50,56 @@ class ReservationDetailsView extends StatefulWidget {
   State<ReservationDetailsView> createState() => _ReservationDetailsViewState();
 }
 
-class _ReservationDetailsViewState extends State<ReservationDetailsView>
-    with TickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
+class _ReservationDetailsViewState extends State<ReservationDetailsView> {
   Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-
-    // Auto-refresh every 15 seconds for active reservations
+    // Rafraichit le statut toutes les 15 s tant que la reservation est active
     _refreshTimer = Timer.periodic(const Duration(seconds: 15), (_) {
-      if (mounted) {
-        final state = context.read<ReservationListBloc>().state;
-        final reservation = state.selectedReservation;
-        // Ne rafraîchir que si la réservation est active
-        if (reservation != null && _isActiveReservation(reservation.status)) {
-          context
-              .read<ReservationListBloc>()
-              .add(LoadReservationById(widget.reservationId));
-        }
+      if (!mounted) return;
+      final reservation =
+          context.read<ReservationListBloc>().state.selectedReservation;
+      if (reservation != null && _isActive(reservation.status)) {
+        _reload();
       }
     });
   }
 
-  bool _isActiveReservation(ReservationStatus status) {
-    return status == ReservationStatus.pending ||
-        status == ReservationStatus.assigned ||
-        status == ReservationStatus.enRoute ||
-        status == ReservationStatus.inProgress;
-  }
-
   @override
   void dispose() {
-    _pulseController.dispose();
     _refreshTimer?.cancel();
     super.dispose();
+  }
+
+  bool _isActive(ReservationStatus status) =>
+      status == ReservationStatus.pending ||
+      status == ReservationStatus.assigned ||
+      status == ReservationStatus.enRoute ||
+      status == ReservationStatus.inProgress;
+
+  void _reload() => context
+      .read<ReservationListBloc>()
+      .add(LoadReservationById(widget.reservationId));
+
+  String get _locale =>
+      Localizations.localeOf(context).languageCode == 'en' ? 'en_CA' : 'fr_CA';
+
+  String _money(double amount) =>
+      NumberFormat.currency(locale: _locale, symbol: '\$').format(amount);
+
+  /// Confirmation sobre (encre marine), ou erreur en rouge.
+  void _notify(String message, {bool error = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content:
+            Text(message, style: const TextStyle(color: AppTheme.onPrimary)),
+        backgroundColor: error ? AppTheme.error : AppTheme.primary,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -101,233 +109,55 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
       builder: (context, state) {
         final reservation = state.selectedReservation;
 
-        // Afficher le chargement uniquement lors du premier chargement
-        // (quand on n'a pas encore de réservation)
         if (state.isLoading && reservation == null) {
           return Scaffold(
             backgroundColor: AppTheme.background,
             appBar: AppBar(
-              title: Text(
-                l10n.reservation_details,
-                style: TextStyle(color: AppTheme.textPrimary),
-              ),
-              backgroundColor: AppTheme.surface,
-              foregroundColor: AppTheme.textPrimary,
+              title:
+                  Text(l10n.reservation_details, style: AppTheme.labelMedium),
+              centerTitle: true,
             ),
-            body: Center(
+            body: const Center(
               child: CircularProgressIndicator(color: AppTheme.primary),
             ),
           );
         }
 
-        // Réservation introuvable après chargement
-        if (reservation == null) {
-          return Scaffold(
-            backgroundColor: AppTheme.background,
-            appBar: AppBar(
-              title: Text(
-                l10n.reservation_details,
-                style: TextStyle(color: AppTheme.textPrimary),
-              ),
-              backgroundColor: AppTheme.surface,
-              foregroundColor: AppTheme.textPrimary,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.search_off,
-                      size: 64, color: AppTheme.textTertiary),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.reservation_notFound,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.reservation_notFoundSubtitle,
-                    style: TextStyle(color: AppTheme.textSecondary),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context
-                          .read<ReservationListBloc>()
-                          .add(LoadReservationById(widget.reservationId));
-                    },
-                    icon: const Icon(Icons.refresh),
-                    label: Text(l10n.reservation_refresh),
-                  ),
-                  const SizedBox(height: 12),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      l10n.common_back,
-                      style: TextStyle(color: AppTheme.textSecondary),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        final isActive = reservation.status == ReservationStatus.enRoute ||
-            reservation.status == ReservationStatus.inProgress;
+        if (reservation == null) return _buildNotFound(context);
 
         return Scaffold(
           backgroundColor: AppTheme.background,
-          body: ColoredBox(
-            color: AppTheme.background,
-            child: SafeArea(
-              child: CustomScrollView(
-                slivers: [
-                  // App Bar
-                  SliverAppBar(
-                    backgroundColor: AppTheme.background,
-                    surfaceTintColor: Colors.transparent,
-                    elevation: 0,
-                    floating: true,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: Text(l10n.reservation_details,
-                        style: AppTheme.labelMedium),
-                    centerTitle: true,
-                    actions: [
-                      if (isActive)
-                        Container(
-                          margin: const EdgeInsets.only(right: 16),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppTheme.errorLight,
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusFull),
-                          ),
-                          child: Row(
-                            children: [
-                              ScaleTransition(
-                                scale: _pulseAnimation,
-                                child: Container(
-                                  width: 7,
-                                  height: 7,
-                                  decoration: const BoxDecoration(
-                                    color: AppTheme.error,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                l10n.reservation_live,
-                                style: const TextStyle(
-                                  color: AppTheme.error,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  // Content
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        // Status Header
-                        _buildStatusHeader(context, reservation),
-
-                        // Main Content
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Timeline
-                              _buildTimeline(context, reservation),
-                              const SizedBox(height: 16),
-
-                              // Worker Card (if assigned)
-                              if (reservation.workerId != null) ...[
-                                _buildWorkerCard(context, reservation),
-                                const SizedBox(height: 16),
-                              ],
-
-                              // Quick Actions (if active)
-                              if (isActive) ...[
-                                _buildQuickActions(context, reservation),
-                                const SizedBox(height: 16),
-                              ],
-
-                              // Details Card
-                              _buildDetailsCard(context, reservation),
-                              const SizedBox(height: 16),
-
-                              // Service Options Card
-                              _buildServiceOptionsCard(context, reservation),
-                              const SizedBox(height: 16),
-
-                              // Photos Card (if available)
-                              if (reservation.afterPhotoUrl != null ||
-                                  reservation.beforePhotoUrl != null) ...[
-                                _buildPhotosCard(context, reservation),
-                                const SizedBox(height: 16),
-                              ],
-
-                              // Price Card
-                              _buildPriceCard(context, reservation),
-                              const SizedBox(height: 24),
-
-                              // Rating section (if completed and not rated)
-                              if (reservation.status ==
-                                  ReservationStatus.completed)
-                                _buildRatingSection(context, reservation),
-
-                              // Action Buttons
-                              if (reservation.canBeEdited)
-                                _buildEditButton(context, reservation),
-                              if (reservation.canBeEdited &&
-                                  reservation.canBeCancelled)
-                                const SizedBox(height: 12),
-                              if (reservation.canBeCancelled)
-                                _buildCancelButton(context, reservation),
-
-                              // Report No-Show button
-                              if (_canReportNoShow(reservation)) ...[
-                                const SizedBox(height: 12),
-                                _buildReportNoShowButton(context, reservation),
-                              ],
-
-                              // Report Problem button (for completed reservations)
-                              if (_canReportProblem(reservation)) ...[
-                                const SizedBox(height: 12),
-                                _buildReportProblemButton(context, reservation),
-                              ],
-
-                              const SizedBox(height: 40),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+          appBar: AppBar(
+            backgroundColor: AppTheme.background,
+            surfaceTintColor: Colors.transparent,
+            title: Text(l10n.reservation_details, style: AppTheme.labelMedium),
+            centerTitle: true,
+          ),
+          body: RefreshIndicator(
+            color: AppTheme.primary,
+            onRefresh: () async => _reload(),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+              children: [
+                _buildStatus(context, reservation),
+                const SizedBox(height: 20),
+                if (reservation.workerId != null) ...[
+                  _buildWorkerCard(context, reservation),
+                  const SizedBox(height: 16),
                 ],
-              ),
+                _buildDetails(context, reservation),
+                if (reservation.afterPhotoUrl != null ||
+                    reservation.beforePhotoUrl != null) ...[
+                  const SizedBox(height: 16),
+                  _buildPhotos(context, reservation),
+                ],
+                if (reservation.status == ReservationStatus.completed) ...[
+                  const SizedBox(height: 16),
+                  _buildRating(context, reservation),
+                ],
+                const SizedBox(height: 24),
+                ..._buildActions(context, reservation),
+              ],
             ),
           ),
         );
@@ -335,39 +165,66 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     );
   }
 
-  Widget _buildStatusHeader(BuildContext context, Reservation reservation) {
+  Widget _buildNotFound(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final color = _getStatusColor(reservation.status);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          StatusBadge(
-            label: reservation.status.displayName,
-            color: color,
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        title: Text(l10n.reservation_details, style: AppTheme.labelMedium),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.search_off_rounded,
+                  size: 48, color: AppTheme.textTertiary),
+              const SizedBox(height: 16),
+              Text(l10n.reservation_notFound, style: AppTheme.headlineSmall),
+              const SizedBox(height: 8),
+              Text(
+                l10n.reservation_notFoundSubtitle,
+                style:
+                    AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: _reload,
+                child: Text(l10n.reservation_refresh),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            _getStatusDescription(l10n, reservation),
-            style: AppTheme.headlineLarge,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            DateFormat(
-                    'EEEE d MMMM, HH:mm',
-                    Localizations.localeOf(context).languageCode == 'en'
-                        ? 'en_CA'
-                        : 'fr_CA')
-                .format(reservation.departureTime),
-            style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  String _getStatusDescription(AppLocalizations l10n, Reservation reservation) {
+  // --- Statut et progression ---
+
+  Widget _buildStatus(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
+    final color = _statusColor(reservation.status);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        StatusBadge(label: reservation.status.displayName, color: color),
+        const SizedBox(height: 12),
+        Text(_statusSentence(l10n, reservation), style: AppTheme.headlineLarge),
+        const SizedBox(height: 6),
+        Text(
+          DateFormat('EEEE d MMMM, HH:mm', _locale)
+              .format(reservation.departureTime),
+          style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+        ),
+        _buildProgress(context, reservation),
+      ],
+    );
+  }
+
+  String _statusSentence(AppLocalizations l10n, Reservation reservation) {
     switch (reservation.status) {
       case ReservationStatus.pending:
         return l10n.reservation_statusPending;
@@ -375,7 +232,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
         return l10n.reservation_statusAssigned;
       case ReservationStatus.enRoute:
         return l10n.reservation_statusEnRoute(
-            reservation.workerName ?? 'Le d\u00e9neigeur');
+            reservation.workerName ?? l10n.reservation_yourWorker);
       case ReservationStatus.inProgress:
         return l10n.reservation_statusInProgress;
       case ReservationStatus.completed:
@@ -387,80 +244,73 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     }
   }
 
-  Widget _buildTimeline(BuildContext context, Reservation reservation) {
+  /// Barre d'avancement en 5 etapes, sans carte autour.
+  Widget _buildProgress(BuildContext context, Reservation reservation) {
     final l10n = AppLocalizations.of(context)!;
-    final statuses = [
+    const steps = [
       ReservationStatus.pending,
       ReservationStatus.assigned,
       ReservationStatus.enRoute,
       ReservationStatus.inProgress,
       ReservationStatus.completed,
     ];
+    final current = steps.indexOf(reservation.status);
+    // Annulee ou en retard : hors du parcours normal
+    if (current < 0) return const SizedBox.shrink();
 
-    final currentIndex = statuses.indexOf(reservation.status);
-    // Une reservation annulee ou en retard n'est pas sur le parcours normal
-    if (currentIndex < 0) return const SizedBox.shrink();
-    final currentColor = _getStatusColor(reservation.status);
-
-    return GlassCard(
-      padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.only(top: 18),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.reservation_progress, style: AppTheme.headlineSmall),
-          const SizedBox(height: 14),
           Row(
-            children: List.generate(statuses.length, (index) {
-              final Color color;
-              if (index < currentIndex) {
-                color = AppTheme.primary;
-              } else if (index == currentIndex) {
-                color = currentColor;
-              } else {
-                color = AppTheme.border;
-              }
-              return Expanded(
-                child: Container(
-                  height: 4,
-                  margin: EdgeInsets.only(
-                      right: index < statuses.length - 1 ? 4 : 0),
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+            children: [
+              for (var i = 0; i < steps.length; i++)
+                Expanded(
+                  child: Container(
+                    height: 4,
+                    margin:
+                        EdgeInsets.only(right: i < steps.length - 1 ? 4 : 0),
+                    decoration: BoxDecoration(
+                      color: i < current
+                          ? AppTheme.primary
+                          : i == current
+                              ? _statusColor(reservation.status)
+                              : AppTheme.border,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                    ),
                   ),
                 ),
-              );
-            }),
+            ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Row(
-            children: statuses.asMap().entries.map((entry) {
-              final isCurrent = entry.key == currentIndex;
-              final isDone = entry.key < currentIndex;
-              return Expanded(
-                child: Text(
-                  _getShortStatusName(l10n, entry.value),
-                  maxLines: 2,
-                  style: TextStyle(
-                    fontSize: 11,
-                    height: 1.2,
-                    fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
-                    color: isCurrent
-                        ? AppTheme.textPrimary
-                        : isDone
-                            ? AppTheme.textSecondary
-                            : AppTheme.textTertiary,
+            children: [
+              for (var i = 0; i < steps.length; i++)
+                Expanded(
+                  child: Text(
+                    _shortStatus(l10n, steps[i]),
+                    maxLines: 2,
+                    style: TextStyle(
+                      fontSize: 11,
+                      height: 1.2,
+                      fontWeight:
+                          i == current ? FontWeight.w800 : FontWeight.w600,
+                      color: i == current
+                          ? AppTheme.textPrimary
+                          : i < current
+                              ? AppTheme.textSecondary
+                              : AppTheme.textTertiary,
+                    ),
                   ),
                 ),
-              );
-            }).toList(),
+            ],
           ),
         ],
       ),
     );
   }
 
-  String _getShortStatusName(AppLocalizations l10n, ReservationStatus status) {
+  String _shortStatus(AppLocalizations l10n, ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
         return l10n.reservation_shortPending;
@@ -479,1117 +329,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     }
   }
 
-  Widget _buildWorkerCard(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    final initial = reservation.workerName?.isNotEmpty == true
-        ? reservation.workerName![0].toUpperCase()
-        : '?';
-    final initialAvatar = Center(
-      child: Text(
-        initial,
-        style: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w800,
-          color: AppTheme.onPrimary,
-        ),
-      ),
-    );
-
-    return GlassCard(
-      padding: const EdgeInsets.all(14),
-      child: Row(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: const BoxDecoration(
-              color: AppTheme.primary,
-              shape: BoxShape.circle,
-            ),
-            child: ClipOval(
-              child: reservation.workerPhotoUrl != null &&
-                      reservation.workerPhotoUrl!.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: reservation.workerPhotoUrl!,
-                      fit: BoxFit.cover,
-                      width: 52,
-                      height: 52,
-                      placeholder: (context, url) => initialAvatar,
-                      errorWidget: (context, url, error) => initialAvatar,
-                    )
-                  : initialAvatar,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.reservation_yourWorker, style: AppTheme.labelMedium),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        reservation.workerName ??
-                            l10n.reservation_workerAssigned,
-                        style: AppTheme.headlineSmall,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (reservation.workerIsVerified == true) ...[
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.verified_rounded,
-                        color: AppTheme.info,
-                        size: 16,
-                        semanticLabel: l10n.worker_verified,
-                      ),
-                    ],
-                  ],
-                ),
-                if (reservation.rating != null) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: List.generate(5, (index) {
-                      return Icon(
-                        index < (reservation.rating ?? 0).round()
-                            ? Icons.star_rounded
-                            : Icons.star_outline_rounded,
-                        color: AppTheme.warning,
-                        size: 15,
-                      );
-                    }),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          IconButton.filledTonal(
-            onPressed: () => _openChat(context, reservation),
-            style: IconButton.styleFrom(
-              backgroundColor: AppTheme.surfaceContainer,
-              foregroundColor: AppTheme.textPrimary,
-            ),
-            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
-          ),
-          if (reservation.workerPhone != null)
-            IconButton.filledTonal(
-              onPressed: () => _callWorker(reservation),
-              style: IconButton.styleFrom(
-                backgroundColor: AppTheme.surfaceContainer,
-                foregroundColor: AppTheme.textPrimary,
-              ),
-              icon: const Icon(Icons.phone_outlined, size: 20),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActions(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: _buildQuickActionButton(
-            icon: Icons.chat_bubble_outline_rounded,
-            label: l10n.reservation_chat,
-            filled: true,
-            onTap: () => _openChat(context, reservation),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _buildQuickActionButton(
-            icon: Icons.phone_outlined,
-            label: l10n.common_call,
-            onTap: () => _callWorker(reservation),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _buildQuickActionButton(
-            icon: Icons.map_outlined,
-            label: l10n.reservation_map,
-            onTap: () => _openMap(reservation),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _openChat(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.reservation_userNotAuth,
-            style: TextStyle(color: AppTheme.onPrimary),
-          ),
-          backgroundColor: AppTheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-      return;
-    }
-
-    // Vérifier qu'un déneigeur est assigné
-    if (reservation.workerId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.info_outline, color: AppTheme.onPrimary),
-              const SizedBox(width: 12),
-              Text(
-                l10n.reservation_noWorkerYet,
-                style: TextStyle(color: AppTheme.onPrimary),
-              ),
-            ],
-          ),
-          backgroundColor: AppTheme.warning,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => sl<ChatBloc>()..add(LoadMessages(reservation.id)),
-          child: ChatScreen(
-            reservationId: reservation.id,
-            otherUserName:
-                reservation.workerName ?? l10n.reservation_workerAssigned,
-            otherUserPhoto: null,
-            currentUserId: authState.user.id,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool filled = false,
-  }) {
-    final foreground = filled ? AppTheme.onPrimary : AppTheme.textPrimary;
-    return Material(
-      color: filled ? AppTheme.primary : AppTheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        side: filled
-            ? BorderSide.none
-            : const BorderSide(color: AppTheme.border, width: 1.5),
-      ),
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          onTap();
-        },
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Column(
-            children: [
-              Icon(icon, color: foreground, size: 22),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  color: foreground,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailsCard(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    final dateFormat = DateFormat(
-        'd MMM yyyy, HH:mm',
-        Localizations.localeOf(context).languageCode == 'en'
-            ? 'en_CA'
-            : 'fr_CA');
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.reservation_info, style: AppTheme.headlineSmall),
-          const Divider(height: 28),
-          _buildDetailRow(
-            Icons.directions_car,
-            l10n.reservation_vehicle,
-            reservation.vehicle.displayName,
-            subtitle: reservation.vehicle.color,
-          ),
-          const SizedBox(height: 16),
-          _buildDetailRow(
-            Icons.local_parking,
-            l10n.reservation_location,
-            reservation.parkingSpot.displayName,
-          ),
-          if (reservation.locationAddress != null) ...[
-            const SizedBox(height: 16),
-            _buildDetailRow(
-              Icons.location_on,
-              l10n.common_address,
-              reservation.locationAddress!,
-            ),
-          ],
-          const SizedBox(height: 16),
-          _buildDetailRow(
-            Icons.schedule,
-            l10n.reservation_departureTime,
-            dateFormat.format(reservation.departureTime),
-          ),
-          if (reservation.assignedAt != null) ...[
-            const SizedBox(height: 16),
-            _buildDetailRow(
-              Icons.person_add,
-              l10n.reservation_assignedAt,
-              dateFormat.format(reservation.assignedAt!),
-            ),
-          ],
-          if (reservation.startedAt != null) ...[
-            const SizedBox(height: 16),
-            _buildDetailRow(
-              Icons.play_arrow,
-              l10n.reservation_startedAt,
-              dateFormat.format(reservation.startedAt!),
-            ),
-          ],
-          if (reservation.completedAt != null) ...[
-            const SizedBox(height: 16),
-            _buildDetailRow(
-              Icons.check_circle,
-              l10n.reservation_completedAt,
-              dateFormat.format(reservation.completedAt!),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildServiceOptionsCard(
-      BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.reservation_servicesRequested,
-              style: AppTheme.headlineSmall),
-          const Divider(height: 28),
-          // Base service
-          _buildServiceItem(
-            icon: Icons.cleaning_services,
-            label: l10n.reservation_basicSnowRemoval,
-            price: reservation.basePrice,
-            isIncluded: true,
-          ),
-          if (reservation.serviceOptions.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            ...reservation.serviceOptions.map((option) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _buildServiceItem(
-                  icon: _getOptionIcon(option),
-                  label: _getOptionLabel(l10n, option),
-                  price: _getOptionPrice(option),
-                  isIncluded: true,
-                ),
-              );
-            }),
-          ],
-          if (reservation.snowDepthCm != null) ...[
-            const Divider(height: 28),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.background,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-                  ),
-                  child: const Icon(Icons.ac_unit_rounded,
-                      color: AppTheme.primary, size: 18),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  l10n.reservation_snowDepthCm(
-                      reservation.snowDepthCm.toString()),
-                  style: TextStyle(
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildServiceItem({
-    required IconData icon,
-    required String label,
-    required double price,
-    required bool isIncluded,
-  }) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppTheme.background,
-            borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-          ),
-          child: Icon(
-            icon,
-            color: isIncluded ? AppTheme.primary : AppTheme.textTertiary,
-            size: 18,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(fontSize: 14, color: AppTheme.textPrimary),
-          ),
-        ),
-        Text(
-          '${price.toStringAsFixed(2)} \$',
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-            color: AppTheme.textPrimary,
-            fontFeatures: [FontFeature.tabularFigures()],
-          ),
-        ),
-      ],
-    );
-  }
-
-  IconData _getOptionIcon(ServiceOption option) {
-    switch (option) {
-      case ServiceOption.windowScraping:
-        return Icons.window;
-      case ServiceOption.doorDeicing:
-        return Icons.door_front_door;
-      case ServiceOption.wheelClearance:
-        return Icons.trip_origin;
-      case ServiceOption.roofClearing:
-        return Icons.car_rental;
-      case ServiceOption.saltSpreading:
-        return Icons.grain_rounded;
-      case ServiceOption.lightsCleaning:
-        return Icons.highlight_rounded;
-      case ServiceOption.perimeterClearance:
-        return Icons.crop_free_rounded;
-      case ServiceOption.exhaustCheck:
-        return Icons.air_rounded;
-    }
-  }
-
-  String _getOptionLabel(AppLocalizations l10n, ServiceOption option) {
-    switch (option) {
-      case ServiceOption.windowScraping:
-        return l10n.reservation_windowScraping;
-      case ServiceOption.doorDeicing:
-        return l10n.reservation_doorDeicing;
-      case ServiceOption.wheelClearance:
-        return l10n.reservation_wheelClearing;
-      case ServiceOption.roofClearing:
-        return l10n.reservation_roofSnowRemoval;
-      case ServiceOption.saltSpreading:
-        return l10n.reservation_saltSpreading;
-      case ServiceOption.lightsCleaning:
-        return l10n.reservation_lightsCleanup;
-      case ServiceOption.perimeterClearance:
-        return l10n.reservation_perimeterClearing;
-      case ServiceOption.exhaustCheck:
-        return l10n.reservation_exhaustCheck;
-    }
-  }
-
-  double _getOptionPrice(ServiceOption option) {
-    switch (option) {
-      case ServiceOption.windowScraping:
-        return 5.0;
-      case ServiceOption.doorDeicing:
-        return 3.0;
-      case ServiceOption.wheelClearance:
-        return 4.0;
-      case ServiceOption.roofClearing:
-        return 8.0;
-      case ServiceOption.saltSpreading:
-        return 5.0;
-      case ServiceOption.lightsCleaning:
-        return 3.0;
-      case ServiceOption.perimeterClearance:
-        return 12.0;
-      case ServiceOption.exhaustCheck:
-        return 2.0;
-    }
-  }
-
-  Widget _buildPhotosCard(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.reservation_photos, style: AppTheme.headlineSmall),
-          const Divider(height: 28),
-
-          // After Photo (primary - result)
-          if (reservation.afterPhotoUrl != null) ...[
-            Text(l10n.reservation_afterPhoto, style: AppTheme.labelLarge),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () => _showPhotoFullscreen(
-                context,
-                reservation.afterPhotoUrl!,
-                l10n.reservation_afterPhoto,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  height: 200,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: CachedNetworkImage(
-                    imageUrl: reservation.afterPhotoUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(
-                      child: CircularProgressIndicator(color: AppTheme.primary),
-                    ),
-                    errorWidget: (context, url, error) => Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error,
-                            color: AppTheme.textTertiary, size: 40),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.reservation_photoUnavailable,
-                          style: TextStyle(color: AppTheme.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.touch_app, size: 14, color: AppTheme.textTertiary),
-                  const SizedBox(width: 4),
-                  Text(
-                    l10n.reservation_tapToEnlarge,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textTertiary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          // Before Photo (if exists)
-          if (reservation.beforePhotoUrl != null) ...[
-            if (reservation.afterPhotoUrl != null) const SizedBox(height: 20),
-            Text(
-              l10n.reservation_beforePhoto,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () => _showPhotoFullscreen(
-                context,
-                reservation.beforePhotoUrl!,
-                l10n.reservation_beforePhoto,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: CachedNetworkImage(
-                    imageUrl: reservation.beforePhotoUrl!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(
-                      child: CircularProgressIndicator(color: AppTheme.primary),
-                    ),
-                    errorWidget: (context, url, error) => Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error,
-                            color: AppTheme.textTertiary, size: 32),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.reservation_photoUnavailable,
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  void _showPhotoFullscreen(
-      BuildContext context, String imageUrl, String title) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-            title: Text(
-              title,
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-          body: Center(
-            child: InteractiveViewer(
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) => Center(
-                  child: CircularProgressIndicator(color: AppTheme.primary),
-                ),
-                errorWidget: (context, url, error) => const Icon(
-                  Icons.broken_image_outlined,
-                  color: Colors.white54,
-                  size: 48,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceCard(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.primary,
-        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.reservation_totalPrice,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.onPrimary.withValues(alpha: 0.7),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${reservation.totalPrice.toStringAsFixed(2)} \$',
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.8,
-                    color: AppTheme.onPrimary,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ),
-                if (reservation.tip != null && reservation.tip! > 0) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.reservation_tipAmount(
-                        reservation.tip!.toStringAsFixed(2)),
-                    style: TextStyle(
-                      color: AppTheme.onPrimary.withValues(alpha: 0.7),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRatingSection(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    if (reservation.rating != null) {
-      // Already rated - show the rating
-      return Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppTheme.successLight,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.success.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.star, color: AppTheme.success, size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.reservation_yourRating,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: List.generate(5, (index) {
-                      return Icon(
-                        index < reservation.rating!.round()
-                            ? Icons.star
-                            : Icons.star_border,
-                        color: AppTheme.warning,
-                        size: 24,
-                      );
-                    }),
-                  ),
-                  if (reservation.review != null &&
-                      reservation.review!.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      '"${reservation.review}"',
-                      style: TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Not rated yet - show button to rate
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      child: Material(
-        color: AppTheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-          side: const BorderSide(color: AppTheme.border, width: 1.5),
-        ),
-        child: InkWell(
-          onTap: () {
-            HapticFeedback.mediumImpact();
-            RatingTipDialog.show(
-              context,
-              workerName:
-                  reservation.workerName ?? l10n.reservation_workerAssigned,
-              servicePrice: reservation.totalPrice,
-              onSubmit: (rating, tip, comment) async {
-                // Submit rating to backend
-                final repository = sl<ReservationRepository>();
-
-                // Send rating first
-                final ratingResult = await repository.rateReservation(
-                  reservationId: reservation.id,
-                  rating: rating,
-                  review: comment,
-                );
-
-                ratingResult.fold(
-                  (failure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            Icon(Icons.error, color: AppTheme.onPrimary),
-                            const SizedBox(width: 12),
-                            Text(
-                              l10n.resDetail_errorPrefix(failure.message),
-                              style: TextStyle(color: AppTheme.onPrimary),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: AppTheme.error,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    );
-                  },
-                  (success) async {
-                    // If tip is provided, send it
-                    if (tip != null && tip > 0) {
-                      final tipResult = await repository.addTip(
-                        reservationId: reservation.id,
-                        amount: tip,
-                      );
-
-                      tipResult.fold(
-                        (failure) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.warning,
-                                      color: AppTheme.onPrimary),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    l10n.resDetail_ratingSuccessTipError(
-                                        failure.message),
-                                    style: TextStyle(color: AppTheme.onPrimary),
-                                  ),
-                                ],
-                              ),
-                              backgroundColor: AppTheme.warning,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          );
-                        },
-                        (tipSuccess) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.check_circle,
-                                      color: AppTheme.onPrimary),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    l10n.resDetail_tipSent(
-                                        tip.toStringAsFixed(0)),
-                                    style: TextStyle(color: AppTheme.onPrimary),
-                                  ),
-                                ],
-                              ),
-                              backgroundColor: AppTheme.success,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              Icon(Icons.check_circle,
-                                  color: AppTheme.onPrimary),
-                              const SizedBox(width: 12),
-                              Text(
-                                l10n.resDetail_ratingSuccess,
-                                style: TextStyle(color: AppTheme.onPrimary),
-                              ),
-                            ],
-                          ),
-                          backgroundColor: AppTheme.success,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      );
-                    }
-
-                    // Retourner au dashboard après un court délai pour voir le message
-                    await Future.delayed(const Duration(milliseconds: 1500));
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                );
-              },
-            );
-          },
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppTheme.warningLight,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  ),
-                  child: const Icon(Icons.star_rounded,
-                      color: AppTheme.warning, size: 26),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(l10n.reservation_rateService,
-                          style: AppTheme.headlineSmall),
-                      const SizedBox(height: 2),
-                      Text(l10n.reservation_rateSubtitle,
-                          style: AppTheme.bodySmall),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right_rounded,
-                    color: AppTheme.textTertiary),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(
-    IconData icon,
-    String label,
-    String value, {
-    String? subtitle,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppTheme.background,
-            borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-          ),
-          child: Icon(icon, size: 18, color: AppTheme.primary),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppTheme.textTertiary,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEditButton(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          HapticFeedback.lightImpact();
-          Navigator.pushNamed(
-            context,
-            AppRoutes.editReservation,
-            arguments: reservation,
-          );
-        },
-        icon: const Icon(Icons.edit_outlined),
-        label: Text(l10n.reservation_edit),
-      ),
-    );
-  }
-
-  Widget _buildCancelButton(BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () => _showCancelDialog(context, reservation),
-        icon: const Icon(Icons.close_rounded),
-        label: Text(l10n.reservation_cancelReservation),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppTheme.error,
-          side: BorderSide(color: AppTheme.error.withValues(alpha: 0.4)),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showCancelDialog(
-      BuildContext context, Reservation reservation) async {
-    final l10n = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context).languageCode == 'en'
-        ? 'en_CA'
-        : 'fr_CA';
-    HapticFeedback.mediumImpact();
-
-    final result = await showCancelReservationSheet(context, reservation);
-    if (result == null || !context.mounted) return;
-
-    final refund = result.refundAmount;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          refund > 0
-              ? l10n.cancel_doneRefund(
-                  NumberFormat.currency(locale: locale, symbol: '\$')
-                      .format(refund))
-              : l10n.cancel_done,
-          style: const TextStyle(color: AppTheme.onPrimary),
-        ),
-        backgroundColor: AppTheme.primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    // true : l'ecran precedent recharge ses reservations
-    Navigator.of(context).pop(true);
-  }
-
-  Future<void> _callWorker(Reservation reservation) async {
-    if (reservation.workerPhone != null) {
-      final uri = Uri.parse('tel:${reservation.workerPhone}');
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-      }
-    } else {
-      if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.reservation_phoneUnavailable,
-              style: TextStyle(color: AppTheme.onPrimary),
-            ),
-            backgroundColor: AppTheme.warning,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _openMap(Reservation reservation) async {
-    if (reservation.locationLatitude != null &&
-        reservation.locationLongitude != null) {
-      final uri = Uri.parse(
-        'https://www.google.com/maps/search/?api=1&query=${reservation.locationLatitude},${reservation.locationLongitude}',
-      );
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    }
-  }
-
-  Color _getStatusColor(ReservationStatus status) {
+  Color _statusColor(ReservationStatus status) {
     switch (status) {
       case ReservationStatus.pending:
         return AppTheme.statusPending;
@@ -1608,197 +348,701 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     }
   }
 
-  /// Check if the user can report a no-show for this reservation
-  bool _canReportNoShow(Reservation reservation) {
-    // Cannot report if cancelled
-    if (reservation.status == ReservationStatus.cancelled) {
-      return false;
-    }
+  // --- Deneigeur ---
 
-    // Must have a worker assigned
-    if (reservation.workerId == null) {
-      return false;
-    }
+  Widget _buildWorkerCard(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
+    final initial = reservation.workerName?.isNotEmpty == true
+        ? reservation.workerName![0].toUpperCase()
+        : '?';
+    final initialAvatar = Center(
+      child: Text(
+        initial,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          color: AppTheme.onPrimary,
+        ),
+      ),
+    );
 
-    // Check if departure time has passed
-    final now = DateTime.now();
-    final departureTime = reservation.departureTime;
-
-    // Allow reporting if:
-    // 1. The departure time has passed (with 30 min grace period)
-    // 2. Status is assigned, enRoute, or late (worker was supposed to come but maybe didn't)
-    // 3. Or completed within the last 24 hours (in case user realizes later)
-
-    if (reservation.status == ReservationStatus.completed) {
-      // Can report within 24 hours of completion
-      final completedAt = reservation.completedAt;
-      if (completedAt != null) {
-        final hoursSinceCompletion = now.difference(completedAt).inHours;
-        return hoursSinceCompletion < 24;
-      }
-      return false;
-    }
-
-    if (reservation.status == ReservationStatus.assigned ||
-        reservation.status == ReservationStatus.enRoute ||
-        reservation.status == ReservationStatus.late) {
-      // Can report if 30 minutes past departure time
-      return now.isAfter(departureTime.add(const Duration(minutes: 30)));
-    }
-
-    return false;
+    return _Section(
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: const BoxDecoration(
+              color: AppTheme.primary,
+              shape: BoxShape.circle,
+            ),
+            child: ClipOval(
+              child: reservation.workerPhotoUrl?.isNotEmpty == true
+                  ? CachedNetworkImage(
+                      imageUrl: reservation.workerPhotoUrl!,
+                      fit: BoxFit.cover,
+                      width: 48,
+                      height: 48,
+                      placeholder: (_, __) => initialAvatar,
+                      errorWidget: (_, __, ___) => initialAvatar,
+                    )
+                  : initialAvatar,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.reservation_yourWorker,
+                    style: AppTheme.bodySmall
+                        .copyWith(color: AppTheme.textSecondary)),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        reservation.workerName ??
+                            l10n.reservation_workerAssigned,
+                        style: AppTheme.headlineSmall,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (reservation.workerIsVerified == true) ...[
+                      const SizedBox(width: 4),
+                      Icon(Icons.verified_rounded,
+                          color: AppTheme.info,
+                          size: 16,
+                          semanticLabel: l10n.worker_verified),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          IconButton.filledTonal(
+            tooltip: l10n.reservation_chat,
+            onPressed: () => _openChat(context, reservation),
+            style: IconButton.styleFrom(
+              backgroundColor: AppTheme.surfaceContainer,
+              foregroundColor: AppTheme.textPrimary,
+            ),
+            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+          ),
+          if (reservation.workerPhone != null)
+            IconButton.filledTonal(
+              tooltip: l10n.common_call,
+              onPressed: () => _callWorker(reservation),
+              style: IconButton.styleFrom(
+                backgroundColor: AppTheme.surfaceContainer,
+                foregroundColor: AppTheme.textPrimary,
+              ),
+              icon: const Icon(Icons.phone_outlined, size: 20),
+            ),
+        ],
+      ),
+    );
   }
 
-  Widget _buildReportNoShowButton(
-      BuildContext context, Reservation reservation) {
+  void _openChat(BuildContext context, Reservation reservation) {
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () {
-          HapticFeedback.mediumImpact();
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ReportNoShowPage(
-                reservationId: reservation.id,
-                workerName: reservation.workerName,
-                totalPrice: reservation.totalPrice,
-                departureTime: reservation.departureTime,
-              ),
-            ),
-          ).then((reported) {
-            if (reported == true) {
-              if (!mounted) return;
-              this
-                  .context
-                  .read<ReservationListBloc>()
-                  .add(LoadReservationById(widget.reservationId));
-
-              ScaffoldMessenger.of(this.context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: AppTheme.onPrimary),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.reservation_noShowReported,
-                        style: TextStyle(color: AppTheme.onPrimary),
-                      ),
-                    ],
-                  ),
-                  backgroundColor: AppTheme.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
-            }
-          });
-        },
-        icon: Icon(Icons.person_off, color: AppTheme.error),
-        label: Text(
-          l10n.reservation_reportNoShow,
-          style: TextStyle(color: AppTheme.error),
-        ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppTheme.error,
-          side: BorderSide(color: AppTheme.error.withValues(alpha: 0.4)),
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      _notify(l10n.reservation_userNotAuth, error: true);
+      return;
+    }
+    if (reservation.workerId == null) {
+      _notify(l10n.reservation_noWorkerYet);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => sl<ChatBloc>()..add(LoadMessages(reservation.id)),
+          child: ChatScreen(
+            reservationId: reservation.id,
+            otherUserName:
+                reservation.workerName ?? l10n.reservation_workerAssigned,
+            otherUserPhoto: null,
+            currentUserId: authState.user.id,
+          ),
         ),
       ),
     );
   }
 
-  /// Check if the user can report a general problem for this reservation
-  bool _canReportProblem(Reservation reservation) {
-    // Cannot report if cancelled
-    if (reservation.status == ReservationStatus.cancelled) {
-      return false;
+  Future<void> _callWorker(Reservation reservation) async {
+    final phone = reservation.workerPhone;
+    if (phone == null) {
+      _notify(AppLocalizations.of(context)!.reservation_phoneUnavailable);
+      return;
+    }
+    final uri = Uri.parse('tel:$phone');
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  }
+
+  // --- Details de la commande ---
+
+  Widget _buildDetails(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
+    final timeFmt = DateFormat.Hm(_locale);
+    final dateTimeFmt = DateFormat('d MMM, HH:mm', _locale);
+    final vehicle = reservation.vehicle;
+
+    final rows = <(String, String, String?)>[
+      (
+        l10n.reservation_vehicle,
+        vehicle.displayName,
+        [vehicle.color, vehicle.licensePlate]
+            .whereType<String>()
+            .where((s) => s.isNotEmpty)
+            .join(' · '),
+      ),
+      (l10n.reservation_location, reservation.parkingSpot.displayName, null),
+      if (reservation.locationAddress != null)
+        (l10n.common_address, reservation.locationAddress!, null),
+      (
+        l10n.details_departure,
+        DateFormat('EEE d MMM, HH:mm', _locale)
+            .format(reservation.departureTime),
+        reservation.deadlineTime == null
+            ? null
+            : l10n.step3_readyBy(timeFmt.format(reservation.deadlineTime!)),
+      ),
+      (
+        l10n.summary_options,
+        reservation.serviceOptions.isEmpty
+            ? l10n.step5_noOptions
+            : reservation.serviceOptions
+                .map((o) => serviceOptionInfo(l10n, o).title)
+                .join(', '),
+        null,
+      ),
+      if (reservation.snowDepthCm != null)
+        (
+          l10n.summary_snow,
+          snowRangeLabel(l10n, reservation.snowDepthCm),
+          null,
+        ),
+      (
+        reservation.isPaid ? l10n.edit_paidPrice : l10n.reservation_totalPrice,
+        _money(reservation.totalPrice),
+        reservation.tip != null && reservation.tip! > 0
+            ? l10n.reservation_tipAmount(reservation.tip!.toStringAsFixed(2))
+            : null,
+      ),
+    ];
+
+    final history = <(String, DateTime)>[
+      if (reservation.assignedAt != null)
+        (l10n.reservation_assignedAt, reservation.assignedAt!),
+      if (reservation.startedAt != null)
+        (l10n.reservation_startedAt, reservation.startedAt!),
+      if (reservation.completedAt != null)
+        (l10n.reservation_completedAt, reservation.completedAt!),
+    ];
+
+    return _Section(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0) const Divider(height: 1, color: AppTheme.border),
+            _DetailRow(
+                label: rows[i].$1, value: rows[i].$2, detail: rows[i].$3),
+          ],
+          if (history.isNotEmpty) ...[
+            const Divider(height: 1, color: AppTheme.border),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.details_history,
+                      style: AppTheme.bodySmall
+                          .copyWith(color: AppTheme.textSecondary)),
+                  const SizedBox(height: 6),
+                  for (final (label, date) in history)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(label,
+                                style: AppTheme.bodyMedium
+                                    .copyWith(color: AppTheme.textPrimary)),
+                          ),
+                          Text(
+                            dateTimeFmt.format(date),
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: AppTheme.textSecondary,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures()
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // --- Photos ---
+
+  Widget _buildPhotos(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
+    final photos = [
+      if (reservation.beforePhotoUrl != null)
+        (l10n.reservation_beforePhoto, reservation.beforePhotoUrl!),
+      if (reservation.afterPhotoUrl != null)
+        (l10n.reservation_afterPhoto, reservation.afterPhotoUrl!),
+    ];
+
+    return _Section(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.reservation_photos, style: AppTheme.headlineSmall),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              for (var i = 0; i < photos.length; i++) ...[
+                if (i > 0) const SizedBox(width: 10),
+                Expanded(
+                  child: _PhotoTile(
+                    label: photos[i].$1,
+                    url: photos[i].$2,
+                    onTap: () => _showPhotoFullscreen(
+                        context, photos[i].$2, photos[i].$1),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPhotoFullscreen(
+      BuildContext context, String imageUrl, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            systemOverlayStyle: SystemUiOverlayStyle.light,
+            title: Text(title, style: const TextStyle(color: Colors.white)),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                fit: BoxFit.contain,
+                placeholder: (_, __) => const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+                errorWidget: (_, __, ___) => const Icon(
+                  Icons.broken_image_outlined,
+                  color: Colors.white54,
+                  size: 48,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Evaluation ---
+
+  Widget _buildRating(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (reservation.rating != null) {
+      return _Section(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.reservation_yourRating,
+                style:
+                    AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary)),
+            const SizedBox(height: 6),
+            Row(
+              children: List.generate(
+                5,
+                (i) => Icon(
+                  i < reservation.rating!.round()
+                      ? Icons.star_rounded
+                      : Icons.star_outline_rounded,
+                  color: AppTheme.warning,
+                  size: 22,
+                ),
+              ),
+            ),
+            if (reservation.review?.isNotEmpty == true) ...[
+              const SizedBox(height: 8),
+              Text(
+                '« ${reservation.review} »',
+                style:
+                    AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+              ),
+            ],
+          ],
+        ),
+      );
     }
 
-    // Must have a worker assigned
-    if (reservation.workerId == null) {
+    return Material(
+      color: AppTheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        side: const BorderSide(color: AppTheme.border),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        onTap: () => _openRating(context, reservation),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              const Icon(Icons.star_outline_rounded,
+                  color: AppTheme.warning, size: 26),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.reservation_rateService,
+                        style: AppTheme.headlineSmall),
+                    const SizedBox(height: 2),
+                    Text(l10n.reservation_rateSubtitle,
+                        style: AppTheme.bodySmall),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded,
+                  color: AppTheme.textTertiary),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openRating(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
+    HapticFeedback.mediumImpact();
+    RatingTipDialog.show(
+      context,
+      workerName: reservation.workerName ?? l10n.reservation_workerAssigned,
+      servicePrice: reservation.totalPrice,
+      onSubmit: (rating, tip, comment) async {
+        final repository = sl<ReservationRepository>();
+        final ratingResult = await repository.rateReservation(
+          reservationId: reservation.id,
+          rating: rating,
+          review: comment,
+        );
+
+        await ratingResult.fold(
+          (failure) async =>
+              _notify(l10n.resDetail_errorPrefix(failure.message), error: true),
+          (_) async {
+            if (tip != null && tip > 0) {
+              final tipResult = await repository.addTip(
+                reservationId: reservation.id,
+                amount: tip,
+              );
+              tipResult.fold(
+                (failure) => _notify(
+                    l10n.resDetail_ratingSuccessTipError(failure.message),
+                    error: true),
+                (_) => _notify(l10n.resDetail_tipSent(tip.toStringAsFixed(0))),
+              );
+            } else {
+              _notify(l10n.resDetail_ratingSuccess);
+            }
+            // La note apparait sur la page, sans la quitter
+            _reload();
+          },
+        );
+      },
+    );
+  }
+
+  // --- Actions ---
+
+  List<Widget> _buildActions(BuildContext context, Reservation reservation) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      if (reservation.canBeEdited) ...[
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () async {
+              HapticFeedback.lightImpact();
+              final changed = await Navigator.pushNamed(
+                context,
+                AppRoutes.editReservation,
+                arguments: reservation,
+              );
+              if (changed == true) _reload();
+            },
+            icon: const Icon(Icons.edit_outlined),
+            label: Text(l10n.reservation_edit),
+          ),
+        ),
+        const SizedBox(height: 4),
+      ],
+      if (reservation.canBeCancelled)
+        Center(
+          child: TextButton(
+            onPressed: () => _cancel(context, reservation),
+            style: TextButton.styleFrom(foregroundColor: AppTheme.error),
+            child: Text(l10n.reservation_cancelReservation,
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ),
+      if (_canReportNoShow(reservation))
+        _LinkRow(
+          icon: Icons.person_off_outlined,
+          label: l10n.details_noShowLink,
+          onTap: () => _report(
+            context,
+            ReportNoShowPage(
+              reservationId: reservation.id,
+              workerName: reservation.workerName,
+              totalPrice: reservation.totalPrice,
+              departureTime: reservation.departureTime,
+            ),
+            l10n.reservation_noShowReported,
+          ),
+        ),
+      if (_canReportProblem(reservation))
+        _LinkRow(
+          icon: Icons.flag_outlined,
+          label: l10n.details_problemLink,
+          onTap: () => _report(
+            context,
+            CreateDisputePage(
+              reservationId: reservation.id,
+              workerName: reservation.workerName,
+              totalPrice: reservation.totalPrice,
+              serviceDate: reservation.completedAt ?? reservation.departureTime,
+            ),
+            l10n.dispute_created,
+          ),
+        ),
+    ];
+  }
+
+  Future<void> _cancel(BuildContext context, Reservation reservation) async {
+    final l10n = AppLocalizations.of(context)!;
+    HapticFeedback.mediumImpact();
+
+    final result = await showCancelReservationSheet(context, reservation);
+    if (result == null || !context.mounted) return;
+
+    final refund = result.refundAmount;
+    _notify(
+        refund > 0 ? l10n.cancel_doneRefund(_money(refund)) : l10n.cancel_done);
+    // true : l'ecran precedent recharge ses reservations
+    Navigator.of(context).pop(true);
+  }
+
+  Future<void> _report(
+      BuildContext context, Widget page, String doneMessage) async {
+    HapticFeedback.mediumImpact();
+    final reported = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => page),
+    );
+    if (reported == true && mounted) {
+      _reload();
+      _notify(doneMessage);
+    }
+  }
+
+  /// Absence signalable 30 min apres l'heure prevue, ou dans les 24 h qui
+  /// suivent un travail marque termine.
+  bool _canReportNoShow(Reservation reservation) {
+    if (reservation.status == ReservationStatus.cancelled ||
+        reservation.workerId == null) {
       return false;
     }
-
-    // Can report problem for completed reservations within 72 hours
+    final now = DateTime.now();
     if (reservation.status == ReservationStatus.completed) {
       final completedAt = reservation.completedAt;
-      if (completedAt != null) {
-        final hoursSinceCompletion =
-            DateTime.now().difference(completedAt).inHours;
-        return hoursSinceCompletion < 72;
-      }
-      return false;
+      return completedAt != null && now.difference(completedAt).inHours < 24;
     }
-
-    // Can also report for in-progress or late reservations
-    if (reservation.status == ReservationStatus.inProgress ||
+    if (reservation.status == ReservationStatus.assigned ||
+        reservation.status == ReservationStatus.enRoute ||
         reservation.status == ReservationStatus.late) {
-      return true;
+      return now
+          .isAfter(reservation.departureTime.add(const Duration(minutes: 30)));
     }
-
     return false;
   }
 
-  Widget _buildReportProblemButton(
-      BuildContext context, Reservation reservation) {
-    final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
+  /// Probleme signalable pendant le travail, ou dans les 72 h qui suivent.
+  bool _canReportProblem(Reservation reservation) {
+    if (reservation.status == ReservationStatus.cancelled ||
+        reservation.workerId == null) {
+      return false;
+    }
+    if (reservation.status == ReservationStatus.completed) {
+      final completedAt = reservation.completedAt;
+      return completedAt != null &&
+          DateTime.now().difference(completedAt).inHours < 72;
+    }
+    return reservation.status == ReservationStatus.inProgress ||
+        reservation.status == ReservationStatus.late;
+  }
+}
+
+/// Carte blanche bordee, commune aux blocs de la page.
+class _Section extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+
+  const _Section({
+    required this.child,
+    this.padding = const EdgeInsets.all(14),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
       width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () {
-          HapticFeedback.mediumImpact();
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CreateDisputePage(
-                reservationId: reservation.id,
-                workerName: reservation.workerName,
-                totalPrice: reservation.totalPrice,
-                serviceDate:
-                    reservation.completedAt ?? reservation.departureTime,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final String? detail;
+
+  const _DetailRow({required this.label, required this.value, this.detail});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style:
+                  AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary)),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+          if (detail != null && detail!.isNotEmpty)
+            Text(detail!,
+                style:
+                    AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary)),
+        ],
+      ),
+    );
+  }
+}
+
+class _PhotoTile extends StatelessWidget {
+  final String label;
+  final String url;
+  final VoidCallback onTap;
+
+  const _PhotoTile({
+    required this.label,
+    required this.url,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: CachedNetworkImage(
+                imageUrl: url,
+                fit: BoxFit.cover,
+                placeholder: (_, __) =>
+                    const ColoredBox(color: AppTheme.surfaceContainer),
+                errorWidget: (_, __, ___) => const ColoredBox(
+                  color: AppTheme.surfaceContainer,
+                  child: Icon(Icons.broken_image_outlined,
+                      color: AppTheme.textTertiary),
+                ),
               ),
             ),
-          ).then((reported) {
-            if (reported == true) {
-              if (!mounted) return;
-              this
-                  .context
-                  .read<ReservationListBloc>()
-                  .add(LoadReservationById(widget.reservationId));
-
-              ScaffoldMessenger.of(this.context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: AppTheme.onPrimary),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.dispute_created,
-                        style: TextStyle(color: AppTheme.onPrimary),
-                      ),
-                    ],
-                  ),
-                  backgroundColor: AppTheme.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
-            }
-          });
-        },
-        icon: Icon(Icons.report_problem, color: AppTheme.warning),
-        label: Text(
-          l10n.dispute_reportProblem,
-          style: TextStyle(color: AppTheme.warning),
+          ),
         ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppTheme.warning,
-          side: BorderSide(color: AppTheme.warning.withValues(alpha: 0.4)),
+        const SizedBox(height: 6),
+        Text(label,
+            style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary)),
+      ],
+    );
+  }
+}
+
+/// Action secondaire en lien discret (signalements).
+class _LinkRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _LinkRow(
+      {required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppTheme.textSecondary),
+            const SizedBox(width: 10),
+            Expanded(child: Text(label, style: AppTheme.labelLarge)),
+            const Icon(Icons.chevron_right_rounded,
+                color: AppTheme.textTertiary),
+          ],
         ),
       ),
     );

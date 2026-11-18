@@ -860,12 +860,6 @@ abstract class AppLocalizations {
   /// **'Actualiser'**
   String get reservation_refresh;
 
-  /// No description provided for @reservation_live.
-  ///
-  /// In fr, this message translates to:
-  /// **'EN DIRECT'**
-  String get reservation_live;
-
   /// No description provided for @reservation_statusPending.
   ///
   /// In fr, this message translates to:
@@ -907,12 +901,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Le service est en retard'**
   String get reservation_statusDelayed;
-
-  /// No description provided for @reservation_progress.
-  ///
-  /// In fr, this message translates to:
-  /// **'Progression'**
-  String get reservation_progress;
 
   /// No description provided for @reservation_shortPending.
   ///
@@ -968,12 +956,6 @@ abstract class AppLocalizations {
   /// **'Déneigeur assigné'**
   String get reservation_workerAssigned;
 
-  /// No description provided for @reservation_map.
-  ///
-  /// In fr, this message translates to:
-  /// **'Carte'**
-  String get reservation_map;
-
   /// No description provided for @reservation_chat.
   ///
   /// In fr, this message translates to:
@@ -992,11 +974,29 @@ abstract class AppLocalizations {
   /// **'Aucun déneigeur assigné pour le moment'**
   String get reservation_noWorkerYet;
 
-  /// No description provided for @reservation_info.
+  /// No description provided for @details_history.
   ///
   /// In fr, this message translates to:
-  /// **'Informations'**
-  String get reservation_info;
+  /// **'Historique'**
+  String get details_history;
+
+  /// No description provided for @details_departure.
+  ///
+  /// In fr, this message translates to:
+  /// **'Départ'**
+  String get details_departure;
+
+  /// No description provided for @details_noShowLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le déneigeur n’est pas venu'**
+  String get details_noShowLink;
+
+  /// No description provided for @details_problemLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signaler un problème'**
+  String get details_problemLink;
 
   /// No description provided for @reservation_vehicle.
   ///
@@ -1034,24 +1034,6 @@ abstract class AppLocalizations {
   /// **'Terminée le'**
   String get reservation_completedAt;
 
-  /// No description provided for @reservation_servicesRequested.
-  ///
-  /// In fr, this message translates to:
-  /// **'Services demandés'**
-  String get reservation_servicesRequested;
-
-  /// No description provided for @reservation_basicSnowRemoval.
-  ///
-  /// In fr, this message translates to:
-  /// **'Déneigement de base'**
-  String get reservation_basicSnowRemoval;
-
-  /// No description provided for @reservation_snowDepthCm.
-  ///
-  /// In fr, this message translates to:
-  /// **'Profondeur de neige: {depth} cm'**
-  String reservation_snowDepthCm(String depth);
-
   /// No description provided for @reservation_photos.
   ///
   /// In fr, this message translates to:
@@ -1069,12 +1051,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Photo non disponible'**
   String get reservation_photoUnavailable;
-
-  /// No description provided for @reservation_tapToEnlarge.
-  ///
-  /// In fr, this message translates to:
-  /// **'Appuyez pour agrandir'**
-  String get reservation_tapToEnlarge;
 
   /// No description provided for @reservation_beforePhoto.
   ///
@@ -1345,36 +1321,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Dégagement des roues'**
   String get reservation_wheelClearing;
-
-  /// No description provided for @reservation_roofSnowRemoval.
-  ///
-  /// In fr, this message translates to:
-  /// **'Déneigement du toit'**
-  String get reservation_roofSnowRemoval;
-
-  /// No description provided for @reservation_saltSpreading.
-  ///
-  /// In fr, this message translates to:
-  /// **'Épandage de sel'**
-  String get reservation_saltSpreading;
-
-  /// No description provided for @reservation_lightsCleanup.
-  ///
-  /// In fr, this message translates to:
-  /// **'Nettoyage phares/feux'**
-  String get reservation_lightsCleanup;
-
-  /// No description provided for @reservation_perimeterClearing.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dégagement périmètre'**
-  String get reservation_perimeterClearing;
-
-  /// No description provided for @reservation_exhaustCheck.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vérif. échappement'**
-  String get reservation_exhaustCheck;
 
   /// No description provided for @edit_paidPrice.
   ///

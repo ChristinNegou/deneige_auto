@@ -410,9 +410,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservation_refresh => 'Refresh';
 
   @override
-  String get reservation_live => 'LIVE';
-
-  @override
   String get reservation_statusPending =>
       'Waiting for an available snow worker';
 
@@ -438,9 +435,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reservation_statusDelayed => 'The service is delayed';
-
-  @override
-  String get reservation_progress => 'Progress';
 
   @override
   String get reservation_shortPending => 'Pending';
@@ -470,9 +464,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservation_workerAssigned => 'Worker assigned';
 
   @override
-  String get reservation_map => 'Map';
-
-  @override
   String get reservation_chat => 'Chat';
 
   @override
@@ -482,7 +473,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservation_noWorkerYet => 'No snow worker assigned yet';
 
   @override
-  String get reservation_info => 'Information';
+  String get details_history => 'History';
+
+  @override
+  String get details_departure => 'Departure';
+
+  @override
+  String get details_noShowLink => 'The snow worker did not come';
+
+  @override
+  String get details_problemLink => 'Report a problem';
 
   @override
   String get reservation_vehicle => 'Vehicle';
@@ -503,17 +503,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservation_completedAt => 'Completed on';
 
   @override
-  String get reservation_servicesRequested => 'Requested services';
-
-  @override
-  String get reservation_basicSnowRemoval => 'Basic snow removal';
-
-  @override
-  String reservation_snowDepthCm(String depth) {
-    return 'Snow depth: $depth cm';
-  }
-
-  @override
   String get reservation_photos => 'Service photos';
 
   @override
@@ -521,9 +510,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reservation_photoUnavailable => 'Photo unavailable';
-
-  @override
-  String get reservation_tapToEnlarge => 'Tap to enlarge';
 
   @override
   String get reservation_beforePhoto => 'Before service';
@@ -673,21 +659,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reservation_wheelClearing => 'Wheel clearing';
-
-  @override
-  String get reservation_roofSnowRemoval => 'Roof snow removal';
-
-  @override
-  String get reservation_saltSpreading => 'Salt spreading';
-
-  @override
-  String get reservation_lightsCleanup => 'Lights cleanup';
-
-  @override
-  String get reservation_perimeterClearing => 'Perimeter clearing';
-
-  @override
-  String get reservation_exhaustCheck => 'Exhaust check';
 
   @override
   String get edit_paidPrice => 'Price paid';
