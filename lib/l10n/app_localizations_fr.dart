@@ -2048,6 +2048,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get clientHome_userNotAuth => 'Erreur: utilisateur non authentifié';
 
   @override
+  String worker_hiddenJobsEquipment(int count, String equipment) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count travaux à proximité demandent de l\'équipement que vous n\'avez pas : $equipment',
+      one:
+          '1 travail à proximité demande de l\'équipement que vous n\'avez pas : $equipment',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String reservation_deadline(String time) {
     return 'À terminer avant $time';
   }

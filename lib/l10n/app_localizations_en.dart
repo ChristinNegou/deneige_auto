@@ -2031,6 +2031,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientHome_userNotAuth => 'Error: user not authenticated';
 
   @override
+  String worker_hiddenJobsEquipment(int count, String equipment) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jobs nearby need equipment you don\'t have: $equipment',
+      one: '1 job nearby needs equipment you don\'t have: $equipment',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String reservation_deadline(String time) {
     return 'Must be done by $time';
   }

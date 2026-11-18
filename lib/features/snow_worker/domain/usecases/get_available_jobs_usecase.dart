@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
-import '../entities/worker_job.dart';
+import '../entities/available_jobs.dart';
 import '../repositories/worker_repository.dart';
 
 class GetAvailableJobsUseCase {
@@ -9,7 +9,7 @@ class GetAvailableJobsUseCase {
 
   GetAvailableJobsUseCase(this.repository);
 
-  Future<Either<Failure, List<WorkerJob>>> call({
+  Future<Either<Failure, AvailableJobs>> call({
     required double latitude,
     required double longitude,
     double radiusKm = 10,

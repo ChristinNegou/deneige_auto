@@ -344,6 +344,14 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
         console.log(`🔧 Worker equipment: [${workerEquipment.join(', ')}]`);
         console.log(`📋 ${reservationsWithEquipment.length} total jobs, ${filteredReservations.length} compatible with worker equipment`);
 
+        // Jobs masques faute d'equipement : l'app explique au deneigeur ce qui lui manque
+        const hiddenReservations = shouldFilter
+            ? reservationsWithEquipment.filter(r =>
+                !workerHasRequiredEquipment(workerEquipment, r.requiredEquipment))
+            : [];
+        const missingEquipment = [...new Set(hiddenReservations.flatMap(r =>
+            (r.requiredEquipment || []).filter(e => !workerEquipment.includes(e))))];
+
         // Format output
         const formattedReservations = filteredReservations.map(r => ({
             _id: r._id,
@@ -385,6 +393,10 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
             success: true,
             count: formattedReservations.length,
             data: formattedReservations,
+            hiddenByEquipment: {
+                count: hiddenReservations.length,
+                missingEquipment,
+            },
         });
     } catch (error) {
         console.error('Error fetching available jobs:', error);

@@ -2,6 +2,8 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:deneige_auto/features/snow_worker/domain/entities/worker_job.dart';
+import 'package:deneige_auto/features/snow_worker/domain/entities/available_jobs.dart';
 import 'package:deneige_auto/core/errors/failures.dart';
 import 'package:deneige_auto/features/snow_worker/domain/usecases/get_available_jobs_usecase.dart';
 import 'package:deneige_auto/features/snow_worker/domain/usecases/get_my_jobs_usecase.dart';
@@ -75,7 +77,7 @@ void main() {
                 latitude: any(named: 'latitude'),
                 longitude: any(named: 'longitude'),
                 radiusKm: any(named: 'radiusKm'),
-              )).thenAnswer((_) async => Right(tJobs));
+              )).thenAnswer((_) async => Right(AvailableJobs(jobs: tJobs)));
           when(() => mockGetMyJobs()).thenAnswer((_) async => const Right([]));
           return bloc;
         },
@@ -86,6 +88,34 @@ void main() {
         expect: () => [
           const WorkerJobsLoading(),
           isA<WorkerJobsLoaded>(),
+        ],
+      );
+
+      blocTest<WorkerJobsBloc, WorkerJobsState>(
+        'passes jobs hidden for missing equipment to the loaded state',
+        build: () {
+          when(() => mockGetAvailableJobs(
+                latitude: any(named: 'latitude'),
+                longitude: any(named: 'longitude'),
+                radiusKm: any(named: 'radiusKm'),
+              )).thenAnswer((_) async => const Right(AvailableJobs(
+                jobs: [],
+                hiddenForEquipmentCount: 2,
+                missingEquipment: [EquipmentType.brush],
+              )));
+          when(() => mockGetMyJobs()).thenAnswer((_) async => const Right([]));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const LoadAvailableJobs(
+          latitude: 46.34,
+          longitude: -72.55,
+        )),
+        expect: () => [
+          const WorkerJobsLoading(),
+          isA<WorkerJobsLoaded>()
+              .having((s) => s.hiddenForEquipmentCount, 'hidden', 2)
+              .having(
+                  (s) => s.missingEquipment, 'missing', [EquipmentType.brush]),
         ],
       );
 

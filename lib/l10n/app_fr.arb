@@ -761,6 +761,13 @@
   "clientHome_theWorker": "le déneigeur",
   "clientHome_mySubscription": "Mon\nabonnement",
   "clientHome_userNotAuth": "Erreur: utilisateur non authentifié",
+  "worker_hiddenJobsEquipment": "{count, plural, =1{1 travail à proximité demande de l'équipement que vous n'avez pas : {equipment}} other{{count} travaux à proximité demandent de l'équipement que vous n'avez pas : {equipment}}}",
+  "@worker_hiddenJobsEquipment": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "equipment": {"type": "String"}
+    }
+  },
   "reservation_deadline": "À terminer avant {time}",
   "@reservation_deadline": {
     "placeholders": {

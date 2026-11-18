@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:deneige_auto/features/snow_worker/domain/entities/available_jobs.dart';
 import 'package:deneige_auto/core/errors/exceptions.dart';
 import 'package:deneige_auto/core/errors/failures.dart';
 import 'package:deneige_auto/features/snow_worker/data/repositories/worker_repository_impl.dart';
@@ -130,7 +131,7 @@ void main() {
               latitude: any(named: 'latitude'),
               longitude: any(named: 'longitude'),
               radiusKm: any(named: 'radiusKm'),
-            )).thenAnswer((_) async => tJobs);
+            )).thenAnswer((_) async => AvailableJobs(jobs: tJobs));
 
         final result = await repository.getAvailableJobs(
           latitude: 46.34,
@@ -141,7 +142,7 @@ void main() {
         expect(result.isRight(), true);
         result.fold(
           (_) => fail('Should return jobs'),
-          (jobs) => expect(jobs.length, 2),
+          (available) => expect(available.jobs.length, 2),
         );
       });
 

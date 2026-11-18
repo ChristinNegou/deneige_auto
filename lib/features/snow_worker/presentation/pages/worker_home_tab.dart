@@ -976,12 +976,16 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
 
             List<WorkerJob> availableJobs = [];
             String? loadingJobId;
+            WorkerJobsLoaded? loaded;
 
             if (state is WorkerJobsLoaded) {
-              availableJobs = state.availableJobs;
+              loaded = state;
             } else if (state is JobActionLoading) {
-              availableJobs = state.previousState.availableJobs;
+              loaded = state.previousState;
               loadingJobId = state.jobId;
+            }
+            if (loaded != null) {
+              availableJobs = loaded.availableJobs;
             }
 
             availableJobs.sort((a, b) {
@@ -1021,6 +1025,16 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                   ],
                 ),
                 const SizedBox(height: 12),
+                // Travaux masques faute d'equipement : dire ce qui manque
+                if (hasEquipment &&
+                    loaded != null &&
+                    loaded.hiddenForEquipmentCount > 0) ...[
+                  _buildMissingEquipmentCard(
+                    loaded.hiddenForEquipmentCount,
+                    loaded.missingEquipment,
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 // Afficher un message si aucun équipement n'est configuré
                 if (!hasEquipment)
                   _buildNoEquipmentWarning()
@@ -1056,6 +1070,68 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           },
         );
       },
+    );
+  }
+
+  /// Nom traduit d'un equipement (memes libelles que l'onglet Profil).
+  String _equipmentLabel(EquipmentType type, AppLocalizations l10n) {
+    switch (type) {
+      case EquipmentType.shovel:
+        return l10n.worker_equipShovel;
+      case EquipmentType.brush:
+        return l10n.worker_equipBroom;
+      case EquipmentType.iceScraper:
+        return l10n.worker_equipScraper;
+      case EquipmentType.saltSpreader:
+        return l10n.worker_equipSaltSpreader;
+      case EquipmentType.snowBlower:
+        return l10n.worker_equipSnowBlower;
+      case EquipmentType.roofBroom:
+        return l10n.worker_equipRoofBroom;
+      case EquipmentType.microfiberCloth:
+        return l10n.worker_equipCloth;
+      case EquipmentType.deicerSpray:
+        return l10n.worker_equipDeicer;
+    }
+  }
+
+  /// Signale les travaux proches masques faute d'equipement, avec un raccourci
+  /// vers l'onglet Profil pour declarer l'equipement manquant.
+  Widget _buildMissingEquipmentCard(
+      int hiddenCount, List<EquipmentType> missing) {
+    final l10n = AppLocalizations.of(context)!;
+    final equipment = missing.map((e) => _equipmentLabel(e, l10n)).join(', ');
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+      decoration: BoxDecoration(
+        color: AppTheme.warningLight,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.handyman_outlined,
+              color: AppTheme.warning, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              l10n.worker_hiddenJobsEquipment(hiddenCount, equipment),
+              style: AppTheme.bodySmall.copyWith(color: AppTheme.textPrimary),
+            ),
+          ),
+          const SizedBox(width: 4),
+          TextButton(
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              WorkerMainDashboard.switchToTab(
+                context,
+                WorkerMainDashboard.profileTab,
+              );
+            },
+            child: Text(l10n.common_add),
+          ),
+        ],
+      ),
     );
   }
 

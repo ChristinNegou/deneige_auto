@@ -161,11 +161,17 @@ class WorkerJobsLoaded extends WorkerJobsState {
   final WorkerJob? activeJob;
   final bool isRefreshing;
 
+  /// Travaux a proximite masques faute d'equipement, et ce qui manque.
+  final int hiddenForEquipmentCount;
+  final List<EquipmentType> missingEquipment;
+
   const WorkerJobsLoaded({
     required this.availableJobs,
     required this.myJobs,
     this.activeJob,
     this.isRefreshing = false,
+    this.hiddenForEquipmentCount = 0,
+    this.missingEquipment = const [],
   });
 
   WorkerJobsLoaded copyWith({
@@ -173,17 +179,29 @@ class WorkerJobsLoaded extends WorkerJobsState {
     List<WorkerJob>? myJobs,
     WorkerJob? activeJob,
     bool? isRefreshing,
+    int? hiddenForEquipmentCount,
+    List<EquipmentType>? missingEquipment,
   }) {
     return WorkerJobsLoaded(
       availableJobs: availableJobs ?? this.availableJobs,
       myJobs: myJobs ?? this.myJobs,
       activeJob: activeJob ?? this.activeJob,
       isRefreshing: isRefreshing ?? this.isRefreshing,
+      hiddenForEquipmentCount:
+          hiddenForEquipmentCount ?? this.hiddenForEquipmentCount,
+      missingEquipment: missingEquipment ?? this.missingEquipment,
     );
   }
 
   @override
-  List<Object?> get props => [availableJobs, myJobs, activeJob, isRefreshing];
+  List<Object?> get props => [
+        availableJobs,
+        myJobs,
+        activeJob,
+        isRefreshing,
+        hiddenForEquipmentCount,
+        missingEquipment,
+      ];
 }
 
 class JobActionLoading extends WorkerJobsState {
@@ -368,9 +386,11 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
                 .firstOrNull;
 
             emit(WorkerJobsLoaded(
-              availableJobs: availableJobs,
+              availableJobs: availableJobs.jobs,
               myJobs: myJobs,
               activeJob: activeJob,
+              hiddenForEquipmentCount: availableJobs.hiddenForEquipmentCount,
+              missingEquipment: availableJobs.missingEquipment,
             ));
           },
         );
@@ -472,9 +492,11 @@ class WorkerJobsBloc extends Bloc<WorkerJobsEvent, WorkerJobsState> {
                 .firstOrNull;
 
             emit(WorkerJobsLoaded(
-              availableJobs: availableJobs,
+              availableJobs: availableJobs.jobs,
               myJobs: myJobs,
               activeJob: activeJob,
+              hiddenForEquipmentCount: availableJobs.hiddenForEquipmentCount,
+              missingEquipment: availableJobs.missingEquipment,
             ));
           },
         );

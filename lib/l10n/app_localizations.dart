@@ -3956,6 +3956,12 @@ abstract class AppLocalizations {
   /// **'Erreur: utilisateur non authentifié'**
   String get clientHome_userNotAuth;
 
+  /// No description provided for @worker_hiddenJobsEquipment.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 travail à proximité demande de l\'équipement que vous n\'avez pas : {equipment}} other{{count} travaux à proximité demandent de l\'équipement que vous n\'avez pas : {equipment}}}'**
+  String worker_hiddenJobsEquipment(int count, String equipment);
+
   /// No description provided for @reservation_deadline.
   ///
   /// In fr, this message translates to:

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
+import '../entities/available_jobs.dart';
 import '../entities/worker_job.dart';
 import '../entities/worker_profile.dart';
 import '../entities/worker_stats.dart';
@@ -11,7 +12,7 @@ import '../../data/datasources/worker_remote_datasource.dart'
 
 abstract class WorkerRepository {
   /// Get available jobs near worker's location
-  Future<Either<Failure, List<WorkerJob>>> getAvailableJobs({
+  Future<Either<Failure, AvailableJobs>> getAvailableJobs({
     required double latitude,
     required double longitude,
     double radiusKm = 10,

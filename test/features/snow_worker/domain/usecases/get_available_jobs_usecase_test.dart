@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:deneige_auto/features/snow_worker/domain/entities/available_jobs.dart';
 import 'package:deneige_auto/features/snow_worker/domain/usecases/get_available_jobs_usecase.dart';
 
 import '../../../../mocks/mock_repositories.dart';
@@ -20,7 +21,7 @@ void main() {
     const tLatitude = 46.3432;
     const tLongitude = -72.5476;
     const tRadiusKm = 10.0;
-    final tJobs = WorkerFixtures.createJobList(5);
+    final tJobs = AvailableJobs(jobs: WorkerFixtures.createJobList(5));
 
     test('should return list of available jobs when successful', () async {
       // Arrange
@@ -52,7 +53,7 @@ void main() {
             latitude: any(named: 'latitude'),
             longitude: any(named: 'longitude'),
             radiusKm: any(named: 'radiusKm'),
-          )).thenAnswer((_) async => const Right([]));
+          )).thenAnswer((_) async => const Right(AvailableJobs(jobs: [])));
 
       // Act
       final result = await usecase(
@@ -64,7 +65,7 @@ void main() {
       expect(result.isRight(), true);
       result.fold(
         (l) => fail('Should be Right'),
-        (jobs) => expect(jobs, isEmpty),
+        (available) => expect(available.jobs, isEmpty),
       );
     });
 

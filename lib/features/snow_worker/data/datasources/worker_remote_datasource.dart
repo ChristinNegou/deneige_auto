@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
+import '../../domain/entities/available_jobs.dart';
+import '../../domain/entities/worker_job.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/utils/time_utils.dart';
@@ -10,7 +12,7 @@ import '../models/worker_profile_model.dart';
 import '../models/worker_stats_model.dart';
 
 abstract class WorkerRemoteDataSource {
-  Future<List<WorkerJobModel>> getAvailableJobs({
+  Future<AvailableJobs> getAvailableJobs({
     required double latitude,
     required double longitude,
     double radiusKm = 10,
@@ -246,7 +248,7 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
   WorkerRemoteDataSourceImpl({required this.dio});
 
   @override
-  Future<List<WorkerJobModel>> getAvailableJobs({
+  Future<AvailableJobs> getAvailableJobs({
     required double latitude,
     required double longitude,
     double radiusKm = 10,
@@ -262,9 +264,18 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
       );
 
       final data = response.data['data'] as List<dynamic>? ?? [];
-      return data
-          .map((job) => WorkerJobModel.fromJson(job as Map<String, dynamic>))
-          .toList();
+      final hidden =
+          response.data['hiddenByEquipment'] as Map<String, dynamic>? ?? {};
+      return AvailableJobs(
+        jobs: data
+            .map((job) => WorkerJobModel.fromJson(job as Map<String, dynamic>))
+            .toList(),
+        hiddenForEquipmentCount: (hidden['count'] as num?)?.toInt() ?? 0,
+        missingEquipment: (hidden['missingEquipment'] as List<dynamic>? ?? [])
+            .map((e) => EquipmentTypeExtension.fromString(e.toString()))
+            .whereType<EquipmentType>()
+            .toList(),
+      );
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
+import '../../domain/entities/available_jobs.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/worker_job.dart';
 import '../../domain/entities/worker_profile.dart';
@@ -26,7 +27,7 @@ class WorkerRepositoryImpl implements WorkerRepository {
   WorkerRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, List<WorkerJob>>> getAvailableJobs({
+  Future<Either<Failure, AvailableJobs>> getAvailableJobs({
     required double latitude,
     required double longitude,
     double radiusKm = 10,

@@ -674,6 +674,13 @@
   "clientHome_theWorker": "the worker",
   "clientHome_mySubscription": "My\nsubscription",
   "clientHome_userNotAuth": "Error: user not authenticated",
+  "worker_hiddenJobsEquipment": "{count, plural, =1{1 job nearby needs equipment you don't have: {equipment}} other{{count} jobs nearby need equipment you don't have: {equipment}}}",
+  "@worker_hiddenJobsEquipment": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "equipment": {"type": "String"}
+    }
+  },
   "reservation_deadline": "Must be done by {time}",
   "@reservation_deadline": {
     "placeholders": {
