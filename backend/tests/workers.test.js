@@ -68,6 +68,31 @@ describe('Worker Routes', () => {
       expect(res.body.data).toBeDefined();
     });
 
+    it('should return no jobs when the worker is offline', async () => {
+      const client = await createTestUser();
+      const vehicle = await createTestVehicle(client._id);
+      await createTestReservation(client._id, vehicle._id, {
+        status: 'pending',
+        location: {
+          type: 'Point',
+          coordinates: [-73.5673, 45.5017],
+          address: 'Montreal',
+        },
+      });
+      const offlineWorker = await createTestWorker({
+        workerProfile: { ...testWorker.workerProfile.toObject(), isAvailable: false },
+      });
+
+      const res = await request(app)
+        .get('/api/workers/available-jobs')
+        .query({ lat: 45.5017, lng: -73.5673, radiusKm: 50 })
+        .set('Authorization', `Bearer ${generateAuthToken(offlineWorker)}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.offline).toBe(true);
+      expect(res.body.data).toEqual([]);
+    });
+
     it('should require lat and lng parameters', async () => {
       const res = await request(app)
         .get('/api/workers/available-jobs')
@@ -206,6 +231,26 @@ describe('Worker Routes', () => {
       // L'API retourne les données dans data, pas reservation
       expect(res.body.data.status).toBe('assigned');
       expect(res.body.data.workerId.toString()).toBe(testWorker._id.toString());
+    });
+
+    it('should not accept a job while the worker is offline', async () => {
+      const client = await createTestUser();
+      const vehicle = await createTestVehicle(client._id);
+      const reservation = await createTestReservation(client._id, vehicle._id, {
+        status: 'pending',
+      });
+      const offlineWorker = await createTestWorker({
+        workerProfile: { ...testWorker.workerProfile.toObject(), isAvailable: false },
+      });
+
+      const res = await request(app)
+        .post(`/api/workers/jobs/${reservation._id}/accept`)
+        .set('Authorization', `Bearer ${generateAuthToken(offlineWorker)}`);
+
+      expect(res.status).toBe(403);
+      expect(res.body.success).toBe(false);
+      const unchanged = await Reservation.findById(reservation._id);
+      expect(unchanged.status).toBe('pending');
     });
 
     it('should not accept an already assigned job', async () => {

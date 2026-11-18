@@ -45,6 +45,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
   bool _isFirstLoad = true;
   late VerificationBloc _verificationBloc;
 
+  /// Derniere disponibilite connue : sert a recharger les travaux au changement.
+  bool? _wasAvailable;
+
   static const Duration _refreshInterval = Duration(seconds: 15);
 
   @override
@@ -252,6 +255,16 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     return SafeArea(
       child: BlocListener<WorkerAvailabilityBloc, WorkerAvailabilityState>(
         listener: (context, state) {
+          // En ligne / hors ligne : recharger les travaux pour refleter le statut
+          if (state is WorkerAvailabilityLoaded && !state.isUpdating) {
+            if (_wasAvailable != null && _wasAvailable != state.isAvailable) {
+              context.read<WorkerJobsBloc>().add(LoadAvailableJobs(
+                    latitude: _currentPosition?.latitude ?? 46.3432,
+                    longitude: _currentPosition?.longitude ?? -72.5476,
+                  ));
+            }
+            _wasAvailable = state.isAvailable;
+          }
           // Quand le profil est mis à jour, recharger les données
           if (state is WorkerProfileUpdated) {
             // Recharger l'availability pour mettre à jour l'UI avec le nouveau profil
@@ -939,6 +952,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
           equipmentList = availabilityState.profile?.equipmentList ?? [];
         }
         final hasEquipment = equipmentList.isNotEmpty;
+        // Hors ligne : aucun travail propose (le serveur applique la meme regle)
+        final isOffline = availabilityState is WorkerAvailabilityLoaded &&
+            !availabilityState.isAvailable;
 
         return BlocConsumer<WorkerJobsBloc, WorkerJobsState>(
           listener: (context, state) {
@@ -1004,7 +1020,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                       children: [
                         Text(l10n.worker_availableJobs,
                             style: AppTheme.headlineMedium),
-                        if (availableJobs.any((j) => j.isPriority)) ...[
+                        if (!isOffline &&
+                            availableJobs.any((j) => j.isPriority)) ...[
                           const SizedBox(width: 8),
                           StatusBadge(
                             label: l10n.worker_urgentCount(availableJobs
@@ -1017,7 +1034,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                         ],
                       ],
                     ),
-                    if (availableJobs.isNotEmpty)
+                    if (!isOffline && availableJobs.isNotEmpty)
                       Text(
                         l10n.worker_jobCount(availableJobs.length),
                         style: AppTheme.bodySmall,
@@ -1026,7 +1043,8 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 ),
                 const SizedBox(height: 12),
                 // Travaux masques faute d'equipement : dire ce qui manque
-                if (hasEquipment &&
+                if (!isOffline &&
+                    hasEquipment &&
                     loaded != null &&
                     loaded.hiddenForEquipmentCount > 0) ...[
                   _buildMissingEquipmentCard(
@@ -1035,8 +1053,15 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                   ),
                   const SizedBox(height: 12),
                 ],
+                if (isOffline)
+                  _buildStateCard(
+                    icon: Icons.power_settings_new_rounded,
+                    color: AppTheme.textSecondary,
+                    title: l10n.worker_youAreOffline,
+                    message: l10n.worker_activateToReceive,
+                  )
                 // Afficher un message si aucun équipement n'est configuré
-                if (!hasEquipment)
+                else if (!hasEquipment)
                   _buildNoEquipmentWarning()
                 else if (availableJobs.isEmpty)
                   _buildEmptyState()

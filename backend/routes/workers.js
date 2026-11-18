@@ -202,6 +202,17 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
         // Get worker's equipment list
         const workerEquipment = req.user.workerProfile?.equipmentList || [];
 
+        // Hors ligne : aucun travail propose, meme si l'equipement correspond
+        if (!req.user.workerProfile?.isAvailable) {
+            return res.json({
+                success: true,
+                count: 0,
+                data: [],
+                offline: true,
+                hiddenByEquipment: { count: 0, missingEquipment: [] },
+            });
+        }
+
         if (!lat || !lng) {
             return res.status(400).json({
                 success: false,
@@ -854,6 +865,14 @@ router.post('/profile/photo', protect, authorize('snowWorker'), uploadLimiter, p
 router.post('/jobs/:id/accept', protect, authorize('snowWorker'), verificationRequired, async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Un deneigeur hors ligne ne peut pas accepter de travail (ecran pas a jour)
+        if (!req.user.workerProfile?.isAvailable) {
+            return res.status(403).json({
+                success: false,
+                message: 'Vous êtes hors ligne. Passez en ligne pour accepter un travail.',
+            });
+        }
 
         // Check if reservation exists and is pending
         const reservation = await Reservation.findById(id);
