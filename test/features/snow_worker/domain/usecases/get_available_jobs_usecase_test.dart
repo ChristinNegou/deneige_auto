@@ -74,7 +74,7 @@ void main() {
       when(() => mockRepository.getAvailableJobs(
             latitude: tLatitude,
             longitude: tLongitude,
-            radiusKm: 10,
+            radiusKm: 25,
           )).thenAnswer((_) async => Right(tJobs));
 
       // Act
