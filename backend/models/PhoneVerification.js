@@ -36,6 +36,7 @@ const phoneVerificationSchema = new mongoose.Schema({
         password: String, // Hashé
         firstName: String,
         lastName: String,
+        dateOfBirth: Date,
         role: {
             type: String,
             enum: ['client', 'snowWorker'],

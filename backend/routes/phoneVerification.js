@@ -25,7 +25,7 @@ const { validateSendCode, validateVerifyCode } = require('../middleware/validato
  */
 router.post('/send-code', smsLimiter, validateSendCode, async (req, res) => {
     try {
-        const { phoneNumber, email, password, firstName, lastName, role } = req.body;
+        const { phoneNumber, email, password, firstName, lastName, dateOfBirth, role } = req.body;
 
         // Valider les champs requis
         if (!phoneNumber) {
@@ -90,6 +90,7 @@ router.post('/send-code', smsLimiter, validateSendCode, async (req, res) => {
                 passwordHashed: true, // Flag pour indiquer que le mdp est déjà hashé
                 firstName,
                 lastName,
+                dateOfBirth: dateOfBirth || undefined,
                 role: role || 'client'
             };
         }
@@ -160,7 +161,7 @@ router.post('/verify-code', validateVerifyCode, async (req, res) => {
 
         // Si des données d'inscription sont en attente, créer le compte
         if (verificationResult.pendingRegistration) {
-            const { email, password, firstName, lastName, role, passwordHashed } = verificationResult.pendingRegistration;
+            const { email, password, firstName, lastName, dateOfBirth, role, passwordHashed } = verificationResult.pendingRegistration;
 
             // Vérifier une dernière fois que l'email n'existe pas
             const existingUser = await User.findOne({ email });
@@ -177,6 +178,7 @@ router.post('/verify-code', validateVerifyCode, async (req, res) => {
                 password,
                 firstName,
                 lastName,
+                dateOfBirth,
                 phoneNumber: formattedPhone,
                 phoneVerified: true,
                 role,

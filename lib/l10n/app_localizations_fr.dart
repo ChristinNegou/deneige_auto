@@ -194,12 +194,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get login_register => 'S\'inscrire';
 
   @override
-  String get register_title => 'Inscription';
-
-  @override
-  String get register_subtitle => 'Créez votre compte pour commencer';
-
-  @override
   String get register_firstNameHint => 'Jean';
 
   @override
@@ -209,14 +203,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get register_phoneHint => '+1 (514) 123-4567';
 
   @override
-  String get register_phoneRequired => 'Le numéro de téléphone est obligatoire';
-
-  @override
   String get register_phoneInvalid => 'Numéro de téléphone invalide';
-
-  @override
-  String get register_verificationCodeSent =>
-      'Un code de vérification sera envoyé';
 
   @override
   String get register_passwordMinChars => 'Minimum 6 caractères';
@@ -226,9 +213,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get register_confirmPassword => 'Confirmer le mot de passe';
-
-  @override
-  String get register_confirmPasswordHint => 'Répétez votre mot de passe';
 
   @override
   String get register_confirmPasswordRequired =>
@@ -243,13 +227,83 @@ class AppLocalizationsFr extends AppLocalizations {
       'Veuillez accepter les conditions d\'utilisation et la politique de confidentialité';
 
   @override
-  String get register_snowWorker => 'Déneigeur';
-
-  @override
-  String get register_submit => 'S\'inscrire';
-
-  @override
   String get register_hasAccount => 'Vous avez déjà un compte ? ';
+
+  @override
+  String registerFlow_step(int current, int total) {
+    return '$current/$total';
+  }
+
+  @override
+  String get registerFlow_nameTitle => 'Comment vous appelez-vous ?';
+
+  @override
+  String get registerFlow_nameHelpClient =>
+      'C\'est le nom que verra votre déneigeur.';
+
+  @override
+  String get registerFlow_nameHelpWorker =>
+      'C\'est le nom que verront vos clients.';
+
+  @override
+  String get registerFlow_nameTooShort =>
+      'Le prénom et le nom doivent avoir au moins 2 lettres.';
+
+  @override
+  String get registerFlow_birthTitle => 'Quelle est votre date de naissance ?';
+
+  @override
+  String registerFlow_birthHelp(int age) {
+    return 'Vous devez avoir au moins $age ans.';
+  }
+
+  @override
+  String get registerFlow_birthHint => 'JJ/MM/AAAA';
+
+  @override
+  String get registerFlow_birthInvalid =>
+      'Cette date n\'existe pas. Utilisez le format JJ/MM/AAAA.';
+
+  @override
+  String registerFlow_birthTooYoung(int age) {
+    return 'Vous devez avoir au moins $age ans pour créer un compte.';
+  }
+
+  @override
+  String get registerFlow_emailTitle => 'Quelle est votre adresse courriel ?';
+
+  @override
+  String get registerFlow_emailHelp =>
+      'Elle vous servira à vous connecter et à récupérer votre compte.';
+
+  @override
+  String get registerFlow_phoneTitle => 'Quel est votre numéro de téléphone ?';
+
+  @override
+  String get registerFlow_phoneHelp =>
+      'Nous vous enverrons un code par texto pour le confirmer.';
+
+  @override
+  String get registerFlow_passwordTitle => 'Choisissez un mot de passe';
+
+  @override
+  String get registerFlow_reviewTitle => 'Vérifiez vos informations';
+
+  @override
+  String get registerFlow_reviewHelp =>
+      'Acceptez les conditions pour recevoir votre code de confirmation.';
+
+  @override
+  String get registerFlow_reviewName => 'Nom';
+
+  @override
+  String get registerFlow_reviewBirthDate => 'Date de naissance';
+
+  @override
+  String get registerFlow_edit => 'Modifier';
+
+  @override
+  String get registerFlow_createAccount => 'Créer mon compte';
 
   @override
   String get forgotPassword_title => 'Mot de passe oublié ?';

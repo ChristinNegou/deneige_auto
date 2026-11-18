@@ -38,6 +38,7 @@ abstract class AuthRemoteDataSource {
     required String password,
     required String firstName,
     required String lastName,
+    required String dateOfBirth,
     required String role,
   });
   Future<UserModel> verifyPhoneCode({
@@ -329,6 +330,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required String firstName,
     required String lastName,
+    required String dateOfBirth,
     required String role,
   }) async {
     try {
@@ -340,6 +342,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'password': password,
           'firstName': firstName,
           'lastName': lastName,
+          'dateOfBirth': dateOfBirth,
           'role': role,
         },
       );

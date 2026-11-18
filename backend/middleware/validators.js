@@ -29,6 +29,32 @@ const handleValidationErrors = (req, res, next) => {
 // VALIDATIONS AUTHENTIFICATION
 // ============================================
 
+/** Age minimum pour ouvrir un compte (client ou deneigeur). */
+const MIN_REGISTRATION_AGE = 18;
+
+/**
+ * Date de naissance au format AAAA-MM-JJ, d'une personne d'au moins
+ * MIN_REGISTRATION_AGE ans et de moins de 120 ans.
+ */
+const dateOfBirthRule = () => body('dateOfBirth')
+    .optional()
+    .isISO8601({ strict: true })
+    .withMessage('Date de naissance invalide')
+    .bail()
+    .custom((value) => {
+        const birth = new Date(value);
+        const now = new Date();
+        let age = now.getUTCFullYear() - birth.getUTCFullYear();
+        const beforeBirthday = now.getUTCMonth() < birth.getUTCMonth()
+            || (now.getUTCMonth() === birth.getUTCMonth() && now.getUTCDate() < birth.getUTCDate());
+        if (beforeBirthday) age -= 1;
+        if (age < MIN_REGISTRATION_AGE) {
+            throw new Error(`Vous devez avoir au moins ${MIN_REGISTRATION_AGE} ans pour créer un compte`);
+        }
+        if (age > 120) throw new Error('Date de naissance invalide');
+        return true;
+    });
+
 const validateRegister = [
     body('email')
         .trim()
@@ -66,6 +92,7 @@ const validateRegister = [
         .optional()
         .isIn(['client', 'snowWorker'])
         .withMessage('Rôle invalide'),
+    dateOfBirthRule(),
     handleValidationErrors,
 ];
 
@@ -160,6 +187,7 @@ const validateSendCode = [
         .trim()
         .isLength({ min: 2, max: 50 })
         .withMessage('Le nom doit contenir entre 2 et 50 caractères'),
+    dateOfBirthRule(),
     handleValidationErrors,
 ];
 

@@ -93,6 +93,9 @@ class SendPhoneVerificationCode extends AuthEvent {
   final String password;
   final String firstName;
   final String lastName;
+
+  /// Format AAAA-MM-JJ.
+  final String dateOfBirth;
   final String role;
 
   const SendPhoneVerificationCode({
@@ -101,12 +104,13 @@ class SendPhoneVerificationCode extends AuthEvent {
     required this.password,
     required this.firstName,
     required this.lastName,
+    required this.dateOfBirth,
     required this.role,
   });
 
   @override
   List<Object?> get props =>
-      [phoneNumber, email, password, firstName, lastName, role];
+      [phoneNumber, email, password, firstName, lastName, dateOfBirth, role];
 }
 
 /// Vérifie le code SMS entré par l'utilisateur

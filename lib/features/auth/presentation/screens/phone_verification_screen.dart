@@ -16,6 +16,9 @@ class PhoneVerificationScreen extends StatefulWidget {
   final String password;
   final String firstName;
   final String lastName;
+
+  /// Format AAAA-MM-JJ.
+  final String dateOfBirth;
   final String role;
 
   const PhoneVerificationScreen({
@@ -25,6 +28,7 @@ class PhoneVerificationScreen extends StatefulWidget {
     required this.password,
     required this.firstName,
     required this.lastName,
+    required this.dateOfBirth,
     required this.role,
   });
 
@@ -98,6 +102,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
             password: widget.password,
             firstName: widget.firstName,
             lastName: widget.lastName,
+            dateOfBirth: widget.dateOfBirth,
             role: widget.role,
           ),
         );

@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Le nom est requis'],
         trim: true,
     },
+    // Demandee a l'inscription depuis novembre 2026 (absente des comptes
+    // plus anciens).
+    dateOfBirth: {
+        type: Date,
+    },
     phoneNumber: {
         type: String,
         required: [true, 'Le numéro de téléphone est requis'],

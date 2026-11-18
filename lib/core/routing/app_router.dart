@@ -112,6 +112,7 @@ class AppRouter {
             password: args['password'] as String,
             firstName: args['firstName'] as String,
             lastName: args['lastName'] as String,
+            dateOfBirth: args['dateOfBirth'] as String,
             role: args['role'] as String,
           ),
           settings: settings,

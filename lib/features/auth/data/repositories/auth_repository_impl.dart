@@ -183,6 +183,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required String firstName,
     required String lastName,
+    required String dateOfBirth,
     required String role,
   }) async {
     try {
@@ -192,6 +193,7 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
         firstName: firstName,
         lastName: lastName,
+        dateOfBirth: dateOfBirth,
         role: role,
       );
       return Right(result);

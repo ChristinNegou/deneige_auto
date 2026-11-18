@@ -458,18 +458,6 @@ abstract class AppLocalizations {
   /// **'S\'inscrire'**
   String get login_register;
 
-  /// No description provided for @register_title.
-  ///
-  /// In fr, this message translates to:
-  /// **'Inscription'**
-  String get register_title;
-
-  /// No description provided for @register_subtitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Créez votre compte pour commencer'**
-  String get register_subtitle;
-
   /// No description provided for @register_firstNameHint.
   ///
   /// In fr, this message translates to:
@@ -488,23 +476,11 @@ abstract class AppLocalizations {
   /// **'+1 (514) 123-4567'**
   String get register_phoneHint;
 
-  /// No description provided for @register_phoneRequired.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le numéro de téléphone est obligatoire'**
-  String get register_phoneRequired;
-
   /// No description provided for @register_phoneInvalid.
   ///
   /// In fr, this message translates to:
   /// **'Numéro de téléphone invalide'**
   String get register_phoneInvalid;
-
-  /// No description provided for @register_verificationCodeSent.
-  ///
-  /// In fr, this message translates to:
-  /// **'Un code de vérification sera envoyé'**
-  String get register_verificationCodeSent;
 
   /// No description provided for @register_passwordMinChars.
   ///
@@ -524,12 +500,6 @@ abstract class AppLocalizations {
   /// **'Confirmer le mot de passe'**
   String get register_confirmPassword;
 
-  /// No description provided for @register_confirmPasswordHint.
-  ///
-  /// In fr, this message translates to:
-  /// **'Répétez votre mot de passe'**
-  String get register_confirmPasswordHint;
-
   /// No description provided for @register_confirmPasswordRequired.
   ///
   /// In fr, this message translates to:
@@ -548,23 +518,137 @@ abstract class AppLocalizations {
   /// **'Veuillez accepter les conditions d\'utilisation et la politique de confidentialité'**
   String get register_acceptTerms;
 
-  /// No description provided for @register_snowWorker.
-  ///
-  /// In fr, this message translates to:
-  /// **'Déneigeur'**
-  String get register_snowWorker;
-
-  /// No description provided for @register_submit.
-  ///
-  /// In fr, this message translates to:
-  /// **'S\'inscrire'**
-  String get register_submit;
-
   /// No description provided for @register_hasAccount.
   ///
   /// In fr, this message translates to:
   /// **'Vous avez déjà un compte ? '**
   String get register_hasAccount;
+
+  /// No description provided for @registerFlow_step.
+  ///
+  /// In fr, this message translates to:
+  /// **'{current}/{total}'**
+  String registerFlow_step(int current, int total);
+
+  /// No description provided for @registerFlow_nameTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment vous appelez-vous ?'**
+  String get registerFlow_nameTitle;
+
+  /// No description provided for @registerFlow_nameHelpClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'C\'est le nom que verra votre déneigeur.'**
+  String get registerFlow_nameHelpClient;
+
+  /// No description provided for @registerFlow_nameHelpWorker.
+  ///
+  /// In fr, this message translates to:
+  /// **'C\'est le nom que verront vos clients.'**
+  String get registerFlow_nameHelpWorker;
+
+  /// No description provided for @registerFlow_nameTooShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le prénom et le nom doivent avoir au moins 2 lettres.'**
+  String get registerFlow_nameTooShort;
+
+  /// No description provided for @registerFlow_birthTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelle est votre date de naissance ?'**
+  String get registerFlow_birthTitle;
+
+  /// No description provided for @registerFlow_birthHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devez avoir au moins {age} ans.'**
+  String registerFlow_birthHelp(int age);
+
+  /// No description provided for @registerFlow_birthHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'JJ/MM/AAAA'**
+  String get registerFlow_birthHint;
+
+  /// No description provided for @registerFlow_birthInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette date n\'existe pas. Utilisez le format JJ/MM/AAAA.'**
+  String get registerFlow_birthInvalid;
+
+  /// No description provided for @registerFlow_birthTooYoung.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devez avoir au moins {age} ans pour créer un compte.'**
+  String registerFlow_birthTooYoung(int age);
+
+  /// No description provided for @registerFlow_emailTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelle est votre adresse courriel ?'**
+  String get registerFlow_emailTitle;
+
+  /// No description provided for @registerFlow_emailHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Elle vous servira à vous connecter et à récupérer votre compte.'**
+  String get registerFlow_emailHelp;
+
+  /// No description provided for @registerFlow_phoneTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quel est votre numéro de téléphone ?'**
+  String get registerFlow_phoneTitle;
+
+  /// No description provided for @registerFlow_phoneHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous vous enverrons un code par texto pour le confirmer.'**
+  String get registerFlow_phoneHelp;
+
+  /// No description provided for @registerFlow_passwordTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez un mot de passe'**
+  String get registerFlow_passwordTitle;
+
+  /// No description provided for @registerFlow_reviewTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez vos informations'**
+  String get registerFlow_reviewTitle;
+
+  /// No description provided for @registerFlow_reviewHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Acceptez les conditions pour recevoir votre code de confirmation.'**
+  String get registerFlow_reviewHelp;
+
+  /// No description provided for @registerFlow_reviewName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom'**
+  String get registerFlow_reviewName;
+
+  /// No description provided for @registerFlow_reviewBirthDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de naissance'**
+  String get registerFlow_reviewBirthDate;
+
+  /// No description provided for @registerFlow_edit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier'**
+  String get registerFlow_edit;
+
+  /// No description provided for @registerFlow_createAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer mon compte'**
+  String get registerFlow_createAccount;
 
   /// No description provided for @forgotPassword_title.
   ///

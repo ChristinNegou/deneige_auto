@@ -52,12 +52,13 @@ const generateLongLivedToken = (id, role) => {
  * @param {string} req.body.firstName - Prénom
  * @param {string} req.body.lastName - Nom de famille
  * @param {string} req.body.phoneNumber - Numéro de téléphone
+ * @param {string} [req.body.dateOfBirth] - Date de naissance (AAAA-MM-JJ, 18 ans minimum)
  * @param {string} [req.body.role='client'] - Rôle (client ou snowWorker)
  * @returns {Object} Token JWT et profil utilisateur
  */
 router.post('/register', registrationLimiter, validateRegister, async (req, res) => {
     try {
-        const { email, password, firstName, lastName, phoneNumber, role } = req.body;
+        const { email, password, firstName, lastName, dateOfBirth, phoneNumber, role } = req.body;
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -73,6 +74,7 @@ router.post('/register', registrationLimiter, validateRegister, async (req, res)
             password,
             firstName,
             lastName,
+            dateOfBirth,
             phoneNumber,
             role: role || 'client',
         };
