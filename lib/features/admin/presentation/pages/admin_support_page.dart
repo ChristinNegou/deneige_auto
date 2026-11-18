@@ -143,7 +143,7 @@ class _AdminSupportPageState extends State<AdminSupportPage> {
     }
 
     if (state.supportRequests.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

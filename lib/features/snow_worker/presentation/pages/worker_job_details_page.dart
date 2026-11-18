@@ -21,6 +21,9 @@ import '../widgets/client_contact_row.dart';
 import '../../data/datasources/worker_remote_datasource.dart'
     show WorkerCancellationReason;
 import '../../../disputes/presentation/pages/create_dispute_page.dart';
+import '../../../../core/utils/money.dart';
+import '../widgets/job_labels.dart';
+import 'package:intl/intl.dart';
 
 class WorkerJobDetailsPage extends StatefulWidget {
   final WorkerJob job;
@@ -108,7 +111,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
               color: AppTheme.errorLight,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.cancel_rounded,
               color: AppTheme.error,
               size: 48,
@@ -131,7 +134,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: AppTheme.error),
+                    Icon(Icons.info_outline, color: AppTheme.error),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -140,7 +143,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                                 .worker_clientCancelledMessage
                             : AppLocalizations.of(context)!
                                 .worker_cancelledMessage,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppTheme.error,
                           fontWeight: FontWeight.w500,
                         ),
@@ -189,10 +192,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlayStyle);
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -338,10 +338,21 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppLocalizations.of(context)!.common_address,
-              style: AppTheme.headlineSmall),
-          const SizedBox(height: 16),
-          Text(job.displayAddress, style: AppTheme.bodyMedium),
+          Text(
+            AppLocalizations.of(context)!.activeJ_readyBy(
+                DateFormat.Hm(Localizations.localeOf(context).toString())
+                    .format((job.deadlineTime ??
+                            job.departureTime
+                                .subtract(const Duration(minutes: 30)))
+                        .toLocal())),
+            style: AppTheme.headlineSmall,
+          ),
+          const SizedBox(height: 12),
+          if (jobSpotLabel(AppLocalizations.of(context)!, job) != null)
+            Text(jobSpotLabel(AppLocalizations.of(context)!, job)!,
+                style: AppTheme.labelLarge),
+          Text(job.location?.address ?? job.displayAddress,
+              style: AppTheme.bodyMedium),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -427,7 +438,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 child: CachedNetworkImage(
                   imageUrl: photoUrl,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(
+                  placeholder: (context, url) => Center(
                     child: CircularProgressIndicator(color: AppTheme.primary),
                   ),
                   errorWidget: (context, url, error) => Column(
@@ -586,10 +597,13 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   padding: const EdgeInsets.only(bottom: 6),
                   child: Row(
                     children: [
-                      const Icon(Icons.check_rounded,
+                      Icon(Icons.check_rounded,
                           color: AppTheme.primary, size: 18),
                       const SizedBox(width: 8),
-                      Text(_getOptionLabel(option), style: AppTheme.bodyMedium),
+                      Text(
+                          serviceOptionLabel(
+                              AppLocalizations.of(context)!, option),
+                          style: AppTheme.bodyMedium),
                     ],
                   ),
                 )),
@@ -617,10 +631,10 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(AppLocalizations.of(context)!.reservation_totalPrice,
+              Text(AppLocalizations.of(context)!.worker_youEarn,
                   style: AppTheme.bodyMedium),
               Text(
-                '${job.totalPrice.toStringAsFixed(2)} \$',
+                formatMoney(context, job.workerEarnings),
                 style: AppTheme.headlineLarge.copyWith(
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
@@ -628,7 +642,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             ],
           ),
           if (job.tipAmount != null && job.tipAmount! > 0) ...[
-            const Divider(height: 24, color: AppTheme.divider),
+            Divider(height: 24, color: AppTheme.divider),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -695,12 +709,11 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.check_circle, color: AppTheme.onPrimary),
+                  Icon(Icons.check_circle, color: AppTheme.onPrimary),
                   const SizedBox(width: 12),
                   Text(AppLocalizations.of(context)!.worker_jobAccepted),
                 ],
               ),
-              backgroundColor: AppTheme.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM)),
@@ -713,7 +726,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error, color: AppTheme.onPrimary),
+                  Icon(Icons.error, color: AppTheme.onPrimary),
                   const SizedBox(width: 12),
                   Expanded(child: Text(state.message)),
                 ],
@@ -731,7 +744,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
 
         return Container(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppTheme.surface,
             border: Border(top: BorderSide(color: AppTheme.divider)),
           ),
@@ -748,7 +761,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 minimumSize: const Size(double.infinity, 56),
               ),
               icon: isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 22,
                       height: 22,
                       child: CircularProgressIndicator(
@@ -800,28 +813,6 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
         return AppTheme.statusCompleted;
       case JobStatus.cancelled:
         return AppTheme.statusCancelled;
-    }
-  }
-
-  String _getOptionLabel(ServiceOption option) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (option) {
-      case ServiceOption.windowScraping:
-        return l10n.option_windowScraping;
-      case ServiceOption.doorDeicing:
-        return l10n.option_doorDeicing;
-      case ServiceOption.wheelClearance:
-        return l10n.option_wheelClearance;
-      case ServiceOption.roofClearing:
-        return l10n.option_roofClearing;
-      case ServiceOption.saltSpreading:
-        return l10n.option_saltSpreading;
-      case ServiceOption.lightsCleaning:
-        return l10n.option_lightsCleaning;
-      case ServiceOption.perimeterClearance:
-        return l10n.option_perimeterClearance;
-      case ServiceOption.exhaustCheck:
-        return l10n.option_exhaustCheck;
     }
   }
 
@@ -981,7 +972,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error, color: AppTheme.onPrimary),
+                  Icon(Icons.error, color: AppTheme.onPrimary),
                   const SizedBox(width: 12),
                   Expanded(child: Text(state.message)),
                 ],
@@ -1021,7 +1012,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                 ),
                 child: Center(
                   child: isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 24,
                           height: 24,
                           child: CircularProgressIndicator(
@@ -1032,13 +1023,13 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.cancel_rounded,
+                            Icon(Icons.cancel_rounded,
                                 color: AppTheme.error, size: 24),
                             const SizedBox(width: 8),
                             Text(
                               AppLocalizations.of(context)!
                                   .worker_cancelThisJob,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppTheme.error,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -1116,13 +1107,11 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                       SnackBar(
                         content: Row(
                           children: [
-                            const Icon(Icons.check_circle,
-                                color: AppTheme.onPrimary),
+                            Icon(Icons.check_circle, color: AppTheme.onPrimary),
                             const SizedBox(width: 12),
                             Text(l10n.dispute_created),
                           ],
                         ),
-                        backgroundColor: AppTheme.success,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius:
@@ -1133,14 +1122,14 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   }
                 });
               },
-              icon: const Icon(Icons.report_problem, color: AppTheme.warning),
+              icon: Icon(Icons.report_problem, color: AppTheme.warning),
               label: Text(
                 l10n.dispute_reportProblem,
-                style: const TextStyle(color: AppTheme.warning),
+                style: TextStyle(color: AppTheme.warning),
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppTheme.warning,
-                side: const BorderSide(color: AppTheme.warning),
+                side: BorderSide(color: AppTheme.warning),
                 padding: const EdgeInsets.all(14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusSM),
@@ -1208,7 +1197,7 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   color: AppTheme.errorLight,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.warning, color: AppTheme.error),
+                child: Icon(Icons.warning, color: AppTheme.error),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1234,12 +1223,12 @@ class _WorkerJobDetailsPageState extends State<WorkerJobDetailsPage> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info, color: AppTheme.warning, size: 20),
+                      Icon(Icons.info, color: AppTheme.warning, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           AppLocalizations.of(context)!.worker_cancelWarning,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppTheme.warning,
                             fontSize: 12,
                           ),

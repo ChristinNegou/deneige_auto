@@ -2192,29 +2192,11 @@ abstract class AppLocalizations {
   /// **'Hors ligne'**
   String get worker_offline;
 
-  /// No description provided for @worker_verificationPending.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vérification en cours'**
-  String get worker_verificationPending;
-
-  /// No description provided for @worker_verificationPendingMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vos documents sont en cours d\'analyse. Vous serez notifié une fois la vérification terminée.'**
-  String get worker_verificationPendingMessage;
-
   /// No description provided for @worker_verificationRejected.
   ///
   /// In fr, this message translates to:
   /// **'Vérification refusée'**
   String get worker_verificationRejected;
-
-  /// No description provided for @worker_verificationRejectedMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vos documents n\'ont pas été approuvés. Veuillez resoumettre des documents valides.'**
-  String get worker_verificationRejectedMessage;
 
   /// No description provided for @worker_verificationExpired.
   ///
@@ -2222,23 +2204,11 @@ abstract class AppLocalizations {
   /// **'Vérification expirée'**
   String get worker_verificationExpired;
 
-  /// No description provided for @worker_verificationExpiredMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre vérification a expiré. Veuillez resoumettre vos documents.'**
-  String get worker_verificationExpiredMessage;
-
   /// No description provided for @worker_verificationRequired.
   ///
   /// In fr, this message translates to:
   /// **'Vérification requise'**
   String get worker_verificationRequired;
-
-  /// No description provided for @worker_verificationRequiredMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vérifiez votre identité pour pouvoir accepter des jobs de déneigement.'**
-  String get worker_verificationRequiredMessage;
 
   /// No description provided for @worker_verify.
   ///
@@ -2293,18 +2263,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Mes jobs actifs'**
   String get worker_myActiveJobs;
-
-  /// No description provided for @worker_activeJobSingular.
-  ///
-  /// In fr, this message translates to:
-  /// **'actif'**
-  String get worker_activeJobSingular;
-
-  /// No description provided for @worker_activeJobPlural.
-  ///
-  /// In fr, this message translates to:
-  /// **'actifs'**
-  String get worker_activeJobPlural;
 
   /// No description provided for @worker_availableJobs.
   ///
@@ -2384,12 +2342,6 @@ abstract class AppLocalizations {
   /// **'Équipement'**
   String get worker_equipment;
 
-  /// No description provided for @worker_preferences.
-  ///
-  /// In fr, this message translates to:
-  /// **'Préférences'**
-  String get worker_preferences;
-
   /// No description provided for @worker_equipShovel.
   ///
   /// In fr, this message translates to:
@@ -2437,30 +2389,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Déglacant'**
   String get worker_equipDeicer;
-
-  /// No description provided for @worker_maxSimultaneousJobs.
-  ///
-  /// In fr, this message translates to:
-  /// **'Jobs simultanés max'**
-  String get worker_maxSimultaneousJobs;
-
-  /// No description provided for @worker_maxSimultaneousJobsDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Nombre de jobs actifs en même temps'**
-  String get worker_maxSimultaneousJobsDesc;
-
-  /// No description provided for @worker_notifNewJobs.
-  ///
-  /// In fr, this message translates to:
-  /// **'Nouveaux jobs'**
-  String get worker_notifNewJobs;
-
-  /// No description provided for @worker_notifTipsReceived.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pourboires reçus'**
-  String get worker_notifTipsReceived;
 
   /// No description provided for @worker_helpSupport.
   ///
@@ -2576,167 +2504,11 @@ abstract class AppLocalizations {
   /// **'Accepter ce job'**
   String get worker_acceptJob;
 
-  /// No description provided for @worker_cancelJobTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Annuler le job?'**
-  String get worker_cancelJobTitle;
-
-  /// No description provided for @worker_cancelJobWarning.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous ne serez pas payé pour ce job.\nLes annulations fréquentes peuvent entraîner une suspension.'**
-  String get worker_cancelJobWarning;
-
-  /// No description provided for @worker_cancelReason_label.
-  ///
-  /// In fr, this message translates to:
-  /// **'Raison de l\'annulation:'**
-  String get worker_cancelReason_label;
-
-  /// No description provided for @worker_cancelDetails.
-  ///
-  /// In fr, this message translates to:
-  /// **'Détails supplémentaires (optionnel)'**
-  String get worker_cancelDetails;
-
-  /// No description provided for @worker_cancelConfirm.
-  ///
-  /// In fr, this message translates to:
-  /// **'Confirmer l\'annulation'**
-  String get worker_cancelConfirm;
-
-  /// No description provided for @worker_cancelVehicleBreakdown.
-  ///
-  /// In fr, this message translates to:
-  /// **'Panne de véhicule'**
-  String get worker_cancelVehicleBreakdown;
-
-  /// No description provided for @worker_cancelVehicleBreakdownDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mon véhicule est en panne ou a un problème mécanique'**
-  String get worker_cancelVehicleBreakdownDesc;
-
-  /// No description provided for @worker_cancelMedicalEmergency.
-  ///
-  /// In fr, this message translates to:
-  /// **'Urgence médicale'**
-  String get worker_cancelMedicalEmergency;
-
-  /// No description provided for @worker_cancelMedicalEmergencyDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'J\'ai une urgence médicale personnelle'**
-  String get worker_cancelMedicalEmergencyDesc;
-
-  /// No description provided for @worker_cancelDangerousWeather.
-  ///
-  /// In fr, this message translates to:
-  /// **'Conditions météo dangereuses'**
-  String get worker_cancelDangerousWeather;
-
-  /// No description provided for @worker_cancelDangerousWeatherDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Les conditions météo rendent le trajet dangereux'**
-  String get worker_cancelDangerousWeatherDesc;
-
-  /// No description provided for @worker_cancelRoadBlocked.
-  ///
-  /// In fr, this message translates to:
-  /// **'Route bloquée'**
-  String get worker_cancelRoadBlocked;
-
-  /// No description provided for @worker_cancelRoadBlockedDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'La route vers le client est bloquée ou inaccessible'**
-  String get worker_cancelRoadBlockedDesc;
-
-  /// No description provided for @worker_cancelFamilyEmergency.
-  ///
-  /// In fr, this message translates to:
-  /// **'Urgence familiale'**
-  String get worker_cancelFamilyEmergency;
-
-  /// No description provided for @worker_cancelFamilyEmergencyDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'J\'ai une urgence familiale'**
-  String get worker_cancelFamilyEmergencyDesc;
-
-  /// No description provided for @worker_cancelEquipmentFailure.
-  ///
-  /// In fr, this message translates to:
-  /// **'Équipement défaillant'**
-  String get worker_cancelEquipmentFailure;
-
-  /// No description provided for @worker_cancelEquipmentFailureDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mon équipement de déneigement est défaillant'**
-  String get worker_cancelEquipmentFailureDesc;
-
-  /// No description provided for @worker_settingsTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Paramètres'**
-  String get worker_settingsTitle;
-
   /// No description provided for @worker_myEquipment.
   ///
   /// In fr, this message translates to:
   /// **'Mon équipement'**
   String get worker_myEquipment;
-
-  /// No description provided for @worker_snowShovel.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pelle à neige'**
-  String get worker_snowShovel;
-
-  /// No description provided for @worker_snowBroom.
-  ///
-  /// In fr, this message translates to:
-  /// **'Balai à neige'**
-  String get worker_snowBroom;
-
-  /// No description provided for @worker_iceScraper.
-  ///
-  /// In fr, this message translates to:
-  /// **'Grattoir à glace'**
-  String get worker_iceScraper;
-
-  /// No description provided for @worker_myVehicle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mon véhicule'**
-  String get worker_myVehicle;
-
-  /// No description provided for @worker_workPreferences.
-  ///
-  /// In fr, this message translates to:
-  /// **'Préférences de travail'**
-  String get worker_workPreferences;
-
-  /// No description provided for @worker_preferredZones.
-  ///
-  /// In fr, this message translates to:
-  /// **'Zones préférées'**
-  String get worker_preferredZones;
-
-  /// No description provided for @worker_notifReception.
-  ///
-  /// In fr, this message translates to:
-  /// **'Notification de réception'**
-  String get worker_notifReception;
-
-  /// No description provided for @worker_otherVehicleType.
-  ///
-  /// In fr, this message translates to:
-  /// **'Autre type de véhicule'**
-  String get worker_otherVehicleType;
 
   /// No description provided for @worker_earningsCompleted.
   ///
@@ -4388,119 +4160,11 @@ abstract class AppLocalizations {
   /// **'Maximum 5 photos. Les photos aident à traiter votre demande plus rapidement.'**
   String get dispute_maxPhotosHint;
 
-  /// No description provided for @worker_myPayments.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mes paiements'**
-  String get worker_myPayments;
-
-  /// No description provided for @worker_configureBankAccount.
-  ///
-  /// In fr, this message translates to:
-  /// **'Configurer mon compte bancaire'**
-  String get worker_configureBankAccount;
-
-  /// No description provided for @worker_saltSpreaderLabel.
-  ///
-  /// In fr, this message translates to:
-  /// **'Épandeur de sel'**
-  String get worker_saltSpreaderLabel;
-
-  /// No description provided for @worker_snowBlowerLabel.
-  ///
-  /// In fr, this message translates to:
-  /// **'Souffleuse'**
-  String get worker_snowBlowerLabel;
-
-  /// No description provided for @worker_vehicleCar.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voiture'**
-  String get worker_vehicleCar;
-
-  /// No description provided for @worker_vehicleTruck.
-  ///
-  /// In fr, this message translates to:
-  /// **'Camionnette'**
-  String get worker_vehicleTruck;
-
-  /// No description provided for @worker_vehicleAtv.
-  ///
-  /// In fr, this message translates to:
-  /// **'VTT / Quad'**
-  String get worker_vehicleAtv;
-
-  /// No description provided for @worker_vehicleOther.
-  ///
-  /// In fr, this message translates to:
-  /// **'Autre'**
-  String get worker_vehicleOther;
-
-  /// No description provided for @worker_vehicleCarDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Petites entrées, stationnements'**
-  String get worker_vehicleCarDesc;
-
-  /// No description provided for @worker_vehicleTruckDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Grandes entrées, équipement lourd'**
-  String get worker_vehicleTruckDesc;
-
-  /// No description provided for @worker_vehicleAtvDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Accès difficile, terrains variés'**
-  String get worker_vehicleAtvDesc;
-
-  /// No description provided for @worker_recommendedJobs.
-  ///
-  /// In fr, this message translates to:
-  /// **'Recommandé: 2-3 jobs'**
-  String get worker_recommendedJobs;
-
-  /// No description provided for @worker_notifNewJobsDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Alerte pour les nouveaux jobs disponibles'**
-  String get worker_notifNewJobsDesc;
-
-  /// No description provided for @worker_addZone.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajouter une zone'**
-  String get worker_addZone;
-
-  /// No description provided for @worker_zoneName.
-  ///
-  /// In fr, this message translates to:
-  /// **'Nom de la zone'**
-  String get worker_zoneName;
-
-  /// No description provided for @worker_zoneHint.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ex: Trois-Rivières Ouest'**
-  String get worker_zoneHint;
-
   /// No description provided for @worker_account.
   ///
   /// In fr, this message translates to:
   /// **'Compte'**
   String get worker_account;
-
-  /// No description provided for @worker_logoutConfirmWorker.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voulez-vous vraiment vous déconnecter de votre compte déneigeur ?'**
-  String get worker_logoutConfirmWorker;
-
-  /// No description provided for @worker_priorityNotifications.
-  ///
-  /// In fr, this message translates to:
-  /// **'Notifications prioritaires'**
-  String get worker_priorityNotifications;
 
   /// No description provided for @worker_history.
   ///
@@ -4508,35 +4172,11 @@ abstract class AppLocalizations {
   /// **'Historique'**
   String get worker_history;
 
-  /// No description provided for @worker_yourCompletedJobs.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vos jobs terminés'**
-  String get worker_yourCompletedJobs;
-
   /// No description provided for @worker_filterAll.
   ///
   /// In fr, this message translates to:
   /// **'Tous'**
   String get worker_filterAll;
-
-  /// No description provided for @worker_filterThisWeek.
-  ///
-  /// In fr, this message translates to:
-  /// **'Cette semaine'**
-  String get worker_filterThisWeek;
-
-  /// No description provided for @worker_filterThisMonth.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ce mois'**
-  String get worker_filterThisMonth;
-
-  /// No description provided for @worker_filterWithTip.
-  ///
-  /// In fr, this message translates to:
-  /// **'Avec pourboire'**
-  String get worker_filterWithTip;
 
   /// No description provided for @worker_noHistory.
   ///
@@ -4550,36 +4190,6 @@ abstract class AppLocalizations {
   /// **'Vos jobs terminés apparaîtront ici'**
   String get worker_completedJobsAppearHere;
 
-  /// No description provided for @worker_dateUnknown.
-  ///
-  /// In fr, this message translates to:
-  /// **'Date inconnue'**
-  String get worker_dateUnknown;
-
-  /// No description provided for @worker_completedStatus.
-  ///
-  /// In fr, this message translates to:
-  /// **'Terminé'**
-  String get worker_completedStatus;
-
-  /// No description provided for @worker_revenueLabel.
-  ///
-  /// In fr, this message translates to:
-  /// **'Revenus'**
-  String get worker_revenueLabel;
-
-  /// No description provided for @worker_clientRating.
-  ///
-  /// In fr, this message translates to:
-  /// **'Évaluation client:'**
-  String get worker_clientRating;
-
-  /// No description provided for @worker_returnToDashboard.
-  ///
-  /// In fr, this message translates to:
-  /// **'Retourner au dashboard'**
-  String get worker_returnToDashboard;
-
   /// No description provided for @worker_photoSelectionError.
   ///
   /// In fr, this message translates to:
@@ -4591,12 +4201,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Notifications'**
   String get worker_notifications;
-
-  /// No description provided for @worker_tipsReceived.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pourboires reçus'**
-  String get worker_tipsReceived;
 
   /// No description provided for @admin_userManagement.
   ///
@@ -7046,18 +6650,6 @@ abstract class AppLocalizations {
   /// **'Renouveler ma vérification'**
   String get verify_renewBtn;
 
-  /// No description provided for @worker_revenue.
-  ///
-  /// In fr, this message translates to:
-  /// **'Revenus'**
-  String get worker_revenue;
-
-  /// No description provided for @worker_myRevenue.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mes revenus'**
-  String get worker_myRevenue;
-
   /// No description provided for @resDetail_errorPrefix.
   ///
   /// In fr, this message translates to:
@@ -7712,18 +7304,6 @@ abstract class AppLocalizations {
   /// **'Règles d\'utilisation de l\'application'**
   String get legal_appUsageRules;
 
-  /// No description provided for @worker_photoSentSuccess.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photo envoyée avec succès!'**
-  String get worker_photoSentSuccess;
-
-  /// No description provided for @worker_positionConfirmed.
-  ///
-  /// In fr, this message translates to:
-  /// **'Position confirmée!'**
-  String get worker_positionConfirmed;
-
   /// No description provided for @worker_coordinatesUnavailable.
   ///
   /// In fr, this message translates to:
@@ -7742,89 +7322,11 @@ abstract class AppLocalizations {
   /// **'Erreur: utilisateur non authentifié'**
   String get worker_userNotAuth;
 
-  /// No description provided for @worker_iArrived.
-  ///
-  /// In fr, this message translates to:
-  /// **'Je suis arrivé'**
-  String get worker_iArrived;
-
-  /// No description provided for @worker_startJob.
-  ///
-  /// In fr, this message translates to:
-  /// **'Commencer'**
-  String get worker_startJob;
-
   /// No description provided for @worker_openGps.
   ///
   /// In fr, this message translates to:
   /// **'Ouvrir GPS'**
   String get worker_openGps;
-
-  /// No description provided for @worker_finishJob.
-  ///
-  /// In fr, this message translates to:
-  /// **'Terminer le job'**
-  String get worker_finishJob;
-
-  /// No description provided for @worker_inFavorOfComplainant.
-  ///
-  /// In fr, this message translates to:
-  /// **'En faveur du plaignant'**
-  String get worker_inFavorOfComplainant;
-
-  /// No description provided for @worker_inFavorOfDefendant.
-  ///
-  /// In fr, this message translates to:
-  /// **'En faveur du defenseur'**
-  String get worker_inFavorOfDefendant;
-
-  /// No description provided for @worker_fullRefund.
-  ///
-  /// In fr, this message translates to:
-  /// **'Remboursement complet'**
-  String get worker_fullRefund;
-
-  /// No description provided for @worker_partialRefund.
-  ///
-  /// In fr, this message translates to:
-  /// **'Remboursement partiel'**
-  String get worker_partialRefund;
-
-  /// No description provided for @worker_noAction.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aucune action'**
-  String get worker_noAction;
-
-  /// No description provided for @worker_mutualAgreement.
-  ///
-  /// In fr, this message translates to:
-  /// **'Accord mutuel'**
-  String get worker_mutualAgreement;
-
-  /// No description provided for @worker_warningAction.
-  ///
-  /// In fr, this message translates to:
-  /// **'Avertissement'**
-  String get worker_warningAction;
-
-  /// No description provided for @worker_permanentBan.
-  ///
-  /// In fr, this message translates to:
-  /// **'Bannissement permanent'**
-  String get worker_permanentBan;
-
-  /// No description provided for @worker_selectDecision.
-  ///
-  /// In fr, this message translates to:
-  /// **'Sélectionnez une décision'**
-  String get worker_selectDecision;
-
-  /// No description provided for @worker_disputeResolvedSuccess.
-  ///
-  /// In fr, this message translates to:
-  /// **'Litige résolu avec succès'**
-  String get worker_disputeResolvedSuccess;
 
   /// No description provided for @summary_spot.
   ///
@@ -8528,107 +8030,11 @@ abstract class AppLocalizations {
   /// **'Signalez que le déneigeur {name} ne s\'est pas présenté pour le service prévu.'**
   String dispute_workerDidNotComeDesc(String name);
 
-  /// No description provided for @worker_accountAlreadyConfigured.
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre compte est déjà configuré!'**
-  String get worker_accountAlreadyConfigured;
-
-  /// No description provided for @worker_accountConfigured.
-  ///
-  /// In fr, this message translates to:
-  /// **'Compte configuré'**
-  String get worker_accountConfigured;
-
-  /// No description provided for @worker_accountDeleted.
-  ///
-  /// In fr, this message translates to:
-  /// **'Compte supprimé'**
-  String get worker_accountDeleted;
-
-  /// No description provided for @worker_accountsConfiguredCount.
-  ///
-  /// In fr, this message translates to:
-  /// **'{count} compte(s) configuré(s)'**
-  String worker_accountsConfiguredCount(int count);
-
-  /// No description provided for @worker_accountSetAsPrimary.
-  ///
-  /// In fr, this message translates to:
-  /// **'Compte défini comme principal'**
-  String get worker_accountSetAsPrimary;
-
-  /// No description provided for @worker_accountVerified.
-  ///
-  /// In fr, this message translates to:
-  /// **'Compte vérifié'**
-  String get worker_accountVerified;
-
-  /// No description provided for @worker_actions.
-  ///
-  /// In fr, this message translates to:
-  /// **'Actions'**
-  String get worker_actions;
-
-  /// No description provided for @worker_actionSuccess.
-  ///
-  /// In fr, this message translates to:
-  /// **'Action réussie'**
-  String get worker_actionSuccess;
-
-  /// No description provided for @worker_activeJob.
-  ///
-  /// In fr, this message translates to:
-  /// **'Job actif'**
-  String get worker_activeJob;
-
-  /// No description provided for @worker_addAccount.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajouter un compte'**
-  String get worker_addAccount;
-
-  /// No description provided for @worker_addBankAccountToReceive.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajoutez un compte bancaire pour recevoir vos gains'**
-  String get worker_addBankAccountToReceive;
-
   /// No description provided for @worker_additionalDetailsOptional.
   ///
   /// In fr, this message translates to:
   /// **'Détails supplémentaires (optionnel)'**
   String get worker_additionalDetailsOptional;
-
-  /// No description provided for @worker_arrivedConfirmedMessage.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous êtes à {distanceMeters}m du véhicule.\n\nVous pouvez maintenant commencer le travail.'**
-  String worker_arrivedConfirmedMessage(int distanceMeters);
-
-  /// No description provided for @worker_automaticTransfers.
-  ///
-  /// In fr, this message translates to:
-  /// **'Virements automatiques'**
-  String get worker_automaticTransfers;
-
-  /// No description provided for @worker_balance.
-  ///
-  /// In fr, this message translates to:
-  /// **'Solde'**
-  String get worker_balance;
-
-  /// No description provided for @worker_bankAccounts.
-  ///
-  /// In fr, this message translates to:
-  /// **'Comptes bancaires'**
-  String get worker_bankAccounts;
-
-  /// No description provided for @worker_basicInfo.
-  ///
-  /// In fr, this message translates to:
-  /// **'Informations de base'**
-  String get worker_basicInfo;
 
   /// No description provided for @worker_cameraPermissionError.
   ///
@@ -8738,143 +8144,17 @@ abstract class AppLocalizations {
   /// **'Impossible de déterminer votre position. Activez la localisation et réessayez.'**
   String get worker_cannotDeterminePosition;
 
-  /// No description provided for @worker_cannotOpenStripeLink.
-  ///
-  /// In fr, this message translates to:
-  /// **'Impossible d\'ouvrir le lien Stripe'**
-  String get worker_cannotOpenStripeLink;
-
-  /// No description provided for @worker_canNowFinish.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous pouvez maintenant terminer'**
-  String get worker_canNowFinish;
-
-  /// No description provided for @worker_configureNow.
-  ///
-  /// In fr, this message translates to:
-  /// **'Configurer maintenant'**
-  String get worker_configureNow;
-
-  /// No description provided for @worker_configurePayments.
-  ///
-  /// In fr, this message translates to:
-  /// **'Configurez vos paiements'**
-  String get worker_configurePayments;
-
   /// No description provided for @worker_confirmCancellation.
   ///
   /// In fr, this message translates to:
   /// **'Confirmer l\'annulation'**
   String get worker_confirmCancellation;
 
-  /// No description provided for @worker_confirmCompleteJob.
-  ///
-  /// In fr, this message translates to:
-  /// **'Êtes-vous sûr de vouloir marquer ce job comme terminé?'**
-  String get worker_confirmCompleteJob;
-
-  /// No description provided for @worker_connectingToStripe.
-  ///
-  /// In fr, this message translates to:
-  /// **'Connexion à Stripe...'**
-  String get worker_connectingToStripe;
-
-  /// No description provided for @worker_continueSetup.
-  ///
-  /// In fr, this message translates to:
-  /// **'Continuer la configuration'**
-  String get worker_continueSetup;
-
-  /// No description provided for @worker_deleteAccountConfirm.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voulez-vous vraiment supprimer le compte se terminant par {last4}?'**
-  String worker_deleteAccountConfirm(String last4);
-
-  /// No description provided for @worker_deleteAccountQuestion.
-  ///
-  /// In fr, this message translates to:
-  /// **'Supprimer ce compte?'**
-  String get worker_deleteAccountQuestion;
-
-  /// No description provided for @worker_depositsIn23Days.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dépôts sous 2-3 jours ouvrables'**
-  String get worker_depositsIn23Days;
-
-  /// No description provided for @worker_documentsRequired.
-  ///
-  /// In fr, this message translates to:
-  /// **'Documents requis'**
-  String get worker_documentsRequired;
-
-  /// No description provided for @worker_documentsSubmitted.
-  ///
-  /// In fr, this message translates to:
-  /// **'Documents soumis'**
-  String get worker_documentsSubmitted;
-
-  /// No description provided for @worker_documentsVerified.
-  ///
-  /// In fr, this message translates to:
-  /// **'Documents vérifiés'**
-  String get worker_documentsVerified;
-
-  /// No description provided for @worker_enlarge.
-  ///
-  /// In fr, this message translates to:
-  /// **'Agrandir'**
-  String get worker_enlarge;
-
   /// No description provided for @worker_enRoute.
   ///
   /// In fr, this message translates to:
   /// **'En route'**
   String get worker_enRoute;
-
-  /// No description provided for @worker_fundsDepositedInfo.
-  ///
-  /// In fr, this message translates to:
-  /// **'Les fonds sont déposés sur votre compte bancaire sous 2-3 jours ouvrables.'**
-  String get worker_fundsDepositedInfo;
-
-  /// No description provided for @worker_goodJob.
-  ///
-  /// In fr, this message translates to:
-  /// **'Bon travail!'**
-  String get worker_goodJob;
-
-  /// No description provided for @worker_headToClient.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dirigez-vous vers le client'**
-  String get worker_headToClient;
-
-  /// No description provided for @worker_howItWorks.
-  ///
-  /// In fr, this message translates to:
-  /// **'Comment ça fonctionne'**
-  String get worker_howItWorks;
-
-  /// No description provided for @worker_identityVerificationInfo.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pour recevoir vos paiements, Stripe doit vérifier votre identité. Préparez les documents suivants:'**
-  String get worker_identityVerificationInfo;
-
-  /// No description provided for @worker_jobCompletedSuccess.
-  ///
-  /// In fr, this message translates to:
-  /// **'Job terminé avec succès!'**
-  String get worker_jobCompletedSuccess;
-
-  /// No description provided for @worker_jobStarted.
-  ///
-  /// In fr, this message translates to:
-  /// **'Job démarré!'**
-  String get worker_jobStarted;
 
   /// No description provided for @worker_locationError.
   ///
@@ -8894,47 +8174,11 @@ abstract class AppLocalizations {
   /// **'Permission de localisation refusée définitivement. Activez-la dans les paramètres.'**
   String get worker_locationPermissionDeniedForever;
 
-  /// No description provided for @worker_manageBankAccounts.
-  ///
-  /// In fr, this message translates to:
-  /// **'Gérer mes comptes bancaires'**
-  String get worker_manageBankAccounts;
-
-  /// No description provided for @worker_noBankAccount.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aucun compte bancaire'**
-  String get worker_noBankAccount;
-
-  /// No description provided for @worker_noBankAccountWarning.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aucun compte bancaire configuré. Ajoutez-en un pour recevoir vos gains.'**
-  String get worker_noBankAccountWarning;
-
   /// No description provided for @worker_noGpsConfirmArrival.
   ///
   /// In fr, this message translates to:
   /// **'Ce job n\'a pas de coordonnées GPS enregistrées.\n\nConfirmez-vous être arrivé à l\'emplacement indiqué?'**
   String get worker_noGpsConfirmArrival;
-
-  /// No description provided for @worker_notChargedForJob.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous ne serez pas facturé pour ce job.'**
-  String get worker_notChargedForJob;
-
-  /// No description provided for @worker_paymentDistribution.
-  ///
-  /// In fr, this message translates to:
-  /// **'Répartition des paiements'**
-  String get worker_paymentDistribution;
-
-  /// No description provided for @worker_paymentExample.
-  ///
-  /// In fr, this message translates to:
-  /// **'Exemple: Pour un job à 50\$, vous recevez {amount}\$'**
-  String worker_paymentExample(String amount);
 
   /// No description provided for @worker_payments.
   ///
@@ -8942,143 +8186,11 @@ abstract class AppLocalizations {
   /// **'Paiements'**
   String get worker_payments;
 
-  /// No description provided for @worker_paymentsActive.
-  ///
-  /// In fr, this message translates to:
-  /// **'Paiements actifs'**
-  String get worker_paymentsActive;
-
-  /// No description provided for @worker_payoutsActive.
-  ///
-  /// In fr, this message translates to:
-  /// **'Virements actifs'**
-  String get worker_payoutsActive;
-
-  /// No description provided for @worker_photoId.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pièce d\'identité avec photo'**
-  String get worker_photoId;
-
-  /// No description provided for @worker_photoIdDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Permis de conduire, passeport ou carte d\'identité'**
-  String get worker_photoIdDesc;
-
-  /// No description provided for @worker_photoOfCompletedWork.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photo du travail terminé'**
-  String get worker_photoOfCompletedWork;
-
-  /// No description provided for @worker_photoRequired.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photo requise'**
-  String get worker_photoRequired;
-
-  /// No description provided for @worker_photoRequirements.
-  ///
-  /// In fr, this message translates to:
-  /// **'Exigences pour les photos'**
-  String get worker_photoRequirements;
-
   /// No description provided for @worker_photoUploadError.
   ///
   /// In fr, this message translates to:
   /// **'Impossible d\'envoyer la photo. Vérifiez votre connexion.'**
   String get worker_photoUploadError;
-
-  /// No description provided for @worker_platformCommission.
-  ///
-  /// In fr, this message translates to:
-  /// **'Commission plateforme'**
-  String get worker_platformCommission;
-
-  /// No description provided for @worker_poweredByStripe.
-  ///
-  /// In fr, this message translates to:
-  /// **'Propulsé par Stripe'**
-  String get worker_poweredByStripe;
-
-  /// No description provided for @worker_poweredByStripeLeader.
-  ///
-  /// In fr, this message translates to:
-  /// **'Propulsé par Stripe, leader mondial des paiements'**
-  String get worker_poweredByStripeLeader;
-
-  /// No description provided for @worker_pressEnRouteToStart.
-  ///
-  /// In fr, this message translates to:
-  /// **'Appuyez sur \"En route\" pour commencer'**
-  String get worker_pressEnRouteToStart;
-
-  /// No description provided for @worker_primary.
-  ///
-  /// In fr, this message translates to:
-  /// **'Principal'**
-  String get worker_primary;
-
-  /// No description provided for @worker_primaryAccount.
-  ///
-  /// In fr, this message translates to:
-  /// **'Compte principal'**
-  String get worker_primaryAccount;
-
-  /// No description provided for @worker_primaryAccountInfo.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vos gains seront déposés sur le compte marqué comme principal.'**
-  String get worker_primaryAccountInfo;
-
-  /// No description provided for @worker_proofOfAddress.
-  ///
-  /// In fr, this message translates to:
-  /// **'Preuve d\'adresse'**
-  String get worker_proofOfAddress;
-
-  /// No description provided for @worker_proofOfAddressDesc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Facture de services publics ou relevé bancaire récent'**
-  String get worker_proofOfAddressDesc;
-
-  /// No description provided for @worker_readyToReceive.
-  ///
-  /// In fr, this message translates to:
-  /// **'Prêt à recevoir des paiements'**
-  String get worker_readyToReceive;
-
-  /// No description provided for @worker_receiveEarningsDirectly.
-  ///
-  /// In fr, this message translates to:
-  /// **'Recevez vos gains directement'**
-  String get worker_receiveEarningsDirectly;
-
-  /// No description provided for @worker_reqColorPhoto.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photo en couleur (format JPG ou PNG)'**
-  String get worker_reqColorPhoto;
-
-  /// No description provided for @worker_reqNameDobVisible.
-  ///
-  /// In fr, this message translates to:
-  /// **'Nom et date de naissance lisibles'**
-  String get worker_reqNameDobVisible;
-
-  /// No description provided for @worker_reqNotExpired.
-  ///
-  /// In fr, this message translates to:
-  /// **'Document non expiré'**
-  String get worker_reqNotExpired;
-
-  /// No description provided for @worker_reqOriginalDoc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Document original, pas une photocopie'**
-  String get worker_reqOriginalDoc;
 
   /// No description provided for @worker_retakePhoto.
   ///
@@ -9086,137 +8198,11 @@ abstract class AppLocalizations {
   /// **'Reprendre'**
   String get worker_retakePhoto;
 
-  /// No description provided for @worker_securePayments.
-  ///
-  /// In fr, this message translates to:
-  /// **'Paiements sécurisés'**
-  String get worker_securePayments;
-
-  /// No description provided for @worker_sendDocumentsToActivate.
-  ///
-  /// In fr, this message translates to:
-  /// **'Envoyez vos documents d\'identité pour activer les virements.'**
-  String get worker_sendDocumentsToActivate;
-
-  /// No description provided for @worker_sending.
-  ///
-  /// In fr, this message translates to:
-  /// **'Envoi...'**
-  String get worker_sending;
-
-  /// No description provided for @worker_sendMyDocuments.
-  ///
-  /// In fr, this message translates to:
-  /// **'Envoyer mes documents'**
-  String get worker_sendMyDocuments;
-
-  /// No description provided for @worker_setAsPrimary.
-  ///
-  /// In fr, this message translates to:
-  /// **'Définir comme principal'**
-  String get worker_setAsPrimary;
-
-  /// No description provided for @worker_statusUnknown.
-  ///
-  /// In fr, this message translates to:
-  /// **'Inconnu'**
-  String get worker_statusUnknown;
-
-  /// No description provided for @worker_statusUpdatedEnRoute.
-  ///
-  /// In fr, this message translates to:
-  /// **'Statut mis à jour: En route'**
-  String get worker_statusUpdatedEnRoute;
-
-  /// No description provided for @worker_step1ClientPays.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le client paie'**
-  String get worker_step1ClientPays;
-
-  /// No description provided for @worker_step1Subtitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le paiement est traité par Stripe'**
-  String get worker_step1Subtitle;
-
-  /// No description provided for @worker_step1SubtitleShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Paiement traité par Stripe'**
-  String get worker_step1SubtitleShort;
-
-  /// No description provided for @worker_step2AutoDistribution.
-  ///
-  /// In fr, this message translates to:
-  /// **'Répartition automatique'**
-  String get worker_step2AutoDistribution;
-
-  /// No description provided for @worker_step2Distribution.
-  ///
-  /// In fr, this message translates to:
-  /// **'Répartition'**
-  String get worker_step2Distribution;
-
-  /// No description provided for @worker_step2Subtitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre part est calculée instantanément'**
-  String get worker_step2Subtitle;
-
-  /// No description provided for @worker_step2SubtitleShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre part est calculée'**
-  String get worker_step2SubtitleShort;
-
-  /// No description provided for @worker_step3Deposit.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dépôt'**
-  String get worker_step3Deposit;
-
-  /// No description provided for @worker_step3DepositToAccount.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dépôt sur votre compte'**
-  String get worker_step3DepositToAccount;
-
-  /// No description provided for @worker_step3Subtitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Sous 2-3 jours ouvrables'**
-  String get worker_step3Subtitle;
-
-  /// No description provided for @worker_stripeResponse.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réponse Stripe: {response}'**
-  String worker_stripeResponse(String response);
-
-  /// No description provided for @worker_stripeVerifying.
-  ///
-  /// In fr, this message translates to:
-  /// **'Stripe vérifie vos informations'**
-  String get worker_stripeVerifying;
-
   /// No description provided for @worker_takePhoto.
   ///
   /// In fr, this message translates to:
   /// **'Prendre une photo'**
   String get worker_takePhoto;
-
-  /// No description provided for @worker_takePhotoBeforeFinish.
-  ///
-  /// In fr, this message translates to:
-  /// **'Prenez une photo avant de terminer'**
-  String get worker_takePhotoBeforeFinish;
-
-  /// No description provided for @worker_timeElapsed.
-  ///
-  /// In fr, this message translates to:
-  /// **'Temps écoulé'**
-  String get worker_timeElapsed;
 
   /// No description provided for @worker_tooFar.
   ///
@@ -9230,47 +8216,11 @@ abstract class AppLocalizations {
   /// **'Vous êtes à {distanceMeters}m du véhicule.\n\nVous devez être à moins de {maxRadius}m pour confirmer votre arrivée.\n\nContinuez à vous rapprocher.'**
   String worker_tooFarMessage(int distanceMeters, int maxRadius);
 
-  /// No description provided for @worker_verificationInProgress.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vérification en cours'**
-  String get worker_verificationInProgress;
-
-  /// No description provided for @worker_verificationTimeInfo.
-  ///
-  /// In fr, this message translates to:
-  /// **'La vérification peut prendre quelques minutes à 24 heures.'**
-  String get worker_verificationTimeInfo;
-
   /// No description provided for @worker_verifyingPosition.
   ///
   /// In fr, this message translates to:
   /// **'Vérification de votre position...'**
   String get worker_verifyingPosition;
-
-  /// No description provided for @worker_viewStatusOnStripe.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voir le statut sur Stripe'**
-  String get worker_viewStatusOnStripe;
-
-  /// No description provided for @worker_viewStripeDashboard.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voir mon dashboard Stripe'**
-  String get worker_viewStripeDashboard;
-
-  /// No description provided for @worker_workInProgress.
-  ///
-  /// In fr, this message translates to:
-  /// **'Travail en cours...'**
-  String get worker_workInProgress;
-
-  /// No description provided for @worker_youReceive.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous recevez'**
-  String get worker_youReceive;
 
   /// No description provided for @verification_addPhoto.
   ///
@@ -9938,66 +8888,6 @@ abstract class AppLocalizations {
   /// **'Bonjour, {name}'**
   String worker_greetingName(String name);
 
-  /// No description provided for @worker_headerAvailable.
-  ///
-  /// In fr, this message translates to:
-  /// **'Disponible'**
-  String get worker_headerAvailable;
-
-  /// No description provided for @worker_headerOffline.
-  ///
-  /// In fr, this message translates to:
-  /// **'Hors ligne'**
-  String get worker_headerOffline;
-
-  /// No description provided for @worker_statsCompleted.
-  ///
-  /// In fr, this message translates to:
-  /// **'Terminés'**
-  String get worker_statsCompleted;
-
-  /// No description provided for @worker_statsInProgress.
-  ///
-  /// In fr, this message translates to:
-  /// **'En cours'**
-  String get worker_statsInProgress;
-
-  /// No description provided for @worker_statsRevenue.
-  ///
-  /// In fr, this message translates to:
-  /// **'Revenus'**
-  String get worker_statsRevenue;
-
-  /// No description provided for @worker_statsRating.
-  ///
-  /// In fr, this message translates to:
-  /// **'Note'**
-  String get worker_statsRating;
-
-  /// No description provided for @worker_statsToday.
-  ///
-  /// In fr, this message translates to:
-  /// **'aujourd\'hui'**
-  String get worker_statsToday;
-
-  /// No description provided for @worker_youAreOnline.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous êtes en ligne'**
-  String get worker_youAreOnline;
-
-  /// No description provided for @worker_receivingSnowRequests.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous recevez les demandes de déneigement'**
-  String get worker_receivingSnowRequests;
-
-  /// No description provided for @worker_activateToReceiveRequests.
-  ///
-  /// In fr, this message translates to:
-  /// **'Activez pour recevoir des demandes'**
-  String get worker_activateToReceiveRequests;
-
   /// No description provided for @worker_activeCount.
   ///
   /// In fr, this message translates to:
@@ -10045,54 +8935,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Annulé'**
   String get worker_statusCancelled;
-
-  /// No description provided for @worker_serviceWindowScraping.
-  ///
-  /// In fr, this message translates to:
-  /// **'Grattage vitres'**
-  String get worker_serviceWindowScraping;
-
-  /// No description provided for @worker_serviceDoorDeicing.
-  ///
-  /// In fr, this message translates to:
-  /// **'Déglaçage portes'**
-  String get worker_serviceDoorDeicing;
-
-  /// No description provided for @worker_serviceWheelClearance.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dégagement roues'**
-  String get worker_serviceWheelClearance;
-
-  /// No description provided for @worker_serviceRoofClearing.
-  ///
-  /// In fr, this message translates to:
-  /// **'Déneigement toit'**
-  String get worker_serviceRoofClearing;
-
-  /// No description provided for @worker_serviceSaltSpreading.
-  ///
-  /// In fr, this message translates to:
-  /// **'Épandage sel'**
-  String get worker_serviceSaltSpreading;
-
-  /// No description provided for @worker_serviceLightsCleaning.
-  ///
-  /// In fr, this message translates to:
-  /// **'Nettoyage phares'**
-  String get worker_serviceLightsCleaning;
-
-  /// No description provided for @worker_servicePerimeterClearance.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dégagement périmètre'**
-  String get worker_servicePerimeterClearance;
-
-  /// No description provided for @worker_serviceExhaustCheck.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vérif. échappement'**
-  String get worker_serviceExhaustCheck;
 
   /// No description provided for @worker_serviceWindows.
   ///
@@ -10904,107 +9746,11 @@ abstract class AppLocalizations {
   /// **'Mes revenus'**
   String get earnings_myEarnings;
 
-  /// No description provided for @earnings_day.
-  ///
-  /// In fr, this message translates to:
-  /// **'Jour'**
-  String get earnings_day;
-
-  /// No description provided for @earnings_week.
-  ///
-  /// In fr, this message translates to:
-  /// **'Semaine'**
-  String get earnings_week;
-
-  /// No description provided for @earnings_month.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mois'**
-  String get earnings_month;
-
   /// No description provided for @earnings_retry.
   ///
   /// In fr, this message translates to:
   /// **'Réessayer'**
   String get earnings_retry;
-
-  /// No description provided for @earnings_today.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aujourd\'hui'**
-  String get earnings_today;
-
-  /// No description provided for @earnings_thisWeek.
-  ///
-  /// In fr, this message translates to:
-  /// **'Cette semaine'**
-  String get earnings_thisWeek;
-
-  /// No description provided for @earnings_thisMonth.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ce mois'**
-  String get earnings_thisMonth;
-
-  /// No description provided for @earnings_jobs.
-  ///
-  /// In fr, this message translates to:
-  /// **'Jobs'**
-  String get earnings_jobs;
-
-  /// No description provided for @earnings_tips.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pourboires'**
-  String get earnings_tips;
-
-  /// No description provided for @earnings_average.
-  ///
-  /// In fr, this message translates to:
-  /// **'Moyenne'**
-  String get earnings_average;
-
-  /// No description provided for @earnings_goalAmount.
-  ///
-  /// In fr, this message translates to:
-  /// **'Objectif: {amount}\$'**
-  String earnings_goalAmount(int amount);
-
-  /// No description provided for @earnings_goalReached.
-  ///
-  /// In fr, this message translates to:
-  /// **'Objectif atteint!'**
-  String get earnings_goalReached;
-
-  /// No description provided for @earnings_completed.
-  ///
-  /// In fr, this message translates to:
-  /// **'Terminés'**
-  String get earnings_completed;
-
-  /// No description provided for @earnings_inProgress.
-  ///
-  /// In fr, this message translates to:
-  /// **'En cours'**
-  String get earnings_inProgress;
-
-  /// No description provided for @earnings_assigned.
-  ///
-  /// In fr, this message translates to:
-  /// **'Assignés'**
-  String get earnings_assigned;
-
-  /// No description provided for @earnings_earnings.
-  ///
-  /// In fr, this message translates to:
-  /// **'Revenus'**
-  String get earnings_earnings;
-
-  /// No description provided for @earnings_tipsShort.
-  ///
-  /// In fr, this message translates to:
-  /// **'Tips'**
-  String get earnings_tipsShort;
 
   /// No description provided for @earnings_jobHistory.
   ///
@@ -11017,60 +9763,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Voir tous vos jobs terminés'**
   String get earnings_viewAllJobs;
-
-  /// No description provided for @earnings_earningsPerDay.
-  ///
-  /// In fr, this message translates to:
-  /// **'Revenus par jour'**
-  String get earnings_earningsPerDay;
-
-  /// No description provided for @earnings_dayMon.
-  ///
-  /// In fr, this message translates to:
-  /// **'Lun'**
-  String get earnings_dayMon;
-
-  /// No description provided for @earnings_dayTue.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mar'**
-  String get earnings_dayTue;
-
-  /// No description provided for @earnings_dayWed.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mer'**
-  String get earnings_dayWed;
-
-  /// No description provided for @earnings_dayThu.
-  ///
-  /// In fr, this message translates to:
-  /// **'Jeu'**
-  String get earnings_dayThu;
-
-  /// No description provided for @earnings_dayFri.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ven'**
-  String get earnings_dayFri;
-
-  /// No description provided for @earnings_daySat.
-  ///
-  /// In fr, this message translates to:
-  /// **'Sam'**
-  String get earnings_daySat;
-
-  /// No description provided for @earnings_daySun.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dim'**
-  String get earnings_daySun;
-
-  /// No description provided for @earnings_overallStats.
-  ///
-  /// In fr, this message translates to:
-  /// **'Statistiques globales'**
-  String get earnings_overallStats;
 
   /// No description provided for @earnings_totalJobs.
   ///
@@ -11461,6 +10153,402 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Vérifié'**
   String get worker_verified;
+
+  /// No description provided for @workerP_equipmentHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous ne recevez que les demandes pour lesquelles vous avez l\'équipement.'**
+  String get workerP_equipmentHelp;
+
+  /// No description provided for @workerP_maxJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Travaux en même temps'**
+  String get workerP_maxJobs;
+
+  /// No description provided for @workerP_maxJobsHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Au-delà, vous ne pouvez plus accepter de nouvelle demande.'**
+  String get workerP_maxJobsHelp;
+
+  /// No description provided for @workerP_newJobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelles demandes près de moi'**
+  String get workerP_newJobs;
+
+  /// No description provided for @workerP_newJobsHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quand une demande payée arrive à moins de 25 km.'**
+  String get workerP_newJobsHelp;
+
+  /// No description provided for @workerP_tips.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourboires'**
+  String get workerP_tips;
+
+  /// No description provided for @workerP_tipsHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quand un client vous laisse un pourboire.'**
+  String get workerP_tipsHelp;
+
+  /// No description provided for @workerP_app.
+  ///
+  /// In fr, this message translates to:
+  /// **'Application'**
+  String get workerP_app;
+
+  /// No description provided for @workerP_work.
+  ///
+  /// In fr, this message translates to:
+  /// **'Travail'**
+  String get workerP_work;
+
+  /// No description provided for @activeJ_title.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigement en cours'**
+  String get activeJ_title;
+
+  /// No description provided for @activeJ_stepAccepted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accepté'**
+  String get activeJ_stepAccepted;
+
+  /// No description provided for @activeJ_stepEnRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'En route'**
+  String get activeJ_stepEnRoute;
+
+  /// No description provided for @activeJ_stepOnSite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sur place'**
+  String get activeJ_stepOnSite;
+
+  /// No description provided for @activeJ_stepDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get activeJ_stepDone;
+
+  /// No description provided for @activeJ_readyBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voiture prête avant {time}'**
+  String activeJ_readyBy(String time);
+
+  /// No description provided for @activeJ_clientLeaves.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le client part à {time}'**
+  String activeJ_clientLeaves(String time);
+
+  /// No description provided for @activeJ_elapsed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Temps écoulé'**
+  String get activeJ_elapsed;
+
+  /// No description provided for @activeJ_where.
+  ///
+  /// In fr, this message translates to:
+  /// **'Où'**
+  String get activeJ_where;
+
+  /// No description provided for @activeJ_spot.
+  ///
+  /// In fr, this message translates to:
+  /// **'Place {spot}'**
+  String activeJ_spot(String spot);
+
+  /// No description provided for @activeJ_todo.
+  ///
+  /// In fr, this message translates to:
+  /// **'À faire'**
+  String get activeJ_todo;
+
+  /// No description provided for @activeJ_basicClearing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneiger la voiture (toit, vitres, phares)'**
+  String get activeJ_basicClearing;
+
+  /// No description provided for @activeJ_snowDepth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Environ {cm} cm de neige'**
+  String activeJ_snowDepth(int cm);
+
+  /// No description provided for @activeJ_client.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client'**
+  String get activeJ_client;
+
+  /// No description provided for @activeJ_vehicle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Véhicule'**
+  String get activeJ_vehicle;
+
+  /// No description provided for @activeJ_goEnRoute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partir vers le client'**
+  String get activeJ_goEnRoute;
+
+  /// No description provided for @activeJ_arrivedStart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je suis arrivé, commencer'**
+  String get activeJ_arrivedStart;
+
+  /// No description provided for @activeJ_finish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminer le déneigement'**
+  String get activeJ_finish;
+
+  /// No description provided for @activeJ_photoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo de la voiture déneigée'**
+  String get activeJ_photoTitle;
+
+  /// No description provided for @activeJ_photoHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Obligatoire pour terminer : elle sert de preuve du travail fait.'**
+  String get activeJ_photoHelp;
+
+  /// No description provided for @activeJ_photoSending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoi de la photo…'**
+  String get activeJ_photoSending;
+
+  /// No description provided for @activeJ_photoSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo envoyée'**
+  String get activeJ_photoSent;
+
+  /// No description provided for @activeJ_confirmFinish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le client sera prévenu que sa voiture est prête.'**
+  String get activeJ_confirmFinish;
+
+  /// No description provided for @activeJ_done.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déneigement terminé'**
+  String get activeJ_done;
+
+  /// No description provided for @activeJ_cancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation annulée'**
+  String get activeJ_cancelled;
+
+  /// No description provided for @activeJ_backHome.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour à l\'accueil'**
+  String get activeJ_backHome;
+
+  /// No description provided for @worker_youEarn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous gagnez'**
+  String get worker_youEarn;
+
+  /// No description provided for @earningsT_today.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd\'hui'**
+  String get earningsT_today;
+
+  /// No description provided for @earningsT_last7.
+  ///
+  /// In fr, this message translates to:
+  /// **'7 derniers jours'**
+  String get earningsT_last7;
+
+  /// No description provided for @earningsT_month.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce mois-ci'**
+  String get earningsT_month;
+
+  /// No description provided for @earningsT_jobs.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{Aucun déneigement} =1{1 déneigement} other{{count} déneigements}}'**
+  String earningsT_jobs(int count);
+
+  /// No description provided for @earningsT_tipsIncluded.
+  ///
+  /// In fr, this message translates to:
+  /// **'dont {amount} de pourboires'**
+  String earningsT_tipsIncluded(String amount);
+
+  /// No description provided for @earningsT_share.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre part : 75 % du prix de chaque déneigement, plus les pourboires.'**
+  String get earningsT_share;
+
+  /// No description provided for @earningsT_ongoing.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 déneigement en cours} other{{count} déneigements en cours}}'**
+  String earningsT_ongoing(int count);
+
+  /// No description provided for @earningsT_toDo.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 déneigement à faire} other{{count} déneigements à faire}}'**
+  String earningsT_toDo(int count);
+
+  /// No description provided for @earningsT_perDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gains par jour'**
+  String get earningsT_perDay;
+
+  /// No description provided for @earningsT_allTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'Depuis le début'**
+  String get earningsT_allTime;
+
+  /// No description provided for @earningsT_noRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore de note'**
+  String get earningsT_noRating;
+
+  /// No description provided for @historyW_completed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminés'**
+  String get historyW_completed;
+
+  /// No description provided for @historyW_cancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulés'**
+  String get historyW_cancelled;
+
+  /// No description provided for @historyW_cancelledLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulé'**
+  String get historyW_cancelledLabel;
+
+  /// No description provided for @historyW_tip.
+  ///
+  /// In fr, this message translates to:
+  /// **'+{amount} de pourboire'**
+  String historyW_tip(String amount);
+
+  /// No description provided for @paymentsW_setupTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurez vos paiements'**
+  String get paymentsW_setupTitle;
+
+  /// No description provided for @paymentsW_setupText.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour recevoir votre part après chaque déneigement, ouvrez votre compte de paiement avec Stripe : pièce d\'identité et compte bancaire.'**
+  String get paymentsW_setupText;
+
+  /// No description provided for @paymentsW_setupButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurer mes paiements'**
+  String get paymentsW_setupButton;
+
+  /// No description provided for @paymentsW_continueButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer la configuration'**
+  String get paymentsW_continueButton;
+
+  /// No description provided for @paymentsW_pendingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification en cours'**
+  String get paymentsW_pendingTitle;
+
+  /// No description provided for @paymentsW_pendingText.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stripe vérifie vos informations. S\'il manque un document, ajoutez-le depuis votre espace Stripe.'**
+  String get paymentsW_pendingText;
+
+  /// No description provided for @paymentsW_activeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements actifs'**
+  String get paymentsW_activeTitle;
+
+  /// No description provided for @paymentsW_activeText.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre part est envoyée à votre compte Stripe à la fin de chaque déneigement, puis Stripe la verse sur votre compte bancaire.'**
+  String get paymentsW_activeText;
+
+  /// No description provided for @paymentsW_openStripe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir mon espace Stripe'**
+  String get paymentsW_openStripe;
+
+  /// No description provided for @paymentsW_available.
+  ///
+  /// In fr, this message translates to:
+  /// **'Disponible'**
+  String get paymentsW_available;
+
+  /// No description provided for @paymentsW_pending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente : {amount}'**
+  String paymentsW_pending(String amount);
+
+  /// No description provided for @paymentsW_transfers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versements reçus'**
+  String get paymentsW_transfers;
+
+  /// No description provided for @paymentsW_noTransfers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos versements apparaîtront ici après votre premier déneigement payé.'**
+  String get paymentsW_noTransfers;
+
+  /// No description provided for @paymentsW_reversed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulé'**
+  String get paymentsW_reversed;
+
+  /// No description provided for @paymentsW_loadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger vos paiements. Vérifiez votre connexion et réessayez.'**
+  String get paymentsW_loadError;
 }
 
 class _AppLocalizationsDelegate

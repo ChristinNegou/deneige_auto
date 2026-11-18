@@ -105,7 +105,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
                 const SizedBox(height: 16),
                 Text(
                   AppLocalizations.of(context)!.verify_heading,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.textPrimary,
@@ -319,7 +319,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             const SizedBox(height: 24),
             Text(
               AppLocalizations.of(context)!.verify_approved,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimary,
@@ -380,7 +380,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             const SizedBox(height: 24),
             Text(
               AppLocalizations.of(context)!.verify_pendingTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimary,
@@ -432,7 +432,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
           const SizedBox(height: 24),
           Text(
             AppLocalizations.of(context)!.verify_rejectedTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -544,7 +544,7 @@ class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
             const SizedBox(height: 24),
             Text(
               AppLocalizations.of(context)!.verify_expiredTitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimary,

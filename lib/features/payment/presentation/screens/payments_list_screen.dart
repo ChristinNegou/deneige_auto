@@ -125,7 +125,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                     const SizedBox(height: 4),
                     Text(
                       '${state.totalSpent.toStringAsFixed(2)} \$',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.8,
@@ -141,7 +141,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
                 children: [
                   Text(
                     '${state.transactionCount}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.onPrimary,
@@ -254,7 +254,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
             children: [
               Text(
                 '${payment.amount.toStringAsFixed(2)} \$',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.textPrimary,
@@ -423,8 +423,7 @@ class _PaymentsListScreenContentState extends State<PaymentsListScreenContent>
 
           // Menu actions
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_horiz_rounded,
-                color: AppTheme.textSecondary),
+            icon: Icon(Icons.more_horiz_rounded, color: AppTheme.textSecondary),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD)),
             onSelected: (value) {

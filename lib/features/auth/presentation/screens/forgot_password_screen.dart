@@ -79,11 +79,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       Container(
                         width: 88,
                         height: 88,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: AppTheme.primaryLight,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.lock_reset,
                           size: 40,
                           color: AppTheme.primary,
@@ -95,7 +95,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       Text(
                         l10n.forgotPassword_title,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.6,

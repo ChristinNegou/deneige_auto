@@ -609,7 +609,7 @@ class _StepLayout extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.error_outline_rounded,
+              Icon(Icons.error_outline_rounded,
                   size: 18, color: AppTheme.error),
               const SizedBox(width: 8),
               Expanded(
@@ -644,9 +644,8 @@ class _ReviewRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
       decoration: BoxDecoration(
-        border: last
-            ? null
-            : const Border(bottom: BorderSide(color: AppTheme.border)),
+        border:
+            last ? null : Border(bottom: BorderSide(color: AppTheme.border)),
       ),
       child: Row(
         children: [

@@ -235,7 +235,7 @@ Courriel : support@deneige-auto.ca''',
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -457,7 +457,7 @@ class LegalDocumentsListPage extends StatelessWidget {
             color: AppTheme.textSecondary,
           ),
         ),
-        trailing: const Icon(
+        trailing: Icon(
           Icons.chevron_right,
           color: AppTheme.textTertiary,
         ),

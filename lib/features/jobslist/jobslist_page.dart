@@ -7,6 +7,7 @@ import '../../core/di/injection_container.dart';
 import '../../l10n/app_localizations.dart';
 import '../snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../snow_worker/domain/entities/worker_job.dart';
+import '../../core/utils/money.dart';
 
 class JobsListPage extends StatelessWidget {
   const JobsListPage({super.key});
@@ -48,10 +49,7 @@ class _JobsListViewState extends State<JobsListView>
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlayStyle);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -120,7 +118,7 @@ class _JobsListViewState extends State<JobsListView>
           color: AppTheme.primary,
           borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         ),
-        labelColor: Colors.white,
+        labelColor: AppTheme.onPrimary,
         unselectedLabelColor: AppTheme.textSecondary,
         labelStyle: const TextStyle(fontWeight: FontWeight.w600),
         indicatorSize: TabBarIndicatorSize.tab,
@@ -137,7 +135,7 @@ class _JobsListViewState extends State<JobsListView>
     return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
       builder: (context, state) {
         if (state is WorkerJobsLoading) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: AppTheme.primary),
           );
         }
@@ -202,7 +200,7 @@ class _JobsListViewState extends State<JobsListView>
     return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
       builder: (context, state) {
         if (state is WorkerJobsLoading) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: AppTheme.primary),
           );
         }
@@ -348,7 +346,7 @@ class _JobsListViewState extends State<JobsListView>
               ],
             ),
             const SizedBox(height: 14),
-            const Divider(height: 1, color: AppTheme.divider),
+            Divider(height: 1, color: AppTheme.divider),
             const SizedBox(height: 14),
             Row(
               children: [
@@ -359,7 +357,7 @@ class _JobsListViewState extends State<JobsListView>
                 const SizedBox(width: 12),
                 _buildInfoChip(
                   Icons.attach_money_rounded,
-                  '${job.totalPrice.toStringAsFixed(0)}\$',
+                  formatMoney(context, job.workerEarnings, decimals: 0),
                 ),
                 if (job.vehicle.licensePlate != null) ...[
                   const SizedBox(width: 12),
@@ -380,14 +378,14 @@ class _JobsListViewState extends State<JobsListView>
                     child: Text(
                       l10n.worker_accept,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppTheme.onPrimary,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   )
                 else
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
                     color: AppTheme.textTertiary,
                   ),

@@ -224,7 +224,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: AppTheme.systemOverlayStyle,
       child: Scaffold(
         backgroundColor: AppTheme.background,
         body: AIChatFabWrapper(
@@ -306,14 +306,14 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             child: Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppTheme.primary,
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
                   userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.onPrimary,
@@ -355,7 +355,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     const SizedBox(width: 8),
                     Text(
                       '${weather.temperature.round()}°C',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppTheme.onPrimary,
@@ -382,7 +382,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               ],
               Text(
                 l10n.clientHome_heroTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   height: 1.25,
                   fontWeight: FontWeight.w800,
@@ -436,7 +436,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.notifications_none_rounded,
                   color: AppTheme.textPrimary,
                   size: 22,
@@ -538,7 +538,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               ),
               icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
             ),
-          const Icon(
+          Icon(
             Icons.chevron_right_rounded,
             color: AppTheme.textTertiary,
           ),
@@ -611,7 +611,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: AppTheme.textPrimary,
@@ -672,7 +672,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       ),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             Icons.event_available_rounded,
             size: 32,
             color: AppTheme.textTertiary,
@@ -713,7 +713,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                 children: [
                   Text(
                     _formatMonth(reservation.departureTime),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.accentDark,
@@ -721,7 +721,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   ),
                   Text(
                     _formatDay(reservation.departureTime),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       height: 1.1,
                       fontWeight: FontWeight.w800,
@@ -744,7 +744,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.schedule_rounded,
                         size: 14,
                         color: AppTheme.textTertiary,
@@ -836,7 +836,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
   Widget _buildBottomNav(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         border: Border(top: BorderSide(color: AppTheme.divider)),
       ),
@@ -869,7 +869,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     shape: BoxShape.circle,
                     boxShadow: AppTheme.glowPrimary,
                   ),
-                  child: const Icon(Icons.add_rounded,
+                  child: Icon(Icons.add_rounded,
                       color: AppTheme.onPrimary, size: 28),
                 ),
               ),

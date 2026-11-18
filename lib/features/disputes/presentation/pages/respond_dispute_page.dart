@@ -98,7 +98,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.photo_camera_outlined,
+                leading: Icon(Icons.photo_camera_outlined,
                     color: AppTheme.textPrimary),
                 title: Text(l10n.dispute_takePhoto),
                 onTap: () {
@@ -107,7 +107,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library_outlined,
+                leading: Icon(Icons.photo_library_outlined,
                     color: AppTheme.textPrimary),
                 title: Text(l10n.dispute_chooseFromGallery),
                 onTap: () {
@@ -141,7 +141,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.disputeR_sent,
-              style: const TextStyle(color: AppTheme.onPrimary)),
+              style: TextStyle(color: AppTheme.onPrimary)),
           backgroundColor: AppTheme.primary,
           behavior: SnackBarBehavior.floating,
         ),
@@ -203,12 +203,11 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                 fillColor: AppTheme.surface,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppTheme.border),
+                  borderSide: BorderSide(color: AppTheme.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: AppTheme.primary, width: 1.5),
+                  borderSide: BorderSide(color: AppTheme.primary, width: 1.5),
                 ),
                 // Le compteur indique le minimum tant qu'il n'est pas atteint
                 counterText: _length < _minChars
@@ -229,7 +228,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.error_outline_rounded,
+                  Icon(Icons.error_outline_rounded,
                       size: 18, color: AppTheme.error),
                   const SizedBox(width: 8),
                   Expanded(
@@ -251,7 +250,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(
+                        SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
@@ -317,7 +316,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
                   onTap: _sending
                       ? null
                       : () => setState(() => _photos.removeAt(i)),
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.all(4),
                     child: Icon(Icons.close_rounded,
                         size: 16, color: AppTheme.onPrimary),
@@ -332,7 +331,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
           color: AppTheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-            side: const BorderSide(color: AppTheme.border),
+            side: BorderSide(color: AppTheme.border),
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.radiusMD),
@@ -340,8 +339,7 @@ class _RespondDisputePageState extends State<RespondDisputePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.add_a_photo_outlined,
-                    color: AppTheme.textPrimary),
+                Icon(Icons.add_a_photo_outlined, color: AppTheme.textPrimary),
                 const SizedBox(height: 6),
                 Text(
                   l10n.disputeR_addPhoto,

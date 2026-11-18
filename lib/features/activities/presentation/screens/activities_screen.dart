@@ -82,7 +82,7 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.cloud_off_rounded,
                     size: 40,
                     color: AppTheme.textTertiary,
@@ -90,7 +90,7 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
                   const SizedBox(height: 16),
                   Text(
                     state.errorMessage!,
-                    style: const TextStyle(color: AppTheme.textSecondary),
+                    style: TextStyle(color: AppTheme.textSecondary),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
@@ -251,7 +251,7 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
             Row(
               children: [
                 if (reservation.workerName != null) ...[
-                  const Icon(
+                  Icon(
                     Icons.person_outline_rounded,
                     size: 16,
                     color: AppTheme.textTertiary,
@@ -268,8 +268,7 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
                 ],
                 if (isRated) ...[
                   const SizedBox(width: 10),
-                  const Icon(Icons.star_rounded,
-                      size: 16, color: AppTheme.warning),
+                  Icon(Icons.star_rounded, size: 16, color: AppTheme.warning),
                   const SizedBox(width: 2),
                   Text(
                     reservation.rating!.toStringAsFixed(1),
@@ -280,7 +279,7 @@ class _ActivitiesScreenContentState extends State<_ActivitiesScreenContent>
                 const Spacer(),
                 Text(
                   '${reservation.totalPrice.toStringAsFixed(2)} \$',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.textPrimary,

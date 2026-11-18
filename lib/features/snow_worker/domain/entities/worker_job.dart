@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../../core/config/app_config.dart';
 
 enum JobStatus {
   pending,
@@ -251,6 +252,10 @@ class WorkerJob extends Equatable {
     this.requiredEquipment = const [],
     this.workerHasEquipment = true,
   });
+
+  /// Ce que le deneigeur gagne pour ce travail (prix moins la commission),
+  /// hors pourboire.
+  double get workerEarnings => totalPrice * AppConfig.workerShare;
 
   /// Returns the display address (parking spot number, custom location, or location address)
   String get displayAddress {

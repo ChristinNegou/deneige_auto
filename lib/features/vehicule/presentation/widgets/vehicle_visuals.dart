@@ -86,7 +86,7 @@ class LicensePlate extends StatelessWidget {
       ),
       child: Text(
         plate.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w800,
           letterSpacing: 1,

@@ -94,8 +94,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:
-            Text(message, style: const TextStyle(color: AppTheme.onPrimary)),
+        content: Text(message, style: TextStyle(color: AppTheme.onPrimary)),
         backgroundColor: error ? AppTheme.error : AppTheme.primary,
         behavior: SnackBarBehavior.floating,
       ),
@@ -117,7 +116,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
                   Text(l10n.reservation_details, style: AppTheme.labelMedium),
               centerTitle: true,
             ),
-            body: const Center(
+            body: Center(
               child: CircularProgressIndicator(color: AppTheme.primary),
             ),
           );
@@ -179,7 +178,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.search_off_rounded,
+              Icon(Icons.search_off_rounded,
                   size: 48, color: AppTheme.textTertiary),
               const SizedBox(height: 16),
               Text(l10n.reservation_notFound, style: AppTheme.headlineSmall),
@@ -358,7 +357,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
     final initialAvatar = Center(
       child: Text(
         initial,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w800,
           color: AppTheme.onPrimary,
@@ -372,7 +371,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
           Container(
             width: 48,
             height: 48,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppTheme.primary,
               shape: BoxShape.circle,
             ),
@@ -549,12 +548,12 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           for (var i = 0; i < rows.length; i++) ...[
-            if (i > 0) const Divider(height: 1, color: AppTheme.border),
+            if (i > 0) Divider(height: 1, color: AppTheme.border),
             _DetailRow(
                 label: rows[i].$1, value: rows[i].$2, detail: rows[i].$3),
           ],
           if (history.isNotEmpty) ...[
-            const Divider(height: 1, color: AppTheme.border),
+            Divider(height: 1, color: AppTheme.border),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
               child: Column(
@@ -709,7 +708,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
       color: AppTheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        side: const BorderSide(color: AppTheme.border),
+        side: BorderSide(color: AppTheme.border),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
@@ -718,7 +717,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              const Icon(Icons.star_outline_rounded,
+              Icon(Icons.star_outline_rounded,
                   color: AppTheme.warning, size: 26),
               const SizedBox(width: 12),
               Expanded(
@@ -733,8 +732,7 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppTheme.textTertiary),
+              Icon(Icons.chevron_right_rounded, color: AppTheme.textTertiary),
             ],
           ),
         ),
@@ -958,7 +956,7 @@ class _DetailRow extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppTheme.textPrimary,
@@ -1001,8 +999,8 @@ class _PhotoTile extends StatelessWidget {
                 imageUrl: url,
                 fit: BoxFit.cover,
                 placeholder: (_, __) =>
-                    const ColoredBox(color: AppTheme.surfaceContainer),
-                errorWidget: (_, __, ___) => const ColoredBox(
+                    ColoredBox(color: AppTheme.surfaceContainer),
+                errorWidget: (_, __, ___) => ColoredBox(
                   color: AppTheme.surfaceContainer,
                   child: Icon(Icons.broken_image_outlined,
                       color: AppTheme.textTertiary),
@@ -1040,8 +1038,7 @@ class _LinkRow extends StatelessWidget {
             Icon(icon, size: 20, color: AppTheme.textSecondary),
             const SizedBox(width: 10),
             Expanded(child: Text(label, style: AppTheme.labelLarge)),
-            const Icon(Icons.chevron_right_rounded,
-                color: AppTheme.textTertiary),
+            Icon(Icons.chevron_right_rounded, color: AppTheme.textTertiary),
           ],
         ),
       ),

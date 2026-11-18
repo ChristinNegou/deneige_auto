@@ -185,9 +185,9 @@ class _DraggableFabOverlayState extends State<_DraggableFabOverlay> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.smart_toy,
-                color: Colors.white,
+                color: AppTheme.onPrimary,
                 size: 28,
               ),
             ),
@@ -386,9 +386,9 @@ class _AIChatFabOverlayWidgetState extends State<_AIChatFabOverlayWidget> {
                   ),
                 ],
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.smart_toy,
-                color: Colors.white,
+                color: AppTheme.onPrimary,
                 size: 28,
               ),
             ),

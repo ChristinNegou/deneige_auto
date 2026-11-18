@@ -4,6 +4,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/di/injection_container.dart';
 import '../../../core/services/locale_service.dart';
+import '../../../core/services/theme_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/presentation/bloc/auth_bloc.dart';
 import '../../auth/presentation/bloc/auth_event.dart';
@@ -116,12 +117,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         icon: Icons.dark_mode_outlined,
                         title: l10n.settings_darkTheme,
                         subtitle: l10n.settings_darkThemeDesc,
-                        value: state.preferences.darkThemeEnabled,
-                        onChanged: (value) {
-                          context
-                              .read<SettingsBloc>()
-                              .add(UpdateDarkTheme(value));
-                        },
+                        value: sl<ThemeService>().isDark,
+                        onChanged: (value) => sl<ThemeService>().setDark(value),
                       ),
 
                       const Divider(height: 32),
@@ -158,7 +155,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       _buildListTile(
                         icon: Icons.person_outline,
                         title: l10n.settings_editProfile,
-                        trailing: const Icon(Icons.arrow_forward_ios,
+                        trailing: Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
                         onTap: () =>
                             Navigator.pushNamed(context, '/profile/edit'),
@@ -167,7 +164,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         icon: Icons.delete_outline,
                         title: l10n.settings_deleteAccount,
                         titleColor: AppTheme.error,
-                        trailing: const Icon(Icons.arrow_forward_ios,
+                        trailing: Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.error),
                         onTap: () => _showDeleteAccountDialog(context, l10n),
                       ),
@@ -180,7 +177,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         icon: Icons.gavel_outlined,
                         title: l10n.settings_legalMentions,
                         subtitle: l10n.settings_legalSubtitle,
-                        trailing: const Icon(Icons.arrow_forward_ios,
+                        trailing: Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
                         onTap: () => Navigator.push(
                           context,
@@ -193,7 +190,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       _buildListTile(
                         icon: Icons.privacy_tip_outlined,
                         title: l10n.settings_privacyPolicy,
-                        trailing: const Icon(Icons.arrow_forward_ios,
+                        trailing: Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
                         onTap: () => Navigator.push(
                           context,
@@ -207,7 +204,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       _buildListTile(
                         icon: Icons.description_outlined,
                         title: l10n.settings_termsOfService,
-                        trailing: const Icon(Icons.arrow_forward_ios,
+                        trailing: Icon(Icons.arrow_forward_ios,
                             size: 16, color: AppTheme.textTertiary),
                         onTap: () => Navigator.push(
                           context,
@@ -243,7 +240,7 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppTheme.textSecondary,
@@ -264,7 +261,7 @@ class _SettingsPageState extends State<SettingsPage> {
       leading: Icon(icon, color: AppTheme.textSecondary),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppTheme.textPrimary,
           fontWeight: FontWeight.w500,
         ),
@@ -272,7 +269,7 @@ class _SettingsPageState extends State<SettingsPage> {
       subtitle: subtitle != null
           ? Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppTheme.textTertiary,
                 fontSize: 13,
               ),
@@ -306,7 +303,7 @@ class _SettingsPageState extends State<SettingsPage> {
       subtitle: subtitle != null
           ? Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppTheme.textTertiary,
                 fontSize: 13,
               ),
@@ -328,11 +325,11 @@ class _SettingsPageState extends State<SettingsPage> {
           backgroundColor: AppTheme.surfaceElevated,
           title: Row(
             children: [
-              const Icon(Icons.warning_amber_rounded, color: AppTheme.error),
+              Icon(Icons.warning_amber_rounded, color: AppTheme.error),
               const SizedBox(width: 12),
               Text(
                 l10n.settings_deleteAccountTitle,
-                style: const TextStyle(color: AppTheme.textPrimary),
+                style: TextStyle(color: AppTheme.textPrimary),
               ),
             ],
           ),
@@ -342,12 +339,12 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 l10n.settings_deleteAccountWarning,
-                style: const TextStyle(color: AppTheme.textSecondary),
+                style: TextStyle(color: AppTheme.textSecondary),
               ),
               const SizedBox(height: 16),
               Text(
                 l10n.settings_enterPassword,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w500,
                 ),
@@ -356,10 +353,10 @@ class _SettingsPageState extends State<SettingsPage> {
               TextField(
                 controller: passwordController,
                 obscureText: obscurePassword,
-                style: const TextStyle(color: AppTheme.textPrimary),
+                style: TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
                   hintText: l10n.common_password,
-                  hintStyle: const TextStyle(color: AppTheme.textTertiary),
+                  hintStyle: TextStyle(color: AppTheme.textTertiary),
                   filled: true,
                   fillColor: AppTheme.surfaceContainer,
                   border: OutlineInputBorder(
@@ -386,7 +383,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () => Navigator.pop(dialogContext),
               child: Text(
                 l10n.common_cancel,
-                style: const TextStyle(color: AppTheme.textSecondary),
+                style: TextStyle(color: AppTheme.textSecondary),
               ),
             ),
             BlocBuilder<SettingsBloc, SettingsState>(
@@ -411,15 +408,15 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.error,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppTheme.onPrimary,
                   ),
                   child: state.isDeleting
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppTheme.onPrimary,
                           ),
                         )
                       : Text(l10n.common_delete),

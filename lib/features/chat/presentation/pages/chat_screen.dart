@@ -111,7 +111,7 @@ class _ChatScreenState extends State<ChatScreen> {
       backgroundColor: AppTheme.surface,
       elevation: 1,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+        icon: Icon(Icons.arrow_back, color: AppTheme.textPrimary),
         onPressed: () => Navigator.pop(context),
       ),
       title: Row(
@@ -127,7 +127,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     widget.otherUserName.isNotEmpty
                         ? widget.otherUserName[0].toUpperCase()
                         : '?',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppTheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
@@ -141,7 +141,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text(
                   widget.otherUserName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -152,7 +152,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     if (state.isOtherTyping) {
                       return Text(
                         AppLocalizations.of(context)!.chat_typing,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppTheme.primary,
                           fontSize: 12,
                         ),
@@ -364,7 +364,7 @@ class _ChatScreenState extends State<ChatScreen> {
         top: 8,
         bottom: MediaQuery.of(context).padding.bottom + 8,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         border: Border(top: BorderSide(color: AppTheme.divider)),
       ),
@@ -402,7 +402,7 @@ class _ChatScreenState extends State<ChatScreen> {
               return IconButton(
                 onPressed: state.isSending ? null : _sendMessage,
                 icon: state.isSending
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(

@@ -45,10 +45,10 @@ class WorkerNotificationService {
       body: l10n != null
           ? l10n.worker_notifNewJobBody(
               job.displayAddress,
-              job.totalPrice.toStringAsFixed(2),
+              job.workerEarnings.toStringAsFixed(2),
               job.distanceKm?.toStringAsFixed(1) ?? '?',
             )
-          : '${job.displayAddress}\n${job.totalPrice.toStringAsFixed(2)}\$ - ${job.distanceKm?.toStringAsFixed(1) ?? "?"} km',
+          : '${job.displayAddress}\n${job.workerEarnings.toStringAsFixed(2)}\$ - ${job.distanceKm?.toStringAsFixed(1) ?? "?"} km',
       isUrgent: job.isPriority,
       l10n: l10n,
     );

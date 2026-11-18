@@ -9,6 +9,7 @@ import '../../../../core/config/app_config.dart' hide ServiceOption;
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/worker_job.dart';
+import '../../../../core/utils/money.dart';
 
 class SwipeableJobCard extends StatefulWidget {
   final WorkerJob job;
@@ -141,7 +142,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                 const SizedBox(width: 8),
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.onPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -151,7 +152,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
             : [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.onPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -218,7 +219,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                     // Address with icon
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.place_outlined,
                           color: AppTheme.textSecondary,
                           size: 22,
@@ -308,7 +309,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                                 children: [
                                   Text(
                                     widget.job.vehicle.displayName,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppTheme.textPrimary,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
@@ -437,8 +438,8 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
 
   Widget _buildPriceTag(ThemeData theme) {
     return Text(
-      '${widget.job.totalPrice.toStringAsFixed(2)} \$',
-      style: const TextStyle(
+      formatMoney(context, widget.job.workerEarnings),
+      style: TextStyle(
         fontWeight: FontWeight.w800,
         fontSize: 20,
         letterSpacing: -0.4,
@@ -467,7 +468,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
               const SizedBox(width: 4),
               Text(
                 optionData.label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w600,
@@ -526,7 +527,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
                 children: [
                   Text(
                     equipment.label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       color: AppTheme.textSecondary,
                       fontWeight: FontWeight.w500,
@@ -547,7 +548,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
       child: ElevatedButton.icon(
         onPressed: widget.isLoading ? null : widget.onAccept,
         icon: widget.isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 18,
                 height: 18,
                 child: CircularProgressIndicator(
@@ -571,7 +572,7 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.swipe_right_alt_rounded,
+        Icon(Icons.swipe_right_alt_rounded,
             color: AppTheme.textTertiary, size: 16),
         const SizedBox(width: 6),
         Text(l10n.worker_swipeHint, style: AppTheme.labelSmall),
@@ -695,18 +696,18 @@ class _SwipeableJobCardState extends State<SwipeableJobCard>
           ? CachedNetworkImage(
               imageUrl: fullPhotoUrl!,
               fit: BoxFit.cover,
-              placeholder: (context, url) => const Icon(
+              placeholder: (context, url) => Icon(
                 Icons.directions_car,
                 color: AppTheme.primary,
                 size: 14,
               ),
-              errorWidget: (context, url, error) => const Icon(
+              errorWidget: (context, url, error) => Icon(
                 Icons.directions_car,
                 color: AppTheme.primary,
                 size: 14,
               ),
             )
-          : const Icon(
+          : Icon(
               Icons.directions_car,
               color: AppTheme.primary,
               size: 14,

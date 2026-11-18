@@ -72,7 +72,8 @@ class WorkerNotificationBusinessService {
       title: job.isPriority
           ? (l10n?.worker_notifUrgentJob ?? 'Job Urgent!')
           : (l10n?.worker_newJob ?? 'Nouveau job'),
-      message: '${job.displayAddress} - ${job.totalPrice.toStringAsFixed(2)}\$',
+      message:
+          '${job.displayAddress} - ${job.workerEarnings.toStringAsFixed(2)}\$',
       data: {'jobId': job.id, 'isPriority': job.isPriority},
     );
 

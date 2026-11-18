@@ -187,7 +187,7 @@ class NewReservationView extends StatelessWidget {
 
     final isLastStep = state.currentStep == 4;
     final buttonContent = state.isLoading
-        ? const SizedBox(
+        ? SizedBox(
             height: 20,
             width: 20,
             child: CircularProgressIndicator(
@@ -200,7 +200,7 @@ class NewReservationView extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         border: Border(top: BorderSide(color: AppTheme.divider)),
       ),

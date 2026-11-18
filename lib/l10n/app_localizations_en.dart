@@ -1116,32 +1116,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worker_offline => 'Offline';
 
   @override
-  String get worker_verificationPending => 'Verification in progress';
-
-  @override
-  String get worker_verificationPendingMessage =>
-      'Your documents are being analyzed. You will be notified once the verification is complete.';
-
-  @override
   String get worker_verificationRejected => 'Verification rejected';
-
-  @override
-  String get worker_verificationRejectedMessage =>
-      'Your documents were not approved. Please resubmit valid documents.';
 
   @override
   String get worker_verificationExpired => 'Verification expired';
 
   @override
-  String get worker_verificationExpiredMessage =>
-      'Your verification has expired. Please resubmit your documents.';
-
-  @override
   String get worker_verificationRequired => 'Verification required';
-
-  @override
-  String get worker_verificationRequiredMessage =>
-      'Verify your identity to be able to accept snow removal jobs.';
 
   @override
   String get worker_verify => 'Verify';
@@ -1169,12 +1150,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get worker_myActiveJobs => 'My active jobs';
-
-  @override
-  String get worker_activeJobSingular => 'active';
-
-  @override
-  String get worker_activeJobPlural => 'active';
 
   @override
   String get worker_availableJobs => 'Available jobs';
@@ -1221,9 +1196,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worker_equipment => 'Equipment';
 
   @override
-  String get worker_preferences => 'Preferences';
-
-  @override
   String get worker_equipShovel => 'Shovel';
 
   @override
@@ -1246,19 +1218,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get worker_equipDeicer => 'De-icer';
-
-  @override
-  String get worker_maxSimultaneousJobs => 'Max simultaneous jobs';
-
-  @override
-  String get worker_maxSimultaneousJobsDesc =>
-      'Number of active jobs at the same time';
-
-  @override
-  String get worker_notifNewJobs => 'New jobs';
-
-  @override
-  String get worker_notifTipsReceived => 'Tips received';
 
   @override
   String get worker_helpSupport => 'Help & support';
@@ -1321,91 +1280,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worker_acceptJob => 'Accept this job';
 
   @override
-  String get worker_cancelJobTitle => 'Cancel job?';
-
-  @override
-  String get worker_cancelJobWarning =>
-      'You will not be paid for this job.\nFrequent cancellations may result in suspension.';
-
-  @override
-  String get worker_cancelReason_label => 'Cancellation reason:';
-
-  @override
-  String get worker_cancelDetails => 'Additional details (optional)';
-
-  @override
-  String get worker_cancelConfirm => 'Confirm cancellation';
-
-  @override
-  String get worker_cancelVehicleBreakdown => 'Vehicle breakdown';
-
-  @override
-  String get worker_cancelVehicleBreakdownDesc =>
-      'My vehicle has broken down or has a mechanical issue';
-
-  @override
-  String get worker_cancelMedicalEmergency => 'Medical emergency';
-
-  @override
-  String get worker_cancelMedicalEmergencyDesc =>
-      'I have a personal medical emergency';
-
-  @override
-  String get worker_cancelDangerousWeather => 'Dangerous weather conditions';
-
-  @override
-  String get worker_cancelDangerousWeatherDesc =>
-      'Weather conditions make the trip dangerous';
-
-  @override
-  String get worker_cancelRoadBlocked => 'Road blocked';
-
-  @override
-  String get worker_cancelRoadBlockedDesc =>
-      'The road to the client is blocked or inaccessible';
-
-  @override
-  String get worker_cancelFamilyEmergency => 'Family emergency';
-
-  @override
-  String get worker_cancelFamilyEmergencyDesc => 'I have a family emergency';
-
-  @override
-  String get worker_cancelEquipmentFailure => 'Equipment failure';
-
-  @override
-  String get worker_cancelEquipmentFailureDesc =>
-      'My snow removal equipment has failed';
-
-  @override
-  String get worker_settingsTitle => 'Settings';
-
-  @override
   String get worker_myEquipment => 'My equipment';
-
-  @override
-  String get worker_snowShovel => 'Snow shovel';
-
-  @override
-  String get worker_snowBroom => 'Snow broom';
-
-  @override
-  String get worker_iceScraper => 'Ice scraper';
-
-  @override
-  String get worker_myVehicle => 'My vehicle';
-
-  @override
-  String get worker_workPreferences => 'Work preferences';
-
-  @override
-  String get worker_preferredZones => 'Preferred zones';
-
-  @override
-  String get worker_notifReception => 'Notification reception';
-
-  @override
-  String get worker_otherVehicleType => 'Other vehicle type';
 
   @override
   String get worker_earningsCompleted => 'Completed';
@@ -2314,80 +2189,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Maximum 5 photos. Photos help process your request faster.';
 
   @override
-  String get worker_myPayments => 'My payments';
-
-  @override
-  String get worker_configureBankAccount => 'Configure my bank account';
-
-  @override
-  String get worker_saltSpreaderLabel => 'Salt spreader';
-
-  @override
-  String get worker_snowBlowerLabel => 'Snow blower';
-
-  @override
-  String get worker_vehicleCar => 'Car';
-
-  @override
-  String get worker_vehicleTruck => 'Pickup truck';
-
-  @override
-  String get worker_vehicleAtv => 'ATV / Quad';
-
-  @override
-  String get worker_vehicleOther => 'Other';
-
-  @override
-  String get worker_vehicleCarDesc => 'Small driveways, parking lots';
-
-  @override
-  String get worker_vehicleTruckDesc => 'Large driveways, heavy equipment';
-
-  @override
-  String get worker_vehicleAtvDesc => 'Difficult access, varied terrain';
-
-  @override
-  String get worker_recommendedJobs => 'Recommended: 2-3 jobs';
-
-  @override
-  String get worker_notifNewJobsDesc => 'Alert for new available jobs';
-
-  @override
-  String get worker_addZone => 'Add a zone';
-
-  @override
-  String get worker_zoneName => 'Zone name';
-
-  @override
-  String get worker_zoneHint => 'E.g.: West side';
-
-  @override
   String get worker_account => 'Account';
-
-  @override
-  String get worker_logoutConfirmWorker =>
-      'Are you sure you want to log out of your snow worker account?';
-
-  @override
-  String get worker_priorityNotifications => 'Priority notifications';
 
   @override
   String get worker_history => 'History';
 
   @override
-  String get worker_yourCompletedJobs => 'Your completed jobs';
-
-  @override
   String get worker_filterAll => 'All';
-
-  @override
-  String get worker_filterThisWeek => 'This week';
-
-  @override
-  String get worker_filterThisMonth => 'This month';
-
-  @override
-  String get worker_filterWithTip => 'With tip';
 
   @override
   String get worker_noHistory => 'No jobs in history';
@@ -2397,28 +2205,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your completed jobs will appear here';
 
   @override
-  String get worker_dateUnknown => 'Unknown date';
-
-  @override
-  String get worker_completedStatus => 'Completed';
-
-  @override
-  String get worker_revenueLabel => 'Revenue';
-
-  @override
-  String get worker_clientRating => 'Client rating:';
-
-  @override
-  String get worker_returnToDashboard => 'Return to dashboard';
-
-  @override
   String get worker_photoSelectionError => 'Error selecting photo';
 
   @override
   String get worker_notifications => 'Notifications';
-
-  @override
-  String get worker_tipsReceived => 'Tips received';
 
   @override
   String get admin_userManagement => 'User management';
@@ -3769,12 +3559,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verify_renewBtn => 'Renew my verification';
 
   @override
-  String get worker_revenue => 'Revenue';
-
-  @override
-  String get worker_myRevenue => 'My revenue';
-
-  @override
   String resDetail_errorPrefix(String message) {
     return 'Error: $message';
   }
@@ -4135,12 +3919,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get legal_appUsageRules => 'App usage rules';
 
   @override
-  String get worker_photoSentSuccess => 'Photo sent successfully!';
-
-  @override
-  String get worker_positionConfirmed => 'Position confirmed!';
-
-  @override
   String get worker_coordinatesUnavailable => 'Coordinates unavailable';
 
   @override
@@ -4150,46 +3928,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get worker_userNotAuth => 'Error: user not authenticated';
 
   @override
-  String get worker_iArrived => 'I have arrived';
-
-  @override
-  String get worker_startJob => 'Start';
-
-  @override
   String get worker_openGps => 'Open GPS';
-
-  @override
-  String get worker_finishJob => 'Finish the job';
-
-  @override
-  String get worker_inFavorOfComplainant => 'In favor of complainant';
-
-  @override
-  String get worker_inFavorOfDefendant => 'In favor of defendant';
-
-  @override
-  String get worker_fullRefund => 'Full refund';
-
-  @override
-  String get worker_partialRefund => 'Partial refund';
-
-  @override
-  String get worker_noAction => 'No action';
-
-  @override
-  String get worker_mutualAgreement => 'Mutual agreement';
-
-  @override
-  String get worker_warningAction => 'Warning';
-
-  @override
-  String get worker_permanentBan => 'Permanent ban';
-
-  @override
-  String get worker_selectDecision => 'Select a decision';
-
-  @override
-  String get worker_disputeResolvedSuccess => 'Dispute resolved successfully';
 
   @override
   String get summary_spot => 'Spot';
@@ -4587,62 +4326,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get worker_accountAlreadyConfigured =>
-      'Your account is already configured!';
-
-  @override
-  String get worker_accountConfigured => 'Account configured';
-
-  @override
-  String get worker_accountDeleted => 'Account deleted';
-
-  @override
-  String worker_accountsConfiguredCount(int count) {
-    return '$count account(s) configured';
-  }
-
-  @override
-  String get worker_accountSetAsPrimary => 'Account set as primary';
-
-  @override
-  String get worker_accountVerified => 'Account verified';
-
-  @override
-  String get worker_actions => 'Actions';
-
-  @override
-  String get worker_actionSuccess => 'Action successful';
-
-  @override
-  String get worker_activeJob => 'Active job';
-
-  @override
-  String get worker_addAccount => 'Add an account';
-
-  @override
-  String get worker_addBankAccountToReceive =>
-      'Add a bank account to receive your earnings';
-
-  @override
   String get worker_additionalDetailsOptional =>
       'Additional details (optional)';
-
-  @override
-  String worker_arrivedConfirmedMessage(int distanceMeters) {
-    return 'You are ${distanceMeters}m from the vehicle.\n\nYou can now start the work.';
-  }
-
-  @override
-  String get worker_automaticTransfers => 'Automatic transfers';
-
-  @override
-  String get worker_balance => 'Balance';
-
-  @override
-  String get worker_bankAccounts => 'Bank accounts';
-
-  @override
-  String get worker_basicInfo => 'Basic information';
 
   @override
   String get worker_cameraPermissionError =>
@@ -4708,78 +4393,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Unable to determine your position. Enable location and try again.';
 
   @override
-  String get worker_cannotOpenStripeLink => 'Unable to open the Stripe link';
-
-  @override
-  String get worker_canNowFinish => 'You can now finish';
-
-  @override
-  String get worker_configureNow => 'Configure now';
-
-  @override
-  String get worker_configurePayments => 'Configure your payments';
-
-  @override
   String get worker_confirmCancellation => 'Confirm cancellation';
 
   @override
-  String get worker_confirmCompleteJob =>
-      'Are you sure you want to mark this job as completed?';
-
-  @override
-  String get worker_connectingToStripe => 'Connecting to Stripe...';
-
-  @override
-  String get worker_continueSetup => 'Continue setup';
-
-  @override
-  String worker_deleteAccountConfirm(String last4) {
-    return 'Are you sure you want to delete the account ending in $last4?';
-  }
-
-  @override
-  String get worker_deleteAccountQuestion => 'Delete this account?';
-
-  @override
-  String get worker_depositsIn23Days => 'Deposits within 2-3 business days';
-
-  @override
-  String get worker_documentsRequired => 'Required documents';
-
-  @override
-  String get worker_documentsSubmitted => 'Documents submitted';
-
-  @override
-  String get worker_documentsVerified => 'Documents verified';
-
-  @override
-  String get worker_enlarge => 'Enlarge';
-
-  @override
   String get worker_enRoute => 'En route';
-
-  @override
-  String get worker_fundsDepositedInfo =>
-      'Funds are deposited to your bank account within 2-3 business days.';
-
-  @override
-  String get worker_goodJob => 'Good job!';
-
-  @override
-  String get worker_headToClient => 'Head to the client';
-
-  @override
-  String get worker_howItWorks => 'How it works';
-
-  @override
-  String get worker_identityVerificationInfo =>
-      'To receive your payments, Stripe must verify your identity. Prepare the following documents:';
-
-  @override
-  String get worker_jobCompletedSuccess => 'Job completed successfully!';
-
-  @override
-  String get worker_jobStarted => 'Job started!';
 
   @override
   String get worker_locationError => 'Location error';
@@ -4792,177 +4409,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Location permission permanently denied. Enable it in settings.';
 
   @override
-  String get worker_manageBankAccounts => 'Manage my bank accounts';
-
-  @override
-  String get worker_noBankAccount => 'No bank account';
-
-  @override
-  String get worker_noBankAccountWarning =>
-      'No bank account configured. Add one to receive your earnings.';
-
-  @override
   String get worker_noGpsConfirmArrival =>
       'This job has no GPS coordinates recorded.\n\nDo you confirm you have arrived at the indicated location?';
 
   @override
-  String get worker_notChargedForJob => 'You will not be charged for this job.';
-
-  @override
-  String get worker_paymentDistribution => 'Payment distribution';
-
-  @override
-  String worker_paymentExample(String amount) {
-    return 'Example: For a \$50 job, you receive $amount\$';
-  }
-
-  @override
   String get worker_payments => 'Payments';
-
-  @override
-  String get worker_paymentsActive => 'Payments active';
-
-  @override
-  String get worker_payoutsActive => 'Payouts active';
-
-  @override
-  String get worker_photoId => 'Photo ID';
-
-  @override
-  String get worker_photoIdDesc => 'Driver\'s license, passport or ID card';
-
-  @override
-  String get worker_photoOfCompletedWork => 'Photo of completed work';
-
-  @override
-  String get worker_photoRequired => 'Photo required';
-
-  @override
-  String get worker_photoRequirements => 'Photo requirements';
 
   @override
   String get worker_photoUploadError =>
       'Unable to upload the photo. Check your connection.';
 
   @override
-  String get worker_platformCommission => 'Platform commission';
-
-  @override
-  String get worker_poweredByStripe => 'Powered by Stripe';
-
-  @override
-  String get worker_poweredByStripeLeader =>
-      'Powered by Stripe, the world leader in payments';
-
-  @override
-  String get worker_pressEnRouteToStart => 'Press \"En route\" to start';
-
-  @override
-  String get worker_primary => 'Primary';
-
-  @override
-  String get worker_primaryAccount => 'Primary account';
-
-  @override
-  String get worker_primaryAccountInfo =>
-      'Your earnings will be deposited to the account marked as primary.';
-
-  @override
-  String get worker_proofOfAddress => 'Proof of address';
-
-  @override
-  String get worker_proofOfAddressDesc =>
-      'Recent utility bill or bank statement';
-
-  @override
-  String get worker_readyToReceive => 'Ready to receive payments';
-
-  @override
-  String get worker_receiveEarningsDirectly => 'Receive your earnings directly';
-
-  @override
-  String get worker_reqColorPhoto => 'Color photo (JPG or PNG format)';
-
-  @override
-  String get worker_reqNameDobVisible => 'Name and date of birth visible';
-
-  @override
-  String get worker_reqNotExpired => 'Document not expired';
-
-  @override
-  String get worker_reqOriginalDoc => 'Original document, not a photocopy';
-
-  @override
   String get worker_retakePhoto => 'Retake';
 
   @override
-  String get worker_securePayments => 'Secure payments';
-
-  @override
-  String get worker_sendDocumentsToActivate =>
-      'Send your identity documents to activate payouts.';
-
-  @override
-  String get worker_sending => 'Sending...';
-
-  @override
-  String get worker_sendMyDocuments => 'Send my documents';
-
-  @override
-  String get worker_setAsPrimary => 'Set as primary';
-
-  @override
-  String get worker_statusUnknown => 'Unknown';
-
-  @override
-  String get worker_statusUpdatedEnRoute => 'Status updated: En route';
-
-  @override
-  String get worker_step1ClientPays => 'The client pays';
-
-  @override
-  String get worker_step1Subtitle => 'Payment is processed by Stripe';
-
-  @override
-  String get worker_step1SubtitleShort => 'Payment processed by Stripe';
-
-  @override
-  String get worker_step2AutoDistribution => 'Automatic distribution';
-
-  @override
-  String get worker_step2Distribution => 'Distribution';
-
-  @override
-  String get worker_step2Subtitle => 'Your share is calculated instantly';
-
-  @override
-  String get worker_step2SubtitleShort => 'Your share is calculated';
-
-  @override
-  String get worker_step3Deposit => 'Deposit';
-
-  @override
-  String get worker_step3DepositToAccount => 'Deposit to your account';
-
-  @override
-  String get worker_step3Subtitle => 'Within 2-3 business days';
-
-  @override
-  String worker_stripeResponse(String response) {
-    return 'Stripe response: $response';
-  }
-
-  @override
-  String get worker_stripeVerifying => 'Stripe is verifying your information';
-
-  @override
   String get worker_takePhoto => 'Take a photo';
-
-  @override
-  String get worker_takePhotoBeforeFinish => 'Take a photo before finishing';
-
-  @override
-  String get worker_timeElapsed => 'Time elapsed';
 
   @override
   String get worker_tooFar => 'Too far';
@@ -4973,26 +4434,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get worker_verificationInProgress => 'Verification in progress';
-
-  @override
-  String get worker_verificationTimeInfo =>
-      'Verification may take a few minutes to 24 hours.';
-
-  @override
   String get worker_verifyingPosition => 'Verifying your position...';
-
-  @override
-  String get worker_viewStatusOnStripe => 'View status on Stripe';
-
-  @override
-  String get worker_viewStripeDashboard => 'View my Stripe dashboard';
-
-  @override
-  String get worker_workInProgress => 'Work in progress...';
-
-  @override
-  String get worker_youReceive => 'You receive';
 
   @override
   String get verification_addPhoto => 'Add a photo';
@@ -5352,37 +4794,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get worker_headerAvailable => 'Available';
-
-  @override
-  String get worker_headerOffline => 'Offline';
-
-  @override
-  String get worker_statsCompleted => 'Completed';
-
-  @override
-  String get worker_statsInProgress => 'In progress';
-
-  @override
-  String get worker_statsRevenue => 'Revenue';
-
-  @override
-  String get worker_statsRating => 'Rating';
-
-  @override
-  String get worker_statsToday => 'today';
-
-  @override
-  String get worker_youAreOnline => 'You are online';
-
-  @override
-  String get worker_receivingSnowRequests =>
-      'You are receiving snow removal requests';
-
-  @override
-  String get worker_activateToReceiveRequests => 'Activate to receive requests';
-
-  @override
   String worker_activeCount(int count) {
     return '$count active';
   }
@@ -5415,30 +4826,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get worker_statusCancelled => 'Cancelled';
-
-  @override
-  String get worker_serviceWindowScraping => 'Window scraping';
-
-  @override
-  String get worker_serviceDoorDeicing => 'Door de-icing';
-
-  @override
-  String get worker_serviceWheelClearance => 'Wheel clearance';
-
-  @override
-  String get worker_serviceRoofClearing => 'Roof clearing';
-
-  @override
-  String get worker_serviceSaltSpreading => 'Salt spreading';
-
-  @override
-  String get worker_serviceLightsCleaning => 'Lights cleaning';
-
-  @override
-  String get worker_servicePerimeterClearance => 'Perimeter clearance';
-
-  @override
-  String get worker_serviceExhaustCheck => 'Exhaust check';
 
   @override
   String get worker_serviceWindows => 'Windows';
@@ -5918,90 +5305,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get earnings_myEarnings => 'My earnings';
 
   @override
-  String get earnings_day => 'Day';
-
-  @override
-  String get earnings_week => 'Week';
-
-  @override
-  String get earnings_month => 'Month';
-
-  @override
   String get earnings_retry => 'Retry';
-
-  @override
-  String get earnings_today => 'Today';
-
-  @override
-  String get earnings_thisWeek => 'This week';
-
-  @override
-  String get earnings_thisMonth => 'This month';
-
-  @override
-  String get earnings_jobs => 'Jobs';
-
-  @override
-  String get earnings_tips => 'Tips';
-
-  @override
-  String get earnings_average => 'Average';
-
-  @override
-  String earnings_goalAmount(int amount) {
-    return 'Goal: $amount\$';
-  }
-
-  @override
-  String get earnings_goalReached => 'Goal reached!';
-
-  @override
-  String get earnings_completed => 'Completed';
-
-  @override
-  String get earnings_inProgress => 'In progress';
-
-  @override
-  String get earnings_assigned => 'Assigned';
-
-  @override
-  String get earnings_earnings => 'Earnings';
-
-  @override
-  String get earnings_tipsShort => 'Tips';
 
   @override
   String get earnings_jobHistory => 'Job history';
 
   @override
   String get earnings_viewAllJobs => 'View all your completed jobs';
-
-  @override
-  String get earnings_earningsPerDay => 'Earnings per day';
-
-  @override
-  String get earnings_dayMon => 'Mon';
-
-  @override
-  String get earnings_dayTue => 'Tue';
-
-  @override
-  String get earnings_dayWed => 'Wed';
-
-  @override
-  String get earnings_dayThu => 'Thu';
-
-  @override
-  String get earnings_dayFri => 'Fri';
-
-  @override
-  String get earnings_daySat => 'Sat';
-
-  @override
-  String get earnings_daySun => 'Sun';
-
-  @override
-  String get earnings_overallStats => 'Overall statistics';
 
   @override
   String get earnings_totalJobs => 'Total jobs';
@@ -6228,4 +5538,252 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get worker_verified => 'Verified';
+
+  @override
+  String get workerP_equipmentHelp =>
+      'You only get requests you have the equipment for.';
+
+  @override
+  String get workerP_maxJobs => 'Jobs at the same time';
+
+  @override
+  String get workerP_maxJobsHelp =>
+      'Beyond this, you can\'t accept new requests.';
+
+  @override
+  String get workerP_newJobs => 'New requests near me';
+
+  @override
+  String get workerP_newJobsHelp =>
+      'When a paid request comes in within 25 km.';
+
+  @override
+  String get workerP_tips => 'Tips';
+
+  @override
+  String get workerP_tipsHelp => 'When a client leaves you a tip.';
+
+  @override
+  String get workerP_app => 'App';
+
+  @override
+  String get workerP_work => 'Work';
+
+  @override
+  String get activeJ_title => 'Job in progress';
+
+  @override
+  String get activeJ_stepAccepted => 'Accepted';
+
+  @override
+  String get activeJ_stepEnRoute => 'On the way';
+
+  @override
+  String get activeJ_stepOnSite => 'On site';
+
+  @override
+  String get activeJ_stepDone => 'Done';
+
+  @override
+  String activeJ_readyBy(String time) {
+    return 'Car ready by $time';
+  }
+
+  @override
+  String activeJ_clientLeaves(String time) {
+    return 'Client leaves at $time';
+  }
+
+  @override
+  String get activeJ_elapsed => 'Time elapsed';
+
+  @override
+  String get activeJ_where => 'Where';
+
+  @override
+  String activeJ_spot(String spot) {
+    return 'Spot $spot';
+  }
+
+  @override
+  String get activeJ_todo => 'To do';
+
+  @override
+  String get activeJ_basicClearing => 'Clear the car (roof, windows, lights)';
+
+  @override
+  String activeJ_snowDepth(int cm) {
+    return 'About $cm cm of snow';
+  }
+
+  @override
+  String get activeJ_client => 'Client';
+
+  @override
+  String get activeJ_vehicle => 'Vehicle';
+
+  @override
+  String get activeJ_goEnRoute => 'Head to the client';
+
+  @override
+  String get activeJ_arrivedStart => 'I\'ve arrived, start';
+
+  @override
+  String get activeJ_finish => 'Finish the job';
+
+  @override
+  String get activeJ_photoTitle => 'Photo of the cleared car';
+
+  @override
+  String get activeJ_photoHelp =>
+      'Required to finish: it proves the work was done.';
+
+  @override
+  String get activeJ_photoSending => 'Sending photo…';
+
+  @override
+  String get activeJ_photoSent => 'Photo sent';
+
+  @override
+  String get activeJ_confirmFinish =>
+      'The client will be told their car is ready.';
+
+  @override
+  String get activeJ_done => 'Job done';
+
+  @override
+  String get activeJ_cancelled => 'Reservation cancelled';
+
+  @override
+  String get activeJ_backHome => 'Back to home';
+
+  @override
+  String get worker_youEarn => 'You earn';
+
+  @override
+  String get earningsT_today => 'Today';
+
+  @override
+  String get earningsT_last7 => 'Last 7 days';
+
+  @override
+  String get earningsT_month => 'This month';
+
+  @override
+  String earningsT_jobs(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jobs',
+      one: '1 job',
+      zero: 'No jobs',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String earningsT_tipsIncluded(String amount) {
+    return 'including $amount in tips';
+  }
+
+  @override
+  String get earningsT_share =>
+      'Your share: 75% of each job\'s price, plus tips.';
+
+  @override
+  String earningsT_ongoing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jobs in progress',
+      one: '1 job in progress',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String earningsT_toDo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jobs to do',
+      one: '1 job to do',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get earningsT_perDay => 'Earnings per day';
+
+  @override
+  String get earningsT_allTime => 'Since you started';
+
+  @override
+  String get earningsT_noRating => 'No rating yet';
+
+  @override
+  String get historyW_completed => 'Completed';
+
+  @override
+  String get historyW_cancelled => 'Cancelled';
+
+  @override
+  String get historyW_cancelledLabel => 'Cancelled';
+
+  @override
+  String historyW_tip(String amount) {
+    return '+$amount tip';
+  }
+
+  @override
+  String get paymentsW_setupTitle => 'Set up your payments';
+
+  @override
+  String get paymentsW_setupText =>
+      'To receive your share after each job, open your payment account with Stripe: ID and bank account.';
+
+  @override
+  String get paymentsW_setupButton => 'Set up my payments';
+
+  @override
+  String get paymentsW_continueButton => 'Continue setup';
+
+  @override
+  String get paymentsW_pendingTitle => 'Verification in progress';
+
+  @override
+  String get paymentsW_pendingText =>
+      'Stripe is checking your information. If a document is missing, add it from your Stripe account.';
+
+  @override
+  String get paymentsW_activeTitle => 'Payments active';
+
+  @override
+  String get paymentsW_activeText =>
+      'Your share is sent to your Stripe account at the end of each job, then Stripe pays it out to your bank account.';
+
+  @override
+  String get paymentsW_openStripe => 'Open my Stripe account';
+
+  @override
+  String get paymentsW_available => 'Available';
+
+  @override
+  String paymentsW_pending(String amount) {
+    return 'Pending: $amount';
+  }
+
+  @override
+  String get paymentsW_transfers => 'Payments received';
+
+  @override
+  String get paymentsW_noTransfers =>
+      'Your payments will show up here after your first paid job.';
+
+  @override
+  String get paymentsW_reversed => 'Reversed';
+
+  @override
+  String get paymentsW_loadError =>
+      'Couldn\'t load your payments. Check your connection and try again.';
 }

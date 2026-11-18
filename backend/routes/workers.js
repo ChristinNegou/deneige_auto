@@ -404,13 +404,20 @@ router.get('/history', protect, authorize('snowWorker'), async (req, res) => {
 
         const total = await Reservation.countDocuments(query);
 
-        const reservations = await Reservation.find(query)
-            .populate('userId', 'firstName lastName phoneNumber')
-            .populate('vehicle', 'make model color licensePlate photoUrl')
-            .sort({ completedAt: -1 })
-            .skip((page - 1) * limit)
-            .limit(parseInt(limit))
-            .lean();
+        // Du plus recent au plus ancien, terminees et annulees melangees
+        // (une annulation n'a pas de date de fin)
+        const pageItems = await Reservation.aggregate([
+            { $match: { ...query, workerId: req.user._id } },
+            { $addFields: { _endedAt: { $ifNull: ['$completedAt', { $ifNull: ['$cancelledAt', '$updatedAt'] }] } } },
+            { $sort: { _endedAt: -1 } },
+            { $skip: (parseInt(page) - 1) * parseInt(limit) },
+            { $limit: parseInt(limit) },
+            { $project: { _endedAt: 0 } },
+        ]);
+        const reservations = await Reservation.populate(pageItems, [
+            { path: 'userId', select: 'firstName lastName phoneNumber' },
+            { path: 'vehicle', select: 'make model color licensePlate photoUrl' },
+        ]);
 
         res.json({
             success: true,
@@ -431,116 +438,76 @@ router.get('/history', protect, authorize('snowWorker'), async (req, res) => {
 
 // --- Statistiques et revenus ---
 
+// Fuseau des deneigeurs : les "jours" et les "semaines" sont ceux du Quebec
+const STATS_TIMEZONE = 'America/Toronto';
+
+/**
+ * Part du deneigeur pour un travail termine : le prix moins la commission,
+ * comme au moment du versement. Les pourboires sont comptes a part.
+ */
+const workerPayExpr = { $multiply: [{ $ifNull: ['$totalPrice', 0] }, WORKER_PERCENT] };
+
+/** Debut du jour (heure du Quebec) il y a `daysAgo` jours, en Date UTC. */
+const startOfLocalDay = (daysAgo = 0) => {
+    const local = new Date(new Date().toLocaleString('en-US', { timeZone: STATS_TIMEZONE }));
+    const offsetMs = new Date().getTime() - local.getTime();
+    local.setHours(0, 0, 0, 0);
+    local.setDate(local.getDate() - daysAgo);
+    return new Date(local.getTime() + offsetMs);
+};
+
+/** Travaux termines, part du deneigeur et pourboires depuis `since`. */
+const completedTotals = async (workerId, since) => {
+    const match = { workerId, status: 'completed' };
+    if (since) match.completedAt = { $gte: since };
+    const [row] = await Reservation.aggregate([
+        { $match: match },
+        {
+            $group: {
+                _id: null,
+                completed: { $sum: 1 },
+                earnings: { $sum: workerPayExpr },
+                tips: { $sum: { $ifNull: ['$tipAmount', 0] } },
+            },
+        },
+    ]);
+    const round = (n) => Math.round((n || 0) * 100) / 100;
+    return { completed: row?.completed || 0, earnings: round(row?.earnings), tips: round(row?.tips) };
+};
+
 /**
  * GET /api/workers/stats
- * Retourne les statistiques du déneigeur (aujourd'hui, semaine, mois, global).
- * Inclut les jobs complétés, revenus, pourboires et note moyenne.
+ * Gains du jour, de la semaine (depuis lundi), du mois et depuis le debut.
+ * "earnings" = part du deneigeur (prix moins commission), hors pourboires.
  */
 router.get('/stats', protect, authorize('snowWorker'), async (req, res) => {
     try {
-        const now = new Date();
-        const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay());
-        startOfWeek.setHours(0, 0, 0, 0);
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const workerId = req.user._id;
+        const startOfToday = startOfLocalDay(0);
+        const weekday = (new Date(new Date().toLocaleString('en-US', { timeZone: STATS_TIMEZONE })).getDay() + 6) % 7;
+        const startOfWeek = startOfLocalDay(weekday);
+        const startOfMonth = startOfLocalDay(
+            new Date(new Date().toLocaleString('en-US', { timeZone: STATS_TIMEZONE })).getDate() - 1,
+        );
 
-        // Get worker profile for all-time stats
-        const worker = await User.findById(req.user.id);
-
-        // Today's stats
-        const todayStats = await Reservation.aggregate([
-            {
-                $match: {
-                    workerId: req.user._id,
-                    completedAt: { $gte: startOfToday },
-                    status: 'completed',
-                },
-            },
-            {
-                $group: {
-                    _id: null,
-                    completed: { $sum: 1 },
-                    earnings: { $sum: '$totalPrice' },
-                    tips: { $sum: { $ifNull: ['$tipAmount', 0] } },
-                },
-            },
-        ]);
-
-        // Count in-progress jobs
-        const inProgressCount = await Reservation.countDocuments({
-            workerId: req.user.id,
-            status: 'inProgress',
-        });
-
-        // Count assigned jobs (pending acceptance)
-        const assignedCount = await Reservation.countDocuments({
-            workerId: req.user.id,
-            status: 'assigned',
-        });
-
-        // Week stats
-        const weekStats = await Reservation.aggregate([
-            {
-                $match: {
-                    workerId: req.user._id,
-                    completedAt: { $gte: startOfWeek },
-                    status: 'completed',
-                },
-            },
-            {
-                $group: {
-                    _id: null,
-                    completed: { $sum: 1 },
-                    earnings: { $sum: '$totalPrice' },
-                    tips: { $sum: { $ifNull: ['$tipAmount', 0] } },
-                },
-            },
-        ]);
-
-        // Month stats
-        const monthStats = await Reservation.aggregate([
-            {
-                $match: {
-                    workerId: req.user._id,
-                    completedAt: { $gte: startOfMonth },
-                    status: 'completed',
-                },
-            },
-            {
-                $group: {
-                    _id: null,
-                    completed: { $sum: 1 },
-                    earnings: { $sum: '$totalPrice' },
-                    tips: { $sum: { $ifNull: ['$tipAmount', 0] } },
-                },
-            },
+        const [worker, today, week, month, allTime, inProgressCount, assignedCount] = await Promise.all([
+            User.findById(req.user.id).select('workerProfile.averageRating workerProfile.totalRatingsCount workerProfile.isAvailable'),
+            completedTotals(workerId, startOfToday),
+            completedTotals(workerId, startOfWeek),
+            completedTotals(workerId, startOfMonth),
+            completedTotals(workerId, null),
+            Reservation.countDocuments({ workerId, status: { $in: ['enRoute', 'inProgress'] } }),
+            Reservation.countDocuments({ workerId, status: 'assigned' }),
         ]);
 
         res.json({
             success: true,
             data: {
-                today: {
-                    completed: todayStats[0]?.completed || 0,
-                    inProgress: inProgressCount,
-                    assigned: assignedCount,
-                    earnings: todayStats[0]?.earnings || 0,
-                    tips: todayStats[0]?.tips || 0,
-                },
-                week: {
-                    completed: weekStats[0]?.completed || 0,
-                    earnings: weekStats[0]?.earnings || 0,
-                    tips: weekStats[0]?.tips || 0,
-                },
-                month: {
-                    completed: monthStats[0]?.completed || 0,
-                    earnings: monthStats[0]?.earnings || 0,
-                    tips: monthStats[0]?.tips || 0,
-                },
+                today: { ...today, inProgress: inProgressCount, assigned: assignedCount },
+                week,
+                month,
                 allTime: {
-                    completed: worker.workerProfile?.totalJobsCompleted || 0,
-                    earnings: worker.workerProfile?.totalEarnings || 0,
-                    tips: worker.workerProfile?.totalTipsReceived || 0,
+                    ...allTime,
                     averageRating: worker.workerProfile?.averageRating || 0,
                     totalRatings: worker.workerProfile?.totalRatingsCount || 0,
                 },
@@ -558,75 +525,48 @@ router.get('/stats', protect, authorize('snowWorker'), async (req, res) => {
 
 /**
  * GET /api/workers/earnings
- * Retourne le détail des revenus avec ventilation quotidienne.
- * @param {string} [req.query.period='week'] - Période (day, week, month, year)
+ * Gains jour par jour (heure du Quebec). "week" = les 7 derniers jours,
+ * aujourd'hui compris ; "month" = depuis le 1er ; "year" = depuis le 1er janvier.
  */
 router.get('/earnings', protect, authorize('snowWorker'), async (req, res) => {
     try {
         const { period = 'week' } = req.query;
+        const localNow = new Date(new Date().toLocaleString('en-US', { timeZone: STATS_TIMEZONE }));
 
-        const now = new Date();
-        let startDate;
+        const daysBack = {
+            day: 0,
+            week: 6,
+            month: localNow.getDate() - 1,
+            year: Math.floor((localNow - new Date(localNow.getFullYear(), 0, 1)) / 86400000),
+        }[period] ?? 6;
+        const startDate = startOfLocalDay(daysBack);
 
-        switch (period) {
-            case 'day':
-                startDate = new Date(now.setHours(0, 0, 0, 0));
-                break;
-            case 'week':
-                startDate = new Date(now);
-                startDate.setDate(now.getDate() - 7);
-                break;
-            case 'month':
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-                break;
-            case 'year':
-                startDate = new Date(now.getFullYear(), 0, 1);
-                break;
-            default:
-                startDate = new Date(now);
-                startDate.setDate(now.getDate() - 7);
-        }
-
-        // Daily breakdown
-        const dailyEarnings = await Reservation.aggregate([
-            {
-                $match: {
-                    workerId: req.user._id,
-                    completedAt: { $gte: startDate },
-                    status: 'completed',
-                },
-            },
-            {
-                $group: {
-                    _id: {
-                        $dateToString: { format: '%Y-%m-%d', date: '$completedAt' },
+        const match = { workerId: req.user._id, completedAt: { $gte: startDate }, status: 'completed' };
+        const [dailyEarnings, totalSummary] = await Promise.all([
+            Reservation.aggregate([
+                { $match: match },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt', timezone: STATS_TIMEZONE } },
+                        jobsCount: { $sum: 1 },
+                        earnings: { $sum: workerPayExpr },
+                        tips: { $sum: { $ifNull: ['$tipAmount', 0] } },
                     },
-                    jobsCount: { $sum: 1 },
-                    earnings: { $sum: '$totalPrice' },
-                    tips: { $sum: { $ifNull: ['$tipAmount', 0] } },
                 },
-            },
-            { $sort: { _id: 1 } },
-        ]);
-
-        // Total summary
-        const totalSummary = await Reservation.aggregate([
-            {
-                $match: {
-                    workerId: req.user._id,
-                    completedAt: { $gte: startDate },
-                    status: 'completed',
+                { $sort: { _id: 1 } },
+            ]),
+            Reservation.aggregate([
+                { $match: match },
+                {
+                    $group: {
+                        _id: null,
+                        totalJobs: { $sum: 1 },
+                        totalEarnings: { $sum: workerPayExpr },
+                        totalTips: { $sum: { $ifNull: ['$tipAmount', 0] } },
+                        avgJobPrice: { $avg: workerPayExpr },
+                    },
                 },
-            },
-            {
-                $group: {
-                    _id: null,
-                    totalJobs: { $sum: 1 },
-                    totalEarnings: { $sum: '$totalPrice' },
-                    totalTips: { $sum: { $ifNull: ['$tipAmount', 0] } },
-                    avgJobPrice: { $avg: '$totalPrice' },
-                },
-            },
+            ]),
         ]);
 
         res.json({

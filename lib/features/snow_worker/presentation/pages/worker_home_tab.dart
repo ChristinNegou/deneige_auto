@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/money.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../verification/presentation/bloc/verification_bloc.dart';
@@ -146,7 +147,6 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 ),
               ],
             ),
-            backgroundColor: AppTheme.success,
             duration: const Duration(seconds: 4),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -209,6 +209,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
       setState(() {
         _currentPosition = position;
       });
+      _reportPosition(position);
 
       _loadData();
     } catch (e) {
@@ -236,7 +237,47 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
     context.read<WorkerStatsBloc>().add(const LoadStats());
   }
 
+  /// Le serveur previent les deneigeurs proches d'une nouvelle demande : il
+  /// doit connaitre leur position, mise a jour a chaque rafraichissement.
+  void _reportPosition(Position position) {
+    context.read<WorkerAvailabilityBloc>().add(UpdateLocation(
+          latitude: position.latitude,
+          longitude: position.longitude,
+        ));
+  }
+
+  bool get _isOnline {
+    final state = context.read<WorkerAvailabilityBloc>().state;
+    return state is WorkerAvailabilityLoaded && state.isAvailable;
+  }
+
+  Future<void> _refreshPosition() async {
+    try {
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return;
+      }
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 8),
+        ),
+      );
+      final isEmulatorLocation =
+          (position.latitude - 37.4219983).abs() < 0.01 &&
+              (position.longitude - (-122.084)).abs() < 0.01;
+      if (isEmulatorLocation || !mounted) return;
+      _currentPosition = position;
+      _reportPosition(position);
+    } catch (_) {
+      // Pas de position : on garde la derniere connue
+    }
+  }
+
   Future<void> _onRefresh() async {
+    if (_isOnline) await _refreshPosition();
+    if (!mounted) return;
     final lat = _currentPosition?.latitude ?? 46.3432;
     final lng = _currentPosition?.longitude ?? -72.5476;
 
@@ -256,6 +297,9 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
         listener: (context, state) {
           // En ligne / hors ligne : recharger les travaux pour refleter le statut
           if (state is WorkerAvailabilityLoaded && !state.isUpdating) {
+            if (_wasAvailable == false && state.isAvailable) {
+              _refreshPosition();
+            }
             if (_wasAvailable != null && _wasAvailable != state.isAvailable) {
               context.read<WorkerJobsBloc>().add(LoadAvailableJobs(
                     latitude: _currentPosition?.latitude ?? 46.3432,
@@ -275,7 +319,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, authState) {
             if (authState is! AuthAuthenticated) {
-              return const Center(
+              return Center(
                 child: CircularProgressIndicator(color: AppTheme.primary),
               );
             }
@@ -341,7 +385,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
               return Container(
                 width: 48,
                 height: 48,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppTheme.primary,
                   shape: BoxShape.circle,
                 ),
@@ -353,7 +397,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                           fit: BoxFit.cover,
                           width: 52,
                           height: 52,
-                          placeholder: (context, url) => const Center(
+                          placeholder: (context, url) => Center(
                             child: SizedBox(
                               width: 20,
                               height: 20,
@@ -368,7 +412,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                               userName.isNotEmpty
                                   ? userName[0].toUpperCase()
                                   : 'D',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w800,
                                 color: AppTheme.onPrimary,
@@ -381,7 +425,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                             userName.isNotEmpty
                                 ? userName[0].toUpperCase()
                                 : 'D',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 19,
                               fontWeight: FontWeight.w800,
                               color: AppTheme.onPrimary,
@@ -400,36 +444,6 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 Text(
                   l10n.worker_greetingName(userName.split(' ').first),
                   style: AppTheme.headlineMedium,
-                ),
-                const SizedBox(height: 2),
-                BlocBuilder<WorkerAvailabilityBloc, WorkerAvailabilityState>(
-                  builder: (context, state) {
-                    bool isAvailable = false;
-                    if (state is WorkerAvailabilityLoaded) {
-                      isAvailable = state.isAvailable;
-                    }
-                    return Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: isAvailable
-                                ? AppTheme.success
-                                : AppTheme.textTertiary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          isAvailable
-                              ? l10n.worker_headerAvailable
-                              : l10n.worker_headerOffline,
-                          style: AppTheme.bodySmall,
-                        ),
-                      ],
-                    );
-                  },
                 ),
               ],
             ),
@@ -450,7 +464,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 shape: BoxShape.circle,
                 border: Border.all(color: AppTheme.border),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.notifications_none_rounded,
                 color: AppTheme.textPrimary,
                 size: 22,
@@ -484,7 +498,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 const SizedBox(width: 6),
                 Text(
                   '${state.weather!.temperature.round()}°',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.textPrimary,
@@ -812,7 +826,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
 
         if (state is WorkerStatsLoaded) {
           completed = state.stats.today.completed;
-          earnings = state.stats.today.earnings;
+          earnings = state.stats.today.earnings + state.stats.today.tips;
           rating = state.stats.allTime.averageRating;
         }
 
@@ -830,7 +844,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 const VerticalDivider(width: 1),
                 Expanded(
                   child: _buildMiniStatCard(
-                    value: '${earnings.toStringAsFixed(0)} \$',
+                    value: formatMoney(context, earnings, decimals: 0),
                     label: l10n.worker_todayLabel,
                   ),
                 ),
@@ -867,7 +881,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
             ],
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 20,
                 letterSpacing: -0.4,
@@ -1119,8 +1133,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
       ),
       child: Row(
         children: [
-          const Icon(Icons.handyman_outlined,
-              color: AppTheme.warning, size: 22),
+          Icon(Icons.handyman_outlined, color: AppTheme.warning, size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -1246,7 +1259,7 @@ class _WorkerHomeTabState extends State<WorkerHomeTab>
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.lightbulb_outline_rounded,
                       color: AppTheme.textSecondary,
                       size: 18,

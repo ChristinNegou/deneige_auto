@@ -82,7 +82,7 @@ class _ContactButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMD),
         side: filled
             ? BorderSide.none
-            : const BorderSide(color: AppTheme.border, width: 1.5),
+            : BorderSide(color: AppTheme.border, width: 1.5),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusMD),

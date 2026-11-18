@@ -28,10 +28,6 @@ import '../../features/ai_chat/presentation/bloc/ai_chat_bloc.dart';
 import '../../features/snow_worker/presentation/pages/worker_job_details_page.dart';
 import '../../features/snow_worker/presentation/pages/active_job_page.dart';
 import '../../features/snow_worker/presentation/pages/worker_history_page.dart';
-import '../../features/snow_worker/presentation/pages/worker_earnings_page.dart';
-import '../../features/snow_worker/presentation/pages/worker_settings_page.dart';
-import '../../features/snow_worker/presentation/pages/worker_payment_setup_page.dart';
-import '../../features/snow_worker/presentation/pages/worker_bank_accounts_page.dart';
 import '../../features/snow_worker/domain/entities/worker_job.dart';
 import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../../features/subscription/presentation/page/subscription_page.dart';
@@ -67,6 +63,7 @@ import '../../features/disputes/presentation/pages/create_dispute_page.dart';
 import '../../features/disputes/presentation/pages/respond_dispute_page.dart';
 import '../../features/disputes/presentation/pages/add_evidence_page.dart';
 import '../../features/disputes/presentation/pages/report_no_show_page.dart';
+import '../theme/app_theme.dart';
 
 /// Classe qui gère la génération et la navigation des routes
 class AppRouter {
@@ -327,30 +324,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case AppRoutes.workerEarnings:
-        return MaterialPageRoute(
-          builder: (_) => const WorkerEarningsPage(),
-          settings: settings,
-        );
-
-      case AppRoutes.workerSettings:
-        return MaterialPageRoute(
-          builder: (_) => const WorkerSettingsPage(),
-          settings: settings,
-        );
-
-      case AppRoutes.workerPaymentSetup:
-        return MaterialPageRoute(
-          builder: (_) => const WorkerPaymentSetupPage(),
-          settings: settings,
-        );
-
-      case AppRoutes.workerBankAccounts:
-        return MaterialPageRoute(
-          builder: (_) => const WorkerBankAccountsPage(),
-          settings: settings,
-        );
-
       case AppRoutes.workerHelpSupport:
         return MaterialPageRoute(
           builder: (_) => const WorkerHelpSupportPage(),
@@ -527,16 +500,16 @@ class AppRouter {
           builder: (context) => Scaffold(
             appBar: AppBar(
               title: const Text('Erreur'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppTheme.error,
             ),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.error_outline,
                     size: 64,
-                    color: Colors.red,
+                    color: AppTheme.error,
                   ),
                   const SizedBox(height: 16),
                   Text(

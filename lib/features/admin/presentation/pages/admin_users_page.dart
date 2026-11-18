@@ -195,8 +195,7 @@ class _AdminUsersPageState extends State<AdminUsersPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.people_outline,
-                size: 64, color: AppTheme.textTertiary),
+            Icon(Icons.people_outline, size: 64, color: AppTheme.textTertiary),
             const SizedBox(height: 16),
             Text(l10n.admin_noUsers),
           ],

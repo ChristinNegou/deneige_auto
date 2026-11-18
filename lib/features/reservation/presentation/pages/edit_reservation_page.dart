@@ -101,11 +101,11 @@ class _EditReservationViewState extends State<EditReservationView> {
                     Container(
                       width: 64,
                       height: 64,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppTheme.surfaceContainer,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.lock_clock_outlined,
                         size: 30,
                         color: AppTheme.textSecondary,
@@ -152,7 +152,7 @@ class _EditReservationViewState extends State<EditReservationView> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline_rounded,
+                      Icon(Icons.info_outline_rounded,
                           color: AppTheme.info, size: 20),
                       const SizedBox(width: 10),
                       Expanded(
@@ -182,7 +182,7 @@ class _EditReservationViewState extends State<EditReservationView> {
           ),
           bottomNavigationBar: Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppTheme.surface,
               border: Border(top: BorderSide(color: AppTheme.divider)),
             ),
@@ -462,7 +462,7 @@ class _EditReservationViewState extends State<EditReservationView> {
               const SizedBox(height: 4),
               Text(
                 '${paid.toStringAsFixed(2)} \$',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.8,
@@ -478,7 +478,7 @@ class _EditReservationViewState extends State<EditReservationView> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.info_outline_rounded,
+              Icon(Icons.info_outline_rounded,
                   size: 18, color: AppTheme.textPrimary),
               const SizedBox(width: 8),
               Expanded(
@@ -509,7 +509,7 @@ class _EditReservationViewState extends State<EditReservationView> {
             }
           : null,
       child: state.isLoading
-          ? const SizedBox(
+          ? SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(

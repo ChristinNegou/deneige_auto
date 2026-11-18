@@ -62,7 +62,7 @@ class ReservationSuccessScreen extends StatelessWidget {
                           borderRadius:
                               BorderRadius.circular(AppTheme.radiusLG),
                         ),
-                        child: const Icon(Icons.check_rounded,
+                        child: Icon(Icons.check_rounded,
                             color: AppTheme.onPrimary, size: 32),
                       ),
                       const SizedBox(height: 20),
@@ -163,7 +163,7 @@ class ReservationSuccessScreen extends StatelessWidget {
       child: Column(
         children: [
           for (var i = 0; i < rows.length; i++) ...[
-            if (i > 0) const Divider(height: 1, color: AppTheme.border),
+            if (i > 0) Divider(height: 1, color: AppTheme.border),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
@@ -180,7 +180,7 @@ class ReservationSuccessScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       rows[i].$2,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.textPrimary,
@@ -214,13 +214,13 @@ class ReservationSuccessScreen extends StatelessWidget {
             width: 24,
             height: 24,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppTheme.primaryLight,
               shape: BoxShape.circle,
             ),
             child: Text(
               '$number',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.primary,

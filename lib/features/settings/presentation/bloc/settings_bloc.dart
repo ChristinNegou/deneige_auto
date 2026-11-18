@@ -29,14 +29,6 @@ class UpdateSound extends SettingsEvent {
   List<Object?> get props => [enabled];
 }
 
-class UpdateDarkTheme extends SettingsEvent {
-  final bool enabled;
-  UpdateDarkTheme(this.enabled);
-
-  @override
-  List<Object?> get props => [enabled];
-}
-
 class DeleteAccountRequested extends SettingsEvent {
   final String password;
   DeleteAccountRequested(this.password);
@@ -110,7 +102,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<LoadSettings>(_onLoadSettings);
     on<UpdatePushNotifications>(_onUpdatePushNotifications);
     on<UpdateSound>(_onUpdateSound);
-    on<UpdateDarkTheme>(_onUpdateDarkTheme);
     on<DeleteAccountRequested>(_onDeleteAccountRequested);
     on<ClearSettingsMessages>(_onClearMessages);
   }
@@ -193,36 +184,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         successMessage: event.enabled
             ? 'settings_soundsEnabled'
             : 'settings_soundsDisabled',
-      )),
-    );
-  }
-
-  Future<void> _onUpdateDarkTheme(
-    UpdateDarkTheme event,
-    Emitter<SettingsState> emit,
-  ) async {
-    final newPreferences = state.preferences.copyWith(
-      darkThemeEnabled: event.enabled,
-    );
-
-    emit(state.copyWith(preferences: newPreferences, clearMessages: true));
-
-    final result = await updatePreferences(newPreferences);
-
-    result.fold(
-      (failure) {
-        emit(state.copyWith(
-          preferences: state.preferences.copyWith(
-            darkThemeEnabled: !event.enabled,
-          ),
-          errorMessage: failure.message,
-        ));
-      },
-      (updatedPreferences) => emit(state.copyWith(
-        preferences: updatedPreferences,
-        successMessage: event.enabled
-            ? 'settings_darkThemeEnabled'
-            : 'settings_lightThemeEnabled',
       )),
     );
   }

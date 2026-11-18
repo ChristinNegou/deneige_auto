@@ -63,10 +63,6 @@ class AppRoutes {
   static const String workerJobDetails = '/snow-worker/jobs/details';
   static const String workerActiveJob = '/snow-worker/active-job';
   static const String workerHistory = '/snow-worker/history';
-  static const String workerEarnings = '/snow-worker/earnings';
-  static const String workerSettings = '/snow-worker/settings';
-  static const String workerPaymentSetup = '/snow-worker/payment-setup';
-  static const String workerBankAccounts = '/snow-worker/bank-accounts';
   static const String workerHelpSupport = '/snow-worker/help-support';
   static const String identityVerification =
       '/snow-worker/identity-verification';

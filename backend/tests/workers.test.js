@@ -512,4 +512,49 @@ describe('Worker Routes', () => {
       expect(res.body.code).toBe('TOO_MANY_JOBS');
     });
   });
+
+  describe('Earnings shown to the worker', () => {
+    it('counts the worker share (75%) and tips separately', async () => {
+      const client = await createTestUser({ email: 'pay-client@example.com' });
+      const vehicle = await createTestVehicle(client._id);
+      await createTestReservation(client._id, vehicle._id, {
+        status: 'completed', paymentStatus: 'paid', workerId: testWorker._id,
+        totalPrice: 40, tipAmount: 5, completedAt: new Date(),
+      });
+
+      const res = await request(app)
+        .get('/api/workers/stats')
+        .set('Authorization', `Bearer ${workerToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.today).toMatchObject({ completed: 1, earnings: 30, tips: 5 });
+      expect(res.body.data.allTime).toMatchObject({ completed: 1, earnings: 30, tips: 5 });
+
+      const earnings = await request(app)
+        .get('/api/workers/earnings?period=week')
+        .set('Authorization', `Bearer ${workerToken}`);
+      expect(earnings.body.data.summary.totalEarnings).toBe(30);
+      expect(earnings.body.data.daily).toHaveLength(1);
+    });
+
+    it('lists completed and cancelled jobs newest first', async () => {
+      const client = await createTestUser({ email: 'hist-client@example.com' });
+      const vehicle = await createTestVehicle(client._id);
+      const hour = 60 * 60 * 1000;
+      const old = await createTestReservation(client._id, vehicle._id, {
+        status: 'completed', workerId: testWorker._id, completedAt: new Date(Date.now() - 3 * hour),
+      });
+      const cancelled = await createTestReservation(client._id, vehicle._id, {
+        status: 'cancelled', workerId: testWorker._id, cancelledAt: new Date(Date.now() - hour),
+      });
+
+      const res = await request(app)
+        .get('/api/workers/history')
+        .set('Authorization', `Bearer ${workerToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.map((r) => String(r._id))).toEqual([String(cancelled._id), String(old._id)]);
+      expect(res.body.data[0].vehicle.make).toBe('Toyota');
+    });
+  });
 });

@@ -9,6 +9,7 @@ import '../../chat/presentation/bloc/chat_bloc.dart';
 import '../../chat/presentation/pages/chat_screen.dart';
 import '../data/models/notification_model.dart';
 import '../domain/entities/notification.dart';
+import '../../../core/theme/app_theme.dart';
 
 /// Service de navigation basé sur les notifications
 /// Implémente le deep-linking moderne comme les apps Uber, DoorDash, etc.
@@ -98,12 +99,12 @@ class NotificationNavigationService {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.1),
+                color: AppTheme.infoLight,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.support_agent,
-                color: Colors.blue,
+                color: AppTheme.info,
                 size: 24,
               ),
             ),
@@ -125,7 +126,7 @@ class NotificationNavigationService {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.1),
+                  color: AppTheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -142,14 +143,14 @@ class NotificationNavigationService {
                   Icon(
                     Icons.access_time,
                     size: 14,
-                    color: Colors.grey[600],
+                    color: AppTheme.textSecondary,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     notification.localizedTimeAgo(l10n),
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                 ],
@@ -182,7 +183,7 @@ class NotificationNavigationService {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.notifAction_userNotAuthenticated),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.error,
         ),
       );
       return;

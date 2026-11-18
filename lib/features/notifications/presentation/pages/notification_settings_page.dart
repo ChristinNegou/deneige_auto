@@ -99,7 +99,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               children: [
                 Text(
                   l10n.notifications_title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.onPrimary,
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
@@ -224,7 +224,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               if (_prefsService!.isQuietHoursEnabled) ...[
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.schedule_rounded,
+                  leading: Icon(Icons.schedule_rounded,
                       color: AppTheme.textSecondary),
                   title: Text(
                     l10n.notifSettings_hours,

@@ -213,10 +213,11 @@ class WorkerJobModel extends WorkerJob {
           JobLocationModel.fromJson(json['location'] as Map<String, dynamic>);
     }
 
-    // Parse tip
-    double? tipAmount;
-    if (json['tip'] != null && json['tip'] is Map) {
-      tipAmount = (json['tip']['amount'] as num?)?.toDouble();
+    // Pourboire : le serveur l'enregistre dans tipAmount (l'ancien champ
+    // tip.amount reste a 0)
+    double? tipAmount = (json['tipAmount'] as num?)?.toDouble();
+    if ((tipAmount == null || tipAmount == 0) && json['tip'] is Map) {
+      tipAmount = (json['tip']['amount'] as num?)?.toDouble() ?? tipAmount;
     }
 
     // Parse required equipment

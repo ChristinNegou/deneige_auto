@@ -10,6 +10,7 @@ import '../bloc/worker_availability_bloc.dart';
 import '../../domain/entities/worker_profile.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/services/locale_service.dart';
+import '../../../../core/services/theme_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -18,13 +19,11 @@ import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/bloc/auth_event.dart' show LogoutRequested;
 import '../../../disputes/presentation/pages/my_disputes_page.dart';
 
-/// Profile tab that uses local state management to avoid bloc-related rebuilds.
-/// The bloc is only used for:
-/// 1. Initial data loading (one-time)
-/// 2. Dispatching save events
-/// 3. Listening for errors
+/// Profil du deneigeur : equipement, limite de travaux, notifications,
+/// theme, langue et compte. Chaque changement est enregistre tout seul.
 ///
-/// The UI is built entirely from local state, not from bloc state.
+/// L'ecran garde son propre etat : le bloc ne sert qu'au chargement initial,
+/// a l'envoi des changements et aux erreurs.
 class WorkerProfileTab extends StatefulWidget {
   const WorkerProfileTab({super.key});
 
@@ -32,38 +31,35 @@ class WorkerProfileTab extends StatefulWidget {
   State<WorkerProfileTab> createState() => _WorkerProfileTabState();
 }
 
+/// Les cles d'equipement du serveur, dans l'ordre d'affichage.
+const _equipmentKeys = [
+  'shovel',
+  'brush',
+  'ice_scraper',
+  'salt_spreader',
+  'snow_blower',
+  'roof_broom',
+  'microfiber_cloth',
+  'deicer_spray',
+];
+
 class _WorkerProfileTabState extends State<WorkerProfileTab>
     with AutomaticKeepAliveClientMixin {
   final _imagePicker = ImagePicker();
   final LocaleService _localeService = sl<LocaleService>();
+  final ThemeService _themeService = sl<ThemeService>();
 
-  // Loading state - managed locally
   bool _isLoading = true;
   bool _hasError = false;
   String _errorMessage = '';
-
-  // Photo upload state
   bool _isUploadingPhoto = false;
-
-  // Profile data - managed locally, NOT from bloc
   String? _photoUrl;
 
-  // Equipment - using ValueNotifiers for granular updates
-  final _hasShovel = ValueNotifier<bool>(false);
-  final _hasBrush = ValueNotifier<bool>(false);
-  final _hasIceScraper = ValueNotifier<bool>(false);
-  final _hasSaltSpreader = ValueNotifier<bool>(false);
-  final _hasSnowBlower = ValueNotifier<bool>(false);
-  final _hasRoofBroom = ValueNotifier<bool>(false);
-  final _hasMicrofiberCloth = ValueNotifier<bool>(false);
-  final _hasDeicerSpray = ValueNotifier<bool>(false);
+  final Set<String> _equipment = {};
+  int _maxActiveJobs = 3;
+  bool _notifyNewJobs = true;
+  bool _notifyTips = true;
 
-  // Preferences - using ValueNotifiers
-  final _maxActiveJobs = ValueNotifier<int>(3);
-  final _notifyNewJobs = ValueNotifier<bool>(true);
-  final _notifyTips = ValueNotifier<bool>(true);
-
-  // Auto-save
   Timer? _debounceTimer;
   bool _isSaving = false;
 
@@ -73,98 +69,57 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   @override
   void initState() {
     super.initState();
-    // Load profile data once
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadProfile();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadProfile());
   }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
-    _hasShovel.dispose();
-    _hasBrush.dispose();
-    _hasIceScraper.dispose();
-    _hasSaltSpreader.dispose();
-    _hasSnowBlower.dispose();
-    _hasRoofBroom.dispose();
-    _hasMicrofiberCloth.dispose();
-    _hasDeicerSpray.dispose();
-    _maxActiveJobs.dispose();
-    _notifyNewJobs.dispose();
-    _notifyTips.dispose();
     super.dispose();
   }
 
   void _loadProfile() {
     final bloc = context.read<WorkerAvailabilityBloc>();
-
-    // Check if data is already loaded in bloc
     final currentState = bloc.state;
     if (currentState is WorkerAvailabilityLoaded &&
         currentState.profile != null) {
       _initializeFromProfile(currentState.profile!);
       setState(() => _isLoading = false);
     } else {
-      // Request data load
       bloc.add(const LoadAvailability());
     }
   }
 
   void _initializeFromProfile(WorkerProfile profile) {
     _photoUrl = profile.photoUrl;
-
-    final equipment = profile.equipmentList;
-    _hasShovel.value = equipment.contains('shovel');
-    _hasBrush.value = equipment.contains('brush');
-    _hasIceScraper.value = equipment.contains('ice_scraper');
-    _hasSaltSpreader.value = equipment.contains('salt_spreader');
-    _hasSnowBlower.value = equipment.contains('snow_blower');
-    _hasRoofBroom.value = equipment.contains('roof_broom');
-    _hasMicrofiberCloth.value = equipment.contains('microfiber_cloth');
-    _hasDeicerSpray.value = equipment.contains('deicer_spray');
-
-    _maxActiveJobs.value = profile.maxActiveJobs;
-    _notifyNewJobs.value = profile.notificationPreferences.newJobs;
-    _notifyTips.value = profile.notificationPreferences.tips;
+    _equipment
+      ..clear()
+      ..addAll(profile.equipmentList.where(_equipmentKeys.contains));
+    _maxActiveJobs = profile.maxActiveJobs;
+    _notifyNewJobs = profile.notificationPreferences.newJobs;
+    _notifyTips = profile.notificationPreferences.tips;
   }
 
-  List<String> _getEquipmentList() {
-    final equipment = <String>[];
-    if (_hasShovel.value) equipment.add('shovel');
-    if (_hasBrush.value) equipment.add('brush');
-    if (_hasIceScraper.value) equipment.add('ice_scraper');
-    if (_hasSaltSpreader.value) equipment.add('salt_spreader');
-    if (_hasSnowBlower.value) equipment.add('snow_blower');
-    if (_hasRoofBroom.value) equipment.add('roof_broom');
-    if (_hasMicrofiberCloth.value) equipment.add('microfiber_cloth');
-    if (_hasDeicerSpray.value) equipment.add('deicer_spray');
-    return equipment;
-  }
-
-  void _autoSave() {
+  /// Change une valeur puis enregistre apres une courte pause (plusieurs
+  /// touches rapides = un seul envoi).
+  void _update(VoidCallback change) {
+    setState(change);
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 800), () {
-      if (mounted && !_isSaving) {
-        _saveSettings();
-      }
+      if (mounted && !_isSaving) _saveSettings();
     });
   }
 
   void _saveSettings() {
-    if (_isSaving) return;
     _isSaving = true;
-
-    final notificationPrefs = WorkerNotificationPreferences(
-      newJobs: _notifyNewJobs.value,
-      tips: _notifyTips.value,
-    );
-
     context.read<WorkerAvailabilityBloc>().add(
           UpdateProfile(
-            equipmentList: _getEquipmentList(),
-            maxActiveJobs: _maxActiveJobs.value,
-            notificationPreferences: notificationPrefs,
+            equipmentList: _equipmentKeys.where(_equipment.contains).toList(),
+            maxActiveJobs: _maxActiveJobs,
+            notificationPreferences: WorkerNotificationPreferences(
+              newJobs: _notifyNewJobs,
+              tips: _notifyTips,
+            ),
           ),
         );
   }
@@ -174,26 +129,16 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     super.build(context);
 
     return SafeArea(
-      // BlocListener ONLY - no rebuilding from bloc state
       child: BlocListener<WorkerAvailabilityBloc, WorkerAvailabilityState>(
         listener: (context, state) {
-          // Handle initial load completion
           if (state is WorkerAvailabilityLoaded && _isLoading) {
-            if (state.profile != null) {
-              _initializeFromProfile(state.profile!);
-            }
+            if (state.profile != null) _initializeFromProfile(state.profile!);
             setState(() {
               _isLoading = false;
               _hasError = false;
             });
           }
 
-          // Handle loading state (only for initial load)
-          if (state is WorkerAvailabilityLoading && _isLoading) {
-            // Keep showing loading
-          }
-
-          // Handle errors
           if (state is WorkerAvailabilityError) {
             if (_isLoading) {
               setState(() {
@@ -202,7 +147,6 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 _isLoading = false;
               });
             } else {
-              // Error during save - just show snackbar
               _isSaving = false;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -213,14 +157,11 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
             }
           }
 
-          // Handle save completion
           if (state is WorkerProfileUpdated) {
             _isSaving = false;
-            // Update photo URL if it changed
             _photoUrl = state.profile.photoUrl;
           }
 
-          // Handle photo upload states
           if (state is WorkerPhotoUploading) {
             setState(() => _isUploadingPhoto = true);
           }
@@ -240,68 +181,200 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   Widget _buildContent() {
     final l10n = AppLocalizations.of(context)!;
 
-    // Show loading only for initial load
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppTheme.primary),
-      );
+      return Center(child: CircularProgressIndicator(color: AppTheme.primary));
     }
 
-    // Show error with retry
     if (_hasError) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.cloud_off_rounded,
-                size: 40, color: AppTheme.textTertiary),
-            const SizedBox(height: 16),
-            Text(
-              _errorMessage,
-              style: TextStyle(color: AppTheme.textSecondary),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(minimumSize: const Size(160, 44)),
-              onPressed: () {
-                setState(() {
-                  _isLoading = true;
-                  _hasError = false;
-                });
-                _loadProfile();
-              },
-              child: Text(l10n.common_retry),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.cloud_off_rounded,
+                  size: 40, color: AppTheme.textTertiary),
+              const SizedBox(height: 16),
+              Text(
+                _errorMessage,
+                style:
+                    AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                style:
+                    OutlinedButton.styleFrom(minimumSize: const Size(160, 44)),
+                onPressed: () {
+                  setState(() {
+                    _isLoading = true;
+                    _hasError = false;
+                  });
+                  _loadProfile();
+                },
+                child: Text(l10n.common_retry),
+              ),
+            ],
+          ),
         ),
       );
     }
 
-    // Main content - built from local state only
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       children: [
         _buildProfileHeader(),
+        const SizedBox(height: 28),
+        _SectionTitle(l10n.worker_myEquipment),
+        _Group(children: [_buildEquipment(l10n)]),
         const SizedBox(height: 24),
-        _buildSection(
-          title: l10n.worker_myEquipment,
-          child: _buildEquipmentGrid(),
-        ),
+        _SectionTitle(l10n.workerP_work),
+        _Group(children: [
+          _Row(
+            title: l10n.workerP_maxJobs,
+            subtitle: l10n.workerP_maxJobsHelp,
+            trailing: _Counter(
+              value: _maxActiveJobs,
+              min: 1,
+              max: 5,
+              onChanged: (v) => _update(() => _maxActiveJobs = v),
+            ),
+          ),
+        ]),
         const SizedBox(height: 24),
-        _buildSection(
-          title: l10n.worker_workPreferences,
-          child: _buildPreferencesContent(),
-        ),
+        _SectionTitle(l10n.worker_notifications),
+        _Group(children: [
+          _Row(
+            title: l10n.workerP_newJobs,
+            subtitle: l10n.workerP_newJobsHelp,
+            trailing: Switch(
+              value: _notifyNewJobs,
+              onChanged: (v) => _update(() => _notifyNewJobs = v),
+            ),
+            onTap: () => _update(() => _notifyNewJobs = !_notifyNewJobs),
+          ),
+          _Row(
+            title: l10n.workerP_tips,
+            subtitle: l10n.workerP_tipsHelp,
+            trailing: Switch(
+              value: _notifyTips,
+              onChanged: (v) => _update(() => _notifyTips = v),
+            ),
+            onTap: () => _update(() => _notifyTips = !_notifyTips),
+          ),
+        ]),
         const SizedBox(height: 24),
-        _buildSection(
-          title: l10n.worker_notifications,
-          child: _buildNotificationsContent(),
-        ),
+        _SectionTitle(l10n.workerP_app),
+        _Group(children: [
+          _Row(
+            icon: Icons.dark_mode_outlined,
+            title: l10n.settings_darkTheme,
+            trailing: Switch(
+              value: _themeService.isDark,
+              onChanged: _themeService.setDark,
+            ),
+            onTap: () => _themeService.setDark(!_themeService.isDark),
+          ),
+          _Row(
+            icon: Icons.language_rounded,
+            title: l10n.settings_language,
+            trailing: DropdownButton<String>(
+              value: _localeService.locale.languageCode,
+              underline: const SizedBox(),
+              dropdownColor: AppTheme.surfaceElevated,
+              isDense: true,
+              style: AppTheme.labelLarge,
+              items: [
+                DropdownMenuItem(
+                    value: 'fr', child: Text(l10n.settings_languageFrench)),
+                DropdownMenuItem(
+                    value: 'en', child: Text(l10n.settings_languageEnglish)),
+              ],
+              onChanged: (value) {
+                if (value != null) _localeService.setLocale(Locale(value));
+              },
+            ),
+          ),
+        ]),
         const SizedBox(height: 24),
-        _buildActionsList(),
-        const SizedBox(height: 24),
+        _SectionTitle(l10n.worker_account),
+        _Group(children: [
+          _Row(
+            icon: Icons.gavel_outlined,
+            title: l10n.profile_myDisputes,
+            trailing:
+                Icon(Icons.chevron_right_rounded, color: AppTheme.textTertiary),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MyDisputesPage()),
+            ),
+          ),
+          _Row(
+            icon: Icons.help_outline_rounded,
+            title: l10n.worker_helpSupport,
+            trailing:
+                Icon(Icons.chevron_right_rounded, color: AppTheme.textTertiary),
+            onTap: () =>
+                Navigator.pushNamed(context, AppRoutes.workerHelpSupport),
+          ),
+          _Row(
+            icon: Icons.logout_rounded,
+            title: l10n.common_logout,
+            destructive: true,
+            onTap: () => _showLogoutDialog(context),
+          ),
+        ]),
       ],
+    );
+  }
+
+  Widget _buildEquipment(AppLocalizations l10n) {
+    final labels = {
+      'shovel': l10n.worker_equipShovel,
+      'brush': l10n.worker_equipBroom,
+      'ice_scraper': l10n.worker_equipScraper,
+      'salt_spreader': l10n.worker_equipSaltSpreader,
+      'snow_blower': l10n.worker_equipSnowBlower,
+      'roof_broom': l10n.worker_equipRoofBroom,
+      'microfiber_cloth': l10n.worker_equipCloth,
+      'deicer_spray': l10n.worker_equipDeicer,
+    };
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.workerP_equipmentHelp, style: AppTheme.bodySmall),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final key in _equipmentKeys)
+                FilterChip(
+                  label: Text(labels[key]!),
+                  selected: _equipment.contains(key),
+                  showCheckmark: true,
+                  checkmarkColor: AppTheme.onPrimary,
+                  selectedColor: AppTheme.primary,
+                  backgroundColor: AppTheme.surface,
+                  labelStyle: AppTheme.labelMedium.copyWith(
+                    color: _equipment.contains(key)
+                        ? AppTheme.onPrimary
+                        : AppTheme.textPrimary,
+                  ),
+                  side: BorderSide(
+                    color: _equipment.contains(key)
+                        ? AppTheme.primary
+                        : AppTheme.border,
+                  ),
+                  onSelected: (selected) => _update(() =>
+                      selected ? _equipment.add(key) : _equipment.remove(key)),
+                ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -309,130 +382,105 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
-        String userName = l10n.worker_badge;
-        String userEmail = '';
-        String userPhone = '';
-
+        var userName = l10n.worker_badge;
+        var userEmail = '';
+        var userPhone = '';
         if (authState is AuthAuthenticated) {
           userName = authState.user.name;
           userEmail = authState.user.email;
           userPhone = authState.user.phoneNumber ?? '';
         }
 
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-            boxShadow: AppTheme.shadowSM,
-          ),
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: _isUploadingPhoto ? null : _showPhotoOptions,
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(32),
-                        child: _isUploadingPhoto
-                            ? const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppTheme.onPrimary,
-                                  ),
+        return Row(
+          children: [
+            GestureDetector(
+              onTap: _isUploadingPhoto ? null : _showPhotoOptions,
+              child: Stack(
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: ClipOval(
+                      child: _isUploadingPhoto
+                          ? Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppTheme.onPrimary,
                                 ),
-                              )
-                            : _photoUrl != null && _photoUrl!.isNotEmpty
-                                ? CachedNetworkImage(
-                                    imageUrl: _photoUrl!,
-                                    fit: BoxFit.cover,
-                                    width: 64,
-                                    height: 64,
-                                    placeholder: (context, url) =>
-                                        _buildInitials(userName),
-                                    errorWidget: (context, url, error) =>
-                                        _buildInitials(userName),
-                                  )
-                                : _buildInitials(userName),
-                      ),
+                              ),
+                            )
+                          : _photoUrl != null && _photoUrl!.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: _photoUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 72,
+                                  height: 72,
+                                  placeholder: (_, __) =>
+                                      _buildInitials(userName),
+                                  errorWidget: (_, __, ___) =>
+                                      _buildInitials(userName),
+                                )
+                              : _buildInitials(userName),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          color: AppTheme.surface,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppTheme.border),
-                        ),
-                        child: const Icon(
-                          Icons.photo_camera_outlined,
-                          size: 12,
-                          color: AppTheme.textPrimary,
-                        ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        color: AppTheme.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppTheme.border),
                       ),
+                      child: Icon(Icons.photo_camera_outlined,
+                          size: 14, color: AppTheme.textPrimary),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            userName,
-                            style: AppTheme.headlineMedium,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          userName,
+                          style: AppTheme.headlineMedium,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        if (_isUserVerified(authState)) ...[
-                          const SizedBox(width: 6),
-                          Icon(Icons.verified, color: AppTheme.info, size: 18),
-                        ],
+                      ),
+                      if (_isUserVerified(authState)) ...[
+                        const SizedBox(width: 6),
+                        Icon(Icons.verified_rounded,
+                            color: AppTheme.info, size: 18),
                       ],
-                    ),
+                    ],
+                  ),
+                  if (userEmail.isNotEmpty) ...[
                     const SizedBox(height: 2),
-                    if (userEmail.isNotEmpty)
-                      Text(
-                        userEmail,
+                    Text(userEmail,
                         style: AppTheme.bodySmall,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    if (userPhone.isNotEmpty)
-                      Text(
-                        userPhone,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppTheme.textTertiary,
-                        ),
-                      ),
+                        overflow: TextOverflow.ellipsis),
                   ],
-                ),
+                  if (userPhone.isNotEmpty)
+                    Text(userPhone, style: AppTheme.bodySmall),
+                ],
               ),
-              StatusBadge(
-                label: l10n.worker_badge,
-                color: AppTheme.primary2,
-                small: true,
-              ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -442,8 +490,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     return Center(
       child: Text(
         name.isNotEmpty ? name[0].toUpperCase() : 'D',
-        style: const TextStyle(
-          fontSize: 24,
+        style: TextStyle(
+          fontSize: 26,
           fontWeight: FontWeight.w800,
           color: AppTheme.onPrimary,
         ),
@@ -452,11 +500,9 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 
   bool _isUserVerified(AuthState authState) {
-    // Check auth state first
     if (authState is AuthAuthenticated && authState.user.isVerified) {
       return true;
     }
-    // Fallback: check worker profile from WorkerAvailabilityBloc
     final workerState = context.read<WorkerAvailabilityBloc>().state;
     if (workerState is WorkerAvailabilityLoaded) {
       return workerState.profile?.isVerified ?? false;
@@ -464,236 +510,11 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
     return false;
   }
 
-  Widget _buildSection({required String title, required Widget child}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 10),
-          child: Text(title, style: AppTheme.headlineSmall),
-        ),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.only(top: 12),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-            boxShadow: AppTheme.shadowSM,
-          ),
-          child: child,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEquipmentGrid() {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          _EquipmentChip(
-              label: l10n.worker_equipShovel,
-              notifier: _hasShovel,
-              onChanged: _autoSave),
-          _EquipmentChip(
-              label: l10n.worker_equipBroom,
-              notifier: _hasBrush,
-              onChanged: _autoSave),
-          _EquipmentChip(
-              label: l10n.worker_equipScraper,
-              notifier: _hasIceScraper,
-              onChanged: _autoSave),
-          _EquipmentChip(
-              label: l10n.worker_equipSaltSpreader,
-              notifier: _hasSaltSpreader,
-              onChanged: _autoSave),
-          _EquipmentChip(
-              label: l10n.worker_equipSnowBlower,
-              notifier: _hasSnowBlower,
-              onChanged: _autoSave),
-          _EquipmentChip(
-              label: l10n.worker_equipRoofBroom,
-              notifier: _hasRoofBroom,
-              onChanged: _autoSave),
-          _EquipmentChip(
-              label: l10n.worker_equipCloth,
-              notifier: _hasMicrofiberCloth,
-              onChanged: _autoSave),
-          _EquipmentChip(
-              label: l10n.worker_equipDeicer,
-              notifier: _hasDeicerSpray,
-              onChanged: _autoSave),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPreferencesContent() {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.worker_maxSimultaneousJobs,
-                    style: AppTheme.labelLarge),
-                Text(l10n.worker_maxSimultaneousJobsDesc,
-                    style: AppTheme.bodySmall),
-              ],
-            ),
-          ),
-          _JobCounterWidget(
-            notifier: _maxActiveJobs,
-            onChanged: _autoSave,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationsContent() {
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      children: [
-        _NotificationToggle(
-          label: l10n.worker_notifNewJobs,
-          notifier: _notifyNewJobs,
-          onChanged: _autoSave,
-        ),
-        const Divider(height: 1, indent: 14, endIndent: 14),
-        _NotificationToggle(
-          label: l10n.worker_tipsReceived,
-          notifier: _notifyTips,
-          onChanged: _autoSave,
-        ),
-        const SizedBox(height: 4),
-      ],
-    );
-  }
-
-  Widget _buildActionsList() {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        children: [
-          _buildActionItem(
-            icon: Icons.gavel_outlined,
-            label: l10n.profile_myDisputes,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const MyDisputesPage()),
-            ),
-          ),
-          const Divider(height: 1, indent: 48),
-          _buildActionItem(
-            icon: Icons.help_outline,
-            label: l10n.worker_helpSupport,
-            onTap: () =>
-                Navigator.pushNamed(context, AppRoutes.workerHelpSupport),
-          ),
-          const Divider(height: 1, indent: 48),
-          _buildLanguageItem(l10n),
-          const Divider(height: 1, indent: 48),
-          _buildActionItem(
-            icon: Icons.logout,
-            label: l10n.common_logout,
-            isDestructive: true,
-            onTap: () => _showLogoutDialog(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionItem({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool isDestructive = false,
-  }) {
-    final color = isDestructive ? AppTheme.error : AppTheme.textPrimary;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: color),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                label,
-                style: AppTheme.labelLarge.copyWith(color: color),
-              ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              size: 20,
-              color: AppTheme.textTertiary,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLanguageItem(AppLocalizations l10n) {
-    final currentLanguage = _localeService.locale.languageCode;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      child: Row(
-        children: [
-          Icon(Icons.language, size: 20, color: AppTheme.textPrimary),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Text(l10n.settings_language, style: AppTheme.labelLarge),
-          ),
-          DropdownButton<String>(
-            value: currentLanguage,
-            underline: const SizedBox(),
-            dropdownColor: AppTheme.surface,
-            isDense: true,
-            items: [
-              DropdownMenuItem(
-                value: 'fr',
-                child: Text(l10n.settings_languageFrench),
-              ),
-              DropdownMenuItem(
-                value: 'en',
-                child: Text(l10n.settings_languageEnglish),
-              ),
-            ],
-            onChanged: (value) {
-              if (value != null) {
-                _localeService.setLocale(Locale(value));
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showPhotoOptions() {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -701,7 +522,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               leading: const Icon(Icons.photo_camera_outlined),
               title: Text(l10n.vehicle_takePhoto),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(sheetContext);
                 _pickPhoto(ImageSource.camera);
               },
             ),
@@ -709,7 +530,7 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
               leading: const Icon(Icons.photo_library_outlined),
               title: Text(l10n.vehicle_choosePhoto),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(sheetContext);
                 _pickPhoto(ImageSource.gallery);
               },
             ),
@@ -722,27 +543,26 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
 
   Future<void> _pickPhoto(ImageSource source) async {
     try {
-      final XFile? photo = await _imagePicker.pickImage(
+      final photo = await _imagePicker.pickImage(
         source: source,
         imageQuality: 85,
         maxWidth: 800,
         maxHeight: 800,
       );
-
       if (photo != null && mounted) {
-        final file = File(photo.path);
-        context.read<WorkerAvailabilityBloc>().add(UploadProfilePhoto(file));
+        context
+            .read<WorkerAvailabilityBloc>()
+            .add(UploadProfilePhoto(File(photo.path)));
       }
-    } catch (e) {
-      if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.worker_photoSelectionError),
-            backgroundColor: AppTheme.error,
-          ),
-        );
-      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(AppLocalizations.of(context)!.worker_photoSelectionError),
+          backgroundColor: AppTheme.error,
+        ),
+      );
     }
   }
 
@@ -752,16 +572,12 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n.common_logout),
-        content: Text(
-          l10n.common_logoutConfirm,
-        ),
+        content: Text(l10n.common_logoutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              l10n.common_cancel,
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
+            child: Text(l10n.common_cancel,
+                style: TextStyle(color: AppTheme.textSecondary)),
           ),
           TextButton(
             onPressed: () {
@@ -773,10 +589,8 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
                 (route) => false,
               );
             },
-            child: Text(
-              l10n.common_logout,
-              style: TextStyle(color: AppTheme.error),
-            ),
+            child: Text(l10n.common_logout,
+                style: TextStyle(color: AppTheme.error)),
           ),
         ],
       ),
@@ -784,230 +598,139 @@ class _WorkerProfileTabState extends State<WorkerProfileTab>
   }
 }
 
-/// Completely isolated equipment chip widget
-class _EquipmentChip extends StatelessWidget {
-  final String label;
-  final ValueNotifier<bool> notifier;
-  final VoidCallback onChanged;
-
-  const _EquipmentChip({
-    required this.label,
-    required this.notifier,
-    required this.onChanged,
-  });
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: notifier,
-      builder: (context, value, _) {
-        return GestureDetector(
-          onTap: () {
-            notifier.value = !notifier.value;
-            onChanged();
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: value ? AppTheme.primary : AppTheme.surface,
-              borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-              border: Border.all(
-                color: value ? AppTheme.primary : AppTheme.border,
-                width: 1.5,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  value ? Icons.check_rounded : Icons.add_rounded,
-                  size: 16,
-                  color: value ? AppTheme.onPrimary : AppTheme.textTertiary,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: value ? FontWeight.w600 : FontWeight.w500,
-                    color: value ? AppTheme.onPrimary : AppTheme.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(text, style: AppTheme.headlineSmall),
     );
   }
 }
 
-/// Completely isolated job counter widget
-class _JobCounterWidget extends StatelessWidget {
-  final ValueNotifier<int> notifier;
-  final VoidCallback onChanged;
-
-  const _JobCounterWidget({
-    required this.notifier,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<int>(
-      valueListenable: notifier,
-      builder: (context, value, _) {
-        return Container(
-          decoration: BoxDecoration(
-            color: AppTheme.background,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppTheme.border),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _CounterButton(
-                icon: Icons.remove,
-                enabled: value > 1,
-                onTap: () {
-                  if (value > 1) {
-                    notifier.value = value - 1;
-                    onChanged();
-                  }
-                },
-              ),
-              Container(
-                width: 40,
-                alignment: Alignment.center,
-                child: Text(
-                  '$value',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-              ),
-              _CounterButton(
-                icon: Icons.add,
-                enabled: value < 5,
-                onTap: () {
-                  if (value < 5) {
-                    notifier.value = value + 1;
-                    onChanged();
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _CounterButton extends StatelessWidget {
-  final IconData icon;
-  final bool enabled;
-  final VoidCallback onTap;
-
-  const _CounterButton({
-    required this.icon,
-    required this.enabled,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: enabled ? onTap : null,
-      child: Container(
-        width: 36,
-        height: 36,
-        alignment: Alignment.center,
-        child: Icon(
-          icon,
-          size: 18,
-          color: enabled ? AppTheme.textPrimary : AppTheme.textTertiary,
-        ),
-      ),
-    );
-  }
-}
-
-/// Completely isolated notification toggle widget
-class _NotificationToggle extends StatelessWidget {
-  final String label;
-  final ValueNotifier<bool> notifier;
-  final VoidCallback onChanged;
-
-  const _NotificationToggle({
-    required this.label,
-    required this.notifier,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: notifier,
-      builder: (context, value, _) {
-        return InkWell(
-          onTap: () {
-            notifier.value = !notifier.value;
-            onChanged();
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                ),
-                _AnimatedSwitch(value: value),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _AnimatedSwitch extends StatelessWidget {
-  final bool value;
-
-  const _AnimatedSwitch({required this.value});
+/// Carte qui regroupe des lignes, separees par un trait fin.
+class _Group extends StatelessWidget {
+  final List<Widget> children;
+  const _Group({required this.children});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 44,
-      height: 24,
       decoration: BoxDecoration(
-        color: value ? AppTheme.success : AppTheme.background,
-        borderRadius: BorderRadius.circular(12),
-        border: value ? null : Border.all(color: AppTheme.border, width: 1.5),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
       ),
-      child: AnimatedAlign(
-        duration: const Duration(milliseconds: 150),
-        alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          width: 18,
-          height: 18,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          decoration: BoxDecoration(
-            color: value ? Colors.white : AppTheme.textTertiary,
-            shape: BoxShape.circle,
-          ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          for (var i = 0; i < children.length; i++) ...[
+            if (i > 0) Divider(height: 1, color: AppTheme.divider),
+            children[i],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  final IconData? icon;
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final bool destructive;
+
+  const _Row({
+    this.icon,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+    this.onTap,
+    this.destructive = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = destructive ? AppTheme.error : AppTheme.textPrimary;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon,
+                  size: 20,
+                  color: destructive ? color : AppTheme.textSecondary),
+              const SizedBox(width: 14),
+            ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: AppTheme.labelLarge.copyWith(color: color)),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(subtitle!, style: AppTheme.bodySmall),
+                  ],
+                ],
+              ),
+            ),
+            if (trailing != null) ...[
+              const SizedBox(width: 12),
+              trailing!,
+            ],
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class _Counter extends StatelessWidget {
+  final int value;
+  final int min;
+  final int max;
+  final ValueChanged<int> onChanged;
+
+  const _Counter({
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget button(IconData icon, bool enabled, int next) => IconButton(
+          onPressed: enabled ? () => onChanged(next) : null,
+          icon: Icon(icon, size: 18),
+          color: AppTheme.textPrimary,
+          disabledColor: AppTheme.textDisabled,
+          visualDensity: VisualDensity.compact,
+        );
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          button(Icons.remove_rounded, value > min, value - 1),
+          SizedBox(
+            width: 28,
+            child: Text('$value',
+                textAlign: TextAlign.center, style: AppTheme.headlineSmall),
+          ),
+          button(Icons.add_rounded, value < max, value + 1),
+        ],
       ),
     );
   }

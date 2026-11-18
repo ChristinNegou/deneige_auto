@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'core/services/analytics_service.dart';
 import 'core/services/locale_service.dart';
 import 'core/services/push_notification_service.dart';
+import 'core/services/theme_service.dart';
 import 'core/widgets/suspension_dialog.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
@@ -34,6 +35,7 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
   bool _hasNavigatedToHome = false;
   final LocaleService _localeService = sl<LocaleService>();
   final PushNotificationService _push = sl<PushNotificationService>();
+  final ThemeService _themeService = sl<ThemeService>();
 
   /// Push touchee avant que l'utilisateur soit connecte et sur l'accueil.
   Map<String, dynamic>? _pendingPush;
@@ -43,6 +45,7 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
     super.initState();
     _localeService.loadLocale();
     _localeService.addListener(_onLocaleChanged);
+    _themeService.addListener(_onThemeChanged);
     _pendingPush = _push.takePendingTap();
     _push.onNotificationTap = _onPushTap;
   }
@@ -50,6 +53,7 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
   @override
   void dispose() {
     _localeService.removeListener(_onLocaleChanged);
+    _themeService.removeListener(_onThemeChanged);
     _push.onNotificationTap = null;
     super.dispose();
   }
@@ -76,6 +80,20 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
     setState(() {});
   }
 
+  /// Les ecrans lisent les couleurs d'AppTheme pendant leur construction :
+  /// on les reconstruit tous, sans perdre la navigation ni leur etat.
+  void _onThemeChanged() {
+    setState(() {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      void rebuild(Element element) {
+        element.markNeedsBuild();
+        element.visitChildren(rebuild);
+      }
+
+      (context as Element).visitChildren(rebuild);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<AuthBloc>(
@@ -94,7 +112,7 @@ class _DeneigeAutoAppState extends State<DeneigeAutoApp> {
         child: MaterialApp(
           navigatorKey: navigatorKey,
           title: 'Deneige Auto',
-          theme: AppTheme.lightTheme,
+          theme: AppTheme.theme,
           initialRoute: AppRoutes.onboarding,
           debugShowCheckedModeBanner: false,
           navigatorObservers: [

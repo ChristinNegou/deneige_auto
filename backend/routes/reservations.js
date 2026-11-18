@@ -1818,8 +1818,10 @@ router.post('/:id/tip', protect, async (req, res) => {
 
         await reservation.save();
 
-        // Notifier le worker du pourboire reçu
-        await Notification.create({
+        // Notifier le worker du pourboire reçu : toujours dans sa liste, en
+        // push seulement s'il a garde le reglage "Pourboires" actif.
+        const tipPushWanted = worker.workerProfile?.notificationPreferences?.tips !== false;
+        await Notification[tipPushWanted ? 'createNotification' : 'create']({
             userId: worker._id,
             type: 'tipReceived',
             title: 'Pourboire reçu!',

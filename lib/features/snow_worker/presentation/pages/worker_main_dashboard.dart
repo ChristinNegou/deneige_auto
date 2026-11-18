@@ -91,10 +91,7 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlayStyle);
 
     return MultiBlocProvider(
       providers: [
@@ -179,7 +176,7 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
               boxShadow:
                   _isDragging ? AppTheme.shadowElevated : AppTheme.shadowLG,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.auto_awesome_rounded,
               color: AppTheme.onPrimary,
               size: 24,
@@ -193,7 +190,7 @@ class _WorkerMainDashboardState extends State<WorkerMainDashboard> {
   Widget _buildBottomNavBar() {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         border: Border(top: BorderSide(color: AppTheme.divider)),
       ),

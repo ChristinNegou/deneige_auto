@@ -182,7 +182,7 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                                 Text(
                                   AppLocalizations.of(context)!
                                       .verification_selfieFaceComparison,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
                                     color: AppTheme.textSecondary,
                                   ),
@@ -384,7 +384,7 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                         : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.success,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppTheme.onPrimary,
                       disabledBackgroundColor:
                           AppTheme.textTertiary.withValues(alpha: 0.3),
                       disabledForegroundColor: AppTheme.textTertiary,
@@ -394,12 +394,12 @@ class _SelfieCapturePageContentState extends State<SelfieCapturePageContent> {
                       ),
                     ),
                     child: isSubmitting
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppTheme.onPrimary,
                             ),
                           )
                         : Row(

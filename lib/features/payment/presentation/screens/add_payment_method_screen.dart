@@ -71,7 +71,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.surface,
           border: Border(top: BorderSide(color: AppTheme.divider)),
         ),
@@ -165,7 +165,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.lock_outline_rounded,
+        Icon(Icons.lock_outline_rounded,
             size: 14, color: AppTheme.textTertiary),
         const SizedBox(width: 6),
         Flexible(
@@ -185,7 +185,7 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     return ElevatedButton(
       onPressed: canSubmit ? _handleAddCard : null,
       child: _isLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 20,
               width: 20,
               child: CircularProgressIndicator(

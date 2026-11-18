@@ -14,10 +14,7 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlayStyle);
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -78,7 +75,7 @@ class ProfilePage extends StatelessWidget {
             style: IconButton.styleFrom(
               backgroundColor: AppTheme.surface,
               foregroundColor: AppTheme.textPrimary,
-              side: const BorderSide(color: AppTheme.border),
+              side: BorderSide(color: AppTheme.border),
             ),
             icon: const Icon(Icons.edit_outlined, size: 20),
           ),
@@ -103,7 +100,7 @@ class ProfilePage extends StatelessWidget {
     final initialsAvatar = Center(
       child: Text(
         initials.isEmpty ? '?' : initials,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.w800,
           color: AppTheme.onPrimary,
@@ -120,7 +117,7 @@ class ProfilePage extends StatelessWidget {
               Container(
                 width: 64,
                 height: 64,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppTheme.primary,
                   shape: BoxShape.circle,
                 ),
@@ -286,7 +283,7 @@ class ProfilePage extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
               color: AppTheme.textTertiary,
               size: 20,

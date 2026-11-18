@@ -100,7 +100,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   listener: (context, state) => _autoSelect(state),
                   builder: (context, state) {
                     if (state.isLoading && state.methods.isEmpty) {
-                      return const Center(
+                      return Center(
                         child:
                             CircularProgressIndicator(color: AppTheme.primary),
                       );
@@ -177,7 +177,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             children: [
               Text(
                 widget.amount.toStringAsFixed(2),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -1,
@@ -224,8 +224,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.error_outline_rounded,
-              color: AppTheme.error, size: 20),
+          Icon(Icons.error_outline_rounded, color: AppTheme.error, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -233,7 +232,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               children: [
                 Text(
                   l10n.payment_declinedTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: AppTheme.error,
@@ -304,7 +303,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                     ),
                     child: isSelected
-                        ? const Icon(Icons.check_rounded,
+                        ? Icon(Icons.check_rounded,
                             size: 14, color: AppTheme.onPrimary)
                         : null,
                   ),
@@ -398,7 +397,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           color: AppTheme.background,
           borderRadius: BorderRadius.circular(5),
         ),
-        child: const Icon(Icons.add_rounded, size: 20, color: AppTheme.primary),
+        child: Icon(Icons.add_rounded, size: 20, color: AppTheme.primary),
       ),
       content: Text(l10n.payment_useNewCard, style: AppTheme.labelLarge),
     );
@@ -408,7 +407,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         border: Border(top: BorderSide(color: AppTheme.divider)),
       ),
@@ -422,7 +421,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.lock_outline_rounded,
+                Icon(Icons.lock_outline_rounded,
                     size: 14, color: AppTheme.textTertiary),
                 const SizedBox(width: 6),
                 Flexible(
@@ -450,7 +449,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ? Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(
+                SizedBox(
                   height: 18,
                   width: 18,
                   child: CircularProgressIndicator(
@@ -566,8 +565,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 color: AppTheme.errorLight,
                 borderRadius: BorderRadius.circular(AppTheme.radiusLG),
               ),
-              child: const Icon(Icons.close_rounded,
-                  color: AppTheme.error, size: 30),
+              child: Icon(Icons.close_rounded, color: AppTheme.error, size: 30),
             ),
             const SizedBox(height: 20),
             Text(l10n.payment_creationFailedTitle,

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import '../../../core/theme/app_theme.dart';
 
 class PaymentService {
   final Dio dio;
@@ -80,10 +81,11 @@ class PaymentService {
       paymentSheetParameters: SetupPaymentSheetParameters(
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: merchantDisplayName,
-        style: ThemeMode.light,
-        appearance: const PaymentSheetAppearance(
+        // Meme theme que l'app, bouton de paiement en orange signalisation
+        style: AppTheme.isDark ? ThemeMode.dark : ThemeMode.light,
+        appearance: PaymentSheetAppearance(
           colors: PaymentSheetAppearanceColors(
-            primary: Color(0xFF2196F3),
+            primary: AppTheme.accent,
           ),
         ),
       ),

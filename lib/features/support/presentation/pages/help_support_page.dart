@@ -163,7 +163,7 @@ class _FaqItemCard extends StatelessWidget {
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         title: Text(
           item.question,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w500,
             fontSize: 14,
@@ -174,7 +174,7 @@ class _FaqItemCard extends StatelessWidget {
         children: [
           Text(
             item.answer,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppTheme.textSecondary,
               fontSize: 14,
               height: 1.5,
@@ -290,7 +290,7 @@ class _ContactTabState extends State<_ContactTab> {
                 // Subject dropdown
                 Text(
                   AppLocalizations.of(context)!.support_subject,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -315,7 +315,7 @@ class _ContactTabState extends State<_ContactTab> {
                           child: Text(
                             subject
                                 .localizedLabel(AppLocalizations.of(context)!),
-                            style: const TextStyle(color: AppTheme.textPrimary),
+                            style: TextStyle(color: AppTheme.textPrimary),
                           ),
                         );
                       }).toList(),
@@ -335,7 +335,7 @@ class _ContactTabState extends State<_ContactTab> {
                 // Message field
                 Text(
                   AppLocalizations.of(context)!.support_message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -346,10 +346,10 @@ class _ContactTabState extends State<_ContactTab> {
                   controller: _messageController,
                   maxLines: 6,
                   maxLength: 2000,
-                  style: const TextStyle(color: AppTheme.textPrimary),
+                  style: TextStyle(color: AppTheme.textPrimary),
                   decoration: InputDecoration(
                     hintText: AppLocalizations.of(context)!.support_messageHint,
-                    hintStyle: const TextStyle(color: AppTheme.textTertiary),
+                    hintStyle: TextStyle(color: AppTheme.textTertiary),
                     filled: true,
                     fillColor: AppTheme.surfaceContainer,
                     border: OutlineInputBorder(
@@ -364,7 +364,7 @@ class _ContactTabState extends State<_ContactTab> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: AppTheme.primary),
                     ),
-                    counterStyle: const TextStyle(color: AppTheme.textTertiary),
+                    counterStyle: TextStyle(color: AppTheme.textTertiary),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -407,7 +407,7 @@ class _ContactTabState extends State<_ContactTab> {
                       ),
                     ),
                     child: state.isSubmitting
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(

@@ -150,7 +150,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 ),
                 Container(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppTheme.surface,
                     border: Border(top: BorderSide(color: AppTheme.divider)),
                   ),
@@ -226,7 +226,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                       shape: BoxShape.circle,
                       border: Border.all(color: AppTheme.border),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.photo_camera_outlined,
                       size: 14,
                       color: AppTheme.textPrimary,
@@ -303,7 +303,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 ),
                 const SizedBox(height: 20),
                 ListTile(
-                  leading: const Icon(Icons.photo_camera_outlined,
+                  leading: Icon(Icons.photo_camera_outlined,
                       color: AppTheme.primary),
                   title:
                       Text(AppLocalizations.of(context)!.addVehicle_takePhoto),
@@ -318,7 +318,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.photo_library_outlined,
+                  leading: Icon(Icons.photo_library_outlined,
                       color: AppTheme.primary),
                   title: Text(
                       AppLocalizations.of(context)!.addVehicle_choosePhoto),
@@ -334,7 +334,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                 ),
                 if (_selectedPhoto != null)
                   ListTile(
-                    leading: const Icon(Icons.delete_outline_rounded,
+                    leading: Icon(Icons.delete_outline_rounded,
                         color: AppTheme.error),
                     title: Text(
                         AppLocalizations.of(context)!.addVehicle_deletePhoto),
@@ -623,7 +623,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
       child: ElevatedButton(
         onPressed: state.isSubmitting ? null : _submitForm,
         child: state.isSubmitting
-            ? const SizedBox(
+            ? SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(

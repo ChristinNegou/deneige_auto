@@ -171,8 +171,7 @@ class _AdminReservationsPageState extends State<AdminReservationsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.calendar_today,
-                size: 64, color: AppTheme.textTertiary),
+            Icon(Icons.calendar_today, size: 64, color: AppTheme.textTertiary),
             const SizedBox(height: 16),
             Text(l10n.admin_noReservations),
           ],

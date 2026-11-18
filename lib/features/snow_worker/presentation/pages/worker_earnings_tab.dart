@@ -1,16 +1,18 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:confetti/confetti.dart';
+import 'package:intl/intl.dart';
 
-import '../../../../l10n/app_localizations.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_routes.dart';
-import '../bloc/worker_stats_bloc.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/money.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/worker_stats.dart';
+import '../bloc/worker_stats_bloc.dart';
 
+enum _Period { today, last7, month }
+
+/// Revenus du deneigeur : ce qu'il a gagne (sa part + pourboires) sur la
+/// periode choisie, ses gains jour par jour et ses totaux depuis le debut.
 class WorkerEarningsTab extends StatefulWidget {
   const WorkerEarningsTab({super.key});
 
@@ -19,12 +21,8 @@ class WorkerEarningsTab extends StatefulWidget {
 }
 
 class _WorkerEarningsTabState extends State<WorkerEarningsTab>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late TabController _tabController;
-  late AnimationController _animationController;
-  late Animation<double> _countAnimation;
-  late ConfettiController _confettiController;
-  bool _hasShownConfetti = false;
+    with AutomaticKeepAliveClientMixin {
+  _Period _period = _Period.today;
 
   @override
   bool get wantKeepAlive => true;
@@ -32,673 +30,422 @@ class _WorkerEarningsTabState extends State<WorkerEarningsTab>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
-    _countAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    );
-    _confettiController = ConfettiController(
-      duration: const Duration(seconds: 2),
-    );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadData();
-      _animationController.forward();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadData());
   }
 
   void _loadData() {
-    context.read<WorkerStatsBloc>().add(const LoadStats());
-    context.read<WorkerStatsBloc>().add(const LoadEarnings());
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _animationController.dispose();
-    _confettiController.dispose();
-    super.dispose();
-  }
-
-  void _checkMilestone(double todayEarnings) {
-    if (!_hasShownConfetti && todayEarnings >= 50 && todayEarnings % 50 < 10) {
-      _confettiController.play();
-      HapticFeedback.heavyImpact();
-      _hasShownConfetti = true;
-    }
+    context.read<WorkerStatsBloc>()
+      ..add(const LoadStats())
+      ..add(const LoadEarnings());
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return SafeArea(
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              _buildHeader(),
-              _buildTabBar(),
-              Expanded(
-                child: BlocBuilder<WorkerStatsBloc, WorkerStatsState>(
-                  builder: (context, state) {
-                    if (state is WorkerStatsLoading) {
-                      return const Center(
-                        child:
-                            CircularProgressIndicator(color: AppTheme.primary),
-                      );
-                    }
+      child: BlocBuilder<WorkerStatsBloc, WorkerStatsState>(
+        builder: (context, state) {
+          if (state is WorkerStatsError) {
+            return _ErrorView(message: state.message, onRetry: _loadData);
+          }
+          if (state is! WorkerStatsLoaded) {
+            return Center(
+                child: CircularProgressIndicator(color: AppTheme.primary));
+          }
 
-                    if (state is WorkerStatsError) {
-                      return _buildErrorState(state.message);
-                    }
-
-                    if (state is WorkerStatsLoaded) {
-                      _checkMilestone(state.stats.today.earnings);
-                      return TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildDayTab(state.stats, state.earnings),
-                          _buildWeekTab(state.stats, state.earnings),
-                          _buildMonthTab(state.stats, state.earnings),
-                        ],
-                      );
-                    }
-
-                    return const SizedBox.shrink();
-                  },
+          return RefreshIndicator(
+            color: AppTheme.primary,
+            onRefresh: () async => _loadData(),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+              children: [
+                Text(l10n.earnings_myEarnings, style: AppTheme.headlineLarge),
+                const SizedBox(height: 16),
+                _PeriodSelector(
+                  value: _period,
+                  onChanged: (p) => setState(() => _period = p),
                 ),
-              ),
-            ],
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirection: math.pi / 2,
-              maxBlastForce: 5,
-              minBlastForce: 2,
-              emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              gravity: 0.2,
-              colors: const [
-                AppTheme.success,
-                AppTheme.primary,
-                AppTheme.warning,
-                AppTheme.secondary,
+                const SizedBox(height: 16),
+                _buildHero(l10n, state.stats, state.earnings),
+                const SizedBox(height: 8),
+                Text(l10n.earningsT_share, style: AppTheme.bodySmall),
+                if (_period == _Period.today)
+                  ..._buildTodayExtras(l10n, state.stats.today),
+                if (_period == _Period.last7 && state.earnings != null) ...[
+                  const SizedBox(height: 20),
+                  _DailyChart(earnings: state.earnings!),
+                ],
+                if (_period == _Period.month) ...[
+                  const SizedBox(height: 20),
+                  _buildAllTime(l10n, state.stats.allTime),
+                ],
+                const SizedBox(height: 20),
+                _HistoryLink(),
               ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildHeader() {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 8, 12),
-      child: Row(
-        children: [
-          Text(l10n.earnings_myEarnings, style: AppTheme.headlineLarge),
-          const Spacer(),
-          IconButton(
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              _loadData();
-              _animationController.reset();
-              _animationController.forward();
-            },
-            icon: const Icon(Icons.refresh_rounded),
-          ),
-        ],
-      ),
-    );
-  }
+  /// Panneau bleu nuit : le total gagne (part + pourboires) sur la periode.
+  Widget _buildHero(
+      AppLocalizations l10n, WorkerStats stats, EarningsBreakdown? earnings) {
+    late final String label;
+    late final double pay;
+    late final double tips;
+    late final int jobs;
+    switch (_period) {
+      case _Period.today:
+        label = l10n.earningsT_today;
+        pay = stats.today.earnings;
+        tips = stats.today.tips;
+        jobs = stats.today.completed;
+      case _Period.last7:
+        label = l10n.earningsT_last7;
+        pay = earnings?.summary.totalEarnings ?? stats.week.earnings;
+        tips = earnings?.summary.totalTips ?? stats.week.tips;
+        jobs = earnings?.summary.totalJobs ?? stats.week.completed;
+      case _Period.month:
+        label = l10n.earningsT_month;
+        pay = stats.month.earnings;
+        tips = stats.month.tips;
+        jobs = stats.month.completed;
+    }
 
-  Widget _buildTabBar() {
-    final l10n = AppLocalizations.of(context)!;
+    final onPrimary = AppTheme.onPrimary;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: AppTheme.labelMedium
+                  .copyWith(color: onPrimary.withValues(alpha: 0.7))),
+          const SizedBox(height: 4),
+          Text(
+            formatMoney(context, pay + tips),
+            style: TextStyle(
+              color: onPrimary,
+              fontSize: 38,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -1,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            tips > 0
+                ? '${l10n.earningsT_jobs(jobs)}, ${l10n.earningsT_tipsIncluded(formatMoney(context, tips))}'
+                : l10n.earningsT_jobs(jobs),
+            style: AppTheme.bodyMedium
+                .copyWith(color: onPrimary.withValues(alpha: 0.8)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildTodayExtras(AppLocalizations l10n, TodayStats today) {
+    final lines = [
+      if (today.inProgress > 0) l10n.earningsT_ongoing(today.inProgress),
+      if (today.assigned > 0) l10n.earningsT_toDo(today.assigned),
+    ];
+    if (lines.isEmpty) return const [];
+    return [
+      const SizedBox(height: 16),
+      _Card(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final line in lines)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Text(line, style: AppTheme.bodyMedium),
+              ),
+          ],
+        ),
+      ),
+    ];
+  }
+
+  Widget _buildAllTime(AppLocalizations l10n, AllTimeStats allTime) {
+    Widget row(String label, String value) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                  child: Text(label,
+                      style: AppTheme.bodyMedium
+                          .copyWith(color: AppTheme.textSecondary))),
+              Text(value,
+                  style: AppTheme.labelLarge.copyWith(
+                      fontFeatures: const [FontFeature.tabularFigures()])),
+            ],
+          ),
+        );
+
+    return _Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.earningsT_allTime, style: AppTheme.headlineSmall),
+          const SizedBox(height: 6),
+          row(l10n.earnings_totalJobs, '${allTime.completed}'),
+          row(l10n.earnings_totalEarnings,
+              formatMoney(context, allTime.earnings + allTime.tips)),
+          row(l10n.earnings_totalTips, formatMoney(context, allTime.tips)),
+          row(
+            l10n.earnings_averageRating,
+            allTime.averageRating > 0
+                ? '${allTime.averageRating.toStringAsFixed(1)} / 5 (${allTime.totalRatings})'
+                : l10n.earningsT_noRating,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PeriodSelector extends StatelessWidget {
+  final _Period value;
+  final ValueChanged<_Period> onChanged;
+  const _PeriodSelector({required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final labels = {
+      _Period.today: l10n.earningsT_today,
+      _Period.last7: l10n.earningsT_last7,
+      _Period.month: l10n.earningsT_month,
+    };
+    return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: AppTheme.surfaceContainer,
         borderRadius: BorderRadius.circular(AppTheme.radiusMD),
       ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusSM),
-          boxShadow: AppTheme.shadowSM,
-        ),
-        labelColor: AppTheme.textPrimary,
-        unselectedLabelColor: AppTheme.textTertiary,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
-        unselectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-        indicatorSize: TabBarIndicatorSize.tab,
-        dividerColor: Colors.transparent,
-        tabs: [
-          Tab(text: l10n.earnings_day),
-          Tab(text: l10n.earnings_week),
-          Tab(text: l10n.earnings_month),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(String message) {
-    final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
-          const Icon(Icons.cloud_off_rounded,
-              size: 40, color: AppTheme.textTertiary),
-          const SizedBox(height: 12),
-          Text(message, style: AppTheme.bodySmall),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: _loadData,
-            style: OutlinedButton.styleFrom(minimumSize: const Size(160, 44)),
-            icon: const Icon(Icons.refresh_rounded),
-            label: Text(l10n.earnings_retry),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDayTab(WorkerStats stats, EarningsBreakdown? earnings) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildEarningsSummaryCard(
-            title: AppLocalizations.of(context)!.earnings_today,
-            amount: stats.today.earnings,
-            jobsCount: stats.today.completed,
-            tips: stats.today.tips,
-            showGoal: true,
-          ),
-          const SizedBox(height: 12),
-          _buildTodayStatsGrid(stats.today),
-          const SizedBox(height: 20),
-          _buildHistoryButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeekTab(WorkerStats stats, EarningsBreakdown? earnings) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildEarningsSummaryCard(
-            title: AppLocalizations.of(context)!.earnings_thisWeek,
-            amount: stats.week.earnings,
-            jobsCount: stats.week.completed,
-            tips: stats.week.tips,
-          ),
-          const SizedBox(height: 12),
-          _buildPeriodStatsRow(stats.week),
-          const SizedBox(height: 20),
-          if (earnings != null) _buildWeeklyChart(earnings),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMonthTab(WorkerStats stats, EarningsBreakdown? earnings) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildEarningsSummaryCard(
-            title: AppLocalizations.of(context)!.earnings_thisMonth,
-            amount: stats.month.earnings,
-            jobsCount: stats.month.completed,
-            tips: stats.month.tips,
-          ),
-          const SizedBox(height: 12),
-          _buildPeriodStatsRow(stats.month),
-          const SizedBox(height: 20),
-          _buildAllTimeStats(stats.allTime),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEarningsSummaryCard({
-    required String title,
-    required double amount,
-    required int jobsCount,
-    required double tips,
-    bool showGoal = false,
-  }) {
-    return AnimatedBuilder(
-      animation: _countAnimation,
-      builder: (context, child) {
-        final l10n = AppLocalizations.of(context)!;
-        final animatedAmount = amount * _countAnimation.value;
-        final animatedTips = tips * _countAnimation.value;
-        final animatedJobs = (jobsCount * _countAnimation.value).round();
-
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppTheme.primary,
-            borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-            boxShadow: AppTheme.shadowLG,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (showGoal) ...[
-                _buildDailyGoalProgress(animatedAmount),
-                const SizedBox(height: 16),
-              ],
-              Text(
-                title,
-                style: TextStyle(
-                  color: AppTheme.onPrimary.withValues(alpha: 0.7),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    animatedAmount.toStringAsFixed(2),
-                    style: const TextStyle(
-                      color: AppTheme.onPrimary,
-                      fontSize: 40,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -1,
-                      fontFeatures: [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Text(
-                      ' \$',
-                      style: TextStyle(
-                        color: AppTheme.onPrimary.withValues(alpha: 0.7),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildSummaryItem(
-                      icon: Icons.check_circle_outline_rounded,
-                      label: l10n.earnings_jobs,
-                      value: animatedJobs.toString(),
-                    ),
-                  ),
-                  Container(
-                    height: 32,
-                    width: 1,
-                    color: AppTheme.onPrimary.withValues(alpha: 0.15),
-                  ),
-                  Expanded(
-                    child: _buildSummaryItem(
-                      icon: Icons.volunteer_activism_rounded,
-                      label: l10n.earnings_tips,
-                      value: '${animatedTips.toStringAsFixed(0)} \$',
-                    ),
-                  ),
-                  Container(
-                    height: 32,
-                    width: 1,
-                    color: AppTheme.onPrimary.withValues(alpha: 0.15),
-                  ),
-                  Expanded(
-                    child: _buildSummaryItem(
-                      icon: Icons.trending_up_rounded,
-                      label: l10n.earnings_average,
-                      value: jobsCount > 0
-                          ? '${(amount / jobsCount).toStringAsFixed(0)} \$'
-                          : '0 \$',
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDailyGoalProgress(double currentAmount) {
-    final l10n = AppLocalizations.of(context)!;
-    const double dailyGoal = 100.0;
-    final progress = (currentAmount / dailyGoal).clamp(0.0, 1.0);
-    final reached = progress >= 1.0;
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              reached
-                  ? l10n.earnings_goalReached
-                  : l10n.earnings_goalAmount(dailyGoal.toInt()),
-              style: TextStyle(
-                color: AppTheme.onPrimary.withValues(alpha: 0.7),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              '${(progress * 100).toInt()} %',
-              style: const TextStyle(
-                color: AppTheme.onPrimary,
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(AppTheme.radiusFull),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: AppTheme.onPrimary.withValues(alpha: 0.15),
-            valueColor: AlwaysStoppedAnimation<Color>(
-              reached ? AppTheme.success : AppTheme.accent,
-            ),
-            minHeight: 6,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummaryItem({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: AppTheme.onPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            fontFeatures: [FontFeature.tabularFigures()],
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            color: AppTheme.onPrimary.withValues(alpha: 0.65),
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTodayStatsGrid(TodayStats stats) {
-    final l10n = AppLocalizations.of(context)!;
-    return _buildStatsCard([
-      (l10n.earnings_completed, stats.completed.toString()),
-      (l10n.earnings_inProgress, stats.inProgress.toString()),
-      (l10n.earnings_assigned, stats.assigned.toString()),
-    ]);
-  }
-
-  Widget _buildPeriodStatsRow(PeriodStats stats) {
-    final l10n = AppLocalizations.of(context)!;
-    return _buildStatsCard([
-      (l10n.earnings_jobs, stats.completed.toString()),
-      (l10n.earnings_earnings, '${stats.earnings.toStringAsFixed(0)} \$'),
-      (l10n.earnings_tipsShort, '${stats.tips.toStringAsFixed(0)} \$'),
-    ]);
-  }
-
-  Widget _buildStatsCard(List<(String, String)> items) {
-    return GlassCard(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            for (var i = 0; i < items.length; i++) ...[
-              if (i > 0) const VerticalDivider(width: 1),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      items[i].$2,
-                      style: const TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3,
-                        color: AppTheme.textPrimary,
-                        fontFeatures: [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      items[i].$1,
-                      style: AppTheme.labelSmall,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHistoryButton() {
-    final l10n = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        Navigator.pushNamed(context, AppRoutes.workerHistory);
-      },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-          border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-          boxShadow: AppTheme.shadowSM,
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.history_rounded,
-                color: AppTheme.primary, size: 22),
-            const SizedBox(width: 12),
+          for (final period in _Period.values)
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.earnings_jobHistory, style: AppTheme.labelLarge),
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.earnings_viewAllJobs,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textTertiary,
+              child: GestureDetector(
+                onTap: () => onChanged(period),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color:
+                        period == value ? AppTheme.surface : Colors.transparent,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSM),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    labels[period]!,
+                    style: AppTheme.labelMedium.copyWith(
+                      color: period == value
+                          ? AppTheme.textPrimary
+                          : AppTheme.textTertiary,
+                      fontWeight:
+                          period == value ? FontWeight.w800 : FontWeight.w600,
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-            Icon(Icons.chevron_right, color: AppTheme.textTertiary, size: 20),
-          ],
-        ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildWeeklyChart(EarningsBreakdown earnings) {
-    if (earnings.daily.isEmpty) return const SizedBox.shrink();
+/// Gains des 7 derniers jours, une barre par jour (les jours sans gain
+/// restent visibles). Toucher une barre affiche son montant.
+class _DailyChart extends StatefulWidget {
+  final EarningsBreakdown earnings;
+  const _DailyChart({required this.earnings});
 
+  @override
+  State<_DailyChart> createState() => _DailyChartState();
+}
+
+class _DailyChartState extends State<_DailyChart> {
+  int _selected = 6; // aujourd'hui
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final days = [
-      l10n.earnings_dayMon,
-      l10n.earnings_dayTue,
-      l10n.earnings_dayWed,
-      l10n.earnings_dayThu,
-      l10n.earnings_dayFri,
-      l10n.earnings_daySat,
-      l10n.earnings_daySun
-    ];
-    final maxEarning =
-        earnings.daily.map((d) => d.total).reduce((a, b) => a > b ? a : b);
-    final maxHeight = maxEarning > 0 ? maxEarning : 100.0;
+    final locale = Localizations.localeOf(context).toString();
+    final byDate = {
+      for (final d in widget.earnings.daily) d.date.substring(0, 10): d
+    };
+    final today = DateTime.now();
+    final days = List.generate(7, (i) {
+      final date = DateTime(today.year, today.month, today.day - 6 + i);
+      final key = DateFormat('yyyy-MM-dd').format(date);
+      return (date, byDate[key]?.total ?? 0.0, byDate[key]?.jobsCount ?? 0);
+    });
+    final max = days.map((d) => d.$2).fold<double>(0, (a, b) => b > a ? b : a);
+    final selected = days[_selected];
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
+    return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.earnings_earningsPerDay, style: AppTheme.headlineSmall),
-          const SizedBox(height: 20),
+          Text(l10n.earningsT_perDay, style: AppTheme.headlineSmall),
+          const SizedBox(height: 4),
+          Text(
+            '${toBeginningOfSentenceCase(DateFormat.MMMEd(locale).format(selected.$1))} : '
+            '${formatMoney(context, selected.$2)}, ${l10n.earningsT_jobs(selected.$3)}',
+            style: AppTheme.bodySmall,
+          ),
+          const SizedBox(height: 16),
           SizedBox(
-            height: 130,
+            height: 120,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(7, (index) {
-                final earning = index < earnings.daily.length
-                    ? earnings.daily[index].total
-                    : 0.0;
-                final height =
-                    maxHeight > 0 ? (earning / maxHeight) * 100 : 0.0;
-
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (earning > 0)
-                      Text(
-                        '${earning.toInt()}\$',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: AppTheme.textSecondary,
+              children: [
+                for (var i = 0; i < days.length; i++)
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => setState(() => _selected = i),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              height: max > 0
+                                  ? (days[i].$2 / max * 96).clamp(3.0, 96.0)
+                                  : 3,
+                              decoration: BoxDecoration(
+                                color: i == _selected
+                                    ? AppTheme.primary
+                                    : AppTheme.primary.withValues(alpha: 0.35),
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(4)),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              DateFormat.E(locale)
+                                  .format(days[i].$1)
+                                  .substring(0, 1)
+                                  .toUpperCase(),
+                              style: AppTheme.labelSmall.copyWith(
+                                color: i == _selected
+                                    ? AppTheme.textPrimary
+                                    : AppTheme.textTertiary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 28,
-                      height: height.clamp(4.0, 100.0),
-                      decoration: BoxDecoration(
-                        color: earning == maxEarning && earning > 0
-                            ? AppTheme.accent
-                            : AppTheme.primary,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      days[index],
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: AppTheme.textTertiary,
-                      ),
-                    ),
-                  ],
-                );
-              }),
+                  ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildAllTimeStats(AllTimeStats allTime) {
+class _HistoryLink extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    return Material(
+      color: AppTheme.surface,
+      borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        onTap: () => Navigator.pushNamed(context, AppRoutes.workerHistory),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.history_rounded, color: AppTheme.textSecondary),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.earnings_jobHistory, style: AppTheme.labelLarge),
+                    const SizedBox(height: 2),
+                    Text(l10n.earnings_viewAllJobs, style: AppTheme.bodySmall),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: AppTheme.textTertiary),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Card extends StatelessWidget {
+  final Widget child;
+  const _Card({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.earnings_overallStats, style: AppTheme.headlineSmall),
-          const SizedBox(height: 14),
-          _buildAllTimeRow(
-              l10n.earnings_totalJobs, allTime.completed.toString()),
-          _buildAllTimeRow(l10n.earnings_totalEarnings,
-              '${allTime.earnings.toStringAsFixed(2)} \$'),
-          _buildAllTimeRow(
-              l10n.earnings_totalTips, '${allTime.tips.toStringAsFixed(2)} \$'),
-          _buildAllTimeRow(
-            l10n.earnings_averageRating,
-            allTime.averageRating > 0
-                ? '${allTime.averageRating.toStringAsFixed(1)} ★ (${allTime.totalRatings})'
-                : 'N/A',
-          ),
-        ],
-      ),
+      child: child,
     );
   }
+}
 
-  Widget _buildAllTimeRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              color: AppTheme.textSecondary,
+class _ErrorView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_rounded,
+                size: 40, color: AppTheme.textTertiary),
+            const SizedBox(height: 12),
+            Text(message,
+                style: AppTheme.bodySmall, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            OutlinedButton(
+              onPressed: onRetry,
+              style: OutlinedButton.styleFrom(minimumSize: const Size(160, 44)),
+              child: Text(AppLocalizations.of(context)!.earnings_retry),
             ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

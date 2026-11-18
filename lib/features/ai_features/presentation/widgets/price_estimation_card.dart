@@ -48,7 +48,7 @@ class PriceEstimationCard extends StatelessWidget {
                     color: AppTheme.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.calculate_outlined,
                     color: AppTheme.primary,
                     size: 24,
@@ -73,7 +73,7 @@ class PriceEstimationCard extends StatelessWidget {
                         children: [
                           Text(
                             '${estimation.suggestedPrice.toStringAsFixed(2)}\$',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: AppTheme.primary,
@@ -105,7 +105,7 @@ class PriceEstimationCard extends StatelessWidget {
                     ),
                     Text(
                       '${estimation.priceRange.min.toStringAsFixed(0)}\$ - ${estimation.priceRange.max.toStringAsFixed(0)}\$',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.textSecondary,
@@ -137,7 +137,7 @@ class PriceEstimationCard extends StatelessWidget {
                       color: AppTheme.info.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSM),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.timer_outlined,
                       color: AppTheme.info,
                       size: 20,
@@ -158,7 +158,7 @@ class PriceEstimationCard extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           estimation.timeEstimation!.formattedRange,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.info,
@@ -183,7 +183,7 @@ class PriceEstimationCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.directions_car,
                           size: 14,
                           color: AppTheme.textSecondary,
@@ -191,7 +191,7 @@ class PriceEstimationCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           estimation.timeEstimation!.breakdown.vehicleTypeLabel,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                             color: AppTheme.textSecondary,

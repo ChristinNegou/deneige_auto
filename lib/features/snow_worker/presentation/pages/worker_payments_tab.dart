@@ -1,13 +1,18 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/money.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/services/worker_stripe_service.dart';
 
+/// Paiements du deneigeur : etat de son compte Stripe, solde et versements
+/// recus. La configuration se fait chez Stripe ; l'ecran se met a jour au
+/// retour dans l'app.
 class WorkerPaymentsTab extends StatefulWidget {
   const WorkerPaymentsTab({super.key});
 
@@ -15,17 +20,19 @@ class WorkerPaymentsTab extends StatefulWidget {
   State<WorkerPaymentsTab> createState() => _WorkerPaymentsTabState();
 }
 
+enum _AccountState { none, incomplete, verifying, active }
+
 class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
-    with AutomaticKeepAliveClientMixin {
-  late WorkerStripeService _stripeService;
-  bool _isLoading = true;
-  bool _hasAccount = false;
-  bool _isComplete = false;
-  bool _chargesEnabled = false;
-  bool _payoutsEnabled = false;
-  Map<String, dynamic>? _balance;
-  Map<String, dynamic>? _feeConfig;
-  String? _errorMessage;
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+  late final WorkerStripeService _stripe;
+
+  bool _loading = true;
+  bool _busy = false;
+  String? _error;
+  _AccountState _account = _AccountState.none;
+  double _available = 0;
+  double _pendingBalance = 0;
+  List<Map<String, dynamic>> _transfers = const [];
 
   @override
   bool get wantKeepAlive => true;
@@ -33,671 +40,308 @@ class _WorkerPaymentsTabState extends State<WorkerPaymentsTab>
   @override
   void initState() {
     super.initState();
-    _stripeService = WorkerStripeService(dioClient: sl<DioClient>());
-    _loadAccountStatus();
+    _stripe = WorkerStripeService(dioClient: sl<DioClient>());
+    WidgetsBinding.instance.addObserver(this);
+    _load();
   }
 
-  Future<void> _loadAccountStatus() async {
-    if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
+  /// Retour depuis Stripe (navigateur) : l'etat du compte a pu changer.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) _load(quiet: true);
+  }
+
+  String _messageOf(Object error) {
+    if (error is DioException) {
+      final data = error.response?.data;
+      if (data is Map && data['message'] is String) return data['message'];
+    }
+    return AppLocalizations.of(context)!.paymentsW_loadError;
+  }
+
+  Future<void> _load({bool quiet = false}) async {
+    if (!mounted) return;
+    if (!quiet) {
+      setState(() {
+        _loading = true;
+        _error = null;
+      });
+    }
     try {
-      final status = await _stripeService.getAccountStatus();
-      final feeConfig = await _stripeService.getFeeConfig();
+      final status = await _stripe.getAccountStatus();
+      final hasAccount = status['hasAccount'] == true;
+      final complete = status['isComplete'] == true;
+      final payouts = status['payoutsEnabled'] == true;
+      final charges = status['chargesEnabled'] == true;
+
+      var account = _AccountState.none;
+      if (hasAccount && payouts && charges) {
+        account = _AccountState.active;
+      } else if (hasAccount && (complete || charges)) {
+        account = _AccountState.verifying;
+      } else if (hasAccount) {
+        account = _AccountState.incomplete;
+      }
+
+      var available = 0.0;
+      var pending = 0.0;
+      var transfers = <Map<String, dynamic>>[];
+      if (account == _AccountState.active) {
+        final results = await Future.wait([
+          _stripe.getBalance(),
+          _stripe.getPayoutHistory(),
+        ]);
+        final balance = results[0] as Map<String, dynamic>;
+        available = (balance['available'] as num?)?.toDouble() ?? 0;
+        pending = (balance['pending'] as num?)?.toDouble() ?? 0;
+        transfers = results[1] as List<Map<String, dynamic>>;
+      }
 
       if (!mounted) return;
       setState(() {
-        _hasAccount = status['hasAccount'] ?? false;
-        _isComplete = status['isComplete'] ?? false;
-        _chargesEnabled = status['chargesEnabled'] ?? false;
-        _payoutsEnabled = status['payoutsEnabled'] ?? false;
-        _feeConfig = feeConfig;
+        _account = account;
+        _available = available;
+        _pendingBalance = pending;
+        _transfers = transfers;
+        _error = null;
       });
-
-      if (_hasAccount && _isComplete) {
-        final balance = await _stripeService.getBalance();
-        if (!mounted) return;
-        setState(() => _balance = balance);
-      }
     } catch (e) {
-      if (!mounted) return;
-      setState(() => _errorMessage = e.toString());
+      if (mounted && !quiet) setState(() => _error = _messageOf(e));
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<void> _createOrContinueSetup() async {
-    if (!mounted) return;
-    setState(() => _isLoading = true);
-
+  Future<void> _openUrl(Future<String?> Function() getUrl) async {
+    setState(() => _busy = true);
     try {
-      final result = await _stripeService.createConnectAccount();
-
-      if (result['onboardingUrl'] != null) {
-        final url = Uri.parse(result['onboardingUrl']);
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
-        }
-      }
-
-      await Future.delayed(const Duration(seconds: 2));
-      await _loadAccountStatus();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _errorMessage = e.toString());
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  Future<void> _openDashboard() async {
-    if (!mounted) return;
-    setState(() => _isLoading = true);
-
-    try {
-      final dashboardUrl = await _stripeService.getDashboardLink();
-      final url = Uri.parse(dashboardUrl);
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
+      final url = await getUrl();
+      if (url != null) {
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)!
-                .clientHome_errorPrefix(e.toString())),
-            backgroundColor: AppTheme.error),
+        SnackBar(content: Text(_messageOf(e)), backgroundColor: AppTheme.error),
       );
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _busy = false);
     }
   }
+
+  void _setup() => _openUrl(() async =>
+      (await _stripe.createConnectAccount())['onboardingUrl'] as String?);
+
+  void _openStripe() => _openUrl(_stripe.getDashboardLink);
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_loading) {
+      return Center(child: CircularProgressIndicator(color: AppTheme.primary));
+    }
 
     return SafeArea(
-      child: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.primary))
-          : RefreshIndicator(
-              onRefresh: _loadAccountStatus,
-              color: AppTheme.primary,
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
+      child: RefreshIndicator(
+        color: AppTheme.primary,
+        onRefresh: _load,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          children: [
+            Text(l10n.worker_payments, style: AppTheme.headlineLarge),
+            const SizedBox(height: 16),
+            if (_error != null)
+              _ErrorCard(message: _error!, onRetry: _load)
+            else ...[
+              if (_account == _AccountState.active) ...[
+                _buildBalance(l10n),
+                const SizedBox(height: 16),
+              ],
+              _buildAccountCard(l10n),
+              if (_account == _AccountState.active) ...[
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4, bottom: 8),
+                  child: Text(l10n.paymentsW_transfers,
+                      style: AppTheme.headlineSmall),
                 ),
-                slivers: [
-                  SliverToBoxAdapter(child: _buildHeader()),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        if (_errorMessage != null) _buildErrorBanner(),
-                        _buildStatusCard(),
-                        const SizedBox(height: 20),
-                        if (_hasAccount && _isComplete) ...[
-                          _buildBalanceCard(),
-                          const SizedBox(height: 20),
-                        ],
-                        _buildPayoutSchedule(),
-                        const SizedBox(height: 20),
-                        _buildCommissionInfo(),
-                        const SizedBox(height: 20),
-                        _buildHowItWorks(),
-                        const SizedBox(height: 20),
-                        _buildSecurityInfo(),
-                        const SizedBox(height: 20),
-                      ]),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 8, 4),
-      child: Row(
-        children: [
-          Text(
-            AppLocalizations.of(context)!.worker_payments,
-            style: AppTheme.headlineLarge,
-          ),
-          const Spacer(),
-          IconButton(
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              _loadAccountStatus();
-            },
-            icon: const Icon(Icons.refresh_rounded),
-          ),
-        ],
+                _buildTransfers(l10n),
+              ],
+            ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildErrorBanner() {
+  Widget _buildBalance(AppLocalizations l10n) {
+    final onPrimary = AppTheme.onPrimary;
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(14),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.errorLight,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-        border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.error_outline, color: AppTheme.error, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              _errorMessage!,
-              style: const TextStyle(fontSize: 13, color: AppTheme.error),
+          Text(l10n.paymentsW_available,
+              style: AppTheme.labelMedium
+                  .copyWith(color: onPrimary.withValues(alpha: 0.7))),
+          const SizedBox(height: 4),
+          Text(
+            formatMoney(context, _available),
+            style: TextStyle(
+              color: onPrimary,
+              fontSize: 36,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -1,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
+          if (_pendingBalance > 0) ...[
+            const SizedBox(height: 4),
+            Text(l10n.paymentsW_pending(formatMoney(context, _pendingBalance)),
+                style: AppTheme.bodyMedium
+                    .copyWith(color: onPrimary.withValues(alpha: 0.8))),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildStatusCard() {
-    final bool isConfigured = _hasAccount && _payoutsEnabled && _chargesEnabled;
-    final bool isPendingVerification =
-        _hasAccount && (_isComplete || _chargesEnabled) && !_payoutsEnabled;
+  Widget _buildAccountCard(AppLocalizations l10n) {
+    final (title, text) = switch (_account) {
+      _AccountState.active => (
+          l10n.paymentsW_activeTitle,
+          l10n.paymentsW_activeText
+        ),
+      _AccountState.verifying => (
+          l10n.paymentsW_pendingTitle,
+          l10n.paymentsW_pendingText
+        ),
+      _ => (l10n.paymentsW_setupTitle, l10n.paymentsW_setupText),
+    };
 
-    final Color statusColor = isConfigured
-        ? AppTheme.success
-        : isPendingVerification
-            ? AppTheme.warning
-            : AppTheme.textSecondary;
+    final Widget action = switch (_account) {
+      _AccountState.none => FilledButton(
+          onPressed: _busy ? null : _setup,
+          child: Text(l10n.paymentsW_setupButton),
+        ),
+      _AccountState.incomplete => FilledButton(
+          onPressed: _busy ? null : _setup,
+          child: Text(l10n.paymentsW_continueButton),
+        ),
+      _ => OutlinedButton.icon(
+          onPressed: _busy ? null : _openStripe,
+          icon: const Icon(Icons.open_in_new_rounded, size: 18),
+          label: Text(l10n.paymentsW_openStripe),
+        ),
+    };
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(
-          color: isConfigured
-              ? AppTheme.success.withValues(alpha: 0.3)
-              : AppTheme.border.withValues(alpha: 0.7),
-        ),
-        boxShadow: AppTheme.shadowSM,
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Icon(
-                isConfigured
-                    ? Icons.check_circle
-                    : isPendingVerification
-                        ? Icons.hourglass_top_rounded
-                        : Icons.account_balance_wallet,
-                color: statusColor,
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isConfigured
-                          ? AppLocalizations.of(context)!
-                              .worker_accountConfigured
-                          : isPendingVerification
-                              ? AppLocalizations.of(context)!
-                                  .worker_verificationInProgress
-                              : AppLocalizations.of(context)!
-                                  .worker_configurePayments,
-                      style: AppTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      isConfigured
-                          ? AppLocalizations.of(context)!.worker_readyToReceive
-                          : isPendingVerification
-                              ? AppLocalizations.of(context)!
-                                  .worker_stripeVerifying
-                              : AppLocalizations.of(context)!
-                                  .worker_receiveEarningsDirectly,
-                      style: TextStyle(
-                        color: AppTheme.textTertiary,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          Text(title, style: AppTheme.headlineSmall),
+          const SizedBox(height: 6),
+          Text(text, style: AppTheme.bodySmall),
           const SizedBox(height: 16),
-          if (isConfigured) ...[
-            _buildStatusRow(
-                AppLocalizations.of(context)!.worker_accountVerified,
-                _isComplete),
-            const SizedBox(height: 6),
-            _buildStatusRow(AppLocalizations.of(context)!.worker_paymentsActive,
-                _chargesEnabled),
-            const SizedBox(height: 6),
-            _buildStatusRow(AppLocalizations.of(context)!.worker_payoutsActive,
-                _payoutsEnabled),
-            const SizedBox(height: 14),
-            OutlinedButton.icon(
-              onPressed: _openDashboard,
-              icon: const Icon(Icons.open_in_new_rounded, size: 18),
-              label: Text(
-                  AppLocalizations.of(context)!.worker_viewStripeDashboard),
-            ),
-          ] else if (isPendingVerification) ...[
-            _buildStatusRow(
-                AppLocalizations.of(context)!.worker_basicInfo, _isComplete),
-            const SizedBox(height: 6),
-            _buildStatusRow(AppLocalizations.of(context)!.worker_paymentsActive,
-                _chargesEnabled),
-            const SizedBox(height: 6),
-            _buildStatusRow(
-                AppLocalizations.of(context)!.worker_documentsVerified,
-                _payoutsEnabled),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.warningLight,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
+          action,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransfers(AppLocalizations l10n) {
+    if (_transfers.isEmpty) {
+      return Text(l10n.paymentsW_noTransfers, style: AppTheme.bodySmall);
+    }
+    final locale = Localizations.localeOf(context).toString();
+    final shown = _transfers.take(20).toList();
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+      ),
+      child: Column(
+        children: [
+          for (var i = 0; i < shown.length; i++) ...[
+            if (i > 0) Divider(height: 1, color: AppTheme.divider),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline, color: AppTheme.warning, size: 18),
-                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      AppLocalizations.of(context)!
-                          .worker_sendDocumentsToActivate,
-                      style: TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: 12,
-                      ),
+                      toBeginningOfSentenceCase(DateFormat.yMMMd(locale).format(
+                          DateTime.tryParse('${shown[i]['createdAt']}')
+                                  ?.toLocal() ??
+                              DateTime.now()))!,
+                      style: AppTheme.bodyMedium,
                     ),
                   ),
+                  if (shown[i]['status'] == 'reversed')
+                    Text(l10n.paymentsW_reversed,
+                        style: AppTheme.labelMedium
+                            .copyWith(color: AppTheme.textTertiary))
+                  else
+                    Text(
+                      formatMoney(context,
+                          (shown[i]['amount'] as num?)?.toDouble() ?? 0),
+                      style: AppTheme.labelLarge.copyWith(
+                          fontFeatures: const [FontFeature.tabularFigures()]),
+                    ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: _openDashboard,
-              child: Text(AppLocalizations.of(context)!.worker_sendMyDocuments),
-            ),
-          ] else ...[
-            // Sans compte de paiement, le deneigeur ne peut pas etre paye :
-            // c'est l'action cle de l'onglet.
-            FilledButton(
-              onPressed: _createOrContinueSetup,
-              child: Text(
-                _hasAccount
-                    ? AppLocalizations.of(context)!.worker_continueSetup
-                    : AppLocalizations.of(context)!.worker_configureNow,
-              ),
-            ),
           ],
         ],
       ),
     );
   }
+}
 
-  Widget _buildStatusRow(String label, bool isActive) {
-    return Row(
-      children: [
-        Icon(
-          isActive ? Icons.check_circle : Icons.radio_button_unchecked,
-          size: 16,
-          color: isActive ? AppTheme.success : AppTheme.textTertiary,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 13,
-          ),
-        ),
-      ],
-    );
-  }
+class _ErrorCard extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorCard({required this.message, required this.onRetry});
 
-  Widget _buildBalanceCard() {
-    final available = (_balance?['available'] ?? 0.0) as num;
-    final pending = (_balance?['pending'] ?? 0.0) as num;
-
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLG),
         border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppLocalizations.of(context)!.worker_balance,
-              style: AppTheme.headlineSmall),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.worker_available,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.textTertiary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${available.toStringAsFixed(2)} \$',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                        color: AppTheme.textPrimary,
-                        fontFeatures: [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 40,
-                width: 1,
-                color: AppTheme.border,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.reservation_shortPending,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppTheme.textTertiary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${pending.toStringAsFixed(2)} \$',
-                        style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                          color: AppTheme.textTertiary,
-                          fontFeatures: [FontFeature.tabularFigures()],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPayoutSchedule() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.schedule_rounded, color: AppTheme.textSecondary, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.worker_automaticTransfers,
-                  style: AppTheme.labelLarge,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  AppLocalizations.of(context)!.worker_depositsIn23Days,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.textTertiary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCommissionInfo() {
-    final platformPercent =
-        ((_feeConfig?['platformFeePercent'] ?? 0.25) * 100).toInt();
-    final workerPercent = 100 - platformPercent;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(AppLocalizations.of(context)!.worker_paymentDistribution,
-              style: AppTheme.headlineSmall),
-          const SizedBox(height: 14),
-          _buildCommissionRow(
-            AppLocalizations.of(context)!.worker_youReceive,
-            '$workerPercent%',
-            AppTheme.success,
-            workerPercent / 100,
-          ),
-          const SizedBox(height: 10),
-          _buildCommissionRow(
-            AppLocalizations.of(context)!.worker_platformCommission,
-            '$platformPercent%',
-            AppTheme.textTertiary,
-            platformPercent / 100,
-          ),
-          const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppTheme.background,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppTheme.border),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline,
-                    color: AppTheme.textTertiary, size: 16),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    AppLocalizations.of(context)!.worker_paymentExample(
-                        (50 * workerPercent / 100).toStringAsFixed(2)),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCommissionRow(
-      String label, String percent, Color color, double progress) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                color: AppTheme.textSecondary,
-              ),
-            ),
-            Text(
-              percent,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(3),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: AppTheme.border,
-            valueColor: AlwaysStoppedAnimation(color),
-            minHeight: 6,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHowItWorks() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(AppLocalizations.of(context)!.worker_howItWorks,
-              style: AppTheme.headlineSmall),
-          const SizedBox(height: 14),
-          _buildStep(1, AppLocalizations.of(context)!.worker_step1ClientPays,
-              AppLocalizations.of(context)!.worker_step1SubtitleShort),
-          _buildStep(2, AppLocalizations.of(context)!.worker_step2Distribution,
-              AppLocalizations.of(context)!.worker_step2SubtitleShort),
-          _buildStep(3, AppLocalizations.of(context)!.worker_step3Deposit,
-              AppLocalizations.of(context)!.worker_step3Subtitle),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStep(int number, String title, String subtitle) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        children: [
-          Container(
-            width: 26,
-            height: 26,
-            decoration: const BoxDecoration(
-              color: AppTheme.primaryLight,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                '$number',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.primary,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTheme.labelLarge),
-                Text(subtitle, style: AppTheme.bodySmall),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSecurityInfo() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.successLight,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.verified_user_outlined, color: AppTheme.success, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.worker_securePayments,
-                  style: AppTheme.labelLarge,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  AppLocalizations.of(context)!.worker_poweredByStripe,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.textTertiary,
-                  ),
-                ),
-              ],
-            ),
+          Text(message, style: AppTheme.bodyMedium),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: onRetry,
+            style: OutlinedButton.styleFrom(minimumSize: const Size(160, 44)),
+            child: Text(AppLocalizations.of(context)!.common_retry),
           ),
         ],
       ),

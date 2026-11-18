@@ -76,7 +76,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
             color: AppTheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Center(
+          child: Center(
             child: CircularProgressIndicator(color: AppTheme.primary),
           ),
         ),
@@ -112,7 +112,7 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
             color: AppTheme.warning.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.warning_amber_rounded,
             color: AppTheme.warning,
             size: 40,

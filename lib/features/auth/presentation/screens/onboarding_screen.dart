@@ -142,14 +142,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: AppTheme.shadowLG,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.ac_unit_rounded,
                 color: AppTheme.onPrimary,
                 size: 48,
               ),
             ),
             const SizedBox(height: 32),
-            const CircularProgressIndicator(
+            CircularProgressIndicator(
               color: AppTheme.primary,
               strokeWidth: 3,
             ),
@@ -290,7 +290,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 32),
           Text(
             content.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.8,

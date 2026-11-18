@@ -69,10 +69,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlayStyle);
 
     return BlocConsumer<AuthBloc, AuthState>(
       buildWhen: (previous, current) {
@@ -186,7 +183,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
           bottomNavigationBar: Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppTheme.surface,
               border: Border(top: BorderSide(color: AppTheme.divider)),
             ),
@@ -224,7 +221,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final initialsAvatar = Center(
       child: Text(
         initials.isEmpty ? '?' : initials,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 30,
           fontWeight: FontWeight.w800,
           color: AppTheme.onPrimary,
@@ -234,7 +231,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     Widget content;
     if (_isUploadingPhoto) {
-      content = const Center(
+      content = Center(
         child: CircularProgressIndicator(
           color: AppTheme.onPrimary,
           strokeWidth: 2,
@@ -267,7 +264,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             Container(
               width: 96,
               height: 96,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppTheme.primary,
                 shape: BoxShape.circle,
               ),
@@ -285,7 +282,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   border: Border.all(color: AppTheme.border),
                   boxShadow: AppTheme.shadowSM,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.photo_camera_outlined,
                   color: AppTheme.textPrimary,
                   size: 18,
@@ -424,7 +421,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return ElevatedButton(
       onPressed: _isLoading ? null : _saveProfile,
       child: _isLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 20,
               width: 20,
               child: CircularProgressIndicator(
@@ -648,7 +645,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.developer_mode,
                             size: 16,
                             color: AppTheme.warning,
@@ -656,7 +653,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           const SizedBox(width: 8),
                           Text(
                             'Code dev: $_devCode',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'monospace',
                               fontWeight: FontWeight.bold,
                               color: AppTheme.warning,
@@ -733,12 +730,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           minimumSize: const Size(0, 44),
                         ),
                         child: isVerifying
-                            ? const SizedBox(
+                            ? SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: AppTheme.onPrimary,
                                 ),
                               )
                             : Text(

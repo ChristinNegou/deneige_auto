@@ -616,9 +616,9 @@ class _CreateDisputePageState extends State<CreateDisputePage> {
                           color: AppTheme.error,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.close,
-                          color: Colors.white,
+                          color: AppTheme.onPrimary,
                           size: 16,
                         ),
                       ),

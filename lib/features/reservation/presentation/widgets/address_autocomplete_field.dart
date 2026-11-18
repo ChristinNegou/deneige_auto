@@ -166,13 +166,13 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
     return TextField(
       controller: widget.controller,
       focusNode: widget.focusNode,
-      style: const TextStyle(
-          color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+      style:
+          TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
       textInputAction: TextInputAction.search,
       autocorrect: false,
       decoration: InputDecoration(
         hintText: l10n.step2_searchHint,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
             color: AppTheme.textTertiary, fontWeight: FontWeight.w400),
         // L'epingle pleine indique qu'une adresse est retenue
         prefixIcon: Icon(
@@ -180,7 +180,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
           color: _confirmed ? AppTheme.primary : AppTheme.textTertiary,
         ),
         suffixIcon: busy
-            ? const Padding(
+            ? Padding(
                 padding: EdgeInsets.all(14),
                 child: SizedBox(
                   width: 18,
@@ -193,7 +193,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
                 ? IconButton(
                     tooltip:
                         MaterialLocalizations.of(context).deleteButtonTooltip,
-                    icon: const Icon(Icons.close_rounded,
+                    icon: Icon(Icons.close_rounded,
                         color: AppTheme.textTertiary, size: 20),
                     onPressed: _clear,
                   )
@@ -202,11 +202,11 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
         fillColor: AppTheme.surface,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.border),
+          borderSide: BorderSide(color: AppTheme.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+          borderSide: BorderSide(color: AppTheme.primary, width: 1.5),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -232,7 +232,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
         child: Column(
           children: [
             for (var i = 0; i < _suggestions.length; i++) ...[
-              if (i > 0) const Divider(height: 1, color: AppTheme.border),
+              if (i > 0) Divider(height: 1, color: AppTheme.border),
               _buildSuggestion(_suggestions[i]),
             ],
           ],
@@ -271,8 +271,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            const Icon(Icons.place_outlined,
-                size: 20, color: AppTheme.textTertiary),
+            Icon(Icons.place_outlined, size: 20, color: AppTheme.textTertiary),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -280,7 +279,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
                 children: [
                   Text(
                     s.primary,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textPrimary,
@@ -289,7 +288,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
                   if (s.secondary.isNotEmpty)
                     Text(
                       s.secondary,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12, color: AppTheme.textSecondary),
                     ),
                 ],

@@ -121,7 +121,7 @@ class _CancelReservationSheetState extends State<_CancelReservationSheet> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.error_outline_rounded,
+                    Icon(Icons.error_outline_rounded,
                         size: 18, color: AppTheme.error),
                     const SizedBox(width: 8),
                     Expanded(
@@ -144,7 +144,7 @@ class _CancelReservationSheetState extends State<_CancelReservationSheet> {
                     foregroundColor: AppTheme.onPrimary,
                   ),
                   child: _sending
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(

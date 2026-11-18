@@ -92,6 +92,10 @@ class AppConfig {
   static const double processingFeeRate = 0.029; // Frais de traitement (2.9%)
   static const double insuranceFee = 0.75; // Frais d'assurance
 
+  /// Part du prix versee au deneigeur (le reste est la commission).
+  /// Meme valeur que WORKER_PERCENT cote serveur.
+  static const double workerShare = 0.75;
+
   // --- Abonnements ---
   static const double weeklySubscriptionPrice = 39.0;
   static const double monthlySubscriptionPrice = 129.0;

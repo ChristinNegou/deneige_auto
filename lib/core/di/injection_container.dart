@@ -151,6 +151,7 @@ import '../services/dispute_service.dart';
 import '../services/connectivity_service.dart';
 import '../services/cache_service.dart';
 import '../services/locale_service.dart';
+import '../services/theme_service.dart';
 
 // BLoCs
 import '../../features/home/presentation/bloc/home_bloc.dart';
@@ -192,6 +193,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
   sl.registerLazySingleton<ApiCacheService>(() => ApiCacheService());
   sl.registerLazySingleton<LocaleService>(() => LocaleService());
+  sl.registerLazySingleton<ThemeService>(() => ThemeService());
 
   // --- Data Sources ---
   sl.registerLazySingleton<AuthRemoteDataSource>(

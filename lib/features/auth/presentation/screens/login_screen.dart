@@ -46,10 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlayStyle);
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -144,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: AppTheme.primary,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMD),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.ac_unit_rounded,
                 size: 22,
                 color: AppTheme.onPrimary,
@@ -157,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 40),
         Text(
           l10n.login_welcome,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.8,
@@ -292,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return ElevatedButton(
       onPressed: isLoading ? null : _handleLogin,
       child: isLoading
-          ? const SizedBox(
+          ? SizedBox(
               width: 22,
               height: 22,
               child: CircularProgressIndicator(

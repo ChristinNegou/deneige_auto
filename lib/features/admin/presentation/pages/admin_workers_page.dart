@@ -272,7 +272,7 @@ class _AdminWorkersPageState extends State<AdminWorkersPage> {
         _sortWorkers(state.users.where((u) => u.role == 'snowWorker').toList());
 
     if (workers.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

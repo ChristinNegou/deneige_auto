@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/notification_bloc.dart';
 import '../../services/notification_polling_service.dart';
+import '../../../../core/theme/app_theme.dart';
 
 /// Badge de notification - Affiche le nombre de notifications non lues
 /// À utiliser sur les icônes de navigation (bottom nav, app bar, etc.)
@@ -41,8 +42,8 @@ class NotificationBadge extends StatelessWidget {
           top: -6,
           child: _Badge(
             count: count,
-            color: badgeColor ?? Colors.red,
-            textColor: textColor ?? Colors.white,
+            color: badgeColor ?? AppTheme.error,
+            textColor: textColor ?? AppTheme.onPrimary,
             size: size,
             animate: animate,
           ),
@@ -298,7 +299,7 @@ class NotificationDot extends StatelessWidget {
     if (!show) return const SizedBox.shrink();
 
     return _PulsingDot(
-      color: color ?? Colors.red,
+      color: color ?? AppTheme.error,
       size: size,
       animate: animate,
     );

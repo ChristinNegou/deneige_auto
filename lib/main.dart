@@ -20,6 +20,7 @@ import 'core/cache/network_status.dart';
 import 'deneigeauto_app.dart';
 
 import 'core/di/injection_container.dart';
+import 'core/services/theme_service.dart';
 
 /// Fonction main enveloppee dans [runZonedGuarded] pour capturer
 /// toutes les erreurs non gerees et les envoyer a Crashlytics.
@@ -56,6 +57,9 @@ void main() {
 
       // Initialiser les dépendances
       await di.initializeDependencies();
+
+      // Theme clair ou sombre avant le premier affichage (pas de flash)
+      await di.sl<ThemeService>().load();
 
       // Initialiser les services de cache et offline
       try {

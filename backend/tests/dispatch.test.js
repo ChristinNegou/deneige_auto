@@ -67,6 +67,13 @@ describe('notifyNearbyWorkers', () => {
     expect(await Notification.countDocuments({ userId: near._id })).toBe(1);
   });
 
+  it('respects the worker setting "Nouvelles demandes"', async () => {
+    await worker({ notificationPreferences: { newJobs: false, tips: true } });
+    const job = await paidJob();
+
+    expect(await notifyNearbyWorkers(job)).toBe(0);
+  });
+
   it('skips workers missing the required equipment', async () => {
     await worker();
     const equipped = await worker({ equipmentList: ['shovel', 'brush', 'snow_blower'] });

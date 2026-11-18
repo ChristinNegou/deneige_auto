@@ -56,7 +56,7 @@ class NotificationsPageContent extends StatelessWidget {
                 },
                 builder: (context, state) {
                   if (state.isLoading && state.notifications.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: CircularProgressIndicator(color: AppTheme.primary),
                     );
                   }
@@ -181,7 +181,7 @@ class NotificationsPageContent extends StatelessWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         color: AppTheme.error,
-        child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+        child: Icon(Icons.delete_outline_rounded, color: AppTheme.onPrimary),
       ),
       child: InkWell(
         onTap: () {
@@ -240,7 +240,7 @@ class NotificationsPageContent extends StatelessWidget {
                             child: Container(
                               width: 8,
                               height: 8,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: AppTheme.accent,
                                 shape: BoxShape.circle,
                               ),

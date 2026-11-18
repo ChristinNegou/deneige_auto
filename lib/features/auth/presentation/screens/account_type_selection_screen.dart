@@ -31,7 +31,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
                       color: AppTheme.primary,
                       borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.ac_unit_rounded,
                       color: AppTheme.onPrimary,
                       size: 22,
@@ -44,7 +44,7 @@ class AccountTypeSelectionScreen extends StatelessWidget {
               const Spacer(),
               Text(
                 l10n.accountType_welcome,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.8,
@@ -169,7 +169,7 @@ class _AccountTypeCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.arrow_forward_rounded, color: AppTheme.textPrimary),
+          Icon(Icons.arrow_forward_rounded, color: AppTheme.textPrimary),
         ],
       ),
     );

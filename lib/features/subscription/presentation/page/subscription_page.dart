@@ -108,8 +108,8 @@ class SubscriptionPage extends StatelessWidget {
                   ),
                   child: Text(
                     AppLocalizations.of(context)!.subscription_recommended,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppTheme.onPrimary,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -168,7 +168,7 @@ class SubscriptionPage extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: color,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppTheme.onPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: Text(

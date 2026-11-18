@@ -3,11 +3,13 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/config/app_config.dart';
@@ -19,15 +21,23 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../chat/presentation/bloc/chat_bloc.dart';
 import '../../../chat/presentation/pages/chat_screen.dart';
+import '../../../vehicule/presentation/widgets/vehicle_visuals.dart';
 import '../../domain/entities/worker_job.dart';
 import '../../domain/repositories/worker_repository.dart';
 import '../bloc/worker_jobs_bloc.dart';
 import '../widgets/client_contact_row.dart';
-import '../../../vehicule/presentation/widgets/vehicle_visuals.dart';
+import '../widgets/job_labels.dart';
 
-// Rayon maximum en mètres pour confirmer l'arrivée
+/// Distance maximale (metres) pour confirmer l'arrivee pres de la voiture.
 const double _arrivalRadiusMeters = 200.0;
 
+/// Position par defaut de l'emulateur Android (Mountain View), ignoree en
+/// mode debug pour pouvoir tester sans se deplacer.
+bool _isEmulatorPosition(double lat, double lng) =>
+    kDebugMode && (lat - 37.4219983).abs() < 0.5 && (lng + 122.084).abs() < 0.5;
+
+/// Deneigement accepte, du depart jusqu'a la fin : une etape a la fois, avec
+/// un seul bouton principal en bas de l'ecran.
 class ActiveJobPage extends StatefulWidget {
   final WorkerJob job;
 
@@ -38,29 +48,29 @@ class ActiveJobPage extends StatefulWidget {
 }
 
 class _ActiveJobPageState extends State<ActiveJobPage> {
+  late WorkerJob _job;
   Timer? _timer;
   Timer? _statusCheckTimer;
-  Duration _elapsed = Duration.zero;
-  late WorkerJob _currentJob;
+  DateTime? _startedAt;
   bool _isJobCancelled = false;
 
-  // Photo management
   final ImagePicker _imagePicker = ImagePicker();
   File? _afterPhoto;
   bool _isUploadingPhoto = false;
   bool _photoUploaded = false;
+  String? _photoError;
 
   @override
   void initState() {
     super.initState();
-    _currentJob = widget.job;
-    if (_currentJob.status == JobStatus.inProgress &&
-        _currentJob.startedAt != null) {
-      _elapsed = DateTime.now().difference(_currentJob.startedAt!);
+    _job = widget.job;
+    _photoUploaded = _job.afterPhotoUrl != null;
+    if (_job.status == JobStatus.inProgress) {
+      _startedAt = _job.startedAt ?? DateTime.now();
       _startTimer();
     }
-    // Démarrer la vérification périodique du statut
-    _startStatusCheck();
+    _statusCheckTimer =
+        Timer.periodic(const Duration(seconds: 10), (_) => _checkJobStatus());
   }
 
   @override
@@ -70,1270 +80,581 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     super.dispose();
   }
 
-  /// Démarre la vérification périodique du statut du job (toutes les 10 secondes)
-  void _startStatusCheck() {
-    _statusCheckTimer = Timer.periodic(const Duration(seconds: 10), (_) {
-      _checkJobStatus();
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() {});
     });
   }
 
-  /// Vérifie le statut actuel du job auprès du serveur
+  /// Le client peut annuler pendant que le deneigeur est en route.
   Future<void> _checkJobStatus() async {
     if (_isJobCancelled || !mounted) return;
-
     try {
-      final dio = sl<Dio>();
-      final response = await dio.get('/reservations/${_currentJob.id}');
-
+      final response = await sl<Dio>().get('/reservations/${_job.id}');
       if (!mounted) return;
-
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        final data = response.data['data'];
-        final status = data['status'] as String?;
-
-        if (status == 'cancelled') {
-          _isJobCancelled = true;
-          _timer?.cancel();
-          _statusCheckTimer?.cancel();
-
-          final cancelReason = data['cancelReason'] as String? ??
-              AppLocalizations.of(context)!.worker_clientCancelled;
-          final cancelledBy = data['cancelledBy'] as String? ?? 'client';
-
-          _showJobCancelledDialog(cancelReason, cancelledBy);
-        }
+      final data = response.data['data'];
+      if (response.statusCode == 200 &&
+          response.data['success'] == true &&
+          data['status'] == 'cancelled') {
+        _isJobCancelled = true;
+        _timer?.cancel();
+        _statusCheckTimer?.cancel();
+        _showJobCancelledDialog(
+          data['cancelReason'] as String?,
+          data['cancelledBy'] as String? ?? 'client',
+        );
       }
     } catch (e) {
-      // Ignorer les erreurs de réseau silencieusement
       debugPrint('Erreur vérification statut job: $e');
     }
   }
 
-  /// Affiche le dialogue d'annulation et redirige vers le dashboard
-  void _showJobCancelledDialog(String reason, String cancelledBy) {
-    HapticFeedback.heavyImpact();
+  String _time(DateTime date) =>
+      DateFormat.Hm(Localizations.localeOf(context).toString())
+          .format(date.toLocal());
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => PopScope(
-        canPop: false,
-        child: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-          ),
-          icon: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppTheme.errorLight,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.cancel_rounded,
-              color: AppTheme.error,
-              size: 48,
-            ),
-          ),
-          title: Text(
-            AppLocalizations.of(context)!.worker_jobCancelled,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppTheme.errorLight,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  border:
-                      Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, color: AppTheme.error),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        cancelledBy == 'client'
-                            ? AppLocalizations.of(context)!
-                                .worker_clientCancelledMessage
-                            : AppLocalizations.of(context)!
-                                .worker_cancelledMessage,
-                        style: const TextStyle(
-                          color: AppTheme.error,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                AppLocalizations.of(context)!.worker_cancelReason(reason),
-                style: AppTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppLocalizations.of(context)!.worker_notChargedForJob,
-                style:
-                    AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          actions: [
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  // Retourner au dashboard
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  ),
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.worker_backToDashboard,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: AppTheme.error),
     );
   }
 
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {
-        _elapsed += const Duration(seconds: 1);
-      });
-    });
-  }
+  // --- Ecran ---
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    final l10n = AppLocalizations.of(context)!;
+    SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlayStyle);
 
     return BlocListener<WorkerJobsBloc, WorkerJobsState>(
       listener: (context, state) {
         if (state is JobActionSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle,
-                      color: AppTheme.onPrimary, size: 20),
-                  const SizedBox(width: 12),
-                  Text(_getSuccessMessage(state.action)),
-                ],
-              ),
-              backgroundColor: AppTheme.success,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-            ),
-          );
           if (state.action == 'complete') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.activeJ_done)),
+            );
             Navigator.pop(context);
           } else if (state.updatedJob != null) {
             setState(() {
-              _currentJob = state.updatedJob!;
-              if (_currentJob.status == JobStatus.inProgress &&
-                  _timer == null) {
+              _job = state.updatedJob!;
+              if (_job.status == JobStatus.inProgress && _timer == null) {
+                _startedAt = _job.startedAt ?? DateTime.now();
                 _startTimer();
               }
             });
           }
         } else if (state is WorkerJobsError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error_outline,
-                      color: AppTheme.onPrimary, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(state.message)),
-                ],
-              ),
-              backgroundColor: AppTheme.error,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-            ),
-          );
+          _showError(state.message);
         }
       },
       child: Scaffold(
         backgroundColor: AppTheme.background,
-        body: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildStatusBanner(),
-                      const SizedBox(height: 16),
-                      if (_currentJob.status == JobStatus.inProgress)
-                        _buildTimerCard(),
-                      if (_currentJob.status == JobStatus.inProgress)
-                        const SizedBox(height: 16),
-                      _buildClientCard(),
-                      const SizedBox(height: 12),
-                      _buildVehicleCard(),
-                      const SizedBox(height: 16),
-                      if (_currentJob.location != null)
-                        _buildNavigationButtons(),
-                      if (_currentJob.location != null)
-                        const SizedBox(height: 16),
-                      _buildActionSection(),
-                      const SizedBox(height: 100),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+        appBar: AppBar(
+          backgroundColor: AppTheme.background,
+          surfaceTintColor: Colors.transparent,
+          title: Text(l10n.activeJ_title, style: AppTheme.labelLarge),
+          centerTitle: true,
         ),
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+          children: [
+            _StepTracker(status: _job.status),
+            const SizedBox(height: 20),
+            _buildHero(l10n),
+            const SizedBox(height: 16),
+            if (_job.status == JobStatus.inProgress) ...[
+              _buildPhotoCard(l10n),
+              const SizedBox(height: 16),
+            ],
+            _buildWhereCard(l10n),
+            const SizedBox(height: 16),
+            _buildVehicleCard(l10n),
+            const SizedBox(height: 16),
+            _buildTodoCard(l10n),
+            const SizedBox(height: 16),
+            _buildClientCard(l10n),
+          ],
+        ),
+        bottomNavigationBar: _buildMainAction(l10n),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
-      child: Row(
+  /// Panneau bleu nuit : l'heure qui compte, ou le chrono une fois commence.
+  Widget _buildHero(AppLocalizations l10n) {
+    final onPrimary = AppTheme.onPrimary;
+    final deadline = _job.deadlineTime ??
+        _job.departureTime.subtract(const Duration(minutes: 30));
+
+    Widget content;
+    if (_job.status == JobStatus.inProgress && _startedAt != null) {
+      final elapsed = DateTime.now().difference(_startedAt!);
+      final minutes = elapsed.inMinutes.toString().padLeft(2, '0');
+      final seconds =
+          elapsed.inSeconds.remainder(60).toString().padLeft(2, '0');
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
-          const SizedBox(width: 16),
+          Text(l10n.activeJ_elapsed,
+              style: AppTheme.labelMedium
+                  .copyWith(color: onPrimary.withValues(alpha: 0.7))),
+          const SizedBox(height: 4),
           Text(
-            AppLocalizations.of(context)!.worker_activeJob,
-            style: AppTheme.headlineMedium,
+            '$minutes:$seconds',
+            style: TextStyle(
+              fontSize: 40,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -1,
+              color: onPrimary,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
-          const Spacer(),
-          StatusBadge(
-            label: _getStatusLabel(_currentJob.status),
-            color: _getStatusColor(_currentJob.status),
-            icon: _getStatusIcon(_currentJob.status),
-          ),
+          const SizedBox(height: 6),
+          Text(l10n.activeJ_readyBy(_time(deadline)),
+              style: AppTheme.bodyMedium.copyWith(color: onPrimary)),
         ],
-      ),
-    );
-  }
-
-  Widget _buildStatusBanner() {
-    final color = _getStatusColor(_currentJob.status);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
-      ),
-      child: Row(
+      );
+    } else {
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _getStatusIcon(_currentJob.status),
-              color: color,
-              size: 24,
-            ),
+          Text(
+            l10n.activeJ_readyBy(_time(deadline)),
+            style: AppTheme.headlineLarge.copyWith(color: onPrimary),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _getStatusLabel(_currentJob.status),
-                  style: AppTheme.headlineMedium,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _getStatusSubtitle(_currentJob.status),
-                  style: AppTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
+          const SizedBox(height: 4),
+          Text(l10n.activeJ_clientLeaves(_time(_job.departureTime)),
+              style: AppTheme.bodyMedium
+                  .copyWith(color: onPrimary.withValues(alpha: 0.75))),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTimerCard() {
-    final hours = _elapsed.inHours;
-    final minutes = _elapsed.inMinutes.remainder(60);
-    final seconds = _elapsed.inSeconds.remainder(60);
+      );
+    }
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppTheme.primary,
-        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-        boxShadow: AppTheme.shadowLG,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
       ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.timer_outlined,
-                  color: AppTheme.onPrimary.withValues(alpha: 0.7), size: 18),
-              const SizedBox(width: 8),
-              Text(
-                AppLocalizations.of(context)!.worker_timeElapsed,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.onPrimary.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildTimeBlock(hours.toString().padLeft(2, '0'), 'h'),
-              const Text(
-                ' : ',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w300,
-                  color: AppTheme.onPrimary,
-                ),
-              ),
-              _buildTimeBlock(minutes.toString().padLeft(2, '0'), 'm'),
-              const Text(
-                ' : ',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w300,
-                  color: AppTheme.onPrimary,
-                ),
-              ),
-              _buildTimeBlock(seconds.toString().padLeft(2, '0'), 's'),
-            ],
-          ),
-        ],
-      ),
+      child: content,
     );
   }
 
-  Widget _buildTimeBlock(String value, String unit) {
-    return Column(
+  Widget _buildWhereCard(AppLocalizations l10n) {
+    final spot = jobSpotLabel(l10n, _job);
+    final address = _job.location?.address;
+    return _Card(
+      title: l10n.activeJ_where,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppTheme.onPrimary.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+        if (spot != null) Text(spot, style: AppTheme.headlineSmall),
+        if (address != null && address.isNotEmpty) ...[
+          if (spot != null) const SizedBox(height: 2),
+          Text(address,
+              style: spot != null ? AppTheme.bodySmall : AppTheme.bodyLarge),
+        ],
+        if (_job.location != null) ...[
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _openMaps(
+                      _job.location!.latitude, _job.location!.longitude),
+                  style:
+                      OutlinedButton.styleFrom(minimumSize: const Size(0, 46)),
+                  icon: const Icon(Icons.map_outlined, size: 18),
+                  label: Text(l10n.worker_googleMaps),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _openWaze(
+                      _job.location!.latitude, _job.location!.longitude),
+                  style:
+                      OutlinedButton.styleFrom(minimumSize: const Size(0, 46)),
+                  icon: const Icon(Icons.navigation_outlined, size: 18),
+                  label: Text(l10n.worker_waze),
+                ),
+              ),
+            ],
           ),
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.5,
-              color: AppTheme.onPrimary,
-              fontFeatures: [FontFeature.tabularFigures()],
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          unit,
-          style: TextStyle(
-            fontSize: 12,
-            color: AppTheme.onPrimary.withValues(alpha: 0.7),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        ],
       ],
     );
   }
 
-  Widget _buildClientCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: const BoxDecoration(
-                  color: AppTheme.primary,
-                  shape: BoxShape.circle,
+  Widget _buildVehicleCard(AppLocalizations l10n) {
+    final vehicle = _job.vehicle;
+    final photoUrl = vehicle.photoUrl != null && vehicle.photoUrl!.isNotEmpty
+        ? '${AppConfig.apiBaseUrl}${vehicle.photoUrl}'
+        : null;
+
+    return _Card(
+      title: l10n.activeJ_vehicle,
+      children: [
+        Row(
+          children: [
+            GestureDetector(
+              onTap:
+                  photoUrl != null ? () => _showVehiclePhoto(photoUrl) : null,
+              child: Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
                 ),
-                child: Center(
-                  child: Text(
-                    _currentJob.client.firstName[0].toUpperCase(),
-                    style: const TextStyle(
-                      color: AppTheme.onPrimary,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                clipBehavior: Clip.antiAlias,
+                child: photoUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: photoUrl,
+                        fit: BoxFit.cover,
+                        errorWidget: (_, __, ___) => Icon(
+                            Icons.directions_car_filled_rounded,
+                            color: AppTheme.textSecondary),
+                      )
+                    : Icon(Icons.directions_car_filled_rounded,
+                        size: 28, color: AppTheme.textSecondary),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _currentJob.client.fullName,
-                      style: AppTheme.headlineSmall,
-                    ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(vehicle.displayName, style: AppTheme.headlineSmall),
+                  if (vehicle.color != null) ...[
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.location_on_outlined,
-                            size: 14, color: AppTheme.textTertiary),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            _currentJob.displayAddress,
-                            style: AppTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
+                        VehicleColorDot(colorName: vehicle.color!),
+                        const SizedBox(width: 6),
+                        Text(vehicle.color!, style: AppTheme.bodySmall),
                       ],
                     ),
                   ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          const Divider(height: 1, color: AppTheme.divider),
-          const SizedBox(height: 14),
-          // Boutons de contact
-          ClientContactRow(
-            hasPhone: _currentJob.client.phoneNumber != null,
-            onCall: _handleCallClient,
-            onChat: () => _openChat(context),
-            onSms: _handleMessageClient,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVehicleCard() {
-    final hasPhoto = _currentJob.vehicle.photoUrl != null &&
-        _currentJob.vehicle.photoUrl!.isNotEmpty;
-    final photoUrl = hasPhoto
-        ? '${AppConfig.apiBaseUrl}${_currentJob.vehicle.photoUrl}'
-        : null;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-        boxShadow: AppTheme.shadowSM,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              // Vehicle photo or icon
-              GestureDetector(
-                onTap: hasPhoto ? () => _showVehiclePhoto(photoUrl!) : null,
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: AppTheme.background,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: hasPhoto
-                      ? CachedNetworkImage(
-                          imageUrl: photoUrl!,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppTheme.secondary,
-                              ),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) => const Center(
-                            child: Icon(Icons.directions_car_filled_rounded,
-                                size: 28, color: AppTheme.textSecondary),
-                          ),
-                        )
-                      : const Center(
-                          child: Icon(Icons.directions_car_filled_rounded,
-                              size: 28, color: AppTheme.textSecondary),
-                        ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _currentJob.vehicle.displayName,
-                      style: AppTheme.headlineSmall,
-                    ),
-                    if (_currentJob.vehicle.licensePlate != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: LicensePlate(
-                            plate: _currentJob.vehicle.licensePlate!),
-                      ),
-                  ],
-                ),
-              ),
-              if (_currentJob.vehicle.color != null)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    VehicleColorDot(colorName: _currentJob.vehicle.color!),
-                    const SizedBox(width: 6),
-                    Text(_currentJob.vehicle.color!, style: AppTheme.bodySmall),
-                  ],
-                ),
-            ],
-          ),
-          // Show larger photo if available
-          if (hasPhoto && photoUrl != null) ...[
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () => _showVehiclePhoto(photoUrl),
-              child: Container(
-                width: double.infinity,
-                height: 140,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                  color: AppTheme.surfaceContainer,
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: photoUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(
-                            color: AppTheme.secondary),
-                      ),
-                      errorWidget: (context, url, error) => Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.broken_image_rounded,
-                              color: AppTheme.textTertiary, size: 40),
-                          const SizedBox(height: 8),
-                          Text(
-                              AppLocalizations.of(context)!
-                                  .reservation_photoUnavailable,
-                              style: AppTheme.bodySmall
-                                  .copyWith(color: AppTheme.textTertiary)),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      right: 8,
-                      bottom: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.zoom_in, color: Colors.white, size: 14),
-                            const SizedBox(width: 4),
-                            Text(
-                              AppLocalizations.of(context)!.worker_enlarge,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 11),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
+            if (vehicle.licensePlate != null)
+              LicensePlate(plate: vehicle.licensePlate!),
           ],
-        ],
-      ),
-    );
-  }
-
-  void _showVehiclePhoto(String photoUrl) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.zero,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(color: Colors.black87),
-            ),
-            Center(
-              child: InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 4.0,
-                child: CachedNetworkImage(
-                  imageUrl: photoUrl,
-                  fit: BoxFit.contain,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  ),
-                  errorWidget: (context, url, error) => const Icon(
-                    Icons.error_outline,
-                    color: Colors.white,
-                    size: 48,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: MediaQuery.of(context).padding.top + 16,
-              right: 16,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close, color: Colors.white, size: 24),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 16,
-              left: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _currentJob.vehicle.displayName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (_currentJob.vehicle.color != null ||
-                        _currentJob.vehicle.licensePlate != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        [
-                          if (_currentJob.vehicle.color != null)
-                            _currentJob.vehicle.color,
-                          if (_currentJob.vehicle.licensePlate != null)
-                            _currentJob.vehicle.licensePlate,
-                        ].join(' • '),
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavigationButtons() {
-    final lat = _currentJob.location!.latitude;
-    final lng = _currentJob.location!.longitude;
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () => _openMaps(lat, lng),
-            icon: const Icon(Icons.map_outlined, size: 18),
-            label: Text(AppLocalizations.of(context)!.worker_googleMaps),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () => _openWaze(lat, lng),
-            icon: const Icon(Icons.navigation_outlined, size: 18),
-            label: Text(AppLocalizations.of(context)!.worker_waze),
-          ),
         ),
       ],
     );
   }
 
-  Widget _buildActionSection() {
-    return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
-      builder: (context, state) {
-        final isLoading =
-            state is JobActionLoading && state.jobId == _currentJob.id;
-
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-            border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
-            boxShadow: AppTheme.shadowSM,
+  Widget _buildTodoCard(AppLocalizations l10n) {
+    return _Card(
+      title: l10n.activeJ_todo,
+      children: [
+        _TodoLine(l10n.activeJ_basicClearing),
+        for (final option in _job.serviceOptions)
+          _TodoLine(serviceOptionLabel(l10n, option)),
+        if (_job.snowDepthCm != null && _job.snowDepthCm! > 0) ...[
+          const SizedBox(height: 6),
+          Text(l10n.activeJ_snowDepth(_job.snowDepthCm!),
+              style: AppTheme.bodySmall),
+        ],
+        if (_job.clientNotes != null &&
+            _job.clientNotes!.trim().isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.worker_clientNotes, style: AppTheme.labelMedium),
+                const SizedBox(height: 4),
+                Text(_job.clientNotes!.trim(), style: AppTheme.bodyMedium),
+              ],
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(AppLocalizations.of(context)!.worker_actions,
-                  style: AppTheme.headlineSmall),
-              const SizedBox(height: 16),
-              if (_currentJob.status == JobStatus.assigned)
-                _buildGradientActionButton(
-                  label: AppLocalizations.of(context)!.worker_enRoute,
-                  icon: Icons.directions_car_rounded,
-                  gradientColors: const [AppTheme.accent],
-                  isLoading: isLoading,
-                  onPressed: () async {
-                    context
-                        .read<WorkerJobsBloc>()
-                        .add(MarkEnRoute(_currentJob.id));
-                    if (_currentJob.location != null) {
-                      await _openMaps(
-                        _currentJob.location!.latitude,
-                        _currentJob.location!.longitude,
-                      );
-                    } else {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              children: [
-                                const Icon(Icons.warning,
-                                    color: AppTheme.onPrimary, size: 20),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                    child: Text(AppLocalizations.of(context)!
-                                        .worker_coordinatesUnavailable)),
-                              ],
-                            ),
-                            backgroundColor: AppTheme.warning,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppTheme.radiusMD),
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  },
+        ],
+      ],
+    );
+  }
+
+  Widget _buildClientCard(AppLocalizations l10n) {
+    return _Card(
+      title: l10n.activeJ_client,
+      children: [
+        Text(_job.client.fullName, style: AppTheme.headlineSmall),
+        const SizedBox(height: 12),
+        ClientContactRow(
+          hasPhone: _job.client.phoneNumber?.isNotEmpty ?? false,
+          onCall: () => _launchPhone('tel'),
+          onChat: () => _openChat(context),
+          onSms: () => _launchPhone('sms'),
+        ),
+      ],
+    );
+  }
+
+  /// Photo "apres", obligatoire pour terminer. Envoyee des qu'elle est prise.
+  Widget _buildPhotoCard(AppLocalizations l10n) {
+    return _Card(
+      title: l10n.activeJ_photoTitle,
+      children: [
+        Text(l10n.activeJ_photoHelp, style: AppTheme.bodySmall),
+        const SizedBox(height: 12),
+        if (_afterPhoto != null || _job.afterPhotoUrl != null)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: 180,
+                  width: double.infinity,
+                  child: _afterPhoto != null
+                      ? Image.file(_afterPhoto!, fit: BoxFit.cover)
+                      : CachedNetworkImage(
+                          imageUrl: _job.afterPhotoUrl!, fit: BoxFit.cover),
                 ),
-              if (_currentJob.status == JobStatus.enRoute) ...[
-                _buildGradientActionButton(
-                  label: AppLocalizations.of(context)!.worker_iArrived,
-                  icon: Icons.location_on_rounded,
-                  gradientColors: const [AppTheme.accent],
-                  isLoading: isLoading,
-                  onPressed: () => _verifyArrivalAndStart(context),
-                ),
-                const SizedBox(height: 12),
-                if (_currentJob.location != null)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildOutlinedButton(
-                          icon: Icons.map_rounded,
-                          label:
-                              AppLocalizations.of(context)!.worker_googleMaps,
-                          color: AppTheme.primary,
-                          onPressed: () => _openMaps(
-                            _currentJob.location!.latitude,
-                            _currentJob.location!.longitude,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildOutlinedButton(
-                          icon: Icons.navigation_rounded,
-                          label: AppLocalizations.of(context)!.worker_waze,
-                          color: AppTheme.info,
-                          onPressed: () => _openWaze(
-                            _currentJob.location!.latitude,
-                            _currentJob.location!.longitude,
-                          ),
-                        ),
-                      ),
-                    ],
+                if (_isUploadingPhoto)
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.black45,
+                      alignment: Alignment.center,
+                      child:
+                          const CircularProgressIndicator(color: Colors.white),
+                    ),
                   ),
               ],
-              if (_currentJob.status == JobStatus.inProgress) ...[
-                _buildPhotoSection(),
-                const SizedBox(height: 16),
-                _buildGradientActionButton(
-                  label: _photoUploaded
-                      ? AppLocalizations.of(context)!.worker_finishJob
-                      : AppLocalizations.of(context)!.worker_photoRequired,
-                  icon: _photoUploaded
-                      ? Icons.check_circle_rounded
-                      : Icons.camera_alt_rounded,
-                  gradientColors: const [AppTheme.accent],
-                  isLoading: isLoading,
-                  onPressed: _photoUploaded
-                      ? () => _showCompleteDialog(context)
-                      : null,
-                ),
-              ],
-            ],
+            ),
+          ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            if (_isUploadingPhoto)
+              Text(l10n.activeJ_photoSending, style: AppTheme.bodySmall)
+            else if (_photoUploaded)
+              Row(
+                children: [
+                  Icon(Icons.check_rounded,
+                      size: 18, color: AppTheme.textSecondary),
+                  const SizedBox(width: 6),
+                  Text(l10n.activeJ_photoSent, style: AppTheme.bodySmall),
+                ],
+              ),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: _isUploadingPhoto ? null : _takePhoto,
+              icon: const Icon(Icons.photo_camera_outlined, size: 18),
+              label: Text(_afterPhoto != null || _photoUploaded
+                  ? l10n.worker_retakePhoto
+                  : l10n.worker_takePhoto),
+            ),
+          ],
+        ),
+        if (_photoError != null)
+          Text(_photoError!,
+              style: AppTheme.bodySmall.copyWith(color: AppTheme.error)),
+      ],
+    );
+  }
+
+  /// Le bouton de l'etape suivante, toujours au meme endroit.
+  Widget _buildMainAction(AppLocalizations l10n) {
+    return BlocBuilder<WorkerJobsBloc, WorkerJobsState>(
+      builder: (context, state) {
+        final isLoading = state is JobActionLoading && state.jobId == _job.id;
+
+        String? label;
+        VoidCallback? onPressed;
+        switch (_job.status) {
+          case JobStatus.assigned:
+            label = l10n.activeJ_goEnRoute;
+            onPressed = _goEnRoute;
+          case JobStatus.enRoute:
+            label = l10n.activeJ_arrivedStart;
+            onPressed = () => _verifyArrivalAndStart(context);
+          case JobStatus.inProgress:
+            label = l10n.activeJ_finish;
+            onPressed = _photoUploaded && !_isUploadingPhoto
+                ? () => _confirmFinish(context)
+                : null;
+          default:
+            return const SizedBox.shrink();
+        }
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+            child: FilledButton(
+              onPressed: isLoading || onPressed == null
+                  ? null
+                  : () {
+                      HapticFeedback.mediumImpact();
+                      onPressed!();
+                    },
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(double.infinity, 58),
+                textStyle:
+                    const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+              ),
+              child: isLoading
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2.5, color: AppTheme.onPrimary),
+                    )
+                  : Text(label),
+            ),
           ),
         );
       },
     );
   }
 
-  /// Bouton de l'etape suivante : grand, orange, impossible a manquer sur le terrain.
-  Widget _buildGradientActionButton({
-    required String label,
-    required IconData icon,
-    required List<Color> gradientColors,
-    required bool isLoading,
-    VoidCallback? onPressed,
-  }) {
-    return FilledButton.icon(
-      onPressed: isLoading || onPressed == null
-          ? null
-          : () {
-              HapticFeedback.mediumImpact();
-              onPressed();
-            },
-      style: FilledButton.styleFrom(
-        backgroundColor: gradientColors.first,
-        minimumSize: const Size(double.infinity, 58),
-        textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-      ),
-      icon: isLoading
-          ? const SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: AppTheme.onPrimary,
-              ),
-            )
-          : Icon(icon, size: 22),
-      label: Text(label),
-    );
-  }
+  // --- Actions ---
 
-  Widget _buildOutlinedButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    return OutlinedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-    );
-  }
-
-  Widget _buildPhotoSection() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _photoUploaded ? AppTheme.successLight : AppTheme.background,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        border: Border.all(
-          color: _photoUploaded
-              ? AppTheme.success.withValues(alpha: 0.3)
-              : AppTheme.border,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: _photoUploaded
-                      ? AppTheme.success.withValues(alpha: 0.15)
-                      : AppTheme.surface,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  _photoUploaded
-                      ? Icons.check_rounded
-                      : Icons.photo_camera_outlined,
-                  color: _photoUploaded ? AppTheme.success : AppTheme.primary,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _photoUploaded
-                          ? AppLocalizations.of(context)!
-                              .worker_photoSentSuccess
-                          : AppLocalizations.of(context)!
-                              .worker_photoOfCompletedWork,
-                      style: AppTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _photoUploaded
-                          ? AppLocalizations.of(context)!.worker_canNowFinish
-                          : AppLocalizations.of(context)!
-                              .worker_takePhotoBeforeFinish,
-                      style: AppTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (_afterPhoto != null && !_photoUploaded) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              child: Image.file(
-                _afterPhoto!,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildOutlinedButton(
-                    icon: Icons.refresh_rounded,
-                    label: AppLocalizations.of(context)!.worker_retakePhoto,
-                    color: AppTheme.textSecondary,
-                    onPressed: _isUploadingPhoto ? () {} : _takePhoto,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _isUploadingPhoto ? null : _uploadPhoto,
-                    icon: _isUploadingPhoto
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppTheme.onPrimary,
-                            ),
-                          )
-                        : const Icon(Icons.cloud_upload_outlined, size: 18),
-                    label: Text(
-                      _isUploadingPhoto
-                          ? AppLocalizations.of(context)!.worker_sending
-                          : AppLocalizations.of(context)!.common_send,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ] else if (_photoUploaded) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              child: Stack(
-                children: [
-                  Image.file(
-                    _afterPhoto!,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                  Positioned(
-                    right: 8,
-                    top: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.success,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.check,
-                        color: AppTheme.onPrimary,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ] else ...[
-            ElevatedButton.icon(
-              onPressed: _takePhoto,
-              icon: const Icon(Icons.photo_camera_outlined, size: 20),
-              label: Text(AppLocalizations.of(context)!.worker_takePhoto),
-            ),
-          ],
-        ],
-      ),
-    );
+  Future<void> _goEnRoute() async {
+    context.read<WorkerJobsBloc>().add(MarkEnRoute(_job.id));
+    if (_job.location != null) {
+      await _openMaps(_job.location!.latitude, _job.location!.longitude);
+    }
   }
 
   Future<void> _takePhoto() async {
     try {
-      final XFile? photo = await _imagePicker.pickImage(
+      final photo = await _imagePicker.pickImage(
         source: ImageSource.camera,
         preferredCameraDevice: CameraDevice.rear,
         imageQuality: 85,
         maxWidth: 1920,
         maxHeight: 1080,
       );
-
-      if (photo != null) {
-        setState(() {
-          _afterPhoto = File(photo.path);
-          _photoUploaded = false;
-        });
-      }
-    } catch (e) {
+      if (photo == null) return;
+      setState(() {
+        _afterPhoto = File(photo.path);
+        _photoUploaded = false;
+        _photoError = null;
+      });
+      await _uploadPhoto();
+    } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                AppLocalizations.of(context)!.worker_cameraPermissionError),
-            backgroundColor: AppTheme.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-            ),
-          ),
-        );
+        _showError(AppLocalizations.of(context)!.worker_cameraPermissionError);
       }
     }
   }
 
   Future<void> _uploadPhoto() async {
     if (_afterPhoto == null) return;
-
-    setState(() {
-      _isUploadingPhoto = true;
-    });
-
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _isUploadingPhoto = true);
     try {
-      final repository = sl<WorkerRepository>();
-      final result = await repository.uploadPhoto(
-        jobId: _currentJob.id,
+      final result = await sl<WorkerRepository>().uploadPhoto(
+        jobId: _job.id,
         type: 'after',
         photo: _afterPhoto!,
       );
-
+      if (!mounted) return;
       result.fold(
-        (failure) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppLocalizations.of(context)!
-                    .clientHome_errorPrefix(failure.message)),
-                backgroundColor: AppTheme.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-              ),
-            );
-          }
-        },
+        (failure) => setState(() => _photoError = failure.message),
         (_) {
-          setState(() {
-            _photoUploaded = true;
-          });
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.check_circle,
-                        color: AppTheme.onPrimary, size: 20),
-                    const SizedBox(width: 12),
-                    Text(AppLocalizations.of(context)!.worker_photoSentSuccess),
-                  ],
-                ),
-                backgroundColor: AppTheme.success,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-                ),
-              ),
-            );
-            // Afficher l'analyse IA de la photo
-            AIPhotoFeedbackDialog.show(
-              context,
-              reservationId: _currentJob.id,
-              onDismiss: () {
-                // L'utilisateur peut continuer
-              },
-              onRetake: () {
-                // Reprendre une photo si la qualite est insuffisante
-                _takePhoto();
-              },
-            );
-          }
+          setState(() => _photoUploaded = true);
+          // Analyse de la photo : propose de la reprendre si elle est floue
+          AIPhotoFeedbackDialog.show(
+            context,
+            reservationId: _job.id,
+            onDismiss: () {},
+            onRetake: _takePhoto,
+          );
         },
       );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text(AppLocalizations.of(context)!.worker_photoUploadError),
-            backgroundColor: AppTheme.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-            ),
-          ),
-        );
-      }
+    } catch (_) {
+      if (mounted) setState(() => _photoError = l10n.worker_photoUploadError);
     } finally {
-      if (mounted) {
-        setState(() {
-          _isUploadingPhoto = false;
-        });
-      }
+      if (mounted) setState(() => _isUploadingPhoto = false);
     }
   }
 
+  void _confirmFinish(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.activeJ_finish),
+        content: Text(l10n.activeJ_confirmFinish),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.common_cancel,
+                style: TextStyle(color: AppTheme.textSecondary)),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(minimumSize: const Size(0, 44)),
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              context.read<WorkerJobsBloc>().add(CompleteJob(_job.id));
+            },
+            child: Text(l10n.common_confirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Verifie la position puis commence directement si le deneigeur est a
+  /// moins de 200 m de la voiture.
   Future<void> _verifyArrivalAndStart(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final bloc = context.read<WorkerJobsBloc>();
+    void start() => bloc.add(StartJob(_job.id));
+
+    if (_job.location == null) {
+      _confirmDialog(
+        title: l10n.worker_coordinatesUnavailable,
+        message: l10n.worker_noGpsConfirmArrival,
+        confirmLabel: l10n.worker_yesStart,
+        onConfirm: start,
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => Center(
-        child: Container(
-          margin: const EdgeInsets.all(32),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-            boxShadow: AppTheme.shadowLG,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(color: AppTheme.primary),
-              const SizedBox(height: 20),
-              Text(
-                AppLocalizations.of(context)!.worker_verifyingPosition,
-                style: AppTheme.bodyMedium,
-              ),
-            ],
-          ),
+      builder: (_) => AlertDialog(
+        content: Row(
+          children: [
+            SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2.5, color: AppTheme.primary),
+            ),
+            const SizedBox(width: 16),
+            Expanded(child: Text(l10n.worker_verifyingPosition)),
+          ],
         ),
       ),
     );
 
     try {
-      LocationPermission permission = await Geolocator.checkPermission();
+      var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          if (!context.mounted) return;
-          Navigator.pop(context);
-          _showLocationError(context,
-              AppLocalizations.of(context)!.worker_locationPermissionDenied);
-          return;
-        }
       }
-
-      if (permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
         if (!context.mounted) return;
         Navigator.pop(context);
-        _showLocationError(
-          context,
-          AppLocalizations.of(context)!.worker_locationPermissionDeniedForever,
+        _messageDialog(
+          l10n.worker_locationError,
+          permission == LocationPermission.deniedForever
+              ? l10n.worker_locationPermissionDeniedForever
+              : l10n.worker_locationPermissionDenied,
         );
         return;
       }
@@ -1344,204 +665,75 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
           timeLimit: Duration(seconds: 10),
         ),
       );
-
       if (!context.mounted) return;
       Navigator.pop(context);
 
-      if (_currentJob.location == null) {
-        _showArrivedDialogNoGps(context);
-        return;
-      }
-
-      final isEmulatorPosition = (position.latitude - 37.4219983).abs() < 0.5 &&
-          (position.longitude - (-122.084)).abs() < 0.5;
-
-      if (isEmulatorPosition) {
-        _showArrivedDialogConfirmed(context, 0);
-        return;
-      }
-
-      final distance = Geolocator.distanceBetween(
-        position.latitude,
-        position.longitude,
-        _currentJob.location!.latitude,
-        _currentJob.location!.longitude,
-      );
+      final distance =
+          _isEmulatorPosition(position.latitude, position.longitude)
+              ? 0.0
+              : Geolocator.distanceBetween(
+                  position.latitude,
+                  position.longitude,
+                  _job.location!.latitude,
+                  _job.location!.longitude,
+                );
 
       if (distance <= _arrivalRadiusMeters) {
-        _showArrivedDialogConfirmed(context, distance.round());
+        start();
       } else {
-        _showTooFarDialog(context, distance.round());
+        _confirmDialog(
+          title: l10n.worker_tooFar,
+          message: l10n.worker_tooFarMessage(
+              distance.round(), _arrivalRadiusMeters.round()),
+          confirmLabel: l10n.worker_openGps,
+          onConfirm: () =>
+              _openMaps(_job.location!.latitude, _job.location!.longitude),
+        );
       }
-    } catch (e) {
+    } catch (_) {
       if (!context.mounted) return;
       Navigator.pop(context);
-      _showLocationError(context,
-          AppLocalizations.of(context)!.worker_cannotDeterminePosition);
+      _messageDialog(
+          l10n.worker_locationError, l10n.worker_cannotDeterminePosition);
     }
   }
 
-  void _showArrivedDialogConfirmed(BuildContext context, int distanceMeters) {
+  void _confirmDialog({
+    required String title,
+    required String message,
+    required String confirmLabel,
+    required VoidCallback onConfirm,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        icon: Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: AppTheme.successLight,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(Icons.check_circle_rounded,
-              color: AppTheme.success, size: 40),
-        ),
-        title: Text(AppLocalizations.of(context)!.worker_positionConfirmed),
-        content: Text(
-          AppLocalizations.of(context)!
-              .worker_arrivedConfirmedMessage(distanceMeters),
-        ),
+        title: Text(title),
+        content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context)!.common_cancel,
+            child: Text(l10n.common_cancel,
                 style: TextStyle(color: AppTheme.textSecondary)),
           ),
-          ElevatedButton.icon(
+          FilledButton(
+            style: FilledButton.styleFrom(minimumSize: const Size(0, 44)),
             onPressed: () {
               Navigator.pop(dialogContext);
-              context.read<WorkerJobsBloc>().add(StartJob(_currentJob.id));
+              onConfirm();
             },
-            icon: const Icon(Icons.play_arrow_rounded),
-            label: Text(AppLocalizations.of(context)!.worker_startJob),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.accent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-            ),
+            child: Text(confirmLabel),
           ),
         ],
       ),
     );
   }
 
-  void _showArrivedDialogNoGps(BuildContext context) {
+  void _messageDialog(String title, String message) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        icon: Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: AppTheme.warningLight,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(Icons.warning_rounded, color: AppTheme.warning, size: 40),
-        ),
-        title:
-            Text(AppLocalizations.of(context)!.worker_coordinatesUnavailable),
-        content: Text(
-          AppLocalizations.of(context)!.worker_noGpsConfirmArrival,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context)!.common_no,
-                style: TextStyle(color: AppTheme.textSecondary)),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<WorkerJobsBloc>().add(StartJob(_currentJob.id));
-            },
-            icon: const Icon(Icons.play_arrow_rounded),
-            label: Text(AppLocalizations.of(context)!.worker_yesStart),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.accent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showTooFarDialog(BuildContext context, int distanceMeters) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        icon: Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: AppTheme.errorLight,
-            shape: BoxShape.circle,
-          ),
-          child:
-              Icon(Icons.location_off_rounded, color: AppTheme.error, size: 40),
-        ),
-        title: Text(AppLocalizations.of(context)!.worker_tooFar),
-        content: Text(
-          AppLocalizations.of(context)!.worker_tooFarMessage(
-              distanceMeters, _arrivalRadiusMeters.round()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text('OK', style: TextStyle(color: AppTheme.textSecondary)),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              if (_currentJob.location != null) {
-                _openMaps(
-                  _currentJob.location!.latitude,
-                  _currentJob.location!.longitude,
-                );
-              }
-            },
-            icon: const Icon(Icons.navigation_rounded),
-            label: Text(AppLocalizations.of(context)!.worker_openGps),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showLocationError(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        icon: Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: AppTheme.errorLight,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(Icons.error_rounded, color: AppTheme.error, size: 40),
-        ),
-        title: Text(AppLocalizations.of(context)!.worker_locationError),
+        title: Text(title),
         content: Text(message),
         actions: [
           TextButton(
@@ -1553,203 +745,96 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     );
   }
 
-  void _showCompleteDialog(BuildContext context) {
+  void _showJobCancelledDialog(String? reason, String cancelledBy) {
+    final l10n = AppLocalizations.of(context)!;
+    HapticFeedback.heavyImpact();
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLG),
-        ),
-        icon: Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: AppTheme.successLight,
-            shape: BoxShape.circle,
+      barrierDismissible: false,
+      builder: (dialogContext) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: Text(l10n.activeJ_cancelled),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(cancelledBy == 'client'
+                  ? l10n.worker_clientCancelledMessage
+                  : l10n.worker_cancelledMessage),
+              if (reason != null && reason.trim().isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(l10n.worker_cancelReason(reason.trim()),
+                    style: AppTheme.bodySmall),
+              ],
+            ],
           ),
-          child:
-              Icon(Icons.task_alt_rounded, color: AppTheme.success, size: 40),
-        ),
-        title: Text(AppLocalizations.of(context)!.worker_finishJob),
-        content: Text(AppLocalizations.of(context)!.worker_confirmCompleteJob),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context)!.common_cancel,
-                style: TextStyle(color: AppTheme.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<WorkerJobsBloc>().add(CompleteJob(_currentJob.id));
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.accent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-              ),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: Text(l10n.activeJ_backHome),
             ),
-            child: Text(AppLocalizations.of(context)!.common_confirm),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Color _getStatusColor(JobStatus status) {
-    switch (status) {
-      case JobStatus.assigned:
-        return AppTheme.statusAssigned;
-      case JobStatus.enRoute:
-        return AppTheme.statusEnRoute;
-      case JobStatus.inProgress:
-        return AppTheme.statusInProgress;
-      case JobStatus.completed:
-        return AppTheme.statusCompleted;
-      default:
-        return AppTheme.textTertiary;
-    }
-  }
-
-  IconData _getStatusIcon(JobStatus status) {
-    switch (status) {
-      case JobStatus.assigned:
-        return Icons.assignment_rounded;
-      case JobStatus.enRoute:
-        return Icons.directions_car_rounded;
-      case JobStatus.inProgress:
-        return Icons.engineering_rounded;
-      case JobStatus.completed:
-        return Icons.check_circle_rounded;
-      default:
-        return Icons.help_rounded;
-    }
-  }
-
-  String _getStatusLabel(JobStatus status) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (status) {
-      case JobStatus.assigned:
-        return l10n.worker_earningsAssigned;
-      case JobStatus.enRoute:
-        return l10n.worker_enRoute;
-      case JobStatus.inProgress:
-        return l10n.activities_inProgress;
-      case JobStatus.completed:
-        return l10n.worker_earningsCompleted;
-      default:
-        return l10n.worker_statusUnknown;
-    }
-  }
-
-  String _getStatusSubtitle(JobStatus status) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (status) {
-      case JobStatus.assigned:
-        return l10n.worker_pressEnRouteToStart;
-      case JobStatus.enRoute:
-        return l10n.worker_headToClient;
-      case JobStatus.inProgress:
-        return l10n.worker_workInProgress;
-      case JobStatus.completed:
-        return l10n.worker_goodJob;
-      default:
-        return '';
-    }
-  }
-
-  String _getSuccessMessage(String action) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (action) {
-      case 'en-route':
-        return l10n.worker_statusUpdatedEnRoute;
-      case 'start':
-        return l10n.worker_jobStarted;
-      case 'complete':
-        return l10n.worker_jobCompletedSuccess;
-      default:
-        return l10n.worker_actionSuccess;
-    }
-  }
-
-  /// Gère l'appel du client avec vérification du numéro
-  void _handleCallClient() {
-    if (_currentJob.client.phoneNumber != null &&
-        _currentJob.client.phoneNumber!.isNotEmpty) {
-      _callClient(_currentJob.client.phoneNumber!);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.worker_phoneUnavailable),
-          backgroundColor: AppTheme.warning,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          ),
+  void _showVehiclePhoto(String photoUrl) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog.fullscreen(
+        backgroundColor: Colors.black,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4,
+              child:
+                  CachedNetworkImage(imageUrl: photoUrl, fit: BoxFit.contain),
+            ),
+            Positioned(
+              top: MediaQuery.of(dialogContext).padding.top + 8,
+              right: 8,
+              child: IconButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                icon: const Icon(Icons.close_rounded, color: Colors.white),
+              ),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
   }
 
-  Future<void> _callClient(String phone) async {
-    final uri = Uri.parse('tel:$phone');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
-  }
-
-  /// Gère l'envoi de SMS au client avec vérification du numéro
-  void _handleMessageClient() {
-    if (_currentJob.client.phoneNumber != null &&
-        _currentJob.client.phoneNumber!.isNotEmpty) {
-      _messageClient(_currentJob.client.phoneNumber!);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.worker_phoneUnavailable),
-          backgroundColor: AppTheme.warning,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> _messageClient(String phone) async {
-    final uri = Uri.parse('sms:$phone');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
-  }
-
-  /// Ouvre l'écran de chat avec le client
-  void _openChat(BuildContext context) {
-    // Récupérer l'ID de l'utilisateur actuel depuis AuthBloc
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.worker_userNotAuth),
-          backgroundColor: AppTheme.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMD),
-          ),
-        ),
-      );
+  Future<void> _launchPhone(String scheme) async {
+    final phone = _job.client.phoneNumber;
+    if (phone == null || phone.isEmpty) {
+      _showError(AppLocalizations.of(context)!.worker_phoneUnavailable);
       return;
     }
+    final uri = Uri.parse('$scheme:$phone');
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  }
 
+  void _openChat(BuildContext context) {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! AuthAuthenticated) {
+      _showError(AppLocalizations.of(context)!.worker_userNotAuth);
+      return;
+    }
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => BlocProvider(
-          create: (_) => sl<ChatBloc>()..add(LoadMessages(_currentJob.id)),
+          create: (_) => sl<ChatBloc>()..add(LoadMessages(_job.id)),
           child: ChatScreen(
-            reservationId: _currentJob.id,
-            otherUserName: _currentJob.client.fullName,
+            reservationId: _job.id,
+            otherUserName: _job.client.fullName,
             otherUserPhoto: null,
             currentUserId: authState.user.id,
           ),
@@ -1758,41 +843,139 @@ class _ActiveJobPageState extends State<ActiveJobPage> {
     );
   }
 
+  /// En debug, la position de l'emulateur est remplacee par Trois-Rivieres.
+  (double, double) _destination(double lat, double lng) =>
+      _isEmulatorPosition(lat, lng)
+          ? (AppConfig.targetLatitude, AppConfig.targetLongitude)
+          : (lat, lng);
+
   Future<void> _openMaps(double lat, double lng) async {
-    double finalLat = lat;
-    double finalLng = lng;
-
-    final isEmulatorLocation =
-        (lat - 37.4219983).abs() < 0.5 && (lng - (-122.084)).abs() < 0.5;
-
-    if (isEmulatorLocation) {
-      finalLat = 46.3432;
-      finalLng = -72.5476;
-    }
-
+    final (dLat, dLng) = _destination(lat, lng);
     final uri = Uri.parse(
-        'https://www.google.com/maps/dir/?api=1&destination=$finalLat,$finalLng');
+        'https://www.google.com/maps/dir/?api=1&destination=$dLat,$dLng');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
   Future<void> _openWaze(double lat, double lng) async {
-    double finalLat = lat;
-    double finalLng = lng;
-
-    final isEmulatorLocation =
-        (lat - 37.4219983).abs() < 0.5 && (lng - (-122.084)).abs() < 0.5;
-
-    if (isEmulatorLocation) {
-      finalLat = 46.3432;
-      finalLng = -72.5476;
-    }
-
-    final uri =
-        Uri.parse('https://waze.com/ul?ll=$finalLat,$finalLng&navigate=yes');
+    final (dLat, dLng) = _destination(lat, lng);
+    final uri = Uri.parse('https://waze.com/ul?ll=$dLat,$dLng&navigate=yes');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+}
+
+/// Les quatre etapes d'un deneigement, l'etape courante mise en avant.
+class _StepTracker extends StatelessWidget {
+  final JobStatus status;
+  const _StepTracker({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final labels = [
+      l10n.activeJ_stepAccepted,
+      l10n.activeJ_stepEnRoute,
+      l10n.activeJ_stepOnSite,
+      l10n.activeJ_stepDone,
+    ];
+    final current = switch (status) {
+      JobStatus.assigned => 0,
+      JobStatus.enRoute => 1,
+      JobStatus.inProgress => 2,
+      JobStatus.completed => 3,
+      _ => 0,
+    };
+
+    return Row(
+      children: [
+        for (var i = 0; i < labels.length; i++)
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 4,
+                  margin: EdgeInsets.only(right: i < labels.length - 1 ? 4 : 0),
+                  decoration: BoxDecoration(
+                    color: i <= current ? AppTheme.primary : AppTheme.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  labels[i],
+                  style: AppTheme.labelSmall.copyWith(
+                    color: i == current
+                        ? AppTheme.textPrimary
+                        : AppTheme.textTertiary,
+                    fontWeight:
+                        i == current ? FontWeight.w800 : FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _Card extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+  const _Card({required this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLG),
+        border: Border.all(color: AppTheme.border.withValues(alpha: 0.7)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: AppTheme.labelMedium),
+          const SizedBox(height: 10),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class _TodoLine extends StatelessWidget {
+  final String text;
+  const _TodoLine(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 7),
+            child: Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: AppTheme.textSecondary,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: AppTheme.bodyMedium)),
+        ],
+      ),
+    );
   }
 }

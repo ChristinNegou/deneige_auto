@@ -53,8 +53,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:
-            Text(message, style: const TextStyle(color: AppTheme.onPrimary)),
+        content: Text(message, style: TextStyle(color: AppTheme.onPrimary)),
         backgroundColor: error ? AppTheme.error : AppTheme.primary,
         behavior: SnackBarBehavior.floating,
       ),
@@ -177,8 +176,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
         surfaceTintColor: Colors.transparent,
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.primary))
+          ? Center(child: CircularProgressIndicator(color: AppTheme.primary))
           : _dispute == null
               ? _buildProblem(l10n)
               : RefreshIndicator(
@@ -352,7 +350,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.hourglass_top_rounded,
+              Icon(Icons.hourglass_top_rounded,
                   size: 18, color: AppTheme.textSecondary),
               const SizedBox(width: 10),
               Expanded(
@@ -458,7 +456,7 @@ class _DisputeDetailsPageState extends State<DisputeDetailsPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.search_off_rounded,
+            Icon(Icons.search_off_rounded,
                 color: AppTheme.textTertiary, size: 48),
             const SizedBox(height: 16),
             Text(
@@ -615,7 +613,7 @@ class _PhotoStrip extends StatelessWidget {
                 width: 84,
                 height: 84,
                 color: AppTheme.surfaceContainer,
-                child: const Icon(Icons.broken_image_outlined,
+                child: Icon(Icons.broken_image_outlined,
                     color: AppTheme.textTertiary),
               ),
             ),

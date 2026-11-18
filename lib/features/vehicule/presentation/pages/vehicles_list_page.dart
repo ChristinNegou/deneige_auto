@@ -51,7 +51,7 @@ class VehiclesListView extends StatelessWidget {
                 },
                 builder: (context, state) {
                   if (state.isLoading && state.vehicles.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: CircularProgressIndicator(color: AppTheme.primary),
                     );
                   }
@@ -177,7 +177,7 @@ class VehiclesListView extends StatelessWidget {
               IconButton(
                 onPressed: () => _showDeleteConfirmation(context, vehicle.id),
                 tooltip: l10n.common_delete,
-                icon: const Icon(
+                icon: Icon(
                   Icons.delete_outline_rounded,
                   color: AppTheme.textTertiary,
                   size: 20,
@@ -233,7 +233,7 @@ class VehiclesListView extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppTheme.border),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.photo_camera_outlined,
                 size: 12,
                 color: AppTheme.textPrimary,
@@ -268,7 +268,7 @@ class VehiclesListView extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 ListTile(
-                  leading: const Icon(Icons.photo_camera_outlined,
+                  leading: Icon(Icons.photo_camera_outlined,
                       color: AppTheme.primary),
                   title: Text(l10n.vehicle_takePhoto),
                   subtitle: Text(
@@ -282,7 +282,7 @@ class VehiclesListView extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.photo_library_outlined,
+                  leading: Icon(Icons.photo_library_outlined,
                       color: AppTheme.primary),
                   title: Text(l10n.vehicle_choosePhoto),
                   subtitle: Text(

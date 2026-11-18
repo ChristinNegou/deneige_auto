@@ -304,7 +304,7 @@ class _RatingDialogState extends State<RatingDialog>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.primary),
+          borderSide: BorderSide(color: AppTheme.primary),
         ),
         counterStyle: TextStyle(color: AppTheme.textTertiary),
       ),

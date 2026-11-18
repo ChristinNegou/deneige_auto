@@ -232,11 +232,11 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                 Container(
                   width: 100,
                   height: 100,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppTheme.primaryLight,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.sms_outlined,
                     size: 44,
                     color: AppTheme.primary,
@@ -248,7 +248,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                 // Titre
                 Text(
                   l10n.phoneVerification_subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.6,
@@ -327,7 +327,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           maxLength: 1,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.6,

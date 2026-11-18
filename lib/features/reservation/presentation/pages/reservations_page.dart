@@ -178,7 +178,7 @@ class _ReservationTile extends StatelessWidget {
               children: [
                 Text(
                   DateFormat('MMM', locale).format(date).toUpperCase(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.accentDark,
@@ -186,7 +186,7 @@ class _ReservationTile extends StatelessWidget {
                 ),
                 Text(
                   '${date.day}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     height: 1.1,
                     fontWeight: FontWeight.w800,
@@ -226,7 +226,7 @@ class _ReservationTile extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             '${reservation.totalPrice.toStringAsFixed(2)} \$',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
               color: AppTheme.textPrimary,

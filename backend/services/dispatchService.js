@@ -91,7 +91,12 @@ async function notifyNearbyWorkers(reservation) {
                 key: 'workerProfile.currentLocation',
                 distanceField: 'distance',
                 maxDistance: DISPATCH_RADIUS_KM * 1000,
-                query: { role: 'snowWorker', 'workerProfile.isAvailable': true },
+                query: {
+                    role: 'snowWorker',
+                    'workerProfile.isAvailable': true,
+                    // Reglage "Nouvelles demandes" du profil deneigeur
+                    'workerProfile.notificationPreferences.newJobs': { $ne: false },
+                },
                 spherical: true,
             },
         },

@@ -2,107 +2,302 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Les couleurs du theme "Hivernal & net", en version claire et sombre.
+class AppPalette {
+  final Brightness brightness;
+  final Color background;
+  final Color surface;
+  final Color surfaceElevated;
+  final Color surfaceContainer;
+  final Color surfaceGlass;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textTertiary;
+  final Color textDisabled;
+  final Color primary;
+  final Color primary2;
+  final Color primary3;
+  final Color primaryLight;
+  final Color secondary;
+  final Color accent;
+  final Color accentDark;
+  final Color accentLight;
+  final Color onPrimary;
+  final Color success;
+  final Color successLight;
+  final Color warning;
+  final Color warningLight;
+  final Color error;
+  final Color errorLight;
+  final Color info;
+  final Color infoLight;
+  final Color border;
+  final Color divider;
+  final Color shadowColor;
+  final Color statusPending;
+  final Color statusPendingBg;
+  final Color statusAssigned;
+  final Color statusAssignedBg;
+  final Color statusEnRoute;
+  final Color statusEnRouteBg;
+  final Color statusInProgress;
+  final Color statusInProgressBg;
+  final Color statusCompleted;
+  final Color statusCompletedBg;
+  final Color statusCancelled;
+  final Color statusCancelledBg;
+
+  const AppPalette({
+    required this.brightness,
+    required this.background,
+    required this.surface,
+    required this.surfaceElevated,
+    required this.surfaceContainer,
+    required this.surfaceGlass,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textTertiary,
+    required this.textDisabled,
+    required this.primary,
+    required this.primary2,
+    required this.primary3,
+    required this.primaryLight,
+    required this.secondary,
+    required this.accent,
+    required this.accentDark,
+    required this.accentLight,
+    required this.onPrimary,
+    required this.success,
+    required this.successLight,
+    required this.warning,
+    required this.warningLight,
+    required this.error,
+    required this.errorLight,
+    required this.info,
+    required this.infoLight,
+    required this.border,
+    required this.divider,
+    required this.shadowColor,
+    required this.statusPending,
+    required this.statusPendingBg,
+    required this.statusAssigned,
+    required this.statusAssignedBg,
+    required this.statusEnRoute,
+    required this.statusEnRouteBg,
+    required this.statusInProgress,
+    required this.statusInProgressBg,
+    required this.statusCompleted,
+    required this.statusCompletedBg,
+    required this.statusCancelled,
+    required this.statusCancelledBg,
+  });
+
+  /// Fond bleu-glace, encre bleu nuit, orange signalisation.
+  static const light = AppPalette(
+    brightness: Brightness.light,
+    background: Color(0xFFF3F6F9),
+    surface: Color(0xFFFFFFFF),
+    surfaceElevated: Color(0xFFFFFFFF),
+    surfaceContainer: Color(0xFFE9EEF3),
+    surfaceGlass: Color(0xF2FFFFFF),
+    textPrimary: Color(0xFF0E1C2B),
+    textSecondary: Color(0xFF4A5A6B),
+    textTertiary: Color(0xFF7D8A98),
+    textDisabled: Color(0xFFB3BDC7),
+    primary: Color(0xFF0E1C2B),
+    primary2: Color(0xFF2F6FB0),
+    primary3: Color(0xFF8FB8DE),
+    primaryLight: Color(0xFFE3EAF2),
+    secondary: Color(0xFF4A5A6B),
+    accent: Color(0xFFF26B1D),
+    accentDark: Color(0xFFC9520F),
+    accentLight: Color(0xFFFDEBDF),
+    onPrimary: Color(0xFFFFFFFF),
+    success: Color(0xFF1F9D63),
+    successLight: Color(0xFFE3F5EC),
+    warning: Color(0xFFC98A06),
+    warningLight: Color(0xFFFBF1D9),
+    error: Color(0xFFD64545),
+    errorLight: Color(0xFFFBE6E6),
+    info: Color(0xFF2F6FB0),
+    infoLight: Color(0xFFE2EDF8),
+    border: Color(0xFFDCE3EA),
+    divider: Color(0xFFE8EDF2),
+    shadowColor: Color(0xFF0E1C2B),
+    statusPending: Color(0xFFC98A06),
+    statusPendingBg: Color(0xFFFBF1D9),
+    statusAssigned: Color(0xFF2F6FB0),
+    statusAssignedBg: Color(0xFFE2EDF8),
+    statusEnRoute: Color(0xFF0E8A9A),
+    statusEnRouteBg: Color(0xFFDFF3F5),
+    statusInProgress: Color(0xFFF26B1D),
+    statusInProgressBg: Color(0xFFFDEBDF),
+    statusCompleted: Color(0xFF1F9D63),
+    statusCompletedBg: Color(0xFFE3F5EC),
+    statusCancelled: Color(0xFF7D8A98),
+    statusCancelledBg: Color(0xFFEDF1F5),
+  );
+
+  /// Nuit d'hiver : fond bleu nuit profond, texte glace. L'encre principale
+  /// devient bleu glace pale (texte bleu nuit dessus) pour rester lisible
+  /// comme texte sur le fond et comme fond de bouton ou de panneau.
+  static const dark = AppPalette(
+    brightness: Brightness.dark,
+    background: Color(0xFF0C1724),
+    surface: Color(0xFF142231),
+    surfaceElevated: Color(0xFF1A2B3D),
+    surfaceContainer: Color(0xFF1F3144),
+    surfaceGlass: Color(0xF2142231),
+    textPrimary: Color(0xFFE8EEF4),
+    textSecondary: Color(0xFFA9B7C5),
+    textTertiary: Color(0xFF7F8E9D),
+    textDisabled: Color(0xFF4C5B6B),
+    primary: Color(0xFFDCE6F0),
+    primary2: Color(0xFF6AA7E6),
+    primary3: Color(0xFF3E6F9E),
+    primaryLight: Color(0xFF1E3247),
+    secondary: Color(0xFFA9B7C5),
+    accent: Color(0xFFF57A30),
+    accentDark: Color(0xFFFF9F66),
+    accentLight: Color(0xFF3A2416),
+    onPrimary: Color(0xFF0E1C2B),
+    success: Color(0xFF3CC384),
+    successLight: Color(0xFF123526),
+    warning: Color(0xFFE3A92B),
+    warningLight: Color(0xFF382B0E),
+    error: Color(0xFFF06A6A),
+    errorLight: Color(0xFF3D1A1D),
+    info: Color(0xFF6AA7E6),
+    infoLight: Color(0xFF162D45),
+    border: Color(0xFF2A3D51),
+    divider: Color(0xFF22344A),
+    shadowColor: Color(0xFF000000),
+    statusPending: Color(0xFFE3A92B),
+    statusPendingBg: Color(0xFF382B0E),
+    statusAssigned: Color(0xFF6AA7E6),
+    statusAssignedBg: Color(0xFF162D45),
+    statusEnRoute: Color(0xFF3FC0D0),
+    statusEnRouteBg: Color(0xFF0F3239),
+    statusInProgress: Color(0xFFF57A30),
+    statusInProgressBg: Color(0xFF3A2416),
+    statusCompleted: Color(0xFF3CC384),
+    statusCompletedBg: Color(0xFF123526),
+    statusCancelled: Color(0xFF8A98A7),
+    statusCancelledBg: Color(0xFF1E2B39),
+  );
+}
+
 /// Theme "Hivernal & net" de l'application Deneige Auto.
 /// Fond bleu-glace, encre bleu nuit pour le texte et les actions courantes,
 /// orange signalisation reserve aux actions cles (reserver, payer, demarrer).
 ///
-/// Les noms des tokens sont conserves depuis l'ancien theme sombre afin que
-/// tous les ecrans existants basculent sur la nouvelle palette sans changement.
+/// Les couleurs suivent la palette active (claire ou sombre) : changer de
+/// palette avec [usePalette] puis reconstruire l'app suffit a tout basculer.
 class AppTheme {
   AppTheme._();
+
+  static AppPalette _palette = AppPalette.light;
+
+  /// Palette active.
+  static AppPalette get palette => _palette;
+
+  static bool get isDark => _palette.brightness == Brightness.dark;
+
+  /// Change la palette. L'app doit ensuite se reconstruire en entier.
+  static void usePalette(AppPalette palette) => _palette = palette;
 
   // --- Couleurs principales ---
 
   /// Fond principal - Bleu glace
-  static const Color background = Color(0xFFF3F6F9);
+  static Color get background => _palette.background;
 
   /// Fond des cartes - Blanc
-  static const Color surface = Color(0xFFFFFFFF);
+  static Color get surface => _palette.surface;
 
   /// Surface élevée - Pour les cartes au-dessus (feuilles, dialogues)
-  static const Color surfaceElevated = Color(0xFFFFFFFF);
+  static Color get surfaceElevated => _palette.surfaceElevated;
 
   /// Surface container - Pour les inputs et éléments interactifs
-  static const Color surfaceContainer = Color(0xFFE9EEF3);
+  static Color get surfaceContainer => _palette.surfaceContainer;
 
   /// Fond des cartes avec transparence
-  static const Color surfaceGlass = Color(0xF2FFFFFF); // 95% opacity
+  static Color get surfaceGlass => _palette.surfaceGlass;
 
   /// Texte principal - Bleu nuit
-  static const Color textPrimary = Color(0xFF0E1C2B);
+  static Color get textPrimary => _palette.textPrimary;
 
   /// Texte secondaire - Ardoise
-  static const Color textSecondary = Color(0xFF4A5A6B);
+  static Color get textSecondary => _palette.textSecondary;
 
   /// Texte tertiaire - Ardoise claire
-  static const Color textTertiary = Color(0xFF7D8A98);
+  static Color get textTertiary => _palette.textTertiary;
 
   /// Texte désactivé
-  static const Color textDisabled = Color(0xFFB3BDC7);
+  static Color get textDisabled => _palette.textDisabled;
 
   /// Encre principale - Bleu nuit (boutons, icones actives, liens)
-  static const Color primary = Color(0xFF0E1C2B);
+  static Color get primary => _palette.primary;
 
   /// Bleu glacier - accent informatif secondaire
-  static const Color primary2 = Color(0xFF2F6FB0);
-  static const Color primary3 = Color(0xFF8FB8DE);
+  static Color get primary2 => _palette.primary2;
+  static Color get primary3 => _palette.primary3;
 
   /// Encre principale atténuée (fonds selectionnes)
-  static const Color primaryLight = Color(0xFFE3EAF2);
+  static Color get primaryLight => _palette.primaryLight;
 
   /// Accent secondaire - Ardoise
-  static const Color secondary = Color(0xFF4A5A6B);
+  static Color get secondary => _palette.secondary;
 
   /// Orange signalisation - reserve aux actions cles, a utiliser avec parcimonie
-  static const Color accent = Color(0xFFF26B1D);
-  static const Color accentDark = Color(0xFFC9520F);
-  static const Color accentLight = Color(0xFFFDEBDF);
+  static Color get accent => _palette.accent;
+  static Color get accentDark => _palette.accentDark;
+  static Color get accentLight => _palette.accentLight;
 
   /// Texte sur fond primary / accent
-  static const Color onPrimary = Color(0xFFFFFFFF);
+  static Color get onPrimary => _palette.onPrimary;
 
   /// Couleur succès - Vert sapin
-  static const Color success = Color(0xFF1F9D63);
-  static const Color successLight = Color(0xFFE3F5EC);
+  static Color get success => _palette.success;
+  static Color get successLight => _palette.successLight;
 
   /// Couleur warning - Ambre
-  static const Color warning = Color(0xFFC98A06);
-  static const Color warningLight = Color(0xFFFBF1D9);
+  static Color get warning => _palette.warning;
+  static Color get warningLight => _palette.warningLight;
 
   /// Couleur erreur - Rouge
-  static const Color error = Color(0xFFD64545);
-  static const Color errorLight = Color(0xFFFBE6E6);
+  static Color get error => _palette.error;
+  static Color get errorLight => _palette.errorLight;
 
   /// Couleur info - Bleu glacier
-  static const Color info = Color(0xFF2F6FB0);
-  static const Color infoLight = Color(0xFFE2EDF8);
+  static Color get info => _palette.info;
+  static Color get infoLight => _palette.infoLight;
 
   /// Bordures et séparateurs
-  static const Color border = Color(0xFFDCE3EA);
-  static const Color divider = Color(0xFFE8EDF2);
+  static Color get border => _palette.border;
+  static Color get divider => _palette.divider;
 
   /// Couleur d'ombre - teintee bleu nuit pour des ombres naturelles
-  static const Color shadowColor = Color(0xFF0E1C2B);
+  static Color get shadowColor => _palette.shadowColor;
 
   // --- Couleurs de statut de reservation ---
 
-  static const Color statusPending = Color(0xFFC98A06);
-  static const Color statusPendingBg = Color(0xFFFBF1D9);
+  static Color get statusPending => _palette.statusPending;
+  static Color get statusPendingBg => _palette.statusPendingBg;
 
-  static const Color statusAssigned = Color(0xFF2F6FB0);
-  static const Color statusAssignedBg = Color(0xFFE2EDF8);
+  static Color get statusAssigned => _palette.statusAssigned;
+  static Color get statusAssignedBg => _palette.statusAssignedBg;
 
-  static const Color statusEnRoute = Color(0xFF0E8A9A);
-  static const Color statusEnRouteBg = Color(0xFFDFF3F5);
+  static Color get statusEnRoute => _palette.statusEnRoute;
+  static Color get statusEnRouteBg => _palette.statusEnRouteBg;
 
-  static const Color statusInProgress = Color(0xFFF26B1D);
-  static const Color statusInProgressBg = Color(0xFFFDEBDF);
+  static Color get statusInProgress => _palette.statusInProgress;
+  static Color get statusInProgressBg => _palette.statusInProgressBg;
 
-  static const Color statusCompleted = Color(0xFF1F9D63);
-  static const Color statusCompletedBg = Color(0xFFE3F5EC);
+  static Color get statusCompleted => _palette.statusCompleted;
+  static Color get statusCompletedBg => _palette.statusCompletedBg;
 
-  static const Color statusCancelled = Color(0xFF7D8A98);
-  static const Color statusCancelledBg = Color(0xFFEDF1F5);
+  static Color get statusCancelled => _palette.statusCancelled;
+  static Color get statusCancelledBg => _palette.statusCancelledBg;
 
   // --- Dimensions et espacements (grille de 4dp) ---
 
@@ -220,74 +415,74 @@ class AppTheme {
   // --- Styles de texte (Manrope, applique via le ThemeData) ---
 
   /// Titre principal (page)
-  static const TextStyle headlineLarge = TextStyle(
-    fontSize: 26,
-    fontWeight: FontWeight.w800,
-    color: textPrimary,
-    letterSpacing: -0.6,
-    height: 1.2,
-  );
+  static TextStyle get headlineLarge => TextStyle(
+        fontSize: 26,
+        fontWeight: FontWeight.w800,
+        color: textPrimary,
+        letterSpacing: -0.6,
+        height: 1.2,
+      );
 
   /// Titre de section
-  static const TextStyle headlineMedium = TextStyle(
-    fontSize: 19,
-    fontWeight: FontWeight.w700,
-    color: textPrimary,
-    letterSpacing: -0.3,
-    height: 1.25,
-  );
+  static TextStyle get headlineMedium => TextStyle(
+        fontSize: 19,
+        fontWeight: FontWeight.w700,
+        color: textPrimary,
+        letterSpacing: -0.3,
+        height: 1.25,
+      );
 
   /// Titre de carte
-  static const TextStyle headlineSmall = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w700,
-    color: textPrimary,
-    letterSpacing: -0.1,
-  );
+  static TextStyle get headlineSmall => TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: textPrimary,
+        letterSpacing: -0.1,
+      );
 
   /// Corps de texte
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    color: textPrimary,
-    height: 1.45,
-  );
+  static TextStyle get bodyLarge => TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: textPrimary,
+        height: 1.45,
+      );
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    color: textPrimary,
-    height: 1.45,
-  );
+  static TextStyle get bodyMedium => TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: textPrimary,
+        height: 1.45,
+      );
 
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w500,
-    color: textSecondary,
-    height: 1.4,
-  );
+  static TextStyle get bodySmall => TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+        color: textSecondary,
+        height: 1.4,
+      );
 
   /// Labels
-  static const TextStyle labelLarge = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w700,
-    color: textPrimary,
-  );
+  static TextStyle get labelLarge => TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: textPrimary,
+      );
 
-  static const TextStyle labelMedium = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w600,
-    color: textSecondary,
-  );
+  static TextStyle get labelMedium => TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: textSecondary,
+      );
 
-  static const TextStyle labelSmall = TextStyle(
-    fontSize: 11,
-    fontWeight: FontWeight.w600,
-    color: textTertiary,
-  );
+  static TextStyle get labelSmall => TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        color: textTertiary,
+      );
 
   static TextTheme get _textTheme => GoogleFonts.manropeTextTheme(
-        const TextTheme(
+        TextTheme(
           displaySmall: TextStyle(
             fontSize: 34,
             fontWeight: FontWeight.w800,
@@ -324,19 +519,20 @@ class AppTheme {
 
   // --- ThemeData Material 3 ---
 
-  /// Configuration complete du ThemeData Material 3 en mode clair.
-  static ThemeData get lightTheme {
+  /// ThemeData Material 3 de la palette active.
+  static ThemeData get theme {
     final textTheme = _textTheme;
     final buttonText = textTheme.labelLarge!.copyWith(fontSize: 16);
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: _palette.brightness,
       primaryColor: primary,
       scaffoldBackgroundColor: background,
       fontFamily: GoogleFonts.manrope().fontFamily,
       textTheme: textTheme,
-      colorScheme: const ColorScheme.light(
+      colorScheme: ColorScheme(
+        brightness: _palette.brightness,
         primary: primary,
         onPrimary: onPrimary,
         primaryContainer: primaryLight,
@@ -365,11 +561,7 @@ class AppTheme {
         backgroundColor: background,
         surfaceTintColor: Colors.transparent,
         foregroundColor: textPrimary,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-        ),
+        systemOverlayStyle: systemOverlayStyle,
         titleTextStyle: textTheme.titleLarge,
       ),
       cardTheme: CardThemeData(
@@ -414,7 +606,7 @@ class AppTheme {
           foregroundColor: textPrimary,
           backgroundColor: surface,
           minimumSize: const Size(double.infinity, buttonHeight),
-          side: const BorderSide(color: border, width: 1.5),
+          side: BorderSide(color: border, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMD),
           ),
@@ -427,7 +619,7 @@ class AppTheme {
           textStyle: textTheme.labelLarge,
         ),
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: accent,
         foregroundColor: onPrimary,
         elevation: 2,
@@ -439,23 +631,23 @@ class AppTheme {
             const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMD),
-          borderSide: const BorderSide(color: border),
+          borderSide: BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMD),
-          borderSide: const BorderSide(color: border),
+          borderSide: BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMD),
-          borderSide: const BorderSide(color: primary, width: 1.5),
+          borderSide: BorderSide(color: primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMD),
-          borderSide: const BorderSide(color: error),
+          borderSide: BorderSide(color: error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMD),
-          borderSide: const BorderSide(color: error, width: 1.5),
+          borderSide: BorderSide(color: error, width: 1.5),
         ),
         prefixIconColor: textTertiary,
         suffixIconColor: textTertiary,
@@ -488,7 +680,7 @@ class AppTheme {
         unselectedLabelStyle:
             textTheme.labelLarge!.copyWith(fontWeight: FontWeight.w600),
       ),
-      dividerTheme: const DividerThemeData(
+      dividerTheme: DividerThemeData(
         color: divider,
         thickness: 1,
         space: 1,
@@ -505,7 +697,7 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusFull),
-          side: const BorderSide(color: border),
+          side: BorderSide(color: border),
         ),
       ),
       dialogTheme: DialogThemeData(
@@ -517,7 +709,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(radiusXL),
         ),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
+      bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: surface,
         modalBackgroundColor: surface,
         surfaceTintColor: Colors.transparent,
@@ -536,7 +728,7 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
+      progressIndicatorTheme: ProgressIndicatorThemeData(
         color: primary,
         linearTrackColor: surfaceContainer,
       ),
@@ -567,7 +759,7 @@ class AppTheme {
           }
           return Colors.transparent;
         }),
-        side: const BorderSide(color: textTertiary, width: 1.5),
+        side: BorderSide(color: textTertiary, width: 1.5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
       radioTheme: RadioThemeData(
@@ -581,8 +773,12 @@ class AppTheme {
     );
   }
 
-  /// Alias pour la compatibilité (l'application n'a plus de theme sombre)
-  static ThemeData get darkTheme => lightTheme;
+  /// Icones de la barre d'etat lisibles sur le fond de la palette active.
+  static SystemUiOverlayStyle get systemOverlayStyle => SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      );
 }
 
 /// Carte de contenu principale : fond blanc, bordure fine et ombre douce.

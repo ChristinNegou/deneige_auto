@@ -59,7 +59,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.smart_toy,
                               size: 16,
                               color: AppTheme.primary,
@@ -67,7 +67,7 @@ class PhotoAnalysisCard extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               AppLocalizations.of(context)!.ai_analysisLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: AppTheme.textPrimary,
