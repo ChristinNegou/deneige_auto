@@ -144,6 +144,9 @@ class NewReservationState extends Equatable {
     String? reservationId,
     String? parkingSpotNumber,
     String? customLocation,
+    // `null` garde la valeur actuelle : ces drapeaux permettent de l'effacer.
+    bool clearParkingSpotNumber = false,
+    bool clearCustomLocation = false,
     double? locationLatitude,
     double? locationLongitude,
     String? locationAddress,
@@ -170,8 +173,11 @@ class NewReservationState extends Equatable {
       errorMessage: errorMessage,
       isSubmitted: isSubmitted ?? this.isSubmitted,
       reservationId: reservationId ?? this.reservationId,
-      parkingSpotNumber: parkingSpotNumber ?? this.parkingSpotNumber,
-      customLocation: customLocation ?? this.customLocation,
+      parkingSpotNumber: clearParkingSpotNumber
+          ? null
+          : parkingSpotNumber ?? this.parkingSpotNumber,
+      customLocation:
+          clearCustomLocation ? null : customLocation ?? this.customLocation,
       locationLatitude: locationLatitude ?? this.locationLatitude,
       locationLongitude: locationLongitude ?? this.locationLongitude,
       locationAddress: locationAddress ?? this.locationAddress,

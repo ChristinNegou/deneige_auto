@@ -133,6 +133,31 @@ void main() {
           expect(bloc.state.parkingSpotNumber, 'A-15');
         },
       );
+
+      blocTest<NewReservationBloc, NewReservationState>(
+        'clears the spot when the field is emptied, blocking step 1',
+        build: () => bloc,
+        act: (bloc) => bloc
+          ..add(SelectVehicle(ReservationFixtures.createVehicle()))
+          ..add(const UpdateParkingSpotNumber('A'))
+          ..add(const UpdateParkingSpotNumber('')),
+        verify: (bloc) {
+          expect(bloc.state.parkingSpotNumber, isNull);
+          expect(bloc.state.canProceedStep1, false);
+        },
+      );
+
+      blocTest<NewReservationBloc, NewReservationState>(
+        'replaces a previous custom location',
+        build: () => bloc,
+        act: (bloc) => bloc
+          ..add(const UpdateCustomLocation('Devant'))
+          ..add(const UpdateParkingSpotNumber('B-2')),
+        verify: (bloc) {
+          expect(bloc.state.customLocation, isNull);
+          expect(bloc.state.parkingSpotNumber, 'B-2');
+        },
+      );
     });
 
     group('UpdateCustomLocation', () {
@@ -142,6 +167,19 @@ void main() {
         act: (bloc) => bloc.add(const UpdateCustomLocation('123 Rue Main')),
         verify: (bloc) {
           expect(bloc.state.customLocation, '123 Rue Main');
+        },
+      );
+
+      blocTest<NewReservationBloc, NewReservationState>(
+        'clears the location when only spaces remain',
+        build: () => bloc,
+        act: (bloc) => bloc
+          ..add(SelectVehicle(ReservationFixtures.createVehicle()))
+          ..add(const UpdateCustomLocation('Der'))
+          ..add(const UpdateCustomLocation('   ')),
+        verify: (bloc) {
+          expect(bloc.state.customLocation, isNull);
+          expect(bloc.state.canProceedStep1, false);
         },
       );
     });

@@ -244,9 +244,12 @@ class NewReservationBloc
     UpdateParkingSpotNumber event,
     Emitter<NewReservationState> emit,
   ) {
+    // Un champ vide efface la valeur : sinon l'etape resterait validee.
+    final spot = event.spotNumber.trim();
     emit(state.copyWith(
-      parkingSpotNumber: event.spotNumber,
-      customLocation: null,
+      parkingSpotNumber: spot.isEmpty ? null : spot,
+      clearParkingSpotNumber: spot.isEmpty,
+      clearCustomLocation: true,
     ));
   }
 
@@ -254,9 +257,11 @@ class NewReservationBloc
     UpdateCustomLocation event,
     Emitter<NewReservationState> emit,
   ) {
+    final location = event.location.trim();
     emit(state.copyWith(
-      customLocation: event.location,
-      parkingSpotNumber: null, // ✅ Réinitialiser l'autre option
+      customLocation: location.isEmpty ? null : location,
+      clearCustomLocation: location.isEmpty,
+      clearParkingSpotNumber: true,
     ));
   }
 

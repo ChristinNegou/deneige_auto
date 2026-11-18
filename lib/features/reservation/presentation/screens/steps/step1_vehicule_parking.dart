@@ -116,7 +116,13 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
           subtitle: l10n.step1_haveSpotNumber,
           icon: Icons.local_parking_rounded,
           isSelected: _selectedLocationOption == 1,
-          onTap: () => setState(() => _selectedLocationOption = 1),
+          onTap: () {
+            setState(() => _selectedLocationOption = 1);
+            // Seule l'option visible compte : l'autre saisie est oubliee.
+            context
+                .read<NewReservationBloc>()
+                .add(UpdateParkingSpotNumber(_parkingSpotController.text));
+          },
           child: _selectedLocationOption == 1
               ? Padding(
                   padding: const EdgeInsets.only(top: 12),
@@ -141,12 +147,10 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                         letterSpacing: 1,
                         color: AppTheme.textPrimary),
                     onChanged: (value) {
-                      if (value.trim().isNotEmpty) {
-                        _customLocationController.clear();
-                        context
-                            .read<NewReservationBloc>()
-                            .add(UpdateParkingSpotNumber(value.trim()));
-                      }
+                      _customLocationController.clear();
+                      context
+                          .read<NewReservationBloc>()
+                          .add(UpdateParkingSpotNumber(value));
                     },
                   ),
                 )
@@ -161,7 +165,12 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
           subtitle: l10n.step1_describeLocation,
           icon: Icons.edit_location_alt_rounded,
           isSelected: _selectedLocationOption == 2,
-          onTap: () => setState(() => _selectedLocationOption = 2),
+          onTap: () {
+            setState(() => _selectedLocationOption = 2);
+            context
+                .read<NewReservationBloc>()
+                .add(UpdateCustomLocation(_customLocationController.text));
+          },
           child: _selectedLocationOption == 2
               ? Padding(
                   padding: const EdgeInsets.only(top: 12),
@@ -186,12 +195,10 @@ class _Step1VehicleParkingScreenState extends State<Step1VehicleParkingScreen> {
                         maxLines: 2,
                         style: TextStyle(color: AppTheme.textPrimary),
                         onChanged: (value) {
-                          if (value.trim().isNotEmpty) {
-                            _parkingSpotController.clear();
-                            context
-                                .read<NewReservationBloc>()
-                                .add(UpdateCustomLocation(value.trim()));
-                          }
+                          _parkingSpotController.clear();
+                          context
+                              .read<NewReservationBloc>()
+                              .add(UpdateCustomLocation(value));
                         },
                       ),
                       const SizedBox(height: 10),
