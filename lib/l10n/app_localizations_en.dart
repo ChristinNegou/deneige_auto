@@ -661,7 +661,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservation_exhaustCheck => 'Exhaust check';
 
   @override
-  String get reservation_originalPrice => 'Original price';
+  String get edit_paidPrice => 'Price paid';
+
+  @override
+  String get edit_priceChangeNotAllowed =>
+      'This change would alter the price you paid. To apply it, cancel this reservation (free until the snow worker is on the way) and create a new one.';
 
   @override
   String get reservation_modifying => 'Modifying...';

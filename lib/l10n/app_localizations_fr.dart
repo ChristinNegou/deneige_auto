@@ -671,7 +671,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reservation_exhaustCheck => 'Vérif. échappement';
 
   @override
-  String get reservation_originalPrice => 'Prix original';
+  String get edit_paidPrice => 'Prix payé';
+
+  @override
+  String get edit_priceChangeNotAllowed =>
+      'Ce changement modifierait le prix payé. Pour l’appliquer, annulez cette réservation (c’est gratuit tant que le déneigeur n’est pas en route) puis créez-en une nouvelle.';
 
   @override
   String get reservation_modifying => 'Modification en cours...';

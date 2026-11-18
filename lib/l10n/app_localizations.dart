@@ -1328,11 +1328,17 @@ abstract class AppLocalizations {
   /// **'Vérif. échappement'**
   String get reservation_exhaustCheck;
 
-  /// No description provided for @reservation_originalPrice.
+  /// No description provided for @edit_paidPrice.
   ///
   /// In fr, this message translates to:
-  /// **'Prix original'**
-  String get reservation_originalPrice;
+  /// **'Prix payé'**
+  String get edit_paidPrice;
+
+  /// No description provided for @edit_priceChangeNotAllowed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce changement modifierait le prix payé. Pour l’appliquer, annulez cette réservation (c’est gratuit tant que le déneigeur n’est pas en route) puis créez-en une nouvelle.'**
+  String get edit_priceChangeNotAllowed;
 
   /// No description provided for @reservation_modifying.
   ///

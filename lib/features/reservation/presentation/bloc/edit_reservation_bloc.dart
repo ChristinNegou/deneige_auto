@@ -140,6 +140,21 @@ class EditReservationState extends Equatable {
         locationAddress != originalReservation!.locationAddress;
   }
 
+  /// Vrai si les choix actuels donneraient un autre prix que celui paye
+  /// (categorie de vehicule, type de place, options). Le serveur refuse ces
+  /// modifications : il faut annuler et refaire une reservation.
+  bool get changesPrice {
+    final original = originalReservation;
+    if (original == null) return false;
+    return (selectedVehicle?.type.priceFactor ??
+                original.vehicle.type.priceFactor) !=
+            original.vehicle.type.priceFactor ||
+        (selectedParkingSpot?.level.priceFactor ??
+                original.parkingSpot.level.priceFactor) !=
+            original.parkingSpot.level.priceFactor ||
+        !_serviceOptionsEqual(selectedOptions, original.serviceOptions);
+  }
+
   bool _serviceOptionsEqual(List<ServiceOption> a, List<ServiceOption> b) {
     if (a.length != b.length) return false;
     return a.toSet().difference(b.toSet()).isEmpty;
@@ -331,69 +346,20 @@ class EditReservationBloc
     RecalculatePrice event,
     Emitter<EditReservationState> emit,
   ) {
-    // Vérifier qu'il y a un véhicule et une place de parking
-    if (state.selectedVehicle == null || state.selectedParkingSpot == null) {
-      return;
+    // Le prix paye ne change jamais a la modification : seules les
+    // modifications sans effet sur le prix sont enregistrees (voir
+    // changesPrice). Recalculer ici donnait un prix sans frais ni taxes.
+    final paid = state.originalReservation?.totalPrice;
+    if (paid != null && state.calculatedPrice != paid) {
+      emit(state.copyWith(calculatedPrice: paid));
     }
-
-    double basePrice = AppConfig.basePrice;
-
-    // Calcul du facteur véhicule
-    final vehicleFactor = state.selectedVehicle!.type.priceFactor;
-    double price = basePrice * vehicleFactor;
-
-    // Calcul du facteur parking
-    final parkingFactor = state.selectedParkingSpot!.level.priceFactor;
-    price *= parkingFactor;
-
-    // Calcul du supplément neige (si disponible dans la réservation originale)
-    if (state.originalReservation?.snowDepthCm != null &&
-        state.originalReservation!.snowDepthCm! > 10) {
-      final snowSurcharge =
-          (state.originalReservation!.snowDepthCm! - 10) * AppConfig.pricePerCm;
-      price += snowSurcharge;
-    }
-
-    // Calcul du coût des options
-    double optionsCost = 0;
-    for (final option in state.selectedOptions) {
-      switch (option) {
-        case ServiceOption.windowScraping:
-          optionsCost += AppConfig.iceRemovalSurcharge;
-          break;
-        case ServiceOption.doorDeicing:
-          optionsCost += AppConfig.doorDeicingSurcharge;
-          break;
-        case ServiceOption.wheelClearance:
-          optionsCost += AppConfig.wheelClearanceSurcharge;
-          break;
-        case ServiceOption.roofClearing:
-          optionsCost += AppConfig.roofClearingSurcharge;
-          break;
-        case ServiceOption.saltSpreading:
-          optionsCost += AppConfig.saltSpreadingSurcharge;
-          break;
-        case ServiceOption.lightsCleaning:
-          optionsCost += AppConfig.lightsCleaningSurcharge;
-          break;
-        case ServiceOption.perimeterClearance:
-          optionsCost += AppConfig.perimeterClearanceSurcharge;
-          break;
-        case ServiceOption.exhaustCheck:
-          optionsCost += AppConfig.exhaustCheckSurcharge;
-          break;
-      }
-    }
-    price += optionsCost;
-
-    emit(state.copyWith(calculatedPrice: price));
   }
 
   Future<void> _onSubmitUpdate(
     SubmitReservationUpdate event,
     Emitter<EditReservationState> emit,
   ) async {
-    if (!state.canSubmit || !state.hasChanges) return;
+    if (!state.canSubmit || !state.hasChanges || state.changesPrice) return;
 
     // Vérifier que la réservation peut toujours être modifiée
     if (state.originalReservation?.canBeEdited != true) {

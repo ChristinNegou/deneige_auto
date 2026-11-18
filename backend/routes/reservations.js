@@ -372,6 +372,21 @@ router.post('/', protect, async (req, res) => {
 
 // --- Modification de réservation ---
 
+/** Delai minimum avant le depart, comme dans l'application. */
+const MIN_LEAD_MINUTES = 60;
+
+/**
+ * Ce qui determine le prix d'une reservation (hors neige, non modifiable) :
+ * deux signatures differentes = deux prix differents.
+ */
+const priceSignature = ({ vehicle, parkingSpotDoc, serviceOptions }) => {
+    const { PRICING } = require('../config/constants');
+    const vehicleFactor = PRICING.VEHICLE_FACTORS[vehicle?.type] ?? 'other';
+    const parkingFactor = parkingSpotDoc ? (PRICING.PARKING_FACTORS[parkingSpotDoc.level] ?? 'other') : 1;
+    const options = [...(serviceOptions || [])].sort().join(',');
+    return `${vehicleFactor}|${parkingFactor}|${options}`;
+};
+
 /**
  * PUT /api/reservations/:id
  * Met à jour une réservation existante (véhicule, place de parking, localisation).
@@ -379,65 +394,9 @@ router.post('/', protect, async (req, res) => {
  */
 router.put('/:id', protect, async (req, res) => {
     try {
-        // Mapper les champs du frontend vers le schéma backend
-        const updateData = { ...req.body };
-
-        // Mapper vehicleId vers vehicle
-        if (updateData.vehicleId) {
-            updateData.vehicle = updateData.vehicleId;
-            delete updateData.vehicleId;
-        }
-
-        // ✅ Gérer les différents cas de place de parking (comme dans POST)
-        if (updateData.parkingSpotId) {
-            const parkingSpotId = updateData.parkingSpotId;
-            delete updateData.parkingSpotId;
-
-            if (parkingSpotId === 'manual' || parkingSpotId.startsWith('manual-')) {
-                // Place manuelle avec numéro
-                updateData.parkingSpot = null; // Pas de référence ObjectId
-                updateData.parkingSpotNumber = parkingSpotId === 'manual'
-                    ? updateData.parkingSpotNumber
-                    : parkingSpotId.replace('manual-', '');
-                updateData.customLocation = null;
-                console.log('✅ Mise à jour avec place manuelle:', updateData.parkingSpotNumber);
-            } else if (parkingSpotId.startsWith('custom-')) {
-                // Emplacement personnalisé
-                updateData.parkingSpot = null;
-                updateData.parkingSpotNumber = null;
-                updateData.customLocation = parkingSpotId.replace('custom-', '');
-                console.log('✅ Mise à jour avec emplacement perso:', updateData.customLocation);
-            } else if (parkingSpotId && parkingSpotId.length === 24) {
-                // ID de place valide (ObjectId MongoDB = 24 caractères hex)
-                updateData.parkingSpot = parkingSpotId;
-                updateData.parkingSpotNumber = null;
-                updateData.customLocation = null;
-                console.log('✅ Mise à jour avec place ID:', parkingSpotId);
-            }
-        }
-
-        // ✅ Gérer la mise à jour de la localisation GPS
-        if (updateData.latitude && updateData.longitude) {
-            updateData.location = {
-                type: 'Point',
-                coordinates: [parseFloat(updateData.longitude), parseFloat(updateData.latitude)],
-                address: updateData.address || 'Adresse mise à jour',
-            };
-            console.log('✅ Mise à jour localisation GPS:', updateData.location);
-            // Nettoyer les champs temporaires
-            delete updateData.latitude;
-            delete updateData.longitude;
-            delete updateData.address;
-        }
-
-        const reservation = await Reservation.findOneAndUpdate(
-            { _id: req.params.id, userId: req.user.id },
-            updateData,
-            { new: true, runValidators: true }
-        )
+        const reservation = await Reservation.findOne({ _id: req.params.id, userId: req.user.id })
             .populate('vehicle')
-            .populate('parkingSpot')
-            .populate('workerId');
+            .populate('parkingSpot');
 
         if (!reservation) {
             return res.status(404).json({
@@ -445,6 +404,108 @@ router.put('/:id', protect, async (req, res) => {
                 message: 'Réservation non trouvée',
             });
         }
+
+        // Une fois un deneigeur assigne, la reservation est figee
+        if (reservation.status !== 'pending') {
+            return res.status(409).json({
+                success: false,
+                code: 'NOT_EDITABLE',
+                message: 'Cette réservation ne peut plus être modifiée : un déneigeur l’a déjà acceptée.',
+            });
+        }
+
+        // Seuls ces champs sont modifiables ; prix, statut, paiement et
+        // deneigeur ne viennent jamais du client.
+        const {
+            vehicleId,
+            parkingSpotId,
+            parkingSpotNumber,
+            departureTime,
+            deadlineTime,
+            serviceOptions,
+            latitude,
+            longitude,
+            address,
+        } = req.body;
+
+        const next = {
+            vehicle: reservation.vehicle,
+            parkingSpotDoc: reservation.parkingSpot,
+            serviceOptions: Array.isArray(serviceOptions) ? serviceOptions : reservation.serviceOptions,
+        };
+
+        if (vehicleId && String(vehicleId) !== String(reservation.vehicle?._id)) {
+            next.vehicle = await Vehicle.findOne({ _id: vehicleId, userId: req.user.id }).catch(() => null);
+            if (!next.vehicle) {
+                return res.status(400).json({ success: false, code: 'VEHICLE_NOT_FOUND', message: 'Véhicule introuvable.' });
+            }
+        }
+
+        // Place de parking : memes formats qu'a la creation
+        let parkingUpdate = null;
+        if (parkingSpotId) {
+            if (parkingSpotId === 'manual' || parkingSpotId.startsWith('manual-')) {
+                parkingUpdate = {
+                    parkingSpot: null,
+                    parkingSpotNumber: parkingSpotId === 'manual' ? parkingSpotNumber : parkingSpotId.replace('manual-', ''),
+                    customLocation: null,
+                };
+                next.parkingSpotDoc = null;
+            } else if (parkingSpotId.startsWith('custom-')) {
+                parkingUpdate = { parkingSpot: null, parkingSpotNumber: null, customLocation: parkingSpotId.replace('custom-', '') };
+                next.parkingSpotDoc = null;
+            } else if (parkingSpotId.length === 24) {
+                next.parkingSpotDoc = await ParkingSpot.findById(parkingSpotId).lean().catch(() => null);
+                if (!next.parkingSpotDoc) {
+                    return res.status(400).json({ success: false, code: 'PARKING_NOT_FOUND', message: 'Place introuvable.' });
+                }
+                parkingUpdate = { parkingSpot: parkingSpotId, parkingSpotNumber: null, customLocation: null };
+            }
+        }
+
+        // Le prix paye ne change pas : on refuse ce qui le modifierait
+        if (priceSignature(next) !== priceSignature({
+            vehicle: reservation.vehicle,
+            parkingSpotDoc: reservation.parkingSpot,
+            serviceOptions: reservation.serviceOptions,
+        })) {
+            return res.status(409).json({
+                success: false,
+                code: 'PRICE_CHANGE_NOT_ALLOWED',
+                message: 'Ce changement modifierait le prix payé. Annulez cette réservation et créez-en une nouvelle.',
+            });
+        }
+
+        if (departureTime) {
+            const departure = new Date(departureTime);
+            const earliest = Date.now() + MIN_LEAD_MINUTES * 60 * 1000;
+            if (Number.isNaN(departure.getTime()) || departure.getTime() < earliest) {
+                return res.status(400).json({
+                    success: false,
+                    code: 'INVALID_DEPARTURE',
+                    message: `Le départ doit être dans au moins ${MIN_LEAD_MINUTES} minutes.`,
+                });
+            }
+            reservation.departureTime = departure;
+            reservation.deadlineTime = deadlineTime
+                ? new Date(deadlineTime)
+                : new Date(departure.getTime() - 30 * 60 * 1000);
+        }
+
+        reservation.vehicle = next.vehicle._id;
+        reservation.serviceOptions = next.serviceOptions;
+        if (parkingUpdate) Object.assign(reservation, parkingUpdate);
+        if (latitude && longitude) {
+            reservation.location = {
+                type: 'Point',
+                coordinates: [parseFloat(longitude), parseFloat(latitude)],
+                address: address || reservation.location?.address || 'Adresse mise à jour',
+            };
+        }
+
+        // save() (et non findOneAndUpdate) : l'equipement requis est recalcule
+        await reservation.save();
+        await reservation.populate(['vehicle', 'parkingSpot', 'workerId']);
 
         // ✅ Formater la réponse avec parkingSpot factice si place manuelle
         const responseReservation = reservation.toObject();

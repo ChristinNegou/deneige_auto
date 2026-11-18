@@ -510,5 +510,76 @@ describe('Reservation Routes', () => {
 
       expect(res.status).toBe(404);
     });
+
+    it('ignores price, status and payment sent by the client', async () => {
+      const reservation = await createTestReservation(testUser._id, testVehicle._id, {
+        serviceOptions: ['windowScraping'],
+        totalPrice: 29.03,
+      });
+      const newDeparture = new Date(Date.now() + 5 * 60 * 60 * 1000);
+
+      const res = await request(app)
+        .put(`/api/reservations/${reservation._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          departureTime: newDeparture.toISOString(),
+          serviceOptions: ['windowScraping'],
+          totalPrice: 1,
+          status: 'completed',
+          paymentStatus: 'paid',
+          workerId: testUser._id.toString(),
+        });
+
+      expect(res.status).toBe(200);
+      const saved = await Reservation.findById(reservation._id);
+      expect(saved.totalPrice).toBe(29.03);
+      expect(saved.status).toBe('pending');
+      expect(saved.paymentStatus).toBe('pending');
+      expect(saved.workerId).toBeFalsy();
+      expect(saved.departureTime.getTime()).toBe(newDeparture.getTime());
+      expect(saved.deadlineTime.getTime()).toBe(newDeparture.getTime() - 30 * 60 * 1000);
+    });
+
+    it('refuses a change that would alter the paid price', async () => {
+      const reservation = await createTestReservation(testUser._id, testVehicle._id, {
+        serviceOptions: ['windowScraping'],
+      });
+
+      const res = await request(app)
+        .put(`/api/reservations/${reservation._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ serviceOptions: ['windowScraping', 'roofClearing'] });
+
+      expect(res.status).toBe(409);
+      expect(res.body.code).toBe('PRICE_CHANGE_NOT_ALLOWED');
+      const saved = await Reservation.findById(reservation._id);
+      expect(saved.serviceOptions).toEqual(['windowScraping']);
+    });
+
+    it('refuses to edit once a snow worker accepted the job', async () => {
+      const reservation = await createTestReservation(testUser._id, testVehicle._id, {
+        status: 'assigned',
+      });
+
+      const res = await request(app)
+        .put(`/api/reservations/${reservation._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ departureTime: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString() });
+
+      expect(res.status).toBe(409);
+      expect(res.body.code).toBe('NOT_EDITABLE');
+    });
+
+    it('refuses a departure less than an hour away', async () => {
+      const reservation = await createTestReservation(testUser._id, testVehicle._id);
+
+      const res = await request(app)
+        .put(`/api/reservations/${reservation._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ departureTime: new Date(Date.now() + 10 * 60 * 1000).toISOString() });
+
+      expect(res.status).toBe(400);
+      expect(res.body.code).toBe('INVALID_DEPARTURE');
+    });
   });
 });

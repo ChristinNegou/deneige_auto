@@ -514,79 +514,73 @@ class _EditReservationViewState extends State<EditReservationView> {
   }
 
   /// Nouveau prix, avec l'ancien barre pour comparer.
+  /// Le prix paye ne change pas a la modification ; si un choix le
+  /// changerait, on explique comment proceder au lieu d'enregistrer.
   Widget _buildPriceCard(BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
-    final original = state.originalReservation?.totalPrice;
-    final current = state.calculatedPrice ?? 0;
-    final priceChanged = original != null && original != current;
+    final paid = state.originalReservation?.totalPrice ?? 0;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.primary,
-        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.reservation_totalPrice,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.onPrimary.withValues(alpha: 0.7),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${current.toStringAsFixed(2)} \$',
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.8,
-                    color: AppTheme.onPrimary,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppTheme.primary,
+            borderRadius: BorderRadius.circular(AppTheme.radiusXL),
           ),
-          if (priceChanged)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  l10n.reservation_originalPrice,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.onPrimary.withValues(alpha: 0.6),
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.edit_paidPrice,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.onPrimary.withValues(alpha: 0.7),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${original.toStringAsFixed(2)} \$',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.onPrimary.withValues(alpha: 0.6),
-                    decoration: TextDecoration.lineThrough,
-                    decorationColor: AppTheme.onPrimary.withValues(alpha: 0.6),
-                  ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${paid.toStringAsFixed(2)} \$',
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.8,
+                  color: AppTheme.onPrimary,
+                  fontFeatures: [FontFeature.tabularFigures()],
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ),
+        if (state.changesPrice) ...[
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.info_outline_rounded,
+                  size: 18, color: AppTheme.textPrimary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.edit_priceChangeNotAllowed,
+                  style:
+                      AppTheme.bodySmall.copyWith(color: AppTheme.textPrimary),
+                ),
+              ),
+            ],
+          ),
         ],
-      ),
+      ],
     );
   }
 
   Widget _buildSubmitButton(BuildContext context, EditReservationState state) {
     final l10n = AppLocalizations.of(context)!;
-    final canSubmit = state.canSubmit && state.hasChanges;
+    final canSubmit =
+        state.canSubmit && state.hasChanges && !state.changesPrice;
 
     return ElevatedButton(
       onPressed: canSubmit && !state.isLoading
