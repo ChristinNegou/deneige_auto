@@ -48,6 +48,10 @@ class AppConfig {
   static const double targetLatitude = 46.3432;
   static const double targetLongitude = -72.5476;
 
+  /// Distance maximale des travaux proposes a un deneigeur (le serveur ne
+  /// propose jamais rien au-dela du rayon demande).
+  static const double workerSearchRadiusKm = 25;
+
   /// Clé API OpenWeatherMap (GRATUIT - 1000 appels/jour)
   /// Configurez via: flutter run --dart-define=OPENWEATHER_API_KEY=votre_cle
   static String get openWeatherApiKey => openWeatherMapApiKey;

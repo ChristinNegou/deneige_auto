@@ -1,3 +1,4 @@
+import '../../../../core/config/app_config.dart';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
@@ -30,7 +31,7 @@ class WorkerRepositoryImpl implements WorkerRepository {
   Future<Either<Failure, AvailableJobs>> getAvailableJobs({
     required double latitude,
     required double longitude,
-    double radiusKm = 10,
+    double radiusKm = AppConfig.workerSearchRadiusKm,
   }) async {
     try {
       final jobs = await remoteDataSource.getAvailableJobs(

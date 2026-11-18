@@ -191,6 +191,8 @@ async function penalizeWorker(workerId, reservation) {
         // Suspendre si trop d'avertissements
         if (worker.workerProfile.warningCount >= CONFIG.MAX_WARNINGS_BEFORE_SUSPENSION) {
             worker.workerProfile.isSuspended = true;
+            // Hors ligne tout de suite : plus aucun travail propose ni accepte
+            worker.workerProfile.isAvailable = false;
             worker.workerProfile.suspendedAt = new Date();
             worker.workerProfile.suspensionReason = `Suspension automatique - ${worker.workerProfile.warningCount} jobs non completes`;
 

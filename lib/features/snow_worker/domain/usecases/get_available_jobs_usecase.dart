@@ -1,3 +1,4 @@
+import '../../../../core/config/app_config.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
@@ -12,7 +13,7 @@ class GetAvailableJobsUseCase {
   Future<Either<Failure, AvailableJobs>> call({
     required double latitude,
     required double longitude,
-    double radiusKm = 10,
+    double radiusKm = AppConfig.workerSearchRadiusKm,
   }) {
     return repository.getAvailableJobs(
       latitude: latitude,

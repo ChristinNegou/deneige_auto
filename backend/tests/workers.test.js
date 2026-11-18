@@ -1,6 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const Reservation = require('../models/Reservation');
+const Notification = require('../models/Notification');
 const {
   createTestUser,
   createTestWorker,
@@ -51,6 +52,7 @@ describe('Worker Routes', () => {
       const vehicle = await createTestVehicle(client._id);
       await createTestReservation(client._id, vehicle._id, {
         status: 'pending',
+        paymentStatus: 'paid',
         location: {
           type: 'Point',
           coordinates: [-73.5673, 45.5017],
@@ -73,6 +75,7 @@ describe('Worker Routes', () => {
       const vehicle = await createTestVehicle(client._id);
       await createTestReservation(client._id, vehicle._id, {
         status: 'pending',
+        paymentStatus: 'paid',
         location: {
           type: 'Point',
           coordinates: [-73.5673, 45.5017],
@@ -220,6 +223,7 @@ describe('Worker Routes', () => {
       const vehicle = await createTestVehicle(client._id);
       const reservation = await createTestReservation(client._id, vehicle._id, {
         status: 'pending',
+        paymentStatus: 'paid',
       });
 
       const res = await request(app)
@@ -238,6 +242,7 @@ describe('Worker Routes', () => {
       const vehicle = await createTestVehicle(client._id);
       const reservation = await createTestReservation(client._id, vehicle._id, {
         status: 'pending',
+        paymentStatus: 'paid',
       });
       const offlineWorker = await createTestWorker({
         workerProfile: { ...testWorker.workerProfile.toObject(), isAvailable: false },
@@ -266,7 +271,7 @@ describe('Worker Routes', () => {
         .post(`/api/workers/jobs/${reservation._id}/accept`)
         .set('Authorization', `Bearer ${workerToken}`);
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(409);
       expect(res.body.success).toBe(false);
     });
   });
@@ -385,6 +390,126 @@ describe('Worker Routes', () => {
 
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
+    });
+  });
+
+  describe('Assignment rules', () => {
+    const TROIS_RIVIERES = [-72.5477, 46.3432];
+    const MONTREAL = [-73.5673, 45.5017]; // ~120 km
+
+    const paidJob = async (overrides = {}) => {
+      const client = await createTestUser({ email: `c${Math.random()}@example.com` });
+      const vehicle = await createTestVehicle(client._id);
+      return createTestReservation(client._id, vehicle._id, {
+        status: 'pending',
+        paymentStatus: 'paid',
+        ...overrides,
+      });
+    };
+
+    const worker = (overrides = {}) => createTestWorker({
+      email: `w${Math.random()}@example.com`,
+      ...overrides,
+      workerProfile: { ...testWorker.workerProfile.toObject(), ...(overrides.workerProfile || {}) },
+    });
+
+    const accept = (job, user) => request(app)
+      .post(`/api/workers/jobs/${job._id}/accept`)
+      .set('Authorization', `Bearer ${generateAuthToken(user)}`);
+
+    const listJobs = (user, [lng, lat], radiusKm = 50) => request(app)
+      .get('/api/workers/available-jobs')
+      .query({ lat, lng, radiusKm })
+      .set('Authorization', `Bearer ${generateAuthToken(user)}`);
+
+    it('gives the job to only one worker when two accept at the same time', async () => {
+      const job = await paidJob();
+      const other = await worker();
+
+      const results = await Promise.all([accept(job, testWorker), accept(job, other)]);
+
+      expect(results.map((r) => r.status).sort()).toEqual([200, 409]);
+      const saved = await Reservation.findById(job._id);
+      const winner = results.find((r) => r.status === 200).body.data.workerId._id
+        ?? results.find((r) => r.status === 200).body.data.workerId;
+      expect(saved.workerId.toString()).toBe(String(winner));
+      expect(await Notification.countDocuments({ userId: job.userId, type: 'reservationAssigned' })).toBe(1);
+    });
+
+    it('blocks a worker suspended automatically, until the suspension ends', async () => {
+      const job = await paidJob();
+      const suspended = await worker({ workerProfile: { isSuspended: true } });
+
+      expect((await accept(job, suspended)).status).toBe(403);
+      const list = await listJobs(suspended, MONTREAL);
+      expect(list.body.suspended).toBe(true);
+      expect(list.body.data).toEqual([]);
+      const online = await request(app)
+        .patch('/api/workers/availability')
+        .send({ isAvailable: true })
+        .set('Authorization', `Bearer ${generateAuthToken(suspended)}`);
+      expect(online.status).toBe(403);
+
+      const ended = await worker({
+        workerProfile: { isSuspended: true, suspendedUntil: new Date(Date.now() - 60 * 1000) },
+      });
+      expect((await accept(job, ended)).status).toBe(200);
+    });
+
+    it('never offers a job outside the radius', async () => {
+      await paidJob({ location: { type: 'Point', coordinates: MONTREAL, address: '1 Rue A, Montréal' } });
+
+      const near = await listJobs(testWorker, TROIS_RIVIERES, 50);
+      expect(near.body.data).toEqual([]);
+
+      // Le rayon demande est plafonne a 100 km
+      const huge = await listJobs(testWorker, TROIS_RIVIERES, 5000);
+      expect(huge.body.data).toEqual([]);
+
+      const local = await listJobs(testWorker, MONTREAL, 50);
+      expect(local.body.data).toHaveLength(1);
+    });
+
+    it('neither lists nor accepts an unpaid job', async () => {
+      const job = await paidJob({ paymentStatus: 'pending' });
+
+      expect((await listJobs(testWorker, MONTREAL)).body.data).toEqual([]);
+      const res = await accept(job, testWorker);
+      expect(res.status).toBe(400);
+      expect(res.body.code).toBe('JOB_NOT_PAID');
+    });
+
+    it('neither lists nor accepts a job whose deadline has passed', async () => {
+      const job = await paidJob({
+        departureTime: new Date(Date.now() + 10 * 60 * 1000),
+        deadlineTime: new Date(Date.now() - 20 * 60 * 1000),
+      });
+
+      expect((await listJobs(testWorker, MONTREAL)).body.data).toEqual([]);
+      const res = await accept(job, testWorker);
+      expect(res.status).toBe(400);
+      expect(res.body.code).toBe('JOB_EXPIRED');
+    });
+
+    it('refuses a job that needs equipment the worker lacks', async () => {
+      const job = await paidJob({ snowDepthCm: 25 }); // souffleuse requise
+
+      const res = await accept(job, testWorker);
+      expect(res.status).toBe(400);
+      expect(res.body.code).toBe('MISSING_EQUIPMENT');
+      expect(res.body.missingEquipment).toContain('snow_blower');
+      expect((await Reservation.findById(job._id)).status).toBe('pending');
+    });
+
+    it('counts jobs en route toward the active job limit', async () => {
+      for (let i = 0; i < 3; i++) {
+        await paidJob({ status: 'enRoute', workerId: testWorker._id });
+      }
+      const job = await paidJob();
+
+      const res = await accept(job, testWorker);
+      expect(res.status).toBe(400);
+      expect(res.body.code).toBe('TOO_MANY_JOBS');
     });
   });
 });

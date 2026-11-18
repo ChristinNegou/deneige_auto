@@ -53,6 +53,35 @@ const profileUpload = multer({
     }
 });
 
+// --- Règles d'attribution ---
+
+/** Statuts d'un travail accepte mais pas termine (compte dans la limite). */
+const ACTIVE_JOB_STATUSES = ['assigned', 'enRoute', 'inProgress'];
+
+/**
+ * Suspendu par un admin (racine du compte) ou automatiquement apres trop de
+ * travaux non termines, d'annulations ou de litiges (workerProfile) : dans
+ * tous les cas, plus de travail. Une suspension datee prend fin d'elle-meme.
+ */
+const isWorkerSuspended = (user) => {
+    const active = (flag, until) => Boolean(flag) && (!until || new Date(until) > new Date());
+    return active(user?.isSuspended, user?.suspendedUntil)
+        || active(user?.workerProfile?.isSuspended, user?.workerProfile?.suspendedUntil);
+};
+
+const SUSPENDED_MESSAGE = 'Votre compte déneigeur est suspendu. Contactez le support pour le rétablir.';
+
+/**
+ * Une reservation peut etre proposee puis acceptee si elle attend un
+ * deneigeur, est payee et que l'heure limite (voiture prete) n'est pas passee.
+ */
+const openJobQuery = (now) => ({
+    status: 'pending',
+    workerId: null,
+    paymentStatus: 'paid',
+    deadlineTime: { $gt: now },
+});
+
 // --- Disponibilité et localisation ---
 
 /**
@@ -63,6 +92,14 @@ const profileUpload = multer({
 router.patch('/availability', protect, authorize('snowWorker'), verificationRequired, async (req, res) => {
     try {
         const { isAvailable } = req.body;
+
+        if (isAvailable && isWorkerSuspended(req.user)) {
+            return res.status(403).json({
+                success: false,
+                code: 'WORKER_SUSPENDED',
+                message: SUSPENDED_MESSAGE,
+            });
+        }
 
         const user = await User.findByIdAndUpdate(
             req.user.id,
@@ -163,13 +200,15 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
         // Get worker's equipment list
         const workerEquipment = req.user.workerProfile?.equipmentList || [];
 
-        // Hors ligne : aucun travail propose, meme si l'equipement correspond
-        if (!req.user.workerProfile?.isAvailable) {
+        // Hors ligne ou suspendu : aucun travail propose, meme si l'equipement correspond
+        const suspended = isWorkerSuspended(req.user);
+        if (!req.user.workerProfile?.isAvailable || suspended) {
             return res.json({
                 success: true,
                 count: 0,
                 data: [],
                 offline: true,
+                suspended,
                 hiddenByEquipment: { count: 0, missingEquipment: [] },
             });
         }
@@ -183,20 +222,21 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
 
         const latitude = parseFloat(lat);
         const longitude = parseFloat(lng);
-        const radius = parseFloat(radiusKm);
+        // Le rayon vient de l'app : borne pour ne jamais proposer toute la province
+        const requested = parseFloat(radiusKm);
+        const radius = Number.isFinite(requested) && requested > 0
+            ? Math.min(requested, GEOLOCATION.MAX_SEARCH_RADIUS_KM)
+            : GEOLOCATION.DEFAULT_SEARCH_RADIUS_KM;
 
         console.log(`📍 Searching jobs around [${longitude}, ${latitude}] within ${radius}km`);
 
-        // Find pending reservations within radius, sorted by urgency and distance
+        // Reservations ouvertes dans le rayon, departs des prochaines 24 h
         const now = new Date();
         const next24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-        const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
 
-        // 1. Get reservations WITH location using geoNear
-        // Inclure: departureTime futur OU créé récemment (moins de 2h)
-        let geoReservations = [];
+        let allReservations = [];
         try {
-            geoReservations = await Reservation.aggregate([
+            allReservations = await Reservation.aggregate([
                 {
                     $geoNear: {
                         near: {
@@ -206,13 +246,8 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
                         distanceField: 'distance',
                         maxDistance: radius * 1000, // Convert km to meters
                         query: {
-                            status: 'pending',
-                            $or: [
-                                // Réservations futures (dans les 24h)
-                                { departureTime: { $gte: now, $lte: next24Hours } },
-                                // OU réservations créées récemment (même si departureTime passé)
-                                { createdAt: { $gte: twoHoursAgo } },
-                            ],
+                            ...openJobQuery(now),
+                            departureTime: { $lte: next24Hours },
                         },
                         spherical: true,
                     },
@@ -251,40 +286,11 @@ router.get('/available-jobs', protect, authorize('snowWorker'), verificationRequ
                     },
                 },
             ]);
-            console.log(`📊 GeoNear found ${geoReservations.length} reservations`);
+            console.log(`📊 GeoNear found ${allReservations.length} reservations`);
         } catch (geoErr) {
-            console.log('⚠️ GeoNear query failed (might be no 2dsphere index or no geo data):', geoErr.message);
-        }
-
-        // Si aucune réservation trouvée par géolocalisation, chercher toutes les pending
-        let allReservations = [...geoReservations];
-
-        if (allReservations.length === 0) {
-            console.log('📍 Aucune réservation trouvée par géolocalisation, recherche de toutes les réservations pending...');
-
-            // Fallback: chercher toutes les réservations pending sans filtre géospatial
-            // Inclure: departureTime futur OU créé récemment (moins de 2h)
-            const fallbackReservations = await Reservation.find({
-                status: 'pending',
-                $or: [
-                    { departureTime: { $gte: now, $lte: next24Hours } },
-                    { createdAt: { $gte: twoHoursAgo } },
-                ],
-            })
-                .populate('userId', 'firstName lastName phoneNumber')
-                .populate('vehicle', 'make model color licensePlate photoUrl')
-                .lean();
-
-            console.log(`📋 Fallback: ${fallbackReservations.length} réservations pending trouvées`);
-
-            // Ajouter des champs calculés
-            allReservations = fallbackReservations.map(r => ({
-                ...r,
-                client: r.userId,
-                vehicleInfo: r.vehicle,
-                distanceKm: null, // Distance inconnue sans géolocalisation
-                hoursUntilDeparture: (new Date(r.departureTime) - now) / (1000 * 60 * 60),
-            }));
+            // Pas de repli sur toutes les reservations : un deneigeur ne doit
+            // jamais se voir proposer un travail hors de son rayon.
+            console.error('⚠️ GeoNear query failed:', geoErr.message);
         }
 
         // Sort: soonest departure first, then by distance
@@ -824,6 +830,14 @@ router.post('/jobs/:id/accept', protect, authorize('snowWorker'), verificationRe
     try {
         const { id } = req.params;
 
+        if (isWorkerSuspended(req.user)) {
+            return res.status(403).json({
+                success: false,
+                code: 'WORKER_SUSPENDED',
+                message: SUSPENDED_MESSAGE,
+            });
+        }
+
         // Un deneigeur hors ligne ne peut pas accepter de travail (ecran pas a jour)
         if (!req.user.workerProfile?.isAvailable) {
             return res.status(403).json({
@@ -842,46 +856,80 @@ router.post('/jobs/:id/accept', protect, authorize('snowWorker'), verificationRe
             });
         }
 
-        if (reservation.status !== 'pending') {
+        const unavailable = () => res.status(409).json({
+            success: false,
+            code: 'JOB_TAKEN',
+            message: 'Cette réservation n\'est plus disponible',
+        });
+
+        if (reservation.status !== 'pending' || reservation.workerId) {
+            return unavailable();
+        }
+
+        // Memes regles que la liste : elle peut ne plus etre a jour
+        const now = new Date();
+        if (reservation.paymentStatus !== 'paid') {
             return res.status(400).json({
                 success: false,
-                message: 'Cette réservation n\'est plus disponible',
+                code: 'JOB_NOT_PAID',
+                message: 'Cette réservation n\'est pas encore payée.',
+            });
+        }
+        if (!reservation.deadlineTime || reservation.deadlineTime <= now) {
+            return res.status(400).json({
+                success: false,
+                code: 'JOB_EXPIRED',
+                message: 'L\'heure limite de cette réservation est passée.',
             });
         }
 
-        // Check worker's active job count
+        const worker = await User.findById(req.user.id);
+        const workerEquipment = worker.workerProfile?.equipmentList || [];
+        const required = computeRequiredEquipment(reservation);
+        if (!workerHasRequiredEquipment(workerEquipment, required)) {
+            return res.status(400).json({
+                success: false,
+                code: 'MISSING_EQUIPMENT',
+                message: 'Il vous manque l\'équipement nécessaire pour ce déneigement.',
+                missingEquipment: required.filter(e => !workerEquipment.includes(e)),
+            });
+        }
+
         const activeJobsCount = await Reservation.countDocuments({
             workerId: req.user.id,
-            status: { $in: ['assigned', 'inProgress'] },
+            status: { $in: ACTIVE_JOB_STATUSES },
         });
-
-        const worker = await User.findById(req.user.id);
         const maxJobs = worker.workerProfile?.maxActiveJobs || 3;
 
         if (activeJobsCount >= maxJobs) {
             return res.status(400).json({
                 success: false,
-                message: `Vous avez déjà ${maxJobs} jobs actifs. Terminez-en un avant d'en accepter un nouveau.`,
+                code: 'TOO_MANY_JOBS',
+                message: `Vous avez déjà ${maxJobs} travaux en cours. Terminez-en un avant d'en accepter un nouveau.`,
             });
         }
 
-        // Accept the job
-        reservation.workerId = req.user.id;
-        reservation.status = 'assigned';
-        reservation.assignedAt = new Date();
-        await reservation.save();
+        // Attribution en une seule operation : si deux deneigeurs acceptent en
+        // meme temps, un seul trouve la reservation encore libre.
+        const accepted = await Reservation.findOneAndUpdate(
+            { _id: reservation._id, ...openJobQuery(now) },
+            { $set: { workerId: req.user.id, status: 'assigned', assignedAt: now } },
+            { new: true },
+        )
+            .populate('userId', 'firstName lastName phoneNumber')
+            .populate('vehicle', 'make model color licensePlate photoUrl');
 
-        // Populate for response
-        await reservation.populate('userId', 'firstName lastName phoneNumber');
-        await reservation.populate('vehicle', 'make model color licensePlate photoUrl');
+        if (!accepted) {
+            return unavailable();
+        }
 
         // Send notification to client
         await Notification.createNotification({
-            userId: reservation.userId._id,
+            userId: accepted.userId._id,
             type: 'reservationAssigned',
             title: 'Déneigeur assigné',
             message: `${worker.firstName} ${worker.lastName} a accepté votre demande de déneigement.`,
-            reservationId: reservation._id,
+            reservationId: accepted._id,
             workerId: worker._id,
             metadata: {
                 workerName: `${worker.firstName} ${worker.lastName}`,
@@ -890,14 +938,14 @@ router.post('/jobs/:id/accept', protect, authorize('snowWorker'), verificationRe
         });
 
         // Envoyer notification push intelligente
-        await smartNotifications.notifyWorkerAssigned(reservation._id);
+        await smartNotifications.notifyWorkerAssigned(accepted._id);
 
-        console.log(`✅ Worker ${worker.firstName} accepted job ${reservation._id}`);
+        console.log(`✅ Worker ${worker.firstName} accepted job ${accepted._id}`);
 
         res.json({
             success: true,
             message: 'Job accepté avec succès',
-            data: reservation,
+            data: accepted,
         });
     } catch (error) {
         console.error('Error accepting job:', error);

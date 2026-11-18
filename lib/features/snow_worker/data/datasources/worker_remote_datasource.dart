@@ -15,7 +15,7 @@ abstract class WorkerRemoteDataSource {
   Future<AvailableJobs> getAvailableJobs({
     required double latitude,
     required double longitude,
-    double radiusKm = 10,
+    double radiusKm = AppConfig.workerSearchRadiusKm,
   });
 
   Future<List<WorkerJobModel>> getMyJobs();
@@ -251,7 +251,7 @@ class WorkerRemoteDataSourceImpl implements WorkerRemoteDataSource {
   Future<AvailableJobs> getAvailableJobs({
     required double latitude,
     required double longitude,
-    double radiusKm = 10,
+    double radiusKm = AppConfig.workerSearchRadiusKm,
   }) async {
     try {
       final response = await dio.get(

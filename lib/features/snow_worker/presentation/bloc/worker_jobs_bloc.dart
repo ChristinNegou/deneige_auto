@@ -1,3 +1,4 @@
+import '../../../../core/config/app_config.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,7 +29,7 @@ class LoadAvailableJobs extends WorkerJobsEvent {
   const LoadAvailableJobs({
     required this.latitude,
     required this.longitude,
-    this.radiusKm = 10,
+    this.radiusKm = AppConfig.workerSearchRadiusKm,
   });
 
   @override
