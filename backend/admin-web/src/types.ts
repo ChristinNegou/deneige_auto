@@ -54,6 +54,8 @@ export interface User {
   lastName: string;
   phoneNumber?: string;
   phoneVerified?: boolean;
+  /** Absente des comptes crees avant novembre 2026. */
+  dateOfBirth?: string | null;
   role: 'client' | 'snowWorker' | 'admin';
   photoUrl?: string;
   isActive?: boolean;
@@ -306,4 +308,18 @@ export interface FcmStatus {
     withoutFcmToken: number;
     byRole: Record<string, { total: number; withToken: number }>;
   };
+}
+
+/** GET /admin/stats/users : inscriptions et activite par ville. */
+export interface UserStats {
+  totals: { users: number; clients: number; workers: number };
+  newThisMonth: { clients: number; workers: number };
+  newLastMonth: { clients: number; workers: number };
+  clientsWithoutReservation: number;
+  signupsByMonth: { month: string; clients: number; workers: number }[];
+  period: 'month' | 'quarter' | 'year' | 'all';
+  city: string | null;
+  cities: { city: string; clients: number; workers: number; reservations: number; completed: number; revenue: number }[];
+  topClients: { id: string; name: string; city: string; reservations: number; completed: number; spent: number }[];
+  topWorkers: { id: string; name: string; city: string; jobs: number; earnings: number; rating: number }[];
 }

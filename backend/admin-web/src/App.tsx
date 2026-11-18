@@ -12,6 +12,7 @@ import { ReservationsPage } from './pages/ReservationsPage';
 import { StripeAccountsPage } from './pages/StripeAccountsPage';
 import { SupportPage } from './pages/SupportPage';
 import { UserDetailPage } from './pages/UserDetailPage';
+import { StatsPage } from './pages/StatsPage';
 import { UsersPage } from './pages/UsersPage';
 import { VerificationDetailPage } from './pages/VerificationDetailPage';
 import { VerificationsPage } from './pages/VerificationsPage';
@@ -25,6 +26,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<DashboardPage />} />
+        <Route path="stats" element={<StatsPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="reservations" element={<ReservationsPage />} />

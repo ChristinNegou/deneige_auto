@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { BellRing, CalendarCheck, CreditCard, Gavel, HardHat, LayoutDashboard, LifeBuoy, LogOut, ShieldCheck, Snowflake, Users, Wallet } from 'lucide-react';
+import { BarChart3, BellRing, CalendarCheck, CreditCard, Gavel, HardHat, LayoutDashboard, LifeBuoy, LogOut, ShieldCheck, Snowflake, Users, Wallet } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -73,6 +73,7 @@ export function Layout() {
 
         <nav className="flex flex-1 flex-col gap-1" aria-label="Navigation principale">
           <NavItem to="/" icon={<LayoutDashboard className={iconClass} />} label="Tableau de bord" />
+          <NavItem to="/stats" icon={<BarChart3 className={iconClass} />} label="Statistiques" />
           <NavItem to="/users" icon={<Users className={iconClass} />} label="Comptes" />
           <NavItem to="/reservations" icon={<CalendarCheck className={iconClass} />} label="Réservations" />
           <NavItem to="/disputes" icon={<Gavel className={iconClass} />} label="Litiges" count={counts.disputes} />

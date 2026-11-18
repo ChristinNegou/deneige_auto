@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Ban, ShieldCheck, Undo2 } from 'lucide-react';
 import { Badge, Button, Card, DataTable, ErrorState, Field, Label, Modal, PageHeader, Select, Spinner, Textarea, useToast } from '../components/ui';
 import { api } from '../lib/api';
-import { formatDate, formatDateTime, formatMoney, formatRating, fullName } from '../lib/format';
+import { formatBirthDate, formatDate, formatDateTime, formatMoney, formatRating, fullName } from '../lib/format';
 import { equipment, reservationStatus, roleLabel, verificationStatus } from '../lib/labels';
 import type { Reservation, User } from '../types';
 import { Avatar, isUserSuspended } from './UsersPage';
@@ -176,6 +176,7 @@ export function UserDetailPage() {
             <Field label="Téléphone">
               {u.phoneNumber ?? '—'} {u.phoneVerified && <Badge tone="ok">Vérifié</Badge>}
             </Field>
+            <Field label="Date de naissance">{u.dateOfBirth ? formatBirthDate(u.dateOfBirth) : 'Non renseignée'}</Field>
             <Field label="Inscrit le">{formatDate(u.createdAt)}</Field>
             <Field label="Client Stripe">{u.stripeCustomerId ? <span className="font-mono text-xs">{u.stripeCustomerId}</span> : '—'}</Field>
           </dl>

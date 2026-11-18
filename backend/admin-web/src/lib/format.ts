@@ -21,6 +21,17 @@ export const parseDay = (day: string) => {
   return new Date(y, m - 1, d);
 };
 
+/** Date de naissance : stockee a minuit UTC, on l'affiche telle quelle avec l'age. */
+const birthFmt = new Intl.DateTimeFormat('fr-CA', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+export function formatBirthDate(iso?: string | null): string {
+  if (!iso) return '—';
+  const birth = new Date(iso);
+  const now = new Date();
+  let age = now.getUTCFullYear() - birth.getUTCFullYear();
+  if (now.getUTCMonth() < birth.getUTCMonth() || (now.getUTCMonth() === birth.getUTCMonth() && now.getUTCDate() < birth.getUTCDate())) age--;
+  return `${birthFmt.format(birth)} (${age} ans)`;
+}
+
 export const formatShortDay = (day: string) => shortDay.format(parseDay(day));
 
 const pad = (n: number) => String(n).padStart(2, '0');

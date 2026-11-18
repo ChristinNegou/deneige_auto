@@ -15,6 +15,7 @@ const SupportRequest = require('../models/SupportRequest');
 const Transaction = require('../models/Transaction');
 const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../services/databaseCleanupService');
 const identityVerificationService = require('../services/identityVerificationService');
+const { getUserStats } = require('../services/userStatsService');
 
 const adminOnly = authorize('admin');
 
@@ -46,6 +47,24 @@ const getErrorMessage = (error) => {
 };
 
 // --- Tableau de bord ---
+
+/**
+ * GET /api/admin/stats/users
+ * Inscriptions (totaux, 12 derniers mois) et activite des clients et
+ * deneigeurs par ville.
+ * @param {string} [req.query.period=year] - month | quarter | year | all
+ * @param {string} [req.query.city] - limite les classements a une ville
+ */
+router.get('/stats/users', protect, adminOnly, async (req, res) => {
+    try {
+        const period = ['month', 'quarter', 'year', 'all'].includes(req.query.period) ? req.query.period : 'year';
+        const city = typeof req.query.city === 'string' && req.query.city.trim() ? req.query.city.trim().slice(0, 100) : undefined;
+        res.json({ success: true, stats: await getUserStats({ period, city }) });
+    } catch (error) {
+        console.error('Erreur statistiques comptes:', error);
+        res.status(500).json({ success: false, message: getErrorMessage(error) });
+    }
+});
 
 /**
  * GET /api/admin/dashboard
