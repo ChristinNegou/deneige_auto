@@ -1124,47 +1124,95 @@ abstract class AppLocalizations {
   /// **'Annuler la réservation'**
   String get reservation_cancelReservation;
 
-  /// No description provided for @reservation_cancelFullRefund.
+  /// No description provided for @cancel_title.
   ///
   /// In fr, this message translates to:
-  /// **'Remboursement complet - Aucun frais'**
-  String get reservation_cancelFullRefund;
+  /// **'Annuler cette réservation ?'**
+  String get cancel_title;
 
-  /// No description provided for @reservation_cancelHalfRefund.
+  /// No description provided for @cancel_refundFull.
   ///
   /// In fr, this message translates to:
-  /// **'Le déneigeur est en route.\nFrais d\'annulation: 50% ({amount}\$)'**
-  String reservation_cancelHalfRefund(String amount);
+  /// **'Vous serez remboursé de {amount} au complet.'**
+  String cancel_refundFull(String amount);
 
-  /// No description provided for @reservation_cancelNoRefund.
+  /// No description provided for @cancel_refundPartial.
   ///
   /// In fr, this message translates to:
-  /// **'Le travail a commencé.\nAucun remboursement (100% facturé)'**
-  String get reservation_cancelNoRefund;
+  /// **'Le déneigeur est en route : {fee} est retenu (50 %). Vous serez remboursé de {refund}.'**
+  String cancel_refundPartial(String fee, String refund);
 
-  /// No description provided for @reservation_cancelConfirmTitle.
+  /// No description provided for @cancel_refundNone.
   ///
   /// In fr, this message translates to:
-  /// **'Annuler?'**
-  String get reservation_cancelConfirmTitle;
+  /// **'Le travail a commencé : les {amount} payés ne sont pas remboursés.'**
+  String cancel_refundNone(String amount);
 
-  /// No description provided for @reservation_cancelConfirmMessage.
+  /// No description provided for @cancel_notPaid.
   ///
   /// In fr, this message translates to:
-  /// **'Êtes-vous sûr de vouloir annuler cette réservation?'**
-  String get reservation_cancelConfirmMessage;
+  /// **'Aucun montant n’a été prélevé pour cette réservation.'**
+  String get cancel_notPaid;
 
-  /// No description provided for @reservation_cancelKeep.
+  /// No description provided for @cancel_refundDelay.
   ///
   /// In fr, this message translates to:
-  /// **'Non, garder'**
-  String get reservation_cancelKeep;
+  /// **'Le remboursement apparaît sur votre carte sous 5 à 10 jours ouvrables.'**
+  String get cancel_refundDelay;
 
-  /// No description provided for @reservation_cancelYes.
+  /// No description provided for @cancel_reasonLabel.
   ///
   /// In fr, this message translates to:
-  /// **'Oui, annuler'**
-  String get reservation_cancelYes;
+  /// **'Pourquoi annulez-vous ? (facultatif)'**
+  String get cancel_reasonLabel;
+
+  /// No description provided for @cancel_reasonNotNeeded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je n’en ai plus besoin'**
+  String get cancel_reasonNotNeeded;
+
+  /// No description provided for @cancel_reasonMistake.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur dans la réservation'**
+  String get cancel_reasonMistake;
+
+  /// No description provided for @cancel_reasonDidItMyself.
+  ///
+  /// In fr, this message translates to:
+  /// **'J’ai déneigé moi-même'**
+  String get cancel_reasonDidItMyself;
+
+  /// No description provided for @cancel_reasonOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre raison'**
+  String get cancel_reasonOther;
+
+  /// No description provided for @cancel_confirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler la réservation'**
+  String get cancel_confirm;
+
+  /// No description provided for @cancel_keep.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garder ma réservation'**
+  String get cancel_keep;
+
+  /// No description provided for @cancel_done.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation annulée.'**
+  String get cancel_done;
+
+  /// No description provided for @cancel_doneRefund.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation annulée. Remboursement de {amount} en cours.'**
+  String cancel_doneRefund(String amount);
 
   /// No description provided for @reservation_phoneUnavailable.
   ///

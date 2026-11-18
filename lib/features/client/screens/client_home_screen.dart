@@ -57,6 +57,21 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     super.dispose();
   }
 
+  /// Ouvre le detail ; au retour d'une annulation ou modification, la liste
+  /// des prochaines reservations est rechargee tout de suite.
+  Future<void> _openDetails(String reservationId) async {
+    final changed = await Navigator.pushNamed(
+      context,
+      AppRoutes.reservationDetails,
+      arguments: reservationId,
+    );
+    if (changed == true && mounted) {
+      context
+          .read<reservation_bloc.ReservationListBloc>()
+          .add(reservation_bloc.RefreshReservations());
+    }
+  }
+
   void _startAutoRefresh() {
     _refreshTimer = Timer.periodic(_refreshInterval, (_) {
       if (mounted) {
@@ -487,11 +502,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
     return GlassCard(
       padding: const EdgeInsets.all(14),
-      onTap: () => Navigator.pushNamed(
-        context,
-        AppRoutes.reservationDetails,
-        arguments: reservation.id,
-      ),
+      onTap: () => _openDetails(reservation.id),
       child: Row(
         children: [
           Container(
@@ -688,11 +699,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       padding: const EdgeInsets.only(bottom: 10),
       child: GlassCard(
         padding: const EdgeInsets.all(12),
-        onTap: () => Navigator.pushNamed(
-          context,
-          AppRoutes.reservationDetails,
-          arguments: reservation.id,
-        ),
+        onTap: () => _openDetails(reservation.id),
         child: Row(
           children: [
             Container(

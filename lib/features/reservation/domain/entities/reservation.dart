@@ -32,6 +32,9 @@ class Reservation extends Equatable {
   final String? review;
   final double? tip;
   final bool isPriority;
+
+  /// Etat du paiement cote serveur ('paid', 'pending', 'refunded'...).
+  final String? paymentStatus;
   final int? snowDepthCm;
   final int? estimatedArrivalMinutes;
 
@@ -67,6 +70,7 @@ class Reservation extends Equatable {
     this.review,
     this.tip,
     this.isPriority = false,
+    this.paymentStatus,
     this.snowDepthCm,
     this.estimatedArrivalMinutes,
     this.locationLatitude,
@@ -83,6 +87,9 @@ class Reservation extends Equatable {
     if (deadlineTime == null || completedAt == null) return null;
     return completedAt!.difference(deadlineTime!).inMinutes;
   }
+
+  /// Le client a paye cette reservation (rien a rembourser sinon).
+  bool get isPaid => paymentStatus == null || paymentStatus == 'paid';
 
   bool get canBeCancelled {
     // Le client peut annuler à tout moment (avec frais selon le statut)
@@ -182,6 +189,7 @@ class Reservation extends Equatable {
     String? review,
     double? tip,
     bool? isPriority,
+    String? paymentStatus,
     int? snowDepthCm,
     int? estimatedArrivalMinutes,
     double? locationLatitude,
@@ -215,6 +223,7 @@ class Reservation extends Equatable {
       review: review ?? this.review,
       tip: tip ?? this.tip,
       isPriority: isPriority ?? this.isPriority,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
       snowDepthCm: snowDepthCm ?? this.snowDepthCm,
       estimatedArrivalMinutes:
           estimatedArrivalMinutes ?? this.estimatedArrivalMinutes,
@@ -252,6 +261,7 @@ class Reservation extends Equatable {
         review,
         tip,
         isPriority,
+        paymentStatus,
         snowDepthCm,
         estimatedArrivalMinutes,
         locationLatitude,

@@ -13,6 +13,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
+import '../widgets/cancel_reservation_sheet.dart';
 import '../bloc/reservation_list_bloc.dart';
 import '../../../widgets/rating_tip_dialog.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -1524,124 +1525,34 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView>
     );
   }
 
-  void _showCancelDialog(BuildContext context, Reservation reservation) {
+  Future<void> _showCancelDialog(
+      BuildContext context, Reservation reservation) async {
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode == 'en'
+        ? 'en_CA'
+        : 'fr_CA';
     HapticFeedback.mediumImpact();
 
-    // Calculer les frais selon le statut
-    String feeMessage;
-    int feePercent;
-    Color feeColor;
+    final result = await showCancelReservationSheet(context, reservation);
+    if (result == null || !context.mounted) return;
 
-    switch (reservation.status) {
-      case ReservationStatus.pending:
-      case ReservationStatus.assigned:
-        feePercent = 0;
-        feeMessage = l10n.reservation_cancelFullRefund;
-        feeColor = AppTheme.success;
-        break;
-      case ReservationStatus.enRoute:
-        feePercent = 50;
-        feeMessage = l10n.reservation_cancelHalfRefund(
-            (reservation.totalPrice * 0.5).toStringAsFixed(2));
-        feeColor = AppTheme.warning;
-        break;
-      case ReservationStatus.inProgress:
-        feePercent = 100;
-        feeMessage = l10n.reservation_cancelNoRefund;
-        feeColor = AppTheme.error;
-        break;
-      default:
-        feePercent = 0;
-        feeMessage = '';
-        feeColor = AppTheme.textTertiary;
-    }
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.errorLight,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.warning, color: AppTheme.error),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              l10n.reservation_cancelConfirmTitle,
-              style: TextStyle(color: AppTheme.textPrimary),
-            ),
-          ],
+    final refund = result.refundAmount;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          refund > 0
+              ? l10n.cancel_doneRefund(
+                  NumberFormat.currency(locale: locale, symbol: '\$')
+                      .format(refund))
+              : l10n.cancel_done,
+          style: const TextStyle(color: AppTheme.onPrimary),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.reservation_cancelConfirmMessage,
-              style: TextStyle(color: AppTheme.textPrimary),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: feeColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: feeColor.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    feePercent == 0 ? Icons.check_circle : Icons.info,
-                    color: feeColor,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      feeMessage,
-                      style: TextStyle(
-                        color: feeColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              l10n.reservation_cancelKeep,
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<ReservationListBloc>().add(
-                    CancelReservationEvent(reservation.id),
-                  );
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.error,
-              foregroundColor: AppTheme.onPrimary,
-              minimumSize: const Size(0, 44),
-            ),
-            child: Text(l10n.reservation_cancelYes),
-          ),
-        ],
+        backgroundColor: AppTheme.primary,
+        behavior: SnackBarBehavior.floating,
       ),
     );
+    // true : l'ecran precedent recharge ses reservations
+    Navigator.of(context).pop(true);
   }
 
   Future<void> _callWorker(Reservation reservation) async {

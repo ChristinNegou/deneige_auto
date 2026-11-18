@@ -552,29 +552,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reservation_cancelReservation => 'Cancel reservation';
 
   @override
-  String get reservation_cancelFullRefund => 'Full refund - No charges';
+  String get cancel_title => 'Cancel this reservation?';
 
   @override
-  String reservation_cancelHalfRefund(String amount) {
-    return 'The worker is on the way.\nCancellation fee: 50% ($amount\$)';
+  String cancel_refundFull(String amount) {
+    return 'You will be fully refunded $amount.';
   }
 
   @override
-  String get reservation_cancelNoRefund =>
-      'Work has started.\nNo refund (100% charged)';
+  String cancel_refundPartial(String fee, String refund) {
+    return 'The snow worker is on the way: $fee is kept (50%). You will be refunded $refund.';
+  }
 
   @override
-  String get reservation_cancelConfirmTitle => 'Cancel?';
+  String cancel_refundNone(String amount) {
+    return 'The work has started: the $amount paid is not refunded.';
+  }
 
   @override
-  String get reservation_cancelConfirmMessage =>
-      'Are you sure you want to cancel this reservation?';
+  String get cancel_notPaid => 'Nothing was charged for this reservation.';
 
   @override
-  String get reservation_cancelKeep => 'No, keep it';
+  String get cancel_refundDelay =>
+      'The refund appears on your card within 5 to 10 business days.';
 
   @override
-  String get reservation_cancelYes => 'Yes, cancel';
+  String get cancel_reasonLabel => 'Why are you cancelling? (optional)';
+
+  @override
+  String get cancel_reasonNotNeeded => 'I no longer need it';
+
+  @override
+  String get cancel_reasonMistake => 'Mistake in the reservation';
+
+  @override
+  String get cancel_reasonDidItMyself => 'I cleared it myself';
+
+  @override
+  String get cancel_reasonOther => 'Other reason';
+
+  @override
+  String get cancel_confirm => 'Cancel reservation';
+
+  @override
+  String get cancel_keep => 'Keep my reservation';
+
+  @override
+  String get cancel_done => 'Reservation cancelled.';
+
+  @override
+  String cancel_doneRefund(String amount) {
+    return 'Reservation cancelled. Refund of $amount on its way.';
+  }
 
   @override
   String get reservation_phoneUnavailable => 'Phone number unavailable';

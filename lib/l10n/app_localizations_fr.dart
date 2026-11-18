@@ -560,30 +560,59 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reservation_cancelReservation => 'Annuler la réservation';
 
   @override
-  String get reservation_cancelFullRefund =>
-      'Remboursement complet - Aucun frais';
+  String get cancel_title => 'Annuler cette réservation ?';
 
   @override
-  String reservation_cancelHalfRefund(String amount) {
-    return 'Le déneigeur est en route.\nFrais d\'annulation: 50% ($amount\$)';
+  String cancel_refundFull(String amount) {
+    return 'Vous serez remboursé de $amount au complet.';
   }
 
   @override
-  String get reservation_cancelNoRefund =>
-      'Le travail a commencé.\nAucun remboursement (100% facturé)';
+  String cancel_refundPartial(String fee, String refund) {
+    return 'Le déneigeur est en route : $fee est retenu (50 %). Vous serez remboursé de $refund.';
+  }
 
   @override
-  String get reservation_cancelConfirmTitle => 'Annuler?';
+  String cancel_refundNone(String amount) {
+    return 'Le travail a commencé : les $amount payés ne sont pas remboursés.';
+  }
 
   @override
-  String get reservation_cancelConfirmMessage =>
-      'Êtes-vous sûr de vouloir annuler cette réservation?';
+  String get cancel_notPaid =>
+      'Aucun montant n’a été prélevé pour cette réservation.';
 
   @override
-  String get reservation_cancelKeep => 'Non, garder';
+  String get cancel_refundDelay =>
+      'Le remboursement apparaît sur votre carte sous 5 à 10 jours ouvrables.';
 
   @override
-  String get reservation_cancelYes => 'Oui, annuler';
+  String get cancel_reasonLabel => 'Pourquoi annulez-vous ? (facultatif)';
+
+  @override
+  String get cancel_reasonNotNeeded => 'Je n’en ai plus besoin';
+
+  @override
+  String get cancel_reasonMistake => 'Erreur dans la réservation';
+
+  @override
+  String get cancel_reasonDidItMyself => 'J’ai déneigé moi-même';
+
+  @override
+  String get cancel_reasonOther => 'Autre raison';
+
+  @override
+  String get cancel_confirm => 'Annuler la réservation';
+
+  @override
+  String get cancel_keep => 'Garder ma réservation';
+
+  @override
+  String get cancel_done => 'Réservation annulée.';
+
+  @override
+  String cancel_doneRefund(String amount) {
+    return 'Réservation annulée. Remboursement de $amount en cours.';
+  }
 
   @override
   String get reservation_phoneUnavailable =>
