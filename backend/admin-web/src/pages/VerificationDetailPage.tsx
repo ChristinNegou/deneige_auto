@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, ImageOff, Sparkles, X } from 'lucide-react';
+import { Check, ImageOff, RefreshCw, Sparkles, X } from 'lucide-react';
 import { Badge, Button, Card, ErrorState, Field, Label, Modal, PageHeader, Spinner, Textarea, useToast } from '../components/ui';
 import { api } from '../lib/api';
 import { formatDate, formatDateTime } from '../lib/format';
@@ -60,6 +60,17 @@ export function VerificationDetailPage() {
     onError: (e) => toast(e instanceof Error ? e.message : 'Décision refusée', 'danger'),
   });
 
+  // Relance l'analyse IA (ex. apres avoir configure la cle Claude)
+  const reanalyze = useMutation({
+    mutationFn: () => api<{ message: string }>(`/admin/verifications/${id}/reanalyze`, { method: 'POST' }),
+    onSuccess: (res) => {
+      toast(res.message);
+      qc.invalidateQueries({ queryKey: ['verification', id] });
+      qc.invalidateQueries({ queryKey: ['verifications'] });
+    },
+    onError: (e) => toast(e instanceof Error ? e.message : 'Analyse impossible', 'danger'),
+  });
+
   if (query.isLoading) return <Spinner />;
   if (query.error || !query.data) return <ErrorState error={query.error} onRetry={() => query.refetch()} />;
 
@@ -84,6 +95,9 @@ export function VerificationDetailPage() {
         actions={
           pending && (
             <>
+              <Button icon={<RefreshCw className="h-4 w-4" />} loading={reanalyze.isPending} onClick={() => reanalyze.mutate()}>
+                Relancer l’analyse IA
+              </Button>
               <Button variant="danger" icon={<X className="h-4 w-4" />} onClick={() => setRejectOpen(true)}>
                 Refuser
               </Button>
