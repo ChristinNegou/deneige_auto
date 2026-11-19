@@ -14,6 +14,7 @@ const photoAnalysisService = require('../services/photoAnalysisService');
 const smartMatchingService = require('../services/smartMatchingService');
 const demandPredictionService = require('../services/demandPredictionService');
 const disputeAnalysisService = require('../services/disputeAnalysisService');
+const { getModel } = require('../services/claudeModel');
 
 // Rate limiter pour les appels IA (10 requêtes par minute)
 const aiRateLimiter = rateLimit({
@@ -448,7 +449,7 @@ router.get('/status', protect, authorize('admin'), (req, res) => {
     demandPrediction: process.env.AI_DEMAND_PREDICTION_ENABLED === 'true',
     disputeAnalysis: process.env.AI_DISPUTE_ANALYSIS_ENABLED === 'true',
     anthropicConfigured: !!process.env.ANTHROPIC_API_KEY,
-    model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+    model: getModel(),
   };
 
   res.json({

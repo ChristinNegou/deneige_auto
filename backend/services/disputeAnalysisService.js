@@ -5,6 +5,7 @@
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
+const { createMessage, textOf } = require('./claudeModel');
 const Dispute = require('../models/Dispute');
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
@@ -399,13 +400,12 @@ Réponds en JSON:
 }`;
 
   try {
-    const response = await client.messages.create({
-      model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+    const response = await createMessage(client, {
       max_tokens: 800,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const responseText = response.content[0].text;
+    const responseText = textOf(response);
 
     // Parser la réponse
     let aiAnalysis;

@@ -4,6 +4,7 @@
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
+const { createMessage, streamMessage, textOf } = require('./claudeModel');
 const { getSystemPrompt, buildUserContext } = require('../config/aiPrompts');
 
 // Client Anthropic (initialisé seulement si la clé API est présente)
@@ -68,14 +69,12 @@ const generateResponse = async (messages, userContext = {}, options = {}) => {
     }
 
     try {
-        const model = options.model || process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514';
-        const maxTokens = options.maxTokens || parseInt(process.env.AI_CHAT_MAX_TOKENS) || 1024;
+        const maxTokens = options.maxTokens || parseInt(process.env.AI_CHAT_MAX_TOKENS) || 4096;
 
         // Construire le prompt système avec le contexte utilisateur et la langue
         const systemPrompt = getSystemPrompt(userContext, lang);
 
-        const response = await anthropicClient.messages.create({
-            model: model,
+        const response = await createMessage(anthropicClient, {
             max_tokens: maxTokens,
             system: systemPrompt,
             messages: messages.map(msg => ({
@@ -84,7 +83,7 @@ const generateResponse = async (messages, userContext = {}, options = {}) => {
             }))
         });
 
-        const responseText = response.content[0].text;
+        const responseText = textOf(response);
 
         console.log(`✅ Réponse Claude générée (${response.usage.input_tokens} in, ${response.usage.output_tokens} out)`);
 
@@ -168,15 +167,13 @@ const generateStreamingResponse = async (messages, userContext = {}, onChunk, op
     }
 
     try {
-        const model = options.model || process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514';
-        const maxTokens = options.maxTokens || parseInt(process.env.AI_CHAT_MAX_TOKENS) || 1024;
+        const maxTokens = options.maxTokens || parseInt(process.env.AI_CHAT_MAX_TOKENS) || 4096;
         const systemPrompt = getSystemPrompt(userContext, lang);
 
         let fullResponse = '';
         let usage = { inputTokens: 0, outputTokens: 0 };
 
-        const stream = anthropicClient.messages.stream({
-            model: model,
+        const stream = streamMessage(anthropicClient, {
             max_tokens: maxTokens,
             system: systemPrompt,
             messages: messages.map(msg => ({

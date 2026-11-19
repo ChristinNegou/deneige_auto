@@ -5,6 +5,7 @@
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
+const { createMessage, textOf, getModel } = require('./claudeModel');
 const Reservation = require('../models/Reservation');
 const axios = require('axios');
 
@@ -229,8 +230,7 @@ async function analyzeJobPhotos(reservationId) {
   });
 
   try {
-    const response = await client.messages.create({
-      model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+    const response = await createMessage(client, {
       max_tokens: 1000,
       messages: [
         {
@@ -240,7 +240,7 @@ async function analyzeJobPhotos(reservationId) {
       ],
     });
 
-    const responseText = response.content[0].text;
+    const responseText = textOf(response);
 
     // Parser la réponse JSON
     let analysis;
@@ -279,7 +279,7 @@ async function analyzeJobPhotos(reservationId) {
         after: afterPhotos.length,
       },
       analyzedAt: new Date(),
-      modelVersion: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+      modelVersion: getModel(),
     };
 
     // Mettre à jour la réservation avec toutes les infos IA
@@ -324,8 +324,7 @@ async function analyzePhoto(photoUrl, photoType = 'after') {
       return { valid: false, issues: ['photo_inaccessible'] };
     }
 
-    const response = await client.messages.create({
-      model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+    const response = await createMessage(client, {
       max_tokens: 300,
       messages: [
         {
@@ -356,7 +355,7 @@ Réponds en JSON:
       ],
     });
 
-    const responseText = response.content[0].text;
+    const responseText = textOf(response);
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 
     if (jsonMatch) {
@@ -393,8 +392,7 @@ async function verifyVehicleConsistency(beforePhotoUrl, afterPhotoUrl) {
       return { consistent: true, confidence: 0.5, error: 'Photos inaccessibles' };
     }
 
-    const response = await client.messages.create({
-      model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+    const response = await createMessage(client, {
       max_tokens: 200,
       messages: [
         {
@@ -432,7 +430,7 @@ async function verifyVehicleConsistency(beforePhotoUrl, afterPhotoUrl) {
       ],
     });
 
-    const responseText = response.content[0].text;
+    const responseText = textOf(response);
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 
     if (jsonMatch) {

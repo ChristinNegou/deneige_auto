@@ -12,6 +12,7 @@ const Vehicle = require('../models/Vehicle');
 const Reservation = require('../models/Reservation');
 const { generateResponse, generateStreamingResponse, isClaudeConfigured, isAIEnabled } = require('../services/claudeService');
 const { buildUserContext, getWelcomeMessages, getQuickActionsForRole, normalizeLang } = require('../config/aiPrompts');
+const { getModel } = require('../services/claudeModel');
 
 /**
  * Récupère la météo actuelle pour une localisation
@@ -284,7 +285,7 @@ router.post('/conversations/:id/messages', protect, checkAIEnabled, aiChatLimite
                 input: result.usage?.inputTokens || 0,
                 output: result.usage?.outputTokens || 0
             },
-            model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+            model: getModel(),
             simulated: result.simulated || false
         });
 
@@ -391,7 +392,7 @@ router.post('/conversations/:id/messages/stream', protect, checkAIEnabled, aiCha
                 input: result.usage?.inputTokens || 0,
                 output: result.usage?.outputTokens || 0
             },
-            model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+            model: getModel(),
             simulated: result.simulated || false
         });
 

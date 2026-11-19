@@ -5,6 +5,7 @@
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
+const { createMessage, textOf } = require('./claudeModel');
 const axios = require('axios');
 const Reservation = require('../models/Reservation');
 const DemandForecast = require('../models/DemandForecast');
@@ -243,13 +244,12 @@ ${weatherSummary}
 
 Fournis une brève analyse (3-4 phrases) expliquant cette prédiction et les facteurs clés.`;
 
-    const response = await client.messages.create({
-      model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+    const response = await createMessage(client, {
       max_tokens: 300,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    return response.content[0].text;
+    return textOf(response);
   } catch (error) {
     console.error('Erreur Claude prédiction:', error.message);
     return null;

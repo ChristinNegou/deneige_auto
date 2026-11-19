@@ -5,6 +5,7 @@
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
+const { createMessage, textOf, getModel } = require('./claudeModel');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const axios = require('axios');
@@ -188,8 +189,7 @@ async function analyzeIdentityDocuments(userId) {
   });
 
   try {
-    const response = await client.messages.create({
-      model: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+    const response = await createMessage(client, {
       max_tokens: 1500,
       messages: [
         {
@@ -197,9 +197,9 @@ async function analyzeIdentityDocuments(userId) {
           content,
         },
       ],
-    });
+    }, { effort: 'medium' }); // pieces d'identite : analyse plus soignee
 
-    const responseText = response.content[0].text;
+    const responseText = textOf(response);
 
     // Parser la réponse JSON
     let analysis;
@@ -241,7 +241,7 @@ async function analyzeIdentityDocuments(userId) {
         expiryDate: analysis.extractedInfo?.expiryDate || null,
       },
       analyzedAt: new Date(),
-      modelVersion: process.env.AI_CHAT_MODEL || 'claude-sonnet-4-20250514',
+      modelVersion: getModel(),
     };
 
     // Déterminer le statut et la décision
