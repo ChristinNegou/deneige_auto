@@ -84,12 +84,26 @@ describe('Payment Routes', () => {
 
   describe('DELETE /api/payments/payment-methods/:id', () => {
     it('should delete a payment method', async () => {
+      const stripe = require('stripe')();
+      stripe.paymentMethods.retrieve.mockResolvedValue({ id: 'pm_test123', customer: 'cus_test123' });
+      stripe.paymentMethods.detach.mockResolvedValue({ id: 'pm_test123' });
       const res = await request(app)
         .delete('/api/payments/payment-methods/pm_test123')
         .set('Authorization', `Bearer ${authToken}`);
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
+    });
+
+    it('should not delete another client card', async () => {
+      const stripe = require('stripe')();
+      stripe.paymentMethods.retrieve.mockResolvedValue({ id: 'pm_other', customer: 'cus_someone_else' });
+      const res = await request(app)
+        .delete('/api/payments/payment-methods/pm_other')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(res.status).toBe(404);
+      expect(stripe.paymentMethods.detach).not.toHaveBeenCalled();
     });
   });
 
@@ -201,8 +215,14 @@ describe('Payment Routes', () => {
       const refund = await request(app).post('/api/payments/refunds').set(auth)
         .send({ reservationId: '507f1f77bcf86cd799439011' });
 
+      const payout = await request(app).post('/api/payments/payouts').set(auth)
+        .send({ reservationId: '507f1f77bcf86cd799439011' });
+      const refundStatus = await request(app).get('/api/payments/refunds/re_123').set(auth);
+
       expect(confirm.status).toBe(404);
       expect(refund.status).toBe(404);
+      expect(payout.status).toBe(404);
+      expect(refundStatus.status).toBe(404);
     });
   });
 });

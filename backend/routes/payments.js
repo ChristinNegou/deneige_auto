@@ -16,9 +16,6 @@ const {
   savePaymentMethod,
   deletePaymentMethod,
   setDefaultPaymentMethod,
-  createRefund,
-  getRefundStatus,
-  createWorkerPayout,
   getPendingPayouts,
   getWorkerPayoutHistory,
   getWorkerEarningsSummary,
@@ -170,19 +167,11 @@ router.patch('/payment-methods/:id/default', protect, setDefaultPaymentMethod);
 // litiges ou l'admin (POST /api/admin/reservations/:id/refund) : un client
 // ne peut pas se rembourser lui-meme.
 
-/**
- * GET /api/payments/refunds/:id
- * Récupère le statut d'un remboursement par son ID.
- */
-router.get('/refunds/:id', protect, getRefundStatus);
 
 // --- Versements aux déneigeurs ---
 
-/**
- * POST /api/payments/payouts
- * Crée un versement manuel au déneigeur (admin uniquement).
- */
-router.post('/payouts', protect, createWorkerPayout);
+// Les versements passent tous par services/payoutService (fin du
+// deneigement, activation du compte Stripe, bouton de l'admin).
 
 /**
  * GET /api/payments/payouts/pending

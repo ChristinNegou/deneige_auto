@@ -18,6 +18,7 @@ const mockStripe = {
   },
 
   paymentMethods: {
+    retrieve: jest.fn().mockResolvedValue({ id: 'pm_test123', customer: 'cus_test123' }),
     list: jest.fn().mockResolvedValue({
       data: [
         {
