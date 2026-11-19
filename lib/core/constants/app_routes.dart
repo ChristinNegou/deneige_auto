@@ -74,15 +74,4 @@ class AppRoutes {
   static const String respondDispute = '/disputes/respond';
   static const String addEvidence = '/disputes/add-evidence';
   static const String reportNoShow = '/disputes/report-no-show';
-
-  // Routes admin
-  static const String adminDashboard = '/admin/dashboard';
-  static const String adminUsers = '/admin/users';
-  static const String adminReservations = '/admin/reservations';
-  static const String adminWorkers = '/admin/workers';
-  static const String adminReports = '/admin/reports';
-  static const String adminSupport = '/admin/support';
-  static const String adminStripeAccounts = '/admin/stripe-accounts';
-  static const String adminAI = '/admin/ai';
-  static const String adminVerifications = '/admin/verifications';
 }

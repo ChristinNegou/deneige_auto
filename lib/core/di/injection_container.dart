@@ -123,12 +123,6 @@ import '../../features/snow_worker/presentation/bloc/worker_jobs_bloc.dart';
 import '../../features/snow_worker/presentation/bloc/worker_stats_bloc.dart';
 import '../../features/snow_worker/presentation/bloc/worker_availability_bloc.dart';
 
-// Admin
-import '../../features/admin/data/datasources/admin_remote_datasource.dart';
-import '../../features/admin/data/repositories/admin_repository_impl.dart';
-import '../../features/admin/domain/repositories/admin_repository.dart';
-import '../../features/admin/presentation/bloc/admin_bloc.dart';
-
 // Settings
 import '../../features/settings/data/datasources/settings_remote_datasource.dart';
 import '../../features/settings/data/repositories/settings_repository_impl.dart';
@@ -214,9 +208,6 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<WorkerRemoteDataSource>(
     () => WorkerRemoteDataSourceImpl(dio: sl()),
   );
-  sl.registerLazySingleton<AdminRemoteDataSource>(
-    () => AdminRemoteDataSourceImpl(dio: sl()),
-  );
   sl.registerLazySingleton<ChatRemoteDataSource>(
     () => ChatRemoteDataSourceImpl(dio: sl()),
   );
@@ -242,9 +233,6 @@ Future<void> initializeDependencies() async {
   );
   sl.registerLazySingleton<WorkerRepository>(
     () => WorkerRepositoryImpl(remoteDataSource: sl()),
-  );
-  sl.registerLazySingleton<AdminRepository>(
-    () => AdminRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(remoteDataSource: sl()),
@@ -405,11 +393,6 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(() => WorkerAvailabilityBloc(
         toggleAvailabilityUseCase: sl(),
         updateLocationUseCase: sl(),
-        repository: sl(),
-      ));
-
-  // --- BLoCs : Administration ---
-  sl.registerFactory(() => AdminBloc(
         repository: sl(),
       ));
 

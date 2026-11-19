@@ -17,6 +17,10 @@ class AppConfig {
 
   // --- Configuration API ---
 
+  /// Site d'administration (servi par le meme serveur que l'API, sous /admin).
+  static String get adminWebUrl =>
+      Uri.parse(apiBaseUrl).replace(path: '/admin').toString();
+
   /// Retourne l'URL de base de l'API selon l'environnement actif.
   static String get apiBaseUrl {
     switch (environment) {

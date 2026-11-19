@@ -5,9 +5,7 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/client/screens/client_home_screen.dart';
 import '../../features/snow_worker/presentation/pages/worker_main_dashboard.dart';
-import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
-import '../../features/admin/presentation/bloc/admin_bloc.dart';
-import '../../features/admin/presentation/bloc/admin_event.dart';
+import '../../features/auth/presentation/screens/admin_web_notice_screen.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/notifications/presentation/bloc/notification_bloc.dart';
 import '../../features/reservation/presentation/bloc/reservation_list_bloc.dart'
@@ -50,11 +48,8 @@ class RoleBasedHomeWrapper extends StatelessWidget {
               return WorkerMainDashboard(key: uniqueKey);
 
             case UserRole.admin:
-              return BlocProvider(
-                key: uniqueKey,
-                create: (context) => sl<AdminBloc>()..add(LoadDashboardStats()),
-                child: const AdminDashboardPage(),
-              );
+              // L'administration se fait sur le site admin
+              return AdminWebNoticeScreen(key: uniqueKey);
           }
         }
 

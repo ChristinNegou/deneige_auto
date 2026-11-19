@@ -44,17 +44,6 @@ import '../../features/auth/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/domain/entities/user.dart';
 import 'role_based_home_wrapper.dart';
 import '../../features/reservation/presentation/screens/new_reservation_screen.dart';
-import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
-import '../../features/admin/presentation/pages/admin_users_page.dart';
-import '../../features/admin/presentation/pages/admin_reservations_page.dart';
-import '../../features/admin/presentation/pages/admin_workers_page.dart';
-import '../../features/admin/presentation/pages/admin_reports_page.dart';
-import '../../features/admin/presentation/pages/admin_support_page.dart';
-import '../../features/admin/presentation/pages/admin_stripe_accounts_page.dart';
-import '../../features/admin/presentation/pages/admin_ai_page.dart';
-import '../../features/admin/presentation/pages/admin_verifications_page.dart';
-import '../../features/admin/presentation/bloc/admin_bloc.dart';
-import '../../features/admin/presentation/bloc/admin_event.dart';
 import '../../features/verification/presentation/bloc/verification_bloc.dart';
 import '../../features/verification/presentation/pages/identity_verification_page.dart';
 import '../../features/disputes/presentation/pages/my_disputes_page.dart';
@@ -336,79 +325,6 @@ class AppRouter {
             create: (_) => sl<VerificationBloc>(),
             child: const IdentityVerificationPage(),
           ),
-          settings: settings,
-        );
-
-      // Routes admin
-      case AppRoutes.adminDashboard:
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<AdminBloc>()..add(LoadDashboardStats()),
-            child: const AdminDashboardPage(),
-          ),
-          settings: settings,
-        );
-
-      case AppRoutes.adminUsers:
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<AdminBloc>(),
-            child: const AdminUsersPage(),
-          ),
-          settings: settings,
-        );
-
-      case AppRoutes.adminReservations:
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<AdminBloc>(),
-            child: const AdminReservationsPage(),
-          ),
-          settings: settings,
-        );
-
-      case AppRoutes.adminWorkers:
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<AdminBloc>(),
-            child: const AdminWorkersPage(),
-          ),
-          settings: settings,
-        );
-
-      case AppRoutes.adminReports:
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<AdminBloc>(),
-            child: const AdminReportsPage(),
-          ),
-          settings: settings,
-        );
-
-      case AppRoutes.adminSupport:
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<AdminBloc>(),
-            child: const AdminSupportPage(),
-          ),
-          settings: settings,
-        );
-
-      case AppRoutes.adminStripeAccounts:
-        return MaterialPageRoute(
-          builder: (_) => const AdminStripeAccountsPage(),
-          settings: settings,
-        );
-
-      case AppRoutes.adminAI:
-        return MaterialPageRoute(
-          builder: (_) => const AdminAIPage(),
-          settings: settings,
-        );
-
-      case AppRoutes.adminVerifications:
-        return MaterialPageRoute(
-          builder: (_) => const AdminVerificationsPage(),
           settings: settings,
         );
 
