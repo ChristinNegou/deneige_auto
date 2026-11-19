@@ -8,6 +8,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const axios = require('axios');
+const { documentUrl } = require('../config/cloudinary');
 
 // --- Initialisation du client Anthropic ---
 
@@ -125,9 +126,9 @@ async function analyzeIdentityDocuments(userId) {
   }
 
   // Préparer les images
-  const idFrontData = await imageUrlToBase64(documents.idFront.url);
-  const idBackData = documents.idBack?.url ? await imageUrlToBase64(documents.idBack.url) : null;
-  const selfieData = await imageUrlToBase64(documents.selfie.url);
+  const idFrontData = await imageUrlToBase64(documentUrl(documents.idFront));
+  const idBackData = documents.idBack?.url ? await imageUrlToBase64(documentUrl(documents.idBack)) : null;
+  const selfieData = await imageUrlToBase64(documentUrl(documents.selfie));
 
   if (!idFrontData || !selfieData) {
     throw new Error('Impossible de charger les images');

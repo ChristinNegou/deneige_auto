@@ -12,7 +12,7 @@ const { protect, authorize } = require('../middleware/auth');
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
-const { uploadFromBuffer } = require('../config/cloudinary');
+const { uploadFromBuffer, uploadPrivateFromBuffer } = require('../config/cloudinary');
 const { WORKER_PERCENT, FILE_UPLOAD, GEOLOCATION } = require('../config/constants');
 const { logError, safeNotify } = require('../utils/errorHandler');
 const { locationLimiter, uploadLimiter } = require('../middleware/rateLimiter');
@@ -1341,45 +1341,45 @@ router.post(
             const documents = {};
 
             // ID Front
-            const idFrontResult = await uploadFromBuffer(
-                req.files.idFront[0].buffer,
-                `deneige-auto/verification/${req.user.id}`,
-                `id-front-${Date.now()}`
-            );
+            const idFrontResult = await uploadPrivateFromBuffer(req.files.idFront[0].buffer, {
+                folder: `deneige-auto/verification/${req.user.id}`,
+                publicId: `id-front-${Date.now()}`,
+            });
             if (idFrontResult.success) {
                 documents.idFront = {
                     url: idFrontResult.url,
                     publicId: idFrontResult.publicId,
+                    private: true,
                     uploadedAt: new Date(),
                 };
             }
 
             // ID Back (optional)
             if (req.files?.idBack?.[0]) {
-                const idBackResult = await uploadFromBuffer(
-                    req.files.idBack[0].buffer,
-                    `deneige-auto/verification/${req.user.id}`,
-                    `id-back-${Date.now()}`
-                );
+                const idBackResult = await uploadPrivateFromBuffer(req.files.idBack[0].buffer, {
+                    folder: `deneige-auto/verification/${req.user.id}`,
+                    publicId: `id-back-${Date.now()}`,
+                });
                 if (idBackResult.success) {
                     documents.idBack = {
                         url: idBackResult.url,
                         publicId: idBackResult.publicId,
+                    private: true,
                         uploadedAt: new Date(),
                     };
                 }
             }
 
             // Selfie
-            const selfieResult = await uploadFromBuffer(
-                req.files.selfie[0].buffer,
-                `deneige-auto/verification/${req.user.id}`,
-                `selfie-${Date.now()}`
-            );
+            const selfieResult = await uploadPrivateFromBuffer(req.files.selfie[0].buffer, {
+                folder: `deneige-auto/verification/${req.user.id}`,
+                publicId: `selfie-${Date.now()}`,
+            });
             if (selfieResult.success) {
                 documents.selfie = {
                     url: selfieResult.url,
                     publicId: selfieResult.publicId,
+                    private: true,
                     uploadedAt: new Date(),
                 };
             }

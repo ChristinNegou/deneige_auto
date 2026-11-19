@@ -16,6 +16,7 @@ const Transaction = require('../models/Transaction');
 const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../services/databaseCleanupService');
 const identityVerificationService = require('../services/identityVerificationService');
 const { getUserStats } = require('../services/userStatsService');
+const { documentUrl } = require('../config/cloudinary');
 const { payoutReservation, payoutTip, workerShareOf, recoverWorkerShare } = require('../services/payoutService');
 
 const adminOnly = authorize('admin');
@@ -2074,13 +2075,13 @@ router.get('/verifications', protect, adminOnly, async (req, res) => {
                 submittedAt: worker.workerProfile?.identityVerification?.submittedAt,
                 documents: worker.workerProfile?.identityVerification?.documents ? {
                     idFront: worker.workerProfile.identityVerification.documents.idFront?.url ? {
-                        url: worker.workerProfile.identityVerification.documents.idFront.url,
+                        url: documentUrl(worker.workerProfile.identityVerification.documents.idFront),
                     } : null,
                     idBack: worker.workerProfile.identityVerification.documents.idBack?.url ? {
-                        url: worker.workerProfile.identityVerification.documents.idBack.url,
+                        url: documentUrl(worker.workerProfile.identityVerification.documents.idBack),
                     } : null,
                     selfie: worker.workerProfile.identityVerification.documents.selfie?.url ? {
-                        url: worker.workerProfile.identityVerification.documents.selfie.url,
+                        url: documentUrl(worker.workerProfile.identityVerification.documents.selfie),
                     } : null,
                 } : null,
                 aiAnalysis: worker.workerProfile?.identityVerification?.aiAnalysis ? {
@@ -2181,7 +2182,10 @@ router.get('/verifications/:userId', protect, adminOnly, async (req, res) => {
                 },
                 verification: {
                     status: verification.status || 'not_submitted',
-                    documents: verification.documents || {},
+                    // Liens signes : les documents sont prives
+                    documents: Object.fromEntries(['idFront', 'idBack', 'selfie']
+                        .filter((k) => verification.documents?.[k]?.url)
+                        .map((k) => [k, { ...verification.documents[k].toObject?.() ?? verification.documents[k], url: documentUrl(verification.documents[k]) }])),
                     aiAnalysis: verification.aiAnalysis || null,
                     decision: verification.decision || null,
                     submittedAt: verification.submittedAt,

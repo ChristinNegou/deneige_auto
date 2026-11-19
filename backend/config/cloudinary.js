@@ -97,9 +97,44 @@ const deleteImage = async (publicId) => {
     }
 };
 
+/**
+ * Televerse un document prive (piece d'identite, selfie) : type
+ * "authenticated", jamais accessible par une URL publique. On l'affiche avec
+ * privateImageUrl().
+ * @param {Buffer} buffer
+ * @param {{folder: string, publicId: string}} options
+ */
+const uploadPrivateFromBuffer = (buffer, { folder, publicId }) => uploadFromBuffer(buffer, {
+    folder,
+    public_id: publicId,
+    type: 'authenticated',
+    transformation: [{ width: 1600, height: 1600, crop: 'limit' }, { quality: 'auto:good' }],
+});
+
+/** URL signee d'un document prive (lisible par le serveur et l'admin). */
+const privateImageUrl = (publicId) => cloudinary.url(publicId, {
+    type: 'authenticated',
+    resource_type: 'image',
+    sign_url: true,
+    secure: true,
+});
+
+/**
+ * URL a utiliser pour un document d'identite : signee s'il est prive, sinon
+ * l'URL enregistree (documents televerses avant ce changement).
+ */
+const documentUrl = (doc) => {
+    if (!doc) return null;
+    if (doc.private && doc.publicId) return privateImageUrl(doc.publicId);
+    return doc.url || null;
+};
+
 module.exports = {
     cloudinary,
     uploadImage,
     uploadFromBuffer,
+    uploadPrivateFromBuffer,
+    privateImageUrl,
+    documentUrl,
     deleteImage,
 };

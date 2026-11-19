@@ -426,16 +426,22 @@ const userSchema = new mongoose.Schema({
                 idFront: {
                     url: String,
                     publicId: String,
+                    // Televerse en prive (lien signe necessaire)
+                    private: Boolean,
                     uploadedAt: Date,
                 },
                 idBack: {
                     url: String,
                     publicId: String,
+                    // Televerse en prive (lien signe necessaire)
+                    private: Boolean,
                     uploadedAt: Date,
                 },
                 selfie: {
                     url: String,
                     publicId: String,
+                    // Televerse en prive (lien signe necessaire)
+                    private: Boolean,
                     uploadedAt: Date,
                 },
             },
