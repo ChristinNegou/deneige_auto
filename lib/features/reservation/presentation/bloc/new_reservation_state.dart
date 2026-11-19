@@ -132,10 +132,8 @@ class NewReservationState extends Equatable {
       return 'Le départ ne peut pas être dans plus de 30 jours';
     }
 
-    if (dateTime.hour < 5 || dateTime.hour >= 23) {
-      return 'L\'heure doit être entre 05:00 et 23:00';
-    }
-
+    // Toutes les heures sont permises : un client peut partir tres tot
+    // (ou tard) et avoir besoin que sa voiture soit deneigee avant.
     return null;
   }
 
