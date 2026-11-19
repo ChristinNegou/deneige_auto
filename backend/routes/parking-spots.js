@@ -15,8 +15,9 @@ router.get('/', protect, async (req, res) => {
             query.isAvailable = true;
         }
 
+        // Sans les residents attitres : nom et courriel restent prives
         const parkingSpots = await ParkingSpot.find(query)
-            .populate('assignedTo', 'firstName lastName email')
+            .select('-assignedTo')
             .sort({ level: 1, spotNumber: 1 });
 
         res.status(200).json({
@@ -39,7 +40,7 @@ router.get('/', protect, async (req, res) => {
 router.get('/:id', protect, async (req, res) => {
     try {
         const parkingSpot = await ParkingSpot.findById(req.params.id)
-            .populate('assignedTo', 'firstName lastName email');
+            .select('-assignedTo');
 
         if (!parkingSpot) {
             return res.status(404).json({

@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
 const Message = require('../models/Message');
@@ -11,7 +12,11 @@ const Notification = require('../models/Notification');
 router.get('/:reservationId', protect, async (req, res) => {
     try {
         const { reservationId } = req.params;
-        const { limit = 50, before } = req.query;
+        const { before } = req.query;
+        const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 100);
+        if (!mongoose.isValidObjectId(reservationId)) {
+            return res.status(404).json({ success: false, message: 'Réservation non trouvée' });
+        }
 
         // Vérifier que l'utilisateur a accès à cette réservation
         const reservation = await Reservation.findById(reservationId);
@@ -34,7 +39,7 @@ router.get('/:reservationId', protect, async (req, res) => {
 
         // Récupérer les messages
         const messages = await Message.getConversation(reservationId, {
-            limit: parseInt(limit),
+            limit,
             before: before ? new Date(before) : null,
         });
 
@@ -44,7 +49,7 @@ router.get('/:reservationId', protect, async (req, res) => {
         res.status(200).json({
             success: true,
             messages: messages.reverse(), // Ordre chronologique
-            hasMore: messages.length === parseInt(limit),
+            hasMore: messages.length === limit,
         });
 
     } catch (error) {
@@ -62,13 +67,23 @@ router.get('/:reservationId', protect, async (req, res) => {
 router.post('/:reservationId', protect, async (req, res) => {
     try {
         const { reservationId } = req.params;
-        const { content, messageType = 'text', imageUrl, location } = req.body;
+        const { messageType = 'text', imageUrl, location } = req.body;
+        const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
 
-        if (!content && messageType === 'text') {
+        if (!['text', 'image', 'location'].includes(messageType)) {
+            return res.status(400).json({ success: false, message: 'Type de message invalide' });
+        }
+        if (messageType === 'text' && !content) {
             return res.status(400).json({
                 success: false,
                 message: 'Le contenu du message est requis',
             });
+        }
+        if (content.length > 1000) {
+            return res.status(400).json({ success: false, message: 'Le message ne peut pas dépasser 1000 caractères' });
+        }
+        if (!mongoose.isValidObjectId(reservationId)) {
+            return res.status(404).json({ success: false, message: 'Réservation non trouvée' });
         }
 
         // Vérifier que l'utilisateur a accès à cette réservation
@@ -93,8 +108,16 @@ router.post('/:reservationId', protect, async (req, res) => {
             });
         }
 
+        // Il faut un deneigeur pour qu'il y ait une conversation
+        if (!reservation.workerId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Le chat sera disponible quand un déneigeur aura accepté la réservation',
+            });
+        }
+
         // Vérifier que la réservation est dans un état permettant le chat
-        const allowedStatuses = ['pending', 'assigned', 'enRoute', 'inProgress'];
+        const allowedStatuses = ['assigned', 'enRoute', 'inProgress'];
         if (!allowedStatuses.includes(reservation.status)) {
             return res.status(400).json({
                 success: false,
@@ -109,7 +132,7 @@ router.post('/:reservationId', protect, async (req, res) => {
             reservationId,
             senderId: req.user.id,
             senderRole: isClient ? 'client' : 'worker',
-            content,
+            content: content || (messageType === 'image' ? 'Photo' : 'Position'),
             messageType,
             imageUrl: messageType === 'image' ? imageUrl : null,
             location: messageType === 'location' ? location : null,
@@ -125,12 +148,13 @@ router.post('/:reservationId', protect, async (req, res) => {
             ? `${reservation.userId.firstName}`
             : `${reservation.workerId.firstName}`;
 
-        // Créer une notification pour le destinataire
-        await Notification.create({
+        // Notification (et push) pour le destinataire
+        const preview = message.content;
+        await Notification.createNotification({
             userId: recipientId,
             type: 'newMessage',
             title: 'Nouveau message',
-            message: `${senderName}: ${content.substring(0, 50)}${content.length > 50 ? '...' : ''}`,
+            message: `${senderName}: ${preview.substring(0, 80)}${preview.length > 80 ? '…' : ''}`,
             priority: 'normal',
             reservationId: reservation._id,
             metadata: {

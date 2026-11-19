@@ -10,6 +10,7 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { protect, authorize } = require('../middleware/auth');
 const { sendEmail } = require('../config/email');
+const { supportLimiter } = require('../middleware/rateLimiter');
 
 /**
  * Échappe les caractères HTML pour éviter les attaques XSS dans les courriels.
@@ -37,7 +38,7 @@ const escapeHtml = (text) => {
  * @param {string} req.body.message - Description du problème
  * @returns {Object} Détails de la demande créée
  */
-router.post('/request', protect, async (req, res) => {
+router.post('/request', protect, supportLimiter, async (req, res) => {
     try {
         const { subject, message } = req.body;
 
@@ -108,7 +109,8 @@ router.get('/my-requests', protect, async (req, res) => {
             message: request.message,
             status: request.status,
             statusLabel: request.getStatusLabel(),
-            adminNotes: request.adminNotes,
+            // Les notes internes de l'admin ne sont jamais envoyees
+            responses: (request.responses || []).map((r) => ({ message: r.message, sentAt: r.sentAt })),
             createdAt: request.createdAt,
             resolvedAt: request.resolvedAt,
         }));
@@ -268,9 +270,7 @@ router.post('/requests/:id/respond', protect, authorize('admin'), async (req, re
         if (request.status === 'pending') {
             request.status = 'in_progress';
         }
-        request.adminNotes = request.adminNotes
-            ? `${request.adminNotes}\n\n[Réponse ${new Date().toLocaleDateString('fr-CA')}]: ${message}`
-            : `[Réponse ${new Date().toLocaleDateString('fr-CA')}]: ${message}`;
+        request.responses.push({ message: message.trim().slice(0, 5000) });
         request.updatedAt = Date.now();
         await request.save();
 
@@ -339,11 +339,12 @@ router.post('/requests/:id/respond', protect, authorize('admin'), async (req, re
         // Créer une notification si demandé
         if (sendNotification) {
             try {
-                await Notification.create({
+                await Notification.createNotification({
                     userId: request.userId,
                     type: 'systemNotification',
                     title: 'Réponse du support',
-                    message: message,
+                    // Le modele limite le message a 500 caracteres
+                    message: message.length > 500 ? `${message.slice(0, 499)}…` : message,
                     priority: 'normal',
                     metadata: {
                         supportRequestId: request._id,

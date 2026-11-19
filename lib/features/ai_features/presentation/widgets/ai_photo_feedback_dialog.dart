@@ -44,7 +44,16 @@ class AIPhotoFeedbackDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AIFeaturesBloc, AIFeaturesState>(
+    // Analyse indisponible (desactivee, refusee, reseau) : on ferme sans
+    // bloquer le deneigeur, la photo est deja envoyee.
+    return BlocConsumer<AIFeaturesBloc, AIFeaturesState>(
+      listenWhen: (previous, current) =>
+          previous.photoAnalysisError == null &&
+          current.photoAnalysisError != null,
+      listener: (context, state) {
+        Navigator.of(context).pop();
+        onDismiss();
+      },
       builder: (context, state) {
         return Dialog(
           shape: RoundedRectangleBorder(

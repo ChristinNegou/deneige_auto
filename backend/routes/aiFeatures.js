@@ -38,7 +38,7 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 router.post(
   '/analyze-photos/:reservationId',
   protect,
-  authorize('worker', 'admin'),
+  authorize('snowWorker', 'admin'),
   aiRateLimiter,
   async (req, res) => {
     try {
@@ -49,6 +49,15 @@ router.post(
           success: false,
           message: 'ID de réservation invalide',
         });
+      }
+
+      // Un deneigeur n'analyse que ses propres travaux
+      if (req.user.role === 'snowWorker') {
+        const Reservation = require('../models/Reservation');
+        const own = await Reservation.exists({ _id: reservationId, workerId: req.user._id });
+        if (!own) {
+          return res.status(403).json({ success: false, message: 'Accès non autorisé à cette réservation' });
+        }
       }
 
       const analysis = await photoAnalysisService.analyzeJobPhotos(reservationId);
@@ -76,7 +85,7 @@ router.post(
 router.post(
   '/analyze-single-photo',
   protect,
-  authorize('worker', 'admin'),
+  authorize('snowWorker', 'admin'),
   aiRateLimiter,
   async (req, res) => {
     try {

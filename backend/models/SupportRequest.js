@@ -37,6 +37,12 @@ const supportRequestSchema = new mongoose.Schema({
         enum: ['pending', 'in_progress', 'resolved', 'closed'],
         default: 'pending',
     },
+    // Reponses envoyees a l'utilisateur (les notes internes restent dans
+    // adminNotes, jamais montrees a l'utilisateur)
+    responses: [{
+        message: { type: String, required: true, maxlength: 5000 },
+        sentAt: { type: Date, default: Date.now },
+    }],
     adminNotes: {
         type: String,
         default: null,

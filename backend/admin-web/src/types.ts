@@ -213,6 +213,8 @@ export interface SupportRequest {
   message: string;
   status: string;
   adminNotes?: string;
+  /** Reponses envoyees a l'utilisateur (les notes restent internes). */
+  responses?: { message: string; sentAt: string }[];
   createdAt: string;
   resolvedAt?: string;
 }

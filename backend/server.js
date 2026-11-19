@@ -429,20 +429,11 @@ io.on('connection', (socket) => {
         socket.join('admins');
     }
 
-    socket.on('disconnect', async () => {
+    // La position du deneigeur est gardee a la deconnexion : l'app passe en
+    // arriere-plan, et c'est justement la qu'il doit etre prevenu des
+    // nouvelles demandes proches (hors ligne = isAvailable a false).
+    socket.on('disconnect', () => {
         console.log(`🔌 Socket déconnecté: ${socket.userId}`);
-
-        // Nettoyer la position du worker si c'est un déneigeur
-        if (socket.userRole === 'snowWorker') {
-            try {
-                await User.findByIdAndUpdate(socket.userId, {
-                    'workerProfile.currentLocation.coordinates': null,
-                    'workerProfile.lastLocationUpdate': null,
-                });
-            } catch (error) {
-                console.error('Erreur nettoyage position à la déconnexion:', error);
-            }
-        }
     });
 
     // Événement pour mettre à jour la position du worker

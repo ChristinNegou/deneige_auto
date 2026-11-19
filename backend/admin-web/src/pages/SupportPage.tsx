@@ -53,6 +53,17 @@ function TicketPanel({ ticket }: { ticket: SupportRequest }) {
       <p className="mb-4 text-xs text-slate-3">Reçu le {formatDateTime(ticket.createdAt)}</p>
       <p className="whitespace-pre-line rounded-lg bg-ice px-4 py-3">{ticket.message}</p>
 
+      {!!ticket.responses?.length && (
+        <div className="mt-4 space-y-2">
+          {ticket.responses.map((r, i) => (
+            <div key={i} className="rounded-lg border border-line/70 px-4 py-3">
+              <p className="text-xs text-slate-3">Réponse envoyée le {formatDateTime(r.sentAt)}</p>
+              <p className="mt-1 whitespace-pre-line">{r.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mt-5">
         <Label htmlFor="reply">Répondre à l’utilisateur</Label>
         <Textarea id="reply" value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Votre réponse…" />
