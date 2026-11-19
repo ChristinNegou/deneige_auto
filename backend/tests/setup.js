@@ -6,7 +6,9 @@ let mongoServer;
 // Setup avant tous les tests
 beforeAll(async () => {
   // Démarrer MongoDB en mémoire
-  mongoServer = await MongoMemoryServer.create();
+  // Machine chargee (tests de l'app en parallele) : laisser le temps a
+  // MongoDB de demarrer plutot que d'echouer apres 10 s
+  mongoServer = await MongoMemoryServer.create({ instance: { launchTimeout: 60000 } });
   const mongoUri = mongoServer.getUri();
 
   // Configurer les variables d'environnement pour les tests
@@ -18,7 +20,7 @@ beforeAll(async () => {
 
   // Connecter à MongoDB
   await mongoose.connect(mongoUri);
-});
+}, 90000);
 
 // Nettoyer après chaque test
 afterEach(async () => {
