@@ -60,6 +60,8 @@ describe('Versements aux déneigeurs', () => {
 
   describe('fin du déneigement', () => {
     it('verse 75 % du prix une seule fois et compte la part, pas le prix', async () => {
+      // Virement rattache au paiement du client : pas besoin de solde disponible
+      stripe.paymentIntents.retrieve.mockResolvedValue({ id: 'pi_job', latest_charge: 'ch_client_job' });
       const job = await jobInProgress();
 
       const res = await request(app)
@@ -70,7 +72,8 @@ describe('Versements aux déneigeurs', () => {
       expect(stripe.transfers.create).toHaveBeenCalledTimes(1);
       const [params, options] = stripe.transfers.create.mock.calls[0];
       expect(params.amount).toBe(3000);
-      expect(options.idempotencyKey).toBe(`payout_job_${job._id}`);
+      expect(params.source_transaction).toBe('ch_client_job');
+      expect(options.idempotencyKey).toBe(`payout_job_v2_${job._id}`);
 
       const saved = await Reservation.findById(job._id);
       expect(saved.payout.status).toBe('paid');
@@ -105,7 +108,7 @@ describe('Versements aux déneigeurs', () => {
       expect(res.body.summary.succeeded).toBe(1);
       const [params, options] = stripe.transfers.create.mock.calls[0];
       expect(params).toMatchObject({ amount: 3000, destination: 'acct_new' });
-      expect(options.idempotencyKey).toBe(`payout_job_${job._id}`);
+      expect(options.idempotencyKey).toBe(`payout_job_v2_${job._id}`);
     });
   });
 
@@ -161,7 +164,7 @@ describe('Versements aux déneigeurs', () => {
       expect(saved.tipPayout.status).toBe('paid');
       const [params, options] = stripe.transfers.create.mock.calls[0];
       expect(params.amount).toBe(500);
-      expect(options.idempotencyKey).toBe(`tip_job_${job._id}`);
+      expect(options.idempotencyKey).toBe(`tip_job_v2_${job._id}`);
       expect((await User.findById(worker._id)).workerProfile.totalTipsReceived).toBe(5);
 
       // Le webhook du meme paiement n'ajoute rien

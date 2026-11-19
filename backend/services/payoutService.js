@@ -24,6 +24,24 @@ const round2 = (n) => Math.round((n || 0) * 100) / 100;
 /** Part du deneigeur pour un prix donne (hors pourboire). */
 const workerShareOf = (totalPrice) => round2((totalPrice || 0) * WORKER_PERCENT);
 
+/**
+ * Paiement Stripe (charge) du client derriere un PaymentIntent. Le virement
+ * qui s'y rattache (source_transaction) part des que l'argent de ce paiement
+ * est disponible, au lieu d'exiger un solde disponible sur la plateforme :
+ * l'argent des paiements reste "en attente" quelques jours chez Stripe.
+ */
+async function chargeIdOf(paymentIntentId) {
+    if (!paymentIntentId) return null;
+    try {
+        const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        const charge = intent?.latest_charge;
+        return typeof charge === 'string' ? charge : charge?.id || null;
+    } catch (error) {
+        console.error('[payout] Paiement source introuvable:', error.message);
+        return null;
+    }
+}
+
 /** Statuts ou la part du deneigeur est deja partie. */
 const PAID_STATUSES = ['paid', 'completed'];
 
@@ -59,19 +77,23 @@ async function payoutReservation(reservation, worker) {
     }
 
     try {
+        const sourceCharge = await chargeIdOf(reservation.paymentIntentId);
         const transfer = await stripe.transfers.create(
             {
                 amount: Math.round(share * 100),
                 currency: 'cad',
                 destination: worker.workerProfile.stripeConnectId,
                 description: `Paiement pour réservation #${reservation._id}`,
+                ...(sourceCharge && { source_transaction: sourceCharge }),
                 metadata: {
                     kind: 'job',
                     reservationId: reservation._id.toString(),
                     workerId: worker._id.toString(),
                 },
             },
-            { idempotencyKey: `payout_job_${reservation._id}` },
+            // v2 : virements rattaches au paiement du client (une cle deja
+            // utilisee ne peut pas etre reprise avec d'autres parametres)
+            { idempotencyKey: `payout_job_v2_${reservation._id}` },
         );
 
         reservation.payout.status = 'paid';
@@ -126,19 +148,21 @@ async function payoutTip(reservation, worker) {
     }
 
     try {
+        const sourceCharge = await chargeIdOf(reservation.tipPaymentIntentId);
         const transfer = await stripe.transfers.create(
             {
                 amount: Math.round(amount * 100),
                 currency: 'cad',
                 destination: worker.workerProfile.stripeConnectId,
                 description: `Pourboire pour réservation #${reservation._id}`,
+                ...(sourceCharge && { source_transaction: sourceCharge }),
                 metadata: {
                     kind: 'tip',
                     reservationId: reservation._id.toString(),
                     workerId: worker._id.toString(),
                 },
             },
-            { idempotencyKey: `tip_job_${reservation._id}` },
+            { idempotencyKey: `tip_job_v2_${reservation._id}` },
         );
         reservation.tipPayout = { status: 'paid', stripeTransferId: transfer.id, paidAt: new Date(), error: null };
         await reservation.save();

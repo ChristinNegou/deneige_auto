@@ -20,6 +20,10 @@ beforeAll(async () => {
 
   // Connecter à MongoDB
   await mongoose.connect(mongoUri);
+
+  // Attendre les index (2dsphere pour les recherches par distance) : sinon
+  // une recherche peut arriver avant qu'ils existent et echouer au hasard
+  await Promise.all(Object.values(mongoose.models).map((model) => model.init()));
 }, 90000);
 
 // Nettoyer après chaque test
