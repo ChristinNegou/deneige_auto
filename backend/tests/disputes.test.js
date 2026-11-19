@@ -2,6 +2,7 @@ const request = require('supertest');
 const express = require('express');
 const Notification = require('../models/Notification');
 const Dispute = require('../models/Dispute');
+const Reservation = require('../models/Reservation');
 const {
   createTestUser,
   createTestWorker,
@@ -93,6 +94,43 @@ describe('Dispute flow (client report, worker response, admin decision)', () => 
 
     expect(res.status).toBe(201);
     expect(res.body.dispute.autoResolutionEligible).toBe(true);
+  });
+
+  it('takes back the worker share when a refund is granted against him', async () => {
+    const stripe = require('stripe')();
+    stripe.refunds.create.mockResolvedValue({ id: 're_dispute', status: 'succeeded' });
+    stripe.transfers.createReversal.mockResolvedValue({ id: 'trr_dispute' });
+    const reservation = await createTestReservation(client._id, vehicle._id, {
+      status: 'completed',
+      workerId: worker._id,
+      completedAt: new Date(),
+      paymentStatus: 'paid',
+      paymentIntentId: 'pi_test123',
+      totalPrice: 40,
+      payout: { status: 'paid', workerAmount: 30, stripeTransferId: 'tr_job_dispute' },
+    });
+
+    const created = await request(app)
+      .post('/api/disputes')
+      .set(auth(client))
+      .send({
+        reservationId: reservation._id.toString(),
+        type: 'quality_issue',
+        description: 'Le pare-brise est encore couvert de glace.',
+      });
+    const disputeId = created.body.dispute?._id || created.body.dispute?.id;
+
+    const resolved = await request(app)
+      .post(`/api/disputes/${disputeId}/resolve`)
+      .set(auth(admin))
+      .send({ decision: 'favor_claimant', refundAmount: 20, notes: 'Travail incomplet.' });
+    expect(resolved.status).toBe(200);
+
+    // 75 % des 20 $ rembourses sont repris sur le virement du deneigeur
+    expect(stripe.transfers.createReversal).toHaveBeenCalledWith(
+      'tr_job_dispute', expect.objectContaining({ amount: 1500 }), expect.any(Object));
+    const saved = await Reservation.findById(reservation._id);
+    expect(saved.payout.reversedAmount).toBe(15);
   });
 
   it('notifies everyone along a general dispute', async () => {

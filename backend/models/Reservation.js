@@ -248,7 +248,8 @@ const reservationSchema = new mongoose.Schema({
     payout: {
         status: {
             type: String,
-            enum: ['pending', 'pending_account', 'pending_payment', 'processing', 'completed', 'paid', 'failed'],
+            // reversed : part reprise apres un litige ; cancelled : plus rien a verser
+            enum: ['pending', 'pending_account', 'pending_payment', 'processing', 'completed', 'paid', 'failed', 'reversed', 'cancelled'],
             default: 'pending',
         },
         workerAmount: {
@@ -262,6 +263,15 @@ const reservationSchema = new mongoose.Schema({
         tipAmount: {
             type: Number,
             default: 0,
+        },
+        // Part reprise au deneigeur (litige perdu)
+        reversedAmount: {
+            type: Number,
+            default: 0,
+        },
+        reversalError: {
+            type: String,
+            default: null,
         },
         stripeFee: {
             type: Number,
@@ -290,6 +300,22 @@ const reservationSchema = new mongoose.Schema({
     },
 
     // Tip amount (pourboire - montant simple pour faciliter les calculs)
+    // Pourboire paye par le client (paiement Stripe distinct) et son
+    // versement au deneigeur
+    tipPaymentIntentId: {
+        type: String,
+        default: null,
+    },
+    tipPayout: {
+        status: {
+            type: String,
+            enum: ['none', 'pending', 'paid', 'failed'],
+            default: 'none',
+        },
+        stripeTransferId: { type: String, default: null },
+        paidAt: { type: Date, default: null },
+        error: { type: String, default: null },
+    },
     tipAmount: {
         type: Number,
         default: 0,

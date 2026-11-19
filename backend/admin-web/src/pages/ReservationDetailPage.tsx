@@ -52,6 +52,13 @@ function RefundDialog({ reservation, open, onClose }: { reservation: Reservation
       <p className="text-slate-2">
         Le remboursement est envoyé par Stripe sur la carte du client. Il est <strong className="text-ink">irréversible</strong>.
       </p>
+      {reservation.workerId && (
+        <p className="text-slate-2">
+          Le déneigeur perd sa part de ce montant (75 %) :{' '}
+          <strong className="tabular text-ink">{formatMoney(Math.round((value > 0 ? value : 0) * 75) / 100)}</strong>
+          {' '}repris sur son versement.
+        </p>
+      )}
       <div>
         <Label htmlFor="amount">Montant (max. {formatMoney(max)})</Label>
         <Input id="amount" type="number" min="0.01" max={max} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} className="tabular" />

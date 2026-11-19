@@ -107,7 +107,7 @@ describe('Payment Routes', () => {
   });
 
   describe('POST /api/reservations/:id/tip', () => {
-    it('should process a tip successfully', async () => {
+    it('should refuse a tip the client has not paid', async () => {
       const worker = await createTestWorker();
       const vehicle = await createTestVehicle(testUser._id);
       const reservation = await createTestReservation(testUser._id, vehicle._id, {
@@ -129,8 +129,8 @@ describe('Payment Routes', () => {
           amount: 5,
         });
 
-      expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
+      expect(res.status).toBe(402);
+      expect(res.body.code).toBe('TIP_PAYMENT_REQUIRED');
     });
 
     it('should fail with negative tip amount', async () => {
@@ -191,16 +191,18 @@ describe('Payment Routes', () => {
     });
   });
 
-  describe('POST /api/payments/confirm', () => {
-    it('should require authentication', async () => {
-      const res = await request(app)
-        .post('/api/payments/confirm')
-        .send({
-          paymentIntentId: 'pi_test123',
-          reservationId: 'test123',
-        });
+  describe('removed routes', () => {
+    it('no longer lets anyone mark a reservation paid or refund it themselves', async () => {
+      const user = await createTestUser({ email: 'removed-routes@example.com' });
+      const auth = { Authorization: `Bearer ${generateAuthToken(user)}` };
 
-      expect(res.status).toBe(401);
+      const confirm = await request(app).post('/api/payments/confirm').set(auth)
+        .send({ paymentIntentId: 'pi_test123', reservationId: '507f1f77bcf86cd799439011' });
+      const refund = await request(app).post('/api/payments/refunds').set(auth)
+        .send({ reservationId: '507f1f77bcf86cd799439011' });
+
+      expect(confirm.status).toBe(404);
+      expect(refund.status).toBe(404);
     });
   });
 });

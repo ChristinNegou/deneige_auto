@@ -16,6 +16,7 @@ const transactionSchema = new mongoose.Schema({
             'payout',            // Versement au déneigeur
             'refund',            // Remboursement client
             'tip',               // Pourboire
+            'payout_reversal',   // Part reprise au deneigeur apres un litige
             'platform_fee',      // Commission plateforme
             'stripe_fee',        // Frais Stripe
         ],

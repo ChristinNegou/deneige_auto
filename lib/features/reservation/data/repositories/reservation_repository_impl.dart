@@ -282,26 +282,6 @@ class ReservationRepositoryImpl implements ReservationRepository {
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> addTip({
-    required String reservationId,
-    required double amount,
-  }) async {
-    try {
-      final result = await remoteDataSource.addTip(
-        reservationId: reservationId,
-        amount: amount,
-      );
-      return Right(result);
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
-    } catch (e) {
-      return Left(ServerFailure(message: 'Erreur inattendue: ${e.toString()}'));
-    }
-  }
-
-  @override
   Future<Either<Failure, void>> deleteVehicle(String vehicleId) async {
     try {
       await remoteDataSource.deleteVehicle(vehicleId);

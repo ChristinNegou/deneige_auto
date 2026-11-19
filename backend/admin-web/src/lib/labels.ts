@@ -143,6 +143,8 @@ export const payoutStatus: Record<string, string> = {
   completed: 'Versé',
   paid: 'Versé',
   failed: 'Échec',
+  reversed: 'Repris (litige)',
+  cancelled: 'Annulé (litige)',
 };
 
 export const disputeDecisions: Record<string, string> = {

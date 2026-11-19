@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { sendPushNotification, sendMulticastNotification } = require('../services/firebaseService');
+const { recoverWorkerShare } = require('../services/payoutService');
 
 // Configuration des pénalités
 const PENALTY_CONFIG = {
@@ -251,8 +252,9 @@ const determinePenalty = (type, count) => {
     return config.fifth || 'suspension_30days';
 };
 
-// Traiter un remboursement
-const processRefund = async (reservation, amount, reason) => {
+// Traiter un remboursement. Quand le litige vise le deneigeur
+// (chargeWorker), sa part du montant rembourse lui est reprise.
+const processRefund = async (reservation, amount, reason, { chargeWorker = false } = {}) => {
     try {
         if (!reservation.paymentIntentId) {
             return { success: false, error: 'Pas de paiement à rembourser' };
@@ -274,7 +276,14 @@ const processRefund = async (reservation, amount, reason) => {
         reservation.refundedAt = new Date();
         await reservation.save();
 
-        return { success: true, refundId: refund.id, amount };
+        let recovered = 0;
+        if (chargeWorker) {
+            const recovery = await recoverWorkerShare(reservation, amount, reason);
+            recovered = recovery.recovered;
+            if (recovery.error) console.error('[dispute] Part du déneigeur non reprise:', recovery.error);
+        }
+
+        return { success: true, refundId: refund.id, amount, workerShareRecovered: recovered };
     } catch (error) {
         console.error('Error processing refund:', error);
         return { success: false, error: error.message };
@@ -1298,7 +1307,8 @@ exports.resolveDispute = async (req, res) => {
             const refundResult = await processRefund(
                 dispute.reservation,
                 refundAmount,
-                `Litige résolu: ${decision}`
+                `Litige résolu: ${decision}`,
+                { chargeWorker: dispute.respondent?.role === 'worker' }
             );
 
             if (refundResult.success) {
@@ -1498,7 +1508,9 @@ exports.resolveAppeal = async (req, res) => {
             if (newRefundAmount !== undefined) {
                 const reservation = await Reservation.findById(dispute.reservation);
                 if (reservation && newRefundAmount > 0) {
-                    await processRefund(reservation, newRefundAmount, 'Appel accepté');
+                    await processRefund(reservation, newRefundAmount, 'Appel accepté', {
+                        chargeWorker: dispute.respondent?.role === 'worker',
+                    });
                 }
             }
         }
@@ -1619,7 +1631,8 @@ exports.processAutoResolution = async (disputeId) => {
                 const refundResult = await processRefund(
                     dispute.reservation,
                     dispute.resolution.refundAmount,
-                    'No-show confirmé automatiquement'
+                    'No-show confirmé automatiquement',
+                    { chargeWorker: true }
                 );
 
                 if (refundResult.success) {

@@ -26,10 +26,6 @@ abstract class ReservationRemoteDataSource {
     String? review,
   });
   Future<Map<String, dynamic>> getReservationRating(String reservationId);
-  Future<Map<String, dynamic>> addTip({
-    required String reservationId,
-    required double amount,
-  });
   Future<void> deleteVehicle(String vehicleId);
   Future<String> uploadVehiclePhoto({
     required String vehicleId,
@@ -410,41 +406,6 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
       }
     } on DioException catch (e) {
       throw NetworkException(message: 'Erreur réseau: ${e.message}');
-    }
-  }
-
-  @override
-  Future<Map<String, dynamic>> addTip({
-    required String reservationId,
-    required double amount,
-  }) async {
-    try {
-      final response = await dio.post(
-        '/reservations/$reservationId/tip',
-        data: {
-          'amount': amount,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return {
-          'success': response.data['success'] ?? true,
-          'message': response.data['message'] ?? 'Pourboire envoyé',
-          'tipAmount': response.data['tipAmount'],
-          'workerName': response.data['workerName'],
-        };
-      } else {
-        throw ServerException(
-          message: response.data['message'] ??
-              'Erreur lors de l\'envoi du pourboire',
-          statusCode: response.statusCode,
-        );
-      }
-    } on DioException catch (e) {
-      final message =
-          e.response?.data['message'] ?? 'Erreur réseau: ${e.message}';
-      throw ServerException(
-          message: message, statusCode: e.response?.statusCode);
     }
   }
 

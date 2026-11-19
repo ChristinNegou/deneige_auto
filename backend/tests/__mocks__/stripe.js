@@ -72,6 +72,10 @@ const mockStripe = {
       amount: 1875,
       destination: 'acct_test123',
     }),
+    createReversal: jest.fn().mockResolvedValue({
+      id: 'trr_test123',
+      amount: 1875,
+    }),
   },
 
   accounts: {

@@ -22,6 +22,7 @@ import '../../widgets/service_completed_dialog.dart';
 import '../../chat/presentation/bloc/chat_bloc.dart';
 import '../../chat/presentation/pages/chat_screen.dart';
 import '../../ai_chat/presentation/widgets/draggable_ai_chat_fab.dart';
+import '../../payment/data/tip_payment.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -172,52 +173,32 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     }
   }
 
+  /// Le client paie le pourboire par carte ; il n'est envoye qu'une fois paye.
   Future<void> _submitTip(String reservationId, double amount) async {
-    try {
-      final repository = sl<ReservationRepository>();
-      final result = await repository.addTip(
-        reservationId: reservationId,
-        amount: amount,
-      );
-
-      result.fold(
-        (failure) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppLocalizations.of(context)!
-                    .clientHome_tipErrorPrefix(failure.message)),
-                backgroundColor: AppTheme.error,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
-        },
-        (data) {
-          if (mounted) {
-            final workerName = data['workerName'] ??
-                AppLocalizations.of(context)!.clientHome_theWorker;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppLocalizations.of(context)!
-                    .clientHome_tipSent(amount.toStringAsFixed(0), workerName)),
-                backgroundColor: AppTheme.success,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
-        },
-      );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.clientHome_tipError),
-            backgroundColor: AppTheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+    final l10n = AppLocalizations.of(context)!;
+    final result = await TipPayment().pay(
+      reservationId: reservationId,
+      amount: amount,
+      merchantName: l10n.appTitle,
+    );
+    if (!mounted) return;
+    switch (result) {
+      case TipPaid(:final workerName):
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(l10n.clientHome_tipSent(amount.toStringAsFixed(0),
+              workerName ?? l10n.clientHome_theWorker)),
+          behavior: SnackBarBehavior.floating,
+        ));
+      case TipCancelled():
+        break;
+      case TipFailed(:final message):
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(message != null
+              ? l10n.clientHome_tipErrorPrefix(message)
+              : l10n.clientHome_tipError),
+          backgroundColor: AppTheme.error,
+          behavior: SnackBarBehavior.floating,
+        ));
     }
   }
 

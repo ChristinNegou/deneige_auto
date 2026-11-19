@@ -79,12 +79,6 @@ abstract class ReservationRepository {
   Future<Either<Failure, Map<String, dynamic>>> getReservationRating(
       String reservationId);
 
-  /// Ajouter un pourboire à une réservation complétée
-  Future<Either<Failure, Map<String, dynamic>>> addTip({
-    required String reservationId,
-    required double amount,
-  });
-
   /// Supprimer un véhicule
   Future<Either<Failure, void>> deleteVehicle(String vehicleId);
 

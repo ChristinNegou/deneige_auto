@@ -16,6 +16,7 @@ const Transaction = require('../models/Transaction');
 const { runFullCleanup, getDatabaseStats, RETENTION_CONFIG } = require('../services/databaseCleanupService');
 const identityVerificationService = require('../services/identityVerificationService');
 const { getUserStats } = require('../services/userStatsService');
+const { payoutReservation, payoutTip, workerShareOf, recoverWorkerShare } = require('../services/payoutService');
 
 const adminOnly = authorize('admin');
 
@@ -755,8 +756,19 @@ router.post('/reservations/:id/refund', protect, adminOnly, async (req, res) => 
         reservation.paymentStatus = refundAmount >= reservation.totalPrice ? 'refunded' : 'partially_refunded';
         await reservation.save();
 
+        // Le deneigeur perd sa part (75 %) du montant rembourse, comme apres
+        // un litige perdu : virement annule ou versement en attente reduit
+        let workerShareRecovered = 0;
+        if (reservation.workerId) {
+            const recovery = await recoverWorkerShare(
+                reservation, refundAmount, `Remboursement admin : ${reason || 'sans motif'}`);
+            workerShareRecovered = recovery.recovered;
+            if (recovery.error) console.error('[admin refund] Part du déneigeur non reprise:', recovery.error);
+        }
+
         res.json({
             success: true,
+            workerShareRecovered,
             message: `Remboursement de ${refundAmount.toFixed(2)}$ effectué`,
             refund: {
                 id: refund.id,
@@ -1881,7 +1893,8 @@ router.post('/finance/fix-payouts', protect, adminOnly, async (req, res) => {
 
             // Calcul des frais
             const platformFee = totalPrice * PLATFORM_FEE_PERCENT;
-            const workerAmount = totalPrice * (1 - PLATFORM_FEE_PERCENT) + tipAmount;
+            // Part du deneigeur sans le pourboire (verse a part)
+            const workerAmount = workerShareOf(totalPrice);
             const stripeFee = (totalPrice + tipAmount) * STRIPE_FEE_PERCENT + STRIPE_FEE_FIXED;
 
             summary.totalRevenue += totalPrice;
@@ -1939,11 +1952,15 @@ router.post('/finance/process-pending-payouts', protect, adminOnly, async (req, 
     try {
         const { dryRun = true } = req.body;
 
-        // Trouver les réservations avec payout en attente
+        // Parts et pourboires restant a verser (meme service et memes cles
+        // anti-doublon que la fin de deneigement : jamais deux versements)
         const pendingPayouts = await Reservation.find({
             status: 'completed',
             paymentStatus: 'paid',
-            'payout.status': { $in: ['pending', 'pending_payment', 'pending_account'] },
+            $or: [
+                { 'payout.status': { $in: ['pending', 'pending_payment', 'pending_account', 'failed'] } },
+                { 'tipPayout.status': { $in: ['pending', 'failed'] } },
+            ],
         }).populate('workerId', 'firstName lastName workerProfile.stripeConnectId');
 
         const summary = {
@@ -1955,19 +1972,14 @@ router.post('/finance/process-pending-payouts', protect, adminOnly, async (req, 
             details: [],
         };
 
-        const PLATFORM_FEE_PERCENT_LOCAL = 0.25;
-
         for (const reservation of pendingPayouts) {
             const worker = reservation.workerId;
-            const totalAmount = reservation.totalPrice;
-            const tipAmount = reservation.tipAmount || 0;
-            const platformFee = reservation.payout?.platformFee || (totalAmount * PLATFORM_FEE_PERCENT_LOCAL);
-            const workerAmount = reservation.payout?.workerAmount || (totalAmount - platformFee + tipAmount);
-
+            const jobDue = ['pending', 'pending_payment', 'pending_account', 'failed'].includes(reservation.payout?.status);
+            const tipDue = reservation.tipAmount > 0 && ['pending', 'failed'].includes(reservation.tipPayout?.status);
             const detail = {
                 reservationId: reservation._id,
                 workerName: worker ? `${worker.firstName} ${worker.lastName}` : 'N/A',
-                amount: workerAmount,
+                amount: Math.round(((jobDue ? workerShareOf(reservation.totalPrice) : 0) + (tipDue ? reservation.tipAmount : 0)) * 100) / 100,
                 currentStatus: reservation.payout?.status,
                 hasStripeConnect: !!worker?.workerProfile?.stripeConnectId,
             };
@@ -1976,52 +1988,17 @@ router.post('/finance/process-pending-payouts', protect, adminOnly, async (req, 
                 detail.result = 'no_account';
                 summary.noAccount++;
             } else if (!dryRun) {
-                try {
-                    const transfer = await stripe.transfers.create(
-                        {
-                            amount: Math.round(workerAmount * 100),
-                            currency: 'cad',
-                            destination: worker.workerProfile.stripeConnectId,
-                            description: `Paiement job #${reservation._id}`,
-                            metadata: {
-                                reservationId: reservation._id.toString(),
-                                workerId: worker._id.toString(),
-                                originalAmount: totalAmount,
-                                platformFee: platformFee,
-                                tipAmount: tipAmount,
-                            },
-                        },
-                        {
-                            idempotencyKey: `transfer_job_${reservation._id}_retry`,
-                        }
-                    );
-
-                    reservation.payout = {
-                        ...reservation.payout,
-                        status: 'completed',
-                        stripeTransferId: transfer.id,
-                        processedAt: new Date(),
-                    };
-                    await reservation.save();
-
-                    // Update worker stats
-                    worker.workerProfile.totalJobsCompleted = (worker.workerProfile.totalJobsCompleted || 0) + 1;
-                    worker.workerProfile.totalEarnings = (worker.workerProfile.totalEarnings || 0) + workerAmount;
-                    worker.workerProfile.totalTipsReceived = (worker.workerProfile.totalTipsReceived || 0) + tipAmount;
-                    await worker.save();
-
-                    detail.result = 'success';
-                    detail.transferId = transfer.id;
-                    summary.succeeded++;
-
-                } catch (stripeError) {
+                const job = jobDue ? await payoutReservation(reservation, worker) : { status: 'already_done' };
+                const tip = tipDue ? await payoutTip(reservation, worker) : { status: 'already_done' };
+                const failed = [job, tip].find((r) => r.status === 'failed');
+                if (failed) {
                     detail.result = 'failed';
-                    detail.error = stripeError.message;
+                    detail.error = failed.error;
                     summary.failed++;
-
-                    reservation.payout.status = 'failed';
-                    reservation.payout.error = stripeError.message;
-                    await reservation.save();
+                } else {
+                    detail.result = 'success';
+                    detail.transferId = job.transferId || tip.transferId;
+                    summary.succeeded++;
                 }
                 summary.processed++;
             } else {
@@ -2039,10 +2016,10 @@ router.post('/finance/process-pending-payouts', protect, adminOnly, async (req, 
             summary,
         });
     } catch (error) {
-        console.error('Erreur process-pending-payouts:', error);
+        console.error('Erreur traitement versements:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors du traitement des payouts',
+            message: getErrorMessage(error),
         });
     }
 });

@@ -8,14 +8,12 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { protect, authorize } = require('../middleware/auth');
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
-const Transaction = require('../models/Transaction');
 const { uploadFromBuffer } = require('../config/cloudinary');
-const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, FILE_UPLOAD, GEOLOCATION } = require('../config/constants');
+const { WORKER_PERCENT, FILE_UPLOAD, GEOLOCATION } = require('../config/constants');
 const { logError, safeNotify } = require('../utils/errorHandler');
 const { locationLimiter, uploadLimiter } = require('../middleware/rateLimiter');
 const smartNotifications = require('../services/smartNotificationService');
@@ -26,6 +24,7 @@ const {
     openJobQuery,
     workerHasRequiredEquipment,
 } = require('../services/dispatchService');
+const { payoutReservation, workerShareOf } = require('../services/payoutService');
 const identityVerificationService = require('../services/identityVerificationService');
 
 // Configure multer with memory storage for Cloudinary uploads
@@ -1041,11 +1040,11 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
         await reservation.populate('userId', 'firstName lastName phoneNumber');
         await reservation.populate('vehicle', 'make model color licensePlate photoUrl');
 
-        // Update worker stats
+        // Compteurs : un deneigement de plus, et sa part (pas le prix client)
         await User.findByIdAndUpdate(req.user.id, {
             $inc: {
                 'workerProfile.totalJobsCompleted': 1,
-                'workerProfile.totalEarnings': reservation.totalPrice,
+                'workerProfile.totalEarnings': workerShareOf(reservation.totalPrice),
             },
         });
 
@@ -1072,90 +1071,10 @@ router.patch('/jobs/:id/complete', protect, authorize('snowWorker'), async (req,
 
         console.log(`✅ Job ${reservation._id} completed by worker ${worker.firstName}`);
 
-        // ============================================
-        // PAYOUT AUTOMATIQUE AU DÉNEIGEUR
-        // ============================================
-        const workerConnectId = worker?.workerProfile?.stripeConnectId;
-        const isPaid = reservation.paymentStatus === 'paid' || reservation.paymentIntentId;
-        const payoutNotDone = reservation.payout?.status !== 'paid';
-
-        if (workerConnectId && isPaid && payoutNotDone) {
-            try {
-                const grossAmount = reservation.totalPrice;
-                const platformFee = grossAmount * PLATFORM_FEE_PERCENT;
-                const workerAmount = grossAmount * WORKER_PERCENT;
-
-                // Créer le transfert vers le compte Connect du déneigeur
-                const transfer = await stripe.transfers.create(
-                    {
-                        amount: Math.round(workerAmount * 100), // En cents
-                        currency: 'cad',
-                        destination: workerConnectId,
-                        description: `Paiement pour réservation #${reservation._id}`,
-                        metadata: {
-                            reservationId: reservation._id.toString(),
-                            workerId: worker._id.toString(),
-                            clientId: reservation.userId._id.toString(),
-                        },
-                    },
-                    {
-                        idempotencyKey: `payout_job_${reservation._id}`, // Empêche les doubles paiements
-                    }
-                );
-
-                // Mettre à jour la réservation avec les infos de payout
-                reservation.payout = {
-                    status: 'paid',
-                    workerAmount: workerAmount,
-                    platformFee: platformFee,
-                    stripeFee: stripeFee,
-                    stripeTransferId: transfer.id,
-                    paidAt: new Date(),
-                };
-                await reservation.save();
-
-                // Créer la transaction
-                await Transaction.create({
-                    type: 'payout',
-                    status: 'succeeded',
-                    amount: workerAmount,
-                    reservationId: reservation._id,
-                    toUserId: worker._id,
-                    stripeTransferId: transfer.id,
-                    breakdown: {
-                        grossAmount,
-                        stripeFee,
-                        platformFee,
-                        workerAmount,
-                    },
-                    description: `Paiement automatique pour réservation #${reservation._id}`,
-                    processedAt: new Date(),
-                });
-
-                console.log(`💰 Payout automatique effectué: ${workerAmount}$ vers ${worker.firstName} (Transfer: ${transfer.id})`);
-
-                // Notification au déneigeur
-                await Notification.createNotification({
-                    userId: worker._id,
-                    type: 'paymentReceived',
-                    title: 'Paiement reçu',
-                    message: `Vous avez reçu ${workerAmount.toFixed(2)} $ pour le job complété.`,
-                    reservationId: reservation._id,
-                    metadata: {
-                        amount: workerAmount,
-                        transferId: transfer.id,
-                    },
-                });
-            } catch (payoutError) {
-                console.error('⚠️ Erreur payout automatique (job complété quand même):', payoutError.message);
-                // Le job est marqué complété même si le payout échoue
-                // On peut réessayer le payout manuellement plus tard
-            }
-        } else if (!workerConnectId) {
-            console.log('⚠️ Pas de compte Stripe Connect configuré pour le déneigeur - payout reporté');
-        } else if (!isPaid) {
-            console.log('⚠️ Paiement non effectué - payout reporté');
-        }
+        // Versement de sa part au deneigeur (ou mise en attente s'il n'a pas
+        // encore de compte de paiement). Un echec n'annule pas la fin du travail.
+        const payoutResult = await payoutReservation(reservation, worker);
+        console.log(`💰 Versement job ${reservation._id}: ${payoutResult.status}`);
 
         res.json({
             success: true,

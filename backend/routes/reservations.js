@@ -15,6 +15,7 @@ const Vehicle = require('../models/Vehicle');
 const ParkingSpot = require('../models/ParkingSpot');
 const { minimumTotal } = require('../services/pricingService');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { recordPaidTip } = require('../services/payoutService');
 const { PLATFORM_FEE_PERCENT, WORKER_PERCENT, CANCELLATION_POLICY } = require('../config/constants');
 const { safeNotify } = require('../utils/errorHandler');
 
@@ -159,7 +160,10 @@ const verifyPayment = async (paymentIntentId, userId, totalPrice) => {
     if (intent.status !== 'succeeded') {
         return refuse('PAYMENT_NOT_COMPLETED', 'Le paiement n’a pas été complété.');
     }
-    if (await Reservation.exists({ paymentIntentId })) {
+    if (intent.metadata?.type === 'tip') {
+        return refuse('PAYMENT_NOT_OWNED', 'Ce paiement ne correspond pas à une réservation.');
+    }
+    if (await Reservation.exists({ $or: [{ paymentIntentId }, { tipPaymentIntentId: paymentIntentId }] })) {
         return refuse('PAYMENT_ALREADY_USED', 'Ce paiement a déjà servi pour une autre réservation.');
     }
     // 1 cent de tolerance pour les arrondis
@@ -748,155 +752,8 @@ router.patch('/:id/start', protect, async (req, res) => {
 });
 
 // --- Complétion et paiement ---
-
-/**
- * PATCH /api/reservations/:id/complete
- * Marque le travail comme terminé, calcule la commission et transfère le paiement
- * au déneigeur via Stripe Connect (avec clé d'idempotence).
- */
-router.patch('/:id/complete', protect, async (req, res) => {
-    try {
-        const reservation = await Reservation.findOne({
-            _id: req.params.id,
-            workerId: req.user.id,
-            status: 'inProgress',
-        });
-
-        if (!reservation) {
-            return res.status(404).json({
-                success: false,
-                message: 'Réservation non trouvée ou pas en cours',
-            });
-        }
-
-        // Récupérer le worker pour son compte Stripe Connect
-        const worker = await User.findById(req.user.id);
-
-        // Calculer les montants
-        const totalAmount = reservation.totalPrice;
-        const tipAmount = reservation.tipAmount || 0;
-        const platformFee = totalAmount * PLATFORM_FEE_PERCENT;
-        const workerAmount = totalAmount - platformFee + tipAmount; // Worker reçoit 75% + pourboire
-
-        // Mettre à jour la réservation
-        reservation.status = 'completed';
-        reservation.completedAt = new Date();
-        reservation.payout = {
-            status: 'pending',
-            workerAmount: workerAmount,
-            platformFee: platformFee,
-            tipAmount: tipAmount,
-            processedAt: null,
-        };
-
-        // Transférer l'argent au déneigeur via Stripe Connect
-        let transferResult = null;
-        if (worker.workerProfile?.stripeConnectId && reservation.paymentStatus === 'paid') {
-            try {
-                const transfer = await stripe.transfers.create(
-                    {
-                        amount: Math.round(workerAmount * 100), // En cents
-                        currency: 'cad',
-                        destination: worker.workerProfile.stripeConnectId,
-                        description: `Paiement job #${reservation._id}`,
-                        metadata: {
-                            reservationId: reservation._id.toString(),
-                            workerId: worker._id.toString(),
-                            originalAmount: totalAmount,
-                            platformFee: platformFee,
-                            tipAmount: tipAmount,
-                        },
-                    },
-                    {
-                        idempotencyKey: `transfer_job_${reservation._id}`, // Empêche les doubles paiements
-                    }
-                );
-
-                reservation.payout.status = 'completed';
-                reservation.payout.stripeTransferId = transfer.id;
-                reservation.payout.processedAt = new Date();
-
-                transferResult = {
-                    success: true,
-                    transferId: transfer.id,
-                    amount: workerAmount,
-                };
-
-                console.log(`✅ Transfert Stripe créé: ${transfer.id} - ${workerAmount}$`);
-
-                // Mettre à jour les stats du worker
-                worker.workerProfile.totalJobsCompleted = (worker.workerProfile.totalJobsCompleted || 0) + 1;
-                worker.workerProfile.totalEarnings = (worker.workerProfile.totalEarnings || 0) + workerAmount;
-                worker.workerProfile.totalTipsReceived = (worker.workerProfile.totalTipsReceived || 0) + tipAmount;
-                await worker.save();
-
-            } catch (stripeError) {
-                console.error('❌ Erreur transfert Stripe:', stripeError.message);
-                reservation.payout.status = 'failed';
-                reservation.payout.error = stripeError.message;
-
-                transferResult = {
-                    success: false,
-                    error: stripeError.message,
-                };
-            }
-        } else if (!worker.workerProfile?.stripeConnectId) {
-            reservation.payout.status = 'pending_account';
-            reservation.payout.note = 'En attente de configuration du compte de paiement';
-
-            transferResult = {
-                success: false,
-                error: 'Compte Stripe Connect non configuré',
-                needsSetup: true,
-            };
-        } else {
-            reservation.payout.status = 'pending_payment';
-            reservation.payout.note = 'En attente du paiement client';
-        }
-
-        await reservation.save();
-
-        // Envoyer notification au client
-        await Notification.notifyWorkCompleted(reservation, req.user);
-
-        // Notifier le worker de son paiement
-        await Notification.create({
-            userId: worker._id,
-            type: 'paymentSuccess',
-            title: 'Paiement reçu',
-            message: transferResult?.success
-                ? `Vous avez reçu ${workerAmount.toFixed(2)}$ pour le job terminé${tipAmount > 0 ? ` (incluant ${tipAmount.toFixed(2)}$ de pourboire)` : ''}.`
-                : `Job terminé! ${!worker.workerProfile?.stripeConnectId ? 'Configurez votre compte de paiement pour recevoir vos gains.' : 'Paiement en attente.'}`,
-            priority: 'high',
-            reservationId: reservation._id,
-            metadata: {
-                workerAmount,
-                platformFee,
-                tipAmount,
-                transferStatus: reservation.payout.status,
-            },
-        });
-
-        res.status(200).json({
-            success: true,
-            reservation,
-            message: 'Travail terminé avec succès',
-            payout: {
-                workerAmount,
-                platformFee,
-                tipAmount,
-                status: reservation.payout.status,
-                transfer: transferResult,
-            },
-        });
-    } catch (error) {
-        console.error('Erreur:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Erreur lors de la complétion',
-        });
-    }
-});
+// La fin d'un deneigement passe par PATCH /api/workers/jobs/:id/complete
+// (photo obligatoire, versement via services/payoutService).
 
 /**
  * POST /api/reservations/create-intent
@@ -1258,7 +1115,7 @@ router.patch('/:id/cancel-by-client', protect, async (req, res) => {
                             },
                         },
                         {
-                            idempotencyKey: `cancel_transfer_${reservation._id}_${Date.now()}`,
+                            idempotencyKey: `cancel_transfer_${reservation._id}`, // une seule compensation
                         }
                     );
 
@@ -1690,164 +1547,128 @@ router.get('/worker/:workerId/reviews', async (req, res) => {
 // --- Pourboire ---
 
 /**
+ * Verifie qu'un client peut laisser un pourboire sur cette reservation.
+ * @returns {Promise<{reservation: object} | {status: number, message: string}>}
+ */
+const checkTipAllowed = async (reservationId, userId, amount) => {
+    const value = Number(amount);
+    if (!Number.isFinite(value) || value < 1) {
+        return { status: 400, message: 'Le pourboire doit être d’au moins 1 $' };
+    }
+    if (value > 500) {
+        return { status: 400, message: 'Le pourboire ne peut pas dépasser 500 $' };
+    }
+    const reservation = await Reservation.findById(reservationId).catch(() => null);
+    if (!reservation) return { status: 404, message: 'Réservation non trouvée' };
+    if (reservation.userId.toString() !== String(userId)) {
+        return { status: 403, message: 'Vous ne pouvez donner un pourboire que sur vos propres réservations' };
+    }
+    if (reservation.status !== 'completed') {
+        return { status: 400, message: 'Vous ne pouvez donner un pourboire que sur une réservation terminée' };
+    }
+    if (!reservation.workerId) {
+        return { status: 400, message: 'Aucun déneigeur assigné à cette réservation' };
+    }
+    if (reservation.tipAmount > 0 || reservation.tipPaymentIntentId) {
+        return { status: 400, message: 'Un pourboire a déjà été donné pour cette réservation' };
+    }
+    return { reservation, amount: Math.round(value * 100) / 100 };
+};
+
+/**
+ * POST /api/reservations/:id/tip/intent
+ * Prepare le paiement d'un pourboire : le client le paie par carte, puis
+ * l'app appelle POST /:id/tip avec le paymentIntentId.
+ * @param {number} req.body.amount - Montant du pourboire (1 $ a 500 $)
+ */
+router.post('/:id/tip/intent', protect, async (req, res) => {
+    try {
+        const check = await checkTipAllowed(req.params.id, req.user.id, req.body.amount);
+        if (check.status) return res.status(check.status).json({ success: false, message: check.message });
+
+        const params = {
+            amount: Math.round(check.amount * 100),
+            currency: 'cad',
+            automatic_payment_methods: { enabled: true },
+            description: `Pourboire pour la réservation #${check.reservation._id}`,
+            metadata: {
+                type: 'tip',
+                reservationId: check.reservation._id.toString(),
+                userId: req.user.id.toString(),
+                amount: String(check.amount),
+            },
+        };
+        if (req.user.stripeCustomerId) params.customer = req.user.stripeCustomerId;
+
+        const intent = await stripe.paymentIntents.create(params, {
+            idempotencyKey: `tip_intent_${check.reservation._id}_${params.amount}_${req.user.id}_${Date.now()}`,
+        });
+
+        res.json({ success: true, clientSecret: intent.client_secret, paymentIntentId: intent.id });
+    } catch (error) {
+        console.error('Erreur préparation pourboire:', error);
+        res.status(500).json({ success: false, message: 'Le paiement du pourboire n’a pas pu être préparé.' });
+    }
+});
+
+/**
  * POST /api/reservations/:id/tip
- * Ajoute un pourboire à une réservation complétée (100% au déneigeur).
- * Transfère via Stripe Connect si le compte est configuré.
- * @param {number} req.body.amount - Montant du pourboire (1$ - 500$)
+ * Enregistre un pourboire PAYE (100 % au deneigeur) et le lui verse.
+ * @param {number} req.body.amount - Montant du pourboire
+ * @param {string} req.body.paymentIntentId - Paiement Stripe du pourboire
  */
 router.post('/:id/tip', protect, async (req, res) => {
     try {
-        const { amount } = req.body;
+        const { paymentIntentId } = req.body;
+        const check = await checkTipAllowed(req.params.id, req.user.id, req.body.amount);
+        if (check.status) return res.status(check.status).json({ success: false, message: check.message });
 
-        // Validation du montant
-        if (!amount || amount <= 0) {
-            return res.status(400).json({
+        if (!paymentIntentId) {
+            return res.status(402).json({
                 success: false,
-                message: 'Le montant du pourboire doit être supérieur à 0',
+                code: 'TIP_PAYMENT_REQUIRED',
+                message: 'Le pourboire doit être payé par carte.',
             });
         }
 
-        if (amount > 500) {
-            return res.status(400).json({
+        let intent;
+        try {
+            intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        } catch (e) {
+            return res.status(402).json({ success: false, code: 'PAYMENT_NOT_FOUND', message: 'Paiement introuvable.' });
+        }
+        const valid = intent.status === 'succeeded'
+            && intent.metadata?.type === 'tip'
+            && intent.metadata?.reservationId === check.reservation._id.toString()
+            && intent.metadata?.userId === String(req.user.id)
+            && (intent.amount_received ?? intent.amount) === Math.round(check.amount * 100);
+        if (!valid) {
+            return res.status(402).json({
                 success: false,
-                message: 'Le pourboire ne peut pas dépasser 500$',
+                code: 'TIP_PAYMENT_INVALID',
+                message: 'Ce paiement ne correspond pas à ce pourboire.',
             });
         }
 
-        const reservation = await Reservation.findById(req.params.id)
-            .populate('workerId', 'firstName lastName workerProfile');
-
-        if (!reservation) {
-            return res.status(404).json({
+        const result = await recordPaidTip(check.reservation._id, check.amount, paymentIntentId);
+        if (!result.ok) {
+            await stripe.refunds.create({ payment_intent: paymentIntentId }).catch(() => {});
+            return res.status(409).json({
                 success: false,
-                message: 'Réservation non trouvée',
+                message: 'Un pourboire a déjà été donné pour cette réservation. Ce paiement a été remboursé.',
             });
         }
 
-        // Vérifier que c'est bien le client qui fait la demande
-        if (reservation.userId.toString() !== req.user.id) {
-            return res.status(403).json({
-                success: false,
-                message: 'Vous ne pouvez donner un pourboire que sur vos propres réservations',
-            });
-        }
-
-        // Vérifier que la réservation est complétée
-        if (reservation.status !== 'completed') {
-            return res.status(400).json({
-                success: false,
-                message: 'Vous ne pouvez donner un pourboire que sur une réservation complétée',
-            });
-        }
-
-        // Vérifier qu'un pourboire n'a pas déjà été donné
-        if (reservation.tipAmount > 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'Un pourboire a déjà été donné pour cette réservation',
-                existingTip: reservation.tipAmount,
-            });
-        }
-
-        const worker = reservation.workerId;
-        if (!worker) {
-            return res.status(400).json({
-                success: false,
-                message: 'Aucun déneigeur assigné à cette réservation',
-            });
-        }
-
-        // Mettre à jour le pourboire sur la réservation
-        reservation.tipAmount = amount;
-        reservation.payout.tipAmount = amount;
-
-        // Mettre à jour le montant du worker (le pourboire va à 100% au worker)
-        reservation.payout.workerAmount = (reservation.payout.workerAmount || 0) + amount;
-
-        let transferResult = null;
-
-        // Si le worker a un compte Stripe Connect, transférer le pourboire
-        if (worker.workerProfile?.stripeConnectId && reservation.paymentStatus === 'paid') {
-            try {
-                const transfer = await stripe.transfers.create(
-                    {
-                        amount: Math.round(amount * 100), // En cents
-                        currency: 'cad',
-                        destination: worker.workerProfile.stripeConnectId,
-                        transfer_group: `reservation_${reservation._id}`,
-                        metadata: {
-                            reservationId: reservation._id.toString(),
-                            type: 'tip',
-                            clientId: req.user.id,
-                            workerId: worker._id.toString(),
-                        },
-                    },
-                    {
-                        idempotencyKey: `tip_${reservation._id}_${Date.now()}`, // Unique par tip
-                    }
-                );
-
-                transferResult = {
-                    success: true,
-                    transferId: transfer.id,
-                    amount: amount,
-                };
-
-                console.log(`✅ Transfert pourboire Stripe créé: ${transfer.id} - ${amount}$`);
-
-            } catch (stripeError) {
-                console.error('❌ Erreur transfert pourboire Stripe:', stripeError.message);
-                transferResult = {
-                    success: false,
-                    error: stripeError.message,
-                };
-            }
-        }
-
-        // Mettre à jour les stats du worker avec findByIdAndUpdate pour éviter la validation complète
-        await User.findByIdAndUpdate(
-            worker._id,
-            {
-                $inc: {
-                    'workerProfile.totalTipsReceived': amount,
-                    'workerProfile.totalEarnings': amount,
-                },
-            },
-            { runValidators: false }
-        );
-
-        await reservation.save();
-
-        // Notifier le worker du pourboire reçu : toujours dans sa liste, en
-        // push seulement s'il a garde le reglage "Pourboires" actif.
-        const tipPushWanted = worker.workerProfile?.notificationPreferences?.tips !== false;
-        await Notification[tipPushWanted ? 'createNotification' : 'create']({
-            userId: worker._id,
-            type: 'tipReceived',
-            title: 'Pourboire reçu!',
-            message: `Vous avez reçu un pourboire de ${amount.toFixed(2)}$ de la part d'un client. Merci pour votre excellent travail!`,
-            priority: 'high',
-            reservationId: reservation._id,
-            metadata: {
-                tipAmount: amount,
-                transferStatus: transferResult?.success ? 'completed' : 'pending',
-            },
-        });
-
-        res.status(200).json({
+        const worker = result.reservation.workerId;
+        res.json({
             success: true,
-            message: 'Pourboire envoyé avec succès',
-            tipAmount: amount,
-            workerName: `${worker.firstName} ${worker.lastName}`,
-            transfer: transferResult,
+            message: 'Pourboire envoyé',
+            tipAmount: check.amount,
+            workerName: worker?.firstName ? `${worker.firstName} ${worker.lastName}` : undefined,
         });
-
     } catch (error) {
         console.error('Erreur ajout pourboire:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Erreur lors de l\'envoi du pourboire',
-        });
+        res.status(500).json({ success: false, message: 'Erreur lors de l’envoi du pourboire' });
     }
 });
 

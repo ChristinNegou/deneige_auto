@@ -23,6 +23,7 @@ import '../../../chat/presentation/bloc/chat_bloc.dart';
 import '../../../chat/presentation/pages/chat_screen.dart';
 import '../../../disputes/presentation/pages/report_no_show_page.dart';
 import '../../../disputes/presentation/pages/create_dispute_page.dart';
+import '../../../payment/data/tip_payment.dart';
 
 class ReservationDetailsPage extends StatelessWidget {
   final String reservationId;
@@ -760,16 +761,23 @@ class _ReservationDetailsViewState extends State<ReservationDetailsView> {
               _notify(l10n.resDetail_errorPrefix(failure.message), error: true),
           (_) async {
             if (tip != null && tip > 0) {
-              final tipResult = await repository.addTip(
+              // Pourboire paye par carte, envoye seulement une fois paye
+              final tipResult = await TipPayment().pay(
                 reservationId: reservation.id,
                 amount: tip,
+                merchantName: l10n.appTitle,
               );
-              tipResult.fold(
-                (failure) => _notify(
-                    l10n.resDetail_ratingSuccessTipError(failure.message),
-                    error: true),
-                (_) => _notify(l10n.resDetail_tipSent(tip.toStringAsFixed(0))),
-              );
+              switch (tipResult) {
+                case TipPaid():
+                  _notify(l10n.resDetail_tipSent(tip.toStringAsFixed(0)));
+                case TipCancelled():
+                  _notify(l10n.resDetail_ratingSuccess);
+                case TipFailed(:final message):
+                  _notify(
+                      l10n.resDetail_ratingSuccessTipError(
+                          message ?? l10n.clientHome_tipError),
+                      error: true);
+              }
             } else {
               _notify(l10n.resDetail_ratingSuccess);
             }

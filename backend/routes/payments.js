@@ -135,145 +135,8 @@ router.post('/create-intent', protect, paymentLimiter, validateCreatePaymentInte
     }
 });
 
-/**
- * POST /api/payments/confirm
- * Confirme un paiement Stripe, met à jour la réservation et les statistiques du déneigeur.
- * Enregistre les transactions et notifie le client.
- * @param {string} req.body.paymentIntentId - ID du Payment Intent Stripe
- * @param {string} req.body.reservationId - ID de la réservation
- */
-router.post('/confirm', protect, paymentLimiter, validateConfirmPayment, async (req, res) => {
-    try {
-        const { paymentIntentId, reservationId } = req.body;
-
-        console.log('✅ Confirmation paiement:', {
-            paymentIntentId,
-            reservationId,
-        });
-
-        // Récupérer le Payment Intent pour vérifier le statut
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-        if (paymentIntent.status === 'succeeded') {
-            // Extraire les métadonnées
-            const metadata = paymentIntent.metadata;
-            const platformFee = parseInt(metadata.platformFee || 0) / 100;
-            const workerAmount = parseInt(metadata.workerAmount || 0) / 100;
-            const workerId = metadata.workerId;
-            const grossAmount = paymentIntent.amount / 100;
-
-            // Estimer les frais Stripe (~2.9% + 0.30$)
-            const stripeFee = (grossAmount * 0.029) + 0.30;
-
-            // Mettre à jour la réservation avec les infos de payout
-            const updateData = {
-                paymentStatus: 'paid',
-                paymentIntentId: paymentIntentId,
-            };
-
-            // Si un déneigeur est assigné, mettre à jour les infos de payout
-            if (workerId) {
-                updateData['payout.status'] = paymentIntent.transfer_data ? 'paid' : 'pending';
-                updateData['payout.workerAmount'] = workerAmount;
-                updateData['payout.platformFee'] = platformFee;
-                updateData['payout.stripeFee'] = stripeFee;
-                updateData['payout.paidAt'] = paymentIntent.transfer_data ? new Date() : null;
-
-                // Récupérer l'ID du transfert si disponible
-                if (paymentIntent.transfer_data) {
-                    try {
-                        const transfers = await stripe.transfers.list({
-                            transfer_group: paymentIntent.transfer_group,
-                            limit: 1,
-                        });
-                        if (transfers.data.length > 0) {
-                            updateData['payout.stripeTransferId'] = transfers.data[0].id;
-                        }
-                    } catch (e) {
-                        console.log('Note: Impossible de récupérer l\'ID du transfert');
-                    }
-                }
-            }
-
-            const reservation = await Reservation.findByIdAndUpdate(
-                reservationId,
-                updateData,
-                { new: true }
-            );
-
-            // Créer les transactions dans notre système
-            if (reservation) {
-                try {
-                    await Transaction.createPaymentTransaction({
-                        reservationId: reservation._id,
-                        clientId: reservation.userId,
-                        workerId: workerId || null,
-                        grossAmount: grossAmount,
-                        stripeFee: stripeFee,
-                        platformFeePercent: PLATFORM_FEE_PERCENT,
-                        stripePaymentIntentId: paymentIntentId,
-                        stripeTransferId: updateData['payout.stripeTransferId'] || null,
-                    });
-                    console.log('✅ Transactions enregistrées');
-                } catch (txError) {
-                    console.error('⚠️ Erreur enregistrement transactions:', txError);
-                    // Ne pas échouer le paiement pour ça
-                }
-
-                // Mettre à jour les stats du déneigeur si applicable
-                if (workerId) {
-                    try {
-                        await User.findByIdAndUpdate(workerId, {
-                            $inc: {
-                                'workerProfile.totalEarnings': workerAmount,
-                                'workerProfile.totalJobsCompleted': 1,
-                            },
-                        });
-                        console.log('✅ Stats déneigeur mises à jour');
-                    } catch (statsError) {
-                        console.error('⚠️ Erreur mise à jour stats:', statsError);
-                    }
-                }
-
-                // Envoyer notification de paiement réussi
-                await safeNotify(
-                    () => Notification.notifyPaymentSuccess(reservation),
-                    'PaymentSuccess'
-                );
-            }
-
-            res.status(200).json({
-                success: true,
-                message: 'Paiement confirmé',
-                breakdown: {
-                    total: grossAmount,
-                    platformFee: platformFee,
-                    workerAmount: workerAmount,
-                    stripeFee: stripeFee,
-                },
-            });
-        } else {
-            // Paiement échoué - envoyer notification
-            if (reservationId) {
-                const reservation = await Reservation.findById(reservationId);
-                if (reservation) {
-                    await safeNotify(
-                        () => Notification.notifyPaymentFailed(reservation, 'Paiement refusé'),
-                        'PaymentFailed'
-                    );
-                }
-            }
-
-            res.status(400).json({
-                success: false,
-                message: 'Le paiement n\'a pas réussi',
-                status: paymentIntent.status,
-            });
-        }
-    } catch (error) {
-        return handleError(res, error, 'payments:confirm', 'Erreur lors de la confirmation du paiement');
-    }
-});
+// Paiement d'une reservation : verifie a la creation (POST /api/reservations)
+// et par le webhook payment_intent.succeeded.
 
 // --- Gestion des méthodes de paiement ---
 
@@ -303,11 +166,9 @@ router.patch('/payment-methods/:id/default', protect, setDefaultPaymentMethod);
 
 // --- Remboursements ---
 
-/**
- * POST /api/payments/refunds
- * Crée un remboursement Stripe pour une réservation.
- */
-router.post('/refunds', protect, paymentLimiter, validateRefund, createRefund);
+// Les remboursements passent par l'annulation (regles d'annulation), les
+// litiges ou l'admin (POST /api/admin/reservations/:id/refund) : un client
+// ne peut pas se rembourser lui-meme.
 
 /**
  * GET /api/payments/refunds/:id
